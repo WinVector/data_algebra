@@ -1,15 +1,12 @@
 
 
-
-import functools
-
-class PipeFunction:
-    """wraps single argument functions into a >> pipeable entity
+class PipeStep:
+    """class to extend to make pipe transform stages
     Examples:
         import data_algebra.pipe
         import math
-        s = PipeFunction(math.sin)
-        c = PipeFunction(math.cos)
+        s = data_algebra.pipe.PipeFunction(math.sin)
+        c = data_algebra.pipe.PipeFunction(math.cos)
         5 >> s >> c
         # Out[]: 0.574400879193934
         5 >> (s >> c)
@@ -17,24 +14,28 @@ class PipeFunction:
         (5 >> s) >> c
         # Out[]: 0.574400879193934
     """
-    def __init__(self, func, name=None):
-        self.func = func
+
+    def __init__(self,
+                 *,
+                 name=None):
         if name is None:
-            self.__name__ = func.__name__
-        else:
-            self.__name__ = name
+            name = "PipeStep"
+        self.__name__ = name
+
+    def apply(self, other):
+        raise Exception("base method called")
 
     def __rrshift__(self, other):
-        return self.func(other)
+        return self.apply(other)
 
     def __rshift__(self, other):
-        if isinstance(other, PipeFunction):
+        if isinstance(other, PipeStep):
             return PipeFunction(
-                lambda x: other.func(self.func(x)),
+                lambda x: other.apply(self.apply(x)),
                 name = self.__name__ + " >> " + other.__name__)
         # assume RHS is a function
         return PipeFunction(
-            lambda x: other(self.func(x)),
+            lambda x: other(self.apply(x)),
             name = self.__name__ + " >> " + other.__name__)
 
     def __repr__(self):
@@ -44,6 +45,52 @@ class PipeFunction:
         return "(" + self.__name__ + ")"
 
 
+
+class PipeFunction(PipeStep):
+    """wraps single argument functions into a >> pipeable entity
+    Examples:
+        import data_algebra.pipe
+        import math
+        s = data_algebra.pipe.PipeFunction(math.sin)
+        c = data_algebra.pipe.PipeFunction(math.cos)
+        5 >> s >> c
+        # Out[]: 0.574400879193934
+        5 >> (s >> c)
+        # Out[]: 0.574400879193934
+        (5 >> s) >> c
+        # Out[]: 0.574400879193934
+    """
+
+    def __init__(self, func,
+                 *,
+                 args_to_override=None,
+                 partial_args=None,
+                 name=None):
+        if not callable(func):
+            raise Exception("func must be callable")
+        if partial_args is None:
+            partial_args = {}
+        if args_to_override is None:
+            args_to_override = []
+        self._partial_args = partial_args
+        self._args_to_override = args_to_override
+        self._func = func
+        if name is None:
+            PipeStep.__init__(self, name=func.__name__)
+        else:
+            PipeStep.__init__(self, name=name)
+
+    def apply(self, other):
+        if len(self._args_to_override)<1:
+            # place argument in first position
+            return self._func(other, **self._partial_args)
+        #  place argument by name
+        args = self._partial_args.copy()()
+        for nm in self._args_to_override:
+            args[nm] = other
+        return self._func(**args)
+
+
 class PipeValue:
     """Extend this class to be a value that can be piped into functions
     in additon to PipeFunctions.
@@ -51,10 +98,10 @@ class PipeValue:
     Examples:
         import data_algebra.pipe
         import math
-        v = Value(5)
+        v = data_algebra.pipe.Value(5)
         v >> math.sin
         # Out[]: -0.9589242746631385
-        s = PipeFunction(math.sin)
+        s = data_algebra.pipe.PipeFunction(math.sin)
         v >> s
         # Out[]: -0.9589242746631385
     """
@@ -65,8 +112,8 @@ class PipeValue:
         return self
 
     def __rshift__(self, other):
-        if isinstance(other, PipeFunction):
-            return other.func(self.__val__())
+        if isinstance(other, PipeStep):
+            return other.apply(self.__val__())
         # assume RHS is a function
         return other(self.__val__())
 
@@ -91,6 +138,7 @@ class Value(PipeValue):
     """
     def __init__(self, value):
         self.value = value
+        PipeValue.__init__(self)
 
     def __val__(self):
         return self.value

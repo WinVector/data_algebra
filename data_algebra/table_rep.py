@@ -1,6 +1,8 @@
 
 import types
 
+import data_algebra.pipe
+
 
 # for some ideas in capturing expressions in Python see:
 #  scipy
@@ -11,7 +13,7 @@ import types
 
 class Term:
     """Inherit from this class to capture expressions.
-    Abstract class, should be extended for use."""
+    Abstract class, should be extended for use.-"""
 
     def __init__(self, ):
         pass
@@ -163,12 +165,18 @@ class ColumnReference(Term):
 
 
 
-class ViewRepresentation:
+class ViewRepresentation(data_algebra.pipe.PipeValue):
     """Structure to represent the columns of a query or a table"""
 
-    def __init__(self, table_name, column_names, *, qualifiers = None):
-        if not isinstance(table_name, str):
+    def __init__(self, table_name, column_names,
+                 *,
+                 qualifiers = None,
+                 view_name = None):
+        if (table_name is not None) and (not isinstance(table_name, str)):
             raise Exception("table_name must be a string")
+        if view_name is None:
+            view_name = "ViewRepresentation"
+        self._view_name = view_name
         self.table_name = table_name
         self.column_names = [c for c in column_names]
         if qualifiers is None:
@@ -186,9 +194,10 @@ class ViewRepresentation:
             raise Exception("duplicate column name(s)")
         column_dict = {ci:ColumnReference(self, ci) for ci in self.column_names}
         self.column_map = types.SimpleNamespace(**column_dict)
+        data_algebra.pipe.PipeValue.__init__(self)
 
     def __repr__(self):
-        return ('ViewRepresentation(' + self.table_name.__repr__() +
+        return (self._view_name + '(' + self.table_name.__repr__() +
                     ", " + self.column_names.__repr__() +
                     ", " + self.qualifiers.__repr__() +
                     ")")
