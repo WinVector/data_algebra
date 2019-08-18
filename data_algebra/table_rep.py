@@ -10,7 +10,8 @@ import types
 
 
 class Term:
-    """Inherit from this class to capture expressions"""
+    """Inherit from this class to capture expressions.
+    Abstract class, should be extended for use."""
 
     def __init__(self, ):
         pass
@@ -162,8 +163,8 @@ class ColumnReference(Term):
 
 
 
-class TableRepresentation:
-    """Structure to represent the columns of a table"""
+class ViewRepresentation:
+    """Structure to represent the columns of a query or a table"""
 
     def __init__(self, table_name, column_names, *, qualifiers = None):
         if not isinstance(table_name, str):
@@ -187,7 +188,7 @@ class TableRepresentation:
         self.column_map = types.SimpleNamespace(**column_dict)
 
     def __repr__(self):
-        return ('TableRepresentation(' + self.table_name.__repr__() +
+        return ('ViewRepresentation(' + self.table_name.__repr__() +
                     ", " + self.column_names.__repr__() +
                     ", " + self.qualifiers.__repr__() +
                     ")")
@@ -198,8 +199,3 @@ class TableRepresentation:
         return str(self.qualifiers) + '.' + self.table_name
 
 
-def mk_td(table_name, column_names, *, qualifiers = None):
-    """Make a table representation object"""
-    return TableRepresentation(table_name = table_name,
-                               column_names = column_names,
-                               qualifiers = qualifiers).column_map
