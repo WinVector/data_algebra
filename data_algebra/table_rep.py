@@ -154,10 +154,14 @@ class ColumnReference(Term):
 
     def __repr__(self):
         # not a full repr
-        return str(self.table) + "." + self.column_name
+        if self.table.table_name is None:
+            return self.column_name
+        return self.table.table_name  + "." + self.column_name
 
     def __str__(self):
-        return str(self.table) + "." + self.column_name
+        if self.table.table_name is None:
+            return self.column_name
+        return self.table.table_name + "." + self.column_name
 
 
 
