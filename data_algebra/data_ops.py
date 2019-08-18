@@ -121,6 +121,8 @@ class Extend(data_algebra.pipe.PipeStep):
                  Extend({'z':_.x + _.y})
             )
             print(ops)
+            ops2 = mk_td('d', ['x', 'y']).extend({'z':1})
+            print(ops2.column_map)
     """
 
     def __init__(self, ops):
