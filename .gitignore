@@ -1,0 +1,6 @@
+
+.idea
+.DS_Store
+.ipython_checkpoint
+__pycache__
+*~
