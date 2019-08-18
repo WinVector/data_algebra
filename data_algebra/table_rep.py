@@ -1,8 +1,4 @@
 
-import types
-
-import data_algebra.pipe
-
 
 # for some ideas in capturing expressions in Python see:
 #  scipy
@@ -163,48 +159,5 @@ class ColumnReference(Term):
     def __str__(self):
         return str(self.table) + "." + self.column_name
 
-
-
-class ViewRepresentation(data_algebra.pipe.PipeValue):
-    """Structure to represent the columns of a query or a table"""
-
-    def __init__(self, table_name, column_names,
-                 *,
-                 qualifiers = None,
-                 view_name = None):
-        if (table_name is not None) and (not isinstance(table_name, str)):
-            raise Exception("table_name must be a string")
-        if view_name is None:
-            view_name = "ViewRepresentation"
-        self._view_name = view_name
-        self.table_name = table_name
-        self.column_names = [c for c in column_names]
-        if qualifiers is None:
-            qualifiers = {}
-        if not isinstance(qualifiers, dict):
-            raise Exception("qualifiers must be a dictionary")
-        self.qualifiers = qualifiers.copy()
-        for ci in self.column_names:
-            if not isinstance(ci, str):
-                raise Exception("non-string column name(s)")
-        if len(self.column_names)<1:
-            raise Exception("no column names")
-        self._column_set = set(self.column_names)
-        if not len(self.column_names) == len(self._column_set):
-            raise Exception("duplicate column name(s)")
-        column_dict = {ci:ColumnReference(self, ci) for ci in self.column_names}
-        self.column_map = types.SimpleNamespace(**column_dict)
-        data_algebra.pipe.PipeValue.__init__(self)
-
-    def __repr__(self):
-        return (self._view_name + '(' + self.table_name.__repr__() +
-                    ", " + self.column_names.__repr__() +
-                    ", " + self.qualifiers.__repr__() +
-                    ")")
-
-    def __str__(self):
-        if len(self.qualifiers) <= 0:
-            return self.table_name
-        return str(self.qualifiers) + '.' + self.table_name
 
 
