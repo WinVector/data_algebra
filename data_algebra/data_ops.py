@@ -50,7 +50,6 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
     # define builders for all node types on base class
 
     def extend(self, ops):
-        ops = data_algebra.table_rep.check_convert_op_dictionary(ops, self.column_map.__dict__)
         return ExtendNode(self, ops)
 
 
@@ -90,6 +89,7 @@ class ExtendNode(ViewRepresentation):
     def __init__(self, source, ops):
         if not isinstance(source, ViewRepresentation):
             raise Exception("source must be a ViewRepresentation")
+        ops = data_algebra.table_rep.check_convert_op_dictionary(ops, source.column_map.__dict__)
         column_names = source.column_names.copy()
         known_cols = set(column_names)
         for ci in ops.keys():
@@ -129,12 +129,12 @@ class Extend(data_algebra.pipe.PipeStep):
                 mk_td('d', ['x', 'y']) .
                     extend({'z':'1 + x'})
             )
-            print(ops2.column_map)
+            print(ops2)
             ops3 = (
                 mk_td('d', ['x', 'y']) .
                     extend({'z':'1 + _.x'})
             )
-            print(ops3.column_map)
+            print(ops3)
     """
 
     def __init__(self, ops):
