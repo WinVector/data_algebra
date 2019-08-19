@@ -299,7 +299,7 @@ def check_convert_op_dictionary(ops, column_defs,
     if not isinstance(column_defs, dict):
         raise Exception("column_defs should be a dictionary")
     if parse_env is None:
-        parse_env = data_algebra._ref_to_global_namespace
+        parse_env = data_algebra.outer_namespace()
         if parse_env is None:
             parse_env = {}
     # first: make sure all entries are parsed
