@@ -38,6 +38,15 @@ class Term:
             raise Exception("op is supposed to be a string")
         return Expression(op, (self, ), params=params)
 
+    def to_python(self):
+        raise Exception("base class called")
+
+    def __repr__(self):
+        raise Exception("base class called")
+
+    def __str__(self):
+        raise Exception("base class called")
+
     # override most of https://docs.python.org/3/reference/datamodel.html#emulating-numeric-types
 
     def __add__(self, other):
@@ -208,6 +217,11 @@ class Value(Term):
         self.value = value
         Term.__init__(self)
 
+    def to_python(self):
+        if self.source is not None:
+            return self.source
+        return self.value.__repr__()
+
     def __repr__(self):
         return self.value.__repr__()
 
@@ -230,6 +244,19 @@ class Expression(Term):
         for a in self.args:
             a.get_column_names(columns_seen)
 
+    def to_python(self):
+        if self.source is not None:
+            return self.source
+        if len(self.args)<1:
+            raise Exception("empty expression")
+        if len(self.args)==1:
+            return "(" + self.op + " " + self.args[0] + ")"
+        # TODO: more cases than just on size
+        if len(self.args)==2:
+            return "(" + self.args[0].to_python() + " " + self.op + " " + self.args[1].to_python() + ")"
+        raise Exception("unimplemented case")
+
+
     def __repr__(self):
         # not a full repr
         return self.op + str(self.args)
@@ -249,6 +276,11 @@ class ColumnReference(Term):
         if column_name not in table._column_set:
             raise Exception("column_name must be a column of the given table")
         Term.__init__(self)
+
+    def to_python(self):
+        if self.source is not None:
+            return self.source
+        return self.column_name
 
     def get_column_names(self, columns_seen):
         columns_seen.add(self.column_name)

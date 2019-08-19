@@ -125,6 +125,7 @@ class Extend(data_algebra.pipe.PipeStep):
                  Extend({'z':_.x + _.y/q})
             )
             print(ops)
+            print(ops._ops['z'].to_python())
             ops2 = (
                 mk_td('d', ['x', 'y']) .
                     extend({'z':'1/q + x'})
