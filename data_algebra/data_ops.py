@@ -2,6 +2,7 @@ import types
 
 import data_algebra.table_rep
 import data_algebra.pipe
+import data_algebra.SimpleNamespaceDict
 
 
 class ViewRepresentation(data_algebra.pipe.PipeValue):
@@ -32,7 +33,7 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
             ci: data_algebra.table_rep.ColumnReference(self, ci)
             for ci in self.column_names
         }
-        self.column_map = types.SimpleNamespace(**column_dict)
+        self.column_map = data_algebra.SimpleNamespaceDict.SimpleNamespaceDict(**column_dict)
         data_algebra.pipe.PipeValue.__init__(self)
 
     def __repr__(self):
@@ -60,7 +61,7 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
 
 def _maybe_set_underbar(mp, mp1=None):
     # make last result referable by names _ and _0
-    ns = data_algebra.outer_namespace()
+    ns = data_algebra._outer_namespace()
     if ns is not None:
         ns["_"] = mp
         ns["_0"] = mp
@@ -122,13 +123,14 @@ class Extend(data_algebra.pipe.PipeStep):
        Examples:
            from data_algebra.data_ops import *
            import data_algebra
-           with data_algebra.Env(globals()) as env:
+           with data_algebra.Env(locals()) as env:
                q = 4
+               var_name = 'y'
 
                print("first example")
                ops = (
                   mk_td('d', ['x', 'y']) >>
-                     Extend({'z':_.x + _.y/q})
+                     Extend({'z':_.x + _[var_name]/q})
                 )
                 print(ops)
 
@@ -142,7 +144,7 @@ class Extend(data_algebra.pipe.PipeStep):
                 print("ex 3")
                 ops3 = (
                     mk_td('d', ['x', 'y']) .
-                        extend({'z':'1/q + _.x', 'f':1, 'g':'"2"'})
+                        extend({'z':'1/q + _.x/_[var_name]', 'f':1, 'g':'"2"', 'h':True})
                 )
                 print(ops3)
 

@@ -274,17 +274,14 @@ def check_convert_op_dictionary(ops, column_defs,
     if not isinstance(column_defs, dict):
         raise Exception("column_defs should be a dictionary")
     if parse_env is None:
-        parse_env = data_algebra.outer_namespace()
+        parse_env = data_algebra._outer_namespace()
         if parse_env is None:
             parse_env = {}
     # first: make sure all entries are parsed
     columns_used = set()
     newops = {}
     mp = column_defs.copy()
-    ns = types.SimpleNamespace(**column_defs.copy())
-    mp["_"] = ns
-    mp["_0"] = ns
-    mp["_1"] = ns
+    data_algebra._populate__specials(column_defs, mp)
     for k in ops.keys():
         if not isinstance(k, str):
             raise Exception("ops keys should be strings")

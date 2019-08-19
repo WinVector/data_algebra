@@ -1,4 +1,6 @@
 
+import data_algebra.SimpleNamespaceDict
+
 # needed to see user variables and set up _, _0, and _1 side-effects
 _namespace_stack = []
 _ref_to_outer_namespace = None
@@ -21,6 +23,25 @@ class Env:
         global _namespace_stack
         _ref_to_outer_namespace = _namespace_stack.pop()
 
-def outer_namespace():
+def _outer_namespace():
+    """get current reference to side-effect namespace"""
     global _ref_to_outer_namespace
     return _ref_to_outer_namespace
+
+
+def _populate__specials(column_defs, destination):
+    """populate a dictionary with special values
+       column_defs is a dictionary,
+         usually formed from a ViewRepresentation.column_map.__dict__
+       destination is a dictionary,
+         usually formed from a ViewRepresentation.column_map.__dict__.copy()
+    """
+
+    if not isinstance(column_defs, dict):
+        raise Exception("column_defs should be a dictionary")
+    if not isinstance(destination, dict):
+        raise Exception("destination should be a dictionary")
+    ns = data_algebra.SimpleNamespaceDict.SimpleNamespaceDict(**column_defs.copy())
+    destination["_"] = ns
+    destination["_0"] = ns
+    destination["_1"] = ns
