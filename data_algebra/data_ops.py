@@ -119,21 +119,29 @@ class Extend(data_algebra.pipe.PipeStep):
        Example:
            from data_algebra.data_ops import *
            data_algebra._ref_to_global_namespace = globals() # needed to define _
+           q = 4
            ops = (
               mk_td('d', ['x', 'y']) >>
-                 Extend({'z':_.x + _.y})
+                 Extend({'z':_.x + _.y/q})
             )
             print(ops)
             ops2 = (
                 mk_td('d', ['x', 'y']) .
-                    extend({'z':'1 + x'})
+                    extend({'z':'1/q + x'})
             )
             print(ops2)
             ops3 = (
                 mk_td('d', ['x', 'y']) .
-                    extend({'z':'1 + _.x'})
+                    extend({'z':'1/q + _.x'})
             )
             print(ops3)
+            import data_algebra.pipe
+
+            ops4 = data_algebra.pipe.build_pipeline(
+                mk_td('d', ['x', 'y']),
+                Extend({'z':'1/_.y + _.x/q'})
+            )
+            print(ops4)
     """
 
     def __init__(self, ops):

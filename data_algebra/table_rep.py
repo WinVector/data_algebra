@@ -1,5 +1,7 @@
 import types
 
+import data_algebra
+
 # for some ideas in capturing expressions in Python see:
 #  scipy
 # pipe-like idea
@@ -263,11 +265,17 @@ class ColumnReference(Term):
         return self.table.table_name + "." + self.column_name
 
 
-def check_convert_op_dictionary(ops, column_defs):
+def check_convert_op_dictionary(ops, column_defs,
+                                *,
+                                parse_env = None):
     if not isinstance(ops, dict):
         raise Exception("ops should be a dictionary")
     if not isinstance(column_defs, dict):
         raise Exception("column_defs should be a dictionary")
+    if parse_env is None:
+        parse_env = data_algebra._ref_to_global_namespace
+        if parse_env is None:
+            parse_env = {}
     # first: make sure all entries are parsed
     columns_used = set()
     newops = {}
@@ -283,7 +291,7 @@ def check_convert_op_dictionary(ops, column_defs):
         if not isinstance(v, Term):
             if not isinstance(v, str):
                 raise Exception("ops values must be Terms or strings")
-            v = eval(v, mp)
+            v = eval(v, parse_env, mp)
         newops[k] = v
         v.get_column_names(columns_used)
     intersect = set(ops.keys()).intersection(columns_used)

@@ -139,3 +139,15 @@ class Value(PipeValue):
 
     def __repr__(self):
         return "Value(" + self.__val__().__repr__() + ")"
+
+
+def build_pipeline(*steps):
+    n = len(steps)
+    if n<1:
+        raise Exception("steps was empty")
+    if n==1:
+        return steps[0]
+    cur = steps[0]
+    for i in range(1,n):
+        cur = cur >> steps[i]
+    return cur
