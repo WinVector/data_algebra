@@ -125,25 +125,28 @@ class Extend(data_algebra.pipe.PipeStep):
            with data_algebra.Env(globals()) as env:
                q = 4
 
+               print("first example")
                ops = (
                   mk_td('d', ['x', 'y']) >>
                      Extend({'z':_.x + _.y/q})
                 )
                 print(ops)
-                print(ops._ops['z'].to_python())
 
+                print("ex 2")
                 ops2 = (
                     mk_td('d', ['x', 'y']) .
                         extend({'z':'1/q + x'})
                 )
                 print(ops2)
 
+                print("ex 3")
                 ops3 = (
                     mk_td('d', ['x', 'y']) .
                         extend({'z':'1/q + _.x', 'f':1, 'g':'"2"'})
                 )
                 print(ops3)
 
+                print("ex 4")
                 import data_algebra.pipe
 
                 ops4 = data_algebra.pipe.build_pipeline(

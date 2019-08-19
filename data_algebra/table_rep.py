@@ -42,10 +42,10 @@ class Term:
         raise Exception("base class called")
 
     def __repr__(self):
-        raise Exception("base class called")
+        return self.to_python()
 
     def __str__(self):
-        raise Exception("base class called")
+        return self.to_python()
 
     # override most of https://docs.python.org/3/reference/datamodel.html#emulating-numeric-types
 
@@ -220,12 +220,6 @@ class Value(Term):
     def to_python(self):
         return self.value.__repr__()
 
-    def __repr__(self):
-        return self.value.__repr__()
-
-    def __str__(self):
-        return str(self.value)
-
 
 class Expression(Term):
     def __init__(self, op, args, *, params=None):
@@ -253,14 +247,6 @@ class Expression(Term):
         raise Exception("unimplemented case")
 
 
-    def __repr__(self):
-        # not a full repr
-        return self.op + str(self.args)
-
-    def __str__(self):
-        return self.op + str(self.args)
-
-
 class ColumnReference(Term):
     """class to represent referring to a column"""
 
@@ -278,17 +264,6 @@ class ColumnReference(Term):
 
     def get_column_names(self, columns_seen):
         columns_seen.add(self.column_name)
-
-    def __repr__(self):
-        # not a full repr
-        if self.table.table_name is None:
-            return self.column_name
-        return self.table.table_name + "." + self.column_name
-
-    def __str__(self):
-        if self.table.table_name is None:
-            return self.column_name
-        return self.table.table_name + "." + self.column_name
 
 
 def check_convert_op_dictionary(ops, column_defs,
