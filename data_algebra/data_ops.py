@@ -132,7 +132,7 @@ class Extend(data_algebra.pipe.PipeStep):
             print(ops2)
             ops3 = (
                 mk_td('d', ['x', 'y']) .
-                    extend({'z':'1/q + _.x'})
+                    extend({'z':'1/q + _.x', 'f':1, 'g':'"2"'})
             )
             print(ops3)
             import data_algebra.pipe

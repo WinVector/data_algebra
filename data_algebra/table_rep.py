@@ -14,7 +14,7 @@ class Term:
     Abstract class, should be extended for use.-"""
 
     def __init__(self,):
-        pass
+        self.source = None
 
     def get_column_names(self, columns_seen):
         pass
@@ -287,11 +287,15 @@ def check_convert_op_dictionary(ops, column_defs,
     for k in ops.keys():
         if not isinstance(k, str):
             raise Exception("ops keys should be strings")
-        v = ops[k]
+        ov = ops[k]
+        v = ov
         if not isinstance(v, Term):
             if not isinstance(v, str):
-                raise Exception("ops values must be Terms or strings")
+                v = str(v)
             v = eval(v, parse_env, mp)
+            if not isinstance(v, Term):
+                v = Value(v)
+            v.source = ov
         newops[k] = v
         v.get_column_names(columns_used)
     intersect = set(ops.keys()).intersection(columns_used)
