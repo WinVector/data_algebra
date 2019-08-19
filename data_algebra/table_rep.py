@@ -34,7 +34,7 @@ class Term:
     def __uop_expr__(self, op, *, params=None):
         if not isinstance(op, str):
             raise Exception("op is supposed to be a string")
-        return Expression(op, (self), params=params)
+        return Expression(op, (self, ), params=params)
 
     # override most of https://docs.python.org/3/reference/datamodel.html#emulating-numeric-types
 
@@ -204,6 +204,7 @@ class Value(Term):
         if not any([isinstance(value, tp) for tp in allowed]):
             raise Exception("value type must be one of: " + str(allowed))
         self.value = value
+        Term.__init__(self)
 
     def __repr__(self):
         return self.value.__repr__()
@@ -221,6 +222,7 @@ class Expression(Term):
         self.op = op
         self.args = args
         self.params = params
+        Term.__init__(self)
 
     def get_column_names(self, columns_seen):
         for a in self.args:
@@ -244,6 +246,7 @@ class ColumnReference(Term):
             raise Exception("column_name must be a string")
         if column_name not in table._column_set:
             raise Exception("column_name must be a column of the given table")
+        Term.__init__(self)
 
     def get_column_names(self, columns_seen):
         columns_seen.add(self.column_name)

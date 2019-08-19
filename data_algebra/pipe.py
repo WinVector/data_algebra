@@ -77,7 +77,7 @@ class PipeFunction(PipeStep):
             # place argument in first position
             return self._func(other, **self._partial_args)
         #  place argument by name
-        args = self._partial_args.copy()()
+        args = self._partial_args.copy()
         for nm in self._args_to_override:
             args[nm] = other
         return self._func(**args)
