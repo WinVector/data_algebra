@@ -116,31 +116,35 @@ class Extend(data_algebra.pipe.PipeStep):
        If data_algebra._ref_to_global_namespace = globals() then
        _ and _0 are set to column name maps as a side-effect.
 
-       Example:
+       Examples:
            from data_algebra.data_ops import *
            data_algebra._ref_to_global_namespace = globals() # needed to define _
            q = 4
+
            ops = (
               mk_td('d', ['x', 'y']) >>
                  Extend({'z':_.x + _.y/q})
             )
             print(ops)
             print(ops._ops['z'].to_python())
+
             ops2 = (
                 mk_td('d', ['x', 'y']) .
                     extend({'z':'1/q + x'})
             )
             print(ops2)
+
             ops3 = (
                 mk_td('d', ['x', 'y']) .
                     extend({'z':'1/q + _.x', 'f':1, 'g':'"2"'})
             )
             print(ops3)
+
             import data_algebra.pipe
 
             ops4 = data_algebra.pipe.build_pipeline(
                 mk_td('d', ['x', 'y']),
-                Extend({'z':'1/_.y + _.x/q'})
+                Extend({'z':'1/_.y + 1/q', 'x':'x+1'})
             )
             print(ops4)
     """

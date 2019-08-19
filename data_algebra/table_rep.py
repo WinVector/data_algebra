@@ -323,7 +323,9 @@ def check_convert_op_dictionary(ops, column_defs,
                 v = Value(v)
             v.source = ov
         newops[k] = v
-        v.get_column_names(columns_used)
+        used_here = set()
+        v.get_column_names(used_here)
+        columns_used = columns_used.union(used_here - set([k]))  # can use a column to update itself
     intersect = set(ops.keys()).intersection(columns_used)
     if len(intersect) > 0:
         raise Exception(
