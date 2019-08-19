@@ -1,4 +1,4 @@
-import types
+from typing import Set, Any, Dict, List
 
 import data_algebra.table_rep
 import data_algebra.pipe
@@ -7,6 +7,12 @@ import data_algebra.env
 
 class ViewRepresentation(data_algebra.pipe.PipeValue):
     """Structure to represent the columns of a query or a table"""
+    _view_name: str
+    table_name: str
+    column_names: List[str]
+    column_set: Set[str]
+    qualifiers: Dict[str, Any]
+    column_map: data_algebra.env.SimpleNamespaceDict
 
     def __init__(self, table_name, column_names, *, qualifiers=None, view_name=None):
         if (table_name is not None) and (not isinstance(table_name, str)):
@@ -26,8 +32,8 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
                 raise Exception("non-string column name(s)")
         if len(self.column_names) < 1:
             raise Exception("no column names")
-        self._column_set = set(self.column_names)
-        if not len(self.column_names) == len(self._column_set):
+        self.column_set = set(self.column_names)
+        if not len(self.column_names) == len(self.column_set):
             raise Exception("duplicate column name(s)")
         column_dict = {
             ci: data_algebra.table_rep.ColumnReference(self, ci)
@@ -67,17 +73,17 @@ def mk_td(table_name, column_names, *, qualifiers=None):
 
        Example:
            from data_algebra.data_ops import *
-           import data_algebra
-           with data_algebra.Env(globals()) as env:
+           import data_algebra.env
+           with data_algebra.env.Env(globals()) as env:
                d = mk_td('d', ['x', 'y'])
-           print(_) # should be a namespace, not d
+           print(_) # should be a SimpleNamespaceDict, not d/ViewRepresentation
            print(d)
     """
     vr = ViewRepresentation(
         table_name=table_name, column_names=column_names, qualifiers=qualifiers
     )
     # make last result referable by names _ and _0
-    data_algebra.env._maybe_set_underbar(mp0=vr.column_map.__dict__)
+    data_algebra.env.maybe_set_underbar(mp0=vr.column_map.__dict__)
     return vr
 
 
@@ -96,7 +102,7 @@ class ExtendNode(ViewRepresentation):
         ViewRepresentation.__init__(self, table_name=None, column_names=column_names)
         self._source = source
         self._ops = ops
-        data_algebra.env._maybe_set_underbar(mp0=self.column_map.__dict__)
+        data_algebra.env.maybe_set_underbar(mp0=self.column_map.__dict__)
 
     def __repr__(self):
         return str(self._source) + " >>\n    " + "Extend(" + str(self._ops) + ")"

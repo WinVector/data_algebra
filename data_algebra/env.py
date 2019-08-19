@@ -1,4 +1,3 @@
-
 import types
 
 # needed to see user variables and set up _, _0, _1, and _get side-effects
@@ -13,13 +12,15 @@ def push_onto_namespace_stack(env):
     _ref_to_outer_namespace = env
     return env
 
+
 def pop_from_namespace_stack():
     global _ref_to_outer_namespace
     global _namespace_stack
     _ref_to_outer_namespace = _namespace_stack.pop()
     return _ref_to_outer_namespace
 
-def _outer_namespace():
+
+def outer_namespace():
     """get current reference to side-effect namespace"""
     global _ref_to_outer_namespace
     return _ref_to_outer_namespace
@@ -35,6 +36,7 @@ class Env:
         push_onto_namespace_stack(self.env)
         return self
 
+    # noinspection PyShadowingBuiltins
     def __exit__(self, type, value, traceback):
         pop_from_namespace_stack()
 
@@ -58,11 +60,7 @@ class SimpleNamespaceDict(types.SimpleNamespace):
         return self.__dict__[key]
 
 
-def _populate_specials(*,
-                       column_defs,
-                       column_defs1 = None,
-                       destination,
-                       user_values = None):
+def populate_specials(*, column_defs, column_defs1=None, destination, user_values=None):
     """populate a dictionary with special values
        column_defs is a dictionary,
          usually formed from a ViewRepresentation.column_map.__dict__
@@ -90,11 +88,13 @@ def _populate_specials(*,
         destination["_1"] = None
     destination["_get"] = lambda key: user_values[key]
 
-def _maybe_set_underbar(*, mp0, mp1=None):
-    destination = _outer_namespace()
-    if destination is not None:
-        _populate_specials(column_defs = mp0,
-                           column_defs1 = mp1,
-                           destination=destination,
-                           user_values=destination)
 
+def maybe_set_underbar(*, mp0, mp1=None):
+    destination = outer_namespace()
+    if destination is not None:
+        populate_specials(
+            column_defs=mp0,
+            column_defs1=mp1,
+            destination=destination,
+            user_values=destination,
+        )

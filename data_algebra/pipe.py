@@ -143,11 +143,11 @@ class Value(PipeValue):
 
 def build_pipeline(*steps):
     n = len(steps)
-    if n<1:
+    if n < 1:
         raise Exception("steps was empty")
-    if n==1:
+    if n == 1:
         return steps[0]
     cur = steps[0]
-    for i in range(1,n):
+    for i in range(1, n):
         cur = cur >> steps[i]
     return cur

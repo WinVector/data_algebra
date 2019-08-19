@@ -1,4 +1,4 @@
-import types
+from typing import Union
 
 import data_algebra.env
 
@@ -12,9 +12,10 @@ import data_algebra.env
 class Term:
     """Inherit from this class to capture expressions.
     Abstract class, should be extended for use.-"""
+    source_string: Union[str, None]
 
     def __init__(self,):
-        self.source = None
+        self.source_string = None
 
     def get_column_names(self, columns_seen):
         pass
@@ -36,7 +37,7 @@ class Term:
     def __uop_expr__(self, op, *, params=None):
         if not isinstance(op, str):
             raise Exception("op is supposed to be a string")
-        return Expression(op, (self, ), params=params)
+        return Expression(op, (self,), params=params)
 
     def to_python(self):
         raise Exception("base class called")
@@ -237,13 +238,21 @@ class Expression(Term):
             a.get_column_names(columns_seen)
 
     def to_python(self):
-        if len(self.args)<1:
+        if len(self.args) < 1:
             raise Exception("empty expression")
-        if len(self.args)==1:
+        if len(self.args) == 1:
             return "(" + self.op + " " + self.args[0] + ")"
         # TODO: more cases than just on size
-        if len(self.args)==2:
-            return "(" + self.args[0].to_python() + " " + self.op + " " + self.args[1].to_python() + ")"
+        if len(self.args) == 2:
+            return (
+                "("
+                + self.args[0].to_python()
+                + " "
+                + self.op
+                + " "
+                + self.args[1].to_python()
+                + ")"
+            )
         raise Exception("unimplemented case")
 
 
@@ -255,7 +264,7 @@ class ColumnReference(Term):
         self.column_name = column_name
         if not isinstance(column_name, str):
             raise Exception("column_name must be a string")
-        if column_name not in table._column_set:
+        if column_name not in table.column_set:
             raise Exception("column_name must be a column of the given table")
         Term.__init__(self)
 
@@ -266,24 +275,22 @@ class ColumnReference(Term):
         columns_seen.add(self.column_name)
 
 
-def check_convert_op_dictionary(ops, column_defs,
-                                *,
-                                parse_env = None):
+def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
     if not isinstance(ops, dict):
         raise Exception("ops should be a dictionary")
     if not isinstance(column_defs, dict):
         raise Exception("column_defs should be a dictionary")
     if parse_env is None:
-        parse_env = data_algebra.env._outer_namespace()
+        parse_env = data_algebra.env.outer_namespace()
         if parse_env is None:
             parse_env = {}
     # first: make sure all entries are parsed
     columns_used = set()
     newops = {}
     mp = column_defs.copy()
-    data_algebra.env._populate_specials(column_defs=column_defs,
-                                    destination=mp,
-                                    user_values=parse_env)
+    data_algebra.env.populate_specials(
+        column_defs=column_defs, destination=mp, user_values=parse_env
+    )
     for k in ops.keys():
         if not isinstance(k, str):
             raise Exception("ops keys should be strings")
@@ -295,11 +302,13 @@ def check_convert_op_dictionary(ops, column_defs,
             v = eval(v, parse_env, mp)
             if not isinstance(v, Term):
                 v = Value(v)
-            v.source = ov
+            v.source_string = ov
         newops[k] = v
         used_here = set()
         v.get_column_names(used_here)
-        columns_used = columns_used.union(used_here - set([k]))  # can use a column to update itself
+        columns_used = columns_used.union(
+            used_here - {k}
+        )  # can use a column to update itself
     intersect = set(ops.keys()).intersection(columns_used)
     if len(intersect) > 0:
         raise Exception(
