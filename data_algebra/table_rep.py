@@ -1,6 +1,6 @@
 import types
 
-import data_algebra
+import data_algebra.env
 
 # for some ideas in capturing expressions in Python see:
 #  scipy
@@ -274,14 +274,14 @@ def check_convert_op_dictionary(ops, column_defs,
     if not isinstance(column_defs, dict):
         raise Exception("column_defs should be a dictionary")
     if parse_env is None:
-        parse_env = data_algebra._outer_namespace()
+        parse_env = data_algebra.env._outer_namespace()
         if parse_env is None:
             parse_env = {}
     # first: make sure all entries are parsed
     columns_used = set()
     newops = {}
     mp = column_defs.copy()
-    data_algebra._populate_specials(column_defs=column_defs,
+    data_algebra.env._populate_specials(column_defs=column_defs,
                                     destination=mp,
                                     user_values=parse_env)
     for k in ops.keys():

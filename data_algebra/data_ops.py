@@ -2,7 +2,7 @@ import types
 
 import data_algebra.table_rep
 import data_algebra.pipe
-import data_algebra.SimpleNamespaceDict
+import data_algebra.env
 
 
 class ViewRepresentation(data_algebra.pipe.PipeValue):
@@ -33,7 +33,7 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
             ci: data_algebra.table_rep.ColumnReference(self, ci)
             for ci in self.column_names
         }
-        self.column_map = data_algebra.SimpleNamespaceDict.SimpleNamespaceDict(**column_dict)
+        self.column_map = data_algebra.env.SimpleNamespaceDict(**column_dict)
         data_algebra.pipe.PipeValue.__init__(self)
 
     def __repr__(self):
@@ -77,7 +77,7 @@ def mk_td(table_name, column_names, *, qualifiers=None):
         table_name=table_name, column_names=column_names, qualifiers=qualifiers
     )
     # make last result referable by names _ and _0
-    data_algebra._maybe_set_underbar(mp0=vr.column_map.__dict__)
+    data_algebra.env._maybe_set_underbar(mp0=vr.column_map.__dict__)
     return vr
 
 
@@ -96,7 +96,7 @@ class ExtendNode(ViewRepresentation):
         ViewRepresentation.__init__(self, table_name=None, column_names=column_names)
         self._source = source
         self._ops = ops
-        data_algebra._maybe_set_underbar(mp0=self.column_map.__dict__)
+        data_algebra.env._maybe_set_underbar(mp0=self.column_map.__dict__)
 
     def __repr__(self):
         return str(self._source) + " >>\n    " + "Extend(" + str(self._ops) + ")"
@@ -113,8 +113,8 @@ class Extend(data_algebra.pipe.PipeStep):
 
        Examples:
            from data_algebra.data_ops import *
-           import data_algebra
-           with data_algebra.Env(locals()) as env:
+           import data_algebra.env
+           with data_algebra.env.Env(locals()) as env:
                q = 4
                x = 2
                var_name = 'y'
