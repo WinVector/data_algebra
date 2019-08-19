@@ -59,15 +59,6 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         return ExtendNode(self, ops)
 
 
-def _maybe_set_underbar(mp, mp1=None):
-    # make last result referable by names _ and _0
-    ns = data_algebra._outer_namespace()
-    if ns is not None:
-        ns["_"] = mp
-        ns["_0"] = mp
-        ns["_1"] = mp1
-
-
 def mk_td(table_name, column_names, *, qualifiers=None):
     """Make a table representation object.
 
@@ -86,7 +77,7 @@ def mk_td(table_name, column_names, *, qualifiers=None):
         table_name=table_name, column_names=column_names, qualifiers=qualifiers
     )
     # make last result referable by names _ and _0
-    _maybe_set_underbar(vr.column_map)
+    data_algebra._maybe_set_underbar(mp0=vr.column_map.__dict__)
     return vr
 
 
@@ -105,7 +96,7 @@ class ExtendNode(ViewRepresentation):
         ViewRepresentation.__init__(self, table_name=None, column_names=column_names)
         self._source = source
         self._ops = ops
-        _maybe_set_underbar(self.column_map)
+        data_algebra._maybe_set_underbar(mp0=self.column_map.__dict__)
 
     def __repr__(self):
         return str(self._source) + " >>\n    " + "Extend(" + str(self._ops) + ")"
@@ -125,12 +116,13 @@ class Extend(data_algebra.pipe.PipeStep):
            import data_algebra
            with data_algebra.Env(locals()) as env:
                q = 4
+               x = 2
                var_name = 'y'
 
                print("first example")
                ops = (
                   mk_td('d', ['x', 'y']) >>
-                     Extend({'z':_.x + _[var_name]/q})
+                     Extend({'z':_.x + _[var_name]/q + _get('x')})
                 )
                 print(ops)
 
@@ -156,6 +148,20 @@ class Extend(data_algebra.pipe.PipeStep):
                     Extend({'z':'1/_.y + 1/q', 'x':'x+1'})
                 )
                 print(ops4)
+
+                print("ex 5, columns take precendence over values")
+                ops5 = (
+                    mk_td('d', ['q', 'y']) .
+                        extend({'z':'1/q + y'})
+                )
+                print(ops5)
+
+                print("ex 6, forcing values")
+                ops6 = (
+                    mk_td('d', ['q', 'y']) .
+                        extend({'z':'q/_get("q") + y + _.q'})
+                )
+                print(ops6)
     """
 
     def __init__(self, ops):

@@ -281,7 +281,9 @@ def check_convert_op_dictionary(ops, column_defs,
     columns_used = set()
     newops = {}
     mp = column_defs.copy()
-    data_algebra._populate__specials(column_defs, mp)
+    data_algebra._populate_specials(column_defs=column_defs,
+                                    destination=mp,
+                                    user_values=parse_env)
     for k in ops.keys():
         if not isinstance(k, str):
             raise Exception("ops keys should be strings")
