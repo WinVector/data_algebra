@@ -47,16 +47,19 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
             return self.table_name
         return str(self.qualifiers) + '.' + self.table_name
 
+    # define builders for all node types on base class
+
     def extend(self, ops):
         ops = data_algebra.table_rep.check_convert_op_dictionary(ops, self.column_map.__dict__)
         return ExtendNode(self, ops)
 
 
-def _maybe_set_underbar(mp):
+def _maybe_set_underbar(mp, mp1=None):
     # make last result referable by names _ and _0
     if data_algebra._ref_to_global_namespace is not None:
         data_algebra._ref_to_global_namespace['_'] = mp
         data_algebra._ref_to_global_namespace['_0'] = mp
+        data_algebra._ref_to_global_namespace['_1'] = mp1
 
 
 def mk_td(table_name, column_names,
