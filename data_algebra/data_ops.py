@@ -123,7 +123,7 @@ class Extend(data_algebra.pipe.PipeStep):
             print(ops)
             ops2 = (
                 mk_td('d', ['x', 'y']) .
-                    extend({'z':1})
+                    extend({'z':1 + _.x})
             )
             print(ops2.column_map)
     """

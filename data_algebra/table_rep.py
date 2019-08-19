@@ -199,6 +199,9 @@ class Term:
 
 class Value(Term):
     def __init__(self, value):
+        allowed = [int, float, str, bool]
+        if not any([isinstance(value, tp) for tp in allowed]):
+            raise Exception("value type must be one of: " + str(allowed))
         self.value = value
 
     def __repr__(self):
