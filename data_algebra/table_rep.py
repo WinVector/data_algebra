@@ -218,8 +218,6 @@ class Value(Term):
         Term.__init__(self)
 
     def to_python(self):
-        if self.source is not None:
-            return self.source
         return self.value.__repr__()
 
     def __repr__(self):
@@ -245,8 +243,6 @@ class Expression(Term):
             a.get_column_names(columns_seen)
 
     def to_python(self):
-        if self.source is not None:
-            return self.source
         if len(self.args)<1:
             raise Exception("empty expression")
         if len(self.args)==1:
@@ -278,8 +274,6 @@ class ColumnReference(Term):
         Term.__init__(self)
 
     def to_python(self):
-        if self.source is not None:
-            return self.source
         return self.column_name
 
     def get_column_names(self, columns_seen):
