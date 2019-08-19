@@ -48,6 +48,7 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         return str(self.qualifiers) + '.' + self.table_name
 
     def extend(self, ops):
+        ops = data_algebra.table_rep.check_convert_op_dictionary(ops, self.column_map.__dict__)
         return ExtendNode(self, ops)
 
 
@@ -123,9 +124,14 @@ class Extend(data_algebra.pipe.PipeStep):
             print(ops)
             ops2 = (
                 mk_td('d', ['x', 'y']) .
-                    extend({'z':1 + _.x})
+                    extend({'z':'1 + x'})
             )
             print(ops2.column_map)
+            ops3 = (
+                mk_td('d', ['x', 'y']) .
+                    extend({'z':'1 + _.x'})
+            )
+            print(ops3.column_map)
     """
 
     def __init__(self, ops):

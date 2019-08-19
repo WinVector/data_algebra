@@ -1,4 +1,5 @@
 
+import types
 
 # for some ideas in capturing expressions in Python see:
 #  scipy
@@ -12,6 +13,9 @@ class Term:
     Abstract class, should be extended for use.-"""
 
     def __init__(self, ):
+        pass
+
+    def get_column_names(self, columns_seen):
         pass
 
     def __op_expr__(self, op, other):
@@ -221,6 +225,10 @@ class Expression(Term):
         self.args = args
         self.params = params
 
+    def get_column_names(self, columns_seen):
+        for a in self.args:
+            a.get_column_names(columns_seen)
+
     def __repr__(self):
         # not a full repr
         return self.op + str(self.args)
@@ -240,6 +248,9 @@ class ColumnReference(Term):
         if column_name not in table._column_set:
             raise Exception("column_name must be a column of the given table")
 
+    def get_column_names(self, columns_seen):
+        columns_seen.add(self.column_name)
+
     def __repr__(self):
         # not a full repr
         if self.table.table_name is None:
@@ -252,4 +263,31 @@ class ColumnReference(Term):
         return self.table.table_name + "." + self.column_name
 
 
+def check_convert_op_dictionary(ops, column_defs):
+    if not isinstance(ops, dict):
+        raise Exception("ops should be a dictionary")
+    if not isinstance(column_defs, dict):
+        raise Exception("column_defs should be a dictionary")
+    # first: make sure all entries are parsed
+    columns_used = set()
+    newops = {}
+    mp = column_defs.copy()
+    ns = types.SimpleNamespace(**column_defs.copy())
+    mp["_"] = ns
+    mp["_0"] = ns
+    mp["_1"] = ns
+    for k in ops.keys():
+        if not isinstance(k, str):
+            raise Exception("ops keys should be strings")
+        v = ops[k]
+        if not isinstance(v, Term):
+            if not isinstance(v, str):
+                raise Exception("ops values must be Terms or strings")
+            v = eval(v, mp)
+        newops[k] = v
+        v.get_column_names(columns_used)
+    intersect = set(ops.keys()).intersection(columns_used)
+    if len(intersect)>0:
+        raise Exception("columns both produced and used in same expression set: " + str(intersect))
+    return newops
 
