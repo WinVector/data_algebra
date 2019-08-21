@@ -258,14 +258,16 @@ class Expression(Term):
 
 class ColumnReference(Term):
     """class to represent referring to a column"""
+    view: any # typically a ViewReference
+    column_name: str
 
-    def __init__(self, table, column_name):
-        self.table = table
+    def __init__(self, view, column_name):
+        self.view = view
         self.column_name = column_name
         if not isinstance(column_name, str):
             raise Exception("column_name must be a string")
-        if column_name not in table.column_set:
-            raise Exception("column_name must be a column of the given table")
+        if column_name not in view.column_set:
+            raise Exception("column_name must be a column of the given view")
         Term.__init__(self)
 
     def to_python(self):

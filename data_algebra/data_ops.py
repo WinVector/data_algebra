@@ -1,32 +1,25 @@
 from typing import Set, Any, Dict, List
 
+import yaml
+
 import data_algebra.table_rep
 import data_algebra.pipe
 import data_algebra.env
 
 
+# yaml notes:
+#    https://stackoverflow.com/questions/2627555/how-to-deserialize-an-object-with-pyyaml-using-safe-load
+
 class ViewRepresentation(data_algebra.pipe.PipeValue):
-    """Structure to represent the columns of a query or a table"""
-    _view_name: str
-    table_name: str
+    """Structure to represent the columns of a query or a table.
+       Abstract base class."""
     column_names: List[str]
     column_set: Set[str]
-    qualifiers: Dict[str, Any]
     column_map: data_algebra.env.SimpleNamespaceDict
+    sources: List[Any]  # actually ViewRepresentation
 
-    def __init__(self, table_name, column_names, *, qualifiers=None, view_name=None):
-        if (table_name is not None) and (not isinstance(table_name, str)):
-            raise Exception("table_name must be a string")
-        if view_name is None:
-            view_name = "ViewRepresentation"
-        self._view_name = view_name
-        self.table_name = table_name
+    def __init__(self, column_names, *, sources=None):
         self.column_names = [c for c in column_names]
-        if qualifiers is None:
-            qualifiers = {}
-        if not isinstance(qualifiers, dict):
-            raise Exception("qualifiers must be a dictionary")
-        self.qualifiers = qualifiers.copy()
         for ci in self.column_names:
             if not isinstance(ci, str):
                 raise Exception("non-string column name(s)")
@@ -40,24 +33,27 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
             for ci in self.column_names
         }
         self.column_map = data_algebra.env.SimpleNamespaceDict(**column_dict)
+        if sources is None:
+            sources = []
+        for si in sources:
+            if not isinstance(si, ViewRepresentation):
+                raise Exception("all sources must be of class ViewRepresentation")
+        self.sources = [si for si in sources]
         data_algebra.pipe.PipeValue.__init__(self)
 
     def __repr__(self):
         return (
-            self._view_name
-            + "("
-            + self.table_name.__repr__()
-            + ", "
+            "ViewRepresentation("
             + self.column_names.__repr__()
-            + ", "
-            + self.qualifiers.__repr__()
             + ")"
         )
 
     def __str__(self):
-        if len(self.qualifiers) <= 0:
-            return self.table_name
-        return str(self.qualifiers) + "." + self.table_name
+        return (
+                "ViewRepresentation("
+                + self.column_names.__repr__()
+                + ")"
+        )
 
     # define builders for all node types on base class
 
@@ -65,8 +61,8 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         return ExtendNode(self, ops)
 
 
-def mk_td(table_name, column_names, *, qualifiers=None):
-    """Make a table representation object.
+class TableDescription(ViewRepresentation):
+    """Describe columns, and qualifiers, of a table.
 
        If outer namespace is set user values are visible and
        _-side effects can be written back.
@@ -75,19 +71,40 @@ def mk_td(table_name, column_names, *, qualifiers=None):
            from data_algebra.data_ops import *
            import data_algebra.env
            with data_algebra.env.Env(globals()) as env:
-               d = mk_td('d', ['x', 'y'])
+               d = TableDescription('d', ['x', 'y'])
            print(_) # should be a SimpleNamespaceDict, not d/ViewRepresentation
            print(d)
     """
-    vr = ViewRepresentation(
-        table_name=table_name, column_names=column_names, qualifiers=qualifiers
-    )
-    # make last result referable by names _ and _0
-    data_algebra.env.maybe_set_underbar(mp0=vr.column_map.__dict__)
-    return vr
+    table_name: str
+    qualifiers: Dict[str, str]
+
+    def __init__(self, table_name, column_names, *, qualifiers=None):
+        ViewRepresentation.__init__(self, column_names=column_names)
+        if (table_name is not None) and (not isinstance(table_name, str)):
+            raise Exception("table_name must be a string")
+        self.table_name = table_name
+        self.column_names = column_names.copy()
+        if qualifiers is None:
+            qualifiers = {}
+        if not isinstance(qualifiers, dict):
+            raise Exception("qualifiers must be a dictionary")
+        self.qualifiers = qualifiers.copy()
+        data_algebra.env.maybe_set_underbar(mp0=self.column_map.__dict__)
+
+    def __repr__(self):
+        if len(self.qualifiers) > 0:
+            return "Table(" + str(self.qualifiers) + ", " + self.table_name + ")"
+        return self.table_name
+
+    def __str__(self):
+        if len(self.qualifiers) > 0:
+            return "Table(" + str(self.qualifiers) + ", " + self.table_name + ")"
+        return self.table_name
 
 
 class ExtendNode(ViewRepresentation):
+    ops: Dict[str, Any]
+
     def __init__(self, source, ops):
         if not isinstance(source, ViewRepresentation):
             raise Exception("source must be a ViewRepresentation")
@@ -99,16 +116,15 @@ class ExtendNode(ViewRepresentation):
         for ci in ops.keys():
             if ci not in known_cols:
                 column_names = column_names + [ci]
-        ViewRepresentation.__init__(self, table_name=None, column_names=column_names)
-        self._source = source
-        self._ops = ops
+        ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
+        self.ops = ops
         data_algebra.env.maybe_set_underbar(mp0=self.column_map.__dict__)
 
     def __repr__(self):
-        return str(self._source) + " >>\n    " + "Extend(" + str(self._ops) + ")"
+        return str(self.sources[0]) + " >>\n    " + "Extend(" + str(self.ops) + ")"
 
     def __str__(self):
-        return str(self._source) + " >>\n    " + "Extend(" + str(self._ops) + ")"
+        return str(self.sources[0]) + " >>\n    " + "Extend(" + str(self.ops) + ")"
 
 
 class Extend(data_algebra.pipe.PipeStep):
@@ -127,21 +143,21 @@ class Extend(data_algebra.pipe.PipeStep):
 
                print("first example")
                ops = (
-                  mk_td('d', ['x', 'y']) >>
+                  TableDescription('d', ['x', 'y']) >>
                      Extend({'z':_.x + _[var_name]/q + _get('x')})
                 )
                 print(ops)
 
                 print("ex 2")
                 ops2 = (
-                    mk_td('d', ['x', 'y']) .
+                    TableDescription('d', ['x', 'y']) .
                         extend({'z':'1/q + x'})
                 )
                 print(ops2)
 
                 print("ex 3")
                 ops3 = (
-                    mk_td('d', ['x', 'y']) .
+                    TableDescription('d', ['x', 'y']) .
                         extend({'z':'1/q + _.x/_[var_name]', 'f':1, 'g':'"2"', 'h':True})
                 )
                 print(ops3)
@@ -150,21 +166,21 @@ class Extend(data_algebra.pipe.PipeStep):
                 import data_algebra.pipe
 
                 ops4 = data_algebra.pipe.build_pipeline(
-                    mk_td('d', ['x', 'y']),
+                    TableDescription('d', ['x', 'y']),
                     Extend({'z':'1/_.y + 1/q', 'x':'x+1'})
                 )
                 print(ops4)
 
                 print("ex 5, columns take precendence over values")
                 ops5 = (
-                    mk_td('d', ['q', 'y']) .
+                    TableDescription('d', ['q', 'y']) .
                         extend({'z':'1/q + y'})
                 )
                 print(ops5)
 
                 print("ex 6, forcing values")
                 ops6 = (
-                    mk_td('d', ['q', 'y']) .
+                    TableDescription('d', ['q', 'y']) .
                         extend({'z':'q/_get("q") + y + _.q'})
                 )
                 print(ops6)

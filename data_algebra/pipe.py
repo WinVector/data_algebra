@@ -85,7 +85,7 @@ class PipeFunction(PipeStep):
 
 class PipeValue:
     """Extend this class to be a value that can be piped into functions
-    in additon to PipeFunctions.
+    in addition to PipeFunctions.
 
     Examples:
         import data_algebra.pipe
