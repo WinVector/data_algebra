@@ -41,6 +41,9 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         self.sources = [si for si in sources]
         data_algebra.pipe.PipeValue.__init__(self)
 
+    def collect_representation(self, pipeline=None):
+        raise Exception("base method called")
+
     def __repr__(self):
         return (
             "ViewRepresentation("
@@ -55,7 +58,7 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
                 + ")"
         )
 
-    # define builders for all node types on base class
+    # define builders for all non-leaf node types on base class
 
     def extend(self, ops):
         return ExtendNode(self, ops)
@@ -91,6 +94,17 @@ class TableDescription(ViewRepresentation):
         self.qualifiers = qualifiers.copy()
         data_algebra.env.maybe_set_underbar(mp0=self.column_map.__dict__)
 
+    def collect_representation(self, pipeline=None):
+        if pipeline is None:
+            pipeline = []
+        pipeline.insert(0,
+                        {'op': 'TableDescription',
+                         'table_name': self.table_name,
+                         'qualifiers': self.qualifiers.copy(),
+                         'column_names': self.column_names
+                         })
+        return pipeline
+
     def __repr__(self):
         if len(self.qualifiers) > 0:
             return "Table(" + str(self.qualifiers) + ", " + self.table_name + ")"
@@ -103,7 +117,7 @@ class TableDescription(ViewRepresentation):
 
 
 class ExtendNode(ViewRepresentation):
-    ops: Dict[str, Any]
+    ops: Dict[str, data_algebra.table_rep.Expression]
 
     def __init__(self, source, ops):
         if not isinstance(source, ViewRepresentation):
@@ -119,6 +133,15 @@ class ExtendNode(ViewRepresentation):
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
         self.ops = ops
         data_algebra.env.maybe_set_underbar(mp0=self.column_map.__dict__)
+
+    def collect_representation(self, pipeline=None):
+        if pipeline is None:
+            pipeline = []
+        pipeline.insert(0,
+                        {'op': 'Extend',
+                         'ops': {ci: vi.to_python() for (ci, vi) in self.ops.items()}})
+        self.sources[0].collect_representation(pipeline)
+        return pipeline
 
     def __repr__(self):
         return str(self.sources[0]) + " >>\n    " + "Extend(" + str(self.ops) + ")"
@@ -171,7 +194,7 @@ class Extend(data_algebra.pipe.PipeStep):
                 )
                 print(ops4)
 
-                print("ex 5, columns take precendence over values")
+                print("ex 5, columns take precedence over values")
                 ops5 = (
                     TableDescription('d', ['q', 'y']) .
                         extend({'z':'1/q + y'})
@@ -184,6 +207,13 @@ class Extend(data_algebra.pipe.PipeStep):
                         extend({'z':'q/_get("q") + y + _.q'})
                 )
                 print(ops6)
+
+                p = ops6.collect_representation()
+                print(p)
+                import yaml
+                print(yaml.dump(p))
+                ops6b = data_algebra.data_ops.to_pipeline(p)
+                print(ops6b)
     """
 
     def __init__(self, ops):
@@ -192,3 +222,25 @@ class Extend(data_algebra.pipe.PipeStep):
 
     def apply(self, other):
         return other.extend(self._ops)
+
+
+def to_pipeline(obj):
+    if isinstance(obj,  dict):
+        # a pipe stage
+        op = obj['op']
+        if op == 'TableDescription':
+            return TableDescription(table_name=obj['table_name'],
+                                    column_names=obj['column_names'],
+                                    qualifiers=obj['qualifiers'])
+        elif op == 'Extend':
+            return Extend(ops=obj['ops'])
+        else:
+            raise Exception("Unexpected op name")
+    if isinstance(obj, list):
+        # a pipeline
+        res = to_pipeline(obj[0])
+        for i in range(1, len(obj)):
+            nxt = to_pipeline(obj[i])
+            res = res >> nxt
+        return res
+    raise Exception("unexpected type")

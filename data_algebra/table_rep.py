@@ -258,7 +258,7 @@ class Expression(Term):
 
 class ColumnReference(Term):
     """class to represent referring to a column"""
-    view: any # typically a ViewReference
+    view: any   # typically a ViewReference
     column_name: str
 
     def __init__(self, view, column_name):
