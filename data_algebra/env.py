@@ -4,6 +4,9 @@ import types
 _namespace_stack = []
 _ref_to_outer_namespace = None
 
+# some notes on inserting user environments:
+# https://stackoverflow.com/questions/11024646/is-it-possible-to-overload-python-assignment
+#    https://stackoverflow.com/a/40645627/6901725
 
 def push_onto_namespace_stack(env):
     global _ref_to_outer_namespace
@@ -58,6 +61,12 @@ class SimpleNamespaceDict(types.SimpleNamespace):
 
     def __getitem__(self, key):
         return self.__dict__[key]
+
+    def __setitem__(self, key, value):
+        raise Exception("__setitem__ not allowed")
+
+    def __setattr__(self, name, value):
+        raise Exception("__setattr__ not allowed")
 
 
 def populate_specials(*, column_defs, column_defs1=None, destination, user_values=None):

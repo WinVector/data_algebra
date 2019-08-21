@@ -13,8 +13,6 @@ setuptools.setup(
     url='https://github.com/WinVector/data_algebra',
     packages=setuptools.find_packages(),
     install_requires=[
-        'pandas',
-        'psycopg2',
     ],
     platforms=['any'],
     license='License :: OSI Approved :: BSD 3-clause License',
