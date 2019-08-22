@@ -1,4 +1,5 @@
 from typing import Set, Any, Dict, List
+import collections
 
 import yaml
 
@@ -9,6 +10,16 @@ import data_algebra.env
 
 # yaml notes:
 #    https://stackoverflow.com/questions/2627555/how-to-deserialize-an-object-with-pyyaml-using-safe-load
+
+# derived from: https://stackoverflow.com/a/16782282/6901725
+def represent_ordereddict(dumper, data):
+    value = [(dumper.represent_data(node_key), dumper.represent_data(node_value)) for
+             (node_key, node_value) in data.items()]
+    return yaml.nodes.MappingNode(u'tag:yaml.org,2002:map', value)
+
+
+yaml.add_representer(collections.OrderedDict, represent_ordereddict)
+
 
 class ViewRepresentation(data_algebra.pipe.PipeValue):
     """Structure to represent the columns of a query or a table.
@@ -97,12 +108,12 @@ class TableDescription(ViewRepresentation):
     def collect_representation(self, pipeline=None):
         if pipeline is None:
             pipeline = []
-        pipeline.insert(0,
-                        {'op': 'TableDescription',
-                         'table_name': self.table_name,
-                         'qualifiers': self.qualifiers.copy(),
-                         'column_names': self.column_names
-                         })
+        od = collections.OrderedDict()
+        od['op'] = 'TableDescription'
+        od['table_name'] = self.table_name
+        od['qualifiers'] = self.qualifiers.copy()
+        od['column_names'] = self.column_names
+        pipeline.insert(0, od)
         return pipeline
 
     def __repr__(self):
@@ -137,9 +148,10 @@ class ExtendNode(ViewRepresentation):
     def collect_representation(self, pipeline=None):
         if pipeline is None:
             pipeline = []
-        pipeline.insert(0,
-                        {'op': 'Extend',
-                         'ops': {ci: vi.to_python() for (ci, vi) in self.ops.items()}})
+        od = collections.OrderedDict()
+        od['op'] = 'Extend'
+        od['ops'] = {ci: vi.to_python() for (ci, vi) in self.ops.items()}
+        pipeline.insert(0, od)
         self.sources[0].collect_representation(pipeline)
         return pipeline
 
@@ -211,8 +223,9 @@ class Extend(data_algebra.pipe.PipeStep):
                 p = ops6.collect_representation()
                 print(p)
                 import yaml
-                print(yaml.dump(p))
-                ops6b = data_algebra.data_ops.to_pipeline(p)
+                dmp = yaml.dump(p)
+                print(dmp)
+                ops6b = data_algebra.data_ops.to_pipeline(yaml.safe_load(dmp))
                 print(ops6b)
     """
 
