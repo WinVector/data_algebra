@@ -279,7 +279,17 @@ class ColumnReference(Term):
         columns_seen.add(self.column_name)
 
 
+# Some notes on trying to harden eval:
+#  http://lybniz2.sourceforge.net/safeeval.html
+
 def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
+    """
+    Convert all entries of ops map to Term-expressions
+
+    Note: eval() is called to interpret expressions on some nodes, so this
+       function is not safe to use on untrusted code (though a somewhat restricted
+       version of eval() is used to try and catch some issues).
+    """
     if not isinstance(ops, dict):
         raise Exception("ops should be a dictionary")
     if not isinstance(column_defs, dict):
@@ -295,6 +305,8 @@ def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
     data_algebra.env.populate_specials(
         column_defs=column_defs, destination=mp, user_values=parse_env
     )
+    sub_env = {k: v for (k, v) in parse_env.items() if not k.startswith("__")}
+    sub_env["__builtins__"] = None
     for k in ops.keys():
         if not isinstance(k, str):
             raise Exception("ops keys should be strings")
@@ -303,7 +315,7 @@ def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
         if not isinstance(v, Term):
             if not isinstance(v, str):
                 v = str(v)
-            v = eval(v, parse_env, mp)
+            v = eval(v, sub_env, mp)  # eval is eval(source, globals, locals)- so mp is first
             if not isinstance(v, Term):
                 v = Value(v)
             v.source_string = ov

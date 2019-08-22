@@ -239,7 +239,8 @@ def to_pipeline(obj):
     """De-serialize data_algebra operator pipeline from a collect_representation() form.
 
        Note: eval() is called to interpret expressions on some nodes, so this
-       function is not safe to use on untrusted code.
+       function is not safe to use on untrusted code (though a somewhat restricted
+       version of eval() is used to try and catch some issues).
     """
     if isinstance(obj, dict):
         # a pipe stage
