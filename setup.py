@@ -7,7 +7,7 @@ vtreat is a pandas.DataFrame processor/conditioner that prepares real-world data
 
 setuptools.setup(
     name='data_algebra',
-    version='0.1.0',
+    version='0.1.1',
     author='John Mount',
     author_email='jmount@win-vector.com',
     url='https://github.com/WinVector/data_algebra',
