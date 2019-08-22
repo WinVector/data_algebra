@@ -218,13 +218,13 @@ class Extend(data_algebra.pipe.PipeStep):
                 )
                 print(ops6)
 
-                p = ops6.collect_representation()
+                p = ops3.collect_representation()
                 print(p)
                 import yaml
                 dmp = yaml.dump(p)
                 print(dmp)
-                ops6b = data_algebra.data_ops.to_pipeline(yaml.safe_load(dmp))
-                print(ops6b)
+                ops3b = data_algebra.data_ops.to_pipeline(yaml.safe_load(dmp))
+                print(ops3b)
     """
 
     def __init__(self, ops):
