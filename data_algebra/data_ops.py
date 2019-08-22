@@ -236,11 +236,15 @@ class Extend(data_algebra.pipe.PipeStep):
 
 
 def to_pipeline(obj):
-    """De-serialize data_algebra operator pipeline from a collect_representation() form."""
+    """De-serialize data_algebra operator pipeline from a collect_representation() form.
+
+       Note: eval() is called to interpret expressions on some nodes, so this
+       function is not safe to use on untrusted code.
+    """
     if isinstance(obj, dict):
         # a pipe stage
         op = obj["op"]
-        # ugly switch statement, helps us avoid calling eval and stay safer
+        # ugly switch statement
         if op == "TableDescription":
             return TableDescription(
                 table_name=obj["table_name"],
