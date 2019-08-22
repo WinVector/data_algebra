@@ -238,9 +238,11 @@ class Extend(data_algebra.pipe.PipeStep):
 
 
 def to_pipeline(obj):
+    """De-serialize data_algebra operator pipeline from a collect_representation() form."""
     if isinstance(obj,  dict):
         # a pipe stage
         op = obj['op']
+        # ugly switch statement, helps us avoid calling eval and stay safer
         if op == 'TableDescription':
             return TableDescription(table_name=obj['table_name'],
                                     column_names=obj['column_names'],
@@ -250,7 +252,7 @@ def to_pipeline(obj):
         else:
             raise Exception("Unexpected op name")
     if isinstance(obj, list):
-        # a pipeline
+        # a pipeline, assumed non empty
         res = to_pipeline(obj[0])
         for i in range(1, len(obj)):
             nxt = to_pipeline(obj[i])
