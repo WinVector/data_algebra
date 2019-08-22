@@ -8,6 +8,7 @@ _ref_to_outer_namespace = None
 # https://stackoverflow.com/questions/11024646/is-it-possible-to-overload-python-assignment
 #    https://stackoverflow.com/a/40645627/6901725
 
+
 def push_onto_namespace_stack(env):
     global _ref_to_outer_namespace
     global _namespace_stack

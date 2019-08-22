@@ -12,6 +12,7 @@ import data_algebra.env
 class Term:
     """Inherit from this class to capture expressions.
     Abstract class, should be extended for use.-"""
+
     source_string: Union[str, None]
 
     def __init__(self,):
@@ -258,7 +259,8 @@ class Expression(Term):
 
 class ColumnReference(Term):
     """class to represent referring to a column"""
-    view: any   # typically a ViewReference
+
+    view: any  # typically a ViewReference
     column_name: str
 
     def __init__(self, view, column_name):

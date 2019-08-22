@@ -13,9 +13,11 @@ import data_algebra.env
 
 # derived from: https://stackoverflow.com/a/16782282/6901725
 def represent_ordereddict(dumper, data):
-    value = [(dumper.represent_data(node_key), dumper.represent_data(node_value)) for
-             (node_key, node_value) in data.items()]
-    return yaml.nodes.MappingNode(u'tag:yaml.org,2002:map', value)
+    value = [
+        (dumper.represent_data(node_key), dumper.represent_data(node_value))
+        for (node_key, node_value) in data.items()
+    ]
+    return yaml.nodes.MappingNode(u"tag:yaml.org,2002:map", value)
 
 
 yaml.add_representer(collections.OrderedDict, represent_ordereddict)
@@ -24,6 +26,7 @@ yaml.add_representer(collections.OrderedDict, represent_ordereddict)
 class ViewRepresentation(data_algebra.pipe.PipeValue):
     """Structure to represent the columns of a query or a table.
        Abstract base class."""
+
     column_names: List[str]
     column_set: Set[str]
     column_map: data_algebra.env.SimpleNamespaceDict
@@ -53,21 +56,15 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         data_algebra.pipe.PipeValue.__init__(self)
 
     def collect_representation(self, pipeline=None):
+        """convert a data_algebra operator pipeline into a
+        simple form for YAML serialization"""
         raise Exception("base method called")
 
     def __repr__(self):
-        return (
-            "ViewRepresentation("
-            + self.column_names.__repr__()
-            + ")"
-        )
+        return "ViewRepresentation(" + self.column_names.__repr__() + ")"
 
     def __str__(self):
-        return (
-                "ViewRepresentation("
-                + self.column_names.__repr__()
-                + ")"
-        )
+        return "ViewRepresentation(" + self.column_names.__repr__() + ")"
 
     # define builders for all non-leaf node types on base class
 
@@ -89,6 +86,7 @@ class TableDescription(ViewRepresentation):
            print(_) # should be a SimpleNamespaceDict, not d/ViewRepresentation
            print(d)
     """
+
     table_name: str
     qualifiers: Dict[str, str]
 
@@ -109,10 +107,10 @@ class TableDescription(ViewRepresentation):
         if pipeline is None:
             pipeline = []
         od = collections.OrderedDict()
-        od['op'] = 'TableDescription'
-        od['table_name'] = self.table_name
-        od['qualifiers'] = self.qualifiers.copy()
-        od['column_names'] = self.column_names
+        od["op"] = "TableDescription"
+        od["table_name"] = self.table_name
+        od["qualifiers"] = self.qualifiers.copy()
+        od["column_names"] = self.column_names
         pipeline.insert(0, od)
         return pipeline
 
@@ -149,8 +147,8 @@ class ExtendNode(ViewRepresentation):
         if pipeline is None:
             pipeline = []
         od = collections.OrderedDict()
-        od['op'] = 'Extend'
-        od['ops'] = {ci: vi.to_python() for (ci, vi) in self.ops.items()}
+        od["op"] = "Extend"
+        od["ops"] = {ci: vi.to_python() for (ci, vi) in self.ops.items()}
         pipeline.insert(0, od)
         self.sources[0].collect_representation(pipeline)
         return pipeline
@@ -239,16 +237,18 @@ class Extend(data_algebra.pipe.PipeStep):
 
 def to_pipeline(obj):
     """De-serialize data_algebra operator pipeline from a collect_representation() form."""
-    if isinstance(obj,  dict):
+    if isinstance(obj, dict):
         # a pipe stage
-        op = obj['op']
+        op = obj["op"]
         # ugly switch statement, helps us avoid calling eval and stay safer
-        if op == 'TableDescription':
-            return TableDescription(table_name=obj['table_name'],
-                                    column_names=obj['column_names'],
-                                    qualifiers=obj['qualifiers'])
-        elif op == 'Extend':
-            return Extend(ops=obj['ops'])
+        if op == "TableDescription":
+            return TableDescription(
+                table_name=obj["table_name"],
+                column_names=obj["column_names"],
+                qualifiers=obj["qualifiers"],
+            )
+        elif op == "Extend":
+            return Extend(ops=obj["ops"])
         else:
             raise Exception("Unexpected op name")
     if isinstance(obj, list):
