@@ -13128,6 +13128,7 @@ div#notebook {
     <span class="n">recursive_example</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span>
+    
 </pre></div>
 
     </div>
@@ -13152,6 +13153,14 @@ div#notebook {
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Note: this throw-pattern can <em>only</em> be used in the case where tail-calls are only called by tail-calls, as the raise will throw-through intermediate code.</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
