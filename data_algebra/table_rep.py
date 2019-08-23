@@ -245,7 +245,7 @@ class Expression(Term):
         if len(self.args) < 1:
             raise Exception("empty expression")
         if len(self.args) == 1:
-            return "(" + self.op + " " + self.args[0].to_python() + ")"
+            return self.op + "(" + self.args[0].to_python() + ")"
         # TODO: more cases than just on size
         if len(self.args) == 2:
             return (
