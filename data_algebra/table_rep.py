@@ -210,6 +210,9 @@ class Term:
     def __ceil__(self):
         return self.__uop_expr__("ceil")
 
+    def max(self):
+        return self.__uop_expr__("max")
+
 
 class Value(Term):
     def __init__(self, value):
@@ -242,7 +245,7 @@ class Expression(Term):
         if len(self.args) < 1:
             raise Exception("empty expression")
         if len(self.args) == 1:
-            return "(" + self.op + " " + self.args[0] + ")"
+            return "(" + self.op + " " + self.args[0].to_python() + ")"
         # TODO: more cases than just on size
         if len(self.args) == 2:
             return (

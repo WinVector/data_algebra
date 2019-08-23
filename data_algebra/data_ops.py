@@ -90,8 +90,11 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
 
     # define builders for all non-leaf node types on base class
 
-    def extend(self, ops):
-        return ExtendNode(source=self, ops=ops)
+    def extend(self, ops,
+                 *,
+                 partition_by=None, order_by=None, reverse=None):
+        return ExtendNode(source=self, ops=ops,
+                          partition_by=partition_by, order_by=order_by, reverse=reverse)
 
     def natural_join(self, b, *, by, jointype):
         return NaturalJoinNode(a=self, b=b, by=by, jointype=jointype)
@@ -189,21 +192,61 @@ class TableDescription(ViewRepresentation):
 
 # TODO: add get all tables in a pipleline and confirm columns are functions of table.key()
 
-
 class ExtendNode(ViewRepresentation):
     ops: Dict[str, data_algebra.table_rep.Expression]
 
-    def __init__(self, source, ops):
+    def __init__(self, source, ops,
+                 *,
+                 partition_by=None, order_by=None, reverse=None):
         ops = data_algebra.table_rep.check_convert_op_dictionary(
             ops, source.column_map.__dict__
         )
+        if len(ops)<1:
+            raise Exception("no ops")
+        self.ops = ops
+        if partition_by is None:
+            partition_by = []
+        if isinstance(partition_by, str):
+            partition_by = [partition_by]
+        self.partition_by = partition_by
+        if order_by is None:
+            order_by = []
+        if isinstance(order_by, str):
+            order_by = [order_by]
+        self.order_by = order_by
+        if reverse is None:
+            reverse = []
+        if isinstance(reverse, str):
+            reverse = [reverse]
+        self.reverse = reverse
         column_names = source.column_names.copy()
+        consumed_cols = set()
+        for (k,o) in ops.items():
+            o.get_column_names(consumed_cols)
+        unknown_cols = consumed_cols - source.column_set
+        if len(unknown_cols)>0:
+            raise Exception("referered to unknown columns: " + str(unknown_cols))
         known_cols = set(column_names)
         for ci in ops.keys():
             if ci not in known_cols:
                 column_names.append(ci)
+        if len(partition_by) != len(set(partition_by)):
+            raise Exception("Duplicate name in partition_by")
+        if len(order_by) != len(set(order_by)):
+            raise Exception("Duplicate name in order_by")
+        if len(reverse) != len(set(reverse)):
+            raise Exception("Duplicate name in reverse")
+        unknown = set(partition_by) - known_cols
+        if len(unknown)>0:
+            raise Exception("unknown partition_by columns: " + str(unknown))
+        unknown = set(order_by) - known_cols
+        if len(unknown) > 0:
+            raise Exception("unknown order_by columns: " + str(unknown))
+        unknown = set(reverse) - set(order_by)
+        if len(unknown) > 0:
+            raise Exception("reverse columns not in order_by: " + str(unknown))
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
-        self.ops = ops
+
 
     def _collect_representation(self, pipeline=None):
         if pipeline is None:
@@ -211,41 +254,71 @@ class ExtendNode(ViewRepresentation):
         od = collections.OrderedDict()
         od["op"] = "Extend"
         od["ops"] = {ci: vi.to_python() for (ci, vi) in self.ops.items()}
+        od["partition_by"] = self.partition_by
+        od["order_by"] = self.order_by
+        od["reverse"] = self.reverse
         pipeline.insert(0, od)
         return data_algebra.pending_eval.tail_call(
             self.sources[0]._collect_representation
         )(pipeline=pipeline)
 
     def format_ops(self, indent=0):
-        return (
+        s = (
             self.sources[0].format_ops(indent=indent)
             + " >>\n"
             + " " * (indent + 3)
             + "Extend("
             + str(self.ops)
-            + ")"
         )
+        if len(self.partition_by)>0:
+            s = s + ", partition_by:" + str(self.partition_by)
+        if len(self.order_by)>0:
+            s = s + ", order_by:" + str(self.order_by)
+        if len(self.reverse)>0:
+            s = s + ", reverse:" + str(self.reverse)
+        s = s + ")"
+        return s
 
     def to_sql(self, db_model, *, using = None, temp_id_source = None):
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
             using = self.column_set
+        subops = {k: op for (k, op) in self.ops.items() if k in using}
+        if len(subops) <= 0:
+            # know using was not None is this case as len(self.ops)>0 and all keys are in self.column_set
+            return self.sources[0].to_sql(db_model=db_model,
+                                          using=using,
+                                          temp_id_source=temp_id_source)
+        using = using.union(self.partition_by, self.order_by, self.reverse)
         if len(using) < 1:
-            raise Exception("must select at least one column")
+            raise Exception("must produce at least one column")
         missing = using - self.column_set
         if len(missing) > 0:
             raise Exception("referred to unknown columns: " + str(missing))
-        subops = {k:op for (k, op) in self.ops.items() if k in using}
-        origcols = {k for k in using if not k in subops.keys()}
-        if len(subops)<=0:
-            return self.sources[0].to_sql(db_model=db_model, using=origcols, temp_id_source=temp_id_source)
-        # TODO: sub-using should only be column names in origcols and RHS vaules from subops
-        subusing = self.sources[0].column_set.copy()
+        # get set of coumns we need from subquery
+        subusing = using.intersection(set(self.sources[0].column_names)) - subops.keys()
+        for (k, o) in subops.items():
+            o.get_column_names(subusing)
+        if len(subusing) < 1:
+            raise Exception("must consume at least one column")
         subsql = self.sources[0].to_sql(db_model=db_model, using=subusing, temp_id_source=temp_id_source)
         sub_view_name = "SQ_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        derived = [db_model.expr_to_sql(oi) + " AS " + db_model.quote_identifier(ci) for (ci, oi) in subops.items()]
+        window_term = ''
+        if len(self.partition_by)>0 or len(self.order_by)>0:
+            window_term = " OVER ( "
+            if len(self.partition_by)>0:
+                pt = [db_model.quote_identifier(ci) for ci in self.partition_by]
+                window_term = window_term + "PARTITION BY " + ', '.join(pt) +  " "
+            if len(self.order_by)>0:
+                revs = set(self.reverse)
+                rt = [db_model.quote_identifier(ci) + (' DESC' if ci in revs else '') for ci in self.partition_by]
+                window_term = window_term + "ORDER BY " + ', '.join(rt) + " "
+            window_term = window_term + " ) "
+        derived = [db_model.expr_to_sql(oi) + window_term + " AS " + db_model.quote_identifier(ci) for
+                    (ci, oi) in subops.items()]
+        origcols = {k for k in using if not k in subops.keys()}
         if len(origcols)>0:
             derived = [db_model.quote_identifier(ci) for ci in origcols] + derived
         sql_str = "SELECT " + ', '.join(derived) + " FROM ( " + subsql + " ) " + db_model.quote_identifier(sub_view_name)
@@ -276,12 +349,18 @@ class Extend(data_algebra.pipe.PipeStep):
 
     ops: Dict[str, data_algebra.table_rep.Expression]
 
-    def __init__(self, ops):
+    def __init__(self, ops, *, partition_by=None, order_by=None, reverse=None):
         data_algebra.pipe.PipeStep.__init__(self, name="Extend")
         self._ops = ops
+        self.partition_by = partition_by
+        self.order_by = order_by
+        self.reverse = reverse
 
     def apply(self, other):
-        return other.extend(self._ops)
+        return other.extend(ops=self._ops,
+                            partition_by=self.partition_by,
+                            order_by=self.order_by,
+                            reverse=self.reverse)
 
 
 class NaturalJoinNode(ViewRepresentation):
