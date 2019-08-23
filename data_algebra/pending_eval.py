@@ -9,6 +9,9 @@ class PendingFunctionEvaluation(Exception):
     """
     Store a planned function evaluation as something to be realized later.
     Essentially a call-by-need, or lazy structure such as a "thunk".
+
+    Note: this throw-pattern can only be used in the case where tail-calls are only called by tail-calls,
+    as the raise will throw-through intermediate code.
     """
 
     def __init__(self, f, *args, **kwargs):

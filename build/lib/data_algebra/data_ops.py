@@ -60,6 +60,8 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         """implementation to collec representation with tail-recursion eliminated eval
         subclasses should override _collect_representation() also not
         call collect_representation() in the calculation.
+        Nota bene: any non-tail calls to the _collect_representation() methods must
+        go through a guard such as eval_using_exceptions (to prevent throw-through).
         """
         raise Exception("base method called")
 
