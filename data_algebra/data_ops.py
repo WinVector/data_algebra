@@ -55,6 +55,7 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
                 raise Exception("all sources must be of class ViewRepresentation")
         self.sources = [si for si in sources]
         data_algebra.pipe.PipeValue.__init__(self)
+        data_algebra.env.maybe_set_underbar(mp0=self.column_map.__dict__)
 
     def _collect_representation(self, pipeline=None):
         """implementation pf _collect_representation representation with tail-recursion eliminated eval
@@ -77,7 +78,10 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
     # define builders for all non-leaf node types on base class
 
     def extend(self, ops):
-        return ExtendNode(self, ops)
+        return ExtendNode(source=self, ops=ops)
+
+    def natural_join(self, b, *, by, jointype):
+        return NaturalJoinNode(a=self, b=b, by=by, jointype=jointype)
 
 
 class TableDescription(ViewRepresentation):
@@ -109,7 +113,6 @@ class TableDescription(ViewRepresentation):
         if not isinstance(qualifiers, dict):
             raise Exception("qualifiers must be a dictionary")
         self.qualifiers = qualifiers.copy()
-        data_algebra.env.maybe_set_underbar(mp0=self.column_map.__dict__)
 
     def _collect_representation(self, pipeline=None):
         if pipeline is None:
@@ -137,8 +140,6 @@ class ExtendNode(ViewRepresentation):
     ops: Dict[str, data_algebra.table_rep.Expression]
 
     def __init__(self, source, ops):
-        if not isinstance(source, ViewRepresentation):
-            raise Exception("source must be a ViewRepresentation")
         ops = data_algebra.table_rep.check_convert_op_dictionary(
             ops, source.column_map.__dict__
         )
@@ -146,10 +147,9 @@ class ExtendNode(ViewRepresentation):
         known_cols = set(column_names)
         for ci in ops.keys():
             if ci not in known_cols:
-                column_names = column_names + [ci]
+                column_names.append(ci)
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
         self.ops = ops
-        data_algebra.env.maybe_set_underbar(mp0=self.column_map.__dict__)
 
     def _collect_representation(self, pipeline=None):
         if pipeline is None:
@@ -158,7 +158,7 @@ class ExtendNode(ViewRepresentation):
         od["op"] = "Extend"
         od["ops"] = {ci: vi.to_python() for (ci, vi) in self.ops.items()}
         pipeline.insert(0, od)
-        return data_algebra.pending_eval.tail_call(self.sources[0].collect_representation)(pipeline=pipeline)
+        return data_algebra.pending_eval.tail_call(self.sources[0]._collect_representation)(pipeline=pipeline)
 
     def __repr__(self):
         return str(self.sources[0]) + " >>\n    " + "Extend(" + str(self.ops) + ")"
@@ -173,7 +173,7 @@ class Extend(data_algebra.pipe.PipeStep):
        If outer namespace is set user values are visible and
        _-side effects can be written back.
 
-       Examples:
+       Example:
            from data_algebra.data_ops import *
            import data_algebra.env
            with data_algebra.env.Env(locals()) as env:
@@ -187,52 +187,9 @@ class Extend(data_algebra.pipe.PipeStep):
                      Extend({'z':_.x + _[var_name]/q + _get('x')})
                 )
                 print(ops)
-
-                print("ex 2")
-                ops2 = (
-                    TableDescription('d', ['x', 'y']) .
-                        extend({'z':'1/q + x'})
-                )
-                print(ops2)
-
-                print("ex 3")
-                ops3 = (
-                    TableDescription('d', ['x', 'y']) .
-                        extend({'z':'1/q + _.x/_[var_name]', 'f':1, 'g':'"2"', 'h':True})
-                )
-                print(ops3)
-
-                print("ex 4")
-                import data_algebra.pipe
-
-                ops4 = data_algebra.pipe.build_pipeline(
-                    TableDescription('d', ['x', 'y']),
-                    Extend({'z':'1/_.y + 1/q', 'x':'x+1'})
-                )
-                print(ops4)
-
-                print("ex 5, columns take precedence over values")
-                ops5 = (
-                    TableDescription('d', ['q', 'y']) .
-                        extend({'z':'1/q + y'})
-                )
-                print(ops5)
-
-                print("ex 6, forcing values")
-                ops6 = (
-                    TableDescription('d', ['q', 'y']) .
-                        extend({'z':'q/_get("q") + y + _.q'})
-                )
-                print(ops6)
-
-                p = ops3.collect_representation()
-                print(p)
-                import yaml
-                dmp = yaml.dump(p)
-                print(dmp)
-                ops3b = data_algebra.data_ops.to_pipeline(yaml.safe_load(dmp))
-                print(ops3b)
     """
+
+    ops: Dict[str, data_algebra.table_rep.Expression]
 
     def __init__(self, ops):
         data_algebra.pipe.PipeStep.__init__(self, name="Extend")
@@ -240,6 +197,71 @@ class Extend(data_algebra.pipe.PipeStep):
 
     def apply(self, other):
         return other.extend(self._ops)
+
+
+class NaturalJoinNode(ViewRepresentation):
+    _by: List[str]
+    _jointype: str
+
+    def __init__(self, a, b,
+                 *,
+                 by = None,
+                 jointype = 'INNER'):
+        sources = [a, b]
+        column_names = sources[0].column_names.copy()
+        for ci in sources[1].column_names:
+            if ci not in sources[0].column_set:
+                column_names.append(ci)
+        missing0 = set(by) - sources[0].column_set
+        missing1 = set(by) - sources[1].column_set
+        if (len(missing0)>0) or (len(missing1)>0):
+            raise Exception("all by-columns must be in both tables")
+        self._by = by
+        self._jointype = jointype
+        ViewRepresentation.__init__(self, column_names=column_names, sources=sources)
+
+    def _collect_representation(self, pipeline=None):
+        if pipeline is None:
+            pipeline = []
+        od = collections.OrderedDict()
+        od["op"] = "NaturalJoin"
+        od["by"] = self._by
+        od["jointype"] = self._jointype
+        od["b"] = self.sources[1].collect_representation()
+        pipeline.insert(0, od)
+        return data_algebra.pending_eval.tail_call(self.sources[0]._collect_representation)(pipeline=pipeline)
+
+    def __repr__(self):
+        return str(self.sources[0]) + " >>\n    " + "NaturalJoin(b=" + str(self.sources[1]) + ", by=" + str(self._by) + ", jointype=" + self._jointype + ")"
+
+    def __str__(self):
+        return str(self.sources[0]) + " >>\n    " + "NaturalJoin(b=" + str(self.sources[1]) + ", by=" + str(self._by) + ", jointype=" + self._jointype + ")"
+
+
+class NaturalJoin(data_algebra.pipe.PipeStep):
+    _by: List[str]
+    _jointype: str
+    _b: ViewRepresentation
+
+    def __init__(self,
+                 *,
+                 b = None,
+                 by = None,
+                 jointype = 'INNER'):
+        if not isinstance(b, ViewRepresentation):
+            raise Exception("b should be a ViewRepresentation")
+        missing1 = set(by) - b.column_set
+        if len(missing1) > 0:
+            raise Exception("all by-columns must be in b-table")
+        data_algebra.pipe.PipeStep.__init__(self, name="NaturalJoin")
+        self._by = by
+        self._jointype = jointype
+        self._b = b
+
+    def apply(self, other):
+        return other.natural_join(b = self._b,
+                                  by = self._by,
+                                  jointype = self._jointype)
 
 
 def to_pipeline(obj):
@@ -261,6 +283,10 @@ def to_pipeline(obj):
             )
         elif op == "Extend":
             return Extend(ops=obj["ops"])
+        elif op == "NaturalJoin":
+            return NaturalJoin(by=obj["by"],
+                               jointype=obj["jointype"],
+                               b=obj["b"])
         else:
             raise Exception("Unexpected op name")
     if isinstance(obj, list):
