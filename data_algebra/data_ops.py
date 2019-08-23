@@ -104,6 +104,7 @@ class TableDescription(ViewRepresentation):
 
     table_name: str
     qualifiers: Dict[str, str]
+    _key: str
 
     def __init__(self, table_name, column_names, *, qualifiers=None):
         ViewRepresentation.__init__(self, column_names=column_names)
@@ -116,6 +117,15 @@ class TableDescription(ViewRepresentation):
         if not isinstance(qualifiers, dict):
             raise Exception("qualifiers must be a dictionary")
         self.qualifiers = qualifiers.copy()
+        key = ''
+        if len(self.qualifiers) > 0:
+            keys = [k for k in self.qualifiers.keys()]
+            keys.sort()
+            key = '{'
+            for k in keys:
+                key = key + '(' + k + ', ' + str(self.qualifiers[k]) + ')'
+            key = key + '}.'
+        self._key = key + self.table_name
 
     def _collect_representation(self, pipeline=None):
         if pipeline is None:
@@ -128,19 +138,22 @@ class TableDescription(ViewRepresentation):
         pipeline.insert(0, od)
         return pipeline
 
-    def key(self):
-        qstr = ''
-        if len(self.qualifiers) > 0:
-            keys = [k for k in self.qualifiers.keys()]
-            keys.sort()
-            qstr = '{'
-            for k in keys:
-                qstr = qstr + '(' + k + ', ' + str(self.qualifiers[k]) + ')'
-            qstr = qstr + '}.'
-        return qstr + self.table_name
-
     def format_ops(self, indent=0):
-        return self.key()
+        return self._key
+
+    # comparable to other table descriptions
+    def __lt__(self, other):
+        if not isinstance(other, TableDescription):
+            return True
+        return self._key.__lt__(other._key)
+
+    def __eq__(self, other):
+        if not isinstance(other, TableDescription):
+            return False
+        return self._key.__eq__(other._key)
+
+    def __hash__(self):
+        return self._key.__hash__()
 
 
 # TODO: add get all tables in a pipleline and confirm columns are functions of table.key()
@@ -270,36 +283,48 @@ class NaturalJoin(data_algebra.pipe.PipeStep):
                                   jointype = self._jointype)
 
 
-def to_pipeline(obj):
+def to_pipeline(obj, *, known_tables = None):
     """De-serialize data_algebra operator pipeline from a collect_representation() form.
 
        Note: eval() is called to interpret expressions on some nodes, so this
        function is not safe to use on untrusted code (though a somewhat restricted
        version of eval() is used to try and catch some issues).
     """
+    if known_tables is None:
+        known_tables = {}
     if isinstance(obj, dict):
         # a pipe stage
         op = obj["op"]
         # ugly switch statement
         if op == "TableDescription":
-            return TableDescription(
+            tab =  TableDescription(
                 table_name=obj["table_name"],
                 column_names=obj["column_names"],
                 qualifiers=obj["qualifiers"],
             )
+            # canonicalize to one object per table
+            k = tab._key
+            if k in known_tables.keys():
+                ov = known_tables[k]
+                if tab.column_set != ov.column_set:
+                    raise Exception("two tables with same qualified table names and different declared column sets")
+                tab = ov
+            else:
+                known_tables[k] = tab
+            return tab
         elif op == "Extend":
             return Extend(ops=obj["ops"])
         elif op == "NaturalJoin":
             return NaturalJoin(by=obj["by"],
                                jointype=obj["jointype"],
-                               b=to_pipeline(obj["b"]))
+                               b=to_pipeline(obj["b"], known_tables=known_tables))
         else:
             raise Exception("Unexpected op name")
     if isinstance(obj, list):
         # a pipeline, assumed non empty
-        res = to_pipeline(obj[0])
+        res = to_pipeline(obj[0], known_tables=known_tables)
         for i in range(1, len(obj)):
-            nxt = to_pipeline(obj[i])
+            nxt = to_pipeline(obj[i], known_tables=known_tables)
             res = res >> nxt
         return res
     raise Exception("unexpected type")
