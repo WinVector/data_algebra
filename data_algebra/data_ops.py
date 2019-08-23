@@ -69,11 +69,14 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         f = data_algebra.pending_eval.tail_version(self._collect_representation)
         return f(pipeline=pipeline)
 
-    def __repr__(self):
+    def format_ops(self, indent=0):
         return "ViewRepresentation(" + self.column_names.__repr__() + ")"
 
+    def __repr__(self):
+        return self.format_ops()
+
     def __str__(self):
-        return "ViewRepresentation(" + self.column_names.__repr__() + ")"
+        return self.format_ops()
 
     # define builders for all non-leaf node types on base class
 
@@ -136,11 +139,9 @@ class TableDescription(ViewRepresentation):
             qstr = qstr + '}.'
         return qstr + self.table_name
 
-    def __repr__(self):
-         return self.key()
-
-    def __str__(self):
+    def format_ops(self, indent=0):
         return self.key()
+
 
 # TODO: add get all tables in a pipleline and confirm columns are functions of table.key()
 
@@ -168,11 +169,8 @@ class ExtendNode(ViewRepresentation):
         pipeline.insert(0, od)
         return data_algebra.pending_eval.tail_call(self.sources[0]._collect_representation)(pipeline=pipeline)
 
-    def __repr__(self):
-        return str(self.sources[0]) + " >>\n    " + "Extend(" + str(self.ops) + ")"
-
-    def __str__(self):
-        return str(self.sources[0]) + " >>\n    " + "Extend(" + str(self.ops) + ")"
+    def format_ops(self, indent=0):
+        return self.sources[0].format_ops(indent=indent) + " >>\n" + " "*(indent+3) + "Extend(" + str(self.ops) + ")"
 
 
 class Extend(data_algebra.pipe.PipeStep):
@@ -239,12 +237,12 @@ class NaturalJoinNode(ViewRepresentation):
         pipeline.insert(0, od)
         return data_algebra.pending_eval.tail_call(self.sources[0]._collect_representation)(pipeline=pipeline)
 
-    def __repr__(self):
-        return str(self.sources[0]) + " >>\n    " + "NaturalJoin(b=" + str(self.sources[1]) + ", by=" + str(self._by) + ", jointype=" + self._jointype + ")"
-
-    def __str__(self):
-        return str(self.sources[0]) + " >>\n    " + "NaturalJoin(b=" + str(self.sources[1]) + ", by=" + str(self._by) + ", jointype=" + self._jointype + ")"
-
+    def format_ops(self, indent=0):
+        return (self.sources[0].format_ops(indent=indent) + " >>\n" +
+                    " "*(indent+3) + "NaturalJoin(b=(\n" +
+                    " " * (indent + 6) +
+                    self.sources[1].format_ops(indent=indent+6) + "),\n" +
+                    " " * (indent + 6) + "by=" + str(self._by) + ", jointype=" + self._jointype + ")")
 
 class NaturalJoin(data_algebra.pipe.PipeStep):
     _by: List[str]
