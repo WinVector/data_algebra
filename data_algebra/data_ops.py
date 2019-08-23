@@ -145,11 +145,17 @@ class TableDescription(ViewRepresentation):
         od["table_name"] = self.table_name
         od["qualifiers"] = self.qualifiers.copy()
         od["column_names"] = self.column_names
+        od["key"] = self._key
         pipeline.insert(0, od)
         return pipeline
 
     def format_ops(self, indent=0):
-        return self._key
+        nc = min(len(self.column_names), 10)
+        ellipis_str = ''
+        if nc<len(self.column_names):
+            ellipis_str = ', ...'
+        s = "Table(" + self._key + "; " + ", ".join([self.column_names[i] for i in range(nc)]) + ellipis_str + ")"
+        return s
 
     def to_sql(self, db_model, *, using = None, temp_id_source = None):
         if temp_id_source is None:
