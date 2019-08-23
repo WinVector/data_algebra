@@ -223,6 +223,8 @@ class NaturalJoinNode(ViewRepresentation):
                 column_names.append(ci)
         if isinstance(by, str):
             by = [by]
+        if len(by) != len(set(by)):
+            raise Exception("duplicate column names in by")
         missing0 = set(by) - sources[0].column_set
         missing1 = set(by) - sources[1].column_set
         if (len(missing0) > 0) or (len(missing1) > 0):
@@ -276,6 +278,8 @@ class NaturalJoin(data_algebra.pipe.PipeStep):
         data_algebra.pipe.PipeStep.__init__(self, name="NaturalJoin")
         if isinstance(by, str):
             by = [by]
+        if len(by) != len(set(by)):
+            raise Exception("duplicate column names in by")
         self._by = by
         self._jointype = jointype
         self._b = b
