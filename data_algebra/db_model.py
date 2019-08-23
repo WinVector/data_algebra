@@ -20,3 +20,6 @@ class DBModel:
 
     def quote_string(self, string):
         raise Exception("base method called")
+
+    def expr_to_sql(self, expression):
+        raise Exception("base method called")

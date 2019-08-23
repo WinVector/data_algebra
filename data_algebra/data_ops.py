@@ -70,7 +70,7 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
 
     # the heavy to-sql methods
 
-    def to_sql(self, db_model, *, using = None):
+    def to_sql(self, db_model, *, using = None, temp_id_source = None):
         """
 
         :param db_model: data_algebra_db_model.DBModel
@@ -79,8 +79,10 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         """
         raise Exception("base method called")
 
-    def pretty_sql(self, db_model, *, using = None):
-        sql = self.to_sql(db_model=db_model, using=using)
+    def pretty_sql(self, db_model, *, using = None, temp_id_source = None):
+        if temp_id_source is None:
+            temp_id_source = [0]
+        sql = self.to_sql(db_model=db_model, using=using, temp_id_source=temp_id_source)
         return sqlparse.format(sql,
                                reindent=True,
                                keyword_case='upper')
@@ -149,7 +151,9 @@ class TableDescription(ViewRepresentation):
     def format_ops(self, indent=0):
         return self._key
 
-    def to_sql(self, db_model, *, using = None):
+    def to_sql(self, db_model, *, using = None, temp_id_source = None):
+        if temp_id_source is None:
+            temp_id_source = [0]
         if using is None:
             using = self.column_set
         if len(using) < 1:
@@ -158,8 +162,8 @@ class TableDescription(ViewRepresentation):
         if len(missing)>0:
             raise Exception("referred to unknown columns: " + str(missing))
         cols = [db_model.quote_identifier(ci) for ci in using]
-        str = "SELECT " + ', '.join(cols) + " FROM " + db_model.quote_table_name(self)
-        return str
+        sql_str = "SELECT " + ', '.join(cols) + " FROM " + db_model.quote_table_name(self)
+        return sql_str
 
 
     # comparable to other table descriptions
@@ -215,6 +219,31 @@ class ExtendNode(ViewRepresentation):
             + str(self.ops)
             + ")"
         )
+
+    def to_sql(self, db_model, *, using = None, temp_id_source = None):
+        if temp_id_source is None:
+            temp_id_source = [0]
+        if using is None:
+            using = self.column_set
+        if len(using) < 1:
+            raise Exception("must select at least one column")
+        missing = using - self.column_set
+        if len(missing) > 0:
+            raise Exception("referred to unknown columns: " + str(missing))
+        subops = {k:op for (k, op) in self.ops.items() if k in using}
+        origcols = {k for k in using if not k in subops.keys()}
+        if len(subops)<=0:
+            return self.sources[0].to_sql(db_model=db_model, using=origcols, temp_id_source=temp_id_source)
+        # TODO: sub-using should only be column names in origcols and RHS vaules from subops
+        subusing = self.sources[0].column_set.copy()
+        subsql = self.sources[0].to_sql(db_model=db_model, using=subusing, temp_id_source=temp_id_source)
+        sub_view_name = "T_" + str(temp_id_source[0])
+        temp_id_source[0] = temp_id_source[0] + 1
+        derived = [db_model.expr_to_sql(oi) + " AS " + db_model.quote_identifier(ci) for (ci, oi) in subops.items()]
+        if len(origcols)>0:
+            derived = [db_model.quote_identifier(ci) for ci in origcols] + derived
+        sql_str = "SELECT " + ', '.join(derived) + " FROM ( " + subsql + " ) " + db_model.quote_identifier(sub_view_name)
+        return sql_str
 
 
 class Extend(data_algebra.pipe.PipeStep):

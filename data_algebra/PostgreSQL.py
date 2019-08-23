@@ -1,6 +1,7 @@
 
 import re
 import data_algebra.db_model
+import data_algebra.table_rep
 
 class PostgreSQLModel(data_algebra.db_model.DBModel):
     """A model of how SQL should be generated for PostgreSQL"""
@@ -32,3 +33,9 @@ class PostgreSQLModel(data_algebra.db_model.DBModel):
             raise Exception('expected string to be a str')
         # replace all single-quotes with doubled single quotes and return surrounded by single quotes
         return "'" + re.sub("'", "''", string) + "'"
+
+    def expr_to_sql(self, expression):
+        if not isinstance(expression, data_algebra.table_rep.Term):
+            raise Exception("expression should be of class data_algebra.table_rep.Term")
+        # TODO: implement an actual tree visitor translation to SQL
+        return expression.to_python()
