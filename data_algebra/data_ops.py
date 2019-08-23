@@ -237,7 +237,7 @@ class ExtendNode(ViewRepresentation):
         # TODO: sub-using should only be column names in origcols and RHS vaules from subops
         subusing = self.sources[0].column_set.copy()
         subsql = self.sources[0].to_sql(db_model=db_model, using=subusing, temp_id_source=temp_id_source)
-        sub_view_name = "T_" + str(temp_id_source[0])
+        sub_view_name = "SQ_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         derived = [db_model.expr_to_sql(oi) + " AS " + db_model.quote_identifier(ci) for (ci, oi) in subops.items()]
         if len(origcols)>0:
@@ -329,6 +329,49 @@ class NaturalJoinNode(ViewRepresentation):
             + self._jointype
             + ")"
         )
+
+    def to_sql(self, db_model, *, using=None, temp_id_source=None):
+        if temp_id_source is None:
+            temp_id_source = [0]
+        if using is None:
+            using = self.column_set
+        by_set = set(self._by)
+        using = using.union(by_set)
+        if len(using) < 1:
+            raise Exception("must select at least one column")
+        missing = using - self.column_set
+        # TODO: move/copy checks into node construction
+        if len(missing) > 0:
+            raise Exception("referred to unknown columns: " + str(missing))
+        missing_left = by_set - self.sources[0].column_set
+        if len(missing_left)>0:
+            raise Exception("left table missing join keys: " + str(missing_left))
+        missing_right = by_set - self.sources[1].column_set
+        if len(missing_right) > 0:
+            raise Exception("right table missing join keys: " + str(missing_left))
+        using_left = self.sources[0].column_set.intersection(using)
+        using_right = self.sources[0].column_set.intersection(using)
+        sql_left = self.sources[0].to_sql(db_model=db_model, using=using_left, temp_id_source=temp_id_source)
+        sql_right = self.sources[0].to_sql(db_model=db_model, using=using_right, temp_id_source=temp_id_source)
+        sub_view_name_left = "LQ_" + str(temp_id_source[0])
+        temp_id_source[0] = temp_id_source[0] + 1
+        sub_view_name_right = "RQ_" + str(temp_id_source[0])
+        temp_id_source[0] = temp_id_source[0] + 1
+        common = using_left.intersection(using_right)
+        col_exprs = (
+            ['COALESE(' +
+                db_model.quote_identifier(sub_view_name_left) + '.' + db_model.quote_identifier(ci) +
+                ", " +
+                db_model.quote_identifier(sub_view_name_right) + '.' + db_model.quote_identifier(ci) +
+                ') AS ' + db_model.quote_identifier(ci) for ci in common] +
+            [db_model.quote_identifier(ci) for ci in using_left - common] +
+            [db_model.quote_identifier(ci) for ci in using_right - common])
+        sql_str = (
+                "SELECT " + ', '.join(col_exprs) +
+                " FROM ( " + sql_left + " ) " + db_model.quote_identifier(sub_view_name_left) +
+                " " + self._jointype + " JOIN ( " + sql_right + " ) " + db_model.quote_identifier(sub_view_name_right)
+        )
+        return sql_str
 
 
 class NaturalJoin(data_algebra.pipe.PipeStep):
