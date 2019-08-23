@@ -296,12 +296,15 @@ class NaturalJoinNode(ViewRepresentation):
                 column_names.append(ci)
         if isinstance(by, str):
             by = [by]
-        if len(by) != len(set(by)):
+        by_set = set(by)
+        if len(by) != len(by_set):
             raise Exception("duplicate column names in by")
-        missing0 = set(by) - sources[0].column_set
-        missing1 = set(by) - sources[1].column_set
-        if (len(missing0) > 0) or (len(missing1) > 0):
-            raise Exception("all by-columns must be in both tables")
+        missing_left = by_set - a.column_set
+        if len(missing_left) > 0:
+            raise Exception("left table missing join keys: " + str(missing_left))
+        missing_right = by_set - b.column_set
+        if len(missing_right) > 0:
+            raise Exception("right table missing join keys: " + str(missing_right))
         self._by = by
         self._jointype = jointype
         ViewRepresentation.__init__(self, column_names=column_names, sources=sources)
@@ -346,15 +349,8 @@ class NaturalJoinNode(ViewRepresentation):
         if len(using) < 1:
             raise Exception("must select at least one column")
         missing = using - self.column_set
-        # TODO: move/copy checks into node construction
         if len(missing) > 0:
             raise Exception("referred to unknown columns: " + str(missing))
-        missing_left = by_set - self.sources[0].column_set
-        if len(missing_left)>0:
-            raise Exception("left table missing join keys: " + str(missing_left))
-        missing_right = by_set - self.sources[1].column_set
-        if len(missing_right) > 0:
-            raise Exception("right table missing join keys: " + str(missing_left))
         using_left = self.sources[0].column_set.intersection(using)
         using_right = self.sources[0].column_set.intersection(using)
         sql_left = self.sources[0].to_sql(db_model=db_model, using=using_left, temp_id_source=temp_id_source)
@@ -394,8 +390,12 @@ class NaturalJoin(data_algebra.pipe.PipeStep):
         data_algebra.pipe.PipeStep.__init__(self, name="NaturalJoin")
         if isinstance(by, str):
             by = [by]
-        if len(by) != len(set(by)):
+        by_set = set(by)
+        if len(by) != len(by_set):
             raise Exception("duplicate column names in by")
+        missing_right = by_set - b.column_set
+        if len(missing_right) > 0:
+            raise Exception("right table missing join keys: " + str(missing_right))
         self._by = by
         self._jointype = jointype
         self._b = b
