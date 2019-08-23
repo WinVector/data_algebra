@@ -77,11 +77,10 @@ def recursive_example_rt(n, d=1):
     if n <= 1:
         return d
     else:
-        return pe.PendingFunctionEvaluation(
-            recursive_example_rt, n - 1, d + 1)
+        return pe.tail_call(recursive_example_rt)(n - 1, d + 1)
 
 
-pe.eval_using_exceptions(recursive_example_rt, 100000)
+pe.tail_version(recursive_example_rt)(100000)
 ```
 
 
@@ -99,11 +98,10 @@ class Cr:
         if n <= 1:
             return d
         else:
-            return pe.PendingFunctionEvaluation(
-                self.f_, n - 1, d + 1)
+            return pe.tail_call(self.f_)(n - 1, d + 1)
 
-    def f(self, n, d=1):
-        return pe.eval_using_exceptions(self.f_, n=n, d=d)
+    def f(self, *args, **kwargs):
+        return pe.tail_version(self.f_)(*args, *kwargs)
 
 o2 = Cr()
 o2.f(100000)

@@ -57,19 +57,16 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         data_algebra.pipe.PipeValue.__init__(self)
 
     def _collect_representation(self, pipeline=None):
-        """implementation to collec representation with tail-recursion eliminated eval
-        subclasses should override _collect_representation() also not
-        call collect_representation() in the calculation.
-        Nota bene: any non-tail calls to the _collect_representation() methods must
-        go through a guard such as eval_using_exceptions (to prevent throw-through).
+        """implementation pf _collect_representation representation with tail-recursion eliminated eval
+        subclasses should override _collect_representation().  Users should call _collect_representation().
         """
         raise Exception("base method called")
 
     def collect_representation(self, pipeline=None):
         """convert a data_algebra operator pipeline into a
         simple form for YAML serialization"""
-        return data_algebra.pending_eval.eval_using_exceptions(self._collect_representation,
-                                                               pipeline=pipeline)
+        f = data_algebra.pending_eval.tail_version(self._collect_representation)
+        return f(pipeline=pipeline)
 
     def __repr__(self):
         return "ViewRepresentation(" + self.column_names.__repr__() + ")"
@@ -161,9 +158,7 @@ class ExtendNode(ViewRepresentation):
         od["op"] = "Extend"
         od["ops"] = {ci: vi.to_python() for (ci, vi) in self.ops.items()}
         pipeline.insert(0, od)
-        # return self.sources[0].collect_representation(pipeline)
-        raise data_algebra.pending_eval.PendingFunctionEvaluation(self.sources[0].collect_representation,
-                                                                  pipeline=pipeline)
+        return data_algebra.pending_eval.tail_call(self.sources[0].collect_representation)(pipeline=pipeline)
 
     def __repr__(self):
         return str(self.sources[0]) + " >>\n    " + "Extend(" + str(self.ops) + ")"

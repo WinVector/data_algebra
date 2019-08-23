@@ -16,8 +16,6 @@ class PendingFunctionEvaluation(Exception):
 
     def __init__(self, f, *args, **kwargs):
         if isinstance(f, PendingFunctionEvaluation):
-            f = f._f
-        if isinstance(f, PendingFunctionEvaluation):
             raise Exception("f should not be a PendingFunctionEvaluation")
         self._f = f
         self._args = args
@@ -33,18 +31,34 @@ class PendingFunctionEvaluation(Exception):
         return v
 
 
-def eval_using_exceptions(f, *args, **kwargs):
-    v = None
-    try:
-        v = f(*args, **kwargs)
-    except PendingFunctionEvaluation as pve:
-        v = pve
+def tail_call(f):
+    return lambda *args, **kwargs: PendingFunctionEvaluation(f, *args, **kwargs)
+
+
+def unpack_result(v):
     while isinstance(v, PendingFunctionEvaluation):
         try:
             v = v()
         except PendingFunctionEvaluation as pve:
             v = pve
     return v
+
+
+def eval_tail(f, *args, **kwargs):
+    v = None
+    try:
+        v = f(*args, **kwargs)
+    except PendingFunctionEvaluation as pve:
+        v = pve
+    return unpack_result(v)
+
+
+def tail_version(f):
+    return lambda *args, **kwargs: eval_tail(f, *args, **kwargs)
+
+
+def eval_using_exceptions(f, *args, **kwargs):
+    return eval_tail(f, *args, **kwargs)
 
 
 
