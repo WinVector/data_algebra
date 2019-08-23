@@ -125,16 +125,24 @@ class TableDescription(ViewRepresentation):
         pipeline.insert(0, od)
         return pipeline
 
-    def __repr__(self):
+    def key(self):
+        qstr = ''
         if len(self.qualifiers) > 0:
-            return "Table(" + str(self.qualifiers) + ", " + self.table_name + ")"
-        return self.table_name
+            keys = [k for k in self.qualifiers.keys()]
+            keys.sort()
+            qstr = '{'
+            for k in keys:
+                qstr = qstr + '(' + k + ', ' + str(self.qualifiers[k]) + ')'
+            qstr = qstr + '}.'
+        return qstr + self.table_name
+
+    def __repr__(self):
+         return self.key()
 
     def __str__(self):
-        if len(self.qualifiers) > 0:
-            return "Table(" + str(self.qualifiers) + ", " + self.table_name + ")"
-        return self.table_name
+        return self.key()
 
+# TODO: add get all tables in a pipleline and confirm columns are functions of table.key()
 
 class ExtendNode(ViewRepresentation):
     ops: Dict[str, data_algebra.table_rep.Expression]
