@@ -282,6 +282,7 @@ class ColumnReference(Term):
 # Some notes on trying to harden eval:
 #  http://lybniz2.sourceforge.net/safeeval.html
 
+
 def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
     """
     Convert all entries of ops map to Term-expressions
@@ -315,7 +316,9 @@ def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
         if not isinstance(v, Term):
             if not isinstance(v, str):
                 v = str(v)
-            v = eval(v, sub_env, mp)  # eval is eval(source, globals, locals)- so mp is first
+            v = eval(
+                v, sub_env, mp
+            )  # eval is eval(source, globals, locals)- so mp is first
             if not isinstance(v, Term):
                 v = Value(v)
             v.source_string = ov

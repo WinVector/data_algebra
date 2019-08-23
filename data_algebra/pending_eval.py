@@ -1,9 +1,9 @@
-
 # Some good reading on thunks in Python here:
 #   https://www.kylem.net/programming/tailcall.html
 
 
 # Exception based idea
+
 
 class PendingFunctionEvaluation(Exception):
     """
@@ -59,6 +59,3 @@ def tail_version(f):
 
 def eval_using_exceptions(f, *args, **kwargs):
     return eval_tail(f, *args, **kwargs)
-
-
-
