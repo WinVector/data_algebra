@@ -231,6 +231,8 @@ class NaturalJoinNode(ViewRepresentation):
         for ci in sources[1].column_names:
             if ci not in sources[0].column_set:
                 column_names.append(ci)
+        if isinstance(by, str):
+            by = [by]
         missing0 = set(by) - sources[0].column_set
         missing1 = set(by) - sources[1].column_set
         if (len(missing0)>0) or (len(missing1)>0):
@@ -273,6 +275,8 @@ class NaturalJoin(data_algebra.pipe.PipeStep):
         if len(missing1) > 0:
             raise Exception("all by-columns must be in b-table")
         data_algebra.pipe.PipeStep.__init__(self, name="NaturalJoin")
+        if isinstance(by, str):
+            by = [by]
         self._by = by
         self._jointype = jointype
         self._b = b
