@@ -14,6 +14,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'PyYAML',
+        'sqlparse',
     ],
     platforms=['any'],
     license='License :: OSI Approved :: BSD 3-clause License',

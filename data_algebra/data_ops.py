@@ -1,10 +1,13 @@
 from typing import Set, Any, Dict, List
 import collections
 
+import sqlparse
+
 import data_algebra.table_rep
 import data_algebra.pipe
 import data_algebra.env
 import data_algebra.pending_eval
+import data_algebra.db_model
 
 
 class ViewRepresentation(data_algebra.pipe.PipeValue):
@@ -40,6 +43,8 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         data_algebra.pipe.PipeValue.__init__(self)
         data_algebra.env.maybe_set_underbar(mp0=self.column_map.__dict__)
 
+    # collect as simple structures for YAML I/O and other generic tasks
+
     def _collect_representation(self, pipeline=None):
         """implementation pf _collect_representation representation with tail-recursion eliminated eval
         subclasses should override _collect_representation().  Users should call _collect_representation().
@@ -52,6 +57,8 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         f = data_algebra.pending_eval.tail_version(self._collect_representation)
         return f(pipeline=pipeline)
 
+    # printing
+
     def format_ops(self, indent=0):
         return "ViewRepresentation(" + self.column_names.__repr__() + ")"
 
@@ -60,6 +67,24 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
 
     def __str__(self):
         return self.format_ops()
+
+    # the heavy to-sql methods
+
+    def to_sql(self, db_model, *, using = None):
+        """
+
+        :param db_model: data_algebra_db_model.DBModel
+        :param using: set of columns used from this view, None implies all columns
+        :return:
+        """
+        raise Exception("base method called")
+
+    def pretty_sql(self, db_model, *, using = None):
+        sql = self.to_sql(db_model=db_model, using=using)
+        return sqlparse.format(sql,
+                               reindent=True,
+                               keyword_case='upper')
+
 
     # define builders for all non-leaf node types on base class
 
@@ -123,6 +148,19 @@ class TableDescription(ViewRepresentation):
 
     def format_ops(self, indent=0):
         return self._key
+
+    def to_sql(self, db_model, *, using = None):
+        if using is None:
+            using = self.column_set
+        if len(using) < 1:
+            raise Exception("must select at least one column")
+        missing = using - self.column_set
+        if len(missing)>0:
+            raise Exception("referred to unknown columns: " + str(missing))
+        cols = [db_model.quote_identifier(ci) for ci in using]
+        str = "SELECT " + ', '.join(cols) + " FROM " + db_model.quote_table_name(self)
+        return str
+
 
     # comparable to other table descriptions
     def __lt__(self, other):
