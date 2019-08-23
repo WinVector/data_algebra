@@ -286,7 +286,7 @@ def to_pipeline(obj):
         elif op == "NaturalJoin":
             return NaturalJoin(by=obj["by"],
                                jointype=obj["jointype"],
-                               b=obj["b"])
+                               b=to_pipeline(obj["b"]))
         else:
             raise Exception("Unexpected op name")
     if isinstance(obj, list):
