@@ -3,7 +3,7 @@ import collections
 
 import sqlparse
 
-import data_algebra.table_rep
+import data_algebra.expr_rep
 import data_algebra.pipe
 import data_algebra.env
 import data_algebra.pending_eval
@@ -30,7 +30,7 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         if not len(self.column_names) == len(self.column_set):
             raise Exception("duplicate column name(s)")
         column_dict = {
-            ci: data_algebra.table_rep.ColumnReference(self, ci)
+            ci: data_algebra.expr_rep.ColumnReference(self, ci)
             for ci in self.column_names
         }
         self.column_map = data_algebra.env.SimpleNamespaceDict(**column_dict)
@@ -193,12 +193,12 @@ class TableDescription(ViewRepresentation):
 # TODO: add get all tables in a pipleline and confirm columns are functions of table.key()
 
 class ExtendNode(ViewRepresentation):
-    ops: Dict[str, data_algebra.table_rep.Expression]
+    ops: Dict[str, data_algebra.expr_rep.Expression]
 
     def __init__(self, source, ops,
                  *,
                  partition_by=None, order_by=None, reverse=None):
-        ops = data_algebra.table_rep.check_convert_op_dictionary(
+        ops = data_algebra.expr_rep.check_convert_op_dictionary(
             ops, source.column_map.__dict__
         )
         if len(ops)<1:
@@ -347,7 +347,7 @@ class Extend(data_algebra.pipe.PipeStep):
                 print(ops)
     """
 
-    ops: Dict[str, data_algebra.table_rep.Expression]
+    ops: Dict[str, data_algebra.expr_rep.Expression]
 
     def __init__(self, ops, *, partition_by=None, order_by=None, reverse=None):
         data_algebra.pipe.PipeStep.__init__(self, name="Extend")
