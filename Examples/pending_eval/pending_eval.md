@@ -60,8 +60,53 @@ class C:
 
 o = C()
 o.f(100000)
+```
 
 
+
+
+    100000
+
+
+
+Or something closer to the original [return-based system](https://www.kylem.net/programming/tailcall.html).
+
+
+```python
+def recursive_example_rt(n, d=1):
+    if n <= 1:
+        return d
+    else:
+        return pe.PendingFunctionEvaluation(
+            recursive_example_rt, n - 1, d + 1)
+
+
+pe.eval_using_exceptions(recursive_example_rt, 100000)
+```
+
+
+
+
+    100000
+
+
+
+
+```python
+class Cr:
+
+    def f_(self, n, d=1):
+        if n <= 1:
+            return d
+        else:
+            return pe.PendingFunctionEvaluation(
+                self.f_, n - 1, d + 1)
+
+    def f(self, n, d=1):
+        return pe.eval_using_exceptions(self.f_, n=n, d=d)
+
+o2 = Cr()
+o2.f(100000)
 ```
 
 

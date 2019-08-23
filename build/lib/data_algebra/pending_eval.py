@@ -16,6 +16,8 @@ class PendingFunctionEvaluation(Exception):
 
     def __init__(self, f, *args, **kwargs):
         if isinstance(f, PendingFunctionEvaluation):
+            f = f._f
+        if isinstance(f, PendingFunctionEvaluation):
             raise Exception("f should not be a PendingFunctionEvaluation")
         self._f = f
         self._args = args
@@ -27,7 +29,8 @@ class PendingFunctionEvaluation(Exception):
             raise Exception("there should be no args to __call__")
         if len(kwargs) > 0:
             raise Exception("there should be no kwargs to __call__")
-        return self._f(*self._args, **self._kwargs)
+        v = self._f(*self._args, **self._kwargs)
+        return v
 
 
 def eval_using_exceptions(f, *args, **kwargs):
