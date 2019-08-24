@@ -7,7 +7,6 @@ import data_algebra.expr_rep
 import data_algebra.pipe
 import data_algebra.env
 import data_algebra.pending_eval
-import data_algebra.db_model
 
 
 class ViewRepresentation(data_algebra.pipe.PipeValue):

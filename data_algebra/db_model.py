@@ -2,6 +2,7 @@ import math
 import re
 
 import data_algebra.expr_rep
+import data_algebra.data_ops
 
 
 class DBModel:
@@ -26,6 +27,8 @@ class DBModel:
         return self.identifier_quote + identifier + self.identifier_quote
 
     def quote_table_name(self, table_description):
+        if not isinstance(table_description, data_algebra.data_ops.TableDescription):
+            raise Exception("Expeted table_description to be a data_algebra.data_ops.TableDescription)")
         qt = self.quote_identifier(table_description.table_name)
         if len(table_description.qualifiers):
             raise Exception("This data model does not expect table qualifiers")
@@ -75,7 +78,8 @@ class DBModel:
         raise Exception("unexpected type: " + str(type(expression)))
 
     def table_def_to_sql(self, table_def, *, using=None):
-        # table_def should be a data_algebra.data_ops.TableDescription
+        if not isinstance(table_def, data_algebra.data_ops.TableDescription):
+            raise Exception("Expeted table_def to be a data_algebra.data_ops.TableDescription)")
         if using is None:
             using = table_def.column_set
         if len(using) < 1:
@@ -90,7 +94,8 @@ class DBModel:
         return sql_str
 
     def extend_to_sql(self, extend_node, *, using=None, temp_id_source=None):
-        # extend_node should be a data_algebra.data_ops.ExtendNode
+        if not isinstance(extend_node, data_algebra.data_ops.ExtendNode):
+            raise Exception("Expeted extend_node to be a data_algebra.data_ops.ExtendNode)")
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
@@ -154,7 +159,8 @@ class DBModel:
         return sql_str
 
     def natural_join_to_sql(self, join_node, *, using=None, temp_id_source=None):
-        # join_node should be a data_algebra.data_ops.NaturalJoinNode
+        if not isinstance(join_node, data_algebra.data_ops.NaturalJoinNode):
+            raise Exception("Expeted join_node to be a data_algebra.data_ops.NaturalJoinNode)")
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
