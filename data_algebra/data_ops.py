@@ -119,10 +119,10 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
     def select_rows(self, expr):
         raise Exception("not implemented yet")  # TODO: implement
 
-    def drop_columns(self, expr):
+    def drop_columns(self, columns):
         raise Exception("not implemented yet")  # TODO: implement
 
-    def select_columns(self, expr):
+    def select_columns(self, columns):
         raise Exception("not implemented yet")  # TODO: implement
 
     def rename_columns(self, column_mapping):
