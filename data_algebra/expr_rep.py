@@ -40,14 +40,14 @@ class Term:
             raise Exception("op is supposed to be a string")
         return Expression(op, (self,), params=params)
 
-    def to_python(self):
+    def to_python(self, *, want_inline_parens=False):
         raise Exception("base class called")
 
     def __repr__(self):
-        return self.to_python()
+        return self.to_python(want_inline_parens=False)
 
     def __str__(self):
-        return self.to_python()
+        return self.to_python(want_inline_parens=False)
 
     # override most of https://docs.python.org/3/reference/datamodel.html#emulating-numeric-types
 
@@ -229,7 +229,7 @@ class Value(Term):
         self.value = value
         Term.__init__(self)
 
-    def to_python(self):
+    def to_python(self, want_inline_parens=False):
         return self.value.__repr__()
 
 
@@ -248,7 +248,7 @@ class ColumnReference(Term):
             raise Exception("column_name must be a column of the given view")
         Term.__init__(self)
 
-    def to_python(self):
+    def to_python(self, want_inline_parens=False):
         return self.column_name
 
     def get_column_names(self, columns_seen):
@@ -273,16 +273,19 @@ class Expression(Term):
         for a in self.args:
             a.get_column_names(columns_seen)
 
-    def to_python(self):
+    def to_python(self, *, want_inline_parens=False):
         if self.op in py_formatters.keys():
             return py_formatters[self.op](self)
-        subs = [ai.to_python() for ai in self.args]
+        subs = [ai.to_python(want_inline_parens=True) for ai in self.args]
         if len(subs) <=0 :
             return "_." + self.op + "()"
         if len(subs) == 1:
             return subs[0] + "." + self.op + "()"
         if len(subs) == 2 and self.inline:
-            return "(" + subs[0] + " " + self.op + " " + subs[1] + ")"
+            if want_inline_parens:
+                return "(" + subs[0] + " " + self.op + " " + subs[1] + ")"
+            else:
+                return subs[0] + " " + self.op + " " + subs[1]
         return self.op + "(" + ", ".join(subs) + ")"
 
 
