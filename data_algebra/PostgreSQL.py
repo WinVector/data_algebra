@@ -18,6 +18,13 @@ class PostgreSQLModel(data_algebra.db_model.DBModel):
             sql_formatters=PostgreSQL_formatters,
         )
 
+    def quote_identifier(self, identifier):
+        if not isinstance(identifier, str):
+            raise Exception("expected identifier to be a str")
+        if self.identifier_quote in identifier:
+            raise Exception('did not expect " in identifier')
+        return self.identifier_quote + identifier.lower() + self.identifier_quote
+
     def quote_table_name(self, table_description):
         if not isinstance(table_description, data_algebra.data_ops.TableDescription):
             raise Exception("Expeted table_description to be a data_algebra.data_ops.TableDescription)")
