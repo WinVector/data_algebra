@@ -100,28 +100,22 @@ class DBModel:
             temp_id_source = [0]
         if using is None:
             using = extend_node.column_set
+        using = using.union(
+            extend_node.partition_by, extend_node.order_by, extend_node.reverse
+        )
         subops = {k: op for (k, op) in extend_node.ops.items() if k in using}
         if len(subops) <= 0:
             # know using was not None is this case as len(extend_node.ops)>0 and all keys are in extend_node.column_set
             return extend_node.sources[0].to_sql_implementation(
                 db_model=self, using=using, temp_id_source=temp_id_source
             )
-        using = using.union(
-            extend_node.partition_by, extend_node.order_by, extend_node.reverse
-        )
         if len(using) < 1:
             raise Exception("must produce at least one column")
         missing = using - extend_node.column_set
         if len(missing) > 0:
             raise Exception("referred to unknown columns: " + str(missing))
-        # get set of coumns we need from subquery
-        subusing = (
-            using.intersection(set(extend_node.sources[0].column_names)) - subops.keys()
-        )
-        for (k, o) in subops.items():
-            o.get_column_names(subusing)
-        if len(subusing) < 1:
-            raise Exception("must consume at least one column")
+        # get set of columns we need from subquery
+        subusing = extend_node.columns_used_from_sources(using=using)[0]
         subsql = extend_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
@@ -172,12 +166,13 @@ class DBModel:
         missing = using - join_node.column_set
         if len(missing) > 0:
             raise Exception("referred to unknown columns: " + str(missing))
-        using_left = join_node.sources[0].column_set.intersection(using)
-        using_right = join_node.sources[0].column_set.intersection(using)
+        subusing = join_node.columns_used_from_sources(using=using)
+        using_left = subusing[0]
+        using_right = subusing[1]
         sql_left = join_node.sources[0].to_sql_implementation(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
-        sql_right = join_node.sources[0].to_sql_implementation(
+        sql_right = join_node.sources[1].to_sql_implementation(
             db_model=self, using=using_right, temp_id_source=temp_id_source
         )
         sub_view_name_left = "LQ_" + str(temp_id_source[0])

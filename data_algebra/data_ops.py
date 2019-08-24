@@ -228,9 +228,7 @@ class TableDescription(ViewRepresentation):
         cset.update(using)
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
-        return db_model.table_def_to_sql(
-            self, using=using
-        )
+        return db_model.table_def_to_sql(self, using=using)
 
     # comparable to other table descriptions
     def __lt__(self, other):
@@ -278,7 +276,7 @@ class ExtendNode(ViewRepresentation):
             o.get_column_names(consumed_cols)
         unknown_cols = consumed_cols - source.column_set
         if len(unknown_cols) > 0:
-            raise Exception("referered to unknown columns: " + str(unknown_cols))
+            raise Exception("referred to unknown columns: " + str(unknown_cols))
         known_cols = set(column_names)
         for ci in ops.keys():
             if ci not in known_cols:
@@ -298,10 +296,23 @@ class ExtendNode(ViewRepresentation):
         unknown = set(reverse) - set(order_by)
         if len(unknown) > 0:
             raise Exception("reverse columns not in order_by: " + str(unknown))
+        bad_overwrite = set(ops.keys()).intersection(set(partition_by).union(order_by, reverse))
+        if len(bad_overwrite) > 0:
+            raise Exception("tried to change: " + str(bad_overwrite))
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
 
     def columns_used_from_sources(self, using):
-        raise Exception("not implemented yet")  # TODO: implement
+        columns_we_take = self.sources[0].column_set.copy()
+        if using is None:
+            return [columns_we_take]
+        subops = {k: op for (k, op) in self.ops.items() if k in using}
+        if len(subops) <= 0:
+            return [columns_we_take]
+        columns_we_take = columns_we_take.union(self.partition_by, self.order_by, self.reverse)
+        columns_we_take = columns_we_take - subops.keys()
+        for (k, o) in subops.items():
+            o.get_column_names(columns_we_take)
+        return [columns_we_take]
 
     def collect_representation_implementation(self, pipeline=None):
         if pipeline is None:
@@ -402,7 +413,10 @@ class NaturalJoinNode(ViewRepresentation):
         ViewRepresentation.__init__(self, column_names=column_names, sources=sources)
 
     def columns_used_from_sources(self, using):
-        raise Exception("not implemented yet")  # TODO: implement
+        if using is None:
+            return [self.sources[i].column_set.copy() for i in range(2)]
+        using = using.union(self.by)
+        return [self.sources[i].column_set.intersection(using) for i in range(2)]
 
     def collect_representation_implementation(self, pipeline=None):
         if pipeline is None:
@@ -433,9 +447,7 @@ class NaturalJoinNode(ViewRepresentation):
         )
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
-        return db_model.natural_join_to_sql(
-            self, using=using, temp_id_source=temp_id_source
-        )
+        return db_model.natural_join_to_sql(self, using=using, temp_id_source=temp_id_source)
 
 
 class NaturalJoin(data_algebra.pipe.PipeStep):
