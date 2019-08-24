@@ -26,14 +26,14 @@ class Term:
             raise Exception("op is supposed to be a string")
         if not isinstance(other, Term):
             other = Value(other)
-        return Expression(op, (self, other))
+        return Expression(op, (self, other), inline=True)
 
     def __rop_expr__(self, op, other):
         if not isinstance(op, str):
             raise Exception("op is supposed to be a string")
         if not isinstance(other, Term):
             other = Value(other)
-        return Expression(op, (other, self))
+        return Expression(op, (other, self), inline=True)
 
     def __uop_expr__(self, op, *, params=None):
         if not isinstance(op, str):
@@ -226,40 +226,6 @@ class Value(Term):
         return self.value.__repr__()
 
 
-class Expression(Term):
-    def __init__(self, op, args, *, params=None):
-        if not isinstance(op, str):
-            raise Exception("op is supposed to be a string")
-        if len(args) < 1:
-            raise Exception("args is not supposed to be empty")
-        self.op = op
-        self.args = args
-        self.params = params
-        Term.__init__(self)
-
-    def get_column_names(self, columns_seen):
-        for a in self.args:
-            a.get_column_names(columns_seen)
-
-    def to_python(self):
-        if len(self.args) < 1:
-            raise Exception("empty expression")
-        if len(self.args) == 1:
-            return self.op + "(" + self.args[0].to_python() + ")"
-        # TODO: more cases than just on size
-        if len(self.args) == 2:
-            return (
-                "("
-                + self.args[0].to_python()
-                + " "
-                + self.op
-                + " "
-                + self.args[1].to_python()
-                + ")"
-            )
-        raise Exception("unimplemented case")
-
-
 class ColumnReference(Term):
     """class to represent referring to a column"""
 
@@ -281,6 +247,44 @@ class ColumnReference(Term):
     def get_column_names(self, columns_seen):
         columns_seen.add(self.column_name)
 
+# map from op-name to special Python formatting code
+py_formatters = {
+    '___': lambda expression : expression.to_python()
+}
+
+class Expression(Term):
+    def __init__(self, op, args, *, params=None, inline=False):
+        if not isinstance(op, str):
+            raise Exception("op is supposed to be a string")
+        if len(args) < 1:
+            raise Exception("args is not supposed to be empty")
+        self.op = op
+        self.args = args
+        self.params = params
+        self.inline = inline
+        Term.__init__(self)
+
+    def get_column_names(self, columns_seen):
+        for a in self.args:
+            a.get_column_names(columns_seen)
+
+    def to_python(self):
+        if self.op in py_formatters.keys():
+            return py_formatters[self.op](self)
+        subs = [ai.to_python() for ai in self.args]
+        if len(subs) == 1:
+            return subs[0] + "." + self.op + "()"
+        if len(subs) == 2 and self.inline:
+            return (
+                "("
+                + subs[0]
+                + " "
+                + self.op
+                + " "
+                + subs[1]
+                + ")"
+            )
+        return self.op + "(" + ', '.join(subs) + ")"
 
 # Some notes on trying to harden eval:
 #  http://lybniz2.sourceforge.net/safeeval.html

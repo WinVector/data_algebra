@@ -1,7 +1,16 @@
 
 import re
+import math
+
 import data_algebra.db_model
 import data_algebra.expr_rep
+
+
+# map from op-name to special SQL formatting code
+sql_formatters = {
+    '___': lambda dbmodel, expression : expression.to_python()
+}
+
 
 class PostgreSQLModel(data_algebra.db_model.DBModel):
     """A model of how SQL should be generated for PostgreSQL"""
@@ -34,8 +43,43 @@ class PostgreSQLModel(data_algebra.db_model.DBModel):
         # replace all single-quotes with doubled single quotes and return surrounded by single quotes
         return "'" + re.sub("'", "''", string) + "'"
 
+    def value_to_sql(self, v):
+        if v is None:
+            return "NULL"
+        if isinstance(v, str):
+            return self.quote_string(v)
+        if isinstance(v, bool):
+            if v:
+                return "TRUE"
+            else:
+                return "FALSE"
+        if isinstance(v, float):
+            if math.isnan(v):
+                return "NULL"
+            return str(v)
+        return str(v)
+
     def expr_to_sql(self, expression):
         if not isinstance(expression, data_algebra.expr_rep.Term):
             raise Exception("expression should be of class data_algebra.table_rep.Term")
-        # TODO: implement an actual tree visitor translation to SQL
-        return expression.to_python()
+        if isinstance(expression, data_algebra.expr_rep.Value):
+            return self.value_to_sql(expression.value)
+        if isinstance(expression, data_algebra.expr_rep.ColumnReference):
+            return self.quote_identifier(expression.column_name)
+        if isinstance(expression, data_algebra.expr_rep.Expression):
+            if expression.op in sql_formatters.keys():
+                return sql_formatters[expression.op](self, expression)
+            subs = [self.expr_to_sql(ai) for ai in expression.args]
+            if len(subs) == 2 and expression.inline:
+                return (
+                        "("
+                        + subs[0]
+                        + " "
+                        + expression.op
+                        + " "
+                        + subs[1]
+                        + ")"
+                )
+            return expression.op + "(" + ', '.join(subs) + ")"
+
+        raise Exception("unexpected type: " + str(type(expression)))
