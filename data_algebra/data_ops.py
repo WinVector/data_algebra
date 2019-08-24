@@ -1,6 +1,9 @@
 from typing import Set, Any, Dict, List
 import collections
 
+import black
+import sqlparse
+
 import data_algebra.expr_rep
 import data_algebra.pipe
 import data_algebra.env
@@ -82,9 +85,14 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
     def to_python_implementation(self, *, indent=0, strict=True):
         return "ViewRepresentation(" + self.column_names.__repr__() + ")"
 
-    def to_python(self, *, indent=0, strict=True):
+    def to_python(self, *, indent=0, strict=True, pretty=False, black_mode=None):
         self.get_tables()  # for table consistency check/raise
-        return self.to_python_implementation(indent=indent, strict=strict)
+        str = self.to_python_implementation(indent=indent, strict=strict)
+        if pretty:
+            if black_mode is None:
+                black_mode = black.FileMode()
+            str = black.format_str(str, mode=black_mode)
+        return str
 
     def __repr__(self):
         return self.to_python(strict=True)
@@ -97,10 +105,13 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         raise Exception("base method called")
 
-    def to_sql(self, db_model):
+    def to_sql(self, db_model, *, pretty=False):
         self.get_tables()  # for table consistency check/raise
         temp_id_source = [0]
-        return self.to_sql_implementation(db_model=db_model, using=None, temp_id_source=temp_id_source)
+        str = self.to_sql_implementation(db_model=db_model, using=None, temp_id_source=temp_id_source)
+        if pretty:
+            str = sqlparse.format(str, reindent=True, keyword_case="upper")
+        return str
 
     # define builders for all non-leaf node types on base class
 
