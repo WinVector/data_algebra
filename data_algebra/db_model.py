@@ -103,7 +103,7 @@ class DBModel:
         subops = {k: op for (k, op) in extend_node.ops.items() if k in using}
         if len(subops) <= 0:
             # know using was not None is this case as len(extend_node.ops)>0 and all keys are in extend_node.column_set
-            return extend_node.sources[0].to_sql(
+            return extend_node.sources[0].to_sql_implementation(
                 db_model=self, using=using, temp_id_source=temp_id_source
             )
         using = using.union(
@@ -122,7 +122,7 @@ class DBModel:
             o.get_column_names(subusing)
         if len(subusing) < 1:
             raise Exception("must consume at least one column")
-        subsql = extend_node.sources[0].to_sql(
+        subsql = extend_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
         sub_view_name = "SQ_" + str(temp_id_source[0])
@@ -174,10 +174,10 @@ class DBModel:
             raise Exception("referred to unknown columns: " + str(missing))
         using_left = join_node.sources[0].column_set.intersection(using)
         using_right = join_node.sources[0].column_set.intersection(using)
-        sql_left = join_node.sources[0].to_sql(
+        sql_left = join_node.sources[0].to_sql_implementation(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
-        sql_right = join_node.sources[0].to_sql(
+        sql_right = join_node.sources[0].to_sql_implementation(
             db_model=self, using=using_right, temp_id_source=temp_id_source
         )
         sub_view_name_left = "LQ_" + str(temp_id_source[0])

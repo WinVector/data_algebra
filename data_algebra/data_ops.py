@@ -43,12 +43,30 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
     # characterization
 
     def get_tables(self, tables=None):
-        """get a dictionary of all tables used in an operator DAG, raise an exception if the values are not consistent"""
+        """get a dictionary of all tables used in an operator DAG,
+        raise an exception if the values are not consistent"""
         if tables is None:
             tables = {}
         for s in self.sources:
             tables = s.get_tables(tables)
         return tables
+
+    def columns_used_from_sources(self, using):
+        """Give column names used from source nodes when this node is exececuted
+        with the using columns (None means all)."""
+        raise Exception("base method called")
+
+    def columns_used_implementation(self, *, columns_used, using):
+        cu_list = self.columns_used_from_sources(using)
+        for i in range(len(self.sources)):
+            self.sources[i].columns_used_implementation(columns_used=columns_used, using=cu_list[i])
+
+    def columns_used(self):
+        """Determine which columns are used from source tables."""
+        tables = self.get_tables()
+        columns_used = {ki: set() for ki in tables.keys()}
+        self.columns_used_implementation(columns_used=columns_used, using=None)
+        return columns_used
 
     # collect as simple structures for YAML I/O and other generic tasks
 
@@ -76,19 +94,13 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
 
     # query generation
 
-    def to_sql_implementation(self, db_model, *, using=None, temp_id_source=None):
+    def to_sql_implementation(self, db_model, *, using, temp_id_source):
         raise Exception("base method called")
 
-    def to_sql(self, db_model, *, using=None, temp_id_source=None):
-        """
-
-        :param db_model: data_algebra_db_model.DBModel
-        :param using: set of columns used from this view, None implies all columns
-        :param temp_id_source: list a single integer to generate temp-ids for sub-queries
-        :return:
-        """
+    def to_sql(self, db_model):
         self.get_tables()  # for table consistency check/raise
-        return self.to_sql_implementation(db_model=db_model, using=using, temp_id_source=temp_id_source)
+        temp_id_source = [0]
+        return self.to_sql_implementation(db_model=db_model, using=None, temp_id_source=temp_id_source)
 
     # define builders for all non-leaf node types on base class
 
@@ -103,6 +115,24 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
         return NaturalJoinNode(a=self, b=b, by=by, jointype=jointype)
+
+    def select_rows(self, expr):
+        raise Exception("not implemented yet")  # TODO: implement
+
+    def drop_columns(self, expr):
+        raise Exception("not implemented yet")  # TODO: implement
+
+    def select_columns(self, expr):
+        raise Exception("not implemented yet")  # TODO: implement
+
+    def rename_columns(self, column_mapping):
+        raise Exception("not implemented yet")  # TODO: implement
+
+    def project(self, group_by):
+        raise Exception("not implemented yet")  # TODO: implement
+
+    def order_by(self, columns, *, reverse):
+        raise Exception("not implemented yet")  # TODO: implement
 
 
 class TableDescription(ViewRepresentation):
@@ -173,7 +203,8 @@ class TableDescription(ViewRepresentation):
         return s
 
     def get_tables(self, tables=None):
-        """get a dictionary of all tables used in an operator DAG, raise an exception if the values are not consistent"""
+        """get a dictionary of all tables used in an operator DAG,
+        raise an exception if the values are not consistent"""
         if tables is None:
             tables = {}
         if self.key in tables.keys():
@@ -184,7 +215,19 @@ class TableDescription(ViewRepresentation):
             tables[self.key] = self
         return tables
 
-    def to_sql_implementation(self, db_model, *, using=None, temp_id_source=None):
+    def columns_used_from_sources(self, using):
+        return []  # no inputs to table description
+
+    def columns_used_implementation(self, *, columns_used, using):
+        cset = columns_used[self.key]
+        if using is None:
+            using = self.column_set
+        unexpected = using - self.column_set
+        if len(unexpected) > 0:
+            raise Exception("asked for undefined columns: " + str(unexpected))
+        cset.update(using)
+
+    def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.table_def_to_sql(
             self, using=using
         )
@@ -257,6 +300,9 @@ class ExtendNode(ViewRepresentation):
             raise Exception("reverse columns not in order_by: " + str(unknown))
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
 
+    def columns_used_from_sources(self, using):
+        raise Exception("not implemented yet")  # TODO: implement
+
     def collect_representation_implementation(self, pipeline=None):
         if pipeline is None:
             pipeline = []
@@ -286,7 +332,7 @@ class ExtendNode(ViewRepresentation):
         s = s + ")"
         return s
 
-    def to_sql_implementation(self, db_model, *, using=None, temp_id_source=None):
+    def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.extend_to_sql(self, using=using, temp_id_source=temp_id_source)
 
 
@@ -355,6 +401,9 @@ class NaturalJoinNode(ViewRepresentation):
         self.jointype = jointype
         ViewRepresentation.__init__(self, column_names=column_names, sources=sources)
 
+    def columns_used_from_sources(self, using):
+        raise Exception("not implemented yet")  # TODO: implement
+
     def collect_representation_implementation(self, pipeline=None):
         if pipeline is None:
             pipeline = []
@@ -383,7 +432,7 @@ class NaturalJoinNode(ViewRepresentation):
             + ")"
         )
 
-    def to_sql_implementation(self, db_model, *, using=None, temp_id_source=None):
+    def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.natural_join_to_sql(
             self, using=using, temp_id_source=temp_id_source
         )
