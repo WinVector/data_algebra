@@ -60,7 +60,7 @@ class DBModel:
             return str(v)
         return str(v)
 
-    def expr_to_sql(self, expression):
+    def expr_to_sql(self, expression, *, want_inline_parens=False):
         if not isinstance(expression, data_algebra.expr_rep.Term):
             raise Exception("expression should be of class data_algebra.table_rep.Term")
         if isinstance(expression, data_algebra.expr_rep.Value):
@@ -70,9 +70,13 @@ class DBModel:
         if isinstance(expression, data_algebra.expr_rep.Expression):
             if expression.op in self.sql_formatters.keys():
                 return self.sql_formatters[expression.op](self, expression)
-            subs = [self.expr_to_sql(ai) for ai in expression.args]
+            subs = [self.expr_to_sql(ai, want_inline_parens=True) for ai in expression.args]
             if len(subs) == 2 and expression.inline:
-                return "(" + subs[0] + " " + expression.op.upper() + " " + subs[1] + ")"
+                if want_inline_parens:
+                    return "(" + subs[0] + " " + expression.op.upper() + " " + subs[1] + ")"
+                else:
+                    # SQL window functions don't like parens
+                    return subs[0] + " " + expression.op.upper() + " " + subs[1]
             return expression.op.upper() + "(" + ", ".join(subs) + ")"
 
         raise Exception("unexpected type: " + str(type(expression)))
