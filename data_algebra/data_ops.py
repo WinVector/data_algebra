@@ -161,19 +161,7 @@ class TableDescription(ViewRepresentation):
         return s
 
     def to_sql(self, db_model, *, using = None, temp_id_source = None):
-        if temp_id_source is None:
-            temp_id_source = [0]
-        if using is None:
-            using = self.column_set
-        if len(using) < 1:
-            raise Exception("must select at least one column")
-        missing = using - self.column_set
-        if len(missing)>0:
-            raise Exception("referred to unknown columns: " + str(missing))
-        cols = [db_model.quote_identifier(ci) for ci in using]
-        sql_str = "SELECT " + ', '.join(cols) + " FROM " + db_model.quote_table_name(self)
-        return sql_str
-
+        return db_model.table_def_to_sql(self, using = using, temp_id_source = temp_id_source)
 
     # comparable to other table descriptions
     def __lt__(self, other):
@@ -280,49 +268,7 @@ class ExtendNode(ViewRepresentation):
         return s
 
     def to_sql(self, db_model, *, using = None, temp_id_source = None):
-        if temp_id_source is None:
-            temp_id_source = [0]
-        if using is None:
-            using = self.column_set
-        subops = {k: op for (k, op) in self.ops.items() if k in using}
-        if len(subops) <= 0:
-            # know using was not None is this case as len(self.ops)>0 and all keys are in self.column_set
-            return self.sources[0].to_sql(db_model=db_model,
-                                          using=using,
-                                          temp_id_source=temp_id_source)
-        using = using.union(self.partition_by, self.order_by, self.reverse)
-        if len(using) < 1:
-            raise Exception("must produce at least one column")
-        missing = using - self.column_set
-        if len(missing) > 0:
-            raise Exception("referred to unknown columns: " + str(missing))
-        # get set of coumns we need from subquery
-        subusing = using.intersection(set(self.sources[0].column_names)) - subops.keys()
-        for (k, o) in subops.items():
-            o.get_column_names(subusing)
-        if len(subusing) < 1:
-            raise Exception("must consume at least one column")
-        subsql = self.sources[0].to_sql(db_model=db_model, using=subusing, temp_id_source=temp_id_source)
-        sub_view_name = "SQ_" + str(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
-        window_term = ''
-        if len(self.partition_by)>0 or len(self.order_by)>0:
-            window_term = " OVER ( "
-            if len(self.partition_by)>0:
-                pt = [db_model.quote_identifier(ci) for ci in self.partition_by]
-                window_term = window_term + "PARTITION BY " + ', '.join(pt) +  " "
-            if len(self.order_by)>0:
-                revs = set(self.reverse)
-                rt = [db_model.quote_identifier(ci) + (' DESC' if ci in revs else '') for ci in self.partition_by]
-                window_term = window_term + "ORDER BY " + ', '.join(rt) + " "
-            window_term = window_term + " ) "
-        derived = [db_model.expr_to_sql(oi) + window_term + " AS " + db_model.quote_identifier(ci) for
-                    (ci, oi) in subops.items()]
-        origcols = {k for k in using if not k in subops.keys()}
-        if len(origcols)>0:
-            derived = [db_model.quote_identifier(ci) for ci in origcols] + derived
-        sql_str = "SELECT " + ', '.join(derived) + " FROM ( " + subsql + " ) " + db_model.quote_identifier(sub_view_name)
-        return sql_str
+        return db_model.extend_to_sql(self, using = using, temp_id_source = temp_id_source)
 
 
 class Extend(data_algebra.pipe.PipeStep):
@@ -419,40 +365,7 @@ class NaturalJoinNode(ViewRepresentation):
         )
 
     def to_sql(self, db_model, *, using=None, temp_id_source=None):
-        if temp_id_source is None:
-            temp_id_source = [0]
-        if using is None:
-            using = self.column_set
-        by_set = set(self._by)
-        using = using.union(by_set)
-        if len(using) < 1:
-            raise Exception("must select at least one column")
-        missing = using - self.column_set
-        if len(missing) > 0:
-            raise Exception("referred to unknown columns: " + str(missing))
-        using_left = self.sources[0].column_set.intersection(using)
-        using_right = self.sources[0].column_set.intersection(using)
-        sql_left = self.sources[0].to_sql(db_model=db_model, using=using_left, temp_id_source=temp_id_source)
-        sql_right = self.sources[0].to_sql(db_model=db_model, using=using_right, temp_id_source=temp_id_source)
-        sub_view_name_left = "LQ_" + str(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
-        sub_view_name_right = "RQ_" + str(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
-        common = using_left.intersection(using_right)
-        col_exprs = (
-            ['COALESE(' +
-                db_model.quote_identifier(sub_view_name_left) + '.' + db_model.quote_identifier(ci) +
-                ", " +
-                db_model.quote_identifier(sub_view_name_right) + '.' + db_model.quote_identifier(ci) +
-                ') AS ' + db_model.quote_identifier(ci) for ci in common] +
-            [db_model.quote_identifier(ci) for ci in using_left - common] +
-            [db_model.quote_identifier(ci) for ci in using_right - common])
-        sql_str = (
-                "SELECT " + ', '.join(col_exprs) +
-                " FROM ( " + sql_left + " ) " + db_model.quote_identifier(sub_view_name_left) +
-                " " + self._jointype + " JOIN ( " + sql_right + " ) " + db_model.quote_identifier(sub_view_name_right)
-        )
-        return sql_str
+        return db_model.natural_join_to_sql(self, using=using, temp_id_source=temp_id_source)
 
 
 class NaturalJoin(data_algebra.pipe.PipeStep):
