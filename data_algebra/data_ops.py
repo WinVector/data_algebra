@@ -79,18 +79,18 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
 
     # printing
 
-    def format_ops_implementation(self, indent=0):
+    def to_python_implementation(self, *, indent=0, strict=True):
         return "ViewRepresentation(" + self.column_names.__repr__() + ")"
 
-    def format_ops(self, indent=0):
+    def to_python(self, *, indent=0, strict=True):
         self.get_tables()  # for table consistency check/raise
-        return self.format_ops_implementation(indent=indent)
+        return self.to_python_implementation(indent=indent, strict=strict)
 
     def __repr__(self):
-        return self.format_ops()
+        return self.to_python(strict=True)
 
     def __str__(self):
-        return self.format_ops()
+        return self.to_python(strict=True)
 
     # query generation
 
@@ -187,21 +187,11 @@ class TableDescription(ViewRepresentation):
         pipeline.insert(0, od)
         return pipeline
 
-    def __repr__(self):
-        s = ( "TableDescription("
-                + "table_name=" + self.table_name.__repr__()
-                + ", column_names=" + self.column_names.__repr__()
-        )
-        if len(self.qualifiers) > 0:
-            s = s + ", qualifiers=" + self.qualifiers.__repr__()
-        s = s + ")"
-        return s
-
-    def format_ops_implementation(self, indent=0):
+    def to_python_implementation(self, *, indent=0, strict=True):
         nc = min(len(self.column_names), 20)
-        if nc < len(self.column_names):
+        if (not strict) and (nc < len(self.column_names)):
             cols_str = '[' + ', '.join([self.column_names[i].__repr__() for i in range(nc)]) +\
-                       ", + " + (len(self.column_names)-nc) + ' more]'
+                       ", + " + str(len(self.column_names)-nc) + ' more]'
         else:
             cols_str = self.column_names.__repr__()
         s = ("TableDescription("
@@ -337,9 +327,9 @@ class ExtendNode(ViewRepresentation):
         pipeline.insert(0, od)
         return self.sources[0].collect_representation_implementation(pipeline=pipeline)
 
-    def format_ops_implementation(self, indent=0):
+    def to_python_implementation(self, *, indent=0, strict=True):
         s = (
-            self.sources[0].format_ops_implementation(indent=indent)
+            self.sources[0].to_python_implementation(indent=indent, strict=strict)
             + " .\\\n"
             + " " * (indent + 3)
             + "extend({"
@@ -441,14 +431,14 @@ class NaturalJoinNode(ViewRepresentation):
         pipeline.insert(0, od)
         return self.sources[0].collect_representation_implementation(pipeline=pipeline)
 
-    def format_ops_implementation(self, indent=0):
+    def to_python_implementation(self, *, indent=0, strict=True):
         return (
-            self.sources[0].format_ops_implementation(indent=indent)
+            self.sources[0].to_python_implementation(indent=indent, strict=strict)
             + " .\\\n"
             + " " * (indent + 3)
             + "natural_join(b=(\n"
             + " " * (indent + 6)
-            + self.sources[1].format_ops_implementation(indent=indent + 6)
+            + self.sources[1].to_python_implementation(indent=indent + 6, strict=strict)
             + "),\n"
             + " " * (indent + 6)
             + "by="
