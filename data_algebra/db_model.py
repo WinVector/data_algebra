@@ -187,7 +187,7 @@ class DBModel:
         common = using_left.intersection(using_right)
         col_exprs = (
             [
-                "COALESE("
+                "COALESCE("
                 + self.quote_identifier(sub_view_name_left)
                 + "."
                 + self.quote_identifier(ci)
