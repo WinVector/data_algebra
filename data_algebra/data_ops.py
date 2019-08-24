@@ -68,13 +68,12 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
     def __str__(self):
         return self.format_ops()
 
-    # the heavy to-sql methods
-
     def to_sql(self, db_model, *, using=None, temp_id_source=None):
         """
 
         :param db_model: data_algebra_db_model.DBModel
         :param using: set of columns used from this view, None implies all columns
+        :param temp_id_source: list a single integer to generate temp-ids for sub-queries
         :return:
         """
         raise Exception("base method called")
@@ -117,7 +116,7 @@ class TableDescription(ViewRepresentation):
 
     table_name: str
     qualifiers: Dict[str, str]
-    _key: str
+    key: str
 
     def __init__(self, table_name, column_names, *, qualifiers=None):
         ViewRepresentation.__init__(self, column_names=column_names)
@@ -138,7 +137,7 @@ class TableDescription(ViewRepresentation):
             for k in keys:
                 key = key + "(" + k + ", " + str(self.qualifiers[k]) + ")"
             key = key + "}."
-        self._key = key + self.table_name
+        self.key = key + self.table_name
 
     def _collect_representation(self, pipeline=None):
         if pipeline is None:
@@ -148,7 +147,7 @@ class TableDescription(ViewRepresentation):
         od["table_name"] = self.table_name
         od["qualifiers"] = self.qualifiers.copy()
         od["column_names"] = self.column_names
-        od["key"] = self._key
+        od["key"] = self.key
         pipeline.insert(0, od)
         return pipeline
 
@@ -159,7 +158,7 @@ class TableDescription(ViewRepresentation):
             ellipis_str = ", ..."
         s = (
             "Table("
-            + self._key
+            + self.key
             + "; "
             + ", ".join([self.column_names[i] for i in range(nc)])
             + ellipis_str
@@ -169,22 +168,22 @@ class TableDescription(ViewRepresentation):
 
     def to_sql(self, db_model, *, using=None, temp_id_source=None):
         return db_model.table_def_to_sql(
-            self, using=using, temp_id_source=temp_id_source
+            self, using=using
         )
 
     # comparable to other table descriptions
     def __lt__(self, other):
         if not isinstance(other, TableDescription):
             return True
-        return self._key.__lt__(other._key)
+        return self.key.__lt__(other.key)
 
     def __eq__(self, other):
         if not isinstance(other, TableDescription):
             return False
-        return self._key.__eq__(other._key)
+        return self.key.__eq__(other.key)
 
     def __hash__(self):
-        return self._key.__hash__()
+        return self.key.__hash__()
 
 
 # TODO: add get all tables in a pipleline and confirm columns are functions of table.key()
@@ -319,8 +318,8 @@ class Extend(data_algebra.pipe.PipeStep):
 
 
 class NaturalJoinNode(ViewRepresentation):
-    _by: List[str]
-    _jointype: str
+    by: List[str]
+    jointype: str
 
     def __init__(self, a, b, *, by=None, jointype="INNER"):
         sources = [a, b]
@@ -339,8 +338,8 @@ class NaturalJoinNode(ViewRepresentation):
         missing_right = by_set - b.column_set
         if len(missing_right) > 0:
             raise Exception("right table missing join keys: " + str(missing_right))
-        self._by = by
-        self._jointype = jointype
+        self.by = by
+        self.jointype = jointype
         ViewRepresentation.__init__(self, column_names=column_names, sources=sources)
 
     def _collect_representation(self, pipeline=None):
@@ -348,8 +347,8 @@ class NaturalJoinNode(ViewRepresentation):
             pipeline = []
         od = collections.OrderedDict()
         od["op"] = "NaturalJoin"
-        od["by"] = self._by
-        od["jointype"] = self._jointype
+        od["by"] = self.by
+        od["jointype"] = self.jointype
         od["b"] = self.sources[1].collect_representation()
         pipeline.insert(0, od)
         return data_algebra.pending_eval.tail_call(
@@ -367,9 +366,9 @@ class NaturalJoinNode(ViewRepresentation):
             + "),\n"
             + " " * (indent + 6)
             + "by="
-            + str(self._by)
+            + str(self.by)
             + ", jointype="
-            + self._jointype
+            + self.jointype
             + ")"
         )
 

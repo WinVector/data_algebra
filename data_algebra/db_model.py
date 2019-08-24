@@ -74,10 +74,8 @@ class DBModel:
 
         raise Exception("unexpected type: " + str(type(expression)))
 
-    def table_def_to_sql(self, table_def, *, using=None, temp_id_source=None):
+    def table_def_to_sql(self, table_def, *, using=None):
         # table_def should be a data_algebra.data_ops.TableDescription
-        if temp_id_source is None:
-            temp_id_source = [0]
         if using is None:
             using = table_def.column_set
         if len(using) < 1:
@@ -142,7 +140,7 @@ class DBModel:
             self.expr_to_sql(oi) + window_term + " AS " + self.quote_identifier(ci)
             for (ci, oi) in subops.items()
         ]
-        origcols = {k for k in using if not k in subops.keys()}
+        origcols = {k for k in using if k not in subops.keys()}
         if len(origcols) > 0:
             derived = [self.quote_identifier(ci) for ci in origcols] + derived
         sql_str = (
@@ -156,11 +154,12 @@ class DBModel:
         return sql_str
 
     def natural_join_to_sql(self, join_node, *, using=None, temp_id_source=None):
+        # join_node should be a data_algebra.data_ops.NaturalJoinNode
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
             using = join_node.column_set
-        by_set = set(join_node._by)
+        by_set = set(join_node.by)
         using = using.union(by_set)
         if len(using) < 1:
             raise Exception("must select at least one column")
@@ -205,7 +204,7 @@ class DBModel:
             + " ) "
             + self.quote_identifier(sub_view_name_left)
             + " "
-            + join_node._jointype
+            + join_node.jointype
             + " JOIN ( "
             + sql_right
             + " ) "

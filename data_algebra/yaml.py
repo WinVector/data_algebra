@@ -38,7 +38,7 @@ def to_pipeline(obj, *, known_tables=None):
                 qualifiers=obj["qualifiers"],
             )
             # canonicalize to one object per table
-            k = tab._key
+            k = tab.key
             if k in known_tables.keys():
                 ov = known_tables[k]
                 if tab.column_set != ov.column_set:

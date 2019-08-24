@@ -45,7 +45,6 @@ def unpack_result(v):
 
 
 def eval_tail(f, *args, **kwargs):
-    v = None
     try:
         v = f(*args, **kwargs)
     except PendingFunctionEvaluation as pve:
