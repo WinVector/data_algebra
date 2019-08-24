@@ -1,8 +1,6 @@
 from typing import Set, Any, Dict, List
 import collections
 
-import sqlparse
-
 import data_algebra.expr_rep
 import data_algebra.pipe
 import data_algebra.env
@@ -76,12 +74,6 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         :return:
         """
         raise Exception("base method called")
-
-    def pretty_sql(self, db_model, *, using=None, temp_id_source=None):
-        if temp_id_source is None:
-            temp_id_source = [0]
-        sql = self.to_sql(db_model=db_model, using=using, temp_id_source=temp_id_source)
-        return sqlparse.format(sql, reindent=True, keyword_case="upper")
 
     # define builders for all non-leaf node types on base class
 

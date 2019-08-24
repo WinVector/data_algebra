@@ -1,4 +1,4 @@
-import yaml
+import yaml  # supplied by PyYAML
 import collections
 import data_algebra.data_ops
 
