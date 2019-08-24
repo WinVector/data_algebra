@@ -40,30 +40,55 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         data_algebra.pipe.PipeValue.__init__(self)
         data_algebra.env.maybe_set_underbar(mp0=self.column_map.__dict__)
 
+    # characterization
+
+    def get_tables_implementation(self):
+        tables = []
+        for s in self.sources:
+            tables = tables + s.get_tables_implementation()
+        return tables
+
+    def get_tables(self):
+        """get a dictionry of all tables used in an operator DAG, raise an exception if the values are not consistent"""
+        tables = self.get_tables_implementation()
+        # check that table columns are a function of table keys (i.e. equivalent definitions being used everywhere)
+        examples = {ti.key:ti for ti in tables}
+        for ti in tables:
+            ei = examples[ti.key]
+            cseta = set(ei.column_names)
+            csetb = set(ti.column_names)
+            if not cseta == csetb:
+                raise Exception("Twp tables with key " + ti.key + " have different column sets.")
+        return examples
+
     # collect as simple structures for YAML I/O and other generic tasks
 
-    def _collect_representation(self, pipeline=None):
-        """implementation pf _collect_representation representation with tail-recursion eliminated eval
-        subclasses should override _collect_representation().  Users should call _collect_representation().
-        """
+    def collect_representation_implementation(self, pipeline=None):
         raise Exception("base method called")
 
     def collect_representation(self, pipeline=None):
-        """convert a data_algebra operator pipeline into a
-        simple form for YAML serialization"""
-        f = data_algebra.pending_eval.tail_version(self._collect_representation)
-        return f(pipeline=pipeline)
+        self.get_tables()  # for table consistency check/raise
+        return self.collect_representation_implementation(pipeline=pipeline)
 
     # printing
 
-    def format_ops(self, indent=0):
+    def format_ops_implementation(self, indent=0):
         return "ViewRepresentation(" + self.column_names.__repr__() + ")"
+
+    def format_ops(self, indent=0):
+        self.get_tables()  # for table consistency check/raise
+        return self.format_ops_implementation(indent=indent)
 
     def __repr__(self):
         return self.format_ops()
 
     def __str__(self):
         return self.format_ops()
+
+    # query generation
+
+    def to_sql_implementation(self, db_model, *, using=None, temp_id_source=None):
+        raise Exception("base method called")
 
     def to_sql(self, db_model, *, using=None, temp_id_source=None):
         """
@@ -73,7 +98,8 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         :param temp_id_source: list a single integer to generate temp-ids for sub-queries
         :return:
         """
-        raise Exception("base method called")
+        self.get_tables()  # for table consistency check/raise
+        return self.to_sql_implementation(db_model=db_model, using=using, temp_id_source=temp_id_source)
 
     # define builders for all non-leaf node types on base class
 
@@ -130,7 +156,7 @@ class TableDescription(ViewRepresentation):
             key = key + "}."
         self.key = key + self.table_name
 
-    def _collect_representation(self, pipeline=None):
+    def collect_representation_implementation(self, pipeline=None):
         if pipeline is None:
             pipeline = []
         od = collections.OrderedDict()
@@ -142,7 +168,7 @@ class TableDescription(ViewRepresentation):
         pipeline.insert(0, od)
         return pipeline
 
-    def format_ops(self, indent=0):
+    def format_ops_implementation(self, indent=0):
         nc = min(len(self.column_names), 10)
         ellipis_str = ""
         if nc < len(self.column_names):
@@ -157,7 +183,10 @@ class TableDescription(ViewRepresentation):
         )
         return s
 
-    def to_sql(self, db_model, *, using=None, temp_id_source=None):
+    def get_tables_implementation(self):
+        return [self]
+
+    def to_sql_implementation(self, db_model, *, using=None, temp_id_source=None):
         return db_model.table_def_to_sql(
             self, using=using
         )
@@ -175,9 +204,6 @@ class TableDescription(ViewRepresentation):
 
     def __hash__(self):
         return self.key.__hash__()
-
-
-# TODO: add get all tables in a pipleline and confirm columns are functions of table.key()
 
 
 class ExtendNode(ViewRepresentation):
@@ -233,7 +259,7 @@ class ExtendNode(ViewRepresentation):
             raise Exception("reverse columns not in order_by: " + str(unknown))
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
 
-    def _collect_representation(self, pipeline=None):
+    def collect_representation_implementation(self, pipeline=None):
         if pipeline is None:
             pipeline = []
         od = collections.OrderedDict()
@@ -243,13 +269,11 @@ class ExtendNode(ViewRepresentation):
         od["order_by"] = self.order_by
         od["reverse"] = self.reverse
         pipeline.insert(0, od)
-        return data_algebra.pending_eval.tail_call(
-            self.sources[0]._collect_representation
-        )(pipeline=pipeline)
+        return self.sources[0].collect_representation_implementation(pipeline=pipeline)
 
-    def format_ops(self, indent=0):
+    def format_ops_implementation(self, indent=0):
         s = (
-            self.sources[0].format_ops(indent=indent)
+            self.sources[0].format_ops_implementation(indent=indent)
             + " .\n"
             + " " * (indent + 3)
             + "extend("
@@ -264,7 +288,7 @@ class ExtendNode(ViewRepresentation):
         s = s + ")"
         return s
 
-    def to_sql(self, db_model, *, using=None, temp_id_source=None):
+    def to_sql_implementation(self, db_model, *, using=None, temp_id_source=None):
         return db_model.extend_to_sql(self, using=using, temp_id_source=temp_id_source)
 
 
@@ -285,7 +309,7 @@ class Extend(data_algebra.pipe.PipeStep):
                print("first example")
                ops = (
                   TableDescription('d', ['x', 'y']) .
-                     Extend({'z':_.x + _[var_name]/q + _get('x')})
+                     extend({'z':_.x + _[var_name]/q + _get('x')})
                 )
                 print(ops)
     """
@@ -333,27 +357,25 @@ class NaturalJoinNode(ViewRepresentation):
         self.jointype = jointype
         ViewRepresentation.__init__(self, column_names=column_names, sources=sources)
 
-    def _collect_representation(self, pipeline=None):
+    def collect_representation_implementation(self, pipeline=None):
         if pipeline is None:
             pipeline = []
         od = collections.OrderedDict()
         od["op"] = "NaturalJoin"
         od["by"] = self.by
         od["jointype"] = self.jointype
-        od["b"] = self.sources[1].collect_representation()
+        od["b"] = self.sources[1].collect_representation_implementation()
         pipeline.insert(0, od)
-        return data_algebra.pending_eval.tail_call(
-            self.sources[0]._collect_representation
-        )(pipeline=pipeline)
+        return self.sources[0].collect_representation_implementation(pipeline=pipeline)
 
-    def format_ops(self, indent=0):
+    def format_ops_implementation(self, indent=0):
         return (
-            self.sources[0].format_ops(indent=indent)
+            self.sources[0].format_ops_implementation(indent=indent)
             + " .\n"
             + " " * (indent + 3)
             + "natural_join(b=(\n"
             + " " * (indent + 6)
-            + self.sources[1].format_ops(indent=indent + 6)
+            + self.sources[1].format_ops_implementation(indent=indent + 6)
             + "),\n"
             + " " * (indent + 6)
             + "by="
@@ -363,7 +385,7 @@ class NaturalJoinNode(ViewRepresentation):
             + ")"
         )
 
-    def to_sql(self, db_model, *, using=None, temp_id_source=None):
+    def to_sql_implementation(self, db_model, *, using=None, temp_id_source=None):
         return db_model.natural_join_to_sql(
             self, using=using, temp_id_source=temp_id_source
         )
