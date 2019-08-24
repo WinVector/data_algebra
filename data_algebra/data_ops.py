@@ -70,7 +70,7 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
 
     # the heavy to-sql methods
 
-    def to_sql(self, db_model, *, using = None, temp_id_source = None):
+    def to_sql(self, db_model, *, using=None, temp_id_source=None):
         """
 
         :param db_model: data_algebra_db_model.DBModel
@@ -79,24 +79,24 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         """
         raise Exception("base method called")
 
-    def pretty_sql(self, db_model, *, using = None, temp_id_source = None):
+    def pretty_sql(self, db_model, *, using=None, temp_id_source=None):
         if temp_id_source is None:
             temp_id_source = [0]
         sql = self.to_sql(db_model=db_model, using=using, temp_id_source=temp_id_source)
-        return sqlparse.format(sql,
-                               reindent=True,
-                               keyword_case='upper')
-
+        return sqlparse.format(sql, reindent=True, keyword_case="upper")
 
     # define builders for all non-leaf node types on base class
 
-    def extend(self, ops,
-                 *,
-                 partition_by=None, order_by=None, reverse=None):
-        return ExtendNode(source=self, ops=ops,
-                          partition_by=partition_by, order_by=order_by, reverse=reverse)
+    def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
+        return ExtendNode(
+            source=self,
+            ops=ops,
+            partition_by=partition_by,
+            order_by=order_by,
+            reverse=reverse,
+        )
 
-    def natural_join(self, b, *, by=None, jointype='INNER'):
+    def natural_join(self, b, *, by=None, jointype="INNER"):
         return NaturalJoinNode(a=self, b=b, by=by, jointype=jointype)
 
 
@@ -154,14 +154,23 @@ class TableDescription(ViewRepresentation):
 
     def format_ops(self, indent=0):
         nc = min(len(self.column_names), 10)
-        ellipis_str = ''
-        if nc<len(self.column_names):
-            ellipis_str = ', ...'
-        s = "Table(" + self._key + "; " + ", ".join([self.column_names[i] for i in range(nc)]) + ellipis_str + ")"
+        ellipis_str = ""
+        if nc < len(self.column_names):
+            ellipis_str = ", ..."
+        s = (
+            "Table("
+            + self._key
+            + "; "
+            + ", ".join([self.column_names[i] for i in range(nc)])
+            + ellipis_str
+            + ")"
+        )
         return s
 
-    def to_sql(self, db_model, *, using = None, temp_id_source = None):
-        return db_model.table_def_to_sql(self, using = using, temp_id_source = temp_id_source)
+    def to_sql(self, db_model, *, using=None, temp_id_source=None):
+        return db_model.table_def_to_sql(
+            self, using=using, temp_id_source=temp_id_source
+        )
 
     # comparable to other table descriptions
     def __lt__(self, other):
@@ -180,16 +189,15 @@ class TableDescription(ViewRepresentation):
 
 # TODO: add get all tables in a pipleline and confirm columns are functions of table.key()
 
+
 class ExtendNode(ViewRepresentation):
     ops: Dict[str, data_algebra.expr_rep.Expression]
 
-    def __init__(self, source, ops,
-                 *,
-                 partition_by=None, order_by=None, reverse=None):
+    def __init__(self, source, ops, *, partition_by=None, order_by=None, reverse=None):
         ops = data_algebra.expr_rep.check_convert_op_dictionary(
             ops, source.column_map.__dict__
         )
-        if len(ops)<1:
+        if len(ops) < 1:
             raise Exception("no ops")
         self.ops = ops
         if partition_by is None:
@@ -209,10 +217,10 @@ class ExtendNode(ViewRepresentation):
         self.reverse = reverse
         column_names = source.column_names.copy()
         consumed_cols = set()
-        for (k,o) in ops.items():
+        for (k, o) in ops.items():
             o.get_column_names(consumed_cols)
         unknown_cols = consumed_cols - source.column_set
-        if len(unknown_cols)>0:
+        if len(unknown_cols) > 0:
             raise Exception("referered to unknown columns: " + str(unknown_cols))
         known_cols = set(column_names)
         for ci in ops.keys():
@@ -225,7 +233,7 @@ class ExtendNode(ViewRepresentation):
         if len(reverse) != len(set(reverse)):
             raise Exception("Duplicate name in reverse")
         unknown = set(partition_by) - known_cols
-        if len(unknown)>0:
+        if len(unknown) > 0:
             raise Exception("unknown partition_by columns: " + str(unknown))
         unknown = set(order_by) - known_cols
         if len(unknown) > 0:
@@ -234,7 +242,6 @@ class ExtendNode(ViewRepresentation):
         if len(unknown) > 0:
             raise Exception("reverse columns not in order_by: " + str(unknown))
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
-
 
     def _collect_representation(self, pipeline=None):
         if pipeline is None:
@@ -258,17 +265,17 @@ class ExtendNode(ViewRepresentation):
             + "extend("
             + str(self.ops)
         )
-        if len(self.partition_by)>0:
+        if len(self.partition_by) > 0:
             s = s + ", partition_by:" + str(self.partition_by)
-        if len(self.order_by)>0:
+        if len(self.order_by) > 0:
             s = s + ", order_by:" + str(self.order_by)
-        if len(self.reverse)>0:
+        if len(self.reverse) > 0:
             s = s + ", reverse:" + str(self.reverse)
         s = s + ")"
         return s
 
-    def to_sql(self, db_model, *, using = None, temp_id_source = None):
-        return db_model.extend_to_sql(self, using = using, temp_id_source = temp_id_source)
+    def to_sql(self, db_model, *, using=None, temp_id_source=None):
+        return db_model.extend_to_sql(self, using=using, temp_id_source=temp_id_source)
 
 
 class Extend(data_algebra.pipe.PipeStep):
@@ -303,10 +310,12 @@ class Extend(data_algebra.pipe.PipeStep):
         self.reverse = reverse
 
     def apply(self, other):
-        return other.extend(ops=self._ops,
-                            partition_by=self.partition_by,
-                            order_by=self.order_by,
-                            reverse=self.reverse)
+        return other.extend(
+            ops=self._ops,
+            partition_by=self.partition_by,
+            order_by=self.order_by,
+            reverse=self.reverse,
+        )
 
 
 class NaturalJoinNode(ViewRepresentation):
@@ -365,7 +374,9 @@ class NaturalJoinNode(ViewRepresentation):
         )
 
     def to_sql(self, db_model, *, using=None, temp_id_source=None):
-        return db_model.natural_join_to_sql(self, using=using, temp_id_source=temp_id_source)
+        return db_model.natural_join_to_sql(
+            self, using=using, temp_id_source=temp_id_source
+        )
 
 
 class NaturalJoin(data_algebra.pipe.PipeStep):

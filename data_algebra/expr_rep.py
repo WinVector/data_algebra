@@ -247,10 +247,10 @@ class ColumnReference(Term):
     def get_column_names(self, columns_seen):
         columns_seen.add(self.column_name)
 
+
 # map from op-name to special Python formatting code
-py_formatters = {
-    '___': lambda expression : expression.to_python()
-}
+py_formatters = {"___": lambda expression: expression.to_python()}
+
 
 class Expression(Term):
     def __init__(self, op, args, *, params=None, inline=False):
@@ -275,16 +275,9 @@ class Expression(Term):
         if len(subs) == 1:
             return subs[0] + "." + self.op + "()"
         if len(subs) == 2 and self.inline:
-            return (
-                "("
-                + subs[0]
-                + " "
-                + self.op
-                + " "
-                + subs[1]
-                + ")"
-            )
-        return self.op + "(" + ', '.join(subs) + ")"
+            return "(" + subs[0] + " " + self.op + " " + subs[1] + ")"
+        return self.op + "(" + ", ".join(subs) + ")"
+
 
 # Some notes on trying to harden eval:
 #  http://lybniz2.sourceforge.net/safeeval.html
