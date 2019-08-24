@@ -42,24 +42,13 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
 
     # characterization
 
-    def get_tables_implementation(self):
-        tables = []
+    def get_tables(self, tables=None):
+        """get a dictionary of all tables used in an operator DAG, raise an exception if the values are not consistent"""
+        if tables is None:
+            tables = {}
         for s in self.sources:
-            tables = tables + s.get_tables_implementation()
+            tables = s.get_tables(tables)
         return tables
-
-    def get_tables(self):
-        """get a dictionry of all tables used in an operator DAG, raise an exception if the values are not consistent"""
-        tables = self.get_tables_implementation()
-        # check that table columns are a function of table keys (i.e. equivalent definitions being used everywhere)
-        examples = {ti.key:ti for ti in tables}
-        for ti in tables:
-            ei = examples[ti.key]
-            cseta = set(ei.column_names)
-            csetb = set(ti.column_names)
-            if not cseta == csetb:
-                raise Exception("Twp tables with key " + ti.key + " have different column sets.")
-        return examples
 
     # collect as simple structures for YAML I/O and other generic tasks
 
@@ -183,8 +172,17 @@ class TableDescription(ViewRepresentation):
         )
         return s
 
-    def get_tables_implementation(self):
-        return [self]
+    def get_tables(self, tables=None):
+        """get a dictionary of all tables used in an operator DAG, raise an exception if the values are not consistent"""
+        if tables is None:
+            tables = {}
+        if self.key in tables.keys():
+            other = tables[self.key]
+            if self.column_set != other.column_set:
+                raise Exception("Two tables with key " + self.key + " have different column sets.")
+        else:
+            tables[self.key] = self
+        return tables
 
     def to_sql_implementation(self, db_model, *, using=None, temp_id_source=None):
         return db_model.table_def_to_sql(
