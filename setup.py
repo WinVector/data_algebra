@@ -2,7 +2,9 @@
 import setuptools
 
 DESCRIPTION = """
-vtreat is a pandas.DataFrame processor/conditioner that prepares real-world data for predictive modeling in a statistically sound manner. 
+vtreat is a pandas.DataFrame processor/conditioner that prepares real-world data for predictive modeling in a statistically sound manner.
+
+Recommended packages include: PyYAML (supplies yaml), sqlparse, and black. 
 """
 
 setuptools.setup(
@@ -13,9 +15,6 @@ setuptools.setup(
     url='https://github.com/WinVector/data_algebra',
     packages=setuptools.find_packages(),
     install_requires=[
-        'PyYAML',
-        'black',
-        'sqlparse',
     ],
     platforms=['any'],
     license='License :: OSI Approved :: BSD 3-clause License',

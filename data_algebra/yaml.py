@@ -1,20 +1,28 @@
-import yaml  # supplied by PyYAML
 import collections
+
+try:
+    import yaml   # supplied by PyYAML
+    have_yaml = False
+except ImportError:
+    have_yaml = True
+
+
 import data_algebra.data_ops
 
 # yaml notes:
 #    https://stackoverflow.com/questions/2627555/how-to-deserialize-an-object-with-pyyaml-using-safe-load
 
-# derived from: https://stackoverflow.com/a/16782282/6901725
-def represent_ordereddict(dumper, data):
-    value = [
-        (dumper.represent_data(node_key), dumper.represent_data(node_value))
-        for (node_key, node_value) in data.items()
-    ]
-    return yaml.nodes.MappingNode(u"tag:yaml.org,2002:map", value)
+def fix_ordered_dict_yaml_rep():
+    """Writer OrderedDict as simple structure"""
+    # derived from: https://stackoverflow.com/a/16782282/6901725
+    def represent_ordereddict(dumper, data):
+        value = [
+            (dumper.represent_data(node_key), dumper.represent_data(node_value))
+            for (node_key, node_value) in data.items()
+        ]
+        return yaml.nodes.MappingNode(u"tag:yaml.org,2002:map", value)
 
-
-yaml.add_representer(collections.OrderedDict, represent_ordereddict)
+    yaml.add_representer(collections.OrderedDict, represent_ordereddict)
 
 
 def to_pipeline(obj, *, known_tables=None):

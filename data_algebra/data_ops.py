@@ -1,8 +1,19 @@
 from typing import Set, Any, Dict, List
 import collections
 
-import black
-import sqlparse
+
+try:
+    import black
+    have_black = False
+except ImportError:
+    have_black = True
+
+try:
+    import sqlparse
+    have_sqlparse = False
+except ImportError:
+    have_sqlparse = True
+
 
 import data_algebra.expr_rep
 import data_algebra.pipe
@@ -87,8 +98,10 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
 
     def to_python(self, *, indent=0, strict=True, pretty=False, black_mode=None):
         self.get_tables()  # for table consistency check/raise
-        str = self.to_python_implementation(indent=indent, strict=strict)
         if pretty:
+            strict = True
+        str = self.to_python_implementation(indent=indent, strict=strict)
+        if pretty and have_black:
             if black_mode is None:
                 black_mode = black.FileMode()
             str = black.format_str(str, mode=black_mode)
@@ -109,7 +122,7 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         self.get_tables()  # for table consistency check/raise
         temp_id_source = [0]
         str = self.to_sql_implementation(db_model=db_model, using=None, temp_id_source=temp_id_source)
-        if pretty:
+        if pretty and have_sqlparse:
             str = sqlparse.format(str, reindent=True, keyword_case="upper")
         return str
 
@@ -447,10 +460,10 @@ class NaturalJoinNode(ViewRepresentation):
             self.sources[0].to_python_implementation(indent=indent, strict=strict)
             + " .\\\n"
             + " " * (indent + 3)
-            + "natural_join(b=(\n"
+            + "natural_join(b=\n"
             + " " * (indent + 6)
             + self.sources[1].to_python_implementation(indent=indent + 6, strict=strict)
-            + "),\n"
+            + ",\n"
             + " " * (indent + 6)
             + "by="
             + self.by.__repr__()
