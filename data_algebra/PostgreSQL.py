@@ -75,11 +75,11 @@ class PostgreSQLModel(data_algebra.db_model.DBModel):
                         "("
                         + subs[0]
                         + " "
-                        + expression.op
+                        + expression.op.upper()
                         + " "
                         + subs[1]
                         + ")"
                 )
-            return expression.op + "(" + ', '.join(subs) + ")"
+            return expression.op.upper() + "(" + ', '.join(subs) + ")"
 
         raise Exception("unexpected type: " + str(type(expression)))
