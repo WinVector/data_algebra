@@ -1,5 +1,7 @@
 import types
 
+import data_algebra.expr_rep
+
 # needed to see user variables and set up _, _0, _1, and _get side-effects
 _namespace_stack = []
 _ref_to_outer_namespace = None
@@ -70,7 +72,11 @@ class SimpleNamespaceDict(types.SimpleNamespace):
         raise Exception("__setattr__ not allowed")
 
 
-def populate_specials(*, column_defs, column_defs1=None, destination, user_values=None):
+def extra_defs(dict):
+    dict['row_number'] = lambda: data_algebra.expr_rep.Expression(op='row_number', args=[])
+
+def populate_specials(*, column_defs, column_defs1=None, destination,
+                      user_values=None):
     """populate a dictionary with special values
        column_defs is a dictionary,
          usually formed from a ViewRepresentation.column_map.__dict__
@@ -86,13 +92,17 @@ def populate_specials(*, column_defs, column_defs1=None, destination, user_value
         user_values = {}
     if not isinstance(user_values, dict):
         raise Exception("user_values should be a dictionary")
-    ns = SimpleNamespaceDict(**column_defs.copy())
+    nd = column_defs.copy()
+    extra_defs(nd)
+    ns = SimpleNamespaceDict(**nd)
     destination["_"] = ns
     destination["_0"] = ns
     if column_defs1 is not None:
         if not isinstance(column_defs1, dict):
             raise Exception("column_defs1 should be a dictionary")
-        ns1 = SimpleNamespaceDict(**column_defs.copy())
+        nd1 = column_defs1.copy()
+        extra_defs(nd1)
+        ns1 = SimpleNamespaceDict(**nd1)
         destination["_1"] = ns1
     else:
         destination["_1"] = None

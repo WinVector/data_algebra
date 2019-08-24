@@ -213,6 +213,13 @@ class Term:
     def max(self):
         return self.__uop_expr__("max")
 
+    def exp(self):
+        return self.__uop_expr__("exp")
+
+    def sum(self):
+        return self.__uop_expr__("sum")
+
+
 
 class Value(Term):
     def __init__(self, value):
@@ -256,8 +263,6 @@ class Expression(Term):
     def __init__(self, op, args, *, params=None, inline=False):
         if not isinstance(op, str):
             raise Exception("op is supposed to be a string")
-        if len(args) < 1:
-            raise Exception("args is not supposed to be empty")
         self.op = op
         self.args = args
         self.params = params
@@ -272,6 +277,8 @@ class Expression(Term):
         if self.op in py_formatters.keys():
             return py_formatters[self.op](self)
         subs = [ai.to_python() for ai in self.args]
+        if len(subs) <=0 :
+            return "_." + self.op + "()"
         if len(subs) == 1:
             return subs[0] + "." + self.op + "()"
         if len(subs) == 2 and self.inline:
@@ -306,7 +313,7 @@ def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
     data_algebra.env.populate_specials(
         column_defs=column_defs, destination=mp, user_values=parse_env
     )
-    sub_env = {k: v for (k, v) in parse_env.items() if not k.startswith("__")}
+    sub_env = {k: v for (k, v) in parse_env.items() if not k.startswith("_")}
     sub_env["__builtins__"] = None
     for k in ops.keys():
         if not isinstance(k, str):

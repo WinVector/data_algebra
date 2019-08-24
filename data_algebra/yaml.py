@@ -2,9 +2,9 @@ import collections
 
 try:
     import yaml   # supplied by PyYAML
-    have_yaml = False
-except ImportError:
     have_yaml = True
+except ImportError:
+    have_yaml = False
 
 
 import data_algebra.data_ops

@@ -4,15 +4,15 @@ import collections
 
 try:
     import black
-    have_black = False
-except ImportError:
     have_black = True
+except ImportError:
+    have_black = False
 
 try:
     import sqlparse
-    have_sqlparse = False
-except ImportError:
     have_sqlparse = True
+except ImportError:
+    have_sqlparse = False
 
 
 import data_algebra.expr_rep
@@ -97,6 +97,7 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         return "ViewRepresentation(" + self.column_names.__repr__() + ")"
 
     def to_python(self, *, indent=0, strict=True, pretty=False, black_mode=None):
+        global have_black
         self.get_tables()  # for table consistency check/raise
         if pretty:
             strict = True
@@ -119,6 +120,7 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         raise Exception("base method called")
 
     def to_sql(self, db_model, *, pretty=False):
+        global have_sqlparse
         self.get_tables()  # for table consistency check/raise
         temp_id_source = [0]
         str = self.to_sql_implementation(db_model=db_model, using=None, temp_id_source=temp_id_source)
