@@ -267,7 +267,7 @@ class ExtendNode(ViewRepresentation):
             self.sources[0].format_ops(indent=indent)
             + " .\n"
             + " " * (indent + 3)
-            + "Extend("
+            + "extend("
             + str(self.ops)
         )
         if len(self.partition_by)>0:
@@ -406,7 +406,7 @@ class NaturalJoinNode(ViewRepresentation):
             self.sources[0].format_ops(indent=indent)
             + " .\n"
             + " " * (indent + 3)
-            + "NaturalJoin(b=(\n"
+            + "natural_join(b=(\n"
             + " " * (indent + 6)
             + self.sources[1].format_ops(indent=indent + 6)
             + "),\n"
