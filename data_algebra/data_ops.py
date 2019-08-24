@@ -131,7 +131,7 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
     def project(self, group_by):
         raise Exception("not implemented yet")  # TODO: implement
 
-    def order_by(self, columns, *, reverse):
+    def order_by(self, columns, *, reverse=None, limit=None):
         raise Exception("not implemented yet")  # TODO: implement
 
 
@@ -187,19 +187,30 @@ class TableDescription(ViewRepresentation):
         pipeline.insert(0, od)
         return pipeline
 
-    def format_ops_implementation(self, indent=0):
-        nc = min(len(self.column_names), 10)
-        ellipis_str = ""
-        if nc < len(self.column_names):
-            ellipis_str = ", ..."
-        s = (
-            "Table("
-            + self.key
-            + "; "
-            + ", ".join([self.column_names[i] for i in range(nc)])
-            + ellipis_str
-            + ")"
+    def __repr__(self):
+        s = ( "TableDescription("
+                + "table_name=" + self.table_name.__repr__()
+                + ", column_names=" + self.column_names.__repr__()
         )
+        if len(self.qualifiers) > 0:
+            s = s + ", qualifiers=" + self.qualifiers.__repr__()
+        s = s + ")"
+        return s
+
+    def format_ops_implementation(self, indent=0):
+        nc = min(len(self.column_names), 20)
+        if nc < len(self.column_names):
+            cols_str = '[' + ', '.join([self.column_names[i].__repr__() for i in range(nc)]) +\
+                       ", + " + (len(self.column_names)-nc) + ' more]'
+        else:
+            cols_str = self.column_names.__repr__()
+        s = ("TableDescription("
+             + "table_name=" + self.table_name.__repr__()
+             + ", column_names=" + cols_str
+             )
+        if len(self.qualifiers) > 0:
+            s = s + ", qualifiers=" + self.qualifiers.__repr__()
+        s = s + ")"
         return s
 
     def get_tables(self, tables=None):
@@ -329,17 +340,18 @@ class ExtendNode(ViewRepresentation):
     def format_ops_implementation(self, indent=0):
         s = (
             self.sources[0].format_ops_implementation(indent=indent)
-            + " .\n"
+            + " .\\\n"
             + " " * (indent + 3)
-            + "extend("
-            + str(self.ops)
+            + "extend({"
+            + ', '.join([k.__repr__() + ": " + opi.to_python().__repr__() for (k, opi) in self.ops.items()])
+            + '}'
         )
         if len(self.partition_by) > 0:
-            s = s + ", partition_by:" + str(self.partition_by)
+            s = s + ", partition_by=" + self.partition_by.__repr__()
         if len(self.order_by) > 0:
-            s = s + ", order_by:" + str(self.order_by)
+            s = s + ", order_by=" + self.order_by.__repr__()
         if len(self.reverse) > 0:
-            s = s + ", reverse:" + str(self.reverse)
+            s = s + ", reverse=" + self.reverse.__repr__()
         s = s + ")"
         return s
 
@@ -432,7 +444,7 @@ class NaturalJoinNode(ViewRepresentation):
     def format_ops_implementation(self, indent=0):
         return (
             self.sources[0].format_ops_implementation(indent=indent)
-            + " .\n"
+            + " .\\\n"
             + " " * (indent + 3)
             + "natural_join(b=(\n"
             + " " * (indent + 6)
@@ -440,9 +452,9 @@ class NaturalJoinNode(ViewRepresentation):
             + "),\n"
             + " " * (indent + 6)
             + "by="
-            + str(self.by)
+            + self.by.__repr__()
             + ", jointype="
-            + self.jointype
+            + self.jointype.__repr__()
             + ")"
         )
 
