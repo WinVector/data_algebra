@@ -96,7 +96,7 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         return ExtendNode(source=self, ops=ops,
                           partition_by=partition_by, order_by=order_by, reverse=reverse)
 
-    def natural_join(self, b, *, by, jointype):
+    def natural_join(self, b, *, by=None, jointype='INNER'):
         return NaturalJoinNode(a=self, b=b, by=by, jointype=jointype)
 
 
@@ -265,7 +265,7 @@ class ExtendNode(ViewRepresentation):
     def format_ops(self, indent=0):
         s = (
             self.sources[0].format_ops(indent=indent)
-            + " >>\n"
+            + " .\n"
             + " " * (indent + 3)
             + "Extend("
             + str(self.ops)
@@ -341,7 +341,7 @@ class Extend(data_algebra.pipe.PipeStep):
 
                print("first example")
                ops = (
-                  TableDescription('d', ['x', 'y']) >>
+                  TableDescription('d', ['x', 'y']) .
                      Extend({'z':_.x + _[var_name]/q + _get('x')})
                 )
                 print(ops)
@@ -404,7 +404,7 @@ class NaturalJoinNode(ViewRepresentation):
     def format_ops(self, indent=0):
         return (
             self.sources[0].format_ops(indent=indent)
-            + " >>\n"
+            + " .\n"
             + " " * (indent + 3)
             + "NaturalJoin(b=(\n"
             + " " * (indent + 6)
