@@ -458,6 +458,7 @@ class ExtendNode(ViewRepresentation):
                 if len(op.args) == 0:
                     col_list = [c for c in set(self.partition_by).union(self.order_by)]
                     ascending = [c not in set(self.reverse) for c in col_list]
+                    # TODO: research sorting a subset (and that current is at least correct)
                     subframe = res.sort_values(
                         col_list, inplace=False, ascending=ascending
                     )
@@ -478,6 +479,7 @@ class ExtendNode(ViewRepresentation):
                         )
                     ]
                     ascending = [c not in set(self.reverse) for c in col_list]
+                    # TODO: research sorting a subset (and that current is at least correct)
                     subframe = res.sort_values(
                         col_list, inplace=False, ascending=ascending
                     )[[value_name] + self.partition_by]
@@ -724,6 +726,12 @@ class OrderRowsNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.order_to_sql(self, using=using, temp_id_source=temp_id_source)
 
+    def eval_pandas(self, data_map):
+        res = self.sources[0].eval_pandas(data_map)
+        ascending = [False if ci in set(self.reverse) else True for ci in self.order_columns]
+        res.sort_values(by=self.order_columns, ascending=ascending)
+        return res
+
 
 class OrderRows(data_algebra.pipe.PipeStep):
     """Class to specify a columns to determine row order.
@@ -799,6 +807,10 @@ class RenameColumnsNode(ViewRepresentation):
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.rename_to_sql(self, using=using, temp_id_source=temp_id_source)
+
+    def eval_pandas(self, data_map):
+        res = self.sources[0].eval_pandas(data_map)
+        return res.rename(columns = self.reverse_mapping)
 
 
 class RenameColumns(data_algebra.pipe.PipeStep):
