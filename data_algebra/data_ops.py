@@ -147,6 +147,8 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         )
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
+        if not isinstance(b, ViewRepresentation):
+            raise Exception("expected b to be a data_algebra.dat_ops.ViewRepresentation")
         return NaturalJoinNode(a=self, b=b, by=by, jointype=jointype)
 
     def select_rows(self, expr):
@@ -431,6 +433,8 @@ class Extend(data_algebra.pipe.PipeStep):
         self.reverse = reverse
 
     def apply(self, other):
+        if not isinstance(other, ViewRepresentation):
+            raise Exception("expected other to be a data_algebra.dat_ops.ViewRepresentation")
         return other.extend(
             ops=self._ops,
             partition_by=self.partition_by,
@@ -501,6 +505,8 @@ class SelectRows(data_algebra.pipe.PipeStep):
         self.expr = expr
 
     def apply(self, other):
+        if not isinstance(other, ViewRepresentation):
+            raise Exception("expected other to be a data_algebra.dat_ops.ViewRepresentation")
         return other.select_rows(expr=self.expr)
 
 
@@ -559,6 +565,8 @@ class SelectColumns(data_algebra.pipe.PipeStep):
         data_algebra.pipe.PipeStep.__init__(self, name="SelectColumns")
 
     def apply(self, other):
+        if not isinstance(other, ViewRepresentation):
+            raise Exception("expected other to be a data_algebra.dat_ops.ViewRepresentation")
         return other.select_columns(self.column_selection)
 
 
@@ -630,6 +638,8 @@ class OrderRows(data_algebra.pipe.PipeStep):
         data_algebra.pipe.PipeStep.__init__(self, name="OrderRows")
 
     def apply(self, other):
+        if not isinstance(other, ViewRepresentation):
+            raise Exception("expected other to be a data_algebra.dat_ops.ViewRepresentation")
         return other.order_rows(
             columns=self.order_columns, reverse=self.reverse, limit=self.limit
         )
@@ -697,6 +707,8 @@ class RenameColumns(data_algebra.pipe.PipeStep):
         data_algebra.pipe.PipeStep.__init__(self, name="RenameColumns")
 
     def apply(self, other):
+        if not isinstance(other, ViewRepresentation):
+            raise Exception("expected other to be a data_algebra.dat_ops.ViewRepresentation")
         return other.rename_columns(column_remapping=self.column_remapping)
 
 
@@ -790,4 +802,6 @@ class NaturalJoin(data_algebra.pipe.PipeStep):
         self._b = b
 
     def apply(self, other):
+        if not isinstance(other, ViewRepresentation):
+            raise Exception("expected other to be a data_algebra.dat_ops.ViewRepresentation")
         return other.natural_join(b=self._b, by=self._by, jointype=self._jointype)

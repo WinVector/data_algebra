@@ -8,7 +8,7 @@ purpose of the package is to support an easy to compose and maintain grammar of 
 steps that in turn can be used to generate database specific SQL.  The package also is intended
 to implement the same transforms for Pandas DataFrames. 
 
-Recommended packages include: PyYAML (supplies yaml), sqlparse, and black. 
+Recommended packages include: Pandas, PyYAML (supplies yaml), sqlparse, and black. 
 """
 
 setuptools.setup(
