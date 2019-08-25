@@ -158,8 +158,8 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
     def project(self, group_by):
         raise Exception("not implemented yet")  # TODO: implement
 
-    def order(self, columns, *, reverse=None, limit=None):
-        return OrderNode(source=self, columns=columns, reverse=reverse, limit=limit)
+    def order_rows(self, columns, *, reverse=None, limit=None):
+        return OrderRowsNode(source=self, columns=columns, reverse=reverse, limit=limit)
 
 
 class TableDescription(ViewRepresentation):
@@ -527,7 +527,7 @@ class SelectColumns(data_algebra.pipe.PipeStep):
         return other.select_columns(expr=self.expr)
 
 
-class OrderNode(ViewRepresentation):
+class OrderRowsNode(ViewRepresentation):
     order_columns: List[str]
     reverse: List[str]
 
@@ -563,7 +563,7 @@ class OrderNode(ViewRepresentation):
             self.sources[0].to_python_implementation(indent=indent, strict=strict)
             + " .\\\n"
             + " " * (indent + 3)
-            + "order(" + self.order_columns.__repr__()
+            + "order_rows(" + self.order_columns.__repr__()
         )
         if len(self.reverse) > 0:
             s = s + ', reverse=' + self.reverse.__repr__()
@@ -576,8 +576,8 @@ class OrderNode(ViewRepresentation):
         return db_model.order_to_sql(self, using=using, temp_id_source=temp_id_source)
 
 
-class Order(data_algebra.pipe.PipeStep):
-    """Class to specify a choice of columns.
+class OrderRows(data_algebra.pipe.PipeStep):
+    """Class to specify a columns to determine row order.
     """
 
     order_columns: List[str]
@@ -589,10 +589,61 @@ class Order(data_algebra.pipe.PipeStep):
             reverse = []
         self.reverse = [c for c in reverse]
         self.limit = limit
-        data_algebra.pipe.PipeStep.__init__(self, name="Order")
+        data_algebra.pipe.PipeStep.__init__(self, name="OrderRows")
 
     def apply(self, other):
-        return other.order(columns=self.order_columns, reverse=self.reverse, limit=self.limit)
+        return other.order_rows(columns=self.order_columns, reverse=self.reverse, limit=self.limit)
+
+
+class RenameNode(ViewRepresentation):
+    column_map: Dict[str, str]
+
+    def __init__(self, source, column_map):
+        self.column_map = column_map.copy()
+        # TODO: check column conditions
+        ViewRepresentation.__init__(self, column_names=source.column_names, sources=[source])
+
+    def columns_used_from_sources(self, using):
+        cols = set(self.column_names.copy())
+        if using is None:
+            return [cols]
+        cols = cols.intersection(using).union([k for k in self.column_map.keys()])
+        return [cols]
+
+    def collect_representation_implementation(self, pipeline=None):
+        if pipeline is None:
+            pipeline = []
+        od = collections.OrderedDict()
+        od["op"] = "Rename"
+        od["column_map"] = self.column_map.__repr__()
+        pipeline.insert(0, od)
+        return self.sources[0].collect_representation_implementation(pipeline=pipeline)
+
+    def to_python_implementation(self, *, indent=0, strict=True):
+        s = (
+            self.sources[0].to_python_implementation(indent=indent, strict=strict)
+            + " .\\\n"
+            + " " * (indent + 3)
+            + "rename(" + self.column_map.__repr__() + ")"
+        )
+        return s
+
+    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+        return db_model.rename_to_sql(self, using=using, temp_id_source=temp_id_source)
+
+
+class Rename(data_algebra.pipe.PipeStep):
+    """Class to rename columns.
+    """
+
+    column_map: Dict[str, str]
+
+    def __init__(self, column_map):
+        self.column_map = column_map.copy()
+        data_algebra.pipe.PipeStep.__init__(self, name="Rename")
+
+    def apply(self, other):
+        return other.rename(column_map=self.column_map)
 
 
 class NaturalJoinNode(ViewRepresentation):

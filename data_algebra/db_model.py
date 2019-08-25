@@ -195,7 +195,7 @@ class DBModel:
 
     def select_columns_to_sql(self, select_columns_node, *, using=None, temp_id_source=None):
         if not isinstance(select_columns_node, data_algebra.data_ops.SelectColumnsNode):
-            raise Exception("Expeted select_rows_node to be a data_algebra.data_ops.SelectColumnsNode)")
+            raise Exception("Expeted select_columns_to_sql to be a data_algebra.data_ops.SelectColumnsNode)")
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
@@ -219,8 +219,8 @@ class DBModel:
         return sql_str
 
     def order_to_sql(self, order_node, *, using=None, temp_id_source=None):
-        if not isinstance(order_node, data_algebra.data_ops.OrderNode):
-            raise Exception("Expeted select_rows_node to be a data_algebra.data_ops.OrderNode)")
+        if not isinstance(order_node, data_algebra.data_ops.OrderRowsNode):
+            raise Exception("Expeted order_node to be a data_algebra.data_ops.OrderRowsNode)")
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
@@ -248,6 +248,9 @@ class DBModel:
         if order_node.limit is not None:
             sql_str = sql_str + ' LIMIT ' + order_node.limit.__repr__()
         return sql_str
+
+    def select_rename_to_sql(self, rename_node, *, using=None, temp_id_source=None):
+        raise Exception("not implemented yet")
 
     def natural_join_to_sql(self, join_node, *, using=None, temp_id_source=None):
         if not isinstance(join_node, data_algebra.data_ops.NaturalJoinNode):
