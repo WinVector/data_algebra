@@ -12,11 +12,14 @@ class DBModel:
     identifier_quote: str
     string_quote: str
 
-    def __init__(self,
-                 *,
-                 identifier_quote='"', string_quote="'",
-                 sql_formatters=None,
-                 op_replacements=None):
+    def __init__(
+        self,
+        *,
+        identifier_quote='"',
+        string_quote="'",
+        sql_formatters=None,
+        op_replacements=None
+    ):
         if sql_formatters is None:
             sql_formatters = {}
         self.identifier_quote = identifier_quote
@@ -25,7 +28,7 @@ class DBModel:
             sql_formatters = {}
         self.sql_formatters = sql_formatters
         if op_replacements is None:
-            op_replacements = {'==': '='}
+            op_replacements = {"==": "="}
         self.op_replacements = op_replacements
 
     def quote_identifier(self, identifier):
@@ -37,7 +40,9 @@ class DBModel:
 
     def quote_table_name(self, table_description):
         if not isinstance(table_description, data_algebra.data_ops.TableDescription):
-            raise Exception("Expected table_description to be a data_algebra.data_ops.TableDescription)")
+            raise Exception(
+                "Expected table_description to be a data_algebra.data_ops.TableDescription)"
+            )
         qt = self.quote_identifier(table_description.table_name)
         if len(table_description.qualifiers):
             raise Exception("This data model does not expect table qualifiers")
@@ -82,7 +87,9 @@ class DBModel:
                 op = self.op_replacements[op]
             if op in self.sql_formatters.keys():
                 return self.sql_formatters[op](self, expression)
-            subs = [self.expr_to_sql(ai, want_inline_parens=True) for ai in expression.args]
+            subs = [
+                self.expr_to_sql(ai, want_inline_parens=True) for ai in expression.args
+            ]
             if len(subs) == 2 and expression.inline:
                 if want_inline_parens:
                     return "(" + subs[0] + " " + op.upper() + " " + subs[1] + ")"
@@ -95,7 +102,9 @@ class DBModel:
 
     def table_def_to_sql(self, table_def, *, using=None):
         if not isinstance(table_def, data_algebra.data_ops.TableDescription):
-            raise Exception("Expected table_def to be a data_algebra.data_ops.TableDescription)")
+            raise Exception(
+                "Expected table_def to be a data_algebra.data_ops.TableDescription)"
+            )
         if using is None:
             using = table_def.column_set
         if len(using) < 1:
@@ -111,7 +120,9 @@ class DBModel:
 
     def extend_to_sql(self, extend_node, *, using=None, temp_id_source=None):
         if not isinstance(extend_node, data_algebra.data_ops.ExtendNode):
-            raise Exception("Expected extend_node to be a data_algebra.data_ops.ExtendNode)")
+            raise Exception(
+                "Expected extend_node to be a data_algebra.data_ops.ExtendNode)"
+            )
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
@@ -170,7 +181,9 @@ class DBModel:
 
     def select_rows_to_sql(self, select_rows_node, *, using=None, temp_id_source=None):
         if not isinstance(select_rows_node, data_algebra.data_ops.SelectRowsNode):
-            raise Exception("Expected select_rows_node to be a data_algebra.data_ops.SelectRowsNode)")
+            raise Exception(
+                "Expected select_rows_node to be a data_algebra.data_ops.SelectRowsNode)"
+            )
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
@@ -182,20 +195,24 @@ class DBModel:
         sub_view_name = "SQ_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         sql_str = (
-                "SELECT "
-                + ", ".join([self.quote_identifier(ci) for ci in using])
-                + " FROM ( "
-                + subsql
-                + " ) "
-                + self.quote_identifier(sub_view_name)
-                + " WHERE "
-                + self.expr_to_sql(select_rows_node.expr)
+            "SELECT "
+            + ", ".join([self.quote_identifier(ci) for ci in using])
+            + " FROM ( "
+            + subsql
+            + " ) "
+            + self.quote_identifier(sub_view_name)
+            + " WHERE "
+            + self.expr_to_sql(select_rows_node.expr)
         )
         return sql_str
 
-    def select_columns_to_sql(self, select_columns_node, *, using=None, temp_id_source=None):
+    def select_columns_to_sql(
+        self, select_columns_node, *, using=None, temp_id_source=None
+    ):
         if not isinstance(select_columns_node, data_algebra.data_ops.SelectColumnsNode):
-            raise Exception("Expected select_columns_to_sql to be a data_algebra.data_ops.SelectColumnsNode)")
+            raise Exception(
+                "Expected select_columns_to_sql to be a data_algebra.data_ops.SelectColumnsNode)"
+            )
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
@@ -209,18 +226,20 @@ class DBModel:
         sub_view_name = "SQ_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         sql_str = (
-                "SELECT "
-                + ", ".join([self.quote_identifier(ci) for ci in subusing])
-                + " FROM ( "
-                + subsql
-                + " ) "
-                + self.quote_identifier(sub_view_name)
+            "SELECT "
+            + ", ".join([self.quote_identifier(ci) for ci in subusing])
+            + " FROM ( "
+            + subsql
+            + " ) "
+            + self.quote_identifier(sub_view_name)
         )
         return sql_str
 
     def order_to_sql(self, order_node, *, using=None, temp_id_source=None):
         if not isinstance(order_node, data_algebra.data_ops.OrderRowsNode):
-            raise Exception("Expected order_node to be a data_algebra.data_ops.OrderRowsNode)")
+            raise Exception(
+                "Expected order_node to be a data_algebra.data_ops.OrderRowsNode)"
+            )
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
@@ -234,24 +253,34 @@ class DBModel:
         sub_view_name = "SQ_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         sql_str = (
-                "SELECT "
-                + ", ".join([self.quote_identifier(ci) for ci in subusing])
-                + " FROM ( "
-                + subsql
-                + " ) "
-                + self.quote_identifier(sub_view_name)
+            "SELECT "
+            + ", ".join([self.quote_identifier(ci) for ci in subusing])
+            + " FROM ( "
+            + subsql
+            + " ) "
+            + self.quote_identifier(sub_view_name)
         )
-        if len(order_node.order_columns)>0:
-            sql_str = sql_str + ' ORDER BY ' + ', '.join([self.quote_identifier(ci) +
-                                                          (' DESC' if ci in set(order_node.reverse) else '')
-                                                          for ci in order_node.order_columns])
+        if len(order_node.order_columns) > 0:
+            sql_str = (
+                sql_str
+                + " ORDER BY "
+                + ", ".join(
+                    [
+                        self.quote_identifier(ci)
+                        + (" DESC" if ci in set(order_node.reverse) else "")
+                        for ci in order_node.order_columns
+                    ]
+                )
+            )
         if order_node.limit is not None:
-            sql_str = sql_str + ' LIMIT ' + order_node.limit.__repr__()
+            sql_str = sql_str + " LIMIT " + order_node.limit.__repr__()
         return sql_str
 
     def rename_to_sql(self, rename_node, *, using=None, temp_id_source=None):
         if not isinstance(rename_node, data_algebra.data_ops.RenameColumnsNode):
-            raise Exception("Expected rename_node to be a data_algebra.data_ops.RenameColumnsNode)")
+            raise Exception(
+                "Expected rename_node to be a data_algebra.data_ops.RenameColumnsNode)"
+            )
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
@@ -262,23 +291,29 @@ class DBModel:
         )
         sub_view_name = "SQ_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        unchanged_columns = subusing - set(rename_node.column_remapping.values()).union(rename_node.column_remapping.keys())
+        unchanged_columns = subusing - set(rename_node.column_remapping.values()).union(
+            rename_node.column_remapping.keys()
+        )
         copies = [self.quote_identifier(vi) for vi in unchanged_columns]
-        remaps = [self.quote_identifier(vi) + " AS " + self.quote_identifier(ki) for
-                    (ki,vi) in rename_node.column_remapping.items()]
+        remaps = [
+            self.quote_identifier(vi) + " AS " + self.quote_identifier(ki)
+            for (ki, vi) in rename_node.column_remapping.items()
+        ]
         sql_str = (
-                "SELECT "
-                + ", ".join(copies + remaps)
-                + " FROM ( "
-                + subsql
-                + " ) "
-                + self.quote_identifier(sub_view_name)
+            "SELECT "
+            + ", ".join(copies + remaps)
+            + " FROM ( "
+            + subsql
+            + " ) "
+            + self.quote_identifier(sub_view_name)
         )
         return sql_str
 
     def natural_join_to_sql(self, join_node, *, using=None, temp_id_source=None):
         if not isinstance(join_node, data_algebra.data_ops.NaturalJoinNode):
-            raise Exception("Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)")
+            raise Exception(
+                "Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)"
+            )
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:

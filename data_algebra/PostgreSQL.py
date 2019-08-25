@@ -1,4 +1,3 @@
-
 import data_algebra.data_ops
 import data_algebra.db_model
 
@@ -27,7 +26,9 @@ class PostgreSQLModel(data_algebra.db_model.DBModel):
 
     def quote_table_name(self, table_description):
         if not isinstance(table_description, data_algebra.data_ops.TableDescription):
-            raise Exception("Expeted table_description to be a data_algebra.data_ops.TableDescription)")
+            raise Exception(
+                "Expeted table_description to be a data_algebra.data_ops.TableDescription)"
+            )
         qt = self.quote_identifier(table_description.table_name)
         ql = table_description.qualifiers
         if "schema" in ql.keys():

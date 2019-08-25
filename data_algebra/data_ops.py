@@ -5,6 +5,7 @@ import collections
 have_black = False
 try:
     import black
+
     have_black = True
 except ImportError:
     pass
@@ -12,6 +13,7 @@ except ImportError:
 have_sqlparse = False
 try:
     import sqlparse
+
     have_sqlparse = True
 except ImportError:
     pass
@@ -74,7 +76,9 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
     def columns_used_implementation(self, *, columns_used, using):
         cu_list = self.columns_used_from_sources(using)
         for i in range(len(self.sources)):
-            self.sources[i].columns_used_implementation(columns_used=columns_used, using=cu_list[i])
+            self.sources[i].columns_used_implementation(
+                columns_used=columns_used, using=cu_list[i]
+            )
 
     def columns_used(self):
         """Determine which columns are used from source tables."""
@@ -124,7 +128,9 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         global have_sqlparse
         self.get_tables()  # for table consistency check/raise
         temp_id_source = [0]
-        sql_str = self.to_sql_implementation(db_model=db_model, using=None, temp_id_source=temp_id_source)
+        sql_str = self.to_sql_implementation(
+            db_model=db_model, using=None, temp_id_source=temp_id_source
+        )
         if pretty and have_sqlparse:
             sql_str = sqlparse.format(sql_str, reindent=True, keyword_case="upper")
         return sql_str
@@ -217,14 +223,22 @@ class TableDescription(ViewRepresentation):
     def to_python_implementation(self, *, indent=0, strict=True):
         nc = min(len(self.column_names), 20)
         if (not strict) and (nc < len(self.column_names)):
-            cols_str = '[' + ', '.join([self.column_names[i].__repr__() for i in range(nc)]) +\
-                       ", + " + str(len(self.column_names)-nc) + ' more]'
+            cols_str = (
+                "["
+                + ", ".join([self.column_names[i].__repr__() for i in range(nc)])
+                + ", + "
+                + str(len(self.column_names) - nc)
+                + " more]"
+            )
         else:
             cols_str = self.column_names.__repr__()
-        s = ("TableDescription("
-             + "table_name=" + self.table_name.__repr__()
-             + ", column_names=" + cols_str
-             )
+        s = (
+            "TableDescription("
+            + "table_name="
+            + self.table_name.__repr__()
+            + ", column_names="
+            + cols_str
+        )
         if len(self.qualifiers) > 0:
             s = s + ", qualifiers=" + self.qualifiers.__repr__()
         s = s + ")"
@@ -238,7 +252,9 @@ class TableDescription(ViewRepresentation):
         if self.key in tables.keys():
             other = tables[self.key]
             if self.column_set != other.column_set:
-                raise Exception("Two tables with key " + self.key + " have different column sets.")
+                raise Exception(
+                    "Two tables with key " + self.key + " have different column sets."
+                )
         else:
             tables[self.key] = self
         return tables
@@ -324,7 +340,9 @@ class ExtendNode(ViewRepresentation):
         unknown = set(reverse) - set(order_by)
         if len(unknown) > 0:
             raise Exception("reverse columns not in order_by: " + str(unknown))
-        bad_overwrite = set(ops.keys()).intersection(set(partition_by).union(order_by, reverse))
+        bad_overwrite = set(ops.keys()).intersection(
+            set(partition_by).union(order_by, reverse)
+        )
         if len(bad_overwrite) > 0:
             raise Exception("tried to change: " + str(bad_overwrite))
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
@@ -360,8 +378,13 @@ class ExtendNode(ViewRepresentation):
             + " .\\\n"
             + " " * (indent + 3)
             + "extend({"
-            + ', '.join([k.__repr__() + ": " + opi.to_python().__repr__() for (k, opi) in self.ops.items()])
-            + '}'
+            + ", ".join(
+                [
+                    k.__repr__() + ": " + opi.to_python().__repr__()
+                    for (k, opi) in self.ops.items()
+                ]
+            )
+            + "}"
         )
         if len(self.partition_by) > 0:
             s = s + ", partition_by=" + self.partition_by.__repr__()
@@ -422,14 +445,16 @@ class SelectRowsNode(ViewRepresentation):
 
     def __init__(self, source, expr):
         ops = data_algebra.expr_rep.check_convert_op_dictionary(
-            {'expr': expr}, source.column_map.__dict__
+            {"expr": expr}, source.column_map.__dict__
         )
         if len(ops) < 1:
             raise Exception("no ops")
-        self.expr = ops['expr']
+        self.expr = ops["expr"]
         self.decision_columns = set()
         self.expr.get_column_names(self.decision_columns)
-        ViewRepresentation.__init__(self, column_names=source.column_names, sources=[source])
+        ViewRepresentation.__init__(
+            self, column_names=source.column_names, sources=[source]
+        )
 
     def columns_used_from_sources(self, using):
         columns_we_take = self.sources[0].column_set.copy()
@@ -453,12 +478,16 @@ class SelectRowsNode(ViewRepresentation):
             self.sources[0].to_python_implementation(indent=indent, strict=strict)
             + " .\\\n"
             + " " * (indent + 3)
-            + "select_rows(" + self.expr.to_python().__repr__() + ')'
+            + "select_rows("
+            + self.expr.to_python().__repr__()
+            + ")"
         )
         return s
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
-        return db_model.select_rows_to_sql(self, using=using, temp_id_source=temp_id_source)
+        return db_model.select_rows_to_sql(
+            self, using=using, temp_id_source=temp_id_source
+        )
 
 
 class SelectRows(data_algebra.pipe.PipeStep):
@@ -482,7 +511,9 @@ class SelectColumnsNode(ViewRepresentation):
         column_selection = [c for c in columns]
         self.column_selection = column_selection
         # TODO: check column conditions
-        ViewRepresentation.__init__(self, column_names=column_selection, sources=[source])
+        ViewRepresentation.__init__(
+            self, column_names=column_selection, sources=[source]
+        )
 
     def columns_used_from_sources(self, using):
         cols = set(self.column_selection.copy())
@@ -504,12 +535,16 @@ class SelectColumnsNode(ViewRepresentation):
             self.sources[0].to_python_implementation(indent=indent, strict=strict)
             + " .\\\n"
             + " " * (indent + 3)
-            + "select_columns(" + self.column_selection.__repr__() + ')'
+            + "select_columns("
+            + self.column_selection.__repr__()
+            + ")"
         )
         return s
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
-        return db_model.select_columns_to_sql(self, using=using, temp_id_source=temp_id_source)
+        return db_model.select_columns_to_sql(
+            self, using=using, temp_id_source=temp_id_source
+        )
 
 
 class SelectColumns(data_algebra.pipe.PipeStep):
@@ -538,7 +573,9 @@ class OrderRowsNode(ViewRepresentation):
         self.reverse = [c for c in reverse]
         self.limit = limit
         # TODO: check column conditions
-        ViewRepresentation.__init__(self, column_names=source.column_names, sources=[source])
+        ViewRepresentation.__init__(
+            self, column_names=source.column_names, sources=[source]
+        )
 
     def columns_used_from_sources(self, using):
         cols = set(self.column_names.copy())
@@ -563,13 +600,14 @@ class OrderRowsNode(ViewRepresentation):
             self.sources[0].to_python_implementation(indent=indent, strict=strict)
             + " .\\\n"
             + " " * (indent + 3)
-            + "order_rows(" + self.order_columns.__repr__()
+            + "order_rows("
+            + self.order_columns.__repr__()
         )
         if len(self.reverse) > 0:
-            s = s + ', reverse=' + self.reverse.__repr__()
+            s = s + ", reverse=" + self.reverse.__repr__()
         if self.limit is not None:
-            s = s + ', limit=' + self.limit.__repr__()
-        s = s + ')'
+            s = s + ", limit=" + self.limit.__repr__()
+        s = s + ")"
         return s
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
@@ -592,7 +630,9 @@ class OrderRows(data_algebra.pipe.PipeStep):
         data_algebra.pipe.PipeStep.__init__(self, name="OrderRows")
 
     def apply(self, other):
-        return other.order_rows(columns=self.order_columns, reverse=self.reverse, limit=self.limit)
+        return other.order_rows(
+            columns=self.order_columns, reverse=self.reverse, limit=self.limit
+        )
 
 
 class RenameColumnsNode(ViewRepresentation):
@@ -602,19 +642,24 @@ class RenameColumnsNode(ViewRepresentation):
 
     def __init__(self, source, column_remapping):
         self.column_remapping = column_remapping.copy()
-        self.reverse_mapping = {v:k for (k,v) in self.column_remapping.items()}
-        self.mapped_columns = set(self.column_remapping.keys()).union(set(self.reverse_mapping.keys()))
-        column_names = [(k if k not in self.reverse_mapping.keys() else self.reverse_mapping[k]) for
-                        k in source.column_names]
+        self.reverse_mapping = {v: k for (k, v) in self.column_remapping.items()}
+        self.mapped_columns = set(self.column_remapping.keys()).union(
+            set(self.reverse_mapping.keys())
+        )
+        column_names = [
+            (k if k not in self.reverse_mapping.keys() else self.reverse_mapping[k])
+            for k in source.column_names
+        ]
         # TODO: check column conditions, don't allow name collisions
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
 
     def columns_used_from_sources(self, using):
-        cols = set(self.column_names.copy())
         if using is None:
             using = self.column_names
-        cols = [(k if k not in self.column_remapping.keys() else self.column_remapping[k]) for
-                        k in using]
+        cols = [
+            (k if k not in self.column_remapping.keys() else self.column_remapping[k])
+            for k in using
+        ]
         return [set(cols)]
 
     def collect_representation_implementation(self, pipeline=None):
@@ -631,7 +676,9 @@ class RenameColumnsNode(ViewRepresentation):
             self.sources[0].to_python_implementation(indent=indent, strict=strict)
             + " .\\\n"
             + " " * (indent + 3)
-            + "rename_columns(" + self.column_remapping.__repr__() + ")"
+            + "rename_columns("
+            + self.column_remapping.__repr__()
+            + ")"
         )
         return s
 
@@ -713,7 +760,9 @@ class NaturalJoinNode(ViewRepresentation):
         )
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
-        return db_model.natural_join_to_sql(self, using=using, temp_id_source=temp_id_source)
+        return db_model.natural_join_to_sql(
+            self, using=using, temp_id_source=temp_id_source
+        )
 
 
 class NaturalJoin(data_algebra.pipe.PipeStep):

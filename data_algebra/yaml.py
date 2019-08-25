@@ -2,7 +2,8 @@ import collections
 
 have_yaml = False
 try:
-    import yaml   # supplied by PyYAML
+    import yaml  # supplied by PyYAML
+
     have_yaml = True
 except ImportError:
     pass
@@ -63,7 +64,8 @@ def to_pipeline(obj, *, known_tables=None):
                 ops=obj["ops"],
                 partition_by=obj["partition_by"],
                 order_by=obj["order_by"],
-                reverse=obj["reverse"])
+                reverse=obj["reverse"],
+            )
         elif op == "NaturalJoin":
             return data_algebra.data_ops.NaturalJoin(
                 by=obj["by"],
@@ -71,22 +73,16 @@ def to_pipeline(obj, *, known_tables=None):
                 b=to_pipeline(obj["b"], known_tables=known_tables),
             )
         elif op == "SelectRows":
-            return data_algebra.data_ops.SelectRows(
-                expr=obj['expr']
-            )
+            return data_algebra.data_ops.SelectRows(expr=obj["expr"])
         elif op == "SelectColumns":
-            return data_algebra.data_ops.SelectColumns(
-                columns=obj['columns']
-            )
+            return data_algebra.data_ops.SelectColumns(columns=obj["columns"])
         elif op == "Rename":
             return data_algebra.data_ops.RenameColumns(
-                column_remapping=obj['column_remapping']
+                column_remapping=obj["column_remapping"]
             )
         elif op == "Order":
             return data_algebra.data_ops.OrderRows(
-                columns=obj['order_columns'],
-                reverse=obj['reverse'],
-                limit=obj['limit']
+                columns=obj["order_columns"], reverse=obj["reverse"], limit=obj["limit"]
             )
         else:
             raise Exception("Unexpected op name: " + op)

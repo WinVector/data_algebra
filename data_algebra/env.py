@@ -72,8 +72,7 @@ class SimpleNamespaceDict(types.SimpleNamespace):
         raise Exception("__setattr__ not allowed")
 
 
-def populate_specials(*, column_defs, column_defs1=None, destination,
-                      user_values=None):
+def populate_specials(*, column_defs, column_defs1=None, destination, user_values=None):
     """populate a dictionary with special values
        column_defs is a dictionary,
          usually formed from a ViewRepresentation.column_map.__dict__
@@ -102,7 +101,9 @@ def populate_specials(*, column_defs, column_defs1=None, destination,
     else:
         destination["_1"] = None
     destination["_get"] = lambda key: user_values[key]
-    destination['_row_number'] = lambda: data_algebra.expr_rep.Expression(op='row_number', args=[])
+    destination["_row_number"] = lambda: data_algebra.expr_rep.Expression(
+        op="row_number", args=[]
+    )
 
 
 def maybe_set_underbar(*, mp0, mp1=None):

@@ -2,7 +2,11 @@
 import setuptools
 
 DESCRIPTION = """
-vtreat is a pandas.DataFrame processor/conditioner that prepares real-world data for predictive modeling in a statistically sound manner.
+data_algebra ( https://github.com/WinVector/data_algebra ) is a piped data wrangling system
+based on Codd's relational algebra and experience working with dplyr at scale.  The primary 
+purpose of the package is to support an easy to compose and maintain grammar of data processing
+steps that in turn can be used to generate database specific SQL.  The package also is intended
+to implement the same transforms for Pandas DataFrames. 
 
 Recommended packages include: PyYAML (supplies yaml), sqlparse, and black. 
 """
