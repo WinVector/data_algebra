@@ -144,7 +144,7 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         return NaturalJoinNode(a=self, b=b, by=by, jointype=jointype)
 
     def select_rows(self, expr):
-        raise Exception("not implemented yet")  # TODO: implement
+        return SelectRowsNode(source=self, expr=expr)
 
     def drop_columns(self, columns):
         raise Exception("not implemented yet")  # TODO: implement
@@ -336,7 +336,7 @@ class ExtendNode(ViewRepresentation):
         subops = {k: op for (k, op) in self.ops.items() if k in using}
         if len(subops) <= 0:
             return [columns_we_take]
-        columns_we_take = columns_we_take.union(self.partition_by, self.order_by, self.reverse)
+        columns_we_take = using.union(self.partition_by, self.order_by, self.reverse)
         columns_we_take = columns_we_take - subops.keys()
         for (k, o) in subops.items():
             o.get_column_names(columns_we_take)
@@ -414,6 +414,60 @@ class Extend(data_algebra.pipe.PipeStep):
             order_by=self.order_by,
             reverse=self.reverse,
         )
+
+
+class SelectRowsNode(ViewRepresentation):
+    expr: data_algebra.expr_rep.Expression
+
+    def __init__(self, source, expr):
+        ops = data_algebra.expr_rep.check_convert_op_dictionary(
+            {'expr': expr}, source.column_map.__dict__
+        )
+        if len(ops) < 1:
+            raise Exception("no ops")
+        self.expr = ops['expr']
+        ViewRepresentation.__init__(self, column_names=source.column_names, sources=[source])
+
+    def columns_used_from_sources(self, using):
+        columns_we_take = self.sources[0].column_set.copy()
+        if using is None:
+            return [columns_we_take]
+        return [columns_we_take.intersection(using)]
+
+    def collect_representation_implementation(self, pipeline=None):
+        if pipeline is None:
+            pipeline = []
+        od = collections.OrderedDict()
+        od["op"] = "SelectRows"
+        od["expr"] = self.expr.to_python()
+        pipeline.insert(0, od)
+        return self.sources[0].collect_representation_implementation(pipeline=pipeline)
+
+    def to_python_implementation(self, *, indent=0, strict=True):
+        s = (
+            self.sources[0].to_python_implementation(indent=indent, strict=strict)
+            + " .\\\n"
+            + " " * (indent + 3)
+            + "select_rows(" + self.expr.to_python().__repr__() + ')'
+        )
+        return s
+
+    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+        return db_model.select_rows_to_sql(self, using=using, temp_id_source=temp_id_source)
+
+
+class SelectRows(data_algebra.pipe.PipeStep):
+    """Class to specify a choice of rows.
+    """
+
+    expr: data_algebra.expr_rep.Expression
+
+    def __init__(self, expr):
+        data_algebra.pipe.PipeStep.__init__(self, name="SelectRows")
+        self.expr = expr
+
+    def apply(self, other):
+        return other.select_rows(expr=self.expr)
 
 
 class NaturalJoinNode(ViewRepresentation):

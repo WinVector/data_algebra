@@ -12,12 +12,21 @@ class DBModel:
     identifier_quote: str
     string_quote: str
 
-    def __init__(self, *, identifier_quote='"', string_quote="'", sql_formatters=None):
+    def __init__(self,
+                 *,
+                 identifier_quote='"', string_quote="'",
+                 sql_formatters=None,
+                 op_replacements=None):
         if sql_formatters is None:
             sql_formatters = {}
         self.identifier_quote = identifier_quote
         self.string_quote = string_quote
+        if sql_formatters is None:
+            sql_formatters = {}
         self.sql_formatters = sql_formatters
+        if op_replacements is None:
+            op_replacements = {'==':'='}
+        self.op_replacements = op_replacements
 
     def quote_identifier(self, identifier):
         if not isinstance(identifier, str):
@@ -68,16 +77,19 @@ class DBModel:
         if isinstance(expression, data_algebra.expr_rep.ColumnReference):
             return self.quote_identifier(expression.column_name)
         if isinstance(expression, data_algebra.expr_rep.Expression):
-            if expression.op in self.sql_formatters.keys():
-                return self.sql_formatters[expression.op](self, expression)
+            op = expression.op
+            if op in self.op_replacements.keys():
+                op = self.op_replacements[op]
+            if op in self.sql_formatters.keys():
+                return self.sql_formatters[op](self, expression)
             subs = [self.expr_to_sql(ai, want_inline_parens=True) for ai in expression.args]
             if len(subs) == 2 and expression.inline:
                 if want_inline_parens:
-                    return "(" + subs[0] + " " + expression.op.upper() + " " + subs[1] + ")"
+                    return "(" + subs[0] + " " + op.upper() + " " + subs[1] + ")"
                 else:
                     # SQL window functions don't like parens
-                    return subs[0] + " " + expression.op.upper() + " " + subs[1]
-            return expression.op.upper() + "(" + ", ".join(subs) + ")"
+                    return subs[0] + " " + op.upper() + " " + subs[1]
+            return op.upper() + "(" + ", ".join(subs) + ")"
 
         raise Exception("unexpected type: " + str(type(expression)))
 
@@ -153,6 +165,31 @@ class DBModel:
             + subsql
             + " ) "
             + self.quote_identifier(sub_view_name)
+        )
+        return sql_str
+
+    def select_rows_to_sql(self, select_rows_node, *, using=None, temp_id_source=None):
+        if not isinstance(select_rows_node, data_algebra.data_ops.SelectRowsNode):
+            raise Exception("Expeted select_rows_node to be a data_algebra.data_ops.SelectRowsNode)")
+        if temp_id_source is None:
+            temp_id_source = [0]
+        if using is None:
+            using = select_rows_node.column_set
+        subusing = select_rows_node.columns_used_from_sources(using=using)[0]
+        subsql = select_rows_node.sources[0].to_sql_implementation(
+            db_model=self, using=subusing, temp_id_source=temp_id_source
+        )
+        sub_view_name = "SQ_" + str(temp_id_source[0])
+        temp_id_source[0] = temp_id_source[0] + 1
+        sql_str = (
+                "SELECT "
+                + ", ".join([self.quote_identifier(ci) for ci in using])
+                + " FROM ( "
+                + subsql
+                + " ) "
+                + self.quote_identifier(sub_view_name)
+                + " WHERE "
+                + self.expr_to_sql(select_rows_node.expr)
         )
         return sql_str
 

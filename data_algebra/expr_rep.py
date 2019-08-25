@@ -49,6 +49,26 @@ class Term:
     def __str__(self):
         return self.to_python(want_inline_parens=False)
 
+    # try to get at == and other comparision operators
+
+    def __eq__(self, other):
+        return self.__op_expr__("==", other)
+
+    def __ne__(self, other):
+        return self.__op_expr__("!=", other)
+
+    def __lt__(self, other):
+        return self.__op_expr__("<", other)
+
+    def __le__(self, other):
+        return self.__op_expr__("<=", other)
+
+    def __gt__(self, other):
+        return self.__op_expr__(">", other)
+
+    def __ge__(self, other):
+        return self.__op_expr__(">=", other)
+
     # override most of https://docs.python.org/3/reference/datamodel.html#emulating-numeric-types
 
     def __add__(self, other):
@@ -209,6 +229,8 @@ class Term:
 
     def __ceil__(self):
         return self.__uop_expr__("ceil")
+
+    # ad-hoc defs
 
     def max(self):
         return self.__uop_expr__("max")
