@@ -165,7 +165,9 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
         if not isinstance(b, ViewRepresentation):
-            raise Exception("expected b to be a data_algebra.dat_ops.ViewRepresentation")
+            raise Exception(
+                "expected b to be a data_algebra.dat_ops.ViewRepresentation"
+            )
         return NaturalJoinNode(a=self, b=b, by=by, jointype=jointype)
 
     def select_rows(self, expr):
@@ -279,8 +281,10 @@ class TableDescription(ViewRepresentation):
         return tables
 
     def eval_pandas(self, data_map):
-        if len(self.qualifiers)>0:
-            raise Exception("table descriptions used with eval_pandas() must not have qualifiers")
+        if len(self.qualifiers) > 0:
+            raise Exception(
+                "table descriptions used with eval_pandas() must not have qualifiers"
+            )
         # make an index-free copy of the data to isolate side-effects and not deal with indices
         res = data_map[self.table_name]
         res = res.copy()
@@ -427,42 +431,60 @@ class ExtendNode(ViewRepresentation):
         return db_model.extend_to_sql(self, using=using, temp_id_source=temp_id_source)
 
     def eval_pandas(self, data_map):
-        window_situation = (len(self.partition_by)>0) or (len(self.order_by)>0)
+        window_situation = (len(self.partition_by) > 0) or (len(self.order_by) > 0)
         if window_situation:
             # check these are forms we are prepared to work with
             for (k, op) in self.ops.items():
                 if len(op.args) > 1:
-                    raise Exception("non-trivial windows expression: " + str(k) + ": " + str(op))
+                    raise Exception(
+                        "non-trivial windows expression: " + str(k) + ": " + str(op)
+                    )
                 if len(op.args) == 1:
-                    if not isinstance(op.args[0], data_algebra.expr_rep.ColumnReference):
-                        raise Exception("windows expression argument must be a column: " + str(k) + ": " + str(op))
+                    if not isinstance(
+                        op.args[0], data_algebra.expr_rep.ColumnReference
+                    ):
+                        raise Exception(
+                            "windows expression argument must be a column: "
+                            + str(k)
+                            + ": "
+                            + str(op)
+                        )
         res = self.sources[0].eval_pandas(data_map)
         if not window_situation:
             for (k, op) in self.ops.items():
                 res[k] = res.eval(op.to_pandas())
-            return res
-        for (k, op) in self.ops.items():
-            if len(op.args)==0:
-                col_list = [c for c in set(self.partition_by).union(self.order_by)]
-                ascending = [c not in set(self.reverse) for c in col_list]
-                subframe = res.sort_values(col_list, inplace=False, ascending=ascending)
-                if len(self.partition_by) > 0:
-                    subframe = subframe.groupby(self.partition_by)
-                # should be placed back in correctly by Pandas row-index rules
-                if op.op=='row_number':
-                    res[k] = subframe.cumcount() + 1
+        else:
+            for (k, op) in self.ops.items():
+                if len(op.args) == 0:
+                    col_list = [c for c in set(self.partition_by).union(self.order_by)]
+                    ascending = [c not in set(self.reverse) for c in col_list]
+                    subframe = res.sort_values(
+                        col_list, inplace=False, ascending=ascending
+                    )
+                    if len(self.partition_by) > 0:
+                        subframe = subframe.groupby(self.partition_by)
+                    # should be placed back in correctly by Pandas row-index rules
+                    if op.op == "row_number":
+                        res[k] = subframe.cumcount() + 1
+                    else:  # TODO: more of these
+                        raise Exception("not implemented: " + str(k) + ": " + str(op))
                 else:
-                    raise Exception("not implemented: " + str(k) + ": " + str(op))
-            else:
-                # len(op.args) == 1
-                value_name = op.args[0].to_pandas()
-                col_list = [c for c in set([value_name]).union(self.partition_by, self.order_by)]
-                ascending = [c not in set(self.reverse) for c in col_list]
-                subframe = res.sort_values(col_list, inplace=False, ascending=ascending)[[value_name] + self.partition_by]
-                if len(self.partition_by)>0:
-                    subframe = subframe.groupby(self.partition_by)
-                # should be placed back in correctly by Pandas row-index rules
-                res[k] = subframe.transform(op.op)
+                    # len(op.args) == 1
+                    value_name = op.args[0].to_pandas()
+                    col_list = [
+                        c
+                        for c in set([value_name]).union(
+                            self.partition_by, self.order_by
+                        )
+                    ]
+                    ascending = [c not in set(self.reverse) for c in col_list]
+                    subframe = res.sort_values(
+                        col_list, inplace=False, ascending=ascending
+                    )[[value_name] + self.partition_by]
+                    if len(self.partition_by) > 0:
+                        subframe = subframe.groupby(self.partition_by)
+                    # should be placed back in correctly by Pandas row-index rules
+                    res[k] = subframe.transform(op.op)
         return res
 
 
@@ -499,7 +521,9 @@ class Extend(data_algebra.pipe.PipeStep):
 
     def apply(self, other):
         if not isinstance(other, ViewRepresentation):
-            raise Exception("expected other to be a data_algebra.dat_ops.ViewRepresentation")
+            raise Exception(
+                "expected other to be a data_algebra.dat_ops.ViewRepresentation"
+            )
         return other.extend(
             ops=self._ops,
             partition_by=self.partition_by,
@@ -571,7 +595,9 @@ class SelectRows(data_algebra.pipe.PipeStep):
 
     def apply(self, other):
         if not isinstance(other, ViewRepresentation):
-            raise Exception("expected other to be a data_algebra.dat_ops.ViewRepresentation")
+            raise Exception(
+                "expected other to be a data_algebra.dat_ops.ViewRepresentation"
+            )
         return other.select_rows(expr=self.expr)
 
 
@@ -631,7 +657,9 @@ class SelectColumns(data_algebra.pipe.PipeStep):
 
     def apply(self, other):
         if not isinstance(other, ViewRepresentation):
-            raise Exception("expected other to be a data_algebra.dat_ops.ViewRepresentation")
+            raise Exception(
+                "expected other to be a data_algebra.dat_ops.ViewRepresentation"
+            )
         return other.select_columns(self.column_selection)
 
 
@@ -704,7 +732,9 @@ class OrderRows(data_algebra.pipe.PipeStep):
 
     def apply(self, other):
         if not isinstance(other, ViewRepresentation):
-            raise Exception("expected other to be a data_algebra.dat_ops.ViewRepresentation")
+            raise Exception(
+                "expected other to be a data_algebra.dat_ops.ViewRepresentation"
+            )
         return other.order_rows(
             columns=self.order_columns, reverse=self.reverse, limit=self.limit
         )
@@ -773,7 +803,9 @@ class RenameColumns(data_algebra.pipe.PipeStep):
 
     def apply(self, other):
         if not isinstance(other, ViewRepresentation):
-            raise Exception("expected other to be a data_algebra.dat_ops.ViewRepresentation")
+            raise Exception(
+                "expected other to be a data_algebra.dat_ops.ViewRepresentation"
+            )
         return other.rename_columns(column_remapping=self.column_remapping)
 
 
@@ -868,5 +900,7 @@ class NaturalJoin(data_algebra.pipe.PipeStep):
 
     def apply(self, other):
         if not isinstance(other, ViewRepresentation):
-            raise Exception("expected other to be a data_algebra.dat_ops.ViewRepresentation")
+            raise Exception(
+                "expected other to be a data_algebra.dat_ops.ViewRepresentation"
+            )
         return other.natural_join(b=self._b, by=self._by, jointype=self._jointype)

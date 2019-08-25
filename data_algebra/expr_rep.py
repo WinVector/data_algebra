@@ -318,7 +318,9 @@ class Expression(Term):
         if len(self.args) <= 0:
             return "_" + self.op + "()"
         if len(self.args) == 1:
-            return self.op + "(" + self.args[0].to_pandas(want_inline_parens=False) + ")"
+            return (
+                self.op + "(" + self.args[0].to_pandas(want_inline_parens=False) + ")"
+            )
         subs = [ai.to_pandas(want_inline_parens=True) for ai in self.args]
         if len(subs) == 2 and self.inline:
             if want_inline_parens:
