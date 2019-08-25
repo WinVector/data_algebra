@@ -158,8 +158,8 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
     def project(self, group_by):
         raise Exception("not implemented yet")  # TODO: implement
 
-    def order_by(self, columns, *, reverse=None, limit=None):
-        raise Exception("not implemented yet")  # TODO: implement
+    def order(self, columns, *, reverse=None, limit=None):
+        return OrderNode(source=self, columns=columns, reverse=reverse, limit=limit)
 
 
 class TableDescription(ViewRepresentation):
@@ -481,6 +481,7 @@ class SelectColumnsNode(ViewRepresentation):
     def __init__(self, source, columns):
         column_selection = [c for c in columns]
         self.column_selection = column_selection
+        # TODO: check column conditions
         ViewRepresentation.__init__(self, column_names=column_selection, sources=[source])
 
     def columns_used_from_sources(self, using):
@@ -515,14 +516,83 @@ class SelectColumns(data_algebra.pipe.PipeStep):
     """Class to specify a choice of columns.
     """
 
-    expr: data_algebra.expr_rep.Expression
+    column_selection: List[str]
 
-    def __init__(self, expr):
-        data_algebra.pipe.PipeStep.__init__(self, name="SelectRows")
-        self.expr = expr
+    def __init__(self, columns):
+        order_columns = [c for c in columns]
+        self.order_columns = order_columns
+        data_algebra.pipe.PipeStep.__init__(self, name="SelectColumns")
 
     def apply(self, other):
-        return other.select_rows(expr=self.expr)
+        return other.select_columns(expr=self.expr)
+
+
+class OrderNode(ViewRepresentation):
+    order_columns: List[str]
+    reverse: List[str]
+
+    def __init__(self, source, columns, *, reverse=None, limit=None):
+        self.order_columns = [c for c in columns]
+        if reverse is None:
+            reverse = []
+        self.reverse = [c for c in reverse]
+        self.limit = limit
+        # TODO: check column conditions
+        ViewRepresentation.__init__(self, column_names=source.column_names, sources=[source])
+
+    def columns_used_from_sources(self, using):
+        cols = set(self.column_names.copy())
+        if using is None:
+            return [cols]
+        cols = cols.intersection(using).union(self.order_columns)
+        return [cols]
+
+    def collect_representation_implementation(self, pipeline=None):
+        if pipeline is None:
+            pipeline = []
+        od = collections.OrderedDict()
+        od["op"] = "Order"
+        od["order_columns"] = self.order_columns.__repr__()
+        od["reverse"] = self.reverse.__repr__()
+        od["limit"] = self.limit.__repr__()
+        pipeline.insert(0, od)
+        return self.sources[0].collect_representation_implementation(pipeline=pipeline)
+
+    def to_python_implementation(self, *, indent=0, strict=True):
+        s = (
+            self.sources[0].to_python_implementation(indent=indent, strict=strict)
+            + " .\\\n"
+            + " " * (indent + 3)
+            + "order(" + self.order_columns.__repr__()
+        )
+        if len(self.reverse) > 0:
+            s = s + ', reverse=' + self.reverse.__repr__()
+        if self.limit is not None:
+            s = s + ', limit=' + self.limit.__repr__()
+        s = s + ')'
+        return s
+
+    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+        return db_model.order_to_sql(self, using=using, temp_id_source=temp_id_source)
+
+
+class Order(data_algebra.pipe.PipeStep):
+    """Class to specify a choice of columns.
+    """
+
+    order_columns: List[str]
+    reverse: List[str]
+
+    def __init__(self, columns, *, reverse=None, limit=None):
+        self.order_columns = [c for c in columns]
+        if reverse is None:
+            reverse = []
+        self.reverse = [c for c in reverse]
+        self.limit = limit
+        data_algebra.pipe.PipeStep.__init__(self, name="Order")
+
+    def apply(self, other):
+        return other.order(columns=self.order_columns, reverse=self.reverse, limit=self.limit)
 
 
 class NaturalJoinNode(ViewRepresentation):

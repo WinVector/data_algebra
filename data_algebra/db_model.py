@@ -204,6 +204,8 @@ class DBModel:
         subsql = select_columns_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
+        # TODO: make sure select rows doesn't force its partition and order columns in, and then
+        #       return the subsql here instead of tacking on an additional query.
         sub_view_name = "SQ_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         sql_str = (
@@ -214,6 +216,37 @@ class DBModel:
                 + " ) "
                 + self.quote_identifier(sub_view_name)
         )
+        return sql_str
+
+    def order_to_sql(self, order_node, *, using=None, temp_id_source=None):
+        if not isinstance(order_node, data_algebra.data_ops.OrderNode):
+            raise Exception("Expeted select_rows_node to be a data_algebra.data_ops.OrderNode)")
+        if temp_id_source is None:
+            temp_id_source = [0]
+        if using is None:
+            using = order_node.column_set
+        subusing = order_node.columns_used_from_sources(using=using)[0]
+        subsql = order_node.sources[0].to_sql_implementation(
+            db_model=self, using=subusing, temp_id_source=temp_id_source
+        )
+        # TODO: make sure select rows doesn't force its partition and order columns in, and then
+        #       return the subsql here instead of tacking on an additional query.
+        sub_view_name = "SQ_" + str(temp_id_source[0])
+        temp_id_source[0] = temp_id_source[0] + 1
+        sql_str = (
+                "SELECT "
+                + ", ".join([self.quote_identifier(ci) for ci in subusing])
+                + " FROM ( "
+                + subsql
+                + " ) "
+                + self.quote_identifier(sub_view_name)
+        )
+        if len(order_node.order_columns)>0:
+            sql_str = sql_str + ' ORDER BY ' + ', '.join([self.quote_identifier(ci) +
+                                                          (' DESC' if ci in set(order_node.reverse) else '')
+                                                          for ci in order_node.order_columns])
+        if order_node.limit is not None:
+            sql_str = sql_str + ' LIMIT ' + order_node.limit.__repr__()
         return sql_str
 
     def natural_join_to_sql(self, join_node, *, using=None, temp_id_source=None):
