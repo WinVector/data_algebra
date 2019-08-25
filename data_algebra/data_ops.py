@@ -443,7 +443,16 @@ class ExtendNode(ViewRepresentation):
             return res
         for (k, op) in self.ops.items():
             if len(op.args)==0:
-                raise Exception("length zero case not yet implemented")
+                col_list = [c for c in set(self.partition_by).union(self.order_by)]
+                ascending = [c not in set(self.reverse) for c in col_list]
+                subframe = res.sort_values(col_list, inplace=False, ascending=ascending)
+                if len(self.partition_by) > 0:
+                    subframe = subframe.groupby(self.partition_by)
+                # should be placed back in correctly by Pandas row-index rules
+                if op.op=='row_number':
+                    res[k] = subframe.cumcount() + 1
+                else:
+                    raise Exception("not implemented: " + str(k) + ": " + str(op))
             else:
                 # len(op.args) == 1
                 value_name = op.args[0].to_pandas()
