@@ -104,6 +104,7 @@ def populate_specials(*, column_defs, column_defs1=None, destination,
     destination["_get"] = lambda key: user_values[key]
     destination['_row_number'] = lambda: data_algebra.expr_rep.Expression(op='row_number', args=[])
 
+
 def maybe_set_underbar(*, mp0, mp1=None):
     destination = outer_namespace()
     if destination is not None:

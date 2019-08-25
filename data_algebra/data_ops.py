@@ -2,18 +2,19 @@ from typing import Set, Any, Dict, List
 import collections
 
 
+have_black = False
 try:
     import black
     have_black = True
 except ImportError:
-    have_black = False
+    pass
 
+have_sqlparse = False
 try:
     import sqlparse
     have_sqlparse = True
 except ImportError:
-    have_sqlparse = False
-
+    pass
 
 import data_algebra.expr_rep
 import data_algebra.pipe
@@ -101,12 +102,12 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         self.get_tables()  # for table consistency check/raise
         if pretty:
             strict = True
-        str = self.to_python_implementation(indent=indent, strict=strict)
+        python_str = self.to_python_implementation(indent=indent, strict=strict)
         if pretty and have_black:
             if black_mode is None:
                 black_mode = black.FileMode()
-            str = black.format_str(str, mode=black_mode)
-        return str
+            python_str = black.format_str(python_str, mode=black_mode)
+        return python_str
 
     def __repr__(self):
         return self.to_python(strict=True)
@@ -123,10 +124,10 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         global have_sqlparse
         self.get_tables()  # for table consistency check/raise
         temp_id_source = [0]
-        str = self.to_sql_implementation(db_model=db_model, using=None, temp_id_source=temp_id_source)
+        sql_str = self.to_sql_implementation(db_model=db_model, using=None, temp_id_source=temp_id_source)
         if pretty and have_sqlparse:
-            str = sqlparse.format(str, reindent=True, keyword_case="upper")
-        return str
+            sql_str = sqlparse.format(sql_str, reindent=True, keyword_case="upper")
+        return sql_str
 
     # define builders for all non-leaf node types on base class
 

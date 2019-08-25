@@ -1,16 +1,17 @@
 import collections
 
+have_yaml = False
 try:
     import yaml   # supplied by PyYAML
     have_yaml = True
 except ImportError:
-    have_yaml = False
-
+    pass
 
 import data_algebra.data_ops
 
 # yaml notes:
 #    https://stackoverflow.com/questions/2627555/how-to-deserialize-an-object-with-pyyaml-using-safe-load
+
 
 def fix_ordered_dict_yaml_rep():
     """Writer OrderedDict as simple structure"""
