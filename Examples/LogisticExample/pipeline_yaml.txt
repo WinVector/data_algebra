@@ -34,11 +34,16 @@
 - op: SelectRows
   expr: row_number == 1
 - op: SelectColumns
-  columns: '[''subjectID'', ''surveyCategory'', ''probability'']'
+  columns:
+  - subjectID
+  - surveyCategory
+  - probability
 - op: Rename
-  column_remapping: '{''diagnosis'': ''surveyCategory''}'
+  column_remapping:
+    diagnosis: surveyCategory
 - op: Order
-  order_columns: '[''subjectID'']'
-  reverse: '[]'
-  limit: None
+  order_columns:
+  - subjectID
+  reverse: []
+  limit: null
 

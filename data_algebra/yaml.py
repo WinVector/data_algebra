@@ -59,15 +59,37 @@ def to_pipeline(obj, *, known_tables=None):
                 known_tables[k] = tab
             return tab
         elif op == "Extend":
-            return data_algebra.data_ops.Extend(ops=obj["ops"])
+            return data_algebra.data_ops.Extend(
+                ops=obj["ops"],
+                partition_by=obj["partition_by"],
+                order_by=obj["order_by"],
+                reverse=obj["reverse"])
         elif op == "NaturalJoin":
             return data_algebra.data_ops.NaturalJoin(
                 by=obj["by"],
                 jointype=obj["jointype"],
                 b=to_pipeline(obj["b"], known_tables=known_tables),
             )
+        elif op == "SelectRows":
+            return data_algebra.data_ops.SelectRows(
+                expr=obj['expr']
+            )
+        elif op == "SelectColumns":
+            return data_algebra.data_ops.SelectColumns(
+                columns=obj['columns']
+            )
+        elif op == "Rename":
+            return data_algebra.data_ops.RenameColumns(
+                column_remapping=obj['column_remapping']
+            )
+        elif op == "Order":
+            return data_algebra.data_ops.OrderRows(
+                columns=obj['order_columns'],
+                reverse=obj['reverse'],
+                limit=obj['limit']
+            )
         else:
-            raise Exception("Unexpected op name")
+            raise Exception("Unexpected op name: " + op)
     if isinstance(obj, list):
         # a pipeline, assumed non empty
         res = to_pipeline(obj[0], known_tables=known_tables)
@@ -75,4 +97,4 @@ def to_pipeline(obj, *, known_tables=None):
             nxt = to_pipeline(obj[i], known_tables=known_tables)
             res = res >> nxt
         return res
-    raise Exception("unexpected type")
+    raise Exception("unexpected type: " + str(obj))

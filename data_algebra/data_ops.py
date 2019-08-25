@@ -495,7 +495,7 @@ class SelectColumnsNode(ViewRepresentation):
             pipeline = []
         od = collections.OrderedDict()
         od["op"] = "SelectColumns"
-        od["columns"] = self.column_selection.__repr__()
+        od["columns"] = self.column_selection
         pipeline.insert(0, od)
         return self.sources[0].collect_representation_implementation(pipeline=pipeline)
 
@@ -519,8 +519,8 @@ class SelectColumns(data_algebra.pipe.PipeStep):
     column_selection: List[str]
 
     def __init__(self, columns):
-        order_columns = [c for c in columns]
-        self.order_columns = order_columns
+        column_selection = [c for c in columns]
+        self.column_selection = column_selection
         data_algebra.pipe.PipeStep.__init__(self, name="SelectColumns")
 
     def apply(self, other):
@@ -552,9 +552,9 @@ class OrderRowsNode(ViewRepresentation):
             pipeline = []
         od = collections.OrderedDict()
         od["op"] = "Order"
-        od["order_columns"] = self.order_columns.__repr__()
-        od["reverse"] = self.reverse.__repr__()
-        od["limit"] = self.limit.__repr__()
+        od["order_columns"] = self.order_columns
+        od["reverse"] = self.reverse
+        od["limit"] = self.limit
         pipeline.insert(0, od)
         return self.sources[0].collect_representation_implementation(pipeline=pipeline)
 
@@ -622,7 +622,7 @@ class RenameColumnsNode(ViewRepresentation):
             pipeline = []
         od = collections.OrderedDict()
         od["op"] = "Rename"
-        od["column_remapping"] = self.column_remapping.__repr__()
+        od["column_remapping"] = self.column_remapping
         pipeline.insert(0, od)
         return self.sources[0].collect_representation_implementation(pipeline=pipeline)
 
@@ -650,7 +650,7 @@ class RenameColumns(data_algebra.pipe.PipeStep):
         data_algebra.pipe.PipeStep.__init__(self, name="RenameColumns")
 
     def apply(self, other):
-        return other.rename(column_remapping=self.column_remapping)
+        return other.rename_columns(column_remapping=self.column_remapping)
 
 
 class NaturalJoinNode(ViewRepresentation):
