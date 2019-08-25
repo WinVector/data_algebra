@@ -43,6 +43,9 @@ class Term:
     def to_python(self, *, want_inline_parens=False):
         raise Exception("base class called")
 
+    def to_pandas(self, *, want_inline_parens=False):
+        return self.to_python(want_inline_parens=want_inline_parens)
+
     def __repr__(self):
         return self.to_python(want_inline_parens=False)
 
@@ -302,6 +305,21 @@ class Expression(Term):
             return "_" + self.op + "()"
         if len(subs) == 1:
             return subs[0] + "." + self.op + "()"
+        if len(subs) == 2 and self.inline:
+            if want_inline_parens:
+                return "(" + subs[0] + " " + self.op + " " + subs[1] + ")"
+            else:
+                return subs[0] + " " + self.op + " " + subs[1]
+        return self.op + "(" + ", ".join(subs) + ")"
+
+    def to_pandas(self, *, want_inline_parens=False):
+        if self.op in py_formatters.keys():
+            return py_formatters[self.op](self)
+        if len(self.args) <= 0:
+            return "_" + self.op + "()"
+        if len(self.args) == 1:
+            return self.op + "(" + self.args[0].to_pandas(want_inline_parens=False) + ")"
+        subs = [ai.to_pandas(want_inline_parens=True) for ai in self.args]
         if len(subs) == 2 and self.inline:
             if want_inline_parens:
                 return "(" + subs[0] + " " + self.op + " " + subs[1] + ")"

@@ -1,6 +1,13 @@
 from typing import Set, Any, Dict, List
 import collections
 
+have_pandas = False
+try:
+    import pandas
+
+    have_pandas = True
+except ImportError:
+    pass
 
 have_black = False
 try:
@@ -135,6 +142,16 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
             sql_str = sqlparse.format(sql_str, reindent=True, keyword_case="upper")
         return sql_str
 
+    # Pandas realization
+
+    def eval_pandas(self, data_map):
+        """
+        Evaluate pipeline taking tables by name from data_map
+        :param data_map: Dict[str, pandas.DataFrame]
+        :return: pandas.DataFrame
+        """
+        raise Exception("base method called")
+
     # define builders for all non-leaf node types on base class
 
     def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
@@ -260,6 +277,15 @@ class TableDescription(ViewRepresentation):
         else:
             tables[self.key] = self
         return tables
+
+    def eval_pandas(self, data_map):
+        if len(self.qualifiers)>0:
+            raise Exception("table descriptions used with eval_pandas() must not have qualifiers")
+        # make an index-free copy of the data to isolate side-effects and not deal with indices
+        res = data_map[self.table_name]
+        res = res.copy()
+        res.reset_index(drop=True, inplace=True)
+        return res
 
     def columns_used_from_sources(self, using):
         return []  # no inputs to table description
@@ -399,6 +425,16 @@ class ExtendNode(ViewRepresentation):
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.extend_to_sql(self, using=using, temp_id_source=temp_id_source)
+
+    def eval_pandas(self, data_map):
+        if len(self.partition_by)>0:
+            raise Exception("partitioned extend not yet implemented for Pandas")
+        if len(self.order_by)>0:
+            raise Exception("ordered extend not yet implemented for Pandas")
+        res = self.sources[0].eval_pandas(data_map)
+        for (k, op) in self.ops.items():
+            res[k] = res.eval(op.to_pandas())
+        return res
 
 
 class Extend(data_algebra.pipe.PipeStep):
