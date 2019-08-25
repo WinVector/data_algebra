@@ -582,6 +582,12 @@ class SelectRowsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
+    def eval_pandas(self, data_map):
+        res = self.sources[0].eval_pandas(data_map)
+        res = res.query(self.expr.to_pandas())
+        res.reset_index(inplace=True, drop=True)
+        return res
+
 
 class SelectRows(data_algebra.pipe.PipeStep):
     """Class to specify a choice of rows.
@@ -642,6 +648,10 @@ class SelectColumnsNode(ViewRepresentation):
         return db_model.select_columns_to_sql(
             self, using=using, temp_id_source=temp_id_source
         )
+
+    def eval_pandas(self, data_map):
+        res = self.sources[0].eval_pandas(data_map)
+        return res[self.column_selection]
 
 
 class SelectColumns(data_algebra.pipe.PipeStep):
