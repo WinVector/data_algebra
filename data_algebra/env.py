@@ -72,9 +72,6 @@ class SimpleNamespaceDict(types.SimpleNamespace):
         raise Exception("__setattr__ not allowed")
 
 
-def extra_defs(dict):
-    dict['row_number'] = lambda: data_algebra.expr_rep.Expression(op='row_number', args=[])
-
 def populate_specials(*, column_defs, column_defs1=None, destination,
                       user_values=None):
     """populate a dictionary with special values
@@ -93,7 +90,6 @@ def populate_specials(*, column_defs, column_defs1=None, destination,
     if not isinstance(user_values, dict):
         raise Exception("user_values should be a dictionary")
     nd = column_defs.copy()
-    extra_defs(nd)
     ns = SimpleNamespaceDict(**nd)
     destination["_"] = ns
     destination["_0"] = ns
@@ -101,13 +97,12 @@ def populate_specials(*, column_defs, column_defs1=None, destination,
         if not isinstance(column_defs1, dict):
             raise Exception("column_defs1 should be a dictionary")
         nd1 = column_defs1.copy()
-        extra_defs(nd1)
         ns1 = SimpleNamespaceDict(**nd1)
         destination["_1"] = ns1
     else:
         destination["_1"] = None
     destination["_get"] = lambda key: user_values[key]
-
+    destination['_row_number'] = lambda: data_algebra.expr_rep.Expression(op='row_number', args=[])
 
 def maybe_set_underbar(*, mp0, mp1=None):
     destination = outer_namespace()

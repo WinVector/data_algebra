@@ -278,7 +278,7 @@ class Expression(Term):
             return py_formatters[self.op](self)
         subs = [ai.to_python(want_inline_parens=True) for ai in self.args]
         if len(subs) <=0 :
-            return "_." + self.op + "()"
+            return "_" + self.op + "()"
         if len(subs) == 1:
             return subs[0] + "." + self.op + "()"
         if len(subs) == 2 and self.inline:
