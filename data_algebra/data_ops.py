@@ -427,13 +427,33 @@ class ExtendNode(ViewRepresentation):
         return db_model.extend_to_sql(self, using=using, temp_id_source=temp_id_source)
 
     def eval_pandas(self, data_map):
-        if len(self.partition_by)>0:
-            raise Exception("partitioned extend not yet implemented for Pandas")
-        if len(self.order_by)>0:
-            raise Exception("ordered extend not yet implemented for Pandas")
+        window_situation = (len(self.partition_by)>0) or (len(self.order_by)>0)
+        if window_situation:
+            # check these are forms we are prepared to work with
+            for (k, op) in self.ops.items():
+                if len(op.args) > 1:
+                    raise Exception("non-trivial windows expression: " + str(k) + ": " + str(op))
+                if len(op.args) == 1:
+                    if not isinstance(op.args[0], data_algebra.expr_rep.ColumnReference):
+                        raise Exception("windows expression argument must be a column: " + str(k) + ": " + str(op))
         res = self.sources[0].eval_pandas(data_map)
+        if not window_situation:
+            for (k, op) in self.ops.items():
+                res[k] = res.eval(op.to_pandas())
+            return res
         for (k, op) in self.ops.items():
-            res[k] = res.eval(op.to_pandas())
+            if len(op.args)==0:
+                raise Exception("length zero case not yet implemented")
+            else:
+                # len(op.args) == 1
+                value_name = op.args[0].to_pandas()
+                col_list = [c for c in set([value_name]).union(self.partition_by, self.order_by)]
+                ascending = [c not in set(self.reverse) for c in col_list]
+                subframe = res.sort_values(col_list, inplace=False, ascending=ascending)[[value_name] + self.partition_by]
+                if len(self.partition_by)>0:
+                    subframe = subframe.groupby(self.partition_by)
+                # should be placed back in correctly by Pandas row-index rules
+                res[k] = subframe.transform(op.op)
         return res
 
 
