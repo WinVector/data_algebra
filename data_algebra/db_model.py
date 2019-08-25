@@ -135,7 +135,7 @@ class DBModel:
                 revs = set(extend_node.reverse)
                 rt = [
                     self.quote_identifier(ci) + (" DESC" if ci in revs else "")
-                    for ci in extend_node.partition_by
+                    for ci in extend_node.order_by
                 ]
                 window_term = window_term + "ORDER BY " + ", ".join(rt) + " "
             window_term = window_term + " ) "
