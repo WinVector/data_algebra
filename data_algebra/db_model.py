@@ -25,7 +25,7 @@ class DBModel:
             sql_formatters = {}
         self.sql_formatters = sql_formatters
         if op_replacements is None:
-            op_replacements = {'==':'='}
+            op_replacements = {'==': '='}
         self.op_replacements = op_replacements
 
     def quote_identifier(self, identifier):
@@ -190,6 +190,29 @@ class DBModel:
                 + self.quote_identifier(sub_view_name)
                 + " WHERE "
                 + self.expr_to_sql(select_rows_node.expr)
+        )
+        return sql_str
+
+    def select_columns_to_sql(self, select_columns_node, *, using=None, temp_id_source=None):
+        if not isinstance(select_columns_node, data_algebra.data_ops.SelectColumnsNode):
+            raise Exception("Expeted select_rows_node to be a data_algebra.data_ops.SelectColumnsNode)")
+        if temp_id_source is None:
+            temp_id_source = [0]
+        if using is None:
+            using = select_columns_node.column_set
+        subusing = select_columns_node.columns_used_from_sources(using=using)[0]
+        subsql = select_columns_node.sources[0].to_sql_implementation(
+            db_model=self, using=subusing, temp_id_source=temp_id_source
+        )
+        sub_view_name = "SQ_" + str(temp_id_source[0])
+        temp_id_source[0] = temp_id_source[0] + 1
+        sql_str = (
+                "SELECT "
+                + ", ".join([self.quote_identifier(ci) for ci in subusing])
+                + " FROM ( "
+                + subsql
+                + " ) "
+                + self.quote_identifier(sub_view_name)
         )
         return sql_str
 

@@ -150,7 +150,7 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         raise Exception("not implemented yet")  # TODO: implement
 
     def select_columns(self, columns):
-        raise Exception("not implemented yet")  # TODO: implement
+        return SelectColumnsNode(source=self, columns=columns)
 
     def rename_columns(self, column_mapping):
         raise Exception("not implemented yet")  # TODO: implement
@@ -418,6 +418,7 @@ class Extend(data_algebra.pipe.PipeStep):
 
 class SelectRowsNode(ViewRepresentation):
     expr: data_algebra.expr_rep.Expression
+    decision_columns: Set[str]
 
     def __init__(self, source, expr):
         ops = data_algebra.expr_rep.check_convert_op_dictionary(
@@ -426,13 +427,17 @@ class SelectRowsNode(ViewRepresentation):
         if len(ops) < 1:
             raise Exception("no ops")
         self.expr = ops['expr']
+        self.decision_columns = set()
+        self.expr.get_column_names(self.decision_columns)
         ViewRepresentation.__init__(self, column_names=source.column_names, sources=[source])
 
     def columns_used_from_sources(self, using):
         columns_we_take = self.sources[0].column_set.copy()
         if using is None:
             return [columns_we_take]
-        return [columns_we_take.intersection(using)]
+        columns_we_take = columns_we_take.intersection(using)
+        columns_we_take = columns_we_take.union(self.decision_columns)
+        return [columns_we_take]
 
     def collect_representation_implementation(self, pipeline=None):
         if pipeline is None:
@@ -458,6 +463,56 @@ class SelectRowsNode(ViewRepresentation):
 
 class SelectRows(data_algebra.pipe.PipeStep):
     """Class to specify a choice of rows.
+    """
+
+    expr: data_algebra.expr_rep.Expression
+
+    def __init__(self, expr):
+        data_algebra.pipe.PipeStep.__init__(self, name="SelectRows")
+        self.expr = expr
+
+    def apply(self, other):
+        return other.select_rows(expr=self.expr)
+
+
+class SelectColumnsNode(ViewRepresentation):
+    column_selection: List[str]
+
+    def __init__(self, source, columns):
+        column_selection = [c for c in columns]
+        self.column_selection = column_selection
+        ViewRepresentation.__init__(self, column_names=column_selection, sources=[source])
+
+    def columns_used_from_sources(self, using):
+        cols = set(self.column_selection.copy())
+        if using is None:
+            return [cols]
+        return [cols.intersection(using)]
+
+    def collect_representation_implementation(self, pipeline=None):
+        if pipeline is None:
+            pipeline = []
+        od = collections.OrderedDict()
+        od["op"] = "SelectColumns"
+        od["columns"] = self.column_selection.__repr__()
+        pipeline.insert(0, od)
+        return self.sources[0].collect_representation_implementation(pipeline=pipeline)
+
+    def to_python_implementation(self, *, indent=0, strict=True):
+        s = (
+            self.sources[0].to_python_implementation(indent=indent, strict=strict)
+            + " .\\\n"
+            + " " * (indent + 3)
+            + "select_columns(" + self.column_selection.__repr__() + ')'
+        )
+        return s
+
+    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+        return db_model.select_columns_to_sql(self, using=using, temp_id_source=temp_id_source)
+
+
+class SelectColumns(data_algebra.pipe.PipeStep):
+    """Class to specify a choice of columns.
     """
 
     expr: data_algebra.expr_rep.Expression
