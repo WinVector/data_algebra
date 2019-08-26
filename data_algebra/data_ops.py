@@ -75,12 +75,12 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
             tables = s.get_tables(tables)
         return tables
 
-    def columns_used_from_sources(self, using):
+    def columns_used_from_sources(self, using=None):
         """Give column names used from source nodes when this node is exececuted
         with the using columns (None means all)."""
         raise Exception("base method called")
 
-    def columns_used_implementation(self, *, columns_used, using):
+    def columns_used_implementation(self, *, columns_used, using=None):
         cu_list = self.columns_used_from_sources(using)
         for i in range(len(self.sources)):
             self.sources[i].columns_used_implementation(
@@ -301,7 +301,7 @@ class TableDescription(ViewRepresentation):
         res.reset_index(drop=True, inplace=True)
         return res
 
-    def columns_used_from_sources(self, using):
+    def columns_used_from_sources(self, using=None):
         return []  # no inputs to table description
 
     def columns_used_implementation(self, *, columns_used, using):
@@ -389,7 +389,7 @@ class ExtendNode(ViewRepresentation):
             raise Exception("tried to change: " + str(bad_overwrite))
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
 
-    def columns_used_from_sources(self, using):
+    def columns_used_from_sources(self, using=None):
         columns_we_take = self.sources[0].column_set.copy()
         if using is None:
             return [columns_we_take]
@@ -564,7 +564,7 @@ class SelectRowsNode(ViewRepresentation):
             self, column_names=source.column_names, sources=[source]
         )
 
-    def columns_used_from_sources(self, using):
+    def columns_used_from_sources(self, using=None):
         columns_we_take = self.sources[0].column_set.copy()
         if using is None:
             return [columns_we_take]
@@ -633,7 +633,7 @@ class SelectColumnsNode(ViewRepresentation):
             self, column_names=column_selection, sources=[source]
         )
 
-    def columns_used_from_sources(self, using):
+    def columns_used_from_sources(self, using=None):
         cols = set(self.column_selection.copy())
         if using is None:
             return [cols]
@@ -703,7 +703,7 @@ class OrderRowsNode(ViewRepresentation):
             self, column_names=source.column_names, sources=[source]
         )
 
-    def columns_used_from_sources(self, using):
+    def columns_used_from_sources(self, using=None):
         cols = set(self.column_names.copy())
         if using is None:
             return [cols]
@@ -789,7 +789,7 @@ class RenameColumnsNode(ViewRepresentation):
         # TODO: check column conditions, don't allow name collisions
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
 
-    def columns_used_from_sources(self, using):
+    def columns_used_from_sources(self, using=None):
         if using is None:
             using = self.column_names
         cols = [
@@ -869,7 +869,7 @@ class NaturalJoinNode(ViewRepresentation):
         self.jointype = jointype
         ViewRepresentation.__init__(self, column_names=column_names, sources=sources)
 
-    def columns_used_from_sources(self, using):
+    def columns_used_from_sources(self, using=None):
         if using is None:
             return [self.sources[i].column_set.copy() for i in range(2)]
         using = using.union(self.by)
