@@ -1,3 +1,10 @@
+import io
+from pprint import pprint
+import psycopg2    # http://initd.org/psycopg/
+import pandas      # https://pandas.pydata.org
+import yaml        # https://pyyaml.org
+
+
 def is_numeric(col):
     try:
         0.0 + col
@@ -26,6 +33,7 @@ def insert_table(conn, d, table_name):
 
 
 def read_query(conn, q):
+    cur = conn.cursor()
     cur.execute(q)
     r = cur.fetchall()
     colnames = [desc[0] for desc in cur.description]

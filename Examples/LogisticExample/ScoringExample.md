@@ -50,9 +50,10 @@ Let's start our `Python` example.  First we import the packages we are going to 
 ```python
 import io
 from pprint import pprint
-import psycopg2  # http://initd.org/psycopg/
-import pandas    # https://pandas.pydata.org
-import yaml      # https://pyyaml.org
+import psycopg2    # http://initd.org/psycopg/
+import pandas      # https://pandas.pydata.org
+import yaml        # https://pyyaml.org
+import db_helpers  # https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/db_helpers.py
 
 
 pandas.set_option('display.max_columns', None)  
@@ -152,50 +153,13 @@ conn = psycopg2.connect(
     password=""
 )
 conn.autocommit=True
-
-cur = conn.cursor()
 ```
 
 
 ```python
-def is_numeric(col):
-    try:
-        0.0 + col
-        return True
-    except Exception as ex:
-        return False
+db_helpers.insert_table(conn, d_local, 'd')
 
-
-def insert_table(conn, d, table_name):
-    cr = [d.columns[i].lower() + " " + ("double precision" if is_numeric(d[d.columns[i]]) else "VARCHAR") for 
-            i in range(d.shape[1])]
-    table_name = 'd'
-    create_stmt = "CREATE TABLE " + table_name + " ( " + ', '.join(cr) + " )"
-    cur = conn.cursor()
-    cur.execute("DROP TABLE IF EXISTS " + table_name)
-    conn.commit()
-    cur.execute(create_stmt)
-    conn.commit()
-    buf = io.StringIO(d.to_csv(index=False, header=False, sep='\t'))
-    cur.copy_from(buf, 'd', columns=[c for c in d.columns])
-    conn.commit()
-
-
-def read_query(conn, q):
-    cur.execute(q)
-    r = cur.fetchall()
-    colnames = [desc[0] for desc in cur.description]
-    return pandas.DataFrame(columns = colnames, data = r)
-
-
-def read_table(conn, table_name):
-    return read_query(conn, "SELECT * FROM " + table_name)
-    
-
-insert_table(conn, d_local, 'd')
-
-
-read_table(conn, 'd')
+db_helpers.read_table(conn, 'd')
 ```
 
 
@@ -385,16 +349,16 @@ print(sql)
               "subjectid",
               "surveycategory" AS "diagnosis"
        FROM
-         (SELECT "surveycategory",
-                 "probability",
+         (SELECT "probability",
+                 "surveycategory",
                  "subjectid"
           FROM
-            (SELECT "surveycategory",
-                    "probability",
+            (SELECT "probability",
+                    "surveycategory",
                     "subjectid"
              FROM
-               (SELECT "surveycategory",
-                       "probability",
+               (SELECT "probability",
+                       "surveycategory",
                        "subjectid",
                        ROW_NUMBER() OVER (PARTITION BY "subjectid"
                                           ORDER BY "probability" DESC, "surveycategory") AS "row_number"
@@ -403,8 +367,8 @@ print(sql)
                           "subjectid",
                           "probability" / "total" AS "probability"
                    FROM
-                     (SELECT "surveycategory",
-                             "probability",
+                     (SELECT "probability",
+                             "surveycategory",
                              "subjectid",
                              SUM("probability") OVER (PARTITION BY "subjectid") AS "total"
                       FROM
@@ -412,8 +376,8 @@ print(sql)
                                 "subjectid",
                                 EXP(("assessmenttotal" * 0.237)) AS "probability"
                          FROM
-                           (SELECT "surveycategory",
-                                   "assessmenttotal",
+                           (SELECT "assessmenttotal",
+                                   "surveycategory",
                                    "subjectid"
                             FROM "d") "sq_0") "sq_1") "sq_2") "sq_3") "sq_4"
              WHERE "row_number" = 1 ) "sq_5") "sq_6") "sq_7"
@@ -426,7 +390,7 @@ Also notice the generate `SQL` has applied query narrowing: columns not used in 
 
 
 ```python
-read_query(conn, sql)
+db_helpers.read_query(conn, sql)
 ```
 
 
@@ -743,15 +707,15 @@ cat(sql)
              "assessmentTotal"
             FROM
              "d"
-            ) tsql_90432529589797589116_0000000000
-           ) tsql_90432529589797589116_0000000001
-          ) tsql_90432529589797589116_0000000002
-         ) tsql_90432529589797589116_0000000003
-       ) tsql_90432529589797589116_0000000004
+            ) tsql_76525498125437036191_0000000000
+           ) tsql_76525498125437036191_0000000001
+          ) tsql_76525498125437036191_0000000002
+         ) tsql_76525498125437036191_0000000003
+       ) tsql_76525498125437036191_0000000004
        WHERE "row_number" = 1
-      ) tsql_90432529589797589116_0000000005
-     ) tsql_90432529589797589116_0000000006
-    ) tsql_90432529589797589116_0000000007 ORDER BY "subjectID"
+      ) tsql_76525498125437036191_0000000005
+     ) tsql_76525498125437036191_0000000006
+    ) tsql_76525498125437036191_0000000007 ORDER BY "subjectID"
 
 
 The `R` implementation is mature, and appropriate to use in production.  The [`rquery`](https://github.com/WinVector/rquery) grammar is designed to have minimal state and minimal annotations (no grouping or ordering annotations!).  This makes the grammar, in my opinion, a good design choice. `rquery` has very good performance, often much faster than `dplyr` or base-`R` due to its query generation ideas and use of [`data.table`](https://CRAN.R-project.org/package=data.table) via [`rqdatatable`](https://CRAN.R-project.org/package=rqdatatable).  `rquery` is a mature pure `R` package; [here](https://github.com/WinVector/rquery/blob/master/README.md) is the same example being worked directly in `R`, with no translation from `Python`. 
