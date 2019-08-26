@@ -10,20 +10,20 @@
   key: d
 - op: Extend
   ops:
-    probability: (assessmentTotal * 0.237).exp()
+    probability: exp(assessmentTotal * 0.237)
   partition_by: []
   order_by: []
   reverse: []
 - op: Extend
   ops:
-    probability: probability / probability.sum()
+    probability: probability / sum(probability)
   partition_by:
   - subjectID
   order_by: []
   reverse: []
 - op: Extend
   ops:
-    row_number: _row_number()
+    row_number: row_number()
   partition_by:
   - subjectID
   order_by:
