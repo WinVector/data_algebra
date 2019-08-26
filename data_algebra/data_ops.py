@@ -450,43 +450,46 @@ class ExtendNode(ViewRepresentation):
                             + str(op)
                         )
         res = self.sources[0].eval_pandas(data_map)
+        res.reset_index(inplace=True, drop=True)
         if not window_situation:
             for (k, op) in self.ops.items():
                 res[k] = res.eval(op.to_pandas())
         else:
             for (k, op) in self.ops.items():
+                # work on a slice of the data frame
+                col_list = [c for c in set(self.partition_by)]
+                for c in self.order_by:
+                    if not c in col_list:
+                        col_list = col_list + [c]
+                value_name = None
+                if (len(op.args) > 0):
+                    value_name = op.args[0].to_pandas()
+                    if not value_name in set(col_list):
+                        col_list = col_list + [value_name]
+                ascending = [c not in set(self.reverse) for c in col_list]
+                subframe = res[col_list].copy()
+                subframe.reset_index(inplace=True, drop=True)
+                subframe['_data_algebra_orig_index'] = [i for i in range(subframe.shape[0])]
+                subframe.sort_values(by=col_list, ascending=ascending, inplace=True)
+                subframe.reset_index(inplace=True, drop=True)
+                if len(self.partition_by) > 0:
+                    opframe = subframe.groupby(self.partition_by)
+                    #  Groupby preserves the order of rows within each group.
+                    # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.groupby.html
+                else:
+                    opframe = subframe
                 if len(op.args) == 0:
-                    col_list = [c for c in set(self.partition_by).union(self.order_by)]
-                    ascending = [c not in set(self.reverse) for c in col_list]
-                    # TODO: research sorting a subset (and that current is at least correct)
-                    subframe = res.sort_values(
-                        col_list, inplace=False, ascending=ascending
-                    )
-                    if len(self.partition_by) > 0:
-                        subframe = subframe.groupby(self.partition_by)
-                    # should be placed back in correctly by Pandas row-index rules
                     if op.op == "row_number":
-                        res[k] = subframe.cumcount() + 1
+                        subframe[k] = opframe.cumcount() + 1
                     else:  # TODO: more of these
                         raise Exception("not implemented: " + str(k) + ": " + str(op))
                 else:
                     # len(op.args) == 1
-                    value_name = op.args[0].to_pandas()
-                    col_list = [
-                        c
-                        for c in set([value_name]).union(
-                            self.partition_by, self.order_by
-                        )
-                    ]
-                    ascending = [c not in set(self.reverse) for c in col_list]
-                    # TODO: research sorting a subset (and that current is at least correct)
-                    subframe = res.sort_values(
-                        col_list, inplace=False, ascending=ascending
-                    )[[value_name] + self.partition_by]
-                    if len(self.partition_by) > 0:
-                        subframe = subframe.groupby(self.partition_by)
-                    # should be placed back in correctly by Pandas row-index rules
-                    res[k] = subframe.transform(op.op)
+                    subframe[k] = opframe[value_name].transform(op.op)
+                subframe.reset_index(inplace=True, drop=True)
+                subframe.sort_values(by=['_data_algebra_orig_index'], inplace=True)
+                subframe.reset_index(inplace=True, drop=True)
+                res[k] = subframe[k]
         return res
 
 
