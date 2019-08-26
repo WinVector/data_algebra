@@ -134,15 +134,22 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         raise Exception("base method called")
 
-    def to_sql(self, db_model, *, pretty=False):
+    def to_sql(self, db_model,
+               *,
+               pretty=False,
+               encoding=None,
+               sqlparse_options=None):
         global have_sqlparse
+        if sqlparse_options is None:
+            sqlparse_options = {'reindent': True,
+                                'keyword_case': 'upper'}
         self.get_tables()  # for table consistency check/raise
         temp_id_source = [0]
         sql_str = self.to_sql_implementation(
             db_model=db_model, using=None, temp_id_source=temp_id_source
         )
         if pretty and have_sqlparse:
-            sql_str = sqlparse.format(sql_str, reindent=True, keyword_case="upper")
+            sql_str = sqlparse.format(sql_str, encoding=encoding, **sqlparse_options)
         return sql_str
 
     # Pandas realization

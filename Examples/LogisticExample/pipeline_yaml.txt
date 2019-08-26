@@ -16,9 +16,15 @@
   reverse: []
 - op: Extend
   ops:
-    probability: probability / sum(probability)
+    total: sum(probability)
   partition_by:
   - subjectID
+  order_by: []
+  reverse: []
+- op: Extend
+  ops:
+    probability: probability / total
+  partition_by: []
   order_by: []
   reverse: []
 - op: Extend
