@@ -96,12 +96,15 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
 
     # collect as simple structures for YAML I/O and other generic tasks
 
-    def collect_representation_implementation(self, pipeline=None):
+    def collect_representation_implementation(self, *, pipeline=None, dialect='Python'):
         raise Exception("base method called")
 
-    def collect_representation(self, pipeline=None):
+    def collect_representation(self, *, pipeline=None, dialect='Python'):
+        """Collect a representation of the operator DAG as simple serializable objects.
+                   These objects can be saved/loaded in YAML format and also can rebuild the
+                   pipeline via data_algebra.yaml.to_pipeline()."""
         self.get_tables()  # for table consistency check/raise
-        return self.collect_representation_implementation(pipeline=pipeline)
+        return self.collect_representation_implementation(pipeline=pipeline, dialect=dialect)
 
     # printing
 
@@ -229,7 +232,7 @@ class TableDescription(ViewRepresentation):
             key = key + "}."
         self.key = key + self.table_name
 
-    def collect_representation_implementation(self, pipeline=None):
+    def collect_representation_implementation(self, *, pipeline=None, dialect='Python'):
         if pipeline is None:
             pipeline = []
         od = collections.OrderedDict()
@@ -392,17 +395,17 @@ class ExtendNode(ViewRepresentation):
             o.get_column_names(columns_we_take)
         return [columns_we_take]
 
-    def collect_representation_implementation(self, pipeline=None):
+    def collect_representation_implementation(self, *, pipeline=None, dialect='Python'):
         if pipeline is None:
             pipeline = []
         od = collections.OrderedDict()
         od["op"] = "Extend"
-        od["ops"] = {ci: vi.to_python() for (ci, vi) in self.ops.items()}
+        od["ops"] = {ci: vi.to_source(dialect=dialect) for (ci, vi) in self.ops.items()}
         od["partition_by"] = self.partition_by
         od["order_by"] = self.order_by
         od["reverse"] = self.reverse
         pipeline.insert(0, od)
-        return self.sources[0].collect_representation_implementation(pipeline=pipeline)
+        return self.sources[0].collect_representation_implementation(pipeline=pipeline, dialect=dialect)
 
     def to_python_implementation(self, *, indent=0, strict=True):
         s = (
@@ -562,14 +565,14 @@ class SelectRowsNode(ViewRepresentation):
         columns_we_take = columns_we_take.union(self.decision_columns)
         return [columns_we_take]
 
-    def collect_representation_implementation(self, pipeline=None):
+    def collect_representation_implementation(self, *, pipeline=None, dialect='Python'):
         if pipeline is None:
             pipeline = []
         od = collections.OrderedDict()
         od["op"] = "SelectRows"
-        od["expr"] = self.expr.to_python()
+        od["expr"] = self.expr.to_source(dialect=dialect)
         pipeline.insert(0, od)
-        return self.sources[0].collect_representation_implementation(pipeline=pipeline)
+        return self.sources[0].collect_representation_implementation(pipeline=pipeline, dialect=dialect)
 
     def to_python_implementation(self, *, indent=0, strict=True):
         s = (
@@ -629,14 +632,14 @@ class SelectColumnsNode(ViewRepresentation):
             return [cols]
         return [cols.intersection(using)]
 
-    def collect_representation_implementation(self, pipeline=None):
+    def collect_representation_implementation(self, *, pipeline=None, dialect='Python'):
         if pipeline is None:
             pipeline = []
         od = collections.OrderedDict()
         od["op"] = "SelectColumns"
         od["columns"] = self.column_selection
         pipeline.insert(0, od)
-        return self.sources[0].collect_representation_implementation(pipeline=pipeline)
+        return self.sources[0].collect_representation_implementation(pipeline=pipeline, dialect=dialect)
 
     def to_python_implementation(self, *, indent=0, strict=True):
         s = (
@@ -700,7 +703,7 @@ class OrderRowsNode(ViewRepresentation):
         cols = cols.intersection(using).union(self.order_columns)
         return [cols]
 
-    def collect_representation_implementation(self, pipeline=None):
+    def collect_representation_implementation(self, *, pipeline=None, dialect='Python'):
         if pipeline is None:
             pipeline = []
         od = collections.OrderedDict()
@@ -709,7 +712,7 @@ class OrderRowsNode(ViewRepresentation):
         od["reverse"] = self.reverse
         od["limit"] = self.limit
         pipeline.insert(0, od)
-        return self.sources[0].collect_representation_implementation(pipeline=pipeline)
+        return self.sources[0].collect_representation_implementation(pipeline=pipeline, dialect=dialect)
 
     def to_python_implementation(self, *, indent=0, strict=True):
         s = (
@@ -788,14 +791,14 @@ class RenameColumnsNode(ViewRepresentation):
         ]
         return [set(cols)]
 
-    def collect_representation_implementation(self, pipeline=None):
+    def collect_representation_implementation(self, *, pipeline=None, dialect='Python'):
         if pipeline is None:
             pipeline = []
         od = collections.OrderedDict()
         od["op"] = "Rename"
         od["column_remapping"] = self.column_remapping
         pipeline.insert(0, od)
-        return self.sources[0].collect_representation_implementation(pipeline=pipeline)
+        return self.sources[0].collect_representation_implementation(pipeline=pipeline, dialect=dialect)
 
     def to_python_implementation(self, *, indent=0, strict=True):
         s = (
@@ -865,16 +868,16 @@ class NaturalJoinNode(ViewRepresentation):
         using = using.union(self.by)
         return [self.sources[i].column_set.intersection(using) for i in range(2)]
 
-    def collect_representation_implementation(self, pipeline=None):
+    def collect_representation_implementation(self, *, pipeline=None, dialect='Python'):
         if pipeline is None:
             pipeline = []
         od = collections.OrderedDict()
         od["op"] = "NaturalJoin"
         od["by"] = self.by
         od["jointype"] = self.jointype
-        od["b"] = self.sources[1].collect_representation_implementation()
+        od["b"] = self.sources[1].collect_representation_implementation(dialect=dialect)
         pipeline.insert(0, od)
-        return self.sources[0].collect_representation_implementation(pipeline=pipeline)
+        return self.sources[0].collect_representation_implementation(pipeline=pipeline, dialect=dialect)
 
     def to_python_implementation(self, *, indent=0, strict=True):
         return (
