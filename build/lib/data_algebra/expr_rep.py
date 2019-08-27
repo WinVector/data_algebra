@@ -1,4 +1,3 @@
-import re
 from typing import Union
 
 import data_algebra.env
@@ -47,13 +46,14 @@ class Term:
     def to_pandas(self, *, want_inline_parens=False):
         return self.to_python(want_inline_parens=want_inline_parens)
 
+    # noinspection PyPep8Naming
     def to_R(self, *, want_inline_parens=False):
         return self.to_pandas(want_inline_parens=want_inline_parens)
 
     def to_source(self, *, want_inline_parens=False, dialect='Python'):
-        if dialect=='Python':
+        if dialect == 'Python':
             return self.to_python(want_inline_parens=want_inline_parens)
-        elif dialect=='Pandas':
+        elif dialect == 'Pandas':
             return self.to_pandas(want_inline_parens=want_inline_parens)
         elif dialect == 'R':
             return self.to_R(want_inline_parens=want_inline_parens)
@@ -297,6 +297,7 @@ class ColumnReference(Term):
 py_formatters = {"___": lambda expression: expression.to_python()}
 pd_formatters = {"___": lambda expression: expression.to_pandas()}
 r_formatters = {"___": lambda expression: expression.to_R()}
+
 
 class Expression(Term):
     def __init__(self, op, args, *, params=None, inline=False):

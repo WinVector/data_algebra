@@ -1,14 +1,17 @@
 import collections
 
+import data_algebra.data_ops
+import data_algebra.data_pipe
+
 have_yaml = False
 try:
+    # noinspection PyUnresolvedReferences
     import yaml  # supplied by PyYAML
 
     have_yaml = True
 except ImportError:
     pass
 
-import data_algebra.data_ops
 
 # yaml notes:
 #    https://stackoverflow.com/questions/2627555/how-to-deserialize-an-object-with-pyyaml-using-safe-load
@@ -60,28 +63,28 @@ def to_pipeline(obj, *, known_tables=None):
                 known_tables[k] = tab
             return tab
         elif op == "Extend":
-            return data_algebra.data_ops.Extend(
+            return data_algebra.data_pipe.Extend(
                 ops=obj["ops"],
                 partition_by=obj["partition_by"],
                 order_by=obj["order_by"],
                 reverse=obj["reverse"],
             )
         elif op == "NaturalJoin":
-            return data_algebra.data_ops.NaturalJoin(
+            return data_algebra.data_pipe.NaturalJoin(
                 by=obj["by"],
                 jointype=obj["jointype"],
                 b=to_pipeline(obj["b"], known_tables=known_tables),
             )
         elif op == "SelectRows":
-            return data_algebra.data_ops.SelectRows(expr=obj["expr"])
+            return data_algebra.data_pipe.SelectRows(expr=obj["expr"])
         elif op == "SelectColumns":
-            return data_algebra.data_ops.SelectColumns(columns=obj["columns"])
+            return data_algebra.data_pipe.SelectColumns(columns=obj["columns"])
         elif op == "Rename":
-            return data_algebra.data_ops.RenameColumns(
+            return data_algebra.data_pipe.RenameColumns(
                 column_remapping=obj["column_remapping"]
             )
         elif op == "Order":
-            return data_algebra.data_ops.OrderRows(
+            return data_algebra.data_pipe.OrderRows(
                 columns=obj["order_columns"], reverse=obj["reverse"], limit=obj["limit"]
             )
         else:
