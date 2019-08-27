@@ -36,12 +36,10 @@ def test_example_data_ops_extend():
     x = 2
     var_name = 'y'
     with data_algebra.env.Env(locals()) as env:
-        ## This doesn't work in test environment.
-        ## TODO: remove quote-free path, too hazzardous
-        #ops = ops + [
-        #    TableDescription('d', ['x', 'y']).
-        #        extend({'z': _.x + _[var_name] / q + _get('x')})
-        #]
+        ops = ops + [
+            TableDescription('d', ['x', 'y']).
+                extend({'z': '_.x + _[var_name]/q + _get("x") + x'})
+        ]
 
         ops = ops + [
             TableDescription('d', ['x', 'y']).
