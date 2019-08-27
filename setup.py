@@ -20,7 +20,7 @@ setuptools.setup(
     author='John Mount',
     author_email='jmount@win-vector.com',
     url='https://github.com/WinVector/data_algebra',
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(exclude=['tests', 'Examples']),
     install_requires=[
     ],
     platforms=['any'],
