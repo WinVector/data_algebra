@@ -367,6 +367,20 @@ class Expression(Term):
 #  http://lybniz2.sourceforge.net/safeeval.html
 
 
+def _eval_by_parse(source_str, *, data_def, outter_environemnt=None):
+    if not isinstance(source_str, str):
+        source_str = str(source_str)
+    if outter_environemnt is None:
+        outter_environemnt = {}
+    v = eval(
+        source_str, outter_environemnt, data_def
+    )  # eval is eval(source, globals, locals)- so mp is first
+    if not isinstance(v, Term):
+        v = Value(v)
+    v.source_string = source_str
+    return v
+
+
 def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
     """
     Convert all entries of ops map to Term-expressions
@@ -398,14 +412,7 @@ def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
         ov = ops[k]
         v = ov
         if not isinstance(v, Term):
-            if not isinstance(v, str):
-                v = str(v)
-            v = eval(
-                v, sub_env, mp
-            )  # eval is eval(source, globals, locals)- so mp is first
-            if not isinstance(v, Term):
-                v = Value(v)
-            v.source_string = ov
+            v = _eval_by_parse(source_str=v, data_def=mp, outter_environemnt=sub_env)
         newops[k] = v
         used_here = set()
         v.get_column_names(used_here)
