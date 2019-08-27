@@ -1,8 +1,18 @@
 
+import collections
 import numpy
 import pandas
 import data_algebra.util
 from data_algebra.data_ops import *
+from data_algebra.util import od
+
+
+def test_od():
+    res = od(y=1, x='b')
+    expect = collections.OrderedDict()
+    expect['y'] = 1
+    expect['x'] = 'b'
+    assert res == expect
 
 
 def test_can_convert_v_to_numeric():

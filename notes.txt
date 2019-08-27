@@ -1,0 +1,7 @@
+
+# run tests
+pytest
+
+# get coverage totals
+# https://pytest-cov.readthedocs.io/en/latest/index.html
+pytest --cov data_algebra tests

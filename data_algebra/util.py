@@ -1,5 +1,14 @@
-
+import collections
 import pandas
+
+
+def od(**kwargs):
+    """Capture arguments in order."""
+    r = collections.OrderedDict()
+    for (k,v) in kwargs.items():
+        r[k] = v
+    return r
+
 
 def can_convert_v_to_numeric(x):
     """check if non-empty vector can convert to numeric"""
@@ -51,7 +60,7 @@ def equivalent_frames(a, b,
         if (ca_null is None) != (cb_null is None):
             return False
         if ca is not None:
-            if not all(ca_null == cb_null):
+            if not all([ca_null[i] == cb_null[i] for i in range(a.shape[0])]):
                 return False
         if can_convert_v_to_numeric(a.iloc[:, i]):
             dif = ca - cb
