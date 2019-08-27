@@ -29,7 +29,6 @@ def check_round_trip(o):
 
 
 def test_example_data_ops_extend():
-    _, _1, _2, _get = [None, None, None, lambda x: x]  # don't look unbound
     data_algebra.yaml.fix_ordered_dict_yaml_rep()
     ops = []
     q = 4

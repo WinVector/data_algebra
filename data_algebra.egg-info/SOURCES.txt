@@ -1,0 +1,17 @@
+README.md
+setup.py
+data_algebra/PostgreSQL.py
+data_algebra/__init__.py
+data_algebra/data_ops.py
+data_algebra/data_pipe.py
+data_algebra/db_model.py
+data_algebra/env.py
+data_algebra/expr_rep.py
+data_algebra/pending_eval.py
+data_algebra/pipe.py
+data_algebra/util.py
+data_algebra/yaml.py
+data_algebra.egg-info/PKG-INFO
+data_algebra.egg-info/SOURCES.txt
+data_algebra.egg-info/dependency_links.txt
+data_algebra.egg-info/top_level.txt

@@ -245,7 +245,6 @@ import data_algebra.PostgreSQL
 
 
 # set some things in our environment
-_, _1, _2, _get = [None, None, None, lambda x: x] # don't look unbound
 data_algebra.env.push_onto_namespace_stack(locals())
 # ask YAML to write simpler structures
 data_algebra.yaml.fix_ordered_dict_yaml_rep()
