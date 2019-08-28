@@ -1,6 +1,7 @@
 README.md
 setup.py
 data_algebra/PostgreSQL.py
+data_algebra/SQLite.py
 data_algebra/__init__.py
 data_algebra/data_ops.py
 data_algebra/data_pipe.py

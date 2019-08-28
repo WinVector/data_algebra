@@ -20,7 +20,6 @@ def insert_table(conn, d, table_name):
         + ("double precision" if is_numeric(d[d.columns[i]]) else "VARCHAR")
         for i in range(d.shape[1])
     ]
-    table_name = "d"
     create_stmt = "CREATE TABLE " + table_name + " ( " + ", ".join(cr) + " )"
     cur = conn.cursor()
     cur.execute("DROP TABLE IF EXISTS " + table_name)
