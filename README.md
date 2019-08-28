@@ -12,7 +12,7 @@ can perform data engineering in [`Pandas`](https://pandas.pydata.org) and genera
 
 # Installing
 
-Install `data_algebra` either with:
+Install `data_algebra` with either of:
 
   * `pip install data_algebra`
   * `pip install https://github.com/WinVector/data_algebra/raw/master/dist/data_algebra-0.1.1.tar.gz`
