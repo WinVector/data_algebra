@@ -1,6 +1,7 @@
 import collections
 import pandas
 
+
 def od(**kwargs):
     """Capture arguments in order."""
     r = collections.OrderedDict()
@@ -73,4 +74,3 @@ def equivalent_frames(a, b,
             if not all([ca[i] == cb[i] for i in range(a.shape[0])]):
                 return False
     return True
-

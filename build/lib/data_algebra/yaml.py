@@ -131,4 +131,3 @@ def check_op_round_trip(o):
             assert strr == strr_back
             strp_back = back.to_python(strict=True, pretty=True)
             assert strp == strp_back
-

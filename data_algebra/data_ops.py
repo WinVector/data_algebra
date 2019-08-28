@@ -560,7 +560,7 @@ class ProjectNode(ViewRepresentation):
             subops = self.ops
         else:
             subops = {k: op for (k, op) in self.ops.items() if k in using}
-        columns_we_take = set()
+        columns_we_take = set().union(self.group_by, self.order_by)
         for (k, o) in subops.items():
             o.get_column_names(columns_we_take)
         return [columns_we_take]

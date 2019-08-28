@@ -253,6 +253,9 @@ class Term:
     def max(self):
         return self.__uop_expr__("max")
 
+    def min(self):
+        return self.__uop_expr__("min")
+
     def exp(self):
         return self.__uop_expr__("exp")
 
@@ -413,7 +416,13 @@ def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
         ov = ops[k]
         v = ov
         if not isinstance(v, Term):
-            v = _eval_by_parse(source_str=v, data_def=mp, outter_environemnt=sub_env)
+            failue = False
+            try:
+                v = _eval_by_parse(source_str=v, data_def=mp, outter_environemnt=sub_env)
+            except Exception:
+                failue = True
+            if failue:
+               raise Exception("parse failed on " + k + " = " + ov)
         newops[k] = v
         used_here = set()
         v.get_column_names(used_here)

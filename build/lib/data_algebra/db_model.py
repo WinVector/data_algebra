@@ -57,7 +57,8 @@ class DBModel:
                 "Expected table_description to be a data_algebra.data_ops.TableDescription)"
             )
         return self.build_qualified_table_name(table_description.table_name,
-                                              qualifiers=table_description.qualifiers)
+                                               qualifiers=table_description.qualifiers)
+
     def quote_string(self, string):
         if not isinstance(string, str):
             raise Exception("expected string to be a str")
@@ -194,53 +195,25 @@ class DBModel:
             raise Exception(
                 "Expected project_node to be a data_algebra.data_ops.ProjectNode)"
             )
-        raise Exception("not implemented yet")  # TODO: implement
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
-            using = extend_node.column_set
-        using = using.union(
-            extend_node.partition_by, extend_node.order_by, extend_node.reverse
-        )
-        subops = {k: op for (k, op) in extend_node.ops.items() if k in using}
-        if len(subops) <= 0:
-            # know using was not None is this case as len(extend_node.ops)>0 and all keys are in extend_node.column_set
-            return extend_node.sources[0].to_sql_implementation(
-                db_model=self, using=using, temp_id_source=temp_id_source
-            )
-        if len(using) < 1:
+            using = project_node.column_set
+        subops = {k: op for (k, op) in project_node.ops.items() if k in using}
+        if len(subops) < 1:
             raise Exception("must produce at least one column")
-        missing = using - extend_node.column_set
-        if len(missing) > 0:
-            raise Exception("referred to unknown columns: " + str(missing))
-        # get set of columns we need from subquery
-        subusing = extend_node.columns_used_from_sources(using=using)[0]
-        subsql = extend_node.sources[0].to_sql_implementation(
+        subusing = project_node.columns_used_from_sources(using=using)[0]
+        if len(subusing) < 1:
+            raise Exception("must use at least one column")
+        derived = [
+            self.expr_to_sql(oi) + " AS " + self.quote_identifier(ci)
+            for (ci, oi) in subops.items()
+        ]
+        subsql = project_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
         sub_view_name = "SQ_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        window_term = ""
-        if len(extend_node.partition_by) > 0 or len(extend_node.order_by) > 0:
-            window_term = " OVER ( "
-            if len(extend_node.partition_by) > 0:
-                pt = [self.quote_identifier(ci) for ci in extend_node.partition_by]
-                window_term = window_term + "PARTITION BY " + ", ".join(pt) + " "
-            if len(extend_node.order_by) > 0:
-                revs = set(extend_node.reverse)
-                rt = [
-                    self.quote_identifier(ci) + (" DESC" if ci in revs else "")
-                    for ci in extend_node.order_by
-                ]
-                window_term = window_term + "ORDER BY " + ", ".join(rt) + " "
-            window_term = window_term + " ) "
-        derived = [
-            self.expr_to_sql(oi) + window_term + " AS " + self.quote_identifier(ci)
-            for (ci, oi) in subops.items()
-        ]
-        origcols = {k for k in using if k not in subops.keys()}
-        if len(origcols) > 0:
-            derived = [self.quote_identifier(ci) for ci in origcols] + derived
         sql_str = (
             "SELECT "
             + ", ".join(derived)
@@ -249,6 +222,13 @@ class DBModel:
             + " ) "
             + self.quote_identifier(sub_view_name)
         )
+        if len(project_node.group_by) > 0:
+            group_terms = [self.quote_identifier(c) for c in project_node.group_by]
+            sql_str = sql_str + " GROUP BY " + ', '.join(group_terms)
+        if len(project_node.order_by) > 0:
+            order_terms = [self.quote_identifier(c) + " DESC" if c in project_node.reverse else "" for
+                           c in project_node.order_by]
+            sql_str = sql_str + " ORDER BY " + ', '.join(order_terms)
         return sql_str
 
     def select_rows_to_sql(self, select_rows_node, *, using=None, temp_id_source=None):
@@ -473,6 +453,7 @@ class DBModel:
 
     # database helpers
 
+    # noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection
     def insert_table(self, conn, d, table_name):
         """
 
@@ -497,6 +478,7 @@ class DBModel:
         cur.copy_from(buf, "d", columns=[c for c in d.columns])
         conn.commit()
 
+    # noinspection PyMethodMayBeStatic
     def read_query(self, conn, q):
         """
 
@@ -510,11 +492,12 @@ class DBModel:
         colnames = [desc[0] for desc in cur.description]
         return pandas.DataFrame(columns=colnames, data=r)
 
+    # noinspection PyMethodMayBeStatic
     def read_table(self, conn, table_name, *, qualifiers=None, limit=None):
         if not isinstance(table_name, str):
             raise Exception("Expect table_name to be a str")
         q_table_name = self.build_qualified_table_name(table_name,
-                                                        qualifiers=qualifiers)
+                                                       qualifiers=qualifiers)
         sql = "SELECT * FROM " + q_table_name
         if limit is not None:
             sql = sql + " LIMIT " + limit
@@ -535,5 +518,3 @@ class DBModel:
         return data_algebra.data_ops.TableDescription(table_name=table_name,
                                                       column_names=[c for c in example.columns],
                                                       qualifiers=qualifiers)
-
-
