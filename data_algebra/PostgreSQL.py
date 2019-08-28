@@ -24,13 +24,10 @@ class PostgreSQLModel(data_algebra.db_model.DBModel):
             raise Exception('did not expect " in identifier')
         return self.identifier_quote + identifier.lower() + self.identifier_quote
 
-    def quote_table_name(self, table_description):
-        if not isinstance(table_description, data_algebra.data_ops.TableDescription):
-            raise Exception(
-                "Expected table_description to be a data_algebra.data_ops.TableDescription)"
-            )
-        qt = self.quote_identifier(table_description.table_name)
-        ql = table_description.qualifiers
-        if "schema" in ql.keys():
-            qt = self.quote_identifier(ql["schema"]) + "." + qt
+    def build_qualified_table_name(self, table_name, *, qualifiers=None):
+        qt = self.quote_identifier(table_name)
+        if qualifiers is None:
+            qualifiers = {}
+        if "schema" in qualifiers.keys():
+            qt = self.quote_identifier(qualifiers["schema"]) + "." + qt
         return qt

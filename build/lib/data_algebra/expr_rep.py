@@ -1,4 +1,5 @@
 from typing import Union
+import collections
 
 import data_algebra.env
 
@@ -399,7 +400,7 @@ def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
             parse_env = {}
     # first: make sure all entries are parsed
     columns_used = set()
-    newops = {}
+    newops = collections.OrderedDict()
     mp = column_defs.copy()
     data_algebra.env.populate_specials(
         column_defs=column_defs, destination=mp, user_values=parse_env

@@ -7,6 +7,7 @@ import pandas
 import data_algebra.expr_rep
 import data_algebra.data_ops
 import data_algebra.util
+import data_algebra.data_ops
 
 
 class DBModel:
@@ -42,16 +43,21 @@ class DBModel:
             raise Exception('did not expect " in identifier')
         return self.identifier_quote + identifier + self.identifier_quote
 
+    def build_qualified_table_name(self, table_name, *, qualifiers=None):
+        qt = self.quote_identifier(table_name)
+        if qualifiers is None:
+            qualifiers = {}
+        if len(qualifiers) > 0:
+            raise Exception("This data model does not expect table qualifiers")
+        return qt
+
     def quote_table_name(self, table_description):
         if not isinstance(table_description, data_algebra.data_ops.TableDescription):
             raise Exception(
                 "Expected table_description to be a data_algebra.data_ops.TableDescription)"
             )
-        qt = self.quote_identifier(table_description.table_name)
-        if len(table_description.qualifiers):
-            raise Exception("This data model does not expect table qualifiers")
-        return qt
-
+        return self.build_qualified_table_name(table_description.table_name,
+                                              qualifiers=table_description.qualifiers)
     def quote_string(self, string):
         if not isinstance(string, str):
             raise Exception("expected string to be a str")
@@ -127,6 +133,68 @@ class DBModel:
             raise Exception(
                 "Expected extend_node to be a data_algebra.data_ops.ExtendNode)"
             )
+        if temp_id_source is None:
+            temp_id_source = [0]
+        if using is None:
+            using = extend_node.column_set
+        using = using.union(
+            extend_node.partition_by, extend_node.order_by, extend_node.reverse
+        )
+        subops = {k: op for (k, op) in extend_node.ops.items() if k in using}
+        if len(subops) <= 0:
+            # know using was not None is this case as len(extend_node.ops)>0 and all keys are in extend_node.column_set
+            return extend_node.sources[0].to_sql_implementation(
+                db_model=self, using=using, temp_id_source=temp_id_source
+            )
+        if len(using) < 1:
+            raise Exception("must produce at least one column")
+        missing = using - extend_node.column_set
+        if len(missing) > 0:
+            raise Exception("referred to unknown columns: " + str(missing))
+        # get set of columns we need from subquery
+        subusing = extend_node.columns_used_from_sources(using=using)[0]
+        subsql = extend_node.sources[0].to_sql_implementation(
+            db_model=self, using=subusing, temp_id_source=temp_id_source
+        )
+        sub_view_name = "SQ_" + str(temp_id_source[0])
+        temp_id_source[0] = temp_id_source[0] + 1
+        window_term = ""
+        if len(extend_node.partition_by) > 0 or len(extend_node.order_by) > 0:
+            window_term = " OVER ( "
+            if len(extend_node.partition_by) > 0:
+                pt = [self.quote_identifier(ci) for ci in extend_node.partition_by]
+                window_term = window_term + "PARTITION BY " + ", ".join(pt) + " "
+            if len(extend_node.order_by) > 0:
+                revs = set(extend_node.reverse)
+                rt = [
+                    self.quote_identifier(ci) + (" DESC" if ci in revs else "")
+                    for ci in extend_node.order_by
+                ]
+                window_term = window_term + "ORDER BY " + ", ".join(rt) + " "
+            window_term = window_term + " ) "
+        derived = [
+            self.expr_to_sql(oi) + window_term + " AS " + self.quote_identifier(ci)
+            for (ci, oi) in subops.items()
+        ]
+        origcols = {k for k in using if k not in subops.keys()}
+        if len(origcols) > 0:
+            derived = [self.quote_identifier(ci) for ci in origcols] + derived
+        sql_str = (
+            "SELECT "
+            + ", ".join(derived)
+            + " FROM ( "
+            + subsql
+            + " ) "
+            + self.quote_identifier(sub_view_name)
+        )
+        return sql_str
+
+    def project_to_sql(self, project_node, *, using=None, temp_id_source=None):
+        if not isinstance(project_node, data_algebra.data_ops.ProjectNode):
+            raise Exception(
+                "Expected project_node to be a data_algebra.data_ops.ProjectNode)"
+            )
+        raise Exception("not implemented yet")  # TODO: implement
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
@@ -403,6 +471,8 @@ class DBModel:
         )
         return sql_str
 
+    # database helpers
+
     def insert_table(self, conn, d, table_name):
         """
 
@@ -440,5 +510,30 @@ class DBModel:
         colnames = [desc[0] for desc in cur.description]
         return pandas.DataFrame(columns=colnames, data=r)
 
-    def read_table(self, conn, table_name):
-        return self.read_query(conn, "SELECT * FROM " + table_name)
+    def read_table(self, conn, table_name, *, qualifiers=None, limit=None):
+        if not isinstance(table_name, str):
+            raise Exception("Expect table_name to be a str")
+        q_table_name = self.build_qualified_table_name(table_name,
+                                                        qualifiers=qualifiers)
+        sql = "SELECT * FROM " + q_table_name
+        if limit is not None:
+            sql = sql + " LIMIT " + limit
+        return self.read_query(conn, sql)
+
+    def read(self, conn, table):
+        if not isinstance(table, data_algebra.data_ops.TableDescription):
+            raise Exception("Expect table to be a data_algebra.data_ops.TableDescription")
+        return self.read_table(conn=conn,
+                               table_name=table.table_name,
+                               qualifiers=table.qualifiers)
+
+    def table_description(self, conn, table_name, *, qualifiers=None):
+        example = self.read_table(conn=conn,
+                                  table_name=table_name,
+                                  qualifiers=qualifiers,
+                                  limit=1)
+        return data_algebra.data_ops.TableDescription(table_name=table_name,
+                                                      column_names=[c for c in example.columns],
+                                                      qualifiers=qualifiers)
+
+

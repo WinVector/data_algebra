@@ -165,14 +165,13 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         )
 
     def project(self, ops, *, group_by=None, order_by=None, reverse=None):
-        raise Exception("not implmented yet")
-        # return ProjectNode(
-        #     source=self,
-        #     ops=ops,
-        #     group_by=group_by,
-        #     order_by=order_by,
-        #     reverse=reverse,
-        # )
+        return ProjectNode(
+            source=self,
+            ops=ops,
+            group_by=group_by,
+            order_by=order_by,
+            reverse=reverse,
+        )
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
         if not isinstance(b, ViewRepresentation):
@@ -334,8 +333,6 @@ def describe_pandas_table(d, table_name):
 
 
 class ExtendNode(ViewRepresentation):
-    ops: Dict[str, data_algebra.expr_rep.Expression]
-
     def __init__(self, source, ops, *, partition_by=None, order_by=None, reverse=None):
         ops = data_algebra.expr_rep.check_convert_op_dictionary(
             ops, source.column_map.__dict__
@@ -502,6 +499,165 @@ class ExtendNode(ViewRepresentation):
                 subframe.sort_values(by=['_data_algebra_orig_index'], inplace=True)
                 subframe.reset_index(inplace=True, drop=True)
                 res[k] = subframe[k]
+        return res
+
+
+class ProjectNode(ViewRepresentation):
+    def __init__(self, source, ops, *, group_by=None, order_by=None, reverse=None):
+        ops = data_algebra.expr_rep.check_convert_op_dictionary(
+            ops, source.column_map.__dict__
+        )
+        if len(ops) < 1:
+            raise Exception("no ops")
+        self.ops = ops
+        if group_by is None:
+            group_by = []
+        if isinstance(group_by, str):
+            group_by = [group_by]
+        self.group_by = group_by
+        if order_by is None:
+            order_by = []
+        if isinstance(order_by, str):
+            order_by = [order_by]
+        self.order_by = order_by
+        if (len(group_by) <= 0) and (len(order_by) <= 0):
+            raise Exception("Must set at least one of group_by or order_by")
+        if reverse is None:
+            reverse = []
+        if isinstance(reverse, str):
+            reverse = [reverse]
+        self.reverse = reverse
+        column_names = source.column_names.copy()
+        consumed_cols = set()
+        for (k, o) in ops.items():
+            o.get_column_names(consumed_cols)
+        unknown_cols = consumed_cols - source.column_set
+        if len(unknown_cols) > 0:
+            raise Exception("referred to unknown columns: " + str(unknown_cols))
+        known_cols = set(column_names)
+        for ci in ops.keys():
+            if ci not in known_cols:
+                column_names.append(ci)
+        if len(group_by) != len(set(group_by)):
+            raise Exception("Duplicate name in group_by")
+        if len(order_by) != len(set(order_by)):
+            raise Exception("Duplicate name in order_by")
+        if len(reverse) != len(set(reverse)):
+            raise Exception("Duplicate name in reverse")
+        unknown = set(group_by) - known_cols
+        if len(unknown) > 0:
+            raise Exception("unknown partition_by columns: " + str(unknown))
+        unknown = set(order_by) - known_cols
+        if len(unknown) > 0:
+            raise Exception("unknown order_by columns: " + str(unknown))
+        unknown = set(reverse) - set(order_by)
+        if len(unknown) > 0:
+            raise Exception("reverse columns not in order_by: " + str(unknown))
+        ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
+
+    def columns_used_from_sources(self, using=None):
+        if using is None:
+            subops = self.ops
+        else:
+            subops = {k: op for (k, op) in self.ops.items() if k in using}
+        columns_we_take = set()
+        for (k, o) in subops.items():
+            o.get_column_names(columns_we_take)
+        return [columns_we_take]
+
+    def collect_representation_implementation(self, *, pipeline=None, dialect='Python'):
+        if pipeline is None:
+            pipeline = []
+        od = collections.OrderedDict()
+        od["op"] = "Project"
+        od["ops"] = {ci: vi.to_source(dialect=dialect) for (ci, vi) in self.ops.items()}
+        od["group_by"] = self.group_by
+        od["order_by"] = self.order_by
+        od["reverse"] = self.reverse
+        pipeline.insert(0, od)
+        return self.sources[0].collect_representation_implementation(pipeline=pipeline, dialect=dialect)
+
+    def to_python_implementation(self, *, indent=0, strict=True):
+        s = (
+            self.sources[0].to_python_implementation(indent=indent, strict=strict)
+            + " .\\\n"
+            + " " * (indent + 3)
+            + "project({"
+            + ", ".join(
+                [
+                    k.__repr__() + ": " + opi.to_python().__repr__()
+                    for (k, opi) in self.ops.items()
+                ]
+            )
+            + "}"
+        )
+        if len(self.group_by) > 0:
+            s = s + ", group_by=" + self.group_by.__repr__()
+        if len(self.order_by) > 0:
+            s = s + ", order_by=" + self.order_by.__repr__()
+        if len(self.reverse) > 0:
+            s = s + ", reverse=" + self.reverse.__repr__()
+        s = s + ")"
+        return s
+
+    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+        return db_model.project_to_sql(self, using=using, temp_id_source=temp_id_source)
+
+    def eval_pandas(self, data_map):
+        raise Exception("not implemented yet")  # TODO: implement
+        # check these are forms we are prepared to work with
+        for (k, op) in self.ops.items():
+            if len(op.args) > 1:
+                raise Exception(
+                    "non-trivial windows expression: " + str(k) + ": " + str(op)
+                )
+            if len(op.args) == 1:
+                if not isinstance(
+                    op.args[0], data_algebra.expr_rep.ColumnReference
+                ):
+                    raise Exception(
+                        "windows expression argument must be a column: "
+                        + str(k)
+                        + ": "
+                        + str(op)
+                    )
+        res = self.sources[0].eval_pandas(data_map)
+        res.reset_index(inplace=True, drop=True)
+        for (k, op) in self.ops.items():
+            # work on a slice of the data frame
+            col_list = [c for c in set(self.group_by)]
+            for c in self.order_by:
+                if c not in col_list:
+                    col_list = col_list + [c]
+            value_name = None
+            if len(op.args) > 0:
+                value_name = op.args[0].to_pandas()
+                if value_name not in set(col_list):
+                    col_list = col_list + [value_name]
+            ascending = [c not in set(self.reverse) for c in col_list]
+            subframe = res[col_list].copy()
+            subframe.reset_index(inplace=True, drop=True)
+            subframe['_data_algebra_orig_index'] = [i for i in range(subframe.shape[0])]
+            subframe.sort_values(by=col_list, ascending=ascending, inplace=True)
+            subframe.reset_index(inplace=True, drop=True)
+            if len(self.group_by) > 0:
+                opframe = subframe.groupby(self.group_by)
+                #  Groupby preserves the order of rows within each group.
+                # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.groupby.html
+            else:
+                opframe = subframe
+            if len(op.args) == 0:
+                if op.op == "row_number":
+                    subframe[k] = opframe.cumcount() + 1
+                else:  # TODO: more of these
+                    raise Exception("not implemented: " + str(k) + ": " + str(op))
+            else:
+                # len(op.args) == 1
+                subframe[k] = opframe[value_name].transform(op.op)
+            subframe.reset_index(inplace=True, drop=True)
+            subframe.sort_values(by=['_data_algebra_orig_index'], inplace=True)
+            subframe.reset_index(inplace=True, drop=True)
+            res[k] = subframe[k]
         return res
 
 
