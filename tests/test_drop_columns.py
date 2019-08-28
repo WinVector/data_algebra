@@ -1,4 +1,4 @@
-import numpy
+
 import pandas
 import data_algebra.util
 from data_algebra.data_ops import *
@@ -17,11 +17,11 @@ def test_drop_columns():
 
     sql = ops.to_sql(db_model)
 
-    ops.eval_pandas(od(d=d))
+    res = ops.eval_pandas(od(d=d))
 
     data_algebra.yaml.check_op_round_trip(ops)
 
-    res = expect = pandas.DataFrame({'y': [2]})
+    expect = pandas.DataFrame({'y': [2]})
 
     assert data_algebra.util.equivalent_frames(expect, res)
 

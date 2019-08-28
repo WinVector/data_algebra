@@ -24,9 +24,9 @@ data_algebra/expr_rep.py         284     93    67%
 data_algebra/pending_eval.py      34     26    24%
 data_algebra/pipe.py              69     35    49%
 data_algebra/util.py              57      5    91%
-data_algebra/yaml.py              72     11    85%
+data_algebra/yaml.py              73     11    85%
 --------------------------------------------------
-TOTAL                           1492    431    71%
+TOTAL                           1493    431    71%
 
 
-=========================== 8 passed in 1.41 seconds ===========================
+=========================== 8 passed in 1.43 seconds ===========================

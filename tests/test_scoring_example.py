@@ -45,6 +45,8 @@ def test_scoring_example():
             rename_columns({'diagnosis': 'surveyCategory'}). \
             order_rows(['subjectID'])
 
+    data_algebra.yaml.check_op_round_trip(ops)
+
     py_source = ops.to_python(strict=True, pretty=False)
     py_sourcep = ops.to_python(strict=True, pretty=True)
 

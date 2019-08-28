@@ -15,7 +15,7 @@ except ImportError:
 
 # yaml notes:
 #    https://stackoverflow.com/questions/2627555/how-to-deserialize-an-object-with-pyyaml-using-safe-load
-
+#    https://stackoverflow.com/a/21912744/6901725
 
 def fix_ordered_dict_yaml_rep():
     """Writer OrderedDict as simple structure"""
@@ -123,7 +123,8 @@ def check_op_round_trip(o):
     strp_back = back.to_python(strict=True, pretty=True)
     assert strp == strp_back
     dmp = yaml.dump(obj)
-    back = data_algebra.yaml.to_pipeline(yaml.safe_load(dmp))
+    ld = yaml.safe_load(dmp)
+    back = data_algebra.yaml.to_pipeline(ld)
     if isinstance(o, data_algebra.data_ops.ExtendNode):
         if len(o.ops) == 1:
             strr_back = back.to_python(strict=True, pretty=False)
