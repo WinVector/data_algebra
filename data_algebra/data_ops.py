@@ -1,6 +1,8 @@
 from typing import Set, Any, Dict, List
 import collections
 
+import pandas
+
 import data_algebra.expr_rep
 import data_algebra.pipe
 import data_algebra.env
@@ -606,7 +608,7 @@ class ProjectNode(ViewRepresentation):
     def eval_pandas(self, data_map):
         # check these are forms we are prepared to work with, and build an aggregation dictionary
         # build an agg list: https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
-        aggregations = {}
+        # https://stackoverflow.com/questions/44635626/rename-result-columns-from-pandas-aggregation-futurewarning-using-a-dict-with
         for (k, op) in self.ops.items():
             if len(op.args) != 1:
                 raise Exception(
@@ -617,17 +619,7 @@ class ProjectNode(ViewRepresentation):
                     "windows expression argument must be a column: "
                     + str(k)
                     + ": "
-                    + str(op)
-                )
-            result = k
-            opstr = op.op
-            input = str(op.args[0])
-            try:
-                oplist = aggregations[input]
-            except KeyError:
-                oplist = {}
-                aggregations[input] = oplist
-            oplist[result] = opstr
+                    + str(op))
         res = self.sources[0].eval_pandas(data_map)
         res.reset_index(inplace=True, drop=True)
         if len(self.order_by)>0:
@@ -635,9 +627,8 @@ class ProjectNode(ViewRepresentation):
             res.reset_index(inplace=True, drop=True)
         if len(self.group_by)>0:
             res = res.groupby(self.group_by)
-        res = res.agg(aggregations)
-        newcols = [c[0] if len(c[1]) <= 0 else c[1] for c in res.columns]
-        res.columns = newcols
+        cols = {k: res[str(op.args[0])].agg(op.op) for (k, op) in self.ops.items()}
+        res = pandas.DataFrame(cols)
         res.reset_index(inplace=True, drop=False) # grouping variables in the index
         return res
 

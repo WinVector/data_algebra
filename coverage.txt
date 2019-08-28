@@ -2,12 +2,13 @@
 platform darwin -- Python 3.6.9, pytest-5.0.1, py-1.8.0, pluggy-0.12.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.7.1
-collected 8 items
+collected 9 items
 
-tests/test_drop_columns.py .                                             [ 12%]
-tests/test_example_data_ops.py .                                         [ 25%]
-tests/test_scoring_example.py .                                          [ 37%]
-tests/test_simple.py ....                                                [ 87%]
+tests/test_drop_columns.py .                                             [ 11%]
+tests/test_example_data_ops.py .                                         [ 22%]
+tests/test_poject.py .                                                   [ 33%]
+tests/test_scoring_example.py .                                          [ 44%]
+tests/test_simple.py ....                                                [ 88%]
 tests/test_sqlite.py .                                                   [100%]
 
 ---------- coverage: platform darwin, python 3.6.9-final-0 -----------
@@ -16,17 +17,17 @@ Name                           Stmts   Miss  Cover
 data_algebra/PostgreSQL.py        19      4    79%
 data_algebra/SQLite.py            25      6    76%
 data_algebra/__init__.py           5      0   100%
-data_algebra/data_ops.py         650    232    64%
-data_algebra/data_pipe.py        106     35    67%
-data_algebra/db_model.py         296    134    55%
+data_algebra/data_ops.py         629    138    78%
+data_algebra/data_pipe.py        106     28    74%
+data_algebra/db_model.py         283    103    64%
 data_algebra/env.py               54     12    78%
-data_algebra/expr_rep.py         285     93    67%
+data_algebra/expr_rep.py         293     94    68%
 data_algebra/pending_eval.py      34     26    24%
 data_algebra/pipe.py              69     35    49%
 data_algebra/util.py              57      5    91%
-data_algebra/yaml.py              73     11    85%
+data_algebra/yaml.py              73     10    86%
 --------------------------------------------------
-TOTAL                           1673    593    65%
+TOTAL                           1647    461    72%
 
 
-=========================== 8 passed in 1.49 seconds ===========================
+=========================== 9 passed in 1.48 seconds ===========================
