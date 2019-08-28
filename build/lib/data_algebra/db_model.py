@@ -239,6 +239,33 @@ class DBModel:
         )
         return sql_str
 
+    def drop_columns_to_sql(self, drop_columns_node, *, using=None, temp_id_source=None):
+        if not isinstance(drop_columns_node, data_algebra.data_ops.DropColumnsNode):
+            raise Exception(
+                "Expected drop_columns_node to be a data_algebra.data_ops.DropColumnsNode)"
+            )
+        if temp_id_source is None:
+            temp_id_source = [0]
+        if using is None:
+            using = drop_columns_node.column_set
+        subusing = drop_columns_node.columns_used_from_sources(using=using)[0]
+        subsql = drop_columns_node.sources[0].to_sql_implementation(
+            db_model=self, using=subusing, temp_id_source=temp_id_source
+        )
+        # TODO: make sure select rows doesn't force its partition and order columns in, and then
+        #       return the subsql here instead of tacking on an additional query.
+        sub_view_name = "SQ_" + str(temp_id_source[0])
+        temp_id_source[0] = temp_id_source[0] + 1
+        sql_str = (
+                "SELECT "
+                + ", ".join([self.quote_identifier(ci) for ci in subusing])
+                + " FROM ( "
+                + subsql
+                + " ) "
+                + self.quote_identifier(sub_view_name)
+        )
+        return sql_str
+
     def order_to_sql(self, order_node, *, using=None, temp_id_source=None):
         if not isinstance(order_node, data_algebra.data_ops.OrderRowsNode):
             raise Exception(
@@ -415,4 +442,3 @@ class DBModel:
 
     def read_table(self, conn, table_name):
         return self.read_query(conn, "SELECT * FROM " + table_name)
-

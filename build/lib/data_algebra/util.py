@@ -1,11 +1,10 @@
 import collections
 import pandas
 
-
 def od(**kwargs):
     """Capture arguments in order."""
     r = collections.OrderedDict()
-    for (k,v) in kwargs.items():
+    for (k, v) in kwargs.items():
         r[k] = v
     return r
 
@@ -17,6 +16,9 @@ def can_convert_v_to_numeric(x):
         return True
     except TypeError:
         return False
+
+
+# for testing
 
 
 def equivalent_frames(a, b,
@@ -71,3 +73,4 @@ def equivalent_frames(a, b,
             if not all([ca[i] == cb[i] for i in range(a.shape[0])]):
                 return False
     return True
+

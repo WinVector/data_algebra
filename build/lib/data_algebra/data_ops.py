@@ -164,6 +164,16 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
             reverse=reverse,
         )
 
+    def project(self, ops, *, group_by=None, order_by=None, reverse=None):
+        raise Exception("not implmented yet")
+        # return ProjectNode(
+        #     source=self,
+        #     ops=ops,
+        #     group_by=group_by,
+        #     order_by=order_by,
+        #     reverse=reverse,
+        # )
+
     def natural_join(self, b, *, by=None, jointype="INNER"):
         if not isinstance(b, ViewRepresentation):
             raise Exception(
@@ -174,17 +184,14 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
     def select_rows(self, expr):
         return SelectRowsNode(source=self, expr=expr)
 
-    def drop_columns(self, columns):
-        raise Exception("not implemented yet")  # TODO: implement
+    def drop_columns(self, column_deletions):
+        return DropColumnsNode(source=self, column_deletions=column_deletions)
 
     def select_columns(self, columns):
         return SelectColumnsNode(source=self, columns=columns)
 
     def rename_columns(self, column_remapping):
         return RenameColumnsNode(source=self, column_remapping=column_remapping)
-
-    def project(self, group_by):
-        raise Exception("not implemented yet")  # TODO: implement
 
     def order_rows(self, columns, *, reverse=None, limit=None):
         return OrderRowsNode(source=self, columns=columns, reverse=reverse, limit=limit)
@@ -320,6 +327,10 @@ class TableDescription(ViewRepresentation):
 
     def __hash__(self):
         return self.key.__hash__()
+
+
+def describe_pandas_table(d, table_name):
+    return TableDescription(table_name, [c for c in d.columns])
 
 
 class ExtendNode(ViewRepresentation):
@@ -596,6 +607,54 @@ class SelectColumnsNode(ViewRepresentation):
     def eval_pandas(self, data_map):
         res = self.sources[0].eval_pandas(data_map)
         return res[self.column_selection]
+
+
+class DropColumnsNode(ViewRepresentation):
+    column_deletions: List[str]
+
+    def __init__(self, source, column_deletions):
+        column_deletions = [c for c in column_deletions]
+        self.column_deletions = column_deletions
+        remaining_columns = [c for c in source.column_names if c not in column_deletions]
+        # TODO: check column conditions
+        ViewRepresentation.__init__(
+            self, column_names=remaining_columns, sources=[source]
+        )
+
+    def columns_used_from_sources(self, using=None):
+        if using is None:
+            using = set(self.sources[0].column_names)
+        return [set([c for c in using if c not in self.column_deletions])]
+
+    def collect_representation_implementation(self, *, pipeline=None, dialect='Python'):
+        if pipeline is None:
+            pipeline = []
+        od = collections.OrderedDict()
+        od["op"] = "DropColumns"
+        od["column_deletions"] = self.column_deletions
+        pipeline.insert(0, od)
+        return self.sources[0].collect_representation_implementation(pipeline=pipeline, dialect=dialect)
+
+    def to_python_implementation(self, *, indent=0, strict=True):
+        s = (
+            self.sources[0].to_python_implementation(indent=indent, strict=strict)
+            + " .\\\n"
+            + " " * (indent + 3)
+            + "drop_columns("
+            + self.column_deletions.__repr__()
+            + ")"
+        )
+        return s
+
+    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+        return db_model.drop_columns_to_sql(
+            self, using=using, temp_id_source=temp_id_source
+        )
+
+    def eval_pandas(self, data_map):
+        res = self.sources[0].eval_pandas(data_map)
+        column_selection = [c for c in res.columns if c not in self.column_deletions]
+        return res[column_selection]
 
 
 class OrderRowsNode(ViewRepresentation):

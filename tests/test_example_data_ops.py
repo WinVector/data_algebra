@@ -4,28 +4,11 @@ from data_algebra.util import od
 import data_algebra.env
 import data_algebra.yaml
 import data_algebra.pipe
-import yaml
 
 
 # test representation paths
 # TODO: more tests for more ops patterns
 
-def check_round_trip(o):
-    strr = o.to_python(strict=True, pretty=False)
-    strp = o.to_python(strict=True, pretty=True)
-    obj = o.collect_representation()
-    back = data_algebra.yaml.to_pipeline(obj)
-    strr_back = back.to_python(strict=True, pretty=False)
-    assert strr == strr_back
-    strp_back = back.to_python(strict=True, pretty=True)
-    assert strp == strp_back
-    dmp = yaml.dump(obj)
-    back = data_algebra.yaml.to_pipeline(yaml.safe_load(dmp))
-    if len(o.ops) == 1:
-        strr_back = back.to_python(strict=True, pretty=False)
-        assert strr == strr_back
-        strp_back = back.to_python(strict=True, pretty=True)
-        assert strp == strp_back
 
 
 def test_example_data_ops_extend():
@@ -66,4 +49,4 @@ def test_example_data_ops_extend():
         ]
 
     for o in ops:
-        check_round_trip(o)
+        data_algebra.yaml.check_op_round_trip(o)

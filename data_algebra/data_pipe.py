@@ -50,6 +50,31 @@ class Extend(data_algebra.pipe.PipeStep):
         )
 
 
+class Project(data_algebra.pipe.PipeStep):
+    """Class to specify aggregating or summarizing columns."""
+
+    ops: Dict[str, data_algebra.expr_rep.Expression]
+
+    def __init__(self, ops, *, group_by=None, order_by=None, reverse=None):
+        data_algebra.pipe.PipeStep.__init__(self, name="Project")
+        self._ops = ops
+        self.group_by = group_by
+        self.order_by = order_by
+        self.reverse = reverse
+
+    def apply(self, other):
+        if not isinstance(other, data_algebra.data_ops.ViewRepresentation):
+            raise Exception(
+                "expected other to be a data_algebra.dat_ops.ViewRepresentation"
+            )
+        return other.project(
+            ops=self._ops,
+            group_by=self.group_by,
+            order_by=self.order_by,
+            reverse=self.reverse,
+        )
+
+
 class SelectRows(data_algebra.pipe.PipeStep):
     """Class to specify a choice of rows.
     """
@@ -85,6 +110,25 @@ class SelectColumns(data_algebra.pipe.PipeStep):
                 "expected other to be a data_algebra.dat_ops.ViewRepresentation"
             )
         return other.select_columns(self.column_selection)
+
+
+class DropColumns(data_algebra.pipe.PipeStep):
+    """Class to specify removal of columns.
+    """
+
+    column_deletions: List[str]
+
+    def __init__(self, column_deletions):
+        column_deletions = [c for c in column_deletions]
+        self.column_deletions = column_deletions
+        data_algebra.pipe.PipeStep.__init__(self, name="DropColumns")
+
+    def apply(self, other):
+        if not isinstance(other, data_algebra.data_ops.ViewRepresentation):
+            raise Exception(
+                "expected other to be a data_algebra.dat_ops.ViewRepresentation"
+            )
+        return other.drop_columns(self.column_deletions)
 
 
 class OrderRows(data_algebra.pipe.PipeStep):

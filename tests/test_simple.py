@@ -1,5 +1,4 @@
 
-import collections
 import numpy
 import pandas
 import data_algebra.util

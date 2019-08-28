@@ -69,6 +69,13 @@ def to_pipeline(obj, *, known_tables=None):
                 order_by=obj["order_by"],
                 reverse=obj["reverse"],
             )
+        elif op == "Project":
+            return data_algebra.data_pipe.Project(
+                ops=obj["ops"],
+                group_by=obj["group_by"],
+                order_by=obj["order_by"],
+                reverse=obj["reverse"],
+            )
         elif op == "NaturalJoin":
             return data_algebra.data_pipe.NaturalJoin(
                 by=obj["by"],
@@ -79,6 +86,8 @@ def to_pipeline(obj, *, known_tables=None):
             return data_algebra.data_pipe.SelectRows(expr=obj["expr"])
         elif op == "SelectColumns":
             return data_algebra.data_pipe.SelectColumns(columns=obj["columns"])
+        elif op == "DropColumns":
+            return data_algebra.data_pipe.DropColumns(column_deletions=obj["column_deletions"])
         elif op == "Rename":
             return data_algebra.data_pipe.RenameColumns(
                 column_remapping=obj["column_remapping"]
@@ -97,3 +106,28 @@ def to_pipeline(obj, *, known_tables=None):
             res = res >> nxt
         return res
     raise Exception("unexpected type: " + str(obj))
+
+
+# for testing
+
+
+def check_op_round_trip(o):
+    if not isinstance(o, data_algebra.data_ops.ViewRepresentation):
+        raise Exception("expect o to be a data_algebra.data_ops.ViewRepresentation")
+    strr = o.to_python(strict=True, pretty=False)
+    strp = o.to_python(strict=True, pretty=True)
+    obj = o.collect_representation()
+    back = data_algebra.yaml.to_pipeline(obj)
+    strr_back = back.to_python(strict=True, pretty=False)
+    assert strr == strr_back
+    strp_back = back.to_python(strict=True, pretty=True)
+    assert strp == strp_back
+    dmp = yaml.dump(obj)
+    back = data_algebra.yaml.to_pipeline(yaml.safe_load(dmp))
+    if isinstance(o, data_algebra.data_ops.ExtendNode):
+        if len(o.ops) == 1:
+            strr_back = back.to_python(strict=True, pretty=False)
+            assert strr == strr_back
+            strp_back = back.to_python(strict=True, pretty=True)
+            assert strp == strp_back
+
