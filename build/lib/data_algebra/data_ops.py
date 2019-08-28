@@ -604,60 +604,41 @@ class ProjectNode(ViewRepresentation):
         return db_model.project_to_sql(self, using=using, temp_id_source=temp_id_source)
 
     def eval_pandas(self, data_map):
-        raise Exception("not implemented yet")  # TODO: implement
-        # check these are forms we are prepared to work with
+        # check these are forms we are prepared to work with, and build an aggregation dictionary
+        # build an agg list: https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
+        aggregations = {}
         for (k, op) in self.ops.items():
-            if len(op.args) > 1:
+            if len(op.args) != 1:
                 raise Exception(
-                    "non-trivial windows expression: " + str(k) + ": " + str(op)
+                    "non-trivial aggregation expression: " + str(k) + ": " + str(op)
                 )
-            if len(op.args) == 1:
-                if not isinstance(
-                    op.args[0], data_algebra.expr_rep.ColumnReference
-                ):
-                    raise Exception(
-                        "windows expression argument must be a column: "
-                        + str(k)
-                        + ": "
-                        + str(op)
-                    )
+            if not isinstance(op.args[0], data_algebra.expr_rep.ColumnReference):
+                raise Exception(
+                    "windows expression argument must be a column: "
+                    + str(k)
+                    + ": "
+                    + str(op)
+                )
+            result = k
+            opstr = op.op
+            input = str(op.args[0])
+            try:
+                oplist = aggregations[input]
+            except KeyError:
+                oplist = {}
+                aggregations[input] = oplist
+            oplist[result] = opstr
         res = self.sources[0].eval_pandas(data_map)
         res.reset_index(inplace=True, drop=True)
-        for (k, op) in self.ops.items():
-            # work on a slice of the data frame
-            col_list = [c for c in set(self.group_by)]
-            for c in self.order_by:
-                if c not in col_list:
-                    col_list = col_list + [c]
-            value_name = None
-            if len(op.args) > 0:
-                value_name = op.args[0].to_pandas()
-                if value_name not in set(col_list):
-                    col_list = col_list + [value_name]
-            ascending = [c not in set(self.reverse) for c in col_list]
-            subframe = res[col_list].copy()
-            subframe.reset_index(inplace=True, drop=True)
-            subframe['_data_algebra_orig_index'] = [i for i in range(subframe.shape[0])]
-            subframe.sort_values(by=col_list, ascending=ascending, inplace=True)
-            subframe.reset_index(inplace=True, drop=True)
-            if len(self.group_by) > 0:
-                opframe = subframe.groupby(self.group_by)
-                #  Groupby preserves the order of rows within each group.
-                # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.groupby.html
-            else:
-                opframe = subframe
-            if len(op.args) == 0:
-                if op.op == "row_number":
-                    subframe[k] = opframe.cumcount() + 1
-                else:  # TODO: more of these
-                    raise Exception("not implemented: " + str(k) + ": " + str(op))
-            else:
-                # len(op.args) == 1
-                subframe[k] = opframe[value_name].transform(op.op)
-            subframe.reset_index(inplace=True, drop=True)
-            subframe.sort_values(by=['_data_algebra_orig_index'], inplace=True)
-            subframe.reset_index(inplace=True, drop=True)
-            res[k] = subframe[k]
+        if len(self.order_by)>0:
+            res.sort_values(by=self.order_by, inplace=True)
+            res.reset_index(inplace=True, drop=True)
+        if len(self.group_by)>0:
+            res = res.groupby(self.group_by)
+        res = res.agg(aggregations)
+        newcols = [c[0] if len(c[1]) <= 0 else c[1] for c in res.columns]
+        res.columns = newcols
+        res.reset_index(inplace=True, drop=False) # grouping variables in the index
         return res
 
 
