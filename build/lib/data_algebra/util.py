@@ -35,7 +35,8 @@ def equivalent_frames(a, b,
     if a.shape[1] < 1:
         return True
     cols = [c for c in a.columns]
-    if set(cols) != set([c for c in b.columns]):
+    bcols = [c for c in b.columns]
+    if set(cols) != set(bcols):
         return False
     if check_column_order:
         if not all([a.columns[i] == b.columns[i] for i in range(a.shape[0])]):

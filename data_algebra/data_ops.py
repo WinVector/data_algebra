@@ -6,14 +6,6 @@ import data_algebra.pipe
 import data_algebra.env
 import data_algebra.pending_eval
 
-have_pandas = False
-try:
-    # noinspection PyUnresolvedReferences
-    import pandas
-    have_pandas = True
-except ImportError:
-    pass
-
 have_black = False
 try:
     # noinspection PyUnresolvedReferences

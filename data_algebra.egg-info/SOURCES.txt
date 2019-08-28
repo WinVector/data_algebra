@@ -15,4 +15,5 @@ data_algebra/yaml.py
 data_algebra.egg-info/PKG-INFO
 data_algebra.egg-info/SOURCES.txt
 data_algebra.egg-info/dependency_links.txt
+data_algebra.egg-info/requires.txt
 data_algebra.egg-info/top_level.txt

@@ -22,6 +22,7 @@ setuptools.setup(
     url='https://github.com/WinVector/data_algebra',
     packages=setuptools.find_packages(exclude=['tests', 'Examples']),
     install_requires=[
+        "pandas",
     ],
     platforms=['any'],
     license='License :: OSI Approved :: BSD 3-clause License',
