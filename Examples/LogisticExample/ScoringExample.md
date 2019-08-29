@@ -50,11 +50,16 @@ Let's start our `Python` example.  First we import the packages we are going to 
 ```python
 import io
 from pprint import pprint
-import psycopg2    # http://initd.org/psycopg/
-import pandas      # https://pandas.pydata.org
-import yaml        # https://pyyaml.org
-import db_helpers  # https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/db_helpers.py
+import psycopg2       # http://initd.org/psycopg/
+import pandas         # https://pandas.pydata.org
+import yaml           # https://pyyaml.org
+from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
+import data_algebra.env
+import data_algebra.yaml
+import data_algebra.PostgreSQL
 
+# ask YAML to write simpler structures
+data_algebra.yaml.fix_ordered_dict_yaml_rep()
 
 pandas.set_option('display.max_columns', None)  
 pandas.set_option('display.expand_frame_repr', False)
@@ -157,9 +162,11 @@ conn.autocommit=True
 
 
 ```python
-db_helpers.insert_table(conn, d_local, 'd')
+db_model = data_algebra.PostgreSQL.PostgreSQLModel()
 
-db_helpers.read_table(conn, 'd')
+db_model.insert_table(conn, d_local, 'd')
+
+db_model.read_table(conn, 'd')
 ```
 
 
@@ -236,46 +243,31 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
 
 Now we continue our example by importing the `data_algebra` components we need.
 
-
-```python
-from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
-import data_algebra.env
-import data_algebra.yaml
-import data_algebra.PostgreSQL
-
-
-# set some things in our environment
-data_algebra.env.push_onto_namespace_stack(locals())
-# ask YAML to write simpler structures
-data_algebra.yaml.fix_ordered_dict_yaml_rep()
-
-db_model = data_algebra.PostgreSQL.PostgreSQLModel()
-```
-
 Now we use the `data_algebra` to define our processing pipeline: `ops`.  We are writing this pipeline using a [method chaining](https://en.wikipedia.org/wiki/Method_chaining) notation where we have placed `Python` method-dot at the end of lines using the `.\` notation.  This notation will look *very* much like a [pipe](https://en.wikipedia.org/wiki/Pipeline_(Unix)) to `R`/[`magrittr`](https://CRAN.R-project.org/package=magrittr) users.
 
 
 ```python
 scale = 0.237
 
-ops = TableDescription('d', 
-                 ['subjectID',
-                  'surveyCategory',
-                  'assessmentTotal',
-                  'irrelevantCol1',
-                  'irrelevantCol2']) .\
-    extend({'probability': '(assessmentTotal * scale).exp()'}) .\
-    extend({'total': 'probability.sum()'},
-           partition_by='subjectID')  .\
-    extend({'probability': 'probability/total'})  .\
-    extend({'row_number':'_row_number()'},
-            partition_by=['subjectID'],
-            order_by=['probability', 'surveyCategory'],
-            reverse=['probability'])  .\
-    select_rows('row_number==1')   .\
-    select_columns(['subjectID', 'surveyCategory', 'probability']) .\
-    rename_columns({'diagnosis': 'surveyCategory'})  .\
-    order_rows(['subjectID'])
+with data_algebra.env.Env(locals()) as env:
+    ops = TableDescription('d', 
+                     ['subjectID',
+                      'surveyCategory',
+                      'assessmentTotal',
+                      'irrelevantCol1',
+                      'irrelevantCol2']) .\
+        extend({'probability': '(assessmentTotal * scale).exp()'}) .\
+        extend({'total': 'probability.sum()'},
+               partition_by='subjectID')  .\
+        extend({'probability': 'probability/total'})  .\
+        extend({'row_number':'_row_number()'},
+                partition_by=['subjectID'],
+                order_by=['probability', 'surveyCategory'],
+                reverse=['probability'])  .\
+        select_rows('row_number==1')   .\
+        select_columns(['subjectID', 'surveyCategory', 'probability']) .\
+        rename_columns({'diagnosis': 'surveyCategory'})  .\
+        order_rows(['subjectID'])
 ```
 
 For a more pythonic way of writing the same pipeline we can show how the code would have been formatted by [`black`](https://github.com/psf/black).
@@ -321,7 +313,7 @@ In either case, the pipeline is read as a sequence of operations (top to bottom,
   * We start with a table named "d" that is known to have columns "subjectID", "surveyCategory", "assessmentTotal", "irrelevantCol1", and "irrelevantCol2".
   * We produce a new table by transforming this table through a sequence of "extend" operations which add new columns.
   
-    * The first `extend` computes `probability = exp(scale*assessmentTotal)`, this is similar to the inverse-link step of a logistic regression. We assume when writing this pipleline we were given this math as a requirement.
+    * The first `extend` computes `probability = exp(scale*assessmentTotal)`, this is similar to the inverse-link step of a logistic regression. We assume when writing this pipeline we were given this math as a requirement.
     * The next few `extend` steps total the `probabilty` per-subject (this is controlled by the `partition_by` argument) and then rank the normalized probabilities per-subject (grouping again specified by the `partition_by` argument, and order contolled by the `order_by` clause).
     
   * We then select the per-subject top-ranked rows by the `select_rows` step.
@@ -341,8 +333,8 @@ print(sql)
 ```
 
     SELECT "probability",
-           "subjectid",
-           "diagnosis"
+           "diagnosis",
+           "subjectid"
     FROM
       (SELECT "probability",
               "subjectid",
@@ -375,8 +367,8 @@ print(sql)
                                 "subjectid",
                                 EXP(("assessmenttotal" * 0.237)) AS "probability"
                          FROM
-                           (SELECT "assessmenttotal",
-                                   "surveycategory",
+                           (SELECT "surveycategory",
+                                   "assessmenttotal",
                                    "subjectid"
                             FROM "d") "sq_0") "sq_1") "sq_2") "sq_3") "sq_4"
              WHERE "row_number" = 1 ) "sq_5") "sq_6") "sq_7"
@@ -389,7 +381,7 @@ Also notice the generate `SQL` has applied query narrowing: columns not used in 
 
 
 ```python
-db_helpers.read_query(conn, sql)
+db_model.read_query(conn, sql)
 ```
 
 
@@ -414,22 +406,22 @@ db_helpers.read_query(conn, sql)
     <tr style="text-align: right;">
       <th></th>
       <th>probability</th>
-      <th>subjectid</th>
       <th>diagnosis</th>
+      <th>subjectid</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
       <td>0.670622</td>
-      <td>1.0</td>
       <td>withdrawal behavior</td>
+      <td>1.0</td>
     </tr>
     <tr>
       <th>1</th>
       <td>0.558974</td>
-      <td>2.0</td>
       <td>positive re-framing</td>
+      <td>2.0</td>
     </tr>
   </tbody>
 </table>
@@ -495,7 +487,7 @@ ops.eval_pandas({'d': d_local})
 
 
 
-`eval_pandas` takes a dictionary of `Pandas` `DataFrame`s (names matching names specified in the pipeline) and returns the result of applying the pipeline to the data using `Pandas` commands.  Currently our `Pandas` implementation only allows very simple window functions.  This is why did't write `probability = probability/sum(probability)`, but instead broken the calculation into multiple steps by introducing the `total` column (the `SQL` realizaition does in fact support more complex window functions).  This is a small issue with the grammar: but our feeling encourange simple steps is in fact a good thing (improves debugabbility), and in `SQL` the query optimizers likely optimize the different query styles into very similar realizations anyway.
+`eval_pandas` takes a dictionary of `Pandas` `DataFrame`s (names matching names specified in the pipeline) and returns the result of applying the pipeline to the data using `Pandas` commands.  Currently our `Pandas` implementation only allows very simple window functions.  This is why we didn't write `probability = probability/sum(probability)`, but instead broken the calculation into multiple steps by introducing the `total` column (the `SQL` realizaition does in fact support more complex window functions).  This is a small issue with the grammar: but our feeling encourange simple steps is in fact a good thing (improves debuggability), and in `SQL` the query optimizers likely optimize the different query styles into very similar realizations anyway.
 
 ## Export/Import
 
@@ -584,10 +576,10 @@ library(yaml)
 library(wrapr)
 library(rquery)
 library(rqdatatable)
-source('R_fns.R')
+source('R_fns.R')  # https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/R_fns.R
 
 r_yaml <- yaml.load_file("pipeline_yaml.txt")
-r_ops <- convert_yaml_to_pipleline(r_yaml)
+r_ops <- convert_yaml_to_pipeline(r_yaml)
 cat(format(r_ops))
 ```
 
@@ -706,15 +698,15 @@ cat(sql)
              "assessmentTotal"
             FROM
              "d"
-            ) tsql_76525498125437036191_0000000000
-           ) tsql_76525498125437036191_0000000001
-          ) tsql_76525498125437036191_0000000002
-         ) tsql_76525498125437036191_0000000003
-       ) tsql_76525498125437036191_0000000004
+            ) tsql_58721496827577556961_0000000000
+           ) tsql_58721496827577556961_0000000001
+          ) tsql_58721496827577556961_0000000002
+         ) tsql_58721496827577556961_0000000003
+       ) tsql_58721496827577556961_0000000004
        WHERE "row_number" = 1
-      ) tsql_76525498125437036191_0000000005
-     ) tsql_76525498125437036191_0000000006
-    ) tsql_76525498125437036191_0000000007 ORDER BY "subjectID"
+      ) tsql_58721496827577556961_0000000005
+     ) tsql_58721496827577556961_0000000006
+    ) tsql_58721496827577556961_0000000007 ORDER BY "subjectID"
 
 
 The `R` implementation is mature, and appropriate to use in production.  The [`rquery`](https://github.com/WinVector/rquery) grammar is designed to have minimal state and minimal annotations (no grouping or ordering annotations!).  This makes the grammar, in my opinion, a good design choice. `rquery` has very good performance, often much faster than `dplyr` or base-`R` due to its query generation ideas and use of [`data.table`](https://CRAN.R-project.org/package=data.table) via [`rqdatatable`](https://CRAN.R-project.org/package=rqdatatable).  `rquery` is a mature pure `R` package; [here](https://github.com/WinVector/rquery/blob/master/README.md) is the same example being worked directly in `R`, with no translation from `Python`. 
