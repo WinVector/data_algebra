@@ -5,12 +5,12 @@ expr_map_to_expr_array <- function(emap) {
   return(r)
 }
 
-convert_yaml_to_pipleline <- function(rep, source=NULL) {
+convert_yaml_to_pipeline <- function(rep, source=NULL) {
   if(is.null(names(rep))) {
-    # unnamed list, a pipleline
-    res <- convert_yaml_to_pipleline(rep[[1]])
+    # unnamed list, a pipeline
+    res <- convert_yaml_to_pipeline(rep[[1]])
     for(i in seqi(2, length(rep))) {
-      res <- convert_yaml_to_pipleline(rep[[i]], source=res)
+      res <- convert_yaml_to_pipeline(rep[[i]], source=res)
     }
     return(res)
   } else {
@@ -40,10 +40,10 @@ convert_yaml_to_pipleline <- function(rep, source=NULL) {
   }
 } <- function(rep, source=NULL) {
   if(is.null(names(rep))) {
-    # unnamed list, a pipleline
-    res <- convert_yaml_to_pipleline(rep[[1]])
+    # unnamed list, a pipeline
+    res <- convert_yaml_to_pipeline(rep[[1]])
     for(i in seqi(2, length(res))) {
-      res <- convert_yaml_to_pipleline(rep[[i]], source=res)
+      res <- convert_yaml_to_pipeline(rep[[i]], source=res)
     }
     return(res)
   } else {
