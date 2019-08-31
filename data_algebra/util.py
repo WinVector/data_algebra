@@ -44,9 +44,9 @@ def equivalent_frames(
             return False
     else:
         b = b[cols]
-    for i in range(a.shape[0]):
-        if can_convert_v_to_numeric(a.iloc[:, i]) != can_convert_v_to_numeric(
-            b.iloc[:, i]
+    for j in range(a.shape[1]):
+        if can_convert_v_to_numeric(a.iloc[:, j]) != can_convert_v_to_numeric(
+            b.iloc[:, j]
         ):
             return False
     a = a.reset_index(inplace=False, drop=True)
@@ -56,9 +56,9 @@ def equivalent_frames(
         a = a.reset_index(inplace=False, drop=True)
         b = b.sort_values(by=cols, inplace=False)
         b = b.reset_index(inplace=False, drop=True)
-    for i in range(a.shape[0]):
-        ca = a.iloc[:, i]
-        cb = b.iloc[:, i]
+    for j in range(a.shape[1]):
+        ca = a.iloc[:, j]
+        cb = b.iloc[:, j]
         ca_null = ca.isnull()
         cb_null = cb.isnull()
         if (ca_null is None) != (cb_null is None):
@@ -66,7 +66,7 @@ def equivalent_frames(
         if ca is not None:
             if not all([ca_null[i] == cb_null[i] for i in range(a.shape[0])]):
                 return False
-        if can_convert_v_to_numeric(a.iloc[:, i]):
+        if can_convert_v_to_numeric(ca):
             dif = ca - cb
             if dif.abs().max() > float_tol:
                 return False

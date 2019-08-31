@@ -440,6 +440,14 @@ class DBModel:
             + [self.quote_identifier(ci) for ci in using_left - common]
             + [self.quote_identifier(ci) for ci in using_right - common]
         )
+        on_terms = ''
+        if len(join_node.by)>0:
+            on_terms =  (
+                    ' ON + ' + ', '.join([self.quote_identifier(sub_view_name_left) + '.' + self.quote_identifier(c)
+                       + " = "
+                       + self.quote_identifier(sub_view_name_right) + '.' + self.quote_identifier(c)
+                      for c in join_node.by])
+            )
         sql_str = (
             "SELECT "
             + ", ".join(col_exprs)
@@ -452,6 +460,7 @@ class DBModel:
             + " JOIN ( "
             + sql_right
             + " ) "
+            + on_terms
             + self.quote_identifier(sub_view_name_right)
         )
         return sql_str
@@ -467,6 +476,9 @@ class DBModel:
         :param table_name: name to give write to
         :return:
         """
+
+        if not isinstance(d, pandas.DataFrame):
+            raise Exception("d is supposed to be a pandas.DataFrame")
         cr = [
             d.columns[i].lower()
             + " "
@@ -486,6 +498,7 @@ class DBModel:
         buf = io.StringIO(d.to_csv(index=False, header=False, sep="\t"))
         cur.copy_from(buf, "d", columns=[c for c in d.columns])
         conn.commit()
+        return data_algebra.data_ops.TableDescription(table_name=table_name, column_names=[c for c in d.columns])
 
     # noinspection PyMethodMayBeStatic
     def read_query(self, conn, q):

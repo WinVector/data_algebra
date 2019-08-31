@@ -1,3 +1,5 @@
+import pandas
+
 import data_algebra.data_ops
 import data_algebra.db_model
 
@@ -45,3 +47,31 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         return data_algebra.db_model.DBModel.extend_to_sql(
             self, extend_node=extend_node, using=using, temp_id_source=temp_id_source
         )
+
+    # noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection
+    def insert_table(self, conn, d, table_name):
+        """
+
+        :param conn: a database connection
+        :param d: a Pandas table
+        :param table_name: name to give write to
+        :return:
+        """
+
+        if not isinstance(d, pandas.DataFrame):
+            raise Exception("d is supposed to be a pandas.DataFrame")
+        cr = [
+            d.columns[i].lower()
+            + " "
+            + (
+                "double precision"
+                if data_algebra.util.can_convert_v_to_numeric(d[d.columns[i]])
+                else "VARCHAR"
+            )
+            for i in range(d.shape[1])
+        ]
+        create_stmt = "CREATE TABLE " + table_name + " ( " + ", ".join(cr) + " )"
+        cur = conn.cursor()
+        cur.execute("DROP TABLE IF EXISTS " + table_name)
+        d.to_sql(name = table_name, con=conn)
+        return data_algebra.data_ops.TableDescription(table_name=table_name, column_names=[c for c in d.columns])
