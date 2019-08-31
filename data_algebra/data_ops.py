@@ -34,9 +34,6 @@ class OperatorPlatform(data_algebra.pipe.PipeValue):
 
     # Pandas interface
 
-    def eval_pandas(self, data_map):
-        raise Exception("base class called")
-
     # noinspection PyPep8Naming
     def transform(self, X):
         raise Exception("base class called")
@@ -1035,3 +1032,6 @@ class NaturalJoinNode(ViewRepresentation):
         return db_model.natural_join_to_sql(
             self, using=using, temp_id_source=temp_id_source
         )
+
+    def eval_pandas(self, data_map):
+        raise Exception("not implemented yet")  # TODO: implement

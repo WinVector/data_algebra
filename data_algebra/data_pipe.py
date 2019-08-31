@@ -181,8 +181,8 @@ class NaturalJoin(data_algebra.pipe.PipeStep):
     _b: data_algebra.data_ops.OperatorPlatform
 
     def __init__(self, *, b=None, by=None, jointype="INNER"):
-        if not isinstance(b, data_algebra.data_ops.OperatorPlatform):
-            raise Exception("b should be a data_algebra.data_ops.OperatorPlatform")
+        if not isinstance(b, data_algebra.data_ops.ViewRepresentation):
+            raise Exception("b must be a data_algebra.data_ops.ViewRepresentation")
         self._by = by
         self._jointype = jointype
         self._b = b
@@ -213,14 +213,6 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
                 pipeline = s.apply(pipeline)
             return pipeline
         raise Exception("can not apply realize() to type " + str(type(X)))
-
-    def eval_pandas(self, data_map):
-        if len(data_map) < 1:
-            raise Exception("eval_pandas can not be applited to empty table map")
-        if len(data_map) != 1:
-            raise Exception("eval_pandas not yet implemented for more than one table")
-        k = [k for k in data_map.keys()][0]
-        return self.transform(data_map[k])
 
     # noinspection PyPep8Naming
     def transform(self, X):
@@ -257,6 +249,8 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
         return self
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
+        if not isinstance(b, data_algebra.data_ops.ViewRepresentation):
+            raise Exception("b must be a data_algebra.data_ops.ViewRepresentation")
         op = NaturalJoin(
                 by=by,
                 jointype=jointype,
