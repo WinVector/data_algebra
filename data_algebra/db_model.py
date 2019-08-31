@@ -443,10 +443,10 @@ class DBModel:
         on_terms = ''
         if len(join_node.by)>0:
             on_terms =  (
-                    ' ON + ' + ', '.join([self.quote_identifier(sub_view_name_left) + '.' + self.quote_identifier(c)
+                    ' ON ' + ', '.join([self.quote_identifier(sub_view_name_left) + '.' + self.quote_identifier(c)
                        + " = "
                        + self.quote_identifier(sub_view_name_right) + '.' + self.quote_identifier(c)
-                      for c in join_node.by])
+                      for c in join_node.by]) + ' '
             )
         sql_str = (
             "SELECT "
@@ -460,8 +460,8 @@ class DBModel:
             + " JOIN ( "
             + sql_right
             + " ) "
-            + on_terms
             + self.quote_identifier(sub_view_name_right)
+            + on_terms
         )
         return sql_str
 

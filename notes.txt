@@ -4,7 +4,7 @@ pytest
 
 # get coverage totals
 # https://pytest-cov.readthedocs.io/en/latest/index.html
-pytest --cov data_algebra tests
+pytest --cov data_algebra tests > coverage.txt 
 
 # check the build looks good
 twine check dist/*

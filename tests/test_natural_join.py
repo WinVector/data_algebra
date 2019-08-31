@@ -31,16 +31,13 @@ def test_natural_join_columns():
 
     assert data_algebra.util.equivalent_frames(expect, res_pandas)
 
-    sql = ops4.to_sql(db_model)
+    sql = ops4.to_sql(db_model, pretty=True)
 
-    ## TODO: get this working
-    # conn = sqlite3.connect(':memory:')
-    # db_model.insert_table(conn, d, 'd')
-    # db_model.insert_table(conn, d2, 'd2')
-    # res_sqlite = db_model.read_query(conn, sql)
-    # # neaten up
-    # conn.close()
-    #
-    # assert data_algebra.util.equivalent_frames(expect, res_sqlite)
+    conn = sqlite3.connect(':memory:')
+    db_model.insert_table(conn, d, 'd')
+    db_model.insert_table(conn, d2, 'd2')
+    res_sqlite = db_model.read_query(conn, sql)
+    # neaten up
+    conn.close()
 
-
+    assert data_algebra.util.equivalent_frames(expect, res_sqlite)
