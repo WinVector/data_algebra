@@ -209,7 +209,8 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
         if isinstance(X, pandas.DataFrame):
             pipeline = data_algebra.data_ops.describe_pandas_table(X, table_name="X")
             for s in self.ops:
-                pipeline = pipeline >> s
+                # pipeline = pipeline >> s
+                pipeline = s.apply(pipeline)
             return pipeline
         raise Exception("can not apply realize() to type " + str(type(X)))
 

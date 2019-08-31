@@ -21,10 +21,10 @@ class PipeStep:
     def apply(self, other):
         raise Exception("base method called")
 
-    def __rrshift__(self, other):
+    def __rrshift__(self, other):  # override other >> self
         return self.apply(other)
 
-    def __rshift__(self, other):
+    def __rshift__(self, other):   # override self >> other
         if isinstance(other, PipeStep):
             return PipeFunction(
                 lambda x: other.apply(self.apply(x)),
@@ -143,5 +143,6 @@ def build_pipeline(*steps):
         return steps[0]
     cur = steps[0]
     for i in range(1, n):
-        cur = cur >> steps[i]
+        # cur = cur >> steps[i]
+        cur = steps[i].apply(cur)
     return cur

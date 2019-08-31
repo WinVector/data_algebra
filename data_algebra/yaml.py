@@ -106,7 +106,8 @@ def to_pipeline(obj, *, known_tables=None):
         res = to_pipeline(obj[0], known_tables=known_tables)
         for i in range(1, len(obj)):
             nxt = to_pipeline(obj[i], known_tables=known_tables)
-            res = res >> nxt
+            # res = res >> nxt
+            res = nxt.apply(res)
         return res
     raise Exception("unexpected type: " + str(obj))
 
