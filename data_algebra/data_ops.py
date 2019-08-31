@@ -32,11 +32,16 @@ class OperatorPlatform(data_algebra.pipe.PipeValue):
     def __init__(self):
         data_algebra.pipe.PipeValue.__init__(self)
 
-    # define builders for all non-initial node types on base class
+    # Pandas interface
+
+    def eval_pandas(self, data_map):
+        raise Exception("base class called")
 
     # noinspection PyPep8Naming
     def transform(self, X):
         raise Exception("base class called")
+
+    # define builders for all non-initial node types on base class
 
     def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
         raise Exception("base class called")

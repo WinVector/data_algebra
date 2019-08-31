@@ -110,12 +110,6 @@ class PipeValue:
         # assume RHS is a function
         return other(self.__val__())
 
-    def __repr__(self):
-        return "<" + str(self.__val__()) + ">"
-
-    def __str__(self):
-        return "<" + str(self.__val__()) + ">"
-
 
 class Value(PipeValue):
     """wraps a value into a >> pipeable entity
