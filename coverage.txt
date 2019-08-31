@@ -18,7 +18,7 @@ data_algebra/PostgreSQL.py        19      4    79%
 data_algebra/SQLite.py            25      6    76%
 data_algebra/__init__.py           5      0   100%
 data_algebra/data_ops.py         663    157    76%
-data_algebra/data_pipe.py        156     63    60%
+data_algebra/data_pipe.py        163     68    58%
 data_algebra/db_model.py         283    103    64%
 data_algebra/env.py               54     12    78%
 data_algebra/expr_rep.py         293     94    68%
@@ -27,7 +27,7 @@ data_algebra/pipe.py              65     33    49%
 data_algebra/util.py              57      5    91%
 data_algebra/yaml.py              73     10    86%
 --------------------------------------------------
-TOTAL                           1727    521    70%
+TOTAL                           1734    526    70%
 
 
-=========================== 9 passed in 1.46 seconds ===========================
+=========================== 9 passed in 1.65 seconds ===========================

@@ -295,3 +295,14 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
             )
         self.ops.append(op)
         return self
+
+
+def wrap_pipeline(ops):
+    return ops.apply(Locum())
+
+
+def wrap_ops(*args):
+    r = Locum()
+    for s in args:
+        s.apply(r)
+    return r
