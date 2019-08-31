@@ -39,9 +39,9 @@ class Extend(data_algebra.pipe.PipeStep):
         self.reverse = reverse
 
     def apply(self, other):
-        if not isinstance(other, data_algebra.data_ops.ViewRepresentation):
+        if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
             raise Exception(
-                "expected other to be a data_algebra.dat_ops.ViewRepresentation"
+                "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
         return other.extend(
             ops=self._ops,
@@ -64,9 +64,9 @@ class Project(data_algebra.pipe.PipeStep):
         self.reverse = reverse
 
     def apply(self, other):
-        if not isinstance(other, data_algebra.data_ops.ViewRepresentation):
+        if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
             raise Exception(
-                "expected other to be a data_algebra.dat_ops.ViewRepresentation"
+                "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
         return other.project(
             ops=self._ops,
@@ -87,9 +87,9 @@ class SelectRows(data_algebra.pipe.PipeStep):
         self.expr = expr
 
     def apply(self, other):
-        if not isinstance(other, data_algebra.data_ops.ViewRepresentation):
+        if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
             raise Exception(
-                "expected other to be a data_algebra.dat_ops.ViewRepresentation"
+                "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
         return other.select_rows(expr=self.expr)
 
@@ -106,9 +106,9 @@ class SelectColumns(data_algebra.pipe.PipeStep):
         data_algebra.pipe.PipeStep.__init__(self, name="SelectColumns")
 
     def apply(self, other):
-        if not isinstance(other, data_algebra.data_ops.ViewRepresentation):
+        if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
             raise Exception(
-                "expected other to be a data_algebra.dat_ops.ViewRepresentation"
+                "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
         return other.select_columns(self.column_selection)
 
@@ -125,9 +125,9 @@ class DropColumns(data_algebra.pipe.PipeStep):
         data_algebra.pipe.PipeStep.__init__(self, name="DropColumns")
 
     def apply(self, other):
-        if not isinstance(other, data_algebra.data_ops.ViewRepresentation):
+        if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
             raise Exception(
-                "expected other to be a data_algebra.dat_ops.ViewRepresentation"
+                "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
         return other.drop_columns(self.column_deletions)
 
@@ -148,9 +148,9 @@ class OrderRows(data_algebra.pipe.PipeStep):
         data_algebra.pipe.PipeStep.__init__(self, name="OrderRows")
 
     def apply(self, other):
-        if not isinstance(other, data_algebra.data_ops.ViewRepresentation):
+        if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
             raise Exception(
-                "expected other to be a data_algebra.dat_ops.ViewRepresentation"
+                "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
         return other.order_rows(
             columns=self.order_columns, reverse=self.reverse, limit=self.limit
@@ -168,9 +168,9 @@ class RenameColumns(data_algebra.pipe.PipeStep):
         data_algebra.pipe.PipeStep.__init__(self, name="RenameColumns")
 
     def apply(self, other):
-        if not isinstance(other, data_algebra.data_ops.ViewRepresentation):
+        if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
             raise Exception(
-                "expected other to be a data_algebra.dat_ops.ViewRepresentation"
+                "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
         return other.rename_columns(column_remapping=self.column_remapping)
 
@@ -181,17 +181,17 @@ class NaturalJoin(data_algebra.pipe.PipeStep):
     _b: data_algebra.data_ops.OperatorPlatform
 
     def __init__(self, *, b=None, by=None, jointype="INNER"):
-        if not isinstance(b, data_algebra.data_ops.ViewRepresentation):
-            raise Exception("b should be a data_algebra.data_ops.ViewRepresentation")
+        if not isinstance(b, data_algebra.data_ops.OperatorPlatform):
+            raise Exception("b should be a data_algebra.data_ops.OperatorPlatform")
         self._by = by
         self._jointype = jointype
         self._b = b
         data_algebra.pipe.PipeStep.__init__(self, name="NaturalJoin")
 
     def apply(self, other):
-        if not isinstance(other, data_algebra.data_ops.ViewRepresentation):
+        if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
             raise Exception(
-                "expected other to be a data_algebra.dat_ops.ViewRepresentation"
+                "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
         return other.natural_join(b=self._b, by=self._by, jointype=self._jointype)
 
@@ -228,6 +228,11 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
             pipeline = self.realize(X)
             return pipeline.transform(X)
         raise Exception("can not apply transform() to type " + str(type(X)))
+
+    def __rrshift__(self, other):  # override other >> self
+        if not isinstance(other, pandas.DataFrame):
+            raise Exception("other should be a pandas.DataFrame")
+        return self.transform(other)
 
     # implement method chaining collection of pending operations
 

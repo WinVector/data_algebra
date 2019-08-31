@@ -195,6 +195,11 @@ class ViewRepresentation(OperatorPlatform):
         """
         raise Exception("base method called")
 
+    def __rrshift__(self, other):  # override other >> self
+        if not isinstance(other, pandas.DataFrame):
+            raise Exception("other should be a pandas.DataFrame")
+        return self.transform(other)
+
     # implement builders for all non-initial node types on base class
 
     # noinspection PyPep8Naming

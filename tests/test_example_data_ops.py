@@ -24,8 +24,9 @@ def test_example_data_ops_extend():
         ]
 
         ops = ops + [
-            TableDescription('d', ['x', 'y']).
-                extend({'z': '1/q + x'})
+            TableDescription('d', ['x', 'y']) >>
+                Extend({'z': '1/q + x'}) >>
+                SelectColumns(['y', 'z'])
         ]
 
         ops = ops + [
