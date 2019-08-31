@@ -1,5 +1,7 @@
 from typing import Dict, List
 
+import pandas
+
 import data_algebra.pipe
 import data_algebra.data_ops
 import data_algebra.expr_rep
@@ -176,26 +178,15 @@ class RenameColumns(data_algebra.pipe.PipeStep):
 class NaturalJoin(data_algebra.pipe.PipeStep):
     _by: List[str]
     _jointype: str
-    _b: data_algebra.data_ops.ViewRepresentation
+    _b: data_algebra.data_ops.OperatorPlatform
 
     def __init__(self, *, b=None, by=None, jointype="INNER"):
         if not isinstance(b, data_algebra.data_ops.ViewRepresentation):
-            raise Exception("b should be a ViewRepresentation")
-        missing1 = set(by) - b.column_set
-        if len(missing1) > 0:
-            raise Exception("all by-columns must be in b-table")
-        data_algebra.pipe.PipeStep.__init__(self, name="NaturalJoin")
-        if isinstance(by, str):
-            by = [by]
-        by_set = set(by)
-        if len(by) != len(by_set):
-            raise Exception("duplicate column names in by")
-        missing_right = by_set - b.column_set
-        if len(missing_right) > 0:
-            raise Exception("right table missing join keys: " + str(missing_right))
+            raise Exception("b should be a data_algebra.data_ops.ViewRepresentation")
         self._by = by
         self._jointype = jointype
         self._b = b
+        data_algebra.pipe.PipeStep.__init__(self, name="NaturalJoin")
 
     def apply(self, other):
         if not isinstance(other, data_algebra.data_ops.ViewRepresentation):
@@ -203,3 +194,89 @@ class NaturalJoin(data_algebra.pipe.PipeStep):
                 "expected other to be a data_algebra.dat_ops.ViewRepresentation"
             )
         return other.natural_join(b=self._b, by=self._by, jointype=self._jointype)
+
+
+class Locum(data_algebra.data_ops.OperatorPlatform):
+    """Class to represent future opertions."""
+
+    def __init__(self):
+        data_algebra.data_ops.OperatorPlatform.__init__(self)
+        self.ops = []
+
+    def realize(self, X):
+        if isinstance(X, pandas.DataFrame):
+            pipeline = X
+            for s in self.ops:
+                pipeline = X >> s
+            return pipeline
+        raise Exception("can not apply realize() to type " + str(type(X)))
+
+    # noinspection PyPep8Naming
+    def transform(self, X):
+        if isinstance(X, pandas.DataFrame):
+            tbl = data_algebra.data_ops.describe_pandas_table(X, table_name="X")
+            pipeline = self.realize(X)
+            return pipeline.transform(X)
+        raise Exception("can not apply transform() to type " + str(type(X)))
+
+    # implement method chaining collection of pending operations
+
+    def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
+        op = Extend(
+                ops=ops,
+                partition_by=partition_by,
+                order_by=order_by,
+                reverse=reverse,
+            )
+        self.ops.append(op)
+        return self
+
+    def project(self, ops, *, group_by=None, order_by=None, reverse=None):
+        op = Project(
+                ops=ops,
+                group_by=group_by,
+                order_by=order_by,
+                reverse=reverse,
+            )
+        self.ops.append(op)
+        return self
+
+    def natural_join(self, b, *, by=None, jointype="INNER"):
+        op = NaturalJoin(
+                by=by,
+                jointype=jointype,
+                b=b,
+        )
+        self.ops.append(op)
+        return self
+
+    def select_rows(self, expr):
+        op = SelectRows(expr=expr)
+        self.ops.append(op)
+        return self
+
+    def drop_columns(self, column_deletions):
+        op = DropColumns(
+                column_deletions=column_deletions
+            )
+        self.ops.append(op)
+        return self
+
+    def select_columns(self, columns):
+        op = SelectColumns(columns=columns)
+        self.ops.append(op)
+        return self
+
+    def rename_columns(self, column_remapping):
+        op = RenameColumns(
+                column_remapping=column_remapping
+            )
+        self.ops.append(op)
+        return self
+
+    def order_rows(self, columns, *, reverse=None, limit=None):
+        op = OrderRows(
+                columns=columns, reverse=reverse, limit=limit
+            )
+        self.ops.append(op)
+        return self

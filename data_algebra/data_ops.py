@@ -6,7 +6,6 @@ import pandas
 import data_algebra.expr_rep
 import data_algebra.pipe
 import data_algebra.env
-import data_algebra.pending_eval
 
 have_black = False
 try:
@@ -27,7 +26,44 @@ except ImportError:
     pass
 
 
-class ViewRepresentation(data_algebra.pipe.PipeValue):
+class OperatorPlatform(data_algebra.pipe.PipeValue):
+    """Abstract class representing ability to apply data_algebra operations."""
+
+    def __init__(self):
+        data_algebra.pipe.PipeValue.__init__(self)
+
+    # define builders for all non-initial node types on base class
+
+    # noinspection PyPep8Naming
+    def transform(self, X):
+        raise Exception("base class called")
+
+    def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
+        raise Exception("base class called")
+
+    def project(self, ops, *, group_by=None, order_by=None, reverse=None):
+        raise Exception("base class called")
+
+    def natural_join(self, b, *, by=None, jointype="INNER"):
+        raise Exception("base class called")
+
+    def select_rows(self, expr):
+        raise Exception("base class called")
+
+    def drop_columns(self, column_deletions):
+        raise Exception("base class called")
+
+    def select_columns(self, columns):
+        raise Exception("base class called")
+
+    def rename_columns(self, column_remapping):
+        raise Exception("base class called")
+
+    def order_rows(self, columns, *, reverse=None, limit=None):
+        raise Exception("base class called")
+
+
+class ViewRepresentation(OperatorPlatform):
     """Structure to represent the columns of a query or a table.
        Abstract base class."""
 
@@ -57,7 +93,7 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
             if not isinstance(si, ViewRepresentation):
                 raise Exception("all sources must be of class ViewRepresentation")
         self.sources = [si for si in sources]
-        data_algebra.pipe.PipeValue.__init__(self)
+        OperatorPlatform.__init__(self)
 
     # characterization
 
@@ -154,7 +190,17 @@ class ViewRepresentation(data_algebra.pipe.PipeValue):
         """
         raise Exception("base method called")
 
-    # define builders for all non-leaf node types on base class
+    # implement builders for all non-initial node types on base class
+
+    # noinspection PyPep8Naming
+    def transform(self, X):
+        if isinstance(X, pandas.DataFrame):
+            tables = self.get_tables()
+            if len(tables) != 1:
+                raise Exception("transfrom(pandas.DataFrame) can only be applied to ops-dags with only one table def")
+            k = [k for k in tables.keys()][0]
+            return self.eval_pandas({k: X})
+        raise Exception("can not apply transform() to type " + str(type(X)))
 
     def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
         return ExtendNode(
