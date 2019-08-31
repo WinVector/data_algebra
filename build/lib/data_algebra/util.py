@@ -22,11 +22,9 @@ def can_convert_v_to_numeric(x):
 # for testing
 
 
-def equivalent_frames(a, b,
-                      *,
-                      float_tol=1e-8,
-                      check_column_order=False,
-                      check_row_order=False):
+def equivalent_frames(
+    a, b, *, float_tol=1e-8, check_column_order=False, check_row_order=False
+):
     """return False if the frames are equivalent (up to column re-ordering and possible row-reordering).
     Ignores indexing."""
     if not isinstance(a, pandas.DataFrame):
@@ -47,7 +45,9 @@ def equivalent_frames(a, b,
     else:
         b = b[cols]
     for i in range(a.shape[0]):
-        if can_convert_v_to_numeric(a.iloc[:, i]) != can_convert_v_to_numeric(b.iloc[:, i]):
+        if can_convert_v_to_numeric(a.iloc[:, i]) != can_convert_v_to_numeric(
+            b.iloc[:, i]
+        ):
             return False
     a = a.reset_index(inplace=False, drop=True)
     b = b.reset_index(inplace=False, drop=True)

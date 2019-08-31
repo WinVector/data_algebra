@@ -51,12 +51,12 @@ class Term:
     def to_R(self, *, want_inline_parens=False):
         return self.to_pandas(want_inline_parens=want_inline_parens)
 
-    def to_source(self, *, want_inline_parens=False, dialect='Python'):
-        if dialect == 'Python':
+    def to_source(self, *, want_inline_parens=False, dialect="Python"):
+        if dialect == "Python":
             return self.to_python(want_inline_parens=want_inline_parens)
-        elif dialect == 'Pandas':
+        elif dialect == "Pandas":
             return self.to_pandas(want_inline_parens=want_inline_parens)
-        elif dialect == 'R':
+        elif dialect == "R":
             return self.to_R(want_inline_parens=want_inline_parens)
         else:
             raise Exception("unexpected dialect string: " + str(dialect))
@@ -356,7 +356,7 @@ class Expression(Term):
             return self.op + "()"
         if len(self.args) == 1:
             return (
-                    self.op + "(" + self.args[0].to_pandas(want_inline_parens=False) + ")"
+                self.op + "(" + self.args[0].to_pandas(want_inline_parens=False) + ")"
             )
         subs = [ai.to_pandas(want_inline_parens=True) for ai in self.args]
         if len(subs) == 2 and self.inline:
@@ -418,11 +418,13 @@ def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
         if not isinstance(v, Term):
             failue = False
             try:
-                v = _eval_by_parse(source_str=v, data_def=mp, outter_environemnt=sub_env)
+                v = _eval_by_parse(
+                    source_str=v, data_def=mp, outter_environemnt=sub_env
+                )
             except Exception:
                 failue = True
             if failue:
-               raise Exception("parse failed on " + k + " = " + ov)
+                raise Exception("parse failed on " + k + " = " + ov)
         newops[k] = v
         used_here = set()
         v.get_column_names(used_here)

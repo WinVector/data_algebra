@@ -1,4 +1,3 @@
-
 from typing import Dict, List
 
 import data_algebra.pipe

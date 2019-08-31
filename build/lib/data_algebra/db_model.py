@@ -56,8 +56,9 @@ class DBModel:
             raise Exception(
                 "Expected table_description to be a data_algebra.data_ops.TableDescription)"
             )
-        return self.build_qualified_table_name(table_description.table_name,
-                                               qualifiers=table_description.qualifiers)
+        return self.build_qualified_table_name(
+            table_description.table_name, qualifiers=table_description.qualifiers
+        )
 
     def quote_string(self, string):
         if not isinstance(string, str):
@@ -224,11 +225,13 @@ class DBModel:
         )
         if len(project_node.group_by) > 0:
             group_terms = [self.quote_identifier(c) for c in project_node.group_by]
-            sql_str = sql_str + " GROUP BY " + ', '.join(group_terms)
+            sql_str = sql_str + " GROUP BY " + ", ".join(group_terms)
         if len(project_node.order_by) > 0:
-            order_terms = [self.quote_identifier(c) + " DESC" if c in project_node.reverse else "" for
-                           c in project_node.order_by]
-            sql_str = sql_str + " ORDER BY " + ', '.join(order_terms)
+            order_terms = [
+                self.quote_identifier(c) + " DESC" if c in project_node.reverse else ""
+                for c in project_node.order_by
+            ]
+            sql_str = sql_str + " ORDER BY " + ", ".join(order_terms)
         return sql_str
 
     def select_rows_to_sql(self, select_rows_node, *, using=None, temp_id_source=None):
@@ -287,7 +290,9 @@ class DBModel:
         )
         return sql_str
 
-    def drop_columns_to_sql(self, drop_columns_node, *, using=None, temp_id_source=None):
+    def drop_columns_to_sql(
+        self, drop_columns_node, *, using=None, temp_id_source=None
+    ):
         if not isinstance(drop_columns_node, data_algebra.data_ops.DropColumnsNode):
             raise Exception(
                 "Expected drop_columns_node to be a data_algebra.data_ops.DropColumnsNode)"
@@ -305,12 +310,12 @@ class DBModel:
         sub_view_name = "SQ_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         sql_str = (
-                "SELECT "
-                + ", ".join([self.quote_identifier(ci) for ci in subusing])
-                + " FROM ( "
-                + subsql
-                + " ) "
-                + self.quote_identifier(sub_view_name)
+            "SELECT "
+            + ", ".join([self.quote_identifier(ci) for ci in subusing])
+            + " FROM ( "
+            + subsql
+            + " ) "
+            + self.quote_identifier(sub_view_name)
         )
         return sql_str
 
@@ -465,7 +470,11 @@ class DBModel:
         cr = [
             d.columns[i].lower()
             + " "
-            + ("double precision" if data_algebra.util.can_convert_v_to_numeric(d[d.columns[i]]) else "VARCHAR")
+            + (
+                "double precision"
+                if data_algebra.util.can_convert_v_to_numeric(d[d.columns[i]])
+                else "VARCHAR"
+            )
             for i in range(d.shape[1])
         ]
         create_stmt = "CREATE TABLE " + table_name + " ( " + ", ".join(cr) + " )"
@@ -496,8 +505,9 @@ class DBModel:
     def read_table(self, conn, table_name, *, qualifiers=None, limit=None):
         if not isinstance(table_name, str):
             raise Exception("Expect table_name to be a str")
-        q_table_name = self.build_qualified_table_name(table_name,
-                                                       qualifiers=qualifiers)
+        q_table_name = self.build_qualified_table_name(
+            table_name, qualifiers=qualifiers
+        )
         sql = "SELECT * FROM " + q_table_name
         if limit is not None:
             sql = sql + " LIMIT " + limit
@@ -505,16 +515,19 @@ class DBModel:
 
     def read(self, conn, table):
         if not isinstance(table, data_algebra.data_ops.TableDescription):
-            raise Exception("Expect table to be a data_algebra.data_ops.TableDescription")
-        return self.read_table(conn=conn,
-                               table_name=table.table_name,
-                               qualifiers=table.qualifiers)
+            raise Exception(
+                "Expect table to be a data_algebra.data_ops.TableDescription"
+            )
+        return self.read_table(
+            conn=conn, table_name=table.table_name, qualifiers=table.qualifiers
+        )
 
     def table_description(self, conn, table_name, *, qualifiers=None):
-        example = self.read_table(conn=conn,
-                                  table_name=table_name,
-                                  qualifiers=qualifiers,
-                                  limit=1)
-        return data_algebra.data_ops.TableDescription(table_name=table_name,
-                                                      column_names=[c for c in example.columns],
-                                                      qualifiers=qualifiers)
+        example = self.read_table(
+            conn=conn, table_name=table_name, qualifiers=qualifiers, limit=1
+        )
+        return data_algebra.data_ops.TableDescription(
+            table_name=table_name,
+            column_names=[c for c in example.columns],
+            qualifiers=qualifiers,
+        )

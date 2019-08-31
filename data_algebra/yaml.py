@@ -17,6 +17,7 @@ except ImportError:
 #    https://stackoverflow.com/questions/2627555/how-to-deserialize-an-object-with-pyyaml-using-safe-load
 #    https://stackoverflow.com/a/21912744/6901725
 
+
 def fix_ordered_dict_yaml_rep():
     """Writer OrderedDict as simple structure"""
     # derived from: https://stackoverflow.com/a/16782282/6901725
@@ -87,7 +88,9 @@ def to_pipeline(obj, *, known_tables=None):
         elif op == "SelectColumns":
             return data_algebra.data_pipe.SelectColumns(columns=obj["columns"])
         elif op == "DropColumns":
-            return data_algebra.data_pipe.DropColumns(column_deletions=obj["column_deletions"])
+            return data_algebra.data_pipe.DropColumns(
+                column_deletions=obj["column_deletions"]
+            )
         elif op == "Rename":
             return data_algebra.data_pipe.RenameColumns(
                 column_remapping=obj["column_remapping"]
