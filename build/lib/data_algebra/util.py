@@ -23,7 +23,10 @@ def can_convert_v_to_numeric(x):
 
 
 def equivalent_frames(
-    a, b, *, float_tol=1e-8, check_column_order=False, check_row_order=False
+    a, b, *, float_tol=1e-8,
+        check_column_order=False,
+        cols_case_sensitive=False,
+        check_row_order=False
 ):
     """return False if the frames are equivalent (up to column re-ordering and possible row-reordering).
     Ignores indexing."""
@@ -35,26 +38,33 @@ def equivalent_frames(
         return False
     if a.shape[1] < 1:
         return True
-    cols = [c for c in a.columns]
+    a = a.reset_index(inplace=False, drop=True)
+    b = b.reset_index(inplace=False, drop=True)
+    if not cols_case_sensitive:
+        a.columns = [c.lower() for c in a.columns]
+        a.reset_index(inplace=True, drop=True)
+        b.columns = [c.lower() for c in b.columns]
+        b.reset_index(inplace=True, drop=True)
+    acols = [c for c in a.columns]
     bcols = [c for c in b.columns]
-    if set(cols) != set(bcols):
+    if set(acols) != set(bcols):
         return False
     if check_column_order:
         if not all([a.columns[i] == b.columns[i] for i in range(a.shape[0])]):
             return False
     else:
-        b = b[cols]
+        # re-order b into a's column order
+        b = b[acols]
+        b.reset_index(inplace=True, drop=True)
     for j in range(a.shape[1]):
         if can_convert_v_to_numeric(a.iloc[:, j]) != can_convert_v_to_numeric(
             b.iloc[:, j]
         ):
             return False
-    a = a.reset_index(inplace=False, drop=True)
-    b = b.reset_index(inplace=False, drop=True)
     if not check_row_order:
-        a = a.sort_values(by=cols, inplace=False)
+        a = a.sort_values(by=acols, inplace=False)
         a = a.reset_index(inplace=False, drop=True)
-        b = b.sort_values(by=cols, inplace=False)
+        b = b.sort_values(by=acols, inplace=False)
         b = b.reset_index(inplace=False, drop=True)
     for j in range(a.shape[1]):
         ca = a.iloc[:, j]

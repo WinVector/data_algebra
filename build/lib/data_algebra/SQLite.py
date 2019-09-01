@@ -35,19 +35,6 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         qt = self.quote_identifier(table_description.table_name)
         return qt
 
-    def extend_to_sql(self, extend_node, *, using=None, temp_id_source=None):
-        if not isinstance(extend_node, data_algebra.data_ops.ExtendNode):
-            raise Exception(
-                "Expected extend_node to be a data_algebra.data_ops.ExtendNode)"
-            )
-        if (len(extend_node.partition_by) > 0) or (len(extend_node.order_by) > 0):
-            raise Exception(
-                "SQLite adapter doesn't currently support window functions for partition_by or order_by"
-            )
-        return data_algebra.db_model.DBModel.extend_to_sql(
-            self, extend_node=extend_node, using=using, temp_id_source=temp_id_source
-        )
-
     # noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection
     def insert_table(self, conn, d, table_name):
         """

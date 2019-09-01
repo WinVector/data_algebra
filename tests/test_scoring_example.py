@@ -1,11 +1,15 @@
-
+import math
+import sqlite3
 import pandas         # https://pandas.pydata.org
 import yaml           # https://pyyaml.org
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 import data_algebra.env
 import data_algebra.yaml
 import data_algebra.PostgreSQL
+import data_algebra.SQLite
 import data_algebra.util
+
+# https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/ScoringExample.ipynb
 
 def test_scoring_example():
     # set some things in our environment
@@ -20,8 +24,6 @@ def test_scoring_example():
         'irrelevantCol1': ['irrel1'] * 4,
         'irrelevantCol2': ['irrel2'] * 4,
     })
-
-    db_model = data_algebra.PostgreSQL.PostgreSQLModel()
 
     scale = 0.237
 
@@ -50,7 +52,7 @@ def test_scoring_example():
     py_source = ops.to_python(strict=True, pretty=False)
     py_sourcep = ops.to_python(strict=True, pretty=True)
 
-    sql = ops.to_sql(db_model, pretty=True)
+
 
     # Pandas calculate
     res = ops.eval_pandas({'d': d_local})
@@ -70,3 +72,24 @@ def test_scoring_example():
     py_sourceb = ops_back.to_python(strict=True, pretty=False)
     assert py_source == py_sourceb
 
+    # test database aspects
+
+    db_model_p = data_algebra.PostgreSQL.PostgreSQLModel()
+    db_model_s = data_algebra.SQLite.SQLiteModel()
+
+    sql_p = ops.to_sql(db_model_p, pretty=True)
+    sql_s = ops.to_sql(db_model_p, pretty=True)
+
+    conn = sqlite3.connect(':memory:')
+    # https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.create_function
+    conn.create_function("exp", 1, math.exp)
+
+    db_model_s.insert_table(conn, d_local, 'd')
+    back = db_model_s.read_table(conn, 'd')
+
+    res_sql = db_model_s.read_query(conn, sql_s)
+
+    assert data_algebra.util.equivalent_frames(expect, res_sql, float_tol=1e-3)
+
+    # be neat
+    conn.close()
