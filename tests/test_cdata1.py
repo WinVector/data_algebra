@@ -40,9 +40,11 @@ def test_cdata1():
     """))
     iris_blocks_orig = pandas.read_csv(buf)
 
+    iris_blocks = iris_blocks_orig.copy()
     iris = iris_orig.copy()
 
     waste_str = str(iris)
+
     # %%
 
     # from:
@@ -77,7 +79,7 @@ def test_cdata1():
     conn = sqlite3.connect(':memory:')
 
     sql = db_model.row_recs_to_blocks_query(source_table, record_spec, temp_table)
-    #print(sql)
+    waste_str = str(sql)
 
     # %%
 
@@ -97,13 +99,13 @@ def test_cdata1():
     )
 
     sql_back = db_model.blocks_to_row_recs_query(source_table2, record_spec)
-    #print(sql_back)
+    waste_str = str(sql_back)
 
     # %%
 
     res_rows = db_model.read_query(conn, sql_back)
     assert data_algebra.util.equivalent_frames(res_rows, iris_orig)
-    #res_rows
+    waste_str = str(res_rows)
 
     # %%
 
@@ -111,28 +113,28 @@ def test_cdata1():
 
     # %%
 
-    #iris
+    waste_str = str(iris)
 
     # %%
 
-    mp_to_blocks = data_algebra.cdata.RecordMap(blocks_in=record_spec)
+    mp_to_blocks = data_algebra.cdata.RecordMap(blocks_out=record_spec)
     waste_str = str(mp_to_blocks)
     arranged_blocks = mp_to_blocks.transform(iris)
     assert data_algebra.util.equivalent_frames(arranged_blocks, iris_blocks_orig)
-    #arranged_blocks
+    arranged_blocks
 
     # %%
 
-    mp_to_rows = data_algebra.cdata.RecordMap(blocks_out=record_spec)
+    mp_to_rows = data_algebra.cdata.RecordMap(blocks_in=record_spec)
     waste_str = str(mp_to_rows)
     arranged_rows = mp_to_rows.transform(arranged_blocks)
     assert data_algebra.util.equivalent_frames(arranged_rows, iris_orig)
-    #arranged_rows
+    arranged_rows
 
     # %%
 
     mp_to_and_back = data_algebra.cdata.RecordMap(blocks_in=record_spec, blocks_out=record_spec)
     waste_str = str(mp_to_and_back)
-    arranged_self = mp_to_and_back.transform(iris)
-    assert data_algebra.util.equivalent_frames(arranged_self, iris_orig)
-    #arranged_self
+    arranged_self = mp_to_and_back.transform(iris_blocks)
+    assert data_algebra.util.equivalent_frames(arranged_self, iris_blocks_orig)
+    arranged_self
