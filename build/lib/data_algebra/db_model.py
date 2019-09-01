@@ -512,7 +512,9 @@ class DBModel:
         cur.execute(q)
         r = cur.fetchall()
         colnames = [desc[0] for desc in cur.description]
-        return pandas.DataFrame(columns=colnames, data=r)
+        r = pandas.DataFrame(columns=colnames, data=r)
+        r.reset_index(inplace=True, drop=True)
+        return r
 
     # noinspection PyMethodMayBeStatic
     def read_table(self, conn, table_name, *, qualifiers=None, limit=None):
