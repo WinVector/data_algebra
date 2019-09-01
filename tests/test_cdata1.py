@@ -3,6 +3,7 @@ import io
 import sqlite3
 import pandas
 import data_algebra.cdata
+import data_algebra.cdata_impl
 import data_algebra.SQLite
 from data_algebra.data_ops import *
 from data_algebra.data_pipe import *
@@ -117,7 +118,7 @@ def test_cdata1():
 
     # %%
 
-    mp_to_blocks = data_algebra.cdata.RecordMap(blocks_out=record_spec)
+    mp_to_blocks = data_algebra.cdata_impl.RecordMap(blocks_out=record_spec)
     waste_str = str(mp_to_blocks)
     arranged_blocks = mp_to_blocks.transform(iris)
     assert data_algebra.util.equivalent_frames(arranged_blocks, iris_blocks_orig)
@@ -125,7 +126,7 @@ def test_cdata1():
 
     # %%
 
-    mp_to_rows = data_algebra.cdata.RecordMap(blocks_in=record_spec)
+    mp_to_rows = data_algebra.cdata_impl.RecordMap(blocks_in=record_spec)
     waste_str = str(mp_to_rows)
     arranged_rows = mp_to_rows.transform(arranged_blocks)
     assert data_algebra.util.equivalent_frames(arranged_rows, iris_orig)
@@ -133,7 +134,7 @@ def test_cdata1():
 
     # %%
 
-    mp_to_and_back = data_algebra.cdata.RecordMap(blocks_in=record_spec, blocks_out=record_spec)
+    mp_to_and_back = data_algebra.cdata_impl.RecordMap(blocks_in=record_spec, blocks_out=record_spec)
     waste_str = str(mp_to_and_back)
     arranged_self = mp_to_and_back.transform(iris_blocks)
     assert data_algebra.util.equivalent_frames(arranged_self, iris_blocks_orig)

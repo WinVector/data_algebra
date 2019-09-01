@@ -20,10 +20,11 @@ Name                           Stmts   Miss  Cover
 data_algebra/PostgreSQL.py        19      4    79%
 data_algebra/SQLite.py            29      5    83%
 data_algebra/__init__.py           5      0   100%
-data_algebra/cdata.py             80     10    88%
+data_algebra/cdata.py             30      4    87%
+data_algebra/cdata_impl.py        53      6    89%
 data_algebra/data_ops.py         674    117    83%
 data_algebra/data_pipe.py        158     33    79%
-data_algebra/db_model.py         334     77    77%
+data_algebra/db_model.py         333     77    77%
 data_algebra/env.py               54     12    78%
 data_algebra/expr_rep.py         293     93    68%
 data_algebra/pending_eval.py      34     34     0%
@@ -31,7 +32,7 @@ data_algebra/pipe.py              65     19    71%
 data_algebra/util.py              63      5    92%
 data_algebra/yaml.py              73      9    88%
 --------------------------------------------------
-TOTAL                           1881    418    78%
+TOTAL                           1883    418    78%
 
 
-========================== 12 passed in 2.17 seconds ===========================
+========================== 12 passed in 2.12 seconds ===========================
