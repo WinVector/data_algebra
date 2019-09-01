@@ -24,7 +24,7 @@ class RecordSpecification:
             control_table_keys = [control_table.columns[0]]
         self.control_table_keys = [k for k in control_table_keys]
 
-    def __repr__(self):
+    def fmt(self):
         s = (
                 'RecordSpecification\n'
                 + '   record_keys: ' + str(self.record_keys) + '\n'
@@ -34,15 +34,11 @@ class RecordSpecification:
         )
         return s
 
+    def __repr__(self):
+        return self.fmt()
+
     def __str__(self):
-        s = (
-                'RecordSpecification\n'
-                + '   record_keys: ' + str(self.record_keys) + '\n'
-                + '   control_table_keys: ' + str(self.control_table_keys) + '\n'
-                + '   control_table:\n'
-                + '   ' + re.sub('\n', '\n   ', str(self.control_table))
-        )
-        return s
+        return self.fmt()
 
 
 class RecordMap:
@@ -82,3 +78,14 @@ class RecordMap:
                 to_blocks_sql = db_model.blocks_to_row_recs_query(x_descr, self.blocks_out)
                 X = db_model.read_query(conn, to_blocks_sql)
         return X
+
+    def fmt(self):
+        if (self.blocks_in is None) and (self.blocks_out is None):
+            return 'RecordMap(no-op)'
+        return str(type(self))
+
+    def __repr__(self):
+        return self.fmt()
+
+    def __str__(self):
+        return self.fmt()
