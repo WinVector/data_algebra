@@ -270,7 +270,7 @@ class TableDescription(ViewRepresentation):
         if (table_name is not None) and (not isinstance(table_name, str)):
             raise Exception("table_name must be a string")
         self.table_name = table_name
-        self.column_names = column_names.copy()
+        self.column_names = [c for c in column_names]
         if qualifiers is None:
             qualifiers = {}
         if not isinstance(qualifiers, dict):
@@ -1047,7 +1047,7 @@ class NaturalJoinNode(ViewRepresentation):
         )
         res.reset_index(inplace=True, drop=True)
         for c in common_cols:
-            if not c in self.by:
+            if c not in self.by:
                 is_null = res[c].isnull()
                 res[c][is_null] = res[c + '_tmp_right_col']
                 res.drop(c + '_tmp_right_col', axis=1, inplace=True)

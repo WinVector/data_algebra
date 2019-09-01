@@ -3,6 +3,7 @@ setup.py
 data_algebra/PostgreSQL.py
 data_algebra/SQLite.py
 data_algebra/__init__.py
+data_algebra/cdata.py
 data_algebra/data_ops.py
 data_algebra/data_pipe.py
 data_algebra/db_model.py

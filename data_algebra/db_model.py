@@ -8,7 +8,7 @@ import data_algebra.expr_rep
 import data_algebra.data_ops
 import data_algebra.util
 import data_algebra.data_ops
-
+import data_algebra.cdata
 
 class DBModel:
     """A model of how SQL should be generated for a given database.
@@ -441,7 +441,7 @@ class DBModel:
             + [self.quote_identifier(ci) for ci in using_right - common]
         )
         on_terms = ''
-        if len(join_node.by)>0:
+        if len(join_node.by) > 0:
             on_terms =  (
                     ' ON ' + ', '.join([self.quote_identifier(sub_view_name_left) + '.' + self.quote_identifier(c)
                        + " = "
@@ -544,3 +544,27 @@ class DBModel:
             column_names=[c for c in example.columns],
             qualifiers=qualifiers,
         )
+
+    def row_recs_to_blocks_query(self, source_table, record_spec, temp_table):
+        if not isinstance(source_table, data_algebra.data_ops.TableDescription):
+            raise Exception("source_table should be a data_algebra.data_ops.TableDescription")
+        if not isinstance(record_spec, data_algebra.cdata.RecordSpecification):
+            raise Exception("record_spec should be a data_algebra.cdata.RecordSpecification")
+        if not isinstance(temp_table, data_algebra.data_ops.TableDescription):
+            raise Exception("temp_table should be a data_algebra.data_ops.TableDescription")
+        control_value_cols = [c for c in record_spec.control_table.columns if c not in record_spec.control_table_keys]
+        sql = 'SELECT\n'
+        for c in record_spec.record_keys:
+            sql = sql + ' a.' + self.quote_identifier(c) + ' AS ' + self.quote_identifier(c) + ',\n'
+        for key_col in record_spec.control_table_keys:
+            sql = sql + ' b.' + self.quote_identifier(key_col) + ' AS ' + self.quote_identifier(key_col) + ',\n'
+        for result_col in control_value_cols:
+            sql = sql + ' CASE\n'
+            for source_col in record_spec.control_table[result_col]:
+                col_sql = ('  WHEN b.' + self.quote_identifier(result_col) + ' = ' + self.quote_string(source_col)
+                            + ' THEN a.' + self.quote_identifier(source_col) + '\n')
+                sql = sql + col_sql
+            sql = sql + ' ELSE NULL END AS ' + self.quote_identifier(result_col) + ",\n"
+        sql = sql +  ( ' FROM ' + self.quote_table_name(source_table)
+                + ' a CROSS JOIN ' + self.quote_table_name(temp_table) + ' b' + '\n')
+        return sql
