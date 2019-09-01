@@ -1,0 +1,13 @@
+id,Species,Part,Measure,Value
+0,setosa,Petal,Length,1.4
+0,setosa,Petal,Width,0.2
+0,setosa,Sepal,Length,5.1
+0,setosa,Sepal,Width,3.5
+1,setosa,Petal,Length,1.4
+1,setosa,Petal,Width,0.2
+1,setosa,Sepal,Length,4.9
+1,setosa,Sepal,Width,3.0
+2,setosa,Petal,Length,1.3
+2,setosa,Petal,Width,0.2
+2,setosa,Sepal,Length,4.7
+2,setosa,Sepal,Width,3.2
