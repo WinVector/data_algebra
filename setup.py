@@ -21,7 +21,7 @@ Recommended packages include: Pandas, PyYAML (supplies yaml), sqlparse, and blac
 
 setuptools.setup(
     name='data_algebra',
-    version='0.1.2',
+    version='0.1.3',
     author='John Mount',
     author_email='jmount@win-vector.com',
     url='https://github.com/WinVector/data_algebra',

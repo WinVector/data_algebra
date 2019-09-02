@@ -1,6 +1,6 @@
 
 import sqlite3
-import re
+import collections
 
 import pandas
 
@@ -81,3 +81,21 @@ class RecordMap:
 
     def __str__(self):
         return self.fmt_string
+
+    def to_simple_obj(self):
+        obj = collections.OrderedDict()
+        obj['type'] = 'data_algebra.cdata_impl.RecordMap'
+        if self.blocks_in is not None:
+            obj['blocks_in'] = self.blocks_in.to_simple_obj()
+        if self.blocks_out is not None:
+            obj['blocks_out'] = self.blocks_out.to_simple_obj()
+        return obj
+
+def record_map_from_simple_obj(obj):
+    blocks_in = None
+    blocks_out = None
+    if 'blocks_in' in obj.keys():
+        blocks_in = data_algebra.cdata.record_spec_from_simple_obj(obj['blocks_in'])
+    if 'blocks_out' in obj.keys():
+        blocks_out = data_algebra.cdata.record_spec_from_simple_obj(obj['blocks_out'])
+    return RecordMap(blocks_in=blocks_in, blocks_out=blocks_out)
