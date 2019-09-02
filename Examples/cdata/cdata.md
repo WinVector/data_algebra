@@ -632,27 +632,7 @@ These queries can be seen below.
 
 ```python
 db_model = data_algebra.SQLite.SQLiteModel()
-
-print(db_model.blocks_to_row_recs_query(
-    source_view=data_algebra.data_ops.describe_pandas_table(
-        iris, 'iris'),
-    record_spec=record_spec
-))
 ```
-
-    SELECT
-     "id" AS "id",
-     "Species" AS "Species",
-     MAX(CASE WHEN  ( "Part" = 'Petal' )  AND  ( "Measure" = 'Length' )  THEN "Value" ELSE NULL END) AS "Petal.Length",
-     MAX(CASE WHEN  ( "Part" = 'Petal' )  AND  ( "Measure" = 'Width' )  THEN "Value" ELSE NULL END) AS "Petal.Width",
-     MAX(CASE WHEN  ( "Part" = 'Sepal' )  AND  ( "Measure" = 'Length' )  THEN "Value" ELSE NULL END) AS "Sepal.Length",
-     MAX(CASE WHEN  ( "Part" = 'Sepal' )  AND  ( "Measure" = 'Width' )  THEN "Value" ELSE NULL END) AS "Sepal.Width"
-    FROM (
-      "iris"
-     )
-     GROUP BY "id", "Species"
-     ORDER BY "id", "Species"
-
 
 
 ```python
@@ -684,12 +664,36 @@ print(db_model.row_recs_to_blocks_query(
 
 
 
+```python
+print(db_model.blocks_to_row_recs_query(
+    source_view=data_algebra.data_ops.describe_pandas_table(
+        iris, 'iris'),
+    record_spec=record_spec
+))
+```
+
+    SELECT
+     "id" AS "id",
+     "Species" AS "Species",
+     MAX(CASE WHEN  ( "Part" = 'Petal' )  AND  ( "Measure" = 'Length' )  THEN "Value" ELSE NULL END) AS "Petal.Length",
+     MAX(CASE WHEN  ( "Part" = 'Petal' )  AND  ( "Measure" = 'Width' )  THEN "Value" ELSE NULL END) AS "Petal.Width",
+     MAX(CASE WHEN  ( "Part" = 'Sepal' )  AND  ( "Measure" = 'Length' )  THEN "Value" ELSE NULL END) AS "Sepal.Length",
+     MAX(CASE WHEN  ( "Part" = 'Sepal' )  AND  ( "Measure" = 'Width' )  THEN "Value" ELSE NULL END) AS "Sepal.Width"
+    FROM (
+      "iris"
+     )
+     GROUP BY "id", "Species"
+     ORDER BY "id", "Species"
+
+
+The use-case for `SQL` queries is: the queries can be used to with "`CREATE TABLE table_name AS`" to materialize transform results in a database, without round-tripping the data in and out of the database.
+
 As complicated as the queries look, they actually expose some deep truths:
+
+  * The `row_recs_to_blocks_query()` is essentially a cross-join of the data to the record description.  Each combination of data row and record description row builds a new result row.
 
   * The `blocks_to_row_recs_query()` is an aggregation.  Each set of rows corresponding to a given data record is aggregated into a single result row.
   
-  * The `row_recs_to_blocks_query()` is essentially a cross-join of the data to the record description.  Each combination of data row and record description row builds a new result row.
-
   * Just about any arbitrary record shape to arbitrary record shape can be written as a transform from the first record shape to row-records (record sets that have exactly one row per record), followed by a transform from the row-records to the new format.  This transform can preserve column types as in the intermediate form each different record entry has its own column.  This is an advantage of using a "thin" intermediate form such as [RDF triples](https://en.wikipedia.org/wiki/Semantic_triple).
 
 This leads us to believe that transforming to and from single-row records are in fact fundemental operations, and

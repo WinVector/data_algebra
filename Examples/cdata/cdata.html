@@ -13952,44 +13952,9 @@ and <code>blocks_out</code> (to describe outgoing structure) at the same time.</
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">db_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">db_model</span><span class="o">.</span><span class="n">blocks_to_row_recs_query</span><span class="p">(</span>
-    <span class="n">source_view</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">describe_pandas_table</span><span class="p">(</span>
-        <span class="n">iris</span><span class="p">,</span> <span class="s1">&#39;iris&#39;</span><span class="p">),</span>
-    <span class="n">record_spec</span><span class="o">=</span><span class="n">record_spec</span>
-<span class="p">))</span>
 </pre></div>
 
     </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>SELECT
- &#34;id&#34; AS &#34;id&#34;,
- &#34;Species&#34; AS &#34;Species&#34;,
- MAX(CASE WHEN  ( &#34;Part&#34; = &#39;Petal&#39; )  AND  ( &#34;Measure&#34; = &#39;Length&#39; )  THEN &#34;Value&#34; ELSE NULL END) AS &#34;Petal.Length&#34;,
- MAX(CASE WHEN  ( &#34;Part&#34; = &#39;Petal&#39; )  AND  ( &#34;Measure&#34; = &#39;Width&#39; )  THEN &#34;Value&#34; ELSE NULL END) AS &#34;Petal.Width&#34;,
- MAX(CASE WHEN  ( &#34;Part&#34; = &#39;Sepal&#39; )  AND  ( &#34;Measure&#34; = &#39;Length&#39; )  THEN &#34;Value&#34; ELSE NULL END) AS &#34;Sepal.Length&#34;,
- MAX(CASE WHEN  ( &#34;Part&#34; = &#39;Sepal&#39; )  AND  ( &#34;Measure&#34; = &#39;Width&#39; )  THEN &#34;Value&#34; ELSE NULL END) AS &#34;Sepal.Width&#34;
-FROM (
-  &#34;iris&#34;
- )
- GROUP BY &#34;id&#34;, &#34;Species&#34;
- ORDER BY &#34;id&#34;, &#34;Species&#34;
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 
@@ -14046,14 +14011,61 @@ CROSS JOIN (
 </div>
 
 </div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">db_model</span><span class="o">.</span><span class="n">blocks_to_row_recs_query</span><span class="p">(</span>
+    <span class="n">source_view</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">describe_pandas_table</span><span class="p">(</span>
+        <span class="n">iris</span><span class="p">,</span> <span class="s1">&#39;iris&#39;</span><span class="p">),</span>
+    <span class="n">record_spec</span><span class="o">=</span><span class="n">record_spec</span>
+<span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>SELECT
+ &#34;id&#34; AS &#34;id&#34;,
+ &#34;Species&#34; AS &#34;Species&#34;,
+ MAX(CASE WHEN  ( &#34;Part&#34; = &#39;Petal&#39; )  AND  ( &#34;Measure&#34; = &#39;Length&#39; )  THEN &#34;Value&#34; ELSE NULL END) AS &#34;Petal.Length&#34;,
+ MAX(CASE WHEN  ( &#34;Part&#34; = &#39;Petal&#39; )  AND  ( &#34;Measure&#34; = &#39;Width&#39; )  THEN &#34;Value&#34; ELSE NULL END) AS &#34;Petal.Width&#34;,
+ MAX(CASE WHEN  ( &#34;Part&#34; = &#39;Sepal&#39; )  AND  ( &#34;Measure&#34; = &#39;Length&#39; )  THEN &#34;Value&#34; ELSE NULL END) AS &#34;Sepal.Length&#34;,
+ MAX(CASE WHEN  ( &#34;Part&#34; = &#39;Sepal&#39; )  AND  ( &#34;Measure&#34; = &#39;Width&#39; )  THEN &#34;Value&#34; ELSE NULL END) AS &#34;Sepal.Width&#34;
+FROM (
+  &#34;iris&#34;
+ )
+ GROUP BY &#34;id&#34;, &#34;Species&#34;
+ ORDER BY &#34;id&#34;, &#34;Species&#34;
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>The use-case for <code>SQL</code> queries is: the queries can be used to with "<code>CREATE TABLE table_name AS</code>" to materialize transform results in a database, without round-tripping the data in and out of the database.</p>
 <p>As complicated as the queries look, they actually expose some deep truths:</p>
 <ul>
-<li><p>The <code>blocks_to_row_recs_query()</code> is an aggregation.  Each set of rows corresponding to a given data record is aggregated into a single result row.</p>
-</li>
 <li><p>The <code>row_recs_to_blocks_query()</code> is essentially a cross-join of the data to the record description.  Each combination of data row and record description row builds a new result row.</p>
+</li>
+<li><p>The <code>blocks_to_row_recs_query()</code> is an aggregation.  Each set of rows corresponding to a given data record is aggregated into a single result row.</p>
 </li>
 <li><p>Just about any arbitrary record shape to arbitrary record shape can be written as a transform from the first record shape to row-records (record sets that have exactly one row per record), followed by a transform from the row-records to the new format.  This transform can preserve column types as in the intermediate form each different record entry has its own column.  This is an advantage of using a "thin" intermediate form such as <a href="https://en.wikipedia.org/wiki/Semantic_triple">RDF triples</a>.</p>
 </li>
@@ -14068,7 +14080,7 @@ not just implementation details.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> rpy2.ipython
@@ -14081,7 +14093,7 @@ not just implementation details.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span>
@@ -14118,7 +14130,7 @@ not just implementation details.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span>
@@ -14134,7 +14146,7 @@ not just implementation details.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span>
@@ -14187,7 +14199,7 @@ not just implementation details.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span>
@@ -14243,7 +14255,7 @@ not just implementation details.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span>
@@ -14299,7 +14311,7 @@ in the <a href="https://github.com/WinVector/data_algebra/blob/master/Examples/L
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">mp_to_blocks</span><span class="o">.</span><span class="n">to_simple_obj</span><span class="p">()))</span>
