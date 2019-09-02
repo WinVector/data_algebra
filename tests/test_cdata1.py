@@ -1,6 +1,7 @@
 import re
 import io
 import sqlite3
+import yaml
 import pandas
 import data_algebra.cdata
 import data_algebra.cdata_impl
@@ -139,3 +140,13 @@ def test_cdata1():
     arranged_self = mp_to_and_back.transform(iris_blocks)
     assert data_algebra.util.equivalent_frames(arranged_self, iris_blocks_orig)
     arranged_self
+
+    #%%
+
+    obj = mp_to_blocks.to_simple_obj()
+    waste_str = str(yaml.dump(obj))
+
+    #%%
+
+    recovered_transform = data_algebra.cdata_impl.record_map_from_simple_obj(obj)
+    waste_str = str(recovered_transform)
