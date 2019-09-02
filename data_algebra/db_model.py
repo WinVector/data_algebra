@@ -112,23 +112,25 @@ class DBModel:
 
         raise Exception("unexpected type: " + str(type(expression)))
 
-    def table_def_to_sql(self, table_def, *, using=None):
+    def table_def_to_sql(self, table_def, *, using=None, force_sql=True):
         if not isinstance(table_def, data_algebra.data_ops.TableDescription):
             raise Exception(
                 "Expected table_def to be a data_algebra.data_ops.TableDescription)"
             )
-        if using is None:
-            using = table_def.column_set
-        if len(using) < 1:
-            raise Exception("must select at least one column")
-        missing = using - table_def.column_set
-        if len(missing) > 0:
-            raise Exception("referred to unknown columns: " + str(missing))
-        cols = [self.quote_identifier(ci) for ci in using]
-        sql_str = (
-            "SELECT " + ", ".join(cols) + " FROM " + self.quote_table_name(table_def)
-        )
-        return sql_str
+        if force_sql:
+            if using is None:
+                using = table_def.column_set
+            if len(using) < 1:
+                raise Exception("must select at least one column")
+            missing = using - table_def.column_set
+            if len(missing) > 0:
+                raise Exception("referred to unknown columns: " + str(missing))
+            cols = [self.quote_identifier(ci) for ci in using]
+            sql_str = (
+                "SELECT " + ", ".join(cols) + " FROM " + self.quote_table_name(table_def)
+            )
+            return sql_str
+        return self.quote_table_name(table_def)
 
     def extend_to_sql(self, extend_node, *, using=None, temp_id_source=None):
         if not isinstance(extend_node, data_algebra.data_ops.ExtendNode):
