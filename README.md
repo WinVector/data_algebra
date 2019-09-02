@@ -19,7 +19,6 @@ Install `data_algebra` with either of:
 # Announcement
 
 
-
 This article introduces the [`data_algebra`](https://github.com/WinVector/data_algebra) project: a data processing tool family available in `R` and `Python`.  These tools are designed to transform data either in-memory or on remote databases.  
 
 In particular we will discuss the `Python` implementation (also called `data_algebra`) and its relation to the mature `R` implementations (`rquery` and `rqdatatable`).
@@ -69,7 +68,9 @@ Let's start our `Python` example.  First we import the packages we are going to 
 
 
 ```python
+import math
 import io
+import sqlite3
 from pprint import pprint
 import psycopg2       # http://initd.org/psycopg/
 import pandas         # https://pandas.pydata.org
@@ -78,6 +79,7 @@ from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 import data_algebra.env
 import data_algebra.yaml
 import data_algebra.PostgreSQL
+import data_algebra.SQLite
 
 # ask YAML to write simpler structures
 data_algebra.yaml.fix_ordered_dict_yaml_rep()
@@ -105,19 +107,6 @@ d_local
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -172,18 +161,27 @@ Let's also copy this data to a [`PostgreSQL`](https://www.postgresql.org) databa
 
 
 ```python
-conn = psycopg2.connect(
-    database="johnmount",
-    user="johnmount",
-    host="localhost",
-    password=""
-)
-conn.autocommit=True
+use_postgresql = False
+
+if use_postgresql:
+    conn = psycopg2.connect(
+        database="johnmount",
+        user="johnmount",
+        host="localhost",
+        password=""
+    )
+    conn.autocommit=True
+    db_model = data_algebra.PostgreSQL.PostgreSQLModel()
+else:
+    conn = sqlite3.connect(':memory:')
+    db_model = data_algebra.SQLite.SQLiteModel()
+    # https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.create_function
+    conn.create_function("exp", 1, math.exp)
 ```
 
 
 ```python
-db_model = data_algebra.PostgreSQL.PostgreSQLModel()
+
 
 db_model.insert_table(conn, d_local, 'd')
 
@@ -194,60 +192,52 @@ db_model.read_table(conn, 'd')
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>subjectid</th>
-      <th>surveycategory</th>
-      <th>assessmenttotal</th>
-      <th>irrelevantcol1</th>
-      <th>irrelevantcol2</th>
+      <th>index</th>
+      <th>subjectID</th>
+      <th>surveyCategory</th>
+      <th>assessmentTotal</th>
+      <th>irrelevantCol1</th>
+      <th>irrelevantCol2</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>1.0</td>
+      <td>0</td>
+      <td>1</td>
       <td>withdrawal behavior</td>
-      <td>5.0</td>
+      <td>5</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>1.0</td>
+      <td>1</td>
+      <td>1</td>
       <td>positive re-framing</td>
-      <td>2.0</td>
+      <td>2</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>2.0</td>
+      <td>2</td>
+      <td>2</td>
       <td>withdrawal behavior</td>
-      <td>3.0</td>
+      <td>3</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>2.0</td>
+      <td>3</td>
+      <td>2</td>
       <td>positive re-framing</td>
-      <td>4.0</td>
+      <td>4</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
@@ -353,47 +343,43 @@ sql = ops.to_sql(db_model, pretty=True)
 print(sql)
 ```
 
-    SELECT "probability",
+    SELECT "subjectID",
            "diagnosis",
-           "subjectid"
+           "probability"
     FROM
-      (SELECT "probability",
-              "subjectid",
-              "surveycategory" AS "diagnosis"
+      (SELECT "subjectID",
+              "probability",
+              "surveyCategory" AS "diagnosis"
        FROM
-         (SELECT "probability",
-                 "surveycategory",
-                 "subjectid"
+         (SELECT "subjectID",
+                 "probability",
+                 "surveyCategory"
           FROM
-            (SELECT "probability",
-                    "surveycategory",
-                    "subjectid"
+            (SELECT "subjectID",
+                    "probability",
+                    "surveyCategory"
              FROM
-               (SELECT "probability",
-                       "surveycategory",
-                       "subjectid",
-                       ROW_NUMBER() OVER (PARTITION BY "subjectid"
-                                          ORDER BY "probability" DESC, "surveycategory") AS "row_number"
+               (SELECT "subjectID",
+                       "probability",
+                       "surveyCategory",
+                       ROW_NUMBER() OVER (PARTITION BY "subjectID"
+                                          ORDER BY "probability" DESC, "surveyCategory") AS "row_number"
                 FROM
-                  (SELECT "surveycategory",
-                          "subjectid",
+                  (SELECT "subjectID",
+                          "surveyCategory",
                           "probability" / "total" AS "probability"
                    FROM
-                     (SELECT "probability",
-                             "surveycategory",
-                             "subjectid",
-                             SUM("probability") OVER (PARTITION BY "subjectid") AS "total"
+                     (SELECT "subjectID",
+                             "probability",
+                             "surveyCategory",
+                             SUM("probability") OVER (PARTITION BY "subjectID") AS "total"
                       FROM
-                        (SELECT "surveycategory",
-                                "subjectid",
-                                EXP(("assessmenttotal" * 0.237)) AS "probability"
-                         FROM
-                           (SELECT "surveycategory",
-                                   "assessmenttotal",
-                                   "subjectid"
-                            FROM "d") "sq_0") "sq_1") "sq_2") "sq_3") "sq_4"
-             WHERE "row_number" = 1 ) "sq_5") "sq_6") "sq_7"
-    ORDER BY "subjectid"
+                        (SELECT "subjectID",
+                                "surveyCategory",
+                                EXP(("assessmentTotal" * 0.237)) AS "probability"
+                         FROM ("d") "SQ_0") "SQ_1") "SQ_2") "SQ_3") "SQ_4"
+             WHERE "row_number" = 1 ) "SQ_5") "SQ_6") "SQ_7"
+    ORDER BY "subjectID"
 
 
 The `SQL` can be hard to read, as `SQL` expresses composition by inner-nesting (inside `SELECT` statements happen first).  The operator pipeline expresses composition by sequencing or method-chaining, which can be a lot more legible.  However the huge advantage of the `SQL` is: we can send it to the database for execution, as we do now.
@@ -409,40 +395,27 @@ db_model.read_query(conn, sql)
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>probability</th>
+      <th>subjectID</th>
       <th>diagnosis</th>
-      <th>subjectid</th>
+      <th>probability</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.670622</td>
+      <td>1</td>
       <td>withdrawal behavior</td>
-      <td>1.0</td>
+      <td>0.670622</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>0.558974</td>
+      <td>2</td>
       <td>positive re-framing</td>
-      <td>2.0</td>
+      <td>0.558974</td>
     </tr>
   </tbody>
 </table>
@@ -467,19 +440,46 @@ ops.eval_pandas({'d': d_local})
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>subjectID</th>
+      <th>diagnosis</th>
+      <th>probability</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>withdrawal behavior</td>
+      <td>0.670622</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>positive re-framing</td>
+      <td>0.558974</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
 
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
+
+There is also a shorthand notation for single table source pipelines:
+
+
+```python
+ops.transform(d_local)
+
+```
+
+
+
+
+<div>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -719,15 +719,15 @@ cat(sql)
              "assessmentTotal"
             FROM
              "d"
-            ) tsql_58721496827577556961_0000000000
-           ) tsql_58721496827577556961_0000000001
-          ) tsql_58721496827577556961_0000000002
-         ) tsql_58721496827577556961_0000000003
-       ) tsql_58721496827577556961_0000000004
+            ) tsql_30847316539397090681_0000000000
+           ) tsql_30847316539397090681_0000000001
+          ) tsql_30847316539397090681_0000000002
+         ) tsql_30847316539397090681_0000000003
+       ) tsql_30847316539397090681_0000000004
        WHERE "row_number" = 1
-      ) tsql_58721496827577556961_0000000005
-     ) tsql_58721496827577556961_0000000006
-    ) tsql_58721496827577556961_0000000007 ORDER BY "subjectID"
+      ) tsql_30847316539397090681_0000000005
+     ) tsql_30847316539397090681_0000000006
+    ) tsql_30847316539397090681_0000000007 ORDER BY "subjectID"
 
 
 The `R` implementation is mature, and appropriate to use in production.  The [`rquery`](https://github.com/WinVector/rquery) grammar is designed to have minimal state and minimal annotations (no grouping or ordering annotations!).  This makes the grammar, in my opinion, a good design choice. `rquery` has very good performance, often much faster than `dplyr` or base-`R` due to its query generation ideas and use of [`data.table`](https://CRAN.R-project.org/package=data.table) via [`rqdatatable`](https://CRAN.R-project.org/package=rqdatatable).  `rquery` is a mature pure `R` package; [here](https://github.com/WinVector/rquery/blob/master/README.md) is the same example being worked directly in `R`, with no translation from `Python`. 
