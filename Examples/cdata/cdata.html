@@ -2,7 +2,7 @@
 <html>
 <head><meta charset="utf-8" />
 
-<title>ScoringExample</title>
+<title>cdata</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
@@ -13116,39 +13116,17 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This article introduces the <a href="https://github.com/WinVector/data_algebra"><code>data_algebra</code></a> project: a data processing tool family available in <code>R</code> and <code>Python</code>.  These tools are designed to transform data either in-memory or on remote databases.</p>
-<p>In particular we will discuss the <code>Python</code> implementation (also called <code>data_algebra</code>) and its relation to the mature <code>R</code> implementations (<code>rquery</code> and <code>rqdatatable</code>).</p>
-<h2 id="Introduction">Introduction<a class="anchor-link" href="#Introduction">&#182;</a></h2><p>Parts of the project are in early development (and not yet ready for production use), and other parts are mature and have been used in production.</p>
-<p>The project intent is to realize a modern data processing language based on <a href="https://en.wikipedia.org/wiki/Relational_model">Codd's relational operators</a> that is easy to maintain, has helpful tooling, and has very similar realizations (or dialects) for:</p>
+<p>The great strength of the <a href="https://www.r-project.org">R</a> <a href="https://github.com/WinVector/cdata">cdata</a> (<a href="http://www.win-vector.com/blog/tag/coordinatized-data/">coordinatized data</a>)
+and Python <a href="https://github.com/WinVector/data_algebra">data_algebra</a> data wrangling systems are:</p>
 <ul>
-<li><a href="https://en.wikipedia.org/wiki/SQL"><code>SQL</code></a> databases accessed from <a href="https://www.python.org"><code>Python</code></a> (in development <a href="https://github.com/WinVector/data_algebra">here</a>, not yet ready for production use).</li>
-<li><code>Pandas</code> <code>Data.Frame</code> objects in <code>Python</code> (in development <a href="https://github.com/WinVector/data_algebra">here</a>, not yet ready for production use).</li>
-<li><code>SQL</code> databases access from <a href="https://www.r-project.org"><code>R</code></a> (implementation is <a href="https://github.com/WinVector/rquery">here</a>, and is mature and ready for production use).</li>
-<li><a href="http://r-datatable.com"><code>data.table</code></a> objects in <code>R</code> (implementation is <a href="https://github.com/WinVector/rqdatatable">here</a>, and is mature and ready for production use).</li>
+<li><p>The user specifies their desired transform declaratively <em>by example</em> and <em>in data</em>.  What one does is: work 
+ an example, and then write-down what you want (we have a tutial on this <a href="https://winvector.github.io/cdata/articles/design.html">here</a>).</p>
+</li>
+<li><p>The transform systems can print what a transform is going to do.  This makes reasoning about data transforms <em>much</em> easier.</p>
+</li>
 </ul>
-<p>The idea is the notation should look idiomatic in each language.  Working in <code>Python</code> should feel like working in <code>Python</code>, and working in <code>R</code> should feel like working in <code>R</code>.  The data semantics, however, are designed to be close to the <code>SQL</code> realizations (given the close connection of <code>SQL</code> to the relational algebra; in particular row numbering starts at <code>1</code> and row and column order is not preserved except at row-order steps or select-columns steps respectively). The intent is: it should be very easy to use the system in either <code>Python</code> or <code>R</code> (a boon to multi-language data science projects) and it is easy to port either code or experience from one system to another (a boon for porting projects, or for data scientists working with more than one code base or computer language).</p>
-<p>Related work includes:</p>
-<ul>
-<li><a href="https://en.wikipedia.org/wiki/Relational_algebra">Codd's relational algebra</a></li>
-<li><a href="https://en.wikipedia.org/wiki/SQL"><code>SQL</code></a></li>
-<li><a href="https://CRAN.R-project.org/package=data.table"><code>data.table</code></a></li>
-<li><a href="https://en.wikipedia.org/wiki/Language_Integrated_Query"><code>LINQ</code></a></li>
-<li><a href="https://CRAN.R-project.org/package=dplyr"><code>dplyr</code></a></li>
-<li><a href="https://CRAN.R-project.org/package=dtplyr"><code>dtplyr</code></a></li>
-<li><a href="https://github.com/asardaes/table.express"><code>table.express</code></a></li>
-<li><a href="https://pandas.pydata.org"><code>Pandas</code></a></li>
-<li><a href="https://www.sqlalchemy.org"><code>SQLAlchemy</code></a></li>
-</ul>
-<p>The <code>data_algebra</code> principles include:</p>
-<ul>
-<li>Writing data transforms as a pipeline or method-chain of many simple transform steps.</li>
-<li>Treating data transform pipelines or directed acyclic graphs (DAGs) as themselves being sharable data.</li>
-<li>Being able to use the same transform specification many places (in memory, on databases, in <code>R</code>, in <code>Python</code>).</li>
-</ul>
-<h2 id="Example">Example<a class="anchor-link" href="#Example">&#182;</a></h2><p>Let's start with an example in <code>Python</code>.</p>
-<p>For our example we will assume we have a data set of how many points different subjects score in a psychological survey.  The goal is transform the data so that we see what fraction of the subjects answers are in each category (subject to an exponential transform, as often used in <a href="https://en.wikipedia.org/wiki/Logistic_regression">logistic regression</a>).  We then treat the per-subject renormalized data as a probabilty or diagnosis.</p>
-<p>The exact meaning of such a scoring method are not the topic of this note.  It is a notional example to show a non-trivial data transformation need.  In particular: having to normalize per-subject (divide some set of scores per-subject by a per-subject total) is a classic pain point in data-processing.  In classic <code>SQL</code> this can only be done by joining against a summary table, or in more modern <code>SQL</code> with a "<a href="https://en.wikipedia.org/wiki/SQL_window_function">window function</a>." We want to show by working in small enough steps this can be done simply.</p>
-<h3 id="Set-up">Set up<a class="anchor-link" href="#Set-up">&#182;</a></h3><p>Let's start our <code>Python</code> example.  First we import the packages we are going to use, and set a few options.</p>
+<p>Let's re-work a small <a href="https://github.com/WinVector/cdata/blob/master/vignettes/control_table_keys.Rmd">R cdata example</a>, using the Python package <a href="https://github.com/WinVector/data_algebra">data_algebra</a>.</p>
+<h2 id="An-Example">An Example<a class="anchor-link" href="#An-Example">&#182;</a></h2><p>First we import some modules and packages, and type in some notional data.</p>
 
 </div>
 </div>
@@ -13158,28 +13136,98 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">io</span>
-<span class="kn">import</span> <span class="nn">sqlite3</span>
-<span class="kn">from</span> <span class="nn">pprint</span> <span class="k">import</span> <span class="n">pprint</span>
-<span class="kn">import</span> <span class="nn">psycopg2</span>       <span class="c1"># http://initd.org/psycopg/</span>
-<span class="kn">import</span> <span class="nn">pandas</span>         <span class="c1"># https://pandas.pydata.org</span>
-<span class="kn">import</span> <span class="nn">yaml</span>           <span class="c1"># https://pyyaml.org</span>
-<span class="kn">from</span> <span class="nn">data_algebra.data_ops</span> <span class="k">import</span> <span class="o">*</span>  <span class="c1"># https://github.com/WinVector/data_algebra</span>
-<span class="kn">import</span> <span class="nn">data_algebra.env</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+<span class="kn">import</span> <span class="nn">data_algebra.cdata</span>
+<span class="kn">import</span> <span class="nn">data_algebra.cdata_impl</span>
+<span class="kn">import</span> <span class="nn">data_algebra.data_ops</span>
 <span class="kn">import</span> <span class="nn">data_algebra.yaml</span>
-<span class="kn">import</span> <span class="nn">data_algebra.PostgreSQL</span>
 <span class="kn">import</span> <span class="nn">data_algebra.SQLite</span>
 
 <span class="c1"># ask YAML to write simpler structures</span>
 <span class="n">data_algebra</span><span class="o">.</span><span class="n">yaml</span><span class="o">.</span><span class="n">fix_ordered_dict_yaml_rep</span><span class="p">()</span>
 
-<span class="n">pandas</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_columns&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  
-<span class="n">pandas</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.expand_frame_repr&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-<span class="n">pandas</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;max_colwidth&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">iris</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;iris_small.csv&#39;</span><span class="p">)</span>
+<span class="n">iris</span>
 </pre></div>
 
     </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[1]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Sepal.Length</th>
+      <th>Sepal.Width</th>
+      <th>Petal.Length</th>
+      <th>Petal.Width</th>
+      <th>Species</th>
+      <th>id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>5.1</td>
+      <td>3.5</td>
+      <td>1.4</td>
+      <td>0.2</td>
+      <td>setosa</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>4.9</td>
+      <td>3.0</td>
+      <td>1.4</td>
+      <td>0.2</td>
+      <td>setosa</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>4.7</td>
+      <td>3.2</td>
+      <td>1.3</td>
+      <td>0.2</td>
+      <td>setosa</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
 </div>
 </div>
 
@@ -13187,7 +13235,8 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Now let's type in our example data.  Notice this is an in-memory <code>Pandas</code> <code>Data.Frame</code>.</p>
+<p>Our goal is to move from this normalized or wide-form into a tall form where information that is currently in multiple columns in a single row is in many rows with descriptive row-keys.</p>
+<p>Or, more concretely, we want our data to look like the following.</p>
 
 </div>
 </div>
@@ -13197,14 +13246,8 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">d_local</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
-    <span class="s1">&#39;subjectID&#39;</span><span class="p">:[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
-    <span class="s1">&#39;surveyCategory&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;withdrawal behavior&quot;</span><span class="p">,</span> <span class="s2">&quot;positive re-framing&quot;</span><span class="p">,</span> <span class="s2">&quot;withdrawal behavior&quot;</span><span class="p">,</span> <span class="s2">&quot;positive re-framing&quot;</span><span class="p">],</span>
-    <span class="s1">&#39;assessmentTotal&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
-    <span class="s1">&#39;irrelevantCol1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;irrel1&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">4</span><span class="p">,</span>
-    <span class="s1">&#39;irrelevantCol2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;irrel2&#39;</span><span class="p">]</span><span class="o">*</span><span class="mi">4</span><span class="p">,</span>
-<span class="p">})</span>
-<span class="n">d_local</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">answer</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;answer.csv&quot;</span><span class="p">)</span>
+<span class="n">answer</span>
 </pre></div>
 
     </div>
@@ -13240,45 +13283,109 @@ div#notebook {
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>subjectID</th>
-      <th>surveyCategory</th>
-      <th>assessmentTotal</th>
-      <th>irrelevantCol1</th>
-      <th>irrelevantCol2</th>
+      <th>id</th>
+      <th>Species</th>
+      <th>Part</th>
+      <th>Measure</th>
+      <th>Value</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>1</td>
-      <td>withdrawal behavior</td>
-      <td>5</td>
-      <td>irrel1</td>
-      <td>irrel2</td>
+      <td>0</td>
+      <td>setosa</td>
+      <td>Petal</td>
+      <td>Length</td>
+      <td>1.4</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>1</td>
-      <td>positive re-framing</td>
-      <td>2</td>
-      <td>irrel1</td>
-      <td>irrel2</td>
+      <td>0</td>
+      <td>setosa</td>
+      <td>Petal</td>
+      <td>Width</td>
+      <td>0.2</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>2</td>
-      <td>withdrawal behavior</td>
-      <td>3</td>
-      <td>irrel1</td>
-      <td>irrel2</td>
+      <td>0</td>
+      <td>setosa</td>
+      <td>Sepal</td>
+      <td>Length</td>
+      <td>5.1</td>
     </tr>
     <tr>
       <th>3</th>
+      <td>0</td>
+      <td>setosa</td>
+      <td>Sepal</td>
+      <td>Width</td>
+      <td>3.5</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>setosa</td>
+      <td>Petal</td>
+      <td>Length</td>
+      <td>1.4</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1</td>
+      <td>setosa</td>
+      <td>Petal</td>
+      <td>Width</td>
+      <td>0.2</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1</td>
+      <td>setosa</td>
+      <td>Sepal</td>
+      <td>Length</td>
+      <td>4.9</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1</td>
+      <td>setosa</td>
+      <td>Sepal</td>
+      <td>Width</td>
+      <td>3.0</td>
+    </tr>
+    <tr>
+      <th>8</th>
       <td>2</td>
-      <td>positive re-framing</td>
-      <td>4</td>
-      <td>irrel1</td>
-      <td>irrel2</td>
+      <td>setosa</td>
+      <td>Petal</td>
+      <td>Length</td>
+      <td>1.3</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>2</td>
+      <td>setosa</td>
+      <td>Petal</td>
+      <td>Width</td>
+      <td>0.2</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>2</td>
+      <td>setosa</td>
+      <td>Sepal</td>
+      <td>Length</td>
+      <td>4.7</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>2</td>
+      <td>setosa</td>
+      <td>Sepal</td>
+      <td>Width</td>
+      <td>3.2</td>
     </tr>
   </tbody>
 </table>
@@ -13294,7 +13401,7 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Let's also copy this data to a <a href="https://www.postgresql.org"><code>PostgreSQL</code></a> database.  Normally big data is already in the system one wants to work with, so the copying over is just to simulate the data already being there.</p>
+<p>First we build a structure describing what we thing a data record looks like.  The simplest data records are exactly rows, but often meaningful records span many rows.  So let's describe the record structure we want.</p>
 
 </div>
 </div>
@@ -13304,37 +13411,11 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">use_postgresql</span> <span class="o">=</span> <span class="kc">False</span>
-
-<span class="k">if</span> <span class="n">use_postgresql</span><span class="p">:</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
-        <span class="n">database</span><span class="o">=</span><span class="s2">&quot;johnmount&quot;</span><span class="p">,</span>
-        <span class="n">user</span><span class="o">=</span><span class="s2">&quot;johnmount&quot;</span><span class="p">,</span>
-        <span class="n">host</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span>
-        <span class="n">password</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
-    <span class="p">)</span>
-    <span class="n">conn</span><span class="o">.</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span>
-    <span class="n">db_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">PostgreSQLModel</span><span class="p">()</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;:memory:&#39;</span><span class="p">)</span>
-    <span class="n">db_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span>
-    <span class="c1"># https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.create_function</span>
-    <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;exp&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">db_model</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">d_local</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">)</span>
-
-<span class="n">db_model</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">control_table</span> <span class="o">=</span> <span class="n">answer</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">answer</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Part&#39;</span><span class="p">,</span> <span class="s1">&#39;Measure&#39;</span><span class="p">]]</span>
+<span class="n">control_table</span> <span class="o">=</span> <span class="n">control_table</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">control_table</span><span class="p">[</span><span class="s2">&quot;Value&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">control_table</span><span class="p">[</span><span class="s1">&#39;Part&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">control_table</span><span class="p">[</span><span class="s1">&#39;Measure&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> 
+                            <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">control_table</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+<span class="n">control_table</span>
 </pre></div>
 
     </div>
@@ -13347,7 +13428,7 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[4]:</div>
+    <div class="prompt output_prompt">Out[3]:</div>
 
 
 
@@ -13370,50 +13451,35 @@ div#notebook {
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>index</th>
-      <th>subjectID</th>
-      <th>surveyCategory</th>
-      <th>assessmentTotal</th>
-      <th>irrelevantCol1</th>
-      <th>irrelevantCol2</th>
+      <th>Part</th>
+      <th>Measure</th>
+      <th>Value</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>0</td>
-      <td>1</td>
-      <td>withdrawal behavior</td>
-      <td>5</td>
-      <td>irrel1</td>
-      <td>irrel2</td>
+      <td>Petal</td>
+      <td>Length</td>
+      <td>Petal.Length</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>1</td>
-      <td>1</td>
-      <td>positive re-framing</td>
-      <td>2</td>
-      <td>irrel1</td>
-      <td>irrel2</td>
+      <td>Petal</td>
+      <td>Width</td>
+      <td>Petal.Width</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>2</td>
-      <td>2</td>
-      <td>withdrawal behavior</td>
-      <td>3</td>
-      <td>irrel1</td>
-      <td>irrel2</td>
+      <td>Sepal</td>
+      <td>Length</td>
+      <td>Sepal.Length</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>3</td>
-      <td>2</td>
-      <td>positive re-framing</td>
-      <td>4</td>
-      <td>irrel1</td>
-      <td>irrel2</td>
+      <td>Sepal</td>
+      <td>Width</td>
+      <td>Sepal.Width</td>
     </tr>
   </tbody>
 </table>
@@ -13429,10 +13495,70 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Normally one does not read data back from a database, but instead materializes results in the database with <code>SQL</code> commands such as <code>CREATE TABLE tablename AS SELECT ...</code>.
-Also note: case in columns is a bit of nightmare.  It is often best to lower-case them all.</p>
-<h3 id="Back-to-the-data_algebra">Back to the <code>data_algebra</code><a class="anchor-link" href="#Back-to-the-data_algebra">&#182;</a></h3><p>Now we continue our example by importing the <code>data_algebra</code> components we need.</p>
-<p>Now we use the <code>data_algebra</code> to define our processing pipeline: <code>ops</code>.  We are writing this pipeline using a <a href="https://en.wikipedia.org/wiki/Method_chaining">method chaining</a> notation where we have placed <code>Python</code> method-dot at the end of lines using the <code>.\</code> notation.  This notation will look <em>very</em> much like a <a href="https://en.wikipedia.org/wiki/Pipeline_(Unix">pipe</a>) to <code>R</code>/<a href="https://CRAN.R-project.org/package=magrittr"><code>magrittr</code></a> users.</p>
+<p>We can derive the control table from the answer, as we did here, or just type one in directly.  The idea is: we can
+use any method we want to derive the prototype record shape, we are not limited to a sub-query language or methodology
+from any one package.</p>
+<p>For each record
+we take care to identify what keys identify records (the <code>record_keys</code>) and want parts identify rows within the record
+(the <code>control_table_keys</code>).</p>
+<p>Notice the above is literally an example of the desired record layout.  We then add a specification of which parts of the
+record are keys (tell us which row is which), which are values (to be filled out by the transform), and how
+we tell which rows are in the same record (the <code>record_key</code>).  This is shown below.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">record_spec</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">(</span>
+    <span class="n">control_table</span><span class="p">,</span>
+    <span class="n">control_table_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Part&#39;</span><span class="p">,</span> <span class="s1">&#39;Measure&#39;</span><span class="p">],</span>
+    <span class="n">record_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;Species&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+<span class="n">record_spec</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[4]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>RecordSpecification
+   record_keys: [&#39;id&#39;, &#39;Species&#39;]
+   control_table_keys: [&#39;Part&#39;, &#39;Measure&#39;]
+   control_table:
+       Part Measure         Value
+   0  Petal  Length  Petal.Length
+   1  Petal   Width   Petal.Width
+   2  Sepal  Length  Sepal.Length
+   3  Sepal   Width   Sepal.Width</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The above is saying: we want each data record to be 4 rows internally keyed by the <code>Part</code> and <code>Measure</code> columns, and we expect which rows in a larger data frame that correspond to the same record to be identified by key-columns <code>id</code> and <code>Species</code>.  The "A.B" entries are stand-ins showing where we expect values to be placed.</p>
+<p>Now we can transform our original row-record oriented data into general block records.  To do this we specify a <code>RecordMap</code> using our record specification to describe the outgoing record structure. The incoming record structure is implicitly assumed to be single-row records, unless we specify otherwise (using the <code>blocks_in</code> argument).</p>
 
 </div>
 </div>
@@ -13442,30 +13568,42 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
 <div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">scale</span> <span class="o">=</span> <span class="mf">0.237</span>
-
-<span class="k">with</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">Env</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span> <span class="k">as</span> <span class="n">env</span><span class="p">:</span>
-    <span class="n">ops</span> <span class="o">=</span> <span class="n">TableDescription</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> 
-                     <span class="p">[</span><span class="s1">&#39;subjectID&#39;</span><span class="p">,</span>
-                      <span class="s1">&#39;surveyCategory&#39;</span><span class="p">,</span>
-                      <span class="s1">&#39;assessmentTotal&#39;</span><span class="p">,</span>
-                      <span class="s1">&#39;irrelevantCol1&#39;</span><span class="p">,</span>
-                      <span class="s1">&#39;irrelevantCol2&#39;</span><span class="p">])</span> <span class="o">.</span>\
-        <span class="n">extend</span><span class="p">({</span><span class="s1">&#39;probability&#39;</span><span class="p">:</span> <span class="s1">&#39;(assessmentTotal * scale).exp()&#39;</span><span class="p">})</span> <span class="o">.</span>\
-        <span class="n">extend</span><span class="p">({</span><span class="s1">&#39;total&#39;</span><span class="p">:</span> <span class="s1">&#39;probability.sum()&#39;</span><span class="p">},</span>
-               <span class="n">partition_by</span><span class="o">=</span><span class="s1">&#39;subjectID&#39;</span><span class="p">)</span>  <span class="o">.</span>\
-        <span class="n">extend</span><span class="p">({</span><span class="s1">&#39;probability&#39;</span><span class="p">:</span> <span class="s1">&#39;probability/total&#39;</span><span class="p">})</span>  <span class="o">.</span>\
-        <span class="n">extend</span><span class="p">({</span><span class="s1">&#39;row_number&#39;</span><span class="p">:</span><span class="s1">&#39;_row_number()&#39;</span><span class="p">},</span>
-                <span class="n">partition_by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;subjectID&#39;</span><span class="p">],</span>
-                <span class="n">order_by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;probability&#39;</span><span class="p">,</span> <span class="s1">&#39;surveyCategory&#39;</span><span class="p">],</span>
-                <span class="n">reverse</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;probability&#39;</span><span class="p">])</span>  <span class="o">.</span>\
-        <span class="n">select_rows</span><span class="p">(</span><span class="s1">&#39;row_number==1&#39;</span><span class="p">)</span>   <span class="o">.</span>\
-        <span class="n">select_columns</span><span class="p">([</span><span class="s1">&#39;subjectID&#39;</span><span class="p">,</span> <span class="s1">&#39;surveyCategory&#39;</span><span class="p">,</span> <span class="s1">&#39;probability&#39;</span><span class="p">])</span> <span class="o">.</span>\
-        <span class="n">rename_columns</span><span class="p">({</span><span class="s1">&#39;diagnosis&#39;</span><span class="p">:</span> <span class="s1">&#39;surveyCategory&#39;</span><span class="p">})</span>  <span class="o">.</span>\
-        <span class="n">order_rows</span><span class="p">([</span><span class="s1">&#39;subjectID&#39;</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mp_to_blocks</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata_impl</span><span class="o">.</span><span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_out</span><span class="o">=</span><span class="n">record_spec</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">mp_to_blocks</span><span class="p">))</span>
 </pre></div>
 
     </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Transform row records of the form:
+  record_keys: [&#39;id&#39;, &#39;Species&#39;]
+ [&#39;id&#39;, &#39;Species&#39;, &#39;Petal.Length&#39;, &#39;Petal.Width&#39;, &#39;Sepal.Length&#39;, &#39;Sepal.Width&#39;]
+to block records of structure:
+RecordSpecification
+   record_keys: [&#39;id&#39;, &#39;Species&#39;]
+   control_table_keys: [&#39;Part&#39;, &#39;Measure&#39;]
+   control_table:
+       Part Measure         Value
+   0  Petal  Length  Petal.Length
+   1  Petal   Width   Petal.Width
+   2  Sepal  Length  Sepal.Length
+   3  Sepal   Width   Sepal.Width
+
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -13473,7 +13611,8 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>For a more pythonic way of writing the same pipeline we can show how the code would have been formatted by <a href="https://github.com/psf/black"><code>black</code></a>.</p>
+<p>Entries in the <code>RecordSpecification</code> that are not in columns mentioned <code>control_key_columns</code> are stand-in values that show where real values will later map. This is easiest to see by continuing the example.</p>
+<p>So let's apply our specified transform.</p>
 
 </div>
 </div>
@@ -13483,8 +13622,8 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
 <div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">py_source</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">py_source</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">arranged_blocks</span> <span class="o">=</span> <span class="n">mp_to_blocks</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
+<span class="n">arranged_blocks</span>
 </pre></div>
 
     </div>
@@ -13497,40 +13636,138 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
 
 <div class="output_area">
 
-    <div class="prompt"></div>
+    <div class="prompt output_prompt">Out[6]:</div>
 
 
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>TableDescription(
-    table_name=&#34;d&#34;,
-    column_names=[
-        &#34;subjectID&#34;,
-        &#34;surveyCategory&#34;,
-        &#34;assessmentTotal&#34;,
-        &#34;irrelevantCol1&#34;,
-        &#34;irrelevantCol2&#34;,
-    ],
-).extend({&#34;probability&#34;: &#34;(assessmentTotal * 0.237).exp()&#34;}).extend(
-    {&#34;total&#34;: &#34;probability.sum()&#34;}, partition_by=[&#34;subjectID&#34;]
-).extend(
-    {&#34;probability&#34;: &#34;probability / total&#34;}
-).extend(
-    {&#34;row_number&#34;: &#34;_row_number()&#34;},
-    partition_by=[&#34;subjectID&#34;],
-    order_by=[&#34;probability&#34;, &#34;surveyCategory&#34;],
-    reverse=[&#34;probability&#34;],
-).select_rows(
-    &#34;row_number == 1&#34;
-).select_columns(
-    [&#34;subjectID&#34;, &#34;surveyCategory&#34;, &#34;probability&#34;]
-).rename_columns(
-    {&#34;diagnosis&#34;: &#34;surveyCategory&#34;}
-).order_rows(
-    [&#34;subjectID&#34;]
-)
 
-</pre>
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>Species</th>
+      <th>Part</th>
+      <th>Measure</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>setosa</td>
+      <td>Petal</td>
+      <td>Length</td>
+      <td>1.4</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>setosa</td>
+      <td>Petal</td>
+      <td>Width</td>
+      <td>0.2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>setosa</td>
+      <td>Sepal</td>
+      <td>Length</td>
+      <td>5.1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>setosa</td>
+      <td>Sepal</td>
+      <td>Width</td>
+      <td>3.5</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>setosa</td>
+      <td>Petal</td>
+      <td>Length</td>
+      <td>1.4</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1</td>
+      <td>setosa</td>
+      <td>Petal</td>
+      <td>Width</td>
+      <td>0.2</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1</td>
+      <td>setosa</td>
+      <td>Sepal</td>
+      <td>Length</td>
+      <td>4.9</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1</td>
+      <td>setosa</td>
+      <td>Sepal</td>
+      <td>Width</td>
+      <td>3.0</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>2</td>
+      <td>setosa</td>
+      <td>Petal</td>
+      <td>Length</td>
+      <td>1.3</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>2</td>
+      <td>setosa</td>
+      <td>Petal</td>
+      <td>Width</td>
+      <td>0.2</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>2</td>
+      <td>setosa</td>
+      <td>Sepal</td>
+      <td>Length</td>
+      <td>4.7</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>2</td>
+      <td>setosa</td>
+      <td>Sepal</td>
+      <td>Width</td>
+      <td>3.2</td>
+    </tr>
+  </tbody>
+</table>
 </div>
+</div>
+
 </div>
 
 </div>
@@ -13540,22 +13777,15 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>In either case, the pipeline is read as a sequence of operations (top to bottom, and left to right).  What it is saying is:</p>
-<ul>
-<li>We start with a table named "d" that is known to have columns "subjectID", "surveyCategory", "assessmentTotal", "irrelevantCol1", and "irrelevantCol2".</li>
-<li><p>We produce a new table by transforming this table through a sequence of "extend" operations which add new columns.</p>
-<ul>
-<li>The first <code>extend</code> computes <code>probability = exp(scale*assessmentTotal)</code>, this is similar to the inverse-link step of a logistic regression. We assume when writing this pipeline we were given this math as a requirement.</li>
-<li>The next few <code>extend</code> steps total the <code>probabilty</code> per-subject (this is controlled by the <code>partition_by</code> argument) and then rank the normalized probabilities per-subject (grouping again specified by the <code>partition_by</code> argument, and order contolled by the <code>order_by</code> clause).</li>
-</ul>
-</li>
-<li><p>We then select the per-subject top-ranked rows by the <code>select_rows</code> step.</p>
-</li>
-<li><p>And finally we clean up the results for presentation with the <code>select_columns</code>, <code>rename_columns</code>, and <code>order_rows</code> steps.  The names of these methods are intedned to evoke what they do.</p>
-</li>
-</ul>
-<p>The point is: each step is deliberately so trivial one can reason about it. However the many steps in sequence do quite a lot.</p>
-<h3 id="SQL"><code>SQL</code><a class="anchor-link" href="#SQL">&#182;</a></h3><p>Once we have the <code>ops</code> object we can do quite a lot with it. We have already exhibited the pretty-printing of the pipeline. Next we demonstrate translating the operator pipeline into <code>SQL</code>.</p>
+<p>We see the operation has been performed for us. Notice we specify the transform <em>declaratively</em> with data structures carrying deceptions of what we want, instead of having to build a sequence of verbs that realize the transformation.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Inverting-the-transform">Inverting the transform<a class="anchor-link" href="#Inverting-the-transform">&#182;</a></h3><p>An inverse transform is simply expressed by reversing the roles of the <code>blocks_out</code> and <code>blocks_in</code> arguments. In this case the output is row-records, as we didn't specify an outgoing block structure with <code>blocks_out</code>.</p>
 
 </div>
 </div>
@@ -13565,8 +13795,8 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
 <div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sql</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mp_to_rows</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata_impl</span><span class="o">.</span><span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">=</span><span class="n">record_spec</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">mp_to_rows</span><span class="p">))</span>
 </pre></div>
 
     </div>
@@ -13583,43 +13813,20 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>SELECT &#34;subjectID&#34;,
-       &#34;diagnosis&#34;,
-       &#34;probability&#34;
-FROM
-  (SELECT &#34;subjectID&#34;,
-          &#34;probability&#34;,
-          &#34;surveyCategory&#34; AS &#34;diagnosis&#34;
-   FROM
-     (SELECT &#34;subjectID&#34;,
-             &#34;probability&#34;,
-             &#34;surveyCategory&#34;
-      FROM
-        (SELECT &#34;subjectID&#34;,
-                &#34;probability&#34;,
-                &#34;surveyCategory&#34;
-         FROM
-           (SELECT &#34;subjectID&#34;,
-                   &#34;probability&#34;,
-                   &#34;surveyCategory&#34;,
-                   ROW_NUMBER() OVER (PARTITION BY &#34;subjectID&#34;
-                                      ORDER BY &#34;probability&#34; DESC, &#34;surveyCategory&#34;) AS &#34;row_number&#34;
-            FROM
-              (SELECT &#34;subjectID&#34;,
-                      &#34;surveyCategory&#34;,
-                      &#34;probability&#34; / &#34;total&#34; AS &#34;probability&#34;
-               FROM
-                 (SELECT &#34;subjectID&#34;,
-                         &#34;probability&#34;,
-                         &#34;surveyCategory&#34;,
-                         SUM(&#34;probability&#34;) OVER (PARTITION BY &#34;subjectID&#34;) AS &#34;total&#34;
-                  FROM
-                    (SELECT &#34;subjectID&#34;,
-                            &#34;surveyCategory&#34;,
-                            EXP((&#34;assessmentTotal&#34; * 0.237)) AS &#34;probability&#34;
-                     FROM (&#34;d&#34;) &#34;SQ_0&#34;) &#34;SQ_1&#34;) &#34;SQ_2&#34;) &#34;SQ_3&#34;) &#34;SQ_4&#34;
-         WHERE &#34;row_number&#34; = 1 ) &#34;SQ_5&#34;) &#34;SQ_6&#34;) &#34;SQ_7&#34;
-ORDER BY &#34;subjectID&#34;
+<pre>Transform block records of structure:
+RecordSpecification
+   record_keys: [&#39;id&#39;, &#39;Species&#39;]
+   control_table_keys: [&#39;Part&#39;, &#39;Measure&#39;]
+   control_table:
+       Part Measure         Value
+   0  Petal  Length  Petal.Length
+   1  Petal   Width   Petal.Width
+   2  Sepal  Length  Sepal.Length
+   3  Sepal   Width   Sepal.Width
+to row records of the form:
+  record_keys: [&#39;id&#39;, &#39;Species&#39;]
+ [&#39;id&#39;, &#39;Species&#39;, &#39;Petal.Length&#39;, &#39;Petal.Width&#39;, &#39;Sepal.Length&#39;, &#39;Sepal.Width&#39;]
+
 </pre>
 </div>
 </div>
@@ -13628,21 +13835,13 @@ ORDER BY &#34;subjectID&#34;
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>The <code>SQL</code> can be hard to read, as <code>SQL</code> expresses composition by inner-nesting (inside <code>SELECT</code> statements happen first).  The operator pipeline expresses composition by sequencing or method-chaining, which can be a lot more legible.  However the huge advantage of the <code>SQL</code> is: we can send it to the database for execution, as we do now.</p>
-<p>Also notice the generate <code>SQL</code> has applied query narrowing: columns not used in the outer queries are removed from the inner queries. The "irrelevant" columns are not carried into the calculation as they would be with a <code>SELECT *</code>.  This early optimization comes in quite handy.</p>
-
-</div>
-</div>
-</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">db_model</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">sql</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">arranged_rows</span> <span class="o">=</span> <span class="n">mp_to_rows</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">arranged_blocks</span><span class="p">)</span>
+<span class="n">arranged_rows</span>
 </pre></div>
 
     </div>
@@ -13678,23 +13877,41 @@ ORDER BY &#34;subjectID&#34;
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>subjectID</th>
-      <th>diagnosis</th>
-      <th>probability</th>
+      <th>id</th>
+      <th>Species</th>
+      <th>Petal.Length</th>
+      <th>Petal.Width</th>
+      <th>Sepal.Length</th>
+      <th>Sepal.Width</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>1</td>
-      <td>withdrawal behavior</td>
-      <td>0.670622</td>
+      <td>0</td>
+      <td>setosa</td>
+      <td>1.4</td>
+      <td>0.2</td>
+      <td>5.1</td>
+      <td>3.5</td>
     </tr>
     <tr>
       <th>1</th>
+      <td>1</td>
+      <td>setosa</td>
+      <td>1.4</td>
+      <td>0.2</td>
+      <td>4.9</td>
+      <td>3.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
       <td>2</td>
-      <td>positive re-framing</td>
-      <td>0.558974</td>
+      <td>setosa</td>
+      <td>1.3</td>
+      <td>0.2</td>
+      <td>4.7</td>
+      <td>3.2</td>
     </tr>
   </tbody>
 </table>
@@ -13710,9 +13927,11 @@ ORDER BY &#34;subjectID&#34;
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>What comes back is: one row per subject, with the highest per-subject diagnosis and the estimated probabilty. Again, the math of this is outside the scope of this note (think of that as something coming from a specification)- the ability to write such a pipeline is our actual topic.</p>
-<p>The hope is that the <code>data_algebra</code> pipeline is easier to read, write, and maintain than the <code>SQL</code> query. If we wanted to change the calculation we would just add a stage to the <code>data_algebra</code> pipeline and then regenerate the <code>SQL</code> query.</p>
-<h3 id="Pandas"><code>Pandas</code><a class="anchor-link" href="#Pandas">&#182;</a></h3><p>An advantage of the pipeline is it can also be directly used on <code>Pandas</code> <code>DataFrame</code>s. Let's see how that is achieved.</p>
+<h2 id="Arbitrary-transforms">Arbitrary transforms<a class="anchor-link" href="#Arbitrary-transforms">&#182;</a></h2><p>Arbitrary record to record transforms can be specified by setting both <code>blocks_in</code> (to describe incoming structure) 
+and <code>blocks_out</code> (to describe outgoing structure) at the same time.</p>
+<h2 id="Transforms-in-databases">Transforms in databases<a class="anchor-link" href="#Transforms-in-databases">&#182;</a></h2><p><code>data_algebra</code> also implements all the transform steps in databases using <code>SQL</code> 
+(via <code>row_recs_to_blocks_query()</code> and <code>blocks_to_row_recs_query()</code>).</p>
+<p>These queries can be seen below.</p>
 
 </div>
 </div>
@@ -13722,176 +13941,12 @@ ORDER BY &#34;subjectID&#34;
 <div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ops</span><span class="o">.</span><span class="n">eval_pandas</span><span class="p">({</span><span class="s1">&#39;d&#39;</span><span class="p">:</span> <span class="n">d_local</span><span class="p">})</span>
-</pre></div>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">db_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span>
 
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[9]:</div>
-
-
-
-<div class="output_html rendered_html output_subarea output_execute_result">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>subjectID</th>
-      <th>diagnosis</th>
-      <th>probability</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>withdrawal behavior</td>
-      <td>0.670622</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>positive re-framing</td>
-      <td>0.558974</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>There is also a shorthand notation for single table source pipelines:</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ops</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">d_local</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[10]:</div>
-
-
-
-<div class="output_html rendered_html output_subarea output_execute_result">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>subjectID</th>
-      <th>diagnosis</th>
-      <th>probability</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>withdrawal behavior</td>
-      <td>0.670622</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>positive re-framing</td>
-      <td>0.558974</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p><code>eval_pandas</code> takes a dictionary of <code>Pandas</code> <code>DataFrame</code>s (names matching names specified in the pipeline) and returns the result of applying the pipeline to the data using <code>Pandas</code> commands.  Currently our <code>Pandas</code> implementation only allows very simple window functions.  This is why we didn't write <code>probability = probability/sum(probability)</code>, but instead broken the calculation into multiple steps by introducing the <code>total</code> column (the <code>SQL</code> realizaition does in fact support more complex window functions).  This is a small issue with the grammar: but our feeling encourange simple steps is in fact a good thing (improves debuggability), and in <code>SQL</code> the query optimizers likely optimize the different query styles into very similar realizations anyway.</p>
-<h2 id="Export/Import">Export/Import<a class="anchor-link" href="#Export/Import">&#182;</a></h2>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Because our operator pipeline is a <code>Python</code> object with no references to external objects (such as the database connection), it can be saved through standard methods such as "<a href="https://docs.python.org/3/library/pickle.html">pickling</a>."</p>
-<p>However, <code>data_algebra</code> also supports exporting a pipeline to and from simple structures that are in turn optimized for conversion  to <a href="https://yaml.org"><code>YAML</code></a>.  The simple structure format is particularly useful for writing more <code>data_algebra</code> tools (such as pipeline analysis and presentation tools).  And the <code>YAML</code> tooling makes moving a processing pipeline to another a language (such as <code>R</code>) quite easy.</p>
-<p>We will demonstrate this next.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># convert pipeline to simple objects</span>
-<span class="n">objs_R</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">collect_representation</span><span class="p">(</span><span class="n">dialect</span><span class="o">=</span><span class="s1">&#39;R&#39;</span><span class="p">)</span>
-<span class="c1"># print these objects</span>
-<span class="n">pprint</span><span class="p">(</span><span class="n">objs_R</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">db_model</span><span class="o">.</span><span class="n">blocks_to_row_recs_query</span><span class="p">(</span>
+    <span class="n">source_view</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">describe_pandas_table</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s1">&#39;iris&#39;</span><span class="p">),</span>
+    <span class="n">record_spec</span><span class="o">=</span><span class="n">record_spec</span>
+<span class="p">))</span>
 </pre></div>
 
     </div>
@@ -13908,45 +13963,68 @@ ORDER BY &#34;subjectID&#34;
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[OrderedDict([(&#39;op&#39;, &#39;TableDescription&#39;),
-              (&#39;table_name&#39;, &#39;d&#39;),
-              (&#39;qualifiers&#39;, {}),
-              (&#39;column_names&#39;,
-               [&#39;subjectID&#39;,
-                &#39;surveyCategory&#39;,
-                &#39;assessmentTotal&#39;,
-                &#39;irrelevantCol1&#39;,
-                &#39;irrelevantCol2&#39;]),
-              (&#39;key&#39;, &#39;d&#39;)]),
- OrderedDict([(&#39;op&#39;, &#39;Extend&#39;),
-              (&#39;ops&#39;, {&#39;probability&#39;: &#39;exp(assessmentTotal * 0.237)&#39;}),
-              (&#39;partition_by&#39;, []),
-              (&#39;order_by&#39;, []),
-              (&#39;reverse&#39;, [])]),
- OrderedDict([(&#39;op&#39;, &#39;Extend&#39;),
-              (&#39;ops&#39;, {&#39;total&#39;: &#39;sum(probability)&#39;}),
-              (&#39;partition_by&#39;, [&#39;subjectID&#39;]),
-              (&#39;order_by&#39;, []),
-              (&#39;reverse&#39;, [])]),
- OrderedDict([(&#39;op&#39;, &#39;Extend&#39;),
-              (&#39;ops&#39;, {&#39;probability&#39;: &#39;probability / total&#39;}),
-              (&#39;partition_by&#39;, []),
-              (&#39;order_by&#39;, []),
-              (&#39;reverse&#39;, [])]),
- OrderedDict([(&#39;op&#39;, &#39;Extend&#39;),
-              (&#39;ops&#39;, {&#39;row_number&#39;: &#39;row_number()&#39;}),
-              (&#39;partition_by&#39;, [&#39;subjectID&#39;]),
-              (&#39;order_by&#39;, [&#39;probability&#39;, &#39;surveyCategory&#39;]),
-              (&#39;reverse&#39;, [&#39;probability&#39;])]),
- OrderedDict([(&#39;op&#39;, &#39;SelectRows&#39;), (&#39;expr&#39;, &#39;row_number == 1&#39;)]),
- OrderedDict([(&#39;op&#39;, &#39;SelectColumns&#39;),
-              (&#39;columns&#39;, [&#39;subjectID&#39;, &#39;surveyCategory&#39;, &#39;probability&#39;])]),
- OrderedDict([(&#39;op&#39;, &#39;Rename&#39;),
-              (&#39;column_remapping&#39;, {&#39;diagnosis&#39;: &#39;surveyCategory&#39;})]),
- OrderedDict([(&#39;op&#39;, &#39;Order&#39;),
-              (&#39;order_columns&#39;, [&#39;subjectID&#39;]),
-              (&#39;reverse&#39;, []),
-              (&#39;limit&#39;, None)])]
+<pre>SELECT
+ &#34;id&#34; AS &#34;id&#34;,
+ &#34;Species&#34; AS &#34;Species&#34;,
+ MAX(CASE WHEN  ( &#34;Part&#34; = &#39;Petal&#39; )  AND  ( &#34;Measure&#34; = &#39;Length&#39; )  THEN &#34;Value&#34; ELSE NULL END) AS &#34;Petal.Length&#34;,
+ MAX(CASE WHEN  ( &#34;Part&#34; = &#39;Petal&#39; )  AND  ( &#34;Measure&#34; = &#39;Width&#39; )  THEN &#34;Value&#34; ELSE NULL END) AS &#34;Petal.Width&#34;,
+ MAX(CASE WHEN  ( &#34;Part&#34; = &#39;Sepal&#39; )  AND  ( &#34;Measure&#34; = &#39;Length&#39; )  THEN &#34;Value&#34; ELSE NULL END) AS &#34;Sepal.Length&#34;,
+ MAX(CASE WHEN  ( &#34;Part&#34; = &#39;Sepal&#39; )  AND  ( &#34;Measure&#34; = &#39;Width&#39; )  THEN &#34;Value&#34; ELSE NULL END) AS &#34;Sepal.Width&#34;
+FROM (
+  &#34;iris&#34;
+ )
+ GROUP BY &#34;id&#34;, &#34;Species&#34;
+ ORDER BY &#34;id&#34;, &#34;Species&#34;
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">db_model</span><span class="o">.</span><span class="n">row_recs_to_blocks_query</span><span class="p">(</span>
+    <span class="n">source_view</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">describe_pandas_table</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s1">&#39;iris&#39;</span><span class="p">),</span>
+    <span class="n">record_spec</span><span class="o">=</span><span class="n">record_spec</span><span class="p">,</span>
+    <span class="n">record_view</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">describe_pandas_table</span><span class="p">(</span><span class="n">record_spec</span><span class="o">.</span><span class="n">control_table</span><span class="p">,</span> <span class="s2">&quot;control_table&quot;</span><span class="p">)</span>
+<span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>SELECT
+ a.&#34;id&#34; AS &#34;id&#34;,
+ a.&#34;Species&#34; AS &#34;Species&#34;,
+ b.&#34;Part&#34; AS &#34;Part&#34;,
+ b.&#34;Measure&#34; AS &#34;Measure&#34;,
+ CASE
+  WHEN b.&#34;Value&#34; = &#39;Petal.Length&#39; THEN a.&#34;Petal.Length&#34;
+  WHEN b.&#34;Value&#34; = &#39;Petal.Width&#39; THEN a.&#34;Petal.Width&#34;
+  WHEN b.&#34;Value&#34; = &#39;Sepal.Length&#39; THEN a.&#34;Sepal.Length&#34;
+  WHEN b.&#34;Value&#34; = &#39;Sepal.Width&#39; THEN a.&#34;Sepal.Width&#34;
+  ELSE NULL END AS &#34;Value&#34;
+FROM (
+  &#34;iris&#34; ) a
+CROSS JOIN (
+  &#34;control_table&#34; ) b
+ ORDER BY a.&#34;id&#34;, a.&#34;Species&#34;, b.&#34;Part&#34;, b.&#34;Measure&#34;
 </pre>
 </div>
 </div>
@@ -13958,40 +14036,26 @@ ORDER BY &#34;subjectID&#34;
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>In the above data structure the recursive operator steps have been linearized into a list, and simplified to just ordered dictionaries of a few defining and derived fields. In particular, the <code>key</code> field of the <code>TableDescription</code> nodes is the unique identifier for the tables, two <code>TableDescription</code> with the same key are referring to the same table.</p>
-<p>We can then write this representation to <code>YAML</code> format.</p>
+<p>As complicated as the queries look, they actually expose some deep truths:</p>
+<ul>
+<li><p>The <code>row_recs_to_blocks_query()</code> is essentially a cross-join of the data to the record description.  Each combination of data row and record description row builds a new result row.</p>
+</li>
+<li><p>The <code>blocks_to_row_recs_query()</code> is an aggregation.  Each set of rows corresponding to a given data record is aggregated into a single result row.</p>
+</li>
+<li><p>Just about any arbitrary record shape to arbitrary record shape can be written as a transform from the first record shape to row-records (record sets that have exactly one row per record), followed by a transform from the row-records to the new format.  This transform can preserve column types as in the intermediate form each different record entry has its own column.  This is an advantage of using a "thin" intermediate form such as <a href="https://en.wikipedia.org/wiki/Semantic_triple">RDF triples</a>.</p>
+</li>
+</ul>
+<p>This leads us to believe that transforming to and from single-row records are in fact fundemental operations, and
+not just implementation details.</p>
+<h2 id="The-R-cdata-version">The R <code>cdata</code> version<a class="anchor-link" href="#The-R-cdata-version">&#182;</a></h2><p>The <code>data_algebra</code> had been previously implemented in <a href="https://www.r-project.org">R</a> in the <a href="https://github.com/WinVector/cdata"><code>cdata</code></a>, <a href="https://github.com/WinVector/rquery"><code>rquery</code></a>, and <a href="https://github.com/WinVector/rqdatatable"><code>rqdatatable</code></a> packages.</p>
+<p>We would perform the above transforms in R as follows.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># convert objects to a YAML string</span>
-<span class="n">dmp_R</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">objs_R</span><span class="p">)</span>
-<span class="c1"># write to file</span>
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;pipeline_yaml.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;wt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">dmp_R</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="R"><code>R</code><a class="anchor-link" href="#R">&#182;</a></h3><p>This pipeline can be loaded into <code>R</code> and used as follows.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> rpy2.ipython
@@ -14004,20 +14068,13 @@ ORDER BY &#34;subjectID&#34;
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span> 
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span>
 
-<span class="nf">library</span><span class="p">(</span><span class="n">yaml</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">wrapr</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">rquery</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">rqdatatable</span><span class="p">)</span>
-<span class="nf">source</span><span class="p">(</span><span class="s">&#39;R_fns.R&#39;</span><span class="p">)</span>  <span class="c1"># https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/R_fns.R</span>
-
-<span class="n">r_yaml</span> <span class="o">&lt;-</span> <span class="nf">yaml.load_file</span><span class="p">(</span><span class="s">&quot;pipeline_yaml.txt&quot;</span><span class="p">)</span>
-<span class="n">r_ops</span> <span class="o">&lt;-</span> <span class="nf">convert_yaml_to_pipeline</span><span class="p">(</span><span class="n">r_yaml</span><span class="p">)</span>
-<span class="nf">cat</span><span class="p">(</span><span class="nf">format</span><span class="p">(</span><span class="n">r_ops</span><span class="p">))</span>
+<span class="n">iris</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&#39;iris_small.csv&#39;</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -14034,30 +14091,70 @@ ORDER BY &#34;subjectID&#34;
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>table(d; 
-  subjectID,
-  surveyCategory,
-  assessmentTotal,
-  irrelevantCol1,
-  irrelevantCol2) %.&gt;%
- extend(.,
-  probability := exp(assessmentTotal * 0.237)) %.&gt;%
- extend(.,
-  total := sum(probability),
-  p= subjectID) %.&gt;%
- extend(.,
-  probability := probability / total) %.&gt;%
- extend(.,
-  row_number := row_number(),
-  p= subjectID,
-  o= &#34;probability&#34; DESC, &#34;surveyCategory&#34;) %.&gt;%
- select_rows(.,
-   row_number == 1) %.&gt;%
- select_columns(.,
-   subjectID, surveyCategory, probability) %.&gt;%
- rename(.,
-  c(&#39;diagnosis&#39; = &#39;surveyCategory&#39;)) %.&gt;%
- orderby(., subjectID)
+<pre>  Sepal.Length Sepal.Width Petal.Length Petal.Width Species id
+1          5.1         3.5          1.4         0.2  setosa  0
+2          4.9         3.0          1.4         0.2  setosa  1
+3          4.7         3.2          1.3         0.2  setosa  2
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span>
+
+<span class="c1"># install.packages(&quot;cdata&quot;)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">cdata</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span>
+
+<span class="n">control_table</span> <span class="o">&lt;-</span> <span class="n">wrapr</span><span class="o">::</span><span class="nf">qchar_frame</span><span class="p">(</span>
+  <span class="n">Part</span><span class="p">,</span>	 <span class="n">Measure</span><span class="p">,</span> <span class="n">Value</span>        <span class="o">|</span>
+  <span class="n">Petal</span><span class="p">,</span> <span class="n">Length</span><span class="p">,</span>  <span class="n">Petal.Length</span> <span class="o">|</span>
+  <span class="n">Petal</span><span class="p">,</span> <span class="n">Width</span><span class="p">,</span>   <span class="n">Petal.Width</span>  <span class="o">|</span>
+  <span class="n">Sepal</span><span class="p">,</span> <span class="n">Length</span><span class="p">,</span>  <span class="n">Sepal.Length</span> <span class="o">|</span>
+  <span class="n">Sepal</span><span class="p">,</span> <span class="n">Width</span><span class="p">,</span>	  <span class="n">Sepal.Width</span>  <span class="p">)</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="n">control_table</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>   Part Measure        Value
+1 Petal  Length Petal.Length
+2 Petal   Width  Petal.Width
+3 Sepal  Length Sepal.Length
+4 Sepal   Width  Sepal.Width
 </pre>
 </div>
 </div>
@@ -14069,7 +14166,8 @@ ORDER BY &#34;subjectID&#34;
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The above representation is nearly "<code>R</code> code" (it is not actually executable, unlike the <code>Python</code> representation, but very similar to the actual <code>rquery</code> steps) written using <a href="https://journal.r-project.org/archive/2018/RJ-2018-042/index.html"><code>wrapr</code> dot pipe</a> notation. However, it can be executed in <code>R</code>.</p>
+<p>Notice this time we just typed in the prototype record (instead of deriving it from a worked answer).</p>
+<p>Let's continut with the R demonstration.</p>
 
 </div>
 </div>
@@ -14079,16 +14177,14 @@ ORDER BY &#34;subjectID&#34;
 <div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span> 
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span>
 
-<span class="n">d_local</span> <span class="o">&lt;-</span> <span class="nf">build_frame</span><span class="p">(</span>
-   <span class="s">&quot;subjectID&quot;</span><span class="p">,</span> <span class="s">&quot;surveyCategory&quot;</span>     <span class="p">,</span> <span class="s">&quot;assessmentTotal&quot;</span><span class="p">,</span> <span class="s">&quot;irrelevantCol1&quot;</span><span class="p">,</span> <span class="s">&quot;irrelevantCol2&quot;</span> <span class="o">|</span>
-   <span class="m">1L</span>         <span class="p">,</span> <span class="s">&quot;withdrawal behavior&quot;</span><span class="p">,</span> <span class="m">5</span>                <span class="p">,</span> <span class="s">&quot;irrel1&quot;</span>        <span class="p">,</span> <span class="s">&quot;irrel2&quot;</span>         <span class="o">|</span>
-   <span class="m">1L</span>         <span class="p">,</span> <span class="s">&quot;positive re-framing&quot;</span><span class="p">,</span> <span class="m">2</span>                <span class="p">,</span> <span class="s">&quot;irrel1&quot;</span>        <span class="p">,</span> <span class="s">&quot;irrel2&quot;</span>         <span class="o">|</span>
-   <span class="m">2L</span>         <span class="p">,</span> <span class="s">&quot;withdrawal behavior&quot;</span><span class="p">,</span> <span class="m">3</span>                <span class="p">,</span> <span class="s">&quot;irrel1&quot;</span>        <span class="p">,</span> <span class="s">&quot;irrel2&quot;</span>         <span class="o">|</span>
-   <span class="m">2L</span>         <span class="p">,</span> <span class="s">&quot;positive re-framing&quot;</span><span class="p">,</span> <span class="m">4</span>                <span class="p">,</span> <span class="s">&quot;irrel1&quot;</span>        <span class="p">,</span> <span class="s">&quot;irrel2&quot;</span>         <span class="p">)</span>
+<span class="n">transform</span> <span class="o">&lt;-</span> <span class="nf">rowrecs_to_blocks_spec</span><span class="p">(</span>
+  <span class="n">control_table</span><span class="p">,</span>
+  <span class="n">recordKeys</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">,</span> <span class="s">&#39;Species&#39;</span><span class="p">),</span>
+  <span class="n">controlTableKeys</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Part&#39;</span><span class="p">,</span> <span class="s">&#39;Measure&#39;</span><span class="p">))</span>
 
-<span class="nf">print</span><span class="p">(</span><span class="n">d_local</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">transform</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -14105,11 +14201,25 @@ ORDER BY &#34;subjectID&#34;
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>  subjectID      surveyCategory assessmentTotal irrelevantCol1 irrelevantCol2
-1         1 withdrawal behavior               5         irrel1         irrel2
-2         1 positive re-framing               2         irrel1         irrel2
-3         2 withdrawal behavior               3         irrel1         irrel2
-4         2 positive re-framing               4         irrel1         irrel2
+<pre>{
+ row_record &lt;- wrapr::qchar_frame(
+   &#34;id&#34;  , &#34;Species&#34;, &#34;Petal.Length&#34;, &#34;Petal.Width&#34;, &#34;Sepal.Length&#34;, &#34;Sepal.Width&#34; |
+     .   , .        , Petal.Length  , Petal.Width  , Sepal.Length  , Sepal.Width   )
+ row_keys &lt;- c(&#39;id&#39;, &#39;Species&#39;)
+
+ # becomes
+
+ block_record &lt;- wrapr::qchar_frame(
+   &#34;id&#34;  , &#34;Species&#34;, &#34;Part&#34; , &#34;Measure&#34;, &#34;Value&#34;      |
+     .   , .        , &#34;Petal&#34;, &#34;Length&#34; , Petal.Length |
+     .   , .        , &#34;Petal&#34;, &#34;Width&#34;  , Petal.Width  |
+     .   , .        , &#34;Sepal&#34;, &#34;Length&#34; , Sepal.Length |
+     .   , .        , &#34;Sepal&#34;, &#34;Width&#34;  , Sepal.Width  )
+ block_keys &lt;- c(&#39;id&#39;, &#39;Species&#39;, &#39;Part&#39;, &#39;Measure&#39;)
+
+ # args: c(checkNames = TRUE, checkKeys = FALSE, strict = FALSE, allow_rqdatatable = TRUE)
+}
+
 </pre>
 </div>
 </div>
@@ -14117,25 +14227,15 @@ ORDER BY &#34;subjectID&#34;
 </div>
 </div>
 
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>We can use the <code>R</code> pipeline by piping data into the <code>r_ops</code> object.</p>
-
-</div>
-</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span> 
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span>
 
-<span class="n">d_local</span> <span class="o">%.&gt;%</span> 
-  <span class="n">r_ops</span> <span class="o">%.&gt;%</span> 
-  <span class="nf">print</span><span class="p">(</span><span class="n">.)</span>
+<span class="n">iris</span> <span class="o">%.&gt;%</span> <span class="n">transform</span>
 </pre></div>
 
     </div>
@@ -14152,9 +14252,19 @@ ORDER BY &#34;subjectID&#34;
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>   subjectID           diagnosis probability
-1:         1 withdrawal behavior   0.6706221
-2:         2 positive re-framing   0.5589742
+<pre>   id Species  Part Measure Value
+1   0  setosa Petal  Length   1.4
+2   0  setosa Petal   Width   0.2
+3   0  setosa Sepal  Length   5.1
+4   0  setosa Sepal   Width   3.5
+5   1  setosa Petal  Length   1.4
+6   1  setosa Petal   Width   0.2
+7   1  setosa Sepal  Length   4.9
+8   1  setosa Sepal   Width   3.0
+9   2  setosa Petal  Length   1.3
+10  2  setosa Petal   Width   0.2
+11  2  setosa Sepal  Length   4.7
+12  2  setosa Sepal   Width   3.2
 </pre>
 </div>
 </div>
@@ -14166,7 +14276,10 @@ ORDER BY &#34;subjectID&#34;
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>And the <code>R</code> <code>rquery</code> package can also perform its own <code>SQL</code> translation (and even execution management).</p>
+<h3 id="Cross-language-work">Cross-language work<a class="anchor-link" href="#Cross-language-work">&#182;</a></h3><p>As the record transform specifications, both in Python <code>data_algebra</code> and R <code>cata</code> are simple data structures (just 
+the control table, and a few lists of key column names), they can be moved from one language to another by <code>YAML</code> (as we demonstrated
+in the <a href="https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/ScoringExample.ipynb">logistic scoring example</a>.</p>
+<p><code>data_algebra</code> supplies a write method, so cross-language interoperation is just a matter of adding additional read/write methods.</p>
 
 </div>
 </div>
@@ -14176,10 +14289,7 @@ ORDER BY &#34;subjectID&#34;
 <div class="prompt input_prompt">In&nbsp;[17]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span>
-
-<span class="n">sql</span> <span class="o">&lt;-</span> <span class="nf">to_sql</span><span class="p">(</span><span class="n">r_ops</span><span class="p">,</span> <span class="nf">rquery_default_db_info</span><span class="p">())</span>
-<span class="nf">cat</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">mp_to_blocks</span><span class="o">.</span><span class="n">to_simple_obj</span><span class="p">()))</span>
 </pre></div>
 
     </div>
@@ -14196,279 +14306,31 @@ ORDER BY &#34;subjectID&#34;
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>SELECT * FROM (
- SELECT
-  &#34;subjectID&#34; AS &#34;subjectID&#34;,
-  &#34;surveyCategory&#34; AS &#34;diagnosis&#34;,
-  &#34;probability&#34; AS &#34;probability&#34;
- FROM (
-  SELECT
-   &#34;subjectID&#34;,
-   &#34;surveyCategory&#34;,
-   &#34;probability&#34;
-  FROM (
-   SELECT * FROM (
-    SELECT
-     &#34;subjectID&#34;,
-     &#34;surveyCategory&#34;,
-     &#34;probability&#34;,
-     row_number ( ) OVER (  PARTITION BY &#34;subjectID&#34; ORDER BY &#34;probability&#34; DESC, &#34;surveyCategory&#34; ) AS &#34;row_number&#34;
-    FROM (
-     SELECT
-      &#34;subjectID&#34;,
-      &#34;surveyCategory&#34;,
-      &#34;probability&#34; / &#34;total&#34;  AS &#34;probability&#34;
-     FROM (
-      SELECT
-       &#34;subjectID&#34;,
-       &#34;surveyCategory&#34;,
-       &#34;probability&#34;,
-       sum ( &#34;probability&#34; ) OVER (  PARTITION BY &#34;subjectID&#34; ) AS &#34;total&#34;
-      FROM (
-       SELECT
-        &#34;subjectID&#34;,
-        &#34;surveyCategory&#34;,
-        exp ( &#34;assessmentTotal&#34; * 0.237 )  AS &#34;probability&#34;
-       FROM (
-        SELECT
-         &#34;subjectID&#34;,
-         &#34;surveyCategory&#34;,
-         &#34;assessmentTotal&#34;
-        FROM
-         &#34;d&#34;
-        ) tsql_30847316539397090681_0000000000
-       ) tsql_30847316539397090681_0000000001
-      ) tsql_30847316539397090681_0000000002
-     ) tsql_30847316539397090681_0000000003
-   ) tsql_30847316539397090681_0000000004
-   WHERE &#34;row_number&#34; = 1
-  ) tsql_30847316539397090681_0000000005
- ) tsql_30847316539397090681_0000000006
-) tsql_30847316539397090681_0000000007 ORDER BY &#34;subjectID&#34;
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>The <code>R</code> implementation is mature, and appropriate to use in production.  The <a href="https://github.com/WinVector/rquery"><code>rquery</code></a> grammar is designed to have minimal state and minimal annotations (no grouping or ordering annotations!).  This makes the grammar, in my opinion, a good design choice. <code>rquery</code> has very good performance, often much faster than <code>dplyr</code> or base-<code>R</code> due to its query generation ideas and use of <a href="https://CRAN.R-project.org/package=data.table"><code>data.table</code></a> via <a href="https://CRAN.R-project.org/package=rqdatatable"><code>rqdatatable</code></a>.  <code>rquery</code> is a mature pure <code>R</code> package; <a href="https://github.com/WinVector/rquery/blob/master/README.md">here</a> is the same example being worked directly in <code>R</code>, with no translation from <code>Python</code>.</p>
-<p>The <code>R</code> implementation supports additional features such as converting a pipeline into a diagram (though that would also be easy to implement in <code>Python</code> on top of the <code>collect_representation()</code> objects).</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p><img src="https://github.com/WinVector/rquery/raw/master/Examples/yaml/yaml_files/figure-gfm/diagram-1.png" alt=""></p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>More of the <code>R</code> example (including how the diagram was produced) can be found <a href="https://github.com/WinVector/rquery/blob/master/Examples/yaml/yaml.md">here</a>.</p>
-<h2 id="Advantages-of-data_algebra">Advantages of <code>data_algebra</code><a class="anchor-link" href="#Advantages-of-data_algebra">&#182;</a></h2><p>Multi-language data science is an important trend, so a cross-language query system that supports at least <code>R</code> and <code>Python</code> is going to be a useful tool or capability going forward. Obviously <code>SQL</code> itself is fairly cross-language, but <code>data_algebra</code> adds a few features we hope are real advantages.</p>
-<p>In addition to the features shown above, a <code>data_algebra</code> operator pipeline carries around usable knowledge of the data transform.  For example:</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># report all tables used by the query, by name</span>
-<span class="n">ops</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[18]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>{&#39;d&#39;: TableDescription(table_name=&#39;d&#39;, column_names=[&#39;subjectID&#39;, &#39;surveyCategory&#39;, &#39;assessmentTotal&#39;, &#39;irrelevantCol1&#39;, &#39;irrelevantCol2&#39;])}</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[19]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># report all source table columns used by the query</span>
-<span class="n">ops</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[19]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>{&#39;d&#39;: {&#39;assessmentTotal&#39;, &#39;subjectID&#39;, &#39;surveyCategory&#39;}}</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[20]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># what columns does this operation produce?</span>
-<span class="n">ops</span><span class="o">.</span><span class="n">column_names</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[20]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>[&#39;subjectID&#39;, &#39;diagnosis&#39;, &#39;probability&#39;]</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">&#182;</a></h2><p>The <code>data_algebra</code> is part of a powerful cross-language and mutli-implementaiton family data manipulation tools. These tools can greatly reduce the development and maintenance cost of data science projects, while improving the documentation of project intent.</p>
-<p><a href="http://www.win-vector.com/">Win Vector LLC</a> is looking for sponsors and partners to further the package.  In particular if your group is using both <code>R</code> and <code>Python</code> in big-data projects (where <code>SQL</code> is a need, including <a href="https://spark.apache.org"><code>Apache Spark</code></a>), or are porting a project from one of these languages to another- please get in touch.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Appendix:">Appendix:<a class="anchor-link" href="#Appendix:">&#182;</a></h2><p>Demonstrate we can round-trip a <code>data_algebra</code> through <code>YAML</code> and recover the code.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[21]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># land the pipeline as a file</span>
-<span class="n">objs_Python</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">collect_representation</span><span class="p">()</span>
-<span class="n">dmp_Python</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">objs_Python</span><span class="p">)</span>
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;pipeline_Python.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;wt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">dmp_Python</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[22]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># read back</span>
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;pipeline_Python.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="n">ops_text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-<span class="n">ops_back</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">yaml</span><span class="o">.</span><span class="n">to_pipeline</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">ops_text</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ops_back</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>TableDescription(
-    table_name=&#34;d&#34;,
-    column_names=[
-        &#34;subjectID&#34;,
-        &#34;surveyCategory&#34;,
-        &#34;assessmentTotal&#34;,
-        &#34;irrelevantCol1&#34;,
-        &#34;irrelevantCol2&#34;,
-    ],
-).extend({&#34;probability&#34;: &#34;(assessmentTotal * 0.237).exp()&#34;}).extend(
-    {&#34;total&#34;: &#34;probability.sum()&#34;}, partition_by=[&#34;subjectID&#34;]
-).extend(
-    {&#34;probability&#34;: &#34;probability / total&#34;}
-).extend(
-    {&#34;row_number&#34;: &#34;_row_number()&#34;},
-    partition_by=[&#34;subjectID&#34;],
-    order_by=[&#34;probability&#34;, &#34;surveyCategory&#34;],
-    reverse=[&#34;probability&#34;],
-).select_rows(
-    &#34;row_number == 1&#34;
-).select_columns(
-    [&#34;subjectID&#34;, &#34;surveyCategory&#34;, &#34;probability&#34;]
-).rename_columns(
-    {&#34;diagnosis&#34;: &#34;surveyCategory&#34;}
-).order_rows(
-    [&#34;subjectID&#34;]
-)
+<pre>type: data_algebra.cdata_impl.RecordMap
+blocks_out:
+  type: data_algebra.cdata.RecordSpecification
+  record_keys:
+  - id
+  - Species
+  control_table_keys:
+  - Part
+  - Measure
+  control_table:
+    Part:
+    - Petal
+    - Petal
+    - Sepal
+    - Sepal
+    Measure:
+    - Length
+    - Width
+    - Length
+    - Width
+    Value:
+    - Petal.Length
+    - Petal.Width
+    - Sepal.Length
+    - Sepal.Width
 
 </pre>
 </div>
@@ -14478,54 +14340,13 @@ ORDER BY &#34;subjectID&#34;
 </div>
 
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[23]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># confirm we have a data_algebra.data_ops.ViewRepresentation</span>
-<span class="c1"># which is the class the data_algebra pipelines are derived from</span>
-<span class="nb">isinstance</span><span class="p">(</span><span class="n">ops_back</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[23]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>True</pre>
-</div>
-
-</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">&#182;</a></h2><p>The <a href="https://github.com/WinVector/cdata"><code>cdata</code></a> and <a href="https://github.com/WinVector/data_algebra"><code>data_algebra</code></a> systems yield powerful implementations, and deep understanding of the nature of record transformations.  They allow one to reshape data quickly and conveniently either in R or in Python/Pandas.</p>
 
 </div>
 </div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[24]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># be neat</span>
-<span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
 </div>
     </div>
   </div>
