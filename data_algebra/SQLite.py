@@ -60,5 +60,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         create_stmt = "CREATE TABLE " + table_name + " ( " + ", ".join(cr) + " )"
         cur = conn.cursor()
         cur.execute("DROP TABLE IF EXISTS " + table_name)
-        d.to_sql(name = table_name, con=conn)
-        return data_algebra.data_ops.TableDescription(table_name=table_name, column_names=[c for c in d.columns])
+        d.to_sql(name=table_name, con=conn)
+        return data_algebra.data_ops.TableDescription(
+            table_name=table_name, column_names=[c for c in d.columns]
+        )

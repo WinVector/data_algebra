@@ -9,6 +9,7 @@ import data_algebra.data_ops
 import data_algebra.util
 import data_algebra.cdata
 
+
 class DBModel:
     """A model of how SQL should be generated for a given database.
        """
@@ -439,13 +440,23 @@ class DBModel:
             + [self.quote_identifier(ci) for ci in using_left - common]
             + [self.quote_identifier(ci) for ci in using_right - common]
         )
-        on_terms = ''
+        on_terms = ""
         if len(join_node.by) > 0:
-            on_terms =  (
-                    ' ON ' + ', '.join([self.quote_identifier(sub_view_name_left) + '.' + self.quote_identifier(c)
-                       + " = "
-                       + self.quote_identifier(sub_view_name_right) + '.' + self.quote_identifier(c)
-                      for c in join_node.by]) + ' '
+            on_terms = (
+                " ON "
+                + ", ".join(
+                    [
+                        self.quote_identifier(sub_view_name_left)
+                        + "."
+                        + self.quote_identifier(c)
+                        + " = "
+                        + self.quote_identifier(sub_view_name_right)
+                        + "."
+                        + self.quote_identifier(c)
+                        for c in join_node.by
+                    ]
+                )
+                + " "
             )
         sql_str = (
             "SELECT "
@@ -497,7 +508,9 @@ class DBModel:
         buf = io.StringIO(d.to_csv(index=False, header=False, sep="\t"))
         cur.copy_from(buf, "d", columns=[c for c in d.columns])
         conn.commit()
-        return data_algebra.data_ops.TableDescription(table_name=table_name, column_names=[c for c in d.columns])
+        return data_algebra.data_ops.TableDescription(
+            table_name=table_name, column_names=[c for c in d.columns]
+        )
 
     # noinspection PyMethodMayBeStatic
     def read_query(self, conn, q):
@@ -548,61 +561,122 @@ class DBModel:
 
     def row_recs_to_blocks_query(self, source_table, record_spec, temp_table):
         if not isinstance(source_table, data_algebra.data_ops.TableDescription):
-            raise Exception("source_table should be a data_algebra.data_ops.TableDescription")
+            raise Exception(
+                "source_table should be a data_algebra.data_ops.TableDescription"
+            )
         if not isinstance(record_spec, data_algebra.cdata.RecordSpecification):
-            raise Exception("record_spec should be a data_algebra.cdata.RecordSpecification")
+            raise Exception(
+                "record_spec should be a data_algebra.cdata.RecordSpecification"
+            )
         if not isinstance(temp_table, data_algebra.data_ops.TableDescription):
-            raise Exception("temp_table should be a data_algebra.data_ops.TableDescription")
-        control_value_cols = [c for c in record_spec.control_table.columns if c not in record_spec.control_table_keys]
-        control_cols = ['a.' + self.quote_identifier(c) for c in record_spec.record_keys] +\
-            ['b.' + self.quote_identifier(key_col) for key_col in record_spec.control_table_keys]
+            raise Exception(
+                "temp_table should be a data_algebra.data_ops.TableDescription"
+            )
+        control_value_cols = [
+            c
+            for c in record_spec.control_table.columns
+            if c not in record_spec.control_table_keys
+        ]
+        control_cols = [
+            "a." + self.quote_identifier(c) for c in record_spec.record_keys
+        ] + [
+            "b." + self.quote_identifier(key_col)
+            for key_col in record_spec.control_table_keys
+        ]
         col_stmts = []
         for c in record_spec.record_keys:
-            col_stmts.append(' a.' + self.quote_identifier(c) + ' AS ' + self.quote_identifier(c))
+            col_stmts.append(
+                " a." + self.quote_identifier(c) + " AS " + self.quote_identifier(c)
+            )
         for key_col in record_spec.control_table_keys:
-            col_stmts.append(' b.' + self.quote_identifier(key_col) + ' AS ' + self.quote_identifier(key_col))
+            col_stmts.append(
+                " b."
+                + self.quote_identifier(key_col)
+                + " AS "
+                + self.quote_identifier(key_col)
+            )
         for result_col in control_value_cols:
-            cstmt = ' CASE\n'
+            cstmt = " CASE\n"
             for source_col in record_spec.control_table[result_col]:
-                col_sql = ('  WHEN b.' + self.quote_identifier(result_col) + ' = ' + self.quote_string(source_col)
-                            + ' THEN a.' + self.quote_identifier(source_col) + '\n')
-                cstmt = cstmt + col_sql
-            cstmt = cstmt + '  ELSE NULL END AS ' + self.quote_identifier(result_col)
-            col_stmts.append(cstmt)
-        sql = ( 'SELECT\n'
-                + ',\n'.join(col_stmts) + '\n'
-                + 'FROM ' + self.quote_table_name(source_table) + ' a\n'
-                + 'CROSS JOIN ' + self.quote_table_name(temp_table) + ' b' + '\n'
-                + ' ORDER BY ' + ', '.join(control_cols)
+                col_sql = (
+                    "  WHEN b."
+                    + self.quote_identifier(result_col)
+                    + " = "
+                    + self.quote_string(source_col)
+                    + " THEN a."
+                    + self.quote_identifier(source_col)
+                    + "\n"
                 )
+                cstmt = cstmt + col_sql
+            cstmt = cstmt + "  ELSE NULL END AS " + self.quote_identifier(result_col)
+            col_stmts.append(cstmt)
+        sql = (
+            "SELECT\n"
+            + ",\n".join(col_stmts)
+            + "\n"
+            + "FROM "
+            + self.quote_table_name(source_table)
+            + " a\n"
+            + "CROSS JOIN "
+            + self.quote_table_name(temp_table)
+            + " b"
+            + "\n"
+            + " ORDER BY "
+            + ", ".join(control_cols)
+        )
         return sql
 
     def blocks_to_row_recs_query(self, source_table, record_spec):
         if not isinstance(source_table, data_algebra.data_ops.TableDescription):
-            raise Exception("source_table should be a data_algebra.data_ops.TableDescription")
+            raise Exception(
+                "source_table should be a data_algebra.data_ops.TableDescription"
+            )
         if not isinstance(record_spec, data_algebra.cdata.RecordSpecification):
-            raise Exception("record_spec should be a data_algebra.cdata.RecordSpecification")
-        control_value_cols = [c for c in record_spec.control_table.columns if c not in record_spec.control_table_keys]
+            raise Exception(
+                "record_spec should be a data_algebra.cdata.RecordSpecification"
+            )
+        control_value_cols = [
+            c
+            for c in record_spec.control_table.columns
+            if c not in record_spec.control_table_keys
+        ]
         control_cols = [self.quote_identifier(c) for c in record_spec.record_keys]
         col_stmts = []
         for c in record_spec.record_keys:
-            col_stmts.append(' ' + self.quote_identifier(c) + ' AS ' + self.quote_identifier(c))
+            col_stmts.append(
+                " " + self.quote_identifier(c) + " AS " + self.quote_identifier(c)
+            )
         for i in range(record_spec.control_table.shape[0]):
             for vc in control_value_cols:
                 clauses = []
                 for cc in record_spec.control_table_keys:
-                    clauses.append(' ( ' + self.quote_identifier(cc) + ' = '
-                                   + self.quote_string(record_spec.control_table[cc][i]) + ' ) ')
-                cstmt = ' MAX(CASE WHEN ' + ' AND '.join(clauses) + ' THEN ' +\
-                        self.quote_identifier(vc) +\
-                        " ELSE NULL END) AS " +\
-                        self.quote_identifier(record_spec.control_table[vc][i])
-                col_stmts.append(cstmt)
-        sql = ( 'SELECT\n'
-                + ',\n'.join(col_stmts) + '\n'
-                + 'FROM ' + self.quote_table_name(source_table) + '\n'
-                + ' GROUP BY ' + ', '.join(control_cols) + '\n'
-                + ' ORDER BY ' + ', '.join(control_cols)
+                    clauses.append(
+                        " ( "
+                        + self.quote_identifier(cc)
+                        + " = "
+                        + self.quote_string(record_spec.control_table[cc][i])
+                        + " ) "
+                    )
+                cstmt = (
+                    " MAX(CASE WHEN "
+                    + " AND ".join(clauses)
+                    + " THEN "
+                    + self.quote_identifier(vc)
+                    + " ELSE NULL END) AS "
+                    + self.quote_identifier(record_spec.control_table[vc][i])
                 )
+                col_stmts.append(cstmt)
+        sql = (
+            "SELECT\n"
+            + ",\n".join(col_stmts)
+            + "\n"
+            + "FROM "
+            + self.quote_table_name(source_table)
+            + "\n"
+            + " GROUP BY "
+            + ", ".join(control_cols)
+            + "\n"
+            + " ORDER BY "
+            + ", ".join(control_cols)
+        )
         return sql
-

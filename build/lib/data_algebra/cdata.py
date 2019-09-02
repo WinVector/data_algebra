@@ -1,16 +1,11 @@
-
 import re
 import collections
 
 import pandas
 
-class RecordSpecification:
 
-    def __init__(self,
-                 control_table,
-                 *,
-                 record_keys=None,
-                 control_table_keys=None):
+class RecordSpecification:
+    def __init__(self, control_table, *, record_keys=None, control_table_keys=None):
         if not isinstance(control_table, pandas.DataFrame):
             raise Exception("control_table should be a pandas.DataFrame")
         self.control_table = control_table.copy()
@@ -34,11 +29,17 @@ class RecordSpecification:
 
     def fmt(self):
         s = (
-                'RecordSpecification\n'
-                + '   record_keys: ' + str(self.record_keys) + '\n'
-                + '   control_table_keys: ' + str(self.control_table_keys) + '\n'
-                + '   control_table:\n'
-                + '   ' + re.sub('\n', '\n   ', str(self.control_table)) + '\n'
+            "RecordSpecification\n"
+            + "   record_keys: "
+            + str(self.record_keys)
+            + "\n"
+            + "   control_table_keys: "
+            + str(self.control_table_keys)
+            + "\n"
+            + "   control_table:\n"
+            + "   "
+            + re.sub("\n", "\n   ", str(self.control_table))
+            + "\n"
         )
         return s
 
@@ -50,20 +51,22 @@ class RecordSpecification:
 
     def to_simple_obj(self):
         obj = collections.OrderedDict()
-        obj['type'] = 'data_algebra.cdata.RecordSpecification'
-        obj['record_keys'] = self.record_keys.copy()
-        obj['control_table_keys'] = self.control_table_keys.copy()
+        obj["type"] = "data_algebra.cdata.RecordSpecification"
+        obj["record_keys"] = self.record_keys.copy()
+        obj["control_table_keys"] = self.control_table_keys.copy()
         tbl = collections.OrderedDict()
         for k in self.control_table.columns:
             tbl[k] = [v for v in self.control_table[k]]
-        obj['control_table'] = tbl
+        obj["control_table"] = tbl
         return obj
 
 
 def record_spec_from_simple_obj(obj):
     control_table = pandas.DataFrame()
-    for k in obj['control_table'].keys():
-        control_table[k] = obj['control_table'][k]
-    return RecordSpecification(control_table,
-                               record_keys = obj['record_keys'],
-                               control_table_keys = obj['control_table_keys'])
+    for k in obj["control_table"].keys():
+        control_table[k] = obj["control_table"][k]
+    return RecordSpecification(
+        control_table,
+        record_keys=obj["record_keys"],
+        control_table_keys=obj["control_table_keys"],
+    )

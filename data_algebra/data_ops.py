@@ -204,7 +204,9 @@ class ViewRepresentation(OperatorPlatform):
         if isinstance(X, pandas.DataFrame):
             tables = self.get_tables()
             if len(tables) != 1:
-                raise Exception("transfrom(pandas.DataFrame) can only be applied to ops-dags with only one table def")
+                raise Exception(
+                    "transfrom(pandas.DataFrame) can only be applied to ops-dags with only one table def"
+                )
             k = [k for k in tables.keys()][0]
             return self.eval_pandas({k: X})
         raise Exception("can not apply transform() to type " + str(type(X)))
@@ -244,6 +246,10 @@ class ViewRepresentation(OperatorPlatform):
 
     def order_rows(self, columns, *, reverse=None, limit=None):
         return OrderRowsNode(source=self, columns=columns, reverse=reverse, limit=limit)
+
+
+# Could also have general query as starting node, but don't see a lot of point to
+# it until somebody needs it.
 
 
 class TableDescription(ViewRepresentation):
@@ -1036,20 +1042,22 @@ class NaturalJoinNode(ViewRepresentation):
     def eval_pandas(self, data_map):
         left = self.sources[0].eval_pandas(data_map)
         right = self.sources[1].eval_pandas(data_map)
-        common_cols = set([c for c in left.columns]).intersection([c for c in right.columns])
+        common_cols = set([c for c in left.columns]).intersection(
+            [c for c in right.columns]
+        )
         res = pandas.merge(
             left=left,
             right=right,
             how=self.jointype.lower(),
             on=self.by,
             sort=False,
-            suffixes=('', '_tmp_right_col')
+            suffixes=("", "_tmp_right_col"),
         )
         res.reset_index(inplace=True, drop=True)
         for c in common_cols:
             if c not in self.by:
                 is_null = res[c].isnull()
-                res[c][is_null] = res[c + '_tmp_right_col']
-                res.drop(c + '_tmp_right_col', axis=1, inplace=True)
+                res[c][is_null] = res[c + "_tmp_right_col"]
+                res.drop(c + "_tmp_right_col", axis=1, inplace=True)
         res.reset_index(inplace=True, drop=True)
         return res

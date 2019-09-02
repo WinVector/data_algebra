@@ -23,10 +23,13 @@ def can_convert_v_to_numeric(x):
 
 
 def equivalent_frames(
-    a, b, *, float_tol=1e-8,
-        check_column_order=False,
-        cols_case_sensitive=False,
-        check_row_order=False
+    a,
+    b,
+    *,
+    float_tol=1e-8,
+    check_column_order=False,
+    cols_case_sensitive=False,
+    check_row_order=False
 ):
     """return False if the frames are equivalent (up to column re-ordering and possible row-reordering).
     Ignores indexing."""

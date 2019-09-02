@@ -230,32 +230,20 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
 
     def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
         op = Extend(
-                ops=ops,
-                partition_by=partition_by,
-                order_by=order_by,
-                reverse=reverse,
-            )
+            ops=ops, partition_by=partition_by, order_by=order_by, reverse=reverse
+        )
         self.ops.append(op)
         return self
 
     def project(self, ops, *, group_by=None, order_by=None, reverse=None):
-        op = Project(
-                ops=ops,
-                group_by=group_by,
-                order_by=order_by,
-                reverse=reverse,
-            )
+        op = Project(ops=ops, group_by=group_by, order_by=order_by, reverse=reverse)
         self.ops.append(op)
         return self
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
         if not isinstance(b, data_algebra.data_ops.ViewRepresentation):
             raise Exception("b must be a data_algebra.data_ops.ViewRepresentation")
-        op = NaturalJoin(
-                by=by,
-                jointype=jointype,
-                b=b,
-        )
+        op = NaturalJoin(by=by, jointype=jointype, b=b)
         self.ops.append(op)
         return self
 
@@ -265,9 +253,7 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
         return self
 
     def drop_columns(self, column_deletions):
-        op = DropColumns(
-                column_deletions=column_deletions
-            )
+        op = DropColumns(column_deletions=column_deletions)
         self.ops.append(op)
         return self
 
@@ -277,16 +263,12 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
         return self
 
     def rename_columns(self, column_remapping):
-        op = RenameColumns(
-                column_remapping=column_remapping
-            )
+        op = RenameColumns(column_remapping=column_remapping)
         self.ops.append(op)
         return self
 
     def order_rows(self, columns, *, reverse=None, limit=None):
-        op = OrderRows(
-                columns=columns, reverse=reverse, limit=limit
-            )
+        op = OrderRows(columns=columns, reverse=reverse, limit=limit)
         self.ops.append(op)
         return self
 

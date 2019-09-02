@@ -24,7 +24,7 @@ class PipeStep:
     def __rrshift__(self, other):  # override other >> self
         return self.apply(other)
 
-    def __rshift__(self, other):   # override self >> other
+    def __rshift__(self, other):  # override self >> other
         if isinstance(other, PipeStep):
             return PipeFunction(
                 lambda x: other.apply(self.apply(x)),
