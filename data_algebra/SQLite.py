@@ -1,5 +1,6 @@
 import pandas
 
+import data_algebra.util
 import data_algebra.data_ops
 import data_algebra.db_model
 
@@ -47,17 +48,6 @@ class SQLiteModel(data_algebra.db_model.DBModel):
 
         if not isinstance(d, pandas.DataFrame):
             raise Exception("d is supposed to be a pandas.DataFrame")
-        cr = [
-            d.columns[i].lower()
-            + " "
-            + (
-                "double precision"
-                if data_algebra.util.can_convert_v_to_numeric(d[d.columns[i]])
-                else "VARCHAR"
-            )
-            for i in range(d.shape[1])
-        ]
-        create_stmt = "CREATE TABLE " + table_name + " ( " + ", ".join(cr) + " )"
         cur = conn.cursor()
         cur.execute("DROP TABLE IF EXISTS " + table_name)
         d.to_sql(name=table_name, con=conn)

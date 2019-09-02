@@ -50,6 +50,8 @@ class RecordSpecification:
         return self.fmt()
 
     def to_simple_obj(self):
+        """Create an object for YAML encoding"""
+
         obj = collections.OrderedDict()
         obj["type"] = "data_algebra.cdata.RecordSpecification"
         obj["record_keys"] = self.record_keys.copy()

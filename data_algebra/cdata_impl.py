@@ -3,6 +3,7 @@ import collections
 
 import pandas
 
+import data_algebra.data_ops
 import data_algebra.cdata
 import data_algebra.SQLite
 
@@ -23,6 +24,7 @@ class RecordMap:
         self.blocks_out = blocks_out
         self.fmt_string = self.fmt()
 
+    # noinspection PyPep8Naming
     def transform(self, X):
         if not isinstance(X, pandas.DataFrame):
             raise Exception("X should be a pandas.DataFrame")
@@ -102,6 +104,8 @@ class RecordMap:
         return self.fmt_string
 
     def to_simple_obj(self):
+        """Create an object for YAML encoding"""
+
         obj = collections.OrderedDict()
         obj["type"] = "data_algebra.cdata_impl.RecordMap"
         if self.blocks_in is not None:
