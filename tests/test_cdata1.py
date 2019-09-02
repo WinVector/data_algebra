@@ -17,7 +17,7 @@ def test_cdata1():
 
     # %%
 
-    buf = io.StringIO(re.sub('[[ \\t]+', '', """
+    buf = io.StringIO(re.sub('[ \\t]+', '', """
     Sepal.Length,Sepal.Width,Petal.Length,Petal.Width,Species,id
     5.1,3.5,1.4,0.2,setosa,0
     4.9,3.0,1.4,0.2,setosa,1
@@ -25,7 +25,7 @@ def test_cdata1():
     """))
     iris_orig = pandas.read_csv(buf)
 
-    buf = io.StringIO(re.sub('[[ \\t]+', '', """
+    buf = io.StringIO(re.sub('[ \\t]+', '', """
     id,Species,Part,Measure,Value
     0,setosa,Petal,Length,1.4
     0,setosa,Petal,Width,0.2
