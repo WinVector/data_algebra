@@ -366,8 +366,21 @@ class TableDescription(ViewRepresentation):
             raise Exception("asked for undefined columns: " + str(unexpected))
         cset.update(using)
 
-    def to_sql_implementation(self, db_model, *, using, temp_id_source):
-        return db_model.table_def_to_sql(self, using=using)
+    def to_sql(self, db_model, *, pretty=False, encoding=None, sqlparse_options=None):
+        global have_sqlparse
+        if sqlparse_options is None:
+            sqlparse_options = {"reindent": True, "keyword_case": "upper"}
+        self.get_tables()  # for table consistency check/raise
+        temp_id_source = [0]
+        sql_str = self.to_sql_implementation(
+            db_model=db_model, using=None, temp_id_source=temp_id_source, force_sql=True
+        )
+        if pretty and have_sqlparse:
+            sql_str = sqlparse.format(sql_str, encoding=encoding, **sqlparse_options)
+        return sql_str
+
+    def to_sql_implementation(self, db_model, *, using, temp_id_source, force_sql=False):
+        return db_model.table_def_to_sql(self, using=using, force_sql=force_sql)
 
     # comparable to other table descriptions
     def __lt__(self, other):

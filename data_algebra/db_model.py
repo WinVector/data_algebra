@@ -620,13 +620,12 @@ class DBModel:
             "SELECT\n"
             + ",\n".join(col_stmts)
             + "\n"
-            + "FROM "
+            + "FROM (\n  "
             + source_view.to_sql_implementation(self, using=using, temp_id_source=temp_id_source)
-            + " a\n"
-            + "CROSS JOIN "
+            + " ) a\n"
+            + "CROSS JOIN (\n  "
             + record_view.to_sql_implementation(self, using=using, temp_id_source=temp_id_source)
-            + " b"
-            + "\n"
+            + " ) b\n"
             + " ORDER BY "
             + ", ".join(control_cols)
         )
@@ -680,9 +679,9 @@ class DBModel:
             "SELECT\n"
             + ",\n".join(col_stmts)
             + "\n"
-            + "FROM "
-            + source_view.to_sql_implementation(self, using=using, temp_id_source=temp_id_source)
-            + "\n"
+            + "FROM (\n  "
+            + source_view.to_sql_implementation(self, using=using, temp_id_source=temp_id_source) + "\n"
+            + " )\n"
             + " GROUP BY "
             + ", ".join(control_cols)
             + "\n"

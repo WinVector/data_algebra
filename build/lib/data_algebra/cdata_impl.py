@@ -54,10 +54,10 @@ class RecordMap:
         X.reset_index(inplace=True, drop=True)
         db_model = data_algebra.SQLite.SQLiteModel()
         if self.blocks_in is not None:
-            x_descr = data_algebra.data_ops.describe_pandas_table(X, table_name="X")
+            x1_descr = data_algebra.data_ops.describe_pandas_table(X, table_name="x_blocks_in")
             missing_cols = (
                     set(self.blocks_in.control_table_keys).union(self.blocks_in.record_keys) -
-                    set(x_descr.column_names))
+                    set(x1_descr.column_names))
             if len(missing_cols) > 0:
                 raise Exception("missing required columns: " + str(missing_cols))
             # convert to row-records
@@ -66,14 +66,14 @@ class RecordMap:
                 if not table_is_keyed_by_columns(X, self.blocks_in.record_keys + self.blocks_in.control_table_keys):
                     raise Exception("table is not keyed by blocks_in.record_keys + blocks_in.control_table_keys")
             with sqlite3.connect(":memory:") as conn:
-                db_model.insert_table(conn, X, "X")
+                db_model.insert_table(conn, X, x1_descr.table_name)
                 to_blocks_sql = db_model.blocks_to_row_recs_query(
-                    x_descr, self.blocks_in
+                    x1_descr, self.blocks_in
                 )
                 X = db_model.read_query(conn, to_blocks_sql)
         if self.blocks_out is not None:
-            x_descr = data_algebra.data_ops.describe_pandas_table(X, table_name="X")
-            missing_cols = set(self.blocks_out.record_keys) - set(x_descr.column_names)
+            x2_descr = data_algebra.data_ops.describe_pandas_table(X, table_name="x_blocks_out")
+            missing_cols = set(self.blocks_out.record_keys) - set(x2_descr.column_names)
             if len(missing_cols) > 0:
                 raise Exception("missing required columns: " + str(missing_cols))
             if check_blocks_out_keying:
@@ -85,12 +85,12 @@ class RecordMap:
                 temp_table = data_algebra.data_ops.TableDescription(
                     "blocks_out", self.blocks_out.control_table.columns
                 )
-                db_model.insert_table(conn, X, "X")
+                db_model.insert_table(conn, X, x2_descr.table_name)
                 db_model.insert_table(
                     conn, self.blocks_out.control_table, temp_table.table_name
                 )
                 to_rows_sql = db_model.row_recs_to_blocks_query(
-                    x_descr, self.blocks_out, temp_table
+                    x2_descr, self.blocks_out, temp_table
                 )
                 X = db_model.read_query(conn, to_rows_sql)
         return X
