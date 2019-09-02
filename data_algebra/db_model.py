@@ -112,7 +112,7 @@ class DBModel:
 
         raise Exception("unexpected type: " + str(type(expression)))
 
-    def table_def_to_sql(self, table_def, *, using=None, force_sql=True):
+    def table_def_to_sql(self, table_def, *, using=None, force_sql=False):
         if not isinstance(table_def, data_algebra.data_ops.TableDescription):
             raise Exception(
                 "Expected table_def to be a data_algebra.data_ops.TableDescription)"
@@ -561,18 +561,22 @@ class DBModel:
             qualifiers=qualifiers,
         )
 
-    def row_recs_to_blocks_query(self, source_table, record_spec, temp_table):
-        if not isinstance(source_table, data_algebra.data_ops.TableDescription):
+    def row_recs_to_blocks_query(self, source_view, record_spec, record_view,
+                                 *,
+                                 using=None, temp_id_source=None):
+        if temp_id_source is None:
+            temp_id_source = [0]
+        if not isinstance(source_view, data_algebra.data_ops.ViewRepresentation):
             raise Exception(
-                "source_table should be a data_algebra.data_ops.TableDescription"
+                "source_view should be a data_algebra.data_ops.ViewRepresentation"
             )
         if not isinstance(record_spec, data_algebra.cdata.RecordSpecification):
             raise Exception(
                 "record_spec should be a data_algebra.cdata.RecordSpecification"
             )
-        if not isinstance(temp_table, data_algebra.data_ops.TableDescription):
+        if not isinstance(record_view, data_algebra.data_ops.ViewRepresentation):
             raise Exception(
-                "temp_table should be a data_algebra.data_ops.TableDescription"
+                "record_view should be a data_algebra.data_ops.ViewRepresentation"
             )
         control_value_cols = [
             c
@@ -617,10 +621,10 @@ class DBModel:
             + ",\n".join(col_stmts)
             + "\n"
             + "FROM "
-            + self.quote_table_name(source_table)
+            + source_view.to_sql_implementation(self, using=using, temp_id_source=temp_id_source)
             + " a\n"
             + "CROSS JOIN "
-            + self.quote_table_name(temp_table)
+            + record_view.to_sql_implementation(self, using=using, temp_id_source=temp_id_source)
             + " b"
             + "\n"
             + " ORDER BY "
@@ -628,10 +632,14 @@ class DBModel:
         )
         return sql
 
-    def blocks_to_row_recs_query(self, source_table, record_spec):
-        if not isinstance(source_table, data_algebra.data_ops.TableDescription):
+    def blocks_to_row_recs_query(self, source_view, record_spec,
+                                 *,
+                                 using=None, temp_id_source=None):
+        if temp_id_source is None:
+            temp_id_source = [0]
+        if not isinstance(source_view, data_algebra.data_ops.ViewRepresentation):
             raise Exception(
-                "source_table should be a data_algebra.data_ops.TableDescription"
+                "source_view should be a data_algebra.data_ops.ViewRepresentation"
             )
         if not isinstance(record_spec, data_algebra.cdata.RecordSpecification):
             raise Exception(
@@ -673,7 +681,7 @@ class DBModel:
             + ",\n".join(col_stmts)
             + "\n"
             + "FROM "
-            + self.quote_table_name(source_table)
+            + source_view.to_sql_implementation(self, using=using, temp_id_source=temp_id_source)
             + "\n"
             + " GROUP BY "
             + ", ".join(control_cols)
