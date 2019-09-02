@@ -580,8 +580,6 @@ class ProjectNode(ViewRepresentation):
         if isinstance(order_by, str):
             order_by = [order_by]
         self.order_by = order_by
-        if (len(group_by) <= 0) and (len(order_by) <= 0):
-            raise Exception("Must set at least one of group_by or order_by")
         if reverse is None:
             reverse = []
         if isinstance(reverse, str):
@@ -689,6 +687,17 @@ class ProjectNode(ViewRepresentation):
         if len(self.group_by) > 0:
             res = res.groupby(self.group_by)
         cols = {k: res[str(op.args[0])].agg(op.op) for (k, op) in self.ops.items()}
+
+        # agg can return scalars, which then can't be made into a pandas.DataFrame
+        def promote_scalar(v):
+            # noinspection PyBroadException
+            try:
+                len(v)
+            except Exception:
+                return [v]
+            return v
+
+        cols = {k: promote_scalar(v) for (k, v) in cols.items()}
         res = pandas.DataFrame(cols)
         res.reset_index(inplace=True, drop=False)  # grouping variables in the index
         return res

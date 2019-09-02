@@ -417,6 +417,7 @@ def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
         v = ov
         if not isinstance(v, Term):
             failue = False
+            # noinspection PyBroadException
             try:
                 v = _eval_by_parse(
                     source_str=v, data_def=mp, outter_environemnt=sub_env

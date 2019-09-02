@@ -18,11 +18,11 @@ tests/test_sqlite.py .                                                   [100%]
 Name                           Stmts   Miss  Cover
 --------------------------------------------------
 data_algebra/PostgreSQL.py        19      4    79%
-data_algebra/SQLite.py            29      5    83%
+data_algebra/SQLite.py            28      5    82%
 data_algebra/__init__.py           5      0   100%
-data_algebra/cdata.py             46      4    91%
-data_algebra/cdata_impl.py        69      8    88%
-data_algebra/data_ops.py         674    117    83%
+data_algebra/cdata.py             49      5    90%
+data_algebra/cdata_impl.py        94     16    83%
+data_algebra/data_ops.py         679    115    83%
 data_algebra/data_pipe.py        158     33    79%
 data_algebra/db_model.py         333     77    77%
 data_algebra/env.py               54     12    78%
@@ -32,7 +32,7 @@ data_algebra/pipe.py              65     19    71%
 data_algebra/util.py              63      5    92%
 data_algebra/yaml.py              73      9    88%
 --------------------------------------------------
-TOTAL                           1915    420    78%
+TOTAL                           1947    427    78%
 
 
-========================== 12 passed in 2.19 seconds ===========================
+========================== 12 passed in 2.15 seconds ===========================
