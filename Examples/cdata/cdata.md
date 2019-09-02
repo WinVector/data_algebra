@@ -686,9 +686,9 @@ print(db_model.row_recs_to_blocks_query(
 
 As complicated as the queries look, they actually expose some deep truths:
 
-  * The `row_recs_to_blocks_query()` is essentially a cross-join of the data to the record description.  Each combination of data row and record description row builds a new result row.
-
   * The `blocks_to_row_recs_query()` is an aggregation.  Each set of rows corresponding to a given data record is aggregated into a single result row.
+  
+  * The `row_recs_to_blocks_query()` is essentially a cross-join of the data to the record description.  Each combination of data row and record description row builds a new result row.
 
   * Just about any arbitrary record shape to arbitrary record shape can be written as a transform from the first record shape to row-records (record sets that have exactly one row per record), followed by a transform from the row-records to the new format.  This transform can preserve column types as in the intermediate form each different record entry has its own column.  This is an advantage of using a "thin" intermediate form such as [RDF triples](https://en.wikipedia.org/wiki/Semantic_triple).
 
@@ -749,7 +749,7 @@ print(control_table)
     4 Sepal   Width  Sepal.Width
 
 
-Notice this time we just typed in the prototype record (instead of deriving it from a worked answer).
+Notice this time we just typed in the prototype record (instead of deriving it from a worked answer). We could also copy the control specification over from Python, as we will discuss later.
 
 Let's continut with the R demonstration.
 
