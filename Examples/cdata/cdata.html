@@ -13116,17 +13116,19 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The great strength of the <a href="https://www.r-project.org">R</a> <a href="https://github.com/WinVector/cdata">cdata</a> (<a href="http://www.win-vector.com/blog/tag/coordinatized-data/">coordinatized data</a>)
-and Python <a href="https://github.com/WinVector/data_algebra">data_algebra</a> data wrangling systems are:</p>
+<p>This note is a simple data wrangling example worked using both the Python <a href="https://github.com/WinVector/data_algebra">data_algebra</a> package and the <a href="https://www.r-project.org">R</a> <a href="https://github.com/WinVector/cdata">cdata</a> package. Both of these packages make data wrangling easy through he use of <a href="http://www.win-vector.com/blog/tag/coordinatized-data/">coordinatized data</a> concepts (essentially <a href="https://en.wikipedia.org/wiki/Codd%27s_12_rules">Codd's "rule of access"</a>).</p>
+<p>The advantages of <a href="https://github.com/WinVector/data_algebra">data_algebra</a> and <a href="https://github.com/WinVector/cdata">cdata</a> are:</p>
 <ul>
 <li><p>The user specifies their desired transform declaratively <em>by example</em> and <em>in data</em>.  What one does is: work 
- an example, and then write-down what you want (we have a tutial on this <a href="https://winvector.github.io/cdata/articles/design.html">here</a>).</p>
+ an example, and then write-down what you want (we have a tutorial on this <a href="https://winvector.github.io/cdata/articles/design.html">here</a>).</p>
 </li>
 <li><p>The transform systems can print what a transform is going to do.  This makes reasoning about data transforms <em>much</em> easier.</p>
 </li>
+<li><p>The transforms, as they themselves are written as data, can be easily shared between systems (such as R and Python).</p>
+</li>
 </ul>
 <p>Let's re-work a small <a href="https://github.com/WinVector/cdata/blob/master/vignettes/control_table_keys.Rmd">R cdata example</a>, using the Python package <a href="https://github.com/WinVector/data_algebra">data_algebra</a>.</p>
-<h2 id="An-Example">An Example<a class="anchor-link" href="#An-Example">&#182;</a></h2><p>First we import some modules and packages, and type in some notional data.</p>
+<h2 id="An-Example">An Example<a class="anchor-link" href="#An-Example">&#182;</a></h2><p>First we import some modules and packages, and import some notional data.</p>
 
 </div>
 </div>
@@ -13136,9 +13138,13 @@ and Python <a href="https://github.com/WinVector/data_algebra">data_algebra</a> 
 <div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># https://pandas.pydata.org</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+
+<span class="c1"># PyYAML from https://pyyaml.org</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
 
+<span class="c1"># pip install https://github.com/WinVector/data_algebra/raw/master/dist/data_algebra-0.1.3.tar.gz</span>
 <span class="kn">import</span> <span class="nn">data_algebra.cdata</span>
 <span class="kn">import</span> <span class="nn">data_algebra.cdata_impl</span>
 <span class="kn">import</span> <span class="nn">data_algebra.data_ops</span>
@@ -13148,7 +13154,9 @@ and Python <a href="https://github.com/WinVector/data_algebra">data_algebra</a> 
 <span class="c1"># ask YAML to write simpler structures</span>
 <span class="n">data_algebra</span><span class="o">.</span><span class="n">yaml</span><span class="o">.</span><span class="n">fix_ordered_dict_yaml_rep</span><span class="p">()</span>
 
+<span class="c1"># read our example data</span>
 <span class="n">iris</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;iris_small.csv&#39;</span><span class="p">)</span>
+<span class="c1"># print it out</span>
 <span class="n">iris</span>
 </pre></div>
 
@@ -13235,7 +13243,7 @@ and Python <a href="https://github.com/WinVector/data_algebra">data_algebra</a> 
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Our goal is to move from this normalized or wide-form into a tall form where information that is currently in multiple columns in a single row is in many rows with descriptive row-keys.</p>
+<p>Our goal is to move from this de-normalized or wide-form (or "model matrix"/"data matrix" form, where each record is exactly one row) into a tall form where records may span more than one row.</p>
 <p>Or, more concretely, we want our data to look like the following.</p>
 
 </div>
@@ -13401,7 +13409,12 @@ and Python <a href="https://github.com/WinVector/data_algebra">data_algebra</a> 
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>First we build a structure describing what we thing a data record looks like.  The simplest data records are exactly rows, but often meaningful records span many rows.  So let's describe the record structure we want.</p>
+<p>Notice each row of the original data set is now four rows of the derived one. This "tall form" is often useful for plotting.</p>
+<p>This sort of conversion can be called an anti-pivot. In Python these sorts of transforms are specified with
+<a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.pivot.html">pandas.DataFrame.pivot</a>, <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.pivot_table.html">pandas.pivot_table</a>, <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.melt.html">pandas.melt</a>, and others. Many <a href="https://www.r-project.org">R</a> packages supply related operators: <a href="https://CRAN.R-project.org/package=reshape">reshape</a>, <a href="https://CRAN.R-project.org/package=reshape2">reshape2</a>,
+<a href="https://CRAN.R-project.org/package=data.table">data.table</a>, <a href="https://CRAN.R-project.org/package=tidyr">tidyr</a>, <a href="https://CRAN.R-project.org/package=cdata">cdata</a>, and more.  We feel the <a href="https://github.com/WinVector/data_algebra">data_algebra</a> and <a href="https://CRAN.R-project.org/package=cdata">cdata</a> methods (which only perform data-reshaping, an not aggregation) offer a number of significant advantages (some of which we a have already mentioned, and a few more of which we will see demonstrated in this note).</p>
+<p>Back to our example.</p>
+<p>To specify our desired transform, we build a structure describing what a data record looks like. We can crib this specification from the answer as follows.</p>
 
 </div>
 </div>
@@ -13501,9 +13514,7 @@ from any one package.</p>
 <p>For each record
 we take care to identify what keys identify records (the <code>record_keys</code>) and want parts identify rows within the record
 (the <code>control_table_keys</code>).</p>
-<p>Notice the above is literally an example of the desired record layout.  We then add a specification of which parts of the
-record are keys (tell us which row is which), which are values (to be filled out by the transform), and how
-we tell which rows are in the same record (the <code>record_key</code>).  This is shown below.</p>
+<p>We combine all of these specification into a <code>RecordSpecification</code> as follows:</p>
 
 </div>
 </div>
@@ -13557,7 +13568,7 @@ we tell which rows are in the same record (the <code>record_key</code>).  This i
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The above is saying: we want each data record to be 4 rows internally keyed by the <code>Part</code> and <code>Measure</code> columns, and we expect which rows in a larger data frame that correspond to the same record to be identified by key-columns <code>id</code> and <code>Species</code>.  The "A.B" entries are stand-ins showing where we expect values to be placed.</p>
+<p>In this notation any cells of the control table from columns that are not <code>control_table_keys</code> are "value stand ins".  During data transfrom these cells will be replaced by values coming from the columns named by these cells.</p>
 <p>Now we can transform our original row-record oriented data into general block records.  To do this we specify a <code>RecordMap</code> using our record specification to describe the outgoing record structure. The incoming record structure is implicitly assumed to be single-row records, unless we specify otherwise (using the <code>blocks_in</code> argument).</p>
 
 </div>
@@ -13611,8 +13622,7 @@ RecordSpecification
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Entries in the <code>RecordSpecification</code> that are not in columns mentioned <code>control_key_columns</code> are stand-in values that show where real values will later map. This is easiest to see by continuing the example.</p>
-<p>So let's apply our specified transform.</p>
+<p>And we are ready to apply our specified transform.</p>
 
 </div>
 </div>
@@ -13929,7 +13939,7 @@ to row records of the form:
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Arbitrary-transforms">Arbitrary transforms<a class="anchor-link" href="#Arbitrary-transforms">&#182;</a></h2><p>Arbitrary record to record transforms can be specified by setting both <code>blocks_in</code> (to describe incoming structure) 
 and <code>blocks_out</code> (to describe outgoing structure) at the same time.</p>
-<h2 id="Transforms-in-databases">Transforms in databases<a class="anchor-link" href="#Transforms-in-databases">&#182;</a></h2><p><code>data_algebra</code> also implements all the transform steps in databases using <code>SQL</code> 
+<h2 id="Transforms-in-databases">Transforms in databases<a class="anchor-link" href="#Transforms-in-databases">&#182;</a></h2><p><code>data_algebra</code> also implements all the transform steps in databases using <a href="https://en.wikipedia.org/wiki/SQL"><code>SQL</code></a> 
 (via <code>row_recs_to_blocks_query()</code> and <code>blocks_to_row_recs_query()</code>).</p>
 <p>These queries can be seen below.</p>
 
@@ -13944,7 +13954,8 @@ and <code>blocks_out</code> (to describe outgoing structure) at the same time.</
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">db_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">db_model</span><span class="o">.</span><span class="n">blocks_to_row_recs_query</span><span class="p">(</span>
-    <span class="n">source_view</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">describe_pandas_table</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s1">&#39;iris&#39;</span><span class="p">),</span>
+    <span class="n">source_view</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">describe_pandas_table</span><span class="p">(</span>
+        <span class="n">iris</span><span class="p">,</span> <span class="s1">&#39;iris&#39;</span><span class="p">),</span>
     <span class="n">record_spec</span><span class="o">=</span><span class="n">record_spec</span>
 <span class="p">))</span>
 </pre></div>
@@ -13989,9 +14000,11 @@ FROM (
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">db_model</span><span class="o">.</span><span class="n">row_recs_to_blocks_query</span><span class="p">(</span>
-    <span class="n">source_view</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">describe_pandas_table</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s1">&#39;iris&#39;</span><span class="p">),</span>
+    <span class="n">source_view</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">describe_pandas_table</span><span class="p">(</span>
+        <span class="n">iris</span><span class="p">,</span> <span class="s1">&#39;iris&#39;</span><span class="p">),</span>
     <span class="n">record_spec</span><span class="o">=</span><span class="n">record_spec</span><span class="p">,</span>
-    <span class="n">record_view</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">describe_pandas_table</span><span class="p">(</span><span class="n">record_spec</span><span class="o">.</span><span class="n">control_table</span><span class="p">,</span> <span class="s2">&quot;control_table&quot;</span><span class="p">)</span>
+    <span class="n">record_view</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">describe_pandas_table</span><span class="p">(</span>
+        <span class="n">record_spec</span><span class="o">.</span><span class="n">control_table</span><span class="p">,</span> <span class="s2">&quot;control_table&quot;</span><span class="p">)</span>
 <span class="p">))</span>
 </pre></div>
 
@@ -14343,7 +14356,7 @@ blocks_out:
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">&#182;</a></h2><p>The <a href="https://github.com/WinVector/cdata"><code>cdata</code></a> and <a href="https://github.com/WinVector/data_algebra"><code>data_algebra</code></a> systems yield powerful implementations, and deep understanding of the nature of record transformations.  They allow one to reshape data quickly and conveniently either in R or in Python/Pandas.</p>
+<h2 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">&#182;</a></h2><p>The <a href="https://github.com/WinVector/cdata"><code>cdata</code></a> and <a href="https://github.com/WinVector/data_algebra"><code>data_algebra</code></a> systems yield powerful implementations, and deep understanding of the nature of record transformations.  They allow one to reshape data quickly and conveniently either in R. Python/<a href="https://pandas.pydata.org">Pandas</a>, or even SQL.</p>
 
 </div>
 </div>

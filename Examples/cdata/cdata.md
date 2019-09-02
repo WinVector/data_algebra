@@ -1,23 +1,30 @@
 
-The great strength of the [R](https://www.r-project.org) [cdata](https://github.com/WinVector/cdata) ([coordinatized data](http://www.win-vector.com/blog/tag/coordinatized-data/))
-and Python [data_algebra](https://github.com/WinVector/data_algebra) data wrangling systems are:
+This note is a simple data wrangling example worked using both the Python [data_algebra](https://github.com/WinVector/data_algebra) package and the [R](https://www.r-project.org) [cdata](https://github.com/WinVector/cdata) package. Both of these packages make data wrangling easy through he use of [coordinatized data](http://www.win-vector.com/blog/tag/coordinatized-data/) concepts (essentially [Codd's "rule of access"](https://en.wikipedia.org/wiki/Codd%27s_12_rules)).
+
+The advantages of [data_algebra](https://github.com/WinVector/data_algebra) and [cdata](https://github.com/WinVector/cdata) are:
 
  * The user specifies their desired transform declaratively *by example* and *in data*.  What one does is: work 
-    an example, and then write-down what you want (we have a tutial on this [here](https://winvector.github.io/cdata/articles/design.html)).
+    an example, and then write-down what you want (we have a tutorial on this [here](https://winvector.github.io/cdata/articles/design.html)).
     
- * The transform systems can print what a transform is going to do.  This makes reasoning about data transforms *much* easier.  
+ * The transform systems can print what a transform is going to do.  This makes reasoning about data transforms *much* easier.
+ 
+ * The transforms, as they themselves are written as data, can be easily shared between systems (such as R and Python).
  
 Let's re-work a small [R cdata example](https://github.com/WinVector/cdata/blob/master/vignettes/control_table_keys.Rmd), using the Python package [data_algebra](https://github.com/WinVector/data_algebra).
 
 ## An Example
 
-First we import some modules and packages, and type in some notional data.
+First we import some modules and packages, and import some notional data.
 
 
 ```python
+# https://pandas.pydata.org
 import pandas
+
+# PyYAML from https://pyyaml.org
 import yaml
 
+# pip install https://github.com/WinVector/data_algebra/raw/master/dist/data_algebra-0.1.3.tar.gz
 import data_algebra.cdata
 import data_algebra.cdata_impl
 import data_algebra.data_ops
@@ -27,7 +34,9 @@ import data_algebra.SQLite
 # ask YAML to write simpler structures
 data_algebra.yaml.fix_ordered_dict_yaml_rep()
 
+# read our example data
 iris = pandas.read_csv('iris_small.csv')
+# print it out
 iris
 ```
 
@@ -94,7 +103,7 @@ iris
 
 
 
-Our goal is to move from this normalized or wide-form into a tall form where information that is currently in multiple columns in a single row is in many rows with descriptive row-keys.
+Our goal is to move from this de-normalized or wide-form (or "model matrix"/"data matrix" form, where each record is exactly one row) into a tall form where records may span more than one row.
 
 Or, more concretely, we want our data to look like the following.
 
@@ -235,7 +244,15 @@ answer
 
 
 
-First we build a structure describing what we thing a data record looks like.  The simplest data records are exactly rows, but often meaningful records span many rows.  So let's describe the record structure we want.
+Notice each row of the original data set is now four rows of the derived one. This "tall form" is often useful for plotting.
+
+This sort of conversion can be called an anti-pivot. In Python these sorts of transforms are specified with
+[pandas.DataFrame.pivot](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.pivot.html), [pandas.pivot_table](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.pivot_table.html), [pandas.melt](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.melt.html), and others. Many [R](https://www.r-project.org) packages supply related operators: [reshape]( https://CRAN.R-project.org/package=reshape), [reshape2](https://CRAN.R-project.org/package=reshape2),
+[data.table](https://CRAN.R-project.org/package=data.table), [tidyr](https://CRAN.R-project.org/package=tidyr), [cdata](https://CRAN.R-project.org/package=cdata), and more.  We feel the [data_algebra](https://github.com/WinVector/data_algebra) and [cdata](https://CRAN.R-project.org/package=cdata) methods (which only perform data-reshaping, an not aggregation) offer a number of significant advantages (some of which we a have already mentioned, and a few more of which we will see demonstrated in this note).
+
+Back to our example.
+
+To specify our desired transform, we build a structure describing what a data record looks like. We can crib this specification from the answer as follows.
 
 
 ```python
@@ -311,9 +328,7 @@ For each record
 we take care to identify what keys identify records (the `record_keys`) and want parts identify rows within the record
 (the `control_table_keys`).
 
-Notice the above is literally an example of the desired record layout.  We then add a specification of which parts of the
-record are keys (tell us which row is which), which are values (to be filled out by the transform), and how
-we tell which rows are in the same record (the `record_key`).  This is shown below.
+We combine all of these specification into a `RecordSpecification` as follows:
 
 
 ```python
@@ -340,7 +355,7 @@ record_spec
 
 
 
-The above is saying: we want each data record to be 4 rows internally keyed by the `Part` and `Measure` columns, and we expect which rows in a larger data frame that correspond to the same record to be identified by key-columns `id` and `Species`.  The "A.B" entries are stand-ins showing where we expect values to be placed.
+In this notation any cells of the control table from columns that are not `control_table_keys` are "value stand ins".  During data transfrom these cells will be replaced by values coming from the columns named by these cells.
 
 Now we can transform our original row-record oriented data into general block records.  To do this we specify a `RecordMap` using our record specification to describe the outgoing record structure. The incoming record structure is implicitly assumed to be single-row records, unless we specify otherwise (using the `blocks_in` argument).
 
@@ -366,9 +381,7 @@ print(str(mp_to_blocks))
     
 
 
-Entries in the `RecordSpecification` that are not in columns mentioned `control_key_columns` are stand-in values that show where real values will later map. This is easiest to see by continuing the example.
-
-So let's apply our specified transform.
+And we are ready to apply our specified transform.
 
 
 ```python
@@ -611,7 +624,7 @@ and `blocks_out` (to describe outgoing structure) at the same time.
 
 ## Transforms in databases
 
-`data_algebra` also implements all the transform steps in databases using `SQL` 
+`data_algebra` also implements all the transform steps in databases using [`SQL`](https://en.wikipedia.org/wiki/SQL) 
 (via `row_recs_to_blocks_query()` and `blocks_to_row_recs_query()`).
 
 These queries can be seen below.
@@ -621,10 +634,10 @@ These queries can be seen below.
 db_model = data_algebra.SQLite.SQLiteModel()
 
 print(db_model.blocks_to_row_recs_query(
-    source_view=data_algebra.data_ops.describe_pandas_table(iris, 'iris'),
+    source_view=data_algebra.data_ops.describe_pandas_table(
+        iris, 'iris'),
     record_spec=record_spec
 ))
-
 ```
 
     SELECT
@@ -644,11 +657,12 @@ print(db_model.blocks_to_row_recs_query(
 
 ```python
 print(db_model.row_recs_to_blocks_query(
-    source_view=data_algebra.data_ops.describe_pandas_table(iris, 'iris'),
+    source_view=data_algebra.data_ops.describe_pandas_table(
+        iris, 'iris'),
     record_spec=record_spec,
-    record_view=data_algebra.data_ops.describe_pandas_table(record_spec.control_table, "control_table")
+    record_view=data_algebra.data_ops.describe_pandas_table(
+        record_spec.control_table, "control_table")
 ))
-
 ```
 
     SELECT
@@ -837,4 +851,4 @@ print(yaml.dump(mp_to_blocks.to_simple_obj()))
 
 ## Conclusion
 
-The [`cdata`](https://github.com/WinVector/cdata) and [`data_algebra`](https://github.com/WinVector/data_algebra) systems yield powerful implementations, and deep understanding of the nature of record transformations.  They allow one to reshape data quickly and conveniently either in R or in Python/Pandas.
+The [`cdata`](https://github.com/WinVector/cdata) and [`data_algebra`](https://github.com/WinVector/data_algebra) systems yield powerful implementations, and deep understanding of the nature of record transformations.  They allow one to reshape data quickly and conveniently either in R. Python/[Pandas](https://pandas.pydata.org), or even SQL.
