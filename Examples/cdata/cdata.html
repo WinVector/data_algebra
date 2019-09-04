@@ -13116,14 +13116,10 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This note is a simple data wrangling example worked using both the Python <a href="https://github.com/WinVector/data_algebra">data_algebra</a> package 
-and the <a href="https://www.r-project.org">R</a> <a href="https://github.com/WinVector/cdata">cdata</a> package. 
-Both of these packages make data wrangling easy through he use of <a href="http://www.win-vector.com/blog/tag/coordinatized-data/">coordinatized data</a> concepts 
-(relying heavily on <a href="https://en.wikipedia.org/wiki/Codd%27s_12_rules">Codd's "rule of access"</a>).</p>
+<p>This note is a simple data wrangling example worked using both the Python <a href="https://github.com/WinVector/data_algebra">data_algebra</a> package and the <a href="https://www.r-project.org">R</a> <a href="https://github.com/WinVector/cdata">cdata</a> package. Both of these packages make data wrangling easy through he use of <a href="http://www.win-vector.com/blog/tag/coordinatized-data/">coordinatized data</a> concepts  (relying heavily on <a href="https://en.wikipedia.org/wiki/Codd%27s_12_rules">Codd's "rule of access"</a>).</p>
 <p>The advantages of <a href="https://github.com/WinVector/data_algebra">data_algebra</a> and <a href="https://github.com/WinVector/cdata">cdata</a> are:</p>
 <ul>
-<li><p>The user specifies their desired transform declaratively <em>by example</em> and <em>in data</em>.  What one does is: work 
- an example, and then write down what you want (we have a tutorial on this <a href="https://winvector.github.io/cdata/articles/design.html">here</a>).</p>
+<li><p>The user specifies their desired transform declaratively <em>by example</em> and <em>in data</em>.  What one does is: work an example, and then write down what you want (we have a tutorial on this <a href="https://winvector.github.io/cdata/articles/design.html">here</a>).</p>
 </li>
 <li><p>The transform systems can print what a transform is going to do.  This makes reasoning about data transforms <em>much</em> easier.</p>
 </li>
@@ -13413,12 +13409,8 @@ Both of these packages make data wrangling easy through he use of <a href="http:
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Notice each row of the original data set is now four rows of the derived one. This "tall form" is often useful for plotting.</p>
-<p>This sort of conversion can be called an anti-pivot. In Python these sorts of transforms are specified with
-<a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.pivot.html">pandas.DataFrame.pivot</a>, <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.pivot_table.html">pandas.pivot_table</a>, <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.melt.html">pandas.melt</a>, 
-and others. Many <a href="https://www.r-project.org">R</a> packages supply related operators: <a href="https://CRAN.R-project.org/package=reshape">reshape</a>, <a href="https://CRAN.R-project.org/package=reshape2">reshape2</a>,
-<a href="https://CRAN.R-project.org/package=data.table">data.table</a>, <a href="https://CRAN.R-project.org/package=tidyr">tidyr</a>, <a href="https://CRAN.R-project.org/package=cdata">cdata</a>, and more.<br>
-We feel the <a href="https://github.com/WinVector/data_algebra">data_algebra</a> and <a href="https://CRAN.R-project.org/package=cdata">cdata</a> methods (which only perform data-reshaping, and not aggregation) offer a number of significant advantages 
-(some of which we have already mentioned, and a few more of which we will see demonstrated in this note).</p>
+<p>This sort of conversion can be called an anti-pivot. In Python these sorts of transforms are specified with <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.pivot.html">pandas.DataFrame.pivot</a>, <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.pivot_table.html">pandas.pivot_table</a>, <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.melt.html">pandas.melt</a>, 
+and others. Many <a href="https://www.r-project.org">R</a> packages supply related operators: <a href="https://CRAN.R-project.org/package=reshape">reshape</a>, <a href="https://CRAN.R-project.org/package=reshape2">reshape2</a>, <a href="https://CRAN.R-project.org/package=data.table">data.table</a>, <a href="https://CRAN.R-project.org/package=tidyr">tidyr</a>, <a href="https://CRAN.R-project.org/package=cdata">cdata</a>, and more. We feel the <a href="https://github.com/WinVector/data_algebra">data_algebra</a> and <a href="https://CRAN.R-project.org/package=cdata">cdata</a> methods (which only perform data-reshaping, and not aggregation) offer a number of significant advantages (some of which we have already mentioned, and a few more of which we will see demonstrated in this note).</p>
 <p>Back to our example.</p>
 <p>To specify our desired transform, we build a structure describing what a data record looks like. We can crib this specification from the answer as follows.</p>
 
@@ -13514,13 +13506,8 @@ We feel the <a href="https://github.com/WinVector/data_algebra">data_algebra</a>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We can derive the control table from the answer, as we did here, or just type one in directly.  The idea is: we can
-use any method we want to derive the prototype record shape, we are not limited to a sub-query language or methodology
-from any one package.</p>
-<p>For each record
-we take care to identify what keys identify records (the <code>record_keys</code>) and want parts identify rows within the record
-(the <code>control_table_keys</code>).  We suppress the <code>record_key</code> when writing the control table, as these are exactly 
-the values that do not vary inside each record.</p>
+<p>We can derive the control table from the answer, as we did here, or just type one in directly.  The idea is: we can use any method we want to derive the prototype record shape, we are not limited to a sub-query language or methodology from any one package.</p>
+<p>For each record we take care to identify what keys identify records (the <code>record_keys</code>) and want parts identify rows within the record (the <code>control_table_keys</code>).  We suppress the <code>record_key</code> when writing the control table, as these are exactly the values that do not vary inside each record.</p>
 <p>We combine all of these specification into a <code>RecordSpecification</code> as follows:</p>
 
 </div>
@@ -13944,10 +13931,8 @@ to row records of the form:
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Arbitrary-transforms">Arbitrary transforms<a class="anchor-link" href="#Arbitrary-transforms">&#182;</a></h2><p>Arbitrary record to record transforms can be specified by setting both <code>blocks_in</code> (to describe incoming structure) 
-and <code>blocks_out</code> (to describe outgoing structure) at the same time.</p>
-<h2 id="Transforms-in-databases">Transforms in databases<a class="anchor-link" href="#Transforms-in-databases">&#182;</a></h2><p><code>data_algebra</code> also implements all the transform steps in databases using <a href="https://en.wikipedia.org/wiki/SQL"><code>SQL</code></a> 
-(via <code>row_recs_to_blocks_query()</code> and <code>blocks_to_row_recs_query()</code>).</p>
+<h2 id="Arbitrary-transforms">Arbitrary transforms<a class="anchor-link" href="#Arbitrary-transforms">&#182;</a></h2><p>Arbitrary record to record transforms can be specified by setting both <code>blocks_in</code> (to describe incoming structure) and <code>blocks_out</code> (to describe outgoing structure) at the same time.</p>
+<h2 id="Transforms-in-databases">Transforms in databases<a class="anchor-link" href="#Transforms-in-databases">&#182;</a></h2><p><code>data_algebra</code> also implements all the transform steps in databases using <a href="https://en.wikipedia.org/wiki/SQL"><code>SQL</code></a> (via <code>row_recs_to_blocks_query()</code> and <code>blocks_to_row_recs_query()</code>).</p>
 <p>These queries can be seen below.</p>
 
 </div>
@@ -14074,11 +14059,10 @@ FROM (
 </li>
 <li><p>The <code>blocks_to_row_recs_query()</code> is an aggregation.  Each set of rows corresponding to a given data record is aggregated into a single result row.</p>
 </li>
-<li><p>Just about any arbitrary record shape to arbitrary record shape can be written as a transform from the first record shape to row-records (record sets that have exactly one row per record), followed by a transform from the row-records to the new format.  This transform can preserve column types as in the intermediate form each different record entry has its own column.  This is an advantage of using a "thin" intermediate form such as <a href="https://en.wikipedia.org/wiki/Semantic_triple">RDF triples</a>.</p>
+<li><p>Just about any arbitrary record shape to arbitrary record shape can be written as a transform from the first record shape to row-records (record sets that have exactly one row per record), followed by a transform from the row-records to the new format. This transform can preserve column types as in the intermediate form each different record entry has its own column.  This is an advantage of using a "thin" intermediate form such as <a href="https://en.wikipedia.org/wiki/Semantic_triple">RDF triples</a>.</p>
 </li>
 </ul>
-<p>This leads us to believe that transforming to and from single-row records are in fact fundemental operations, and
-not just implementation details.</p>
+<p>This leads us to believe that transforming to and from single-row records are in fact fundemental operations, and not just implementation details.</p>
 <h2 id="The-R-cdata-version">The R <code>cdata</code> version<a class="anchor-link" href="#The-R-cdata-version">&#182;</a></h2><p>The <code>data_algebra</code> had been previously implemented in 
 <a href="https://www.r-project.org">R</a> in the <a href="https://github.com/WinVector/cdata"><code>cdata</code></a>, <a href="https://github.com/WinVector/rquery"><code>rquery</code></a>, and <a href="https://github.com/WinVector/rqdatatable"><code>rqdatatable</code></a> packages.
 This packages support both in-memory operations and translation of the transforms to SQL.</p>
@@ -14279,9 +14263,7 @@ This packages support both in-memory operations and translation of the transform
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Cross-language-work">Cross-language work<a class="anchor-link" href="#Cross-language-work">&#182;</a></h3><p>As the record transform specifications, both in Python <code>data_algebra</code> and R <code>cata</code> are simple data structures (just 
-the control table, and a few lists of key column names), they can be moved from one language to another by <code>YAML</code> (as we also demonstrated
-in the <a href="https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/ScoringExample.ipynb">logistic scoring example</a>.</p>
+<h3 id="Cross-language-work">Cross-language work<a class="anchor-link" href="#Cross-language-work">&#182;</a></h3><p>As the record transform specifications, both in Python <code>data_algebra</code> and R <code>cata</code> are simple data structures (just the control table, and a few lists of key column names), they can be moved from one language to another by <code>YAML</code> (as we also demonstrated in the <a href="https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/ScoringExample.ipynb">logistic scoring example</a>.</p>
 <p><code>data_algebra</code> supplies a write method, so cross-language interoperation is just a matter of adding additional read/write methods.</p>
 
 </div>

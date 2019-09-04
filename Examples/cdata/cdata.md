@@ -1,13 +1,9 @@
 
-This note is a simple data wrangling example worked using both the Python [data_algebra](https://github.com/WinVector/data_algebra) package 
-and the [R](https://www.r-project.org) [cdata](https://github.com/WinVector/cdata) package. 
-Both of these packages make data wrangling easy through he use of [coordinatized data](http://www.win-vector.com/blog/tag/coordinatized-data/) concepts 
-(relying heavily on [Codd's "rule of access"](https://en.wikipedia.org/wiki/Codd%27s_12_rules)).
+This note is a simple data wrangling example worked using both the Python [data_algebra](https://github.com/WinVector/data_algebra) package and the [R](https://www.r-project.org) [cdata](https://github.com/WinVector/cdata) package. Both of these packages make data wrangling easy through he use of [coordinatized data](http://www.win-vector.com/blog/tag/coordinatized-data/) concepts  (relying heavily on [Codd's "rule of access"](https://en.wikipedia.org/wiki/Codd%27s_12_rules)).
 
 The advantages of [data_algebra](https://github.com/WinVector/data_algebra) and [cdata](https://github.com/WinVector/cdata) are:
 
- * The user specifies their desired transform declaratively *by example* and *in data*.  What one does is: work 
-    an example, and then write down what you want (we have a tutorial on this [here](https://winvector.github.io/cdata/articles/design.html)).
+ * The user specifies their desired transform declaratively *by example* and *in data*.  What one does is: work an example, and then write down what you want (we have a tutorial on this [here](https://winvector.github.io/cdata/articles/design.html)).
     
  * The transform systems can print what a transform is going to do.  This makes reasoning about data transforms *much* easier.
  
@@ -249,12 +245,8 @@ answer
 
 Notice each row of the original data set is now four rows of the derived one. This "tall form" is often useful for plotting.
 
-This sort of conversion can be called an anti-pivot. In Python these sorts of transforms are specified with
-[pandas.DataFrame.pivot](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.pivot.html), [pandas.pivot_table](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.pivot_table.html), [pandas.melt](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.melt.html), 
-and others. Many [R](https://www.r-project.org) packages supply related operators: [reshape]( https://CRAN.R-project.org/package=reshape), [reshape2](https://CRAN.R-project.org/package=reshape2),
-[data.table](https://CRAN.R-project.org/package=data.table), [tidyr](https://CRAN.R-project.org/package=tidyr), [cdata](https://CRAN.R-project.org/package=cdata), and more.  
-We feel the [data_algebra](https://github.com/WinVector/data_algebra) and [cdata](https://CRAN.R-project.org/package=cdata) methods (which only perform data-reshaping, and not aggregation) offer a number of significant advantages 
-(some of which we have already mentioned, and a few more of which we will see demonstrated in this note).
+This sort of conversion can be called an anti-pivot. In Python these sorts of transforms are specified with [pandas.DataFrame.pivot](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.pivot.html), [pandas.pivot_table](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.pivot_table.html), [pandas.melt](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.melt.html), 
+and others. Many [R](https://www.r-project.org) packages supply related operators: [reshape]( https://CRAN.R-project.org/package=reshape), [reshape2](https://CRAN.R-project.org/package=reshape2), [data.table](https://CRAN.R-project.org/package=data.table), [tidyr](https://CRAN.R-project.org/package=tidyr), [cdata](https://CRAN.R-project.org/package=cdata), and more. We feel the [data_algebra](https://github.com/WinVector/data_algebra) and [cdata](https://CRAN.R-project.org/package=cdata) methods (which only perform data-reshaping, and not aggregation) offer a number of significant advantages (some of which we have already mentioned, and a few more of which we will see demonstrated in this note).
 
 Back to our example.
 
@@ -326,14 +318,9 @@ control_table
 
 
 
-We can derive the control table from the answer, as we did here, or just type one in directly.  The idea is: we can
-use any method we want to derive the prototype record shape, we are not limited to a sub-query language or methodology
-from any one package.
+We can derive the control table from the answer, as we did here, or just type one in directly.  The idea is: we can use any method we want to derive the prototype record shape, we are not limited to a sub-query language or methodology from any one package.
 
-For each record
-we take care to identify what keys identify records (the `record_keys`) and want parts identify rows within the record
-(the `control_table_keys`).  We suppress the `record_key` when writing the control table, as these are exactly 
-the values that do not vary inside each record.
+For each record we take care to identify what keys identify records (the `record_keys`) and want parts identify rows within the record (the `control_table_keys`).  We suppress the `record_key` when writing the control table, as these are exactly the values that do not vary inside each record.
 
 We combine all of these specification into a `RecordSpecification` as follows:
 
@@ -626,13 +613,11 @@ arranged_rows
 
 ## Arbitrary transforms
 
-Arbitrary record to record transforms can be specified by setting both `blocks_in` (to describe incoming structure) 
-and `blocks_out` (to describe outgoing structure) at the same time.  
+Arbitrary record to record transforms can be specified by setting both `blocks_in` (to describe incoming structure) and `blocks_out` (to describe outgoing structure) at the same time.  
 
 ## Transforms in databases
 
-`data_algebra` also implements all the transform steps in databases using [`SQL`](https://en.wikipedia.org/wiki/SQL) 
-(via `row_recs_to_blocks_query()` and `blocks_to_row_recs_query()`).
+`data_algebra` also implements all the transform steps in databases using [`SQL`](https://en.wikipedia.org/wiki/SQL) (via `row_recs_to_blocks_query()` and `blocks_to_row_recs_query()`).
 
 These queries can be seen below.
 
@@ -701,10 +686,9 @@ As complicated as the queries look, they actually expose some deep truths:
 
   * The `blocks_to_row_recs_query()` is an aggregation.  Each set of rows corresponding to a given data record is aggregated into a single result row.
   
-  * Just about any arbitrary record shape to arbitrary record shape can be written as a transform from the first record shape to row-records (record sets that have exactly one row per record), followed by a transform from the row-records to the new format.  This transform can preserve column types as in the intermediate form each different record entry has its own column.  This is an advantage of using a "thin" intermediate form such as [RDF triples](https://en.wikipedia.org/wiki/Semantic_triple).
+  * Just about any arbitrary record shape to arbitrary record shape can be written as a transform from the first record shape to row-records (record sets that have exactly one row per record), followed by a transform from the row-records to the new format. This transform can preserve column types as in the intermediate form each different record entry has its own column.  This is an advantage of using a "thin" intermediate form such as [RDF triples](https://en.wikipedia.org/wiki/Semantic_triple).
 
-This leads us to believe that transforming to and from single-row records are in fact fundemental operations, and
-not just implementation details.
+This leads us to believe that transforming to and from single-row records are in fact fundemental operations, and not just implementation details.
 
 ## The R `cdata` version
 
@@ -810,9 +794,7 @@ iris %.>% transform
 
 ### Cross-language work
 
-As the record transform specifications, both in Python `data_algebra` and R `cata` are simple data structures (just 
-the control table, and a few lists of key column names), they can be moved from one language to another by `YAML` (as we also demonstrated
-in the [logistic scoring example](https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/ScoringExample.ipynb).
+As the record transform specifications, both in Python `data_algebra` and R `cata` are simple data structures (just the control table, and a few lists of key column names), they can be moved from one language to another by `YAML` (as we also demonstrated in the [logistic scoring example](https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/ScoringExample.ipynb).
 
 `data_algebra` supplies a write method, so cross-language interoperation is just a matter of adding additional read/write methods.
 
