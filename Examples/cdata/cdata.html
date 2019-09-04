@@ -14074,6 +14074,7 @@ FROM (
 not just implementation details.</p>
 <h2 id="The-R-cdata-version">The R <code>cdata</code> version<a class="anchor-link" href="#The-R-cdata-version">&#182;</a></h2><p>The <code>data_algebra</code> had been previously implemented in <a href="https://www.r-project.org">R</a> in the <a href="https://github.com/WinVector/cdata"><code>cdata</code></a>, <a href="https://github.com/WinVector/rquery"><code>rquery</code></a>, and <a href="https://github.com/WinVector/rqdatatable"><code>rqdatatable</code></a> packages.</p>
 <p>We would perform the above transforms in R as follows.</p>
+<p>First we write out a copy of the transform.</p>
 
 </div>
 </div>
@@ -14081,6 +14082,31 @@ not just implementation details.</p>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># convert objects to a YAML string</span>
+<span class="n">xform_rep</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">mp_to_blocks</span><span class="o">.</span><span class="n">to_simple_obj</span><span class="p">())</span>
+<span class="c1"># write to file</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;xform_yaml.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;wt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">xform_rep</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now we we start up our R environment and read in the transform specification and data.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> rpy2.ipython
@@ -14093,10 +14119,16 @@ not just implementation details.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span>
+
+<span class="c1"># install.packages(&quot;cdata&quot;)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">cdata</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">yaml</span><span class="p">)</span>
+<span class="c1"># https://github.com/WinVector/data_algebra/blob/master/Examples/cdata/cdata_yaml.R</span>
+<span class="nf">source</span><span class="p">(</span><span class="s">&quot;cdata_yaml.R&quot;</span><span class="p">)</span>
 
 <span class="n">iris</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&#39;iris_small.csv&#39;</span><span class="p">)</span>
 <span class="nf">print</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
@@ -14130,84 +14162,13 @@ not just implementation details.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span>
-
-<span class="c1"># install.packages(&quot;cdata&quot;)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">cdata</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 <div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span>
 
-<span class="n">control_table</span> <span class="o">&lt;-</span> <span class="n">wrapr</span><span class="o">::</span><span class="nf">qchar_frame</span><span class="p">(</span>
-  <span class="n">Part</span><span class="p">,</span>	 <span class="n">Measure</span><span class="p">,</span> <span class="n">Value</span>        <span class="o">|</span>
-  <span class="n">Petal</span><span class="p">,</span> <span class="n">Length</span><span class="p">,</span>  <span class="n">Petal.Length</span> <span class="o">|</span>
-  <span class="n">Petal</span><span class="p">,</span> <span class="n">Width</span><span class="p">,</span>   <span class="n">Petal.Width</span>  <span class="o">|</span>
-  <span class="n">Sepal</span><span class="p">,</span> <span class="n">Length</span><span class="p">,</span>  <span class="n">Sepal.Length</span> <span class="o">|</span>
-  <span class="n">Sepal</span><span class="p">,</span> <span class="n">Width</span><span class="p">,</span>	  <span class="n">Sepal.Width</span>  <span class="p">)</span>
-
-<span class="nf">print</span><span class="p">(</span><span class="n">control_table</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>   Part Measure        Value
-1 Petal  Length Petal.Length
-2 Petal   Width  Petal.Width
-3 Sepal  Length Sepal.Length
-4 Sepal   Width  Sepal.Width
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Notice this time we just typed in the prototype record (instead of deriving it from a worked answer). We could also copy the control specification over from Python, as we will discuss later.</p>
-<p>Let's continut with the R demonstration.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span>
-
-<span class="n">transform</span> <span class="o">&lt;-</span> <span class="nf">rowrecs_to_blocks_spec</span><span class="p">(</span>
-  <span class="n">control_table</span><span class="p">,</span>
-  <span class="n">recordKeys</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">,</span> <span class="s">&#39;Species&#39;</span><span class="p">),</span>
-  <span class="n">controlTableKeys</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Part&#39;</span><span class="p">,</span> <span class="s">&#39;Measure&#39;</span><span class="p">))</span>
+<span class="n">r_yaml</span> <span class="o">&lt;-</span> <span class="nf">yaml.load_file</span><span class="p">(</span><span class="s">&quot;xform_yaml.txt&quot;</span><span class="p">)</span>
+<span class="n">transform</span> <span class="o">&lt;-</span> <span class="nf">convert_yaml_to_cdata_spec</span><span class="p">(</span><span class="n">r_yaml</span><span class="p">)</span>
 
 <span class="nf">print</span><span class="p">(</span><span class="n">transform</span><span class="p">)</span>
 </pre></div>
@@ -14253,9 +14214,17 @@ not just implementation details.</p>
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now that we have recovered the transform, we can use it in R.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span>
@@ -14302,7 +14271,7 @@ not just implementation details.</p>
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Cross-language-work">Cross-language work<a class="anchor-link" href="#Cross-language-work">&#182;</a></h3><p>As the record transform specifications, both in Python <code>data_algebra</code> and R <code>cata</code> are simple data structures (just 
-the control table, and a few lists of key column names), they can be moved from one language to another by <code>YAML</code> (as we demonstrated
+the control table, and a few lists of key column names), they can be moved from one language to another by <code>YAML</code> (as we also demonstrated
 in the <a href="https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/ScoringExample.ipynb">logistic scoring example</a>.</p>
 <p><code>data_algebra</code> supplies a write method, so cross-language interoperation is just a matter of adding additional read/write methods.</p>
 
@@ -14311,7 +14280,7 @@ in the <a href="https://github.com/WinVector/data_algebra/blob/master/Examples/L
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">mp_to_blocks</span><span class="o">.</span><span class="n">to_simple_obj</span><span class="p">()))</span>

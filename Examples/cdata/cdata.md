@@ -705,6 +705,19 @@ The `data_algebra` had been previously implemented in [R](https://www.r-project.
 
 We would perform the above transforms in R as follows.
 
+First we write out a copy of the transform.
+
+
+```python
+# convert objects to a YAML string
+xform_rep = yaml.dump(mp_to_blocks.to_simple_obj())
+# write to file
+with open("xform_yaml.txt", "wt") as f:
+    print(xform_rep, file=f)
+```
+
+Now we we start up our R environment and read in the transform specification and data.
+
 
 ```python
 %load_ext rpy2.ipython
@@ -714,8 +727,15 @@ We would perform the above transforms in R as follows.
 ```r
 %%R
 
+# install.packages("cdata")
+library(cdata)
+library(yaml)
+# https://github.com/WinVector/data_algebra/blob/master/Examples/cdata/cdata_yaml.R
+source("cdata_yaml.R")
+
 iris <- read.csv('iris_small.csv')
 print(iris)
+
 ```
 
       Sepal.Length Sepal.Width Petal.Length Petal.Width Species id
@@ -728,43 +748,8 @@ print(iris)
 ```r
 %%R
 
-# install.packages("cdata")
-library(cdata)
-```
-
-
-```r
-%%R
-
-control_table <- wrapr::qchar_frame(
-  Part,	 Measure, Value        |
-  Petal, Length,  Petal.Length |
-  Petal, Width,   Petal.Width  |
-  Sepal, Length,  Sepal.Length |
-  Sepal, Width,	  Sepal.Width  )
-
-print(control_table)
-```
-
-       Part Measure        Value
-    1 Petal  Length Petal.Length
-    2 Petal   Width  Petal.Width
-    3 Sepal  Length Sepal.Length
-    4 Sepal   Width  Sepal.Width
-
-
-Notice this time we just typed in the prototype record (instead of deriving it from a worked answer). We could also copy the control specification over from Python, as we will discuss later.
-
-Let's continut with the R demonstration.
-
-
-```r
-%%R
-
-transform <- rowrecs_to_blocks_spec(
-  control_table,
-  recordKeys = c('id', 'Species'),
-  controlTableKeys = c('Part', 'Measure'))
+r_yaml <- yaml.load_file("xform_yaml.txt")
+transform <- convert_yaml_to_cdata_spec(r_yaml)
 
 print(transform)
 ```
@@ -789,6 +774,8 @@ print(transform)
     }
     
 
+
+Now that we have recovered the transform, we can use it in R.
 
 
 ```r
@@ -815,7 +802,7 @@ iris %.>% transform
 ### Cross-language work
 
 As the record transform specifications, both in Python `data_algebra` and R `cata` are simple data structures (just 
-the control table, and a few lists of key column names), they can be moved from one language to another by `YAML` (as we demonstrated
+the control table, and a few lists of key column names), they can be moved from one language to another by `YAML` (as we also demonstrated
 in the [logistic scoring example](https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/ScoringExample.ipynb).
 
 `data_algebra` supplies a write method, so cross-language interoperation is just a matter of adding additional read/write methods.
