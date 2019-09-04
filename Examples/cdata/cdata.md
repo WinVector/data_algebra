@@ -1,10 +1,13 @@
 
-This note is a simple data wrangling example worked using both the Python [data_algebra](https://github.com/WinVector/data_algebra) package and the [R](https://www.r-project.org) [cdata](https://github.com/WinVector/cdata) package. Both of these packages make data wrangling easy through he use of [coordinatized data](http://www.win-vector.com/blog/tag/coordinatized-data/) concepts (essentially [Codd's "rule of access"](https://en.wikipedia.org/wiki/Codd%27s_12_rules)).
+This note is a simple data wrangling example worked using both the Python [data_algebra](https://github.com/WinVector/data_algebra) package 
+and the [R](https://www.r-project.org) [cdata](https://github.com/WinVector/cdata) package. 
+Both of these packages make data wrangling easy through he use of [coordinatized data](http://www.win-vector.com/blog/tag/coordinatized-data/) concepts 
+(relying heavily on [Codd's "rule of access"](https://en.wikipedia.org/wiki/Codd%27s_12_rules)).
 
 The advantages of [data_algebra](https://github.com/WinVector/data_algebra) and [cdata](https://github.com/WinVector/cdata) are:
 
  * The user specifies their desired transform declaratively *by example* and *in data*.  What one does is: work 
-    an example, and then write-down what you want (we have a tutorial on this [here](https://winvector.github.io/cdata/articles/design.html)).
+    an example, and then write down what you want (we have a tutorial on this [here](https://winvector.github.io/cdata/articles/design.html)).
     
  * The transform systems can print what a transform is going to do.  This makes reasoning about data transforms *much* easier.
  
@@ -247,8 +250,11 @@ answer
 Notice each row of the original data set is now four rows of the derived one. This "tall form" is often useful for plotting.
 
 This sort of conversion can be called an anti-pivot. In Python these sorts of transforms are specified with
-[pandas.DataFrame.pivot](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.pivot.html), [pandas.pivot_table](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.pivot_table.html), [pandas.melt](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.melt.html), and others. Many [R](https://www.r-project.org) packages supply related operators: [reshape]( https://CRAN.R-project.org/package=reshape), [reshape2](https://CRAN.R-project.org/package=reshape2),
-[data.table](https://CRAN.R-project.org/package=data.table), [tidyr](https://CRAN.R-project.org/package=tidyr), [cdata](https://CRAN.R-project.org/package=cdata), and more.  We feel the [data_algebra](https://github.com/WinVector/data_algebra) and [cdata](https://CRAN.R-project.org/package=cdata) methods (which only perform data-reshaping, an not aggregation) offer a number of significant advantages (some of which we a have already mentioned, and a few more of which we will see demonstrated in this note).
+[pandas.DataFrame.pivot](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.pivot.html), [pandas.pivot_table](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.pivot_table.html), [pandas.melt](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.melt.html), 
+and others. Many [R](https://www.r-project.org) packages supply related operators: [reshape]( https://CRAN.R-project.org/package=reshape), [reshape2](https://CRAN.R-project.org/package=reshape2),
+[data.table](https://CRAN.R-project.org/package=data.table), [tidyr](https://CRAN.R-project.org/package=tidyr), [cdata](https://CRAN.R-project.org/package=cdata), and more.  
+We feel the [data_algebra](https://github.com/WinVector/data_algebra) and [cdata](https://CRAN.R-project.org/package=cdata) methods (which only perform data-reshaping, and not aggregation) offer a number of significant advantages 
+(some of which we have already mentioned, and a few more of which we will see demonstrated in this note).
 
 Back to our example.
 
@@ -326,7 +332,8 @@ from any one package.
 
 For each record
 we take care to identify what keys identify records (the `record_keys`) and want parts identify rows within the record
-(the `control_table_keys`).
+(the `control_table_keys`).  We suppress the `record_key` when writing the control table, as these are exactly 
+the values that do not vary inside each record.
 
 We combine all of these specification into a `RecordSpecification` as follows:
 
@@ -686,7 +693,7 @@ print(db_model.blocks_to_row_recs_query(
      ORDER BY "id", "Species"
 
 
-The use-case for `SQL` queries is: the queries can be used to with "`CREATE TABLE table_name AS`" to materialize transform results in a database, without round-tripping the data in and out of the database.
+The use case for `SQL` queries is: the queries can be used to with "`CREATE TABLE table_name AS`" to materialize transform results in a database, without round-tripping the data in and out of the database.
 
 As complicated as the queries look, they actually expose some deep truths:
 
@@ -701,7 +708,9 @@ not just implementation details.
 
 ## The R `cdata` version
 
-The `data_algebra` had been previously implemented in [R](https://www.r-project.org) in the [`cdata`](https://github.com/WinVector/cdata), [`rquery`](https://github.com/WinVector/rquery), and [`rqdatatable`](https://github.com/WinVector/rqdatatable) packages.
+The `data_algebra` had been previously implemented in 
+[R](https://www.r-project.org) in the [`cdata`](https://github.com/WinVector/cdata), [`rquery`](https://github.com/WinVector/rquery), and [`rqdatatable`](https://github.com/WinVector/rqdatatable) packages.
+This packages support both in-memory operations and translation of the transforms to SQL.
 
 We would perform the above transforms in R as follows.
 

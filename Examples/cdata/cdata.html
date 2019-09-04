@@ -13116,11 +13116,14 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This note is a simple data wrangling example worked using both the Python <a href="https://github.com/WinVector/data_algebra">data_algebra</a> package and the <a href="https://www.r-project.org">R</a> <a href="https://github.com/WinVector/cdata">cdata</a> package. Both of these packages make data wrangling easy through he use of <a href="http://www.win-vector.com/blog/tag/coordinatized-data/">coordinatized data</a> concepts (essentially <a href="https://en.wikipedia.org/wiki/Codd%27s_12_rules">Codd's "rule of access"</a>).</p>
+<p>This note is a simple data wrangling example worked using both the Python <a href="https://github.com/WinVector/data_algebra">data_algebra</a> package 
+and the <a href="https://www.r-project.org">R</a> <a href="https://github.com/WinVector/cdata">cdata</a> package. 
+Both of these packages make data wrangling easy through he use of <a href="http://www.win-vector.com/blog/tag/coordinatized-data/">coordinatized data</a> concepts 
+(relying heavily on <a href="https://en.wikipedia.org/wiki/Codd%27s_12_rules">Codd's "rule of access"</a>).</p>
 <p>The advantages of <a href="https://github.com/WinVector/data_algebra">data_algebra</a> and <a href="https://github.com/WinVector/cdata">cdata</a> are:</p>
 <ul>
 <li><p>The user specifies their desired transform declaratively <em>by example</em> and <em>in data</em>.  What one does is: work 
- an example, and then write-down what you want (we have a tutorial on this <a href="https://winvector.github.io/cdata/articles/design.html">here</a>).</p>
+ an example, and then write down what you want (we have a tutorial on this <a href="https://winvector.github.io/cdata/articles/design.html">here</a>).</p>
 </li>
 <li><p>The transform systems can print what a transform is going to do.  This makes reasoning about data transforms <em>much</em> easier.</p>
 </li>
@@ -13411,8 +13414,11 @@ div#notebook {
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Notice each row of the original data set is now four rows of the derived one. This "tall form" is often useful for plotting.</p>
 <p>This sort of conversion can be called an anti-pivot. In Python these sorts of transforms are specified with
-<a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.pivot.html">pandas.DataFrame.pivot</a>, <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.pivot_table.html">pandas.pivot_table</a>, <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.melt.html">pandas.melt</a>, and others. Many <a href="https://www.r-project.org">R</a> packages supply related operators: <a href="https://CRAN.R-project.org/package=reshape">reshape</a>, <a href="https://CRAN.R-project.org/package=reshape2">reshape2</a>,
-<a href="https://CRAN.R-project.org/package=data.table">data.table</a>, <a href="https://CRAN.R-project.org/package=tidyr">tidyr</a>, <a href="https://CRAN.R-project.org/package=cdata">cdata</a>, and more.  We feel the <a href="https://github.com/WinVector/data_algebra">data_algebra</a> and <a href="https://CRAN.R-project.org/package=cdata">cdata</a> methods (which only perform data-reshaping, an not aggregation) offer a number of significant advantages (some of which we a have already mentioned, and a few more of which we will see demonstrated in this note).</p>
+<a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.pivot.html">pandas.DataFrame.pivot</a>, <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.pivot_table.html">pandas.pivot_table</a>, <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.melt.html">pandas.melt</a>, 
+and others. Many <a href="https://www.r-project.org">R</a> packages supply related operators: <a href="https://CRAN.R-project.org/package=reshape">reshape</a>, <a href="https://CRAN.R-project.org/package=reshape2">reshape2</a>,
+<a href="https://CRAN.R-project.org/package=data.table">data.table</a>, <a href="https://CRAN.R-project.org/package=tidyr">tidyr</a>, <a href="https://CRAN.R-project.org/package=cdata">cdata</a>, and more.<br>
+We feel the <a href="https://github.com/WinVector/data_algebra">data_algebra</a> and <a href="https://CRAN.R-project.org/package=cdata">cdata</a> methods (which only perform data-reshaping, and not aggregation) offer a number of significant advantages 
+(some of which we have already mentioned, and a few more of which we will see demonstrated in this note).</p>
 <p>Back to our example.</p>
 <p>To specify our desired transform, we build a structure describing what a data record looks like. We can crib this specification from the answer as follows.</p>
 
@@ -13513,7 +13519,8 @@ use any method we want to derive the prototype record shape, we are not limited 
 from any one package.</p>
 <p>For each record
 we take care to identify what keys identify records (the <code>record_keys</code>) and want parts identify rows within the record
-(the <code>control_table_keys</code>).</p>
+(the <code>control_table_keys</code>).  We suppress the <code>record_key</code> when writing the control table, as these are exactly 
+the values that do not vary inside each record.</p>
 <p>We combine all of these specification into a <code>RecordSpecification</code> as follows:</p>
 
 </div>
@@ -14060,7 +14067,7 @@ FROM (
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The use-case for <code>SQL</code> queries is: the queries can be used to with "<code>CREATE TABLE table_name AS</code>" to materialize transform results in a database, without round-tripping the data in and out of the database.</p>
+<p>The use case for <code>SQL</code> queries is: the queries can be used to with "<code>CREATE TABLE table_name AS</code>" to materialize transform results in a database, without round-tripping the data in and out of the database.</p>
 <p>As complicated as the queries look, they actually expose some deep truths:</p>
 <ul>
 <li><p>The <code>row_recs_to_blocks_query()</code> is essentially a cross-join of the data to the record description.  Each combination of data row and record description row builds a new result row.</p>
@@ -14072,7 +14079,9 @@ FROM (
 </ul>
 <p>This leads us to believe that transforming to and from single-row records are in fact fundemental operations, and
 not just implementation details.</p>
-<h2 id="The-R-cdata-version">The R <code>cdata</code> version<a class="anchor-link" href="#The-R-cdata-version">&#182;</a></h2><p>The <code>data_algebra</code> had been previously implemented in <a href="https://www.r-project.org">R</a> in the <a href="https://github.com/WinVector/cdata"><code>cdata</code></a>, <a href="https://github.com/WinVector/rquery"><code>rquery</code></a>, and <a href="https://github.com/WinVector/rqdatatable"><code>rqdatatable</code></a> packages.</p>
+<h2 id="The-R-cdata-version">The R <code>cdata</code> version<a class="anchor-link" href="#The-R-cdata-version">&#182;</a></h2><p>The <code>data_algebra</code> had been previously implemented in 
+<a href="https://www.r-project.org">R</a> in the <a href="https://github.com/WinVector/cdata"><code>cdata</code></a>, <a href="https://github.com/WinVector/rquery"><code>rquery</code></a>, and <a href="https://github.com/WinVector/rqdatatable"><code>rqdatatable</code></a> packages.
+This packages support both in-memory operations and translation of the transforms to SQL.</p>
 <p>We would perform the above transforms in R as follows.</p>
 <p>First we write out a copy of the transform.</p>
 
