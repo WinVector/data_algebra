@@ -1,0 +1,26 @@
+type: data_algebra.cdata_impl.RecordMap
+blocks_out:
+  type: data_algebra.cdata.RecordSpecification
+  record_keys:
+  - id
+  - Species
+  control_table_keys:
+  - Part
+  - Measure
+  control_table:
+    Part:
+    - Petal
+    - Petal
+    - Sepal
+    - Sepal
+    Measure:
+    - Length
+    - Width
+    - Length
+    - Width
+    Value:
+    - Petal.Length
+    - Petal.Width
+    - Sepal.Length
+    - Sepal.Width
+
