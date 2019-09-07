@@ -379,7 +379,9 @@ class TableDescription(ViewRepresentation):
             sql_str = sqlparse.format(sql_str, encoding=encoding, **sqlparse_options)
         return sql_str
 
-    def to_sql_implementation(self, db_model, *, using, temp_id_source, force_sql=False):
+    def to_sql_implementation(
+        self, db_model, *, using, temp_id_source, force_sql=False
+    ):
         return db_model.table_def_to_sql(self, using=using, force_sql=force_sql)
 
     # comparable to other table descriptions

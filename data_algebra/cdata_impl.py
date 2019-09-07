@@ -18,12 +18,13 @@ def table_is_keyed_by_columns(table, column_names):
         return True
     if len(column_names) < 1:
         return False
-    ops = data_algebra.data_ops.describe_pandas_table(table, "table") .\
-        select_columns(column_names) .\
-        extend({'cdata_temp_one': 1}) .\
-        project({'_cdata_temp_sum': 'cdata_temp_one.sum()'},
-                group_by=column_names) .\
-        project({'_cdata_temp_sum': '_cdata_temp_sum.max()'})
+    ops = (
+        data_algebra.data_ops.describe_pandas_table(table, "table")
+        .select_columns(column_names)
+        .extend({"cdata_temp_one": 1})
+        .project({"_cdata_temp_sum": "cdata_temp_one.sum()"}, group_by=column_names)
+        .project({"_cdata_temp_sum": "_cdata_temp_sum.max()"})
+    )
     t2s = ops.transform(table)
     return t2s.iloc[0, 0] <= 1
 
@@ -41,30 +42,40 @@ class RecordMap:
                     "blocks_out should be a data_algebra.cdata.RecordSpecification"
                 )
         if (blocks_in is None) and (blocks_out is None):
-            raise Exception("At least one of blocks_in or blocks_out should not be None")
+            raise Exception(
+                "At least one of blocks_in or blocks_out should not be None"
+            )
         self.blocks_in = blocks_in
         self.blocks_out = blocks_out
         self.fmt_string = self.fmt()
 
     # noinspection PyPep8Naming
-    def transform(self, X, *, check_blocks_in_keying=True, check_blocks_out_keying=False):
+    def transform(
+        self, X, *, check_blocks_in_keying=True, check_blocks_out_keying=False
+    ):
         if not isinstance(X, pandas.DataFrame):
             raise Exception("X should be a pandas.DataFrame")
         X = X.copy()
         X.reset_index(inplace=True, drop=True)
         db_model = data_algebra.SQLite.SQLiteModel()
         if self.blocks_in is not None:
-            x1_descr = data_algebra.data_ops.describe_pandas_table(X, table_name="x_blocks_in")
-            missing_cols = (
-                    set(self.blocks_in.control_table_keys).union(self.blocks_in.record_keys) -
-                    set(x1_descr.column_names))
+            x1_descr = data_algebra.data_ops.describe_pandas_table(
+                X, table_name="x_blocks_in"
+            )
+            missing_cols = set(self.blocks_in.control_table_keys).union(
+                self.blocks_in.record_keys
+            ) - set(x1_descr.column_names)
             if len(missing_cols) > 0:
                 raise Exception("missing required columns: " + str(missing_cols))
             # convert to row-records
             if check_blocks_in_keying:
                 # table should be keyed by record_keys + control_table_keys
-                if not table_is_keyed_by_columns(X, self.blocks_in.record_keys + self.blocks_in.control_table_keys):
-                    raise Exception("table is not keyed by blocks_in.record_keys + blocks_in.control_table_keys")
+                if not table_is_keyed_by_columns(
+                    X, self.blocks_in.record_keys + self.blocks_in.control_table_keys
+                ):
+                    raise Exception(
+                        "table is not keyed by blocks_in.record_keys + blocks_in.control_table_keys"
+                    )
             with sqlite3.connect(":memory:") as conn:
                 db_model.insert_table(conn, X, x1_descr.table_name)
                 to_blocks_sql = db_model.blocks_to_row_recs_query(
@@ -72,7 +83,9 @@ class RecordMap:
                 )
                 X = db_model.read_query(conn, to_blocks_sql)
         if self.blocks_out is not None:
-            x2_descr = data_algebra.data_ops.describe_pandas_table(X, table_name="x_blocks_out")
+            x2_descr = data_algebra.data_ops.describe_pandas_table(
+                X, table_name="x_blocks_out"
+            )
             missing_cols = set(self.blocks_out.record_keys) - set(x2_descr.column_names)
             if len(missing_cols) > 0:
                 raise Exception("missing required columns: " + str(missing_cols))
@@ -100,36 +113,36 @@ class RecordMap:
             return "RecordMap(no-op)"
         if (self.blocks_in is not None) and (self.blocks_out is not None):
             s = (
-                    "Transform block records of structure:\n"
-                    + self.blocks_in.fmt()
-                    + "to block records of structure:\n"
-                    + self.blocks_out.fmt()
+                "Transform block records of structure:\n"
+                + self.blocks_in.fmt()
+                + "to block records of structure:\n"
+                + self.blocks_out.fmt()
             )
             return s
         if self.blocks_in is not None:
             s = (
-                    "Transform block records of structure:\n"
-                    + self.blocks_in.fmt()
-                    + "to row records of the form:\n"
-                    + "  record_keys: "
-                    + str(self.blocks_in.record_keys)
-                    + "\n"
-                    + " "
-                    + str(self.blocks_in.row_version(include_record_keys=True))
-                    + "\n"
+                "Transform block records of structure:\n"
+                + self.blocks_in.fmt()
+                + "to row records of the form:\n"
+                + "  record_keys: "
+                + str(self.blocks_in.record_keys)
+                + "\n"
+                + " "
+                + str(self.blocks_in.row_version(include_record_keys=True))
+                + "\n"
             )
             return s
         else:
             s = (
-                    "Transform row records of the form:\n"
-                    + "  record_keys: "
-                    + str(self.blocks_out.record_keys)
-                    + "\n"
-                    + " "
-                    + str(self.blocks_out.row_version(include_record_keys=True))
-                    + "\n"
-                    + "to block records of structure:\n"
-                    + self.blocks_out.fmt()
+                "Transform row records of the form:\n"
+                + "  record_keys: "
+                + str(self.blocks_out.record_keys)
+                + "\n"
+                + " "
+                + str(self.blocks_out.row_version(include_record_keys=True))
+                + "\n"
+                + "to block records of structure:\n"
+                + self.blocks_out.fmt()
             )
             return s
 

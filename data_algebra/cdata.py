@@ -18,7 +18,9 @@ class RecordSpecification:
         self.control_table_keys = [k for k in control_table_keys]
         confused = set(record_keys).intersection(control_table_keys)
         if len(confused) > 0:
-            raise Exception("columns common to record_keys and control_table_keys: " + str(confused))
+            raise Exception(
+                "columns common to record_keys and control_table_keys: " + str(confused)
+            )
 
     def row_version(self, *, include_record_keys=True):
         cols = []

@@ -17,15 +17,25 @@ def test_cdata1():
 
     # %%
 
-    buf = io.StringIO(re.sub('[ \\t]+', '', """
+    buf = io.StringIO(
+        re.sub(
+            "[ \\t]+",
+            "",
+            """
     Sepal.Length,Sepal.Width,Petal.Length,Petal.Width,Species,id
     5.1,3.5,1.4,0.2,setosa,0
     4.9,3.0,1.4,0.2,setosa,1
     4.7,3.2,1.3,0.2,setosa,2
-    """))
+    """,
+        )
+    )
     iris_orig = pandas.read_csv(buf)
 
-    buf = io.StringIO(re.sub('[ \\t]+', '', """
+    buf = io.StringIO(
+        re.sub(
+            "[ \\t]+",
+            "",
+            """
     id,Species,Part,Measure,Value
     0,setosa,Petal,Length,1.4
     0,setosa,Petal,Width,0.2
@@ -39,7 +49,9 @@ def test_cdata1():
     2,setosa,Petal,Width,0.2
     2,setosa,Sepal,Length,4.7
     2,setosa,Sepal,Width,3.2
-    """))
+    """,
+        )
+    )
     iris_blocks_orig = pandas.read_csv(buf)
 
     iris_blocks = iris_blocks_orig.copy()
@@ -52,15 +64,17 @@ def test_cdata1():
     # from:
     #   https://github.com/WinVector/cdata/blob/master/vignettes/control_table_keys.Rmd
 
-    control_table = pandas.DataFrame({
-        'Part': ["Sepal", "Sepal", "Petal", "Petal"],
-        'Measure': ["Length", "Width", "Length", "Width"],
-        'Value': ["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"]
-    })
+    control_table = pandas.DataFrame(
+        {
+            "Part": ["Sepal", "Sepal", "Petal", "Petal"],
+            "Measure": ["Length", "Width", "Length", "Width"],
+            "Value": ["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"],
+        }
+    )
     record_spec = data_algebra.cdata.RecordSpecification(
         control_table,
-        control_table_keys=['Part', 'Measure'],
-        record_keys=['id', 'Species']
+        control_table_keys=["Part", "Measure"],
+        record_keys=["id", "Species"],
     )
     waste_str = str(record_spec)
 
@@ -69,23 +83,22 @@ def test_cdata1():
     db_model = data_algebra.SQLite.SQLiteModel()
 
     source_table = data_algebra.data_ops.TableDescription(
-        'iris',
-        ['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width', 'Species']
+        "iris",
+        ["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width", "Species"],
     )
 
     temp_table = data_algebra.data_ops.TableDescription(
-        'control_table',
-        record_spec.control_table.columns
+        "control_table", record_spec.control_table.columns
     )
 
-    conn = sqlite3.connect(':memory:')
+    conn = sqlite3.connect(":memory:")
 
     sql = db_model.row_recs_to_blocks_query(source_table, record_spec, temp_table)
     waste_str = str(sql)
 
     # %%
 
-    db_model.insert_table(conn, iris, 'iris')
+    db_model.insert_table(conn, iris, "iris")
     db_model.insert_table(conn, record_spec.control_table, temp_table.table_name)
 
     res_blocks = db_model.read_query(conn, sql)
@@ -94,10 +107,9 @@ def test_cdata1():
 
     # %%
 
-    db_model.insert_table(conn, res_blocks, 'res_blocks')
+    db_model.insert_table(conn, res_blocks, "res_blocks")
     source_table2 = data_algebra.data_ops.TableDescription(
-        'res_blocks',
-        ['Species', 'Part', 'Measure', 'Value']
+        "res_blocks", ["Species", "Part", "Measure", "Value"]
     )
 
     sql_back = db_model.blocks_to_row_recs_query(source_table2, record_spec)
@@ -135,7 +147,9 @@ def test_cdata1():
 
     # %%
 
-    mp_to_and_back = data_algebra.cdata_impl.RecordMap(blocks_in=record_spec, blocks_out=record_spec)
+    mp_to_and_back = data_algebra.cdata_impl.RecordMap(
+        blocks_in=record_spec, blocks_out=record_spec
+    )
     waste_str = str(mp_to_and_back)
     arranged_self = mp_to_and_back.transform(iris_blocks)
     assert data_algebra.util.equivalent_frames(arranged_self, iris_blocks_orig)
