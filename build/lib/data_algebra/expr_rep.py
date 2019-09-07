@@ -371,7 +371,6 @@ class Expression(Term):
 #  http://lybniz2.sourceforge.net/safeeval.html
 
 
-# noinspection PyBroadException
 def _parse_by_eval(source_str, *, data_def, outter_environemnt=None):
     if not isinstance(source_str, str):
         source_str = str(source_str)
@@ -379,8 +378,11 @@ def _parse_by_eval(source_str, *, data_def, outter_environemnt=None):
         outter_environemnt = {}
     else:
         outter_environemnt = {k: v for (k, v) in outter_environemnt.items() if not k.startswith("_")}
+    # don't have to completely kill this environment, as the code is something
+    # the user intends to run (and may have even typed in).
+    # But let's cut down the builtins anyway.
     outter_environemnt["__builtins__"] = {
-        'TypeError':TypeError
+        k: v for (k, v) in outter_environemnt.items() if isinstance(v, Exception)
     }
     v = eval(
         source_str, outter_environemnt, data_def
