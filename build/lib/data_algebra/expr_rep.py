@@ -371,11 +371,17 @@ class Expression(Term):
 #  http://lybniz2.sourceforge.net/safeeval.html
 
 
-def _eval_by_parse(source_str, *, data_def, outter_environemnt=None):
+# noinspection PyBroadException
+def _parse_by_eval(source_str, *, data_def, outter_environemnt=None):
     if not isinstance(source_str, str):
         source_str = str(source_str)
     if outter_environemnt is None:
         outter_environemnt = {}
+    else:
+        outter_environemnt = {k: v for (k, v) in outter_environemnt.items() if not k.startswith("_")}
+    outter_environemnt["__builtins__"] = {
+        'TypeError':TypeError
+    }
     v = eval(
         source_str, outter_environemnt, data_def
     )  # eval is eval(source, globals, locals)- so mp is first
@@ -408,24 +414,15 @@ def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
     data_algebra.env.populate_specials(
         column_defs=column_defs, destination=mp, user_values=parse_env
     )
-    sub_env = {k: v for (k, v) in parse_env.items() if not k.startswith("_")}
-    sub_env["__builtins__"] = None
     for k in ops.keys():
         if not isinstance(k, str):
             raise Exception("ops keys should be strings")
         ov = ops[k]
         v = ov
         if not isinstance(v, Term):
-            failue = False
-            # noinspection PyBroadException
-            try:
-                v = _eval_by_parse(
-                    source_str=v, data_def=mp, outter_environemnt=sub_env
+            v = _parse_by_eval(
+                    source_str=v, data_def=mp, outter_environemnt=parse_env
                 )
-            except Exception:
-                failue = True
-            if failue:
-                raise Exception("parse failed on " + k + " = " + ov)
         newops[k] = v
         used_here = set()
         v.get_column_names(used_here)
