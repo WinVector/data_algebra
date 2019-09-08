@@ -74,7 +74,7 @@ def test_null_bad():
 
         db_model_p.insert_table(conn_p, d, 'd')
 
-        res_p = db_model.read_query(conn_p, sql_p)
+        res_p = db_model_p.read_query(conn_p, sql_p)
 
         conn_p.close()
 
