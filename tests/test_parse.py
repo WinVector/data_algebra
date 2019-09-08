@@ -11,3 +11,8 @@ def test_parse():
 
     with pytest.raises(NameError):
         TableDescription("d", ["x", "y"]).extend({"z": "1/q + x"})
+
+    TableDescription("d", ["x", "y"]).extend({
+        "z": "x.is_null()",
+        "q": "x.is_bad()"
+    })
