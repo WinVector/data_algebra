@@ -62,9 +62,9 @@ class DBModel:
 
     def quote_identifier(self, identifier):
         if not isinstance(identifier, str):
-            raise Exception("expected identifier to be a str")
+            raise TypeError("expected identifier to be a str")
         if self.identifier_quote in identifier:
-            raise Exception('did not expect " in identifier')
+            raise TypeError('did not expect " in identifier')
         return self.identifier_quote + identifier + self.identifier_quote
 
     def build_qualified_table_name(self, table_name, *, qualifiers=None):
@@ -72,12 +72,12 @@ class DBModel:
         if qualifiers is None:
             qualifiers = {}
         if len(qualifiers) > 0:
-            raise Exception("This data model does not expect table qualifiers")
+            raise ValueError("This data model does not expect table qualifiers")
         return qt
 
     def quote_table_name(self, table_description):
         if not isinstance(table_description, data_algebra.data_ops.TableDescription):
-            raise Exception(
+            raise TypeError(
                 "Expected table_description to be a data_algebra.data_ops.TableDescription)"
             )
         return self.build_qualified_table_name(
@@ -86,7 +86,7 @@ class DBModel:
 
     def quote_string(self, string):
         if not isinstance(string, str):
-            raise Exception("expected string to be a str")
+            raise TypeError("expected string to be a str")
         # replace all single-quotes with doubled single quotes and return surrounded by single quotes
         return (
             self.string_quote
@@ -112,7 +112,7 @@ class DBModel:
 
     def expr_to_sql(self, expression, *, want_inline_parens=False):
         if not isinstance(expression, data_algebra.expr_rep.Term):
-            raise Exception("expression should be of class data_algebra.table_rep.Term")
+            raise TypeError("expression should be of class data_algebra.table_rep.Term")
         if isinstance(expression, data_algebra.expr_rep.Value):
             return self.value_to_sql(expression.value)
         if isinstance(expression, data_algebra.expr_rep.ColumnReference):
@@ -133,22 +133,21 @@ class DBModel:
                     # SQL window functions don't like parens
                     return subs[0] + " " + op.upper() + " " + subs[1]
             return op.upper() + "(" + ", ".join(subs) + ")"
-
-        raise Exception("unexpected type: " + str(type(expression)))
+        raise TypeError("unexpected type: " + str(type(expression)))
 
     def table_def_to_sql(self, table_def, *, using=None, force_sql=False):
         if not isinstance(table_def, data_algebra.data_ops.TableDescription):
-            raise Exception(
+            raise TypeError(
                 "Expected table_def to be a data_algebra.data_ops.TableDescription)"
             )
         if force_sql:
             if using is None:
                 using = table_def.column_set
             if len(using) < 1:
-                raise Exception("must select at least one column")
+                raise ValueError("must select at least one column")
             missing = using - table_def.column_set
             if len(missing) > 0:
-                raise Exception("referred to unknown columns: " + str(missing))
+                raise KeyError("referred to unknown columns: " + str(missing))
             cols = [self.quote_identifier(ci) for ci in using]
             sql_str = (
                 "SELECT "
@@ -161,7 +160,7 @@ class DBModel:
 
     def extend_to_sql(self, extend_node, *, using=None, temp_id_source=None):
         if not isinstance(extend_node, data_algebra.data_ops.ExtendNode):
-            raise Exception(
+            raise TypeError(
                 "Expected extend_node to be a data_algebra.data_ops.ExtendNode)"
             )
         if temp_id_source is None:
@@ -178,10 +177,10 @@ class DBModel:
                 db_model=self, using=using, temp_id_source=temp_id_source
             )
         if len(using) < 1:
-            raise Exception("must produce at least one column")
+            raise ValueError("must produce at least one column")
         missing = using - extend_node.column_set
         if len(missing) > 0:
-            raise Exception("referred to unknown columns: " + str(missing))
+            raise KeyError("referred to unknown columns: " + str(missing))
         # get set of columns we need from subquery
         subusing = extend_node.columns_used_from_sources(using=using)[0]
         subsql = extend_node.sources[0].to_sql_implementation(
@@ -222,7 +221,7 @@ class DBModel:
 
     def project_to_sql(self, project_node, *, using=None, temp_id_source=None):
         if not isinstance(project_node, data_algebra.data_ops.ProjectNode):
-            raise Exception(
+            raise TypeError(
                 "Expected project_node to be a data_algebra.data_ops.ProjectNode)"
             )
         if temp_id_source is None:
@@ -231,10 +230,10 @@ class DBModel:
             using = project_node.column_set
         subops = {k: op for (k, op) in project_node.ops.items() if k in using}
         if len(subops) < 1:
-            raise Exception("must produce at least one column")
+            raise ValueError("must produce at least one column")
         subusing = project_node.columns_used_from_sources(using=using)[0]
         if len(subusing) < 1:
-            raise Exception("must use at least one column")
+            raise ValueError("must use at least one column")
         derived = [
             self.expr_to_sql(oi) + " AS " + self.quote_identifier(ci)
             for (ci, oi) in subops.items()
@@ -265,7 +264,7 @@ class DBModel:
 
     def select_rows_to_sql(self, select_rows_node, *, using=None, temp_id_source=None):
         if not isinstance(select_rows_node, data_algebra.data_ops.SelectRowsNode):
-            raise Exception(
+            raise TypeError(
                 "Expected select_rows_node to be a data_algebra.data_ops.SelectRowsNode)"
             )
         if temp_id_source is None:
@@ -294,7 +293,7 @@ class DBModel:
         self, select_columns_node, *, using=None, temp_id_source=None
     ):
         if not isinstance(select_columns_node, data_algebra.data_ops.SelectColumnsNode):
-            raise Exception(
+            raise TypeError(
                 "Expected select_columns_to_sql to be a data_algebra.data_ops.SelectColumnsNode)"
             )
         if temp_id_source is None:
@@ -323,7 +322,7 @@ class DBModel:
         self, drop_columns_node, *, using=None, temp_id_source=None
     ):
         if not isinstance(drop_columns_node, data_algebra.data_ops.DropColumnsNode):
-            raise Exception(
+            raise TypeError(
                 "Expected drop_columns_node to be a data_algebra.data_ops.DropColumnsNode)"
             )
         if temp_id_source is None:
@@ -350,7 +349,7 @@ class DBModel:
 
     def order_to_sql(self, order_node, *, using=None, temp_id_source=None):
         if not isinstance(order_node, data_algebra.data_ops.OrderRowsNode):
-            raise Exception(
+            raise TypeError(
                 "Expected order_node to be a data_algebra.data_ops.OrderRowsNode)"
             )
         if temp_id_source is None:
@@ -391,7 +390,7 @@ class DBModel:
 
     def rename_to_sql(self, rename_node, *, using=None, temp_id_source=None):
         if not isinstance(rename_node, data_algebra.data_ops.RenameColumnsNode):
-            raise Exception(
+            raise TypeError(
                 "Expected rename_node to be a data_algebra.data_ops.RenameColumnsNode)"
             )
         if temp_id_source is None:
@@ -424,7 +423,7 @@ class DBModel:
 
     def natural_join_to_sql(self, join_node, *, using=None, temp_id_source=None):
         if not isinstance(join_node, data_algebra.data_ops.NaturalJoinNode):
-            raise Exception(
+            raise TypeError(
                 "Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)"
             )
         if temp_id_source is None:
@@ -434,10 +433,10 @@ class DBModel:
         by_set = set(join_node.by)
         using = using.union(by_set)
         if len(using) < 1:
-            raise Exception("must select at least one column")
+            raise ValueError("must select at least one column")
         missing = using - join_node.column_set
         if len(missing) > 0:
-            raise Exception("referred to unknown columns: " + str(missing))
+            raise KeyError("referred to unknown columns: " + str(missing))
         subusing = join_node.columns_used_from_sources(using=using)
         using_left = subusing[0]
         using_right = subusing[1]
@@ -517,7 +516,7 @@ class DBModel:
         """
 
         if not isinstance(d, pandas.DataFrame):
-            raise Exception("d is supposed to be a pandas.DataFrame")
+            raise TypeError("d is supposed to be a pandas.DataFrame")
         cr = [
             d.columns[i].lower()
             + " "
@@ -560,7 +559,7 @@ class DBModel:
     # noinspection PyMethodMayBeStatic
     def read_table(self, conn, table_name, *, qualifiers=None, limit=None):
         if not isinstance(table_name, str):
-            raise Exception("Expect table_name to be a str")
+            raise TypeError("Expect table_name to be a str")
         q_table_name = self.build_qualified_table_name(
             table_name, qualifiers=qualifiers
         )
@@ -571,7 +570,7 @@ class DBModel:
 
     def read(self, conn, table):
         if not isinstance(table, data_algebra.data_ops.TableDescription):
-            raise Exception(
+            raise TypeError(
                 "Expect table to be a data_algebra.data_ops.TableDescription"
             )
         return self.read_table(
@@ -594,15 +593,15 @@ class DBModel:
         if temp_id_source is None:
             temp_id_source = [0]
         if not isinstance(source_view, data_algebra.data_ops.ViewRepresentation):
-            raise Exception(
+            raise TypeError(
                 "source_view should be a data_algebra.data_ops.ViewRepresentation"
             )
         if not isinstance(record_spec, data_algebra.cdata.RecordSpecification):
-            raise Exception(
+            raise TypeError(
                 "record_spec should be a data_algebra.cdata.RecordSpecification"
             )
         if not isinstance(record_view, data_algebra.data_ops.ViewRepresentation):
-            raise Exception(
+            raise TypeError(
                 "record_view should be a data_algebra.data_ops.ViewRepresentation"
             )
         control_value_cols = [
@@ -668,11 +667,11 @@ class DBModel:
         if temp_id_source is None:
             temp_id_source = [0]
         if not isinstance(source_view, data_algebra.data_ops.ViewRepresentation):
-            raise Exception(
+            raise TypeError(
                 "source_view should be a data_algebra.data_ops.ViewRepresentation"
             )
         if not isinstance(record_spec, data_algebra.cdata.RecordSpecification):
-            raise Exception(
+            raise TypeError(
                 "record_spec should be a data_algebra.cdata.RecordSpecification"
             )
         control_value_cols = [

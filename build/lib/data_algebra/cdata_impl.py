@@ -12,7 +12,7 @@ def table_is_keyed_by_columns(table, column_names):
     # check for ill-condition
     missing_columns = set(column_names) - set([c for c in table.columns])
     if len(missing_columns) > 0:
-        raise Exception("missing columns: " + str(missing_columns))
+        raise KeyError("missing columns: " + str(missing_columns))
     # get rid of some corner cases
     if table.shape[0] < 2:
         return True
@@ -33,16 +33,16 @@ class RecordMap:
     def __init__(self, *, blocks_in=None, blocks_out=None):
         if blocks_in is not None:
             if not isinstance(blocks_in, data_algebra.cdata.RecordSpecification):
-                raise Exception(
+                raise TypeError(
                     "blocks_in should be a data_algebra.cdata.RecordSpecification"
                 )
         if blocks_out is not None:
             if not isinstance(blocks_out, data_algebra.cdata.RecordSpecification):
-                raise Exception(
+                raise TypeError(
                     "blocks_out should be a data_algebra.cdata.RecordSpecification"
                 )
         if (blocks_in is None) and (blocks_out is None):
-            raise Exception(
+            raise ValueError(
                 "At least one of blocks_in or blocks_out should not be None"
             )
         self.blocks_in = blocks_in
@@ -54,7 +54,7 @@ class RecordMap:
         self, X, *, check_blocks_in_keying=True, check_blocks_out_keying=False
     ):
         if not isinstance(X, pandas.DataFrame):
-            raise Exception("X should be a pandas.DataFrame")
+            raise TypeError("X should be a pandas.DataFrame")
         X = X.copy()
         X.reset_index(inplace=True, drop=True)
         db_model = data_algebra.SQLite.SQLiteModel()
@@ -66,14 +66,14 @@ class RecordMap:
                 self.blocks_in.record_keys
             ) - set(x1_descr.column_names)
             if len(missing_cols) > 0:
-                raise Exception("missing required columns: " + str(missing_cols))
+                raise KeyError("missing required columns: " + str(missing_cols))
             # convert to row-records
             if check_blocks_in_keying:
                 # table should be keyed by record_keys + control_table_keys
                 if not table_is_keyed_by_columns(
                     X, self.blocks_in.record_keys + self.blocks_in.control_table_keys
                 ):
-                    raise Exception(
+                    raise ValueError(
                         "table is not keyed by blocks_in.record_keys + blocks_in.control_table_keys"
                     )
             with sqlite3.connect(":memory:") as conn:
@@ -88,11 +88,11 @@ class RecordMap:
             )
             missing_cols = set(self.blocks_out.record_keys) - set(x2_descr.column_names)
             if len(missing_cols) > 0:
-                raise Exception("missing required columns: " + str(missing_cols))
+                raise KeyError("missing required columns: " + str(missing_cols))
             if check_blocks_out_keying:
                 # table should be keyed by record_keys
                 if not table_is_keyed_by_columns(X, self.blocks_out.record_keys):
-                    raise Exception("table is not keyed by blocks_out.record_keys")
+                    raise ValueError("table is not keyed by blocks_out.record_keys")
             # convert to block records
             with sqlite3.connect(":memory:") as conn:
                 temp_table = data_algebra.data_ops.TableDescription(

@@ -36,33 +36,33 @@ class OperatorPlatform(data_algebra.pipe.PipeValue):
 
     # noinspection PyPep8Naming
     def transform(self, X):
-        raise Exception("base class called")
+        raise NotImplementedError("base class called")
 
     # define builders for all non-initial node types on base class
 
     def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
-        raise Exception("base class called")
+        raise NotImplementedError("base class called")
 
     def project(self, ops, *, group_by=None, order_by=None, reverse=None):
-        raise Exception("base class called")
+        raise NotImplementedError("base class called")
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
-        raise Exception("base class called")
+        raise NotImplementedError("base class called")
 
     def select_rows(self, expr):
-        raise Exception("base class called")
+        raise NotImplementedError("base class called")
 
     def drop_columns(self, column_deletions):
-        raise Exception("base class called")
+        raise NotImplementedError("base class called")
 
     def select_columns(self, columns):
-        raise Exception("base class called")
+        raise NotImplementedError("base class called")
 
     def rename_columns(self, column_remapping):
-        raise Exception("base class called")
+        raise NotImplementedError("base class called")
 
     def order_rows(self, columns, *, reverse=None, limit=None):
-        raise Exception("base class called")
+        raise NotImplementedError("base class called")
 
 
 class ViewRepresentation(OperatorPlatform):
@@ -78,12 +78,12 @@ class ViewRepresentation(OperatorPlatform):
         self.column_names = [c for c in column_names]
         for ci in self.column_names:
             if not isinstance(ci, str):
-                raise Exception("non-string column name(s)")
+                raise ValueError("non-string column name(s)")
         if len(self.column_names) < 1:
-            raise Exception("no column names")
+            raise ValueError("no column names")
         self.column_set = set(self.column_names)
         if not len(self.column_names) == len(self.column_set):
-            raise Exception("duplicate column name(s)")
+            raise ValueError("duplicate column name(s)")
         column_dict = {
             ci: data_algebra.expr_rep.ColumnReference(self, ci)
             for ci in self.column_names
@@ -93,7 +93,7 @@ class ViewRepresentation(OperatorPlatform):
             sources = []
         for si in sources:
             if not isinstance(si, ViewRepresentation):
-                raise Exception("all sources must be of class ViewRepresentation")
+                raise ValueError("all sources must be of class ViewRepresentation")
         self.sources = [si for si in sources]
         OperatorPlatform.__init__(self)
 
@@ -111,7 +111,7 @@ class ViewRepresentation(OperatorPlatform):
     def columns_used_from_sources(self, using=None):
         """Give column names used from source nodes when this node is exececuted
         with the using columns (None means all)."""
-        raise Exception("base method called")
+        raise NotImplementedError("base method called")
 
     def columns_used_implementation(self, *, columns_used, using=None):
         cu_list = self.columns_used_from_sources(using)
@@ -130,7 +130,7 @@ class ViewRepresentation(OperatorPlatform):
     # collect as simple structures for YAML I/O and other generic tasks
 
     def collect_representation_implementation(self, *, pipeline=None, dialect="Python"):
-        raise Exception("base method called")
+        raise NotImplementedError("base method called")
 
     def collect_representation(self, *, pipeline=None, dialect="Python"):
         """Collect a representation of the operator DAG as simple serializable objects.
@@ -167,7 +167,7 @@ class ViewRepresentation(OperatorPlatform):
     # query generation
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
-        raise Exception("base method called")
+        raise NotImplementedError("base method called")
 
     def to_sql(self, db_model, *, pretty=False, encoding=None, sqlparse_options=None):
         global have_sqlparse
@@ -191,11 +191,11 @@ class ViewRepresentation(OperatorPlatform):
         :param eval_env: environment to take values from
         :return: pandas.DataFrame
         """
-        raise Exception("base method called")
+        raise NotImplementedError("base method called")
 
     def __rrshift__(self, other):  # override other >> self
         if not isinstance(other, pandas.DataFrame):
-            raise Exception("other should be a pandas.DataFrame")
+            raise TypeError("other should be a pandas.DataFrame")
         return self.transform(other)
 
     # implement builders for all non-initial node types on base class
@@ -205,7 +205,7 @@ class ViewRepresentation(OperatorPlatform):
         if isinstance(X, pandas.DataFrame):
             tables = self.get_tables()
             if len(tables) != 1:
-                raise Exception(
+                raise ValueError(
                     "transfrom(pandas.DataFrame) can only be applied to ops-dags with only one table def"
                 )
             k = [k for k in tables.keys()][0]
@@ -213,7 +213,7 @@ class ViewRepresentation(OperatorPlatform):
             if eval_env is None:
                 eval_env = globals()
             return self.eval_pandas(data_map={k: X}, eval_env=eval_env)
-        raise Exception("can not apply transform() to type " + str(type(X)))
+        raise TypeError("can not apply transform() to type " + str(type(X)))
 
     def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
         return ExtendNode(
@@ -231,7 +231,7 @@ class ViewRepresentation(OperatorPlatform):
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
         if not isinstance(b, ViewRepresentation):
-            raise Exception(
+            raise TypeError(
                 "expected b to be a data_algebra.dat_ops.ViewRepresentation"
             )
         return NaturalJoinNode(a=self, b=b, by=by, jointype=jointype)
@@ -278,13 +278,13 @@ class TableDescription(ViewRepresentation):
     def __init__(self, table_name, column_names, *, qualifiers=None):
         ViewRepresentation.__init__(self, column_names=column_names)
         if (table_name is not None) and (not isinstance(table_name, str)):
-            raise Exception("table_name must be a string")
+            raise TypeError("table_name must be a string")
         self.table_name = table_name
         self.column_names = [c for c in column_names]
         if qualifiers is None:
             qualifiers = {}
         if not isinstance(qualifiers, dict):
-            raise Exception("qualifiers must be a dictionary")
+            raise TypeError("qualifiers must be a dictionary")
         self.qualifiers = qualifiers.copy()
         key = ""
         if len(self.qualifiers) > 0:
@@ -340,7 +340,7 @@ class TableDescription(ViewRepresentation):
         if self.key in tables.keys():
             other = tables[self.key]
             if self.column_set != other.column_set:
-                raise Exception(
+                raise ValueError(
                     "Two tables with key " + self.key + " have different column sets."
                 )
         else:
@@ -349,7 +349,7 @@ class TableDescription(ViewRepresentation):
 
     def eval_pandas(self, *, data_map, eval_env):
         if len(self.qualifiers) > 0:
-            raise Exception(
+            raise ValueError(
                 "table descriptions used with eval_pandas() must not have qualifiers"
             )
         # make an index-free copy of the data to isolate side-effects and not deal with indices
@@ -367,7 +367,7 @@ class TableDescription(ViewRepresentation):
             using = self.column_set
         unexpected = using - self.column_set
         if len(unexpected) > 0:
-            raise Exception("asked for undefined columns: " + str(unexpected))
+            raise KeyError("asked for undefined columns: " + str(unexpected))
         cset.update(using)
 
     def to_sql(self, db_model, *, pretty=False, encoding=None, sqlparse_options=None):
@@ -413,7 +413,7 @@ class ExtendNode(ViewRepresentation):
             ops, source.column_map.__dict__
         )
         if len(ops) < 1:
-            raise Exception("no ops")
+            raise ValueError("no ops")
         self.ops = ops
         if partition_by is None:
             partition_by = []
@@ -436,31 +436,31 @@ class ExtendNode(ViewRepresentation):
             o.get_column_names(consumed_cols)
         unknown_cols = consumed_cols - source.column_set
         if len(unknown_cols) > 0:
-            raise Exception("referred to unknown columns: " + str(unknown_cols))
+            raise KeyError("referred to unknown columns: " + str(unknown_cols))
         known_cols = set(column_names)
         for ci in ops.keys():
             if ci not in known_cols:
                 column_names.append(ci)
         if len(partition_by) != len(set(partition_by)):
-            raise Exception("Duplicate name in partition_by")
+            raise ValueError("Duplicate name in partition_by")
         if len(order_by) != len(set(order_by)):
-            raise Exception("Duplicate name in order_by")
+            raise ValueError("Duplicate name in order_by")
         if len(reverse) != len(set(reverse)):
-            raise Exception("Duplicate name in reverse")
+            raise ValueError("Duplicate name in reverse")
         unknown = set(partition_by) - known_cols
         if len(unknown) > 0:
-            raise Exception("unknown partition_by columns: " + str(unknown))
+            raise ValueError("unknown partition_by columns: " + str(unknown))
         unknown = set(order_by) - known_cols
         if len(unknown) > 0:
-            raise Exception("unknown order_by columns: " + str(unknown))
+            raise ValueError("unknown order_by columns: " + str(unknown))
         unknown = set(reverse) - set(order_by)
         if len(unknown) > 0:
-            raise Exception("reverse columns not in order_by: " + str(unknown))
+            raise ValueError("reverse columns not in order_by: " + str(unknown))
         bad_overwrite = set(ops.keys()).intersection(
             set(partition_by).union(order_by, reverse)
         )
         if len(bad_overwrite) > 0:
-            raise Exception("tried to change: " + str(bad_overwrite))
+            raise ValueError("tried to change: " + str(bad_overwrite))
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
 
     def columns_used_from_sources(self, using=None):
@@ -522,14 +522,14 @@ class ExtendNode(ViewRepresentation):
             # check these are forms we are prepared to work with
             for (k, op) in self.ops.items():
                 if len(op.args) > 1:
-                    raise Exception(
+                    raise ValueError(
                         "non-trivial windows expression: " + str(k) + ": " + str(op)
                     )
                 if len(op.args) == 1:
                     if not isinstance(
                         op.args[0], data_algebra.expr_rep.ColumnReference
                     ):
-                        raise Exception(
+                        raise ValueError(
                             "windows expression argument must be a column: "
                             + str(k)
                             + ": "
@@ -571,7 +571,7 @@ class ExtendNode(ViewRepresentation):
                     if op.op == "row_number":
                         subframe[k] = opframe.cumcount() + 1
                     else:  # TODO: more of these
-                        raise Exception("not implemented: " + str(k) + ": " + str(op))
+                        raise KeyError("not implemented: " + str(k) + ": " + str(op))
                 else:
                     # len(op.args) == 1
                     subframe[k] = opframe[value_name].transform(op.op)
@@ -588,7 +588,7 @@ class ProjectNode(ViewRepresentation):
             ops, source.column_map.__dict__
         )
         if len(ops) < 1:
-            raise Exception("no ops")
+            raise ValueError("no ops")
         self.ops = ops
         if group_by is None:
             group_by = []
@@ -611,26 +611,26 @@ class ProjectNode(ViewRepresentation):
             o.get_column_names(consumed_cols)
         unknown_cols = consumed_cols - source.column_set
         if len(unknown_cols) > 0:
-            raise Exception("referred to unknown columns: " + str(unknown_cols))
+            raise KeyError("referred to unknown columns: " + str(unknown_cols))
         known_cols = set(column_names)
         for ci in ops.keys():
             if ci not in known_cols:
                 column_names.append(ci)
         if len(group_by) != len(set(group_by)):
-            raise Exception("Duplicate name in group_by")
+            raise ValueError("Duplicate name in group_by")
         if len(order_by) != len(set(order_by)):
-            raise Exception("Duplicate name in order_by")
+            raise ValueError("Duplicate name in order_by")
         if len(reverse) != len(set(reverse)):
-            raise Exception("Duplicate name in reverse")
+            raise ValueError("Duplicate name in reverse")
         unknown = set(group_by) - known_cols
         if len(unknown) > 0:
-            raise Exception("unknown partition_by columns: " + str(unknown))
+            raise ValueError("unknown partition_by columns: " + str(unknown))
         unknown = set(order_by) - known_cols
         if len(unknown) > 0:
-            raise Exception("unknown order_by columns: " + str(unknown))
+            raise ValueError("unknown order_by columns: " + str(unknown))
         unknown = set(reverse) - set(order_by)
         if len(unknown) > 0:
-            raise Exception("reverse columns not in order_by: " + str(unknown))
+            raise ValueError("reverse columns not in order_by: " + str(unknown))
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
 
     def columns_used_from_sources(self, using=None):
@@ -689,11 +689,11 @@ class ProjectNode(ViewRepresentation):
         # https://stackoverflow.com/questions/44635626/rename-result-columns-from-pandas-aggregation-futurewarning-using-a-dict-with
         for (k, op) in self.ops.items():
             if len(op.args) != 1:
-                raise Exception(
+                raise ValueError(
                     "non-trivial aggregation expression: " + str(k) + ": " + str(op)
                 )
             if not isinstance(op.args[0], data_algebra.expr_rep.ColumnReference):
-                raise Exception(
+                raise ValueError(
                     "windows expression argument must be a column: "
                     + str(k)
                     + ": "
@@ -732,7 +732,7 @@ class SelectRowsNode(ViewRepresentation):
             {"expr": expr}, source.column_map.__dict__
         )
         if len(ops) < 1:
-            raise Exception("no ops")
+            raise ValueError("no ops")
         self.expr = ops["expr"]
         self.decision_columns = set()
         self.expr.get_column_names(self.decision_columns)
@@ -1016,13 +1016,13 @@ class NaturalJoinNode(ViewRepresentation):
             by = [by]
         by_set = set(by)
         if len(by) != len(by_set):
-            raise Exception("duplicate column names in by")
+            raise ValueError("duplicate column names in by")
         missing_left = by_set - a.column_set
         if len(missing_left) > 0:
-            raise Exception("left table missing join keys: " + str(missing_left))
+            raise KeyError("left table missing join keys: " + str(missing_left))
         missing_right = by_set - b.column_set
         if len(missing_right) > 0:
-            raise Exception("right table missing join keys: " + str(missing_right))
+            raise KeyError("right table missing join keys: " + str(missing_right))
         self.by = by
         self.jointype = jointype
         ViewRepresentation.__init__(self, column_names=column_names, sources=sources)

@@ -19,7 +19,7 @@ class PipeStep:
         self.__name__ = name
 
     def apply(self, other):
-        raise Exception("base method called")
+        raise NotImplementedError("base method called")
 
     def __rrshift__(self, other):  # override other >> self
         return self.apply(other)
@@ -59,7 +59,7 @@ class PipeFunction(PipeStep):
 
     def __init__(self, func, *, args_to_override=None, partial_args=None, name=None):
         if not callable(func):
-            raise Exception("func must be callable")
+            raise TypeError("func must be callable")
         if partial_args is None:
             partial_args = {}
         if args_to_override is None:
@@ -138,7 +138,7 @@ class Value(PipeValue):
 def build_pipeline(*steps):
     n = len(steps)
     if n < 1:
-        raise Exception("steps was empty")
+        raise ValueError("steps was empty")
     if n == 1:
         return steps[0]
     cur = steps[0]

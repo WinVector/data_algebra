@@ -56,7 +56,7 @@ def to_pipeline(obj, *, known_tables=None):
             if k in known_tables.keys():
                 ov = known_tables[k]
                 if tab.column_set != ov.column_set:
-                    raise Exception(
+                    raise ValueError(
                         "two tables with same qualified table names and different declared column sets"
                     )
                 tab = ov
@@ -100,7 +100,7 @@ def to_pipeline(obj, *, known_tables=None):
                 columns=obj["order_columns"], reverse=obj["reverse"], limit=obj["limit"]
             )
         else:
-            raise Exception("Unexpected op name: " + op)
+            raise TypeError("Unexpected op name: " + op)
     if isinstance(obj, list):
         # a pipeline, assumed non empty
         res = to_pipeline(obj[0], known_tables=known_tables)
@@ -109,7 +109,7 @@ def to_pipeline(obj, *, known_tables=None):
             # res = res >> nxt
             res = nxt.apply(res)
         return res
-    raise Exception("unexpected type: " + str(obj))
+    raise TypeError("unexpected type: " + str(obj))
 
 
 # for testing
@@ -117,7 +117,7 @@ def to_pipeline(obj, *, known_tables=None):
 
 def check_op_round_trip(o):
     if not isinstance(o, data_algebra.data_ops.ViewRepresentation):
-        raise Exception("expect o to be a data_algebra.data_ops.ViewRepresentation")
+        raise TypeError("expect o to be a data_algebra.data_ops.ViewRepresentation")
     strr = o.to_python(strict=True, pretty=False)
     strp = o.to_python(strict=True, pretty=True)
     obj = o.collect_representation()

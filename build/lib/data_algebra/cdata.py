@@ -7,7 +7,7 @@ import pandas
 class RecordSpecification:
     def __init__(self, control_table, *, record_keys=None, control_table_keys=None):
         if not isinstance(control_table, pandas.DataFrame):
-            raise Exception("control_table should be a pandas.DataFrame")
+            raise TypeError("control_table should be a pandas.DataFrame")
         self.control_table = control_table.copy()
         self.control_table.reset_index(inplace=True, drop=True)
         if record_keys is None:
@@ -18,7 +18,7 @@ class RecordSpecification:
         self.control_table_keys = [k for k in control_table_keys]
         confused = set(record_keys).intersection(control_table_keys)
         if len(confused) > 0:
-            raise Exception(
+            raise ValueError(
                 "columns common to record_keys and control_table_keys: " + str(confused)
             )
 

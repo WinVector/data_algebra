@@ -40,7 +40,7 @@ class Extend(data_algebra.pipe.PipeStep):
 
     def apply(self, other):
         if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
-            raise Exception(
+            raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
         return other.extend(
@@ -65,7 +65,7 @@ class Project(data_algebra.pipe.PipeStep):
 
     def apply(self, other):
         if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
-            raise Exception(
+            raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
         return other.project(
@@ -88,7 +88,7 @@ class SelectRows(data_algebra.pipe.PipeStep):
 
     def apply(self, other):
         if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
-            raise Exception(
+            raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
         return other.select_rows(expr=self.expr)
@@ -107,7 +107,7 @@ class SelectColumns(data_algebra.pipe.PipeStep):
 
     def apply(self, other):
         if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
-            raise Exception(
+            raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
         return other.select_columns(self.column_selection)
@@ -126,7 +126,7 @@ class DropColumns(data_algebra.pipe.PipeStep):
 
     def apply(self, other):
         if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
-            raise Exception(
+            raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
         return other.drop_columns(self.column_deletions)
@@ -149,7 +149,7 @@ class OrderRows(data_algebra.pipe.PipeStep):
 
     def apply(self, other):
         if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
-            raise Exception(
+            raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
         return other.order_rows(
@@ -169,7 +169,7 @@ class RenameColumns(data_algebra.pipe.PipeStep):
 
     def apply(self, other):
         if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
-            raise Exception(
+            raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
         return other.rename_columns(column_remapping=self.column_remapping)
@@ -182,7 +182,7 @@ class NaturalJoin(data_algebra.pipe.PipeStep):
 
     def __init__(self, *, b=None, by=None, jointype="INNER"):
         if not isinstance(b, data_algebra.data_ops.ViewRepresentation):
-            raise Exception("b must be a data_algebra.data_ops.ViewRepresentation")
+            raise TypeError("b must be a data_algebra.data_ops.ViewRepresentation")
         self._by = by
         self._jointype = jointype
         self._b = b
@@ -190,7 +190,7 @@ class NaturalJoin(data_algebra.pipe.PipeStep):
 
     def apply(self, other):
         if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
-            raise Exception(
+            raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
         return other.natural_join(b=self._b, by=self._by, jointype=self._jointype)
@@ -212,18 +212,18 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
                 # pipeline = pipeline >> s
                 pipeline = s.apply(pipeline)
             return pipeline
-        raise Exception("can not apply realize() to type " + str(type(X)))
+        raise TypeError("can not apply realize() to type " + str(type(X)))
 
     # noinspection PyPep8Naming
     def transform(self, X):
         if isinstance(X, pandas.DataFrame):
             pipeline = self.realize(X)
             return pipeline.transform(X)
-        raise Exception("can not apply transform() to type " + str(type(X)))
+        raise TypeError("can not apply transform() to type " + str(type(X)))
 
     def __rrshift__(self, other):  # override other >> self
         if not isinstance(other, pandas.DataFrame):
-            raise Exception("other should be a pandas.DataFrame")
+            raise TypeError("other should be a pandas.DataFrame")
         return self.transform(other)
 
     # implement method chaining collection of pending operations
@@ -242,7 +242,7 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
         if not isinstance(b, data_algebra.data_ops.ViewRepresentation):
-            raise Exception("b must be a data_algebra.data_ops.ViewRepresentation")
+            raise TypeError("b must be a data_algebra.data_ops.ViewRepresentation")
         op = NaturalJoin(by=by, jointype=jointype, b=b)
         self.ops.append(op)
         return self

@@ -35,7 +35,7 @@ def outer_namespace():
 class Env:
     def __init__(self, env):
         if not isinstance(env, dict):
-            raise Exception("env should be a dictionary such as locals() or globals()")
+            raise TypeError("env should be a dictionary such as locals() or globals()")
         self.env = env
 
     def __enter__(self):
@@ -66,10 +66,10 @@ class SimpleNamespaceDict(types.SimpleNamespace):
         return self.__dict__[key]
 
     def __setitem__(self, key, value):
-        raise Exception("__setitem__ not allowed")
+        raise RuntimeError("__setitem__ not allowed")
 
     def __setattr__(self, name, value):
-        raise Exception("__setattr__ not allowed")
+        raise RuntimeError("__setattr__ not allowed")
 
 
 def populate_specials(*, column_defs, column_defs1=None, destination, user_values=None):
@@ -81,20 +81,20 @@ def populate_specials(*, column_defs, column_defs1=None, destination, user_value
     """
 
     if not isinstance(column_defs, dict):
-        raise Exception("column_defs should be a dictionary")
+        raise TypeError("column_defs should be a dictionary")
     if not isinstance(destination, dict):
-        raise Exception("destination should be a dictionary")
+        raise TypeError("destination should be a dictionary")
     if user_values is None:
         user_values = {}
     if not isinstance(user_values, dict):
-        raise Exception("user_values should be a dictionary")
+        raise TypeError("user_values should be a dictionary")
     nd = column_defs.copy()
     ns = SimpleNamespaceDict(**nd)
     destination["_"] = ns
     destination["_0"] = ns
     if column_defs1 is not None:
         if not isinstance(column_defs1, dict):
-            raise Exception("column_defs1 should be a dictionary")
+            raise TypeError("column_defs1 should be a dictionary")
         nd1 = column_defs1.copy()
         ns1 = SimpleNamespaceDict(**nd1)
         destination["_1"] = ns1

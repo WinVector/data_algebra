@@ -27,25 +27,25 @@ class Term:
 
     def __op_expr__(self, op, other):
         if not isinstance(op, str):
-            raise Exception("op is supposed to be a string")
+            raise TypeError("op is supposed to be a string")
         if not isinstance(other, Term):
             other = Value(other)
         return Expression(op, (self, other), inline=True)
 
     def __rop_expr__(self, op, other):
         if not isinstance(op, str):
-            raise Exception("op is supposed to be a string")
+            raise TypeError("op is supposed to be a string")
         if not isinstance(other, Term):
             other = Value(other)
         return Expression(op, (other, self), inline=True)
 
     def __uop_expr__(self, op, *, params=None):
         if not isinstance(op, str):
-            raise Exception("op is supposed to be a string")
+            raise TypeError("op is supposed to be a string")
         return Expression(op, (self,), params=params)
 
     def to_python(self, *, want_inline_parens=False):
-        raise Exception("base class called")
+        raise NotImplementedError("base class called")
 
     def to_pandas(self, *, want_inline_parens=False):
         return self.to_python(want_inline_parens=want_inline_parens)
@@ -62,7 +62,7 @@ class Term:
         elif dialect == "R":
             return self.to_R(want_inline_parens=want_inline_parens)
         else:
-            raise Exception("unexpected dialect string: " + str(dialect))
+            raise ValueError("unexpected dialect string: " + str(dialect))
 
     def __repr__(self):
         return self.to_python(want_inline_parens=False)
@@ -177,43 +177,43 @@ class Term:
         return self.__rop_expr__("or", other)
 
     def __iadd__(self, other):
-        raise Exception("assignment operator called")
+        raise RuntimeError("unsuppoted method called")
 
     def __isub__(self, other):
-        raise Exception("assignment operator called")
+        raise RuntimeError("unsuppoted method called")
 
     def __imul__(self, other):
-        raise Exception("assignment operator called")
+        raise RuntimeError("unsuppoted method called")
 
     def __imatmul__(self, other):
-        raise Exception("assignment operator called")
+        raise RuntimeError("unsuppoted method called")
 
     def __itruediv__(self, other):
-        raise Exception("assignment operator called")
+        raise RuntimeError("unsuppoted method called")
 
     def __ifloordiv__(self, other):
-        raise Exception("assignment operator called")
+        raise RuntimeError("unsuppoted method called")
 
     def __imod__(self, other):
-        raise Exception("assignment operator called")
+        raise RuntimeError("unsuppoted method called")
 
     def __ipow__(self, other, modulo=None):
-        raise Exception("assignment operator called")
+        raise RuntimeError("unsuppoted method called")
 
     def __ilshift__(self, other):
-        raise Exception("assignment operator called")
+        raise RuntimeError("unsuppoted method called")
 
     def __irshift__(self, other):
-        raise Exception("assignment operator called")
+        raise RuntimeError("unsuppoted method called")
 
     def __iand__(self, other):
-        raise Exception("assignment operator called")
+        raise RuntimeError("unsuppoted method called")
 
     def __ixor__(self, other):
-        raise Exception("assignment operator called")
+        raise RuntimeError("unsuppoted method called")
 
     def __ior__(self, other):
-        raise Exception("assignment operator called")
+        raise RuntimeError("unsuppoted method called")
 
     def __neg__(self):
         return self.__uop_expr__("neg")
@@ -228,16 +228,16 @@ class Term:
         return self.__uop_expr__("invert")
 
     def __complex__(self):
-        raise Exception("cast called")
+        raise RuntimeError("unsuppoted method called")
 
     def __int__(self):
-        raise Exception("cast called")
+        raise RuntimeError("unsuppoted method called")
 
     def __float__(self):
-        raise Exception("cast called")
+        raise RuntimeError("unsuppoted method called")
 
     def __index__(self):
-        raise Exception("cast called")
+        raise RuntimeError("unsuppoted method called")
 
     def __round__(self, ndigits=None):
         return self.__uop_expr__("neg", params={"ndigits": ndigits})
@@ -276,7 +276,7 @@ class Value(Term):
     def __init__(self, value):
         allowed = [int, float, str, bool]
         if not any([isinstance(value, tp) for tp in allowed]):
-            raise Exception("value type must be one of: " + str(allowed))
+            raise TypeError("value type must be one of: " + str(allowed))
         self.value = value
         Term.__init__(self)
 
@@ -294,9 +294,9 @@ class ColumnReference(Term):
         self.view = view
         self.column_name = column_name
         if not isinstance(column_name, str):
-            raise Exception("column_name must be a string")
+            raise TypeError("column_name must be a string")
         if column_name not in view.column_set:
-            raise Exception("column_name must be a column of the given view")
+            raise KeyError("column_name must be a column of the given view")
         Term.__init__(self)
 
     def to_python(self, want_inline_parens=False):
@@ -324,7 +324,7 @@ r_formatters = {"___": lambda expr: expr.to_R()}
 class Expression(Term):
     def __init__(self, op, args, *, params=None, inline=False):
         if not isinstance(op, str):
-            raise Exception("op is supposed to be a string")
+            raise TypeError("op is supposed to be a string")
         self.op = op
         self.args = args
         self.params = params
@@ -420,9 +420,9 @@ def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
        version of eval() is used to try and catch some issues).
     """
     if not isinstance(ops, dict):
-        raise Exception("ops should be a dictionary")
+        raise TypeError("ops should be a dictionary")
     if not isinstance(column_defs, dict):
-        raise Exception("column_defs should be a dictionary")
+        raise TypeError("column_defs should be a dictionary")
     if parse_env is None:
         parse_env = data_algebra.env.outer_namespace()
         if parse_env is None:
@@ -436,7 +436,7 @@ def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
     )
     for k in ops.keys():
         if not isinstance(k, str):
-            raise Exception("ops keys should be strings")
+            raise TypeError("ops keys should be strings")
         ov = ops[k]
         v = ov
         if not isinstance(v, Term):
@@ -451,7 +451,7 @@ def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
         )  # can use a column to update itself
     intersect = set(ops.keys()).intersection(columns_used)
     if len(intersect) > 0:
-        raise Exception(
+        raise ValueError(
             "columns both produced and used in same expression set: " + str(intersect)
         )
     return newops
