@@ -540,7 +540,7 @@ class ExtendNode(ViewRepresentation):
         if not window_situation:
             for (k, op) in self.ops.items():
                 op_src = op.to_pandas()
-                res[k] = res.eval(op_src, global_dict=eval_env)
+                res[k] = res.eval(op_src, local_dict=data_algebra.expr_rep.pandas_eval_env)
         else:
             for (k, op) in self.ops.items():
                 # work on a slice of the data frame

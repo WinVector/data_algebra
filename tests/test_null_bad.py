@@ -17,8 +17,4 @@ def test_null_bad():
         'x': [1, numpy.nan, math.inf, -math.inf, None, 2]
     })
 
-    is_null = lambda x: pandas.isnull(x)
-    is_bad = lambda x: pandas.isnull(x)
-
-    with data_algebra.env.Env(locals()) as env:
-        d2 = ops.transform(d)
+    d2 = ops.transform(d)

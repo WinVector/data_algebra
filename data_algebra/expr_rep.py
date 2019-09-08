@@ -1,6 +1,8 @@
 from typing import Union
 import collections
 
+import pandas
+
 import data_algebra.env
 
 # for some ideas in capturing expressions in Python see:
@@ -306,6 +308,10 @@ class ColumnReference(Term):
 # map from op-name to special Python formatting code
 py_formatters = {"___": lambda expr: expr.to_python()}
 
+pandas_eval_env = {
+    'is_null': lambda x: pandas.isnull(x),
+    'is_bad': lambda x: pandas.isnull(x), # TODO: replace with correct code
+}
 pd_formatters = {
     "is_bad": lambda expr: "@is_bad(" + expr.args[0].to_pandas() + ")",
     "is_null": lambda expr: "@is_null(" + expr.args[0].to_pandas() + ")",
