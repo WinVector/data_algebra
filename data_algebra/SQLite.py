@@ -4,8 +4,10 @@ import data_algebra.util
 import data_algebra.data_ops
 import data_algebra.db_model
 
+
 # map from op-name to special SQL formatting code
-SQLite_formatters = {"___": lambda dbmodel, expression: expression.to_python()}
+SQLite_formatters = {
+}
 
 
 class SQLiteModel(data_algebra.db_model.DBModel):

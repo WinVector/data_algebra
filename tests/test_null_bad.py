@@ -1,11 +1,10 @@
 
-import numpy
-import numpy
 import math
+import numpy
 
 import data_algebra.util
 from data_algebra.data_ops import *
-
+import data_algebra.SQLite
 
 def test_null_bad():
     ops =  TableDescription("d", ["x"]).extend({
@@ -27,3 +26,8 @@ def test_null_bad():
 
     assert all(d2['x_is_null'] == expect['x_is_null'])
     assert all(d2['x_is_bad'] == expect['x_is_bad'])
+
+    db_model = data_algebra.SQLite.SQLiteModel()
+
+    sql = ops.to_sql(db_model, pretty=True)
+    assert isinstance(sql, str)

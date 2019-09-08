@@ -10,6 +10,24 @@ import data_algebra.util
 import data_algebra.cdata
 
 
+# map from op-name to special SQL formatting code
+
+def _db_is_null_expr(dbmodel, expression):
+    return "(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + " IS NULL)"
+
+
+def _db_is_bad_expr(dbmodel, expression):
+    subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    return "(" + subexpr + " IS NULL OR " + subexpr + " >= Infinity OR " + subexpr + " <= -Infinity " +\
+           " OR (" + subexpr + " != 0 AND " + subexpr + " == -" + subexpr + "))"
+
+
+db_expr_formatters = {
+    "is_null": _db_is_null_expr,
+    "is_bad": _db_is_bad_expr,
+}
+
+
 class DBModel:
     """A model of how SQL should be generated for a given database.
        """
@@ -31,7 +49,10 @@ class DBModel:
         self.string_quote = string_quote
         if sql_formatters is None:
             sql_formatters = {}
-        self.sql_formatters = sql_formatters
+        self.sql_formatters = sql_formatters.copy()
+        for k in db_expr_formatters.keys():
+            if k not in self.sql_formatters.keys():
+                self.sql_formatters[k] = db_expr_formatters[k]
         if op_replacements is None:
             op_replacements = {"==": "="}
         self.op_replacements = op_replacements
