@@ -22,7 +22,7 @@ def test_project():
 
     data_algebra.yaml.check_op_round_trip(ops)
 
-    res = ops.eval_pandas(od(d=d))
+    res = ops.eval_pandas(data_map=od(d=d), eval_env=locals())
 
     expect = pandas.DataFrame(
         {"c": [1, 1], "g": ["a", "b"], "ymax": [3, 4], "ymin": [1, 2]}

@@ -184,10 +184,11 @@ class ViewRepresentation(OperatorPlatform):
 
     # Pandas realization
 
-    def eval_pandas(self, data_map):
+    def eval_pandas(self, *, data_map, eval_env):
         """
         Evaluate pipeline taking tables by name from data_map
         :param data_map: Dict[str, pandas.DataFrame]
+        :param eval_env: environment to take values from
         :return: pandas.DataFrame
         """
         raise Exception("base method called")
@@ -208,7 +209,10 @@ class ViewRepresentation(OperatorPlatform):
                     "transfrom(pandas.DataFrame) can only be applied to ops-dags with only one table def"
                 )
             k = [k for k in tables.keys()][0]
-            return self.eval_pandas({k: X})
+            eval_env = data_algebra.env.outer_namespace()
+            if eval_env is None:
+                eval_env = globals()
+            return self.eval_pandas(data_map={k: X}, eval_env=eval_env)
         raise Exception("can not apply transform() to type " + str(type(X)))
 
     def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
@@ -343,7 +347,7 @@ class TableDescription(ViewRepresentation):
             tables[self.key] = self
         return tables
 
-    def eval_pandas(self, data_map):
+    def eval_pandas(self, *, data_map, eval_env):
         if len(self.qualifiers) > 0:
             raise Exception(
                 "table descriptions used with eval_pandas() must not have qualifiers"
@@ -512,7 +516,7 @@ class ExtendNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.extend_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_pandas(self, data_map):
+    def eval_pandas(self, *, data_map, eval_env):
         window_situation = (len(self.partition_by) > 0) or (len(self.order_by) > 0)
         if window_situation:
             # check these are forms we are prepared to work with
@@ -531,11 +535,12 @@ class ExtendNode(ViewRepresentation):
                             + ": "
                             + str(op)
                         )
-        res = self.sources[0].eval_pandas(data_map)
+        res = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env)
         res.reset_index(inplace=True, drop=True)
         if not window_situation:
             for (k, op) in self.ops.items():
-                res[k] = res.eval(op.to_pandas())
+                op_src = op.to_pandas()
+                res[k] = res.eval(op_src, local_dict=data_algebra.expr_rep.pandas_eval_env, global_dict=eval_env)
         else:
             for (k, op) in self.ops.items():
                 # work on a slice of the data frame
@@ -678,7 +683,7 @@ class ProjectNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.project_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_pandas(self, data_map):
+    def eval_pandas(self, *, data_map, eval_env):
         # check these are forms we are prepared to work with, and build an aggregation dictionary
         # build an agg list: https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
         # https://stackoverflow.com/questions/44635626/rename-result-columns-from-pandas-aggregation-futurewarning-using-a-dict-with
@@ -694,7 +699,7 @@ class ProjectNode(ViewRepresentation):
                     + ": "
                     + str(op)
                 )
-        res = self.sources[0].eval_pandas(data_map)
+        res = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env)
         res.reset_index(inplace=True, drop=True)
         if len(self.order_by) > 0:
             res.sort_values(by=self.order_by, inplace=True)
@@ -770,8 +775,8 @@ class SelectRowsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_pandas(self, data_map):
-        res = self.sources[0].eval_pandas(data_map)
+    def eval_pandas(self, *, data_map, eval_env):
+        res = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env)
         res = res.query(self.expr.to_pandas())
         res.reset_index(inplace=True, drop=True)
         return res
@@ -821,8 +826,8 @@ class SelectColumnsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_pandas(self, data_map):
-        res = self.sources[0].eval_pandas(data_map)
+    def eval_pandas(self, *, data_map, eval_env):
+        res = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env)
         return res[self.column_selection]
 
 
@@ -872,8 +877,8 @@ class DropColumnsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_pandas(self, data_map):
-        res = self.sources[0].eval_pandas(data_map)
+    def eval_pandas(self, *, data_map, eval_env):
+        res = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env)
         column_selection = [c for c in res.columns if c not in self.column_deletions]
         return res[column_selection]
 
@@ -931,8 +936,8 @@ class OrderRowsNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.order_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_pandas(self, data_map):
-        res = self.sources[0].eval_pandas(data_map)
+    def eval_pandas(self, *, data_map, eval_env):
+        res = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env)
         ascending = [
             False if ci in set(self.reverse) else True for ci in self.order_columns
         ]
@@ -992,8 +997,8 @@ class RenameColumnsNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.rename_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_pandas(self, data_map):
-        res = self.sources[0].eval_pandas(data_map)
+    def eval_pandas(self, *, data_map, eval_env):
+        res = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env)
         return res.rename(columns=self.reverse_mapping)
 
 
@@ -1063,9 +1068,9 @@ class NaturalJoinNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_pandas(self, data_map):
-        left = self.sources[0].eval_pandas(data_map)
-        right = self.sources[1].eval_pandas(data_map)
+    def eval_pandas(self, *, data_map, eval_env):
+        left = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env)
+        right = self.sources[1].eval_pandas(data_map=data_map, eval_env=eval_env)
         common_cols = set([c for c in left.columns]).intersection(
             [c for c in right.columns]
         )

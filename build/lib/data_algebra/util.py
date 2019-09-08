@@ -1,4 +1,5 @@
 import collections
+import numpy
 import pandas
 
 
@@ -13,10 +14,23 @@ def od(**kwargs):
 def can_convert_v_to_numeric(x):
     """check if non-empty vector can convert to numeric"""
     try:
-        x + 0.0
+        numpy.asarray(x+0, dtype=float)
         return True
     except TypeError:
         return False
+
+
+def is_bad(x):
+    """ for numeric vector x, return logical vector of positions that are null, NaN, infinite"""
+    if can_convert_v_to_numeric(x):
+        x = numpy.asarray(x+0, dtype=float)
+        return numpy.logical_or(
+            pandas.isnull(x),
+            numpy.logical_or(
+                numpy.isnan(x),
+                numpy.isinf(x)
+            ))
+    return pandas.isnull(x)
 
 
 # for testing

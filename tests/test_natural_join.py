@@ -21,7 +21,7 @@ def test_natural_join_columns():
 
     data_algebra.yaml.check_op_round_trip(ops4)
 
-    res_pandas = ops4.eval_pandas({"d": d, "d2": d2})
+    res_pandas = ops4.eval_pandas(data_map={"d": d, "d2": d2}, eval_env=locals())
 
     expect = pandas.DataFrame(
         {

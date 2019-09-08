@@ -16,7 +16,7 @@ def test_drop_columns():
 
     sql = ops.to_sql(db_model)
 
-    res = ops.eval_pandas(od(d=d))
+    res = ops.eval_pandas(data_map=od(d=d), eval_env=locals())
 
     data_algebra.yaml.check_op_round_trip(ops)
 

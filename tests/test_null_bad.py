@@ -18,3 +18,12 @@ def test_null_bad():
     })
 
     d2 = ops.transform(d)
+
+    expect = pandas.DataFrame({
+        'x': [1, numpy.nan, math.inf, -math.inf, None, 2],
+        'x_is_null': [False, True, False, False, True, False],
+        'x_is_bad': [False, True, True, True, True, False]
+    })
+
+    assert all(d2['x_is_null'] == expect['x_is_null'])
+    assert all(d2['x_is_bad'] == expect['x_is_bad'])

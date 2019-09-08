@@ -21,7 +21,7 @@ def test_apply():
         TableDescription("t1", ["x", "y"]).extend({"z": "x / y"}).select_rows("z >= 0")
     )
 
-    ops0.eval_pandas({"t1": d})
+    ops0.eval_pandas(data_map={"t1": d}, eval_env=locals())
 
     res_0_1 = ops0.transform(d)
 
@@ -37,7 +37,7 @@ def test_apply():
         >> SelectRows("z >= 0")
     )
 
-    res_1_1 = ops1.eval_pandas({"t1": d})
+    res_1_1 = ops1.eval_pandas(data_map={"t1": d}, eval_env=locals())
 
     assert data_algebra.util.equivalent_frames(expect_1, res_1_1)
 

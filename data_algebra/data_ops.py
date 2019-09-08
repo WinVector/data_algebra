@@ -211,7 +211,7 @@ class ViewRepresentation(OperatorPlatform):
             k = [k for k in tables.keys()][0]
             eval_env = data_algebra.env.outer_namespace()
             if eval_env is None:
-                eval_env = {}
+                eval_env = globals()
             return self.eval_pandas(data_map={k: X}, eval_env=eval_env)
         raise Exception("can not apply transform() to type " + str(type(X)))
 
@@ -540,7 +540,7 @@ class ExtendNode(ViewRepresentation):
         if not window_situation:
             for (k, op) in self.ops.items():
                 op_src = op.to_pandas()
-                res[k] = res.eval(op_src, local_dict=data_algebra.expr_rep.pandas_eval_env)
+                res[k] = res.eval(op_src, local_dict=data_algebra.expr_rep.pandas_eval_env, global_dict=eval_env)
         else:
             for (k, op) in self.ops.items():
                 # work on a slice of the data frame

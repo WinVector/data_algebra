@@ -1,6 +1,9 @@
 from typing import Union
 import collections
 
+import pandas
+
+import data_algebra.util
 import data_algebra.env
 
 # for some ideas in capturing expressions in Python see:
@@ -262,6 +265,12 @@ class Term:
     def sum(self):
         return self.__uop_expr__("sum")
 
+    def is_null(self):
+        return self.__uop_expr__("is_null")
+
+    def is_bad(self):
+        return self.__uop_expr__("is_bad")
+
 
 class Value(Term):
     def __init__(self, value):
@@ -298,9 +307,18 @@ class ColumnReference(Term):
 
 
 # map from op-name to special Python formatting code
-py_formatters = {"___": lambda expression: expression.to_python()}
-pd_formatters = {"___": lambda expression: expression.to_pandas()}
-r_formatters = {"___": lambda expression: expression.to_R()}
+py_formatters = {"___": lambda expr: expr.to_python()}
+
+pandas_eval_env = {
+    'is_null': lambda x: pandas.isnull(x),
+    'is_bad': data_algebra.util.is_bad
+}
+pd_formatters = {
+    "is_bad": lambda expr: "@is_bad(" + expr.args[0].to_pandas() + ")",
+    "is_null": lambda expr: "@is_null(" + expr.args[0].to_pandas() + ")",
+}
+
+r_formatters = {"___": lambda expr: expr.to_R()}
 
 
 class Expression(Term):

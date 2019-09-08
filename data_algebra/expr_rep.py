@@ -3,6 +3,7 @@ import collections
 
 import pandas
 
+import data_algebra.util
 import data_algebra.env
 
 # for some ideas in capturing expressions in Python see:
@@ -310,7 +311,7 @@ py_formatters = {"___": lambda expr: expr.to_python()}
 
 pandas_eval_env = {
     'is_null': lambda x: pandas.isnull(x),
-    'is_bad': lambda x: pandas.isnull(x), # TODO: replace with correct code
+    'is_bad': data_algebra.util.is_bad
 }
 pd_formatters = {
     "is_bad": lambda expr: "@is_bad(" + expr.args[0].to_pandas() + ")",
