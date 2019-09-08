@@ -57,6 +57,9 @@ class DBModel:
             op_replacements = {"==": "="}
         self.op_replacements = op_replacements
 
+    def prepare_connection(self, conn):
+        pass
+
     def quote_identifier(self, identifier):
         if not isinstance(identifier, str):
             raise Exception("expected identifier to be a str")

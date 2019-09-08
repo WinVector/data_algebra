@@ -96,8 +96,7 @@ def test_scoring_example():
     sql_s = ops.to_sql(db_model_p, pretty=True)
 
     conn = sqlite3.connect(":memory:")
-    # https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.create_function
-    conn.create_function("exp", 1, math.exp)
+    db_model_s.prepare_connection(conn)
 
     db_model_s.insert_table(conn, d_local, "d")
     back = db_model_s.read_table(conn, "d")

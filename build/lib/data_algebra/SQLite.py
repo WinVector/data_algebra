@@ -1,11 +1,32 @@
+import math
 import pandas
+import numpy
+import numbers
 
 import data_algebra.util
 import data_algebra.data_ops
 import data_algebra.db_model
 
+
 # map from op-name to special SQL formatting code
-SQLite_formatters = {"___": lambda dbmodel, expression: expression.to_python()}
+
+def _sqlite_is_bad_expr(dbmodel, expression):
+    return "is_bad(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ")"
+
+
+SQLite_formatters = {
+    "is_bad": _sqlite_is_bad_expr,
+}
+
+
+def _check_scalar_bad(x):
+    if x is None:
+        return 1
+    if not isinstance(x, numbers.Number):
+        return 0
+    if numpy.isinf(x) or numpy.isnan(x):
+        return 1
+    return 0
 
 
 class SQLiteModel(data_algebra.db_model.DBModel):
@@ -18,6 +39,11 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             string_quote="'",
             sql_formatters=SQLite_formatters,
         )
+
+    def prepare_connection(self, conn):
+        # https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.create_function
+        conn.create_function("exp", 1, math.exp)
+        conn.create_function("is_bad", 1, _check_scalar_bad)
 
     def quote_identifier(self, identifier):
         if not isinstance(identifier, str):
