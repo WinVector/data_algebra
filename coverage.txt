@@ -19,14 +19,14 @@ tests/test_sqlite.py .                                                   [100%]
 ---------- coverage: platform darwin, python 3.6.9-final-0 -----------
 Name                           Stmts   Miss  Cover
 --------------------------------------------------
-data_algebra/PostgreSQL.py        19      4    79%
+data_algebra/PostgreSQL.py        21      4    81%
 data_algebra/SQLite.py            44      6    86%
 data_algebra/__init__.py           5      0   100%
 data_algebra/cdata.py             49      5    90%
 data_algebra/cdata_impl.py        94     16    83%
 data_algebra/data_ops.py         692    124    82%
 data_algebra/data_pipe.py        158     33    79%
-data_algebra/db_model.py         350     86    75%
+data_algebra/db_model.py         352     77    78%
 data_algebra/env.py               54     12    78%
 data_algebra/expr_rep.py         294     89    70%
 data_algebra/pending_eval.py      34     34     0%
@@ -34,7 +34,7 @@ data_algebra/pipe.py              65     19    71%
 data_algebra/util.py              69      6    91%
 data_algebra/yaml.py              73      9    88%
 --------------------------------------------------
-TOTAL                           2000    443    78%
+TOTAL                           2004    434    78%
 
 
-========================== 14 passed in 2.45 seconds ===========================
+========================== 14 passed in 2.56 seconds ===========================

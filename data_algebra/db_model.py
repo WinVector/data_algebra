@@ -18,8 +18,10 @@ def _db_is_null_expr(dbmodel, expression):
 
 def _db_is_bad_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
-    return "(" + subexpr + " IS NULL OR " + subexpr + " >= Infinity OR " + subexpr + " <= -Infinity " +\
-           " OR (" + subexpr + " != 0 AND " + subexpr + " == -" + subexpr + "))"
+    return "(" + subexpr + " IS NULL OR " + subexpr +\
+           " >= " + dbmodel.quote_literal('+infinity') + " OR " +\
+           subexpr + " <= " + dbmodel.quote_literal('-infinity') +\
+           " OR (" + subexpr + " != 0 AND " + subexpr + " = -" + subexpr + "))"
 
 
 db_expr_formatters = {
@@ -93,6 +95,9 @@ class DBModel:
             + re.sub(self.string_quote, self.string_quote + self.string_quote, string)
             + self.string_quote
         )
+
+    def quote_literal(self, string):
+        return self.quote_string(string)
 
     def value_to_sql(self, v):
         if v is None:
