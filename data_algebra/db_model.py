@@ -558,7 +558,7 @@ class DBModel:
         r = cur.fetchall()
         colnames = [desc[0] for desc in cur.description]
         r = pandas.DataFrame(columns=colnames, data=r)
-        r.reset_index(inplace=True, drop=True)
+        r = r.reset_index(drop=True)
         return r
 
     # noinspection PyMethodMayBeStatic

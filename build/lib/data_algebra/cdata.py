@@ -3,13 +3,13 @@ import collections
 
 import pandas
 
+import data_algebra.data_types
+
 
 class RecordSpecification:
     def __init__(self, control_table, *, record_keys=None, control_table_keys=None):
-        if not isinstance(control_table, pandas.DataFrame):
-            raise TypeError("control_table should be a pandas.DataFrame")
-        self.control_table = control_table.copy()
-        self.control_table.reset_index(inplace=True, drop=True)
+        control_table = data_algebra.data_types.convert_to_pandas_dataframe(control_table, "control_table")
+        self.control_table = control_table.reset_index(drop=True)
         if record_keys is None:
             record_keys = []
         self.record_keys = [k for k in record_keys]

@@ -55,8 +55,7 @@ class RecordMap:
         self, X, *, check_blocks_in_keying=True, check_blocks_out_keying=False
     ):
         X = data_algebra.data_types.convert_to_pandas_dataframe(X, 'X')
-        X = X.copy()
-        X.reset_index(inplace=True, drop=True)
+        X = X.reset_index(drop=True)
         db_model = data_algebra.SQLite.SQLiteModel()
         if self.blocks_in is not None:
             x1_descr = data_algebra.data_ops.describe_pandas_table(

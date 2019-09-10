@@ -206,7 +206,7 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
 
     # noinspection PyPep8Naming
     def realize(self, X):
-        if isinstance(X, pandas.DataFrame):
+        if data_algebra.data_types.is_acceptable_data_frame(X):
             pipeline = data_algebra.data_ops.describe_pandas_table(X, table_name="X")
             for s in self.ops:
                 # pipeline = pipeline >> s
@@ -216,14 +216,14 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
 
     # noinspection PyPep8Naming
     def transform(self, X):
-        if isinstance(X, pandas.DataFrame):
+        if data_algebra.data_types.is_acceptable_data_frame(X):
             pipeline = self.realize(X)
             return pipeline.transform(X)
         raise TypeError("can not apply transform() to type " + str(type(X)))
 
     def __rrshift__(self, other):  # override other >> self
-        if not isinstance(other, pandas.DataFrame):
-            raise TypeError("other should be a pandas.DataFrame")
+        if not data_algebra.data_types.is_acceptable_data_frame(other):
+            raise TypeError("can not apply >> (transform()) to type " + str(type(other)))
         return self.transform(other)
 
     # implement method chaining collection of pending operations

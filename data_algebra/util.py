@@ -59,13 +59,13 @@ def equivalent_frames(
         return False
     if a.shape[1] < 1:
         return True
-    a = a.reset_index(inplace=False, drop=True)
-    b = b.reset_index(inplace=False, drop=True)
+    a = a.reset_index(drop=True)
+    b = b.reset_index(drop=True)
     if not cols_case_sensitive:
         a.columns = [c.lower() for c in a.columns]
-        a.reset_index(inplace=True, drop=True)
+        a = a.reset_index(drop=True)
         b.columns = [c.lower() for c in b.columns]
-        b.reset_index(inplace=True, drop=True)
+        b = b.reset_index(drop=True)
     acols = [c for c in a.columns]
     bcols = [c for c in b.columns]
     if set(acols) != set(bcols):
@@ -76,17 +76,17 @@ def equivalent_frames(
     else:
         # re-order b into a's column order
         b = b[acols]
-        b.reset_index(inplace=True, drop=True)
+        b = b.reset_index(drop=True)
     for j in range(a.shape[1]):
         if can_convert_v_to_numeric(a.iloc[:, j]) != can_convert_v_to_numeric(
             b.iloc[:, j]
         ):
             return False
     if not check_row_order:
-        a = a.sort_values(by=acols, inplace=False)
-        a = a.reset_index(inplace=False, drop=True)
-        b = b.sort_values(by=acols, inplace=False)
-        b = b.reset_index(inplace=False, drop=True)
+        a = a.sort_values(by=acols)
+        a = a.reset_index(drop=True)
+        b = b.sort_values(by=acols)
+        b = b.reset_index(drop=True)
     for j in range(a.shape[1]):
         ca = a.iloc[:, j]
         cb = b.iloc[:, j]

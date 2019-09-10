@@ -354,8 +354,7 @@ class TableDescription(ViewRepresentation):
             )
         # make an index-free copy of the data to isolate side-effects and not deal with indices
         res = data_map[self.table_name]
-        res = res.copy()
-        res.reset_index(drop=True, inplace=True)
+        res = res.reset_index(drop=True)
         return res
 
     def columns_used_from_sources(self, using=None):
@@ -536,7 +535,7 @@ class ExtendNode(ViewRepresentation):
                             + str(op)
                         )
         res = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env)
-        res.reset_index(inplace=True, drop=True)
+        res = res.reset_index(drop=True)
         if not window_situation:
             for (k, op) in self.ops.items():
                 op_src = op.to_pandas()
@@ -554,13 +553,11 @@ class ExtendNode(ViewRepresentation):
                     if value_name not in set(col_list):
                         col_list = col_list + [value_name]
                 ascending = [c not in set(self.reverse) for c in col_list]
-                subframe = res[col_list].copy()
-                subframe.reset_index(inplace=True, drop=True)
+                subframe = res[col_list].reset_index(drop=True)
                 subframe["_data_algebra_orig_index"] = [
                     i for i in range(subframe.shape[0])
                 ]
-                subframe.sort_values(by=col_list, ascending=ascending, inplace=True)
-                subframe.reset_index(inplace=True, drop=True)
+                subframe = subframe.sort_values(by=col_list, ascending=ascending).reset_index(drop=True)
                 if len(self.partition_by) > 0:
                     opframe = subframe.groupby(self.partition_by)
                     #  Groupby preserves the order of rows within each group.
@@ -575,9 +572,9 @@ class ExtendNode(ViewRepresentation):
                 else:
                     # len(op.args) == 1
                     subframe[k] = opframe[value_name].transform(op.op)
-                subframe.reset_index(inplace=True, drop=True)
-                subframe.sort_values(by=["_data_algebra_orig_index"], inplace=True)
-                subframe.reset_index(inplace=True, drop=True)
+                subframe = subframe.reset_index(drop=True)
+                subframe = subframe.sort_values(by=["_data_algebra_orig_index"])
+                subframe = subframe.reset_index(drop=True)
                 res[k] = subframe[k]
         return res
 
@@ -699,11 +696,10 @@ class ProjectNode(ViewRepresentation):
                     + ": "
                     + str(op)
                 )
-        res = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env)
-        res.reset_index(inplace=True, drop=True)
+        res = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env).reset_index(drop=True)
         if len(self.order_by) > 0:
-            res.sort_values(by=self.order_by, inplace=True)
-            res.reset_index(inplace=True, drop=True)
+            res = res.sort_values(by=self.order_by)
+            res = res.reset_index(drop=True)
         if len(self.group_by) > 0:
             res = res.groupby(self.group_by)
         cols = {k: res[str(op.args[0])].agg(op.op) for (k, op) in self.ops.items()}
@@ -718,8 +714,7 @@ class ProjectNode(ViewRepresentation):
             return v
 
         cols = {k: promote_scalar(v) for (k, v) in cols.items()}
-        res = pandas.DataFrame(cols)
-        res.reset_index(inplace=True, drop=False)  # grouping variables in the index
+        res = pandas.DataFrame(cols).reset_index(drop=False)  # grouping variables in the index
         return res
 
 
@@ -777,8 +772,7 @@ class SelectRowsNode(ViewRepresentation):
 
     def eval_pandas(self, *, data_map, eval_env):
         res = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env)
-        res = res.query(self.expr.to_pandas())
-        res.reset_index(inplace=True, drop=True)
+        res = res.query(self.expr.to_pandas()).reset_index(drop=True)
         return res
 
 
@@ -1082,11 +1076,11 @@ class NaturalJoinNode(ViewRepresentation):
             sort=False,
             suffixes=("", "_tmp_right_col"),
         )
-        res.reset_index(inplace=True, drop=True)
+        res = res.reset_index(drop=True)
         for c in common_cols:
             if c not in self.by:
                 is_null = res[c].isnull()
                 res[c][is_null] = res[c + "_tmp_right_col"]
-                res.drop(c + "_tmp_right_col", axis=1, inplace=True)
-        res.reset_index(inplace=True, drop=True)
+                res = res.drop(c + "_tmp_right_col", axis=1)
+        res = res.reset_index(drop=True)
         return res
