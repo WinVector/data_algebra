@@ -3,6 +3,7 @@ import collections
 
 import pandas
 
+import data_algebra.data_types
 import data_algebra.data_ops
 import data_algebra.cdata
 import data_algebra.SQLite
@@ -53,8 +54,7 @@ class RecordMap:
     def transform(
         self, X, *, check_blocks_in_keying=True, check_blocks_out_keying=False
     ):
-        if not isinstance(X, pandas.DataFrame):
-            raise TypeError("X should be a pandas.DataFrame")
+        X = data_algebra.data_types.convert_to_pandas_dataframe(X, 'X')
         X = X.copy()
         X.reset_index(inplace=True, drop=True)
         db_model = data_algebra.SQLite.SQLiteModel()

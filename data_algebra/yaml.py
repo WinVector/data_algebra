@@ -21,6 +21,9 @@ except ImportError:
 def fix_ordered_dict_yaml_rep():
     """Writer OrderedDict as simple structure"""
     # derived from: https://stackoverflow.com/a/16782282/6901725
+    global have_yaml
+    if not have_yaml:
+        raise RuntimeError("yaml/PyYAML not installed")
     def represent_ordereddict(dumper, data):
         value = [
             (dumper.represent_data(node_key), dumper.represent_data(node_value))
@@ -118,6 +121,9 @@ def to_pipeline(obj, *, known_tables=None):
 def check_op_round_trip(o):
     if not isinstance(o, data_algebra.data_ops.ViewRepresentation):
         raise TypeError("expect o to be a data_algebra.data_ops.ViewRepresentation")
+    global have_yaml
+    if not have_yaml:
+        raise RuntimeError("yaml/PyYAML not installed")
     strr = o.to_python(strict=True, pretty=False)
     strp = o.to_python(strict=True, pretty=True)
     obj = o.collect_representation()

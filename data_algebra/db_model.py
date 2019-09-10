@@ -4,6 +4,7 @@ import io
 
 import pandas
 
+import data_algebra.data_types
 import data_algebra.expr_rep
 import data_algebra.data_ops
 import data_algebra.util
@@ -520,8 +521,7 @@ class DBModel:
         :return:
         """
 
-        if not isinstance(d, pandas.DataFrame):
-            raise TypeError("d is supposed to be a pandas.DataFrame")
+        data_algebra.data_types.assert_is_acceptable_data_frame(d, 'd')
         cr = [
             d.columns[i].lower()
             + " "

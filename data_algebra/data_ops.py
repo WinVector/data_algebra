@@ -194,15 +194,15 @@ class ViewRepresentation(OperatorPlatform):
         raise NotImplementedError("base method called")
 
     def __rrshift__(self, other):  # override other >> self
-        if not isinstance(other, pandas.DataFrame):
-            raise TypeError("other should be a pandas.DataFrame")
+        if not data_algebra.data_types.is_acceptable_data_frame(other):
+            raise TypeError("can not apply >> (transform()) to type " + str(type(other)))
         return self.transform(other)
 
     # implement builders for all non-initial node types on base class
 
     # noinspection PyPep8Naming
     def transform(self, X):
-        if isinstance(X, pandas.DataFrame):
+        if data_algebra.data_types.is_acceptable_data_frame(X):
             tables = self.get_tables()
             if len(tables) != 1:
                 raise ValueError(
