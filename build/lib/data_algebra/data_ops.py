@@ -561,9 +561,7 @@ class ExtendNode(ViewRepresentation):
                         col_list = col_list + [value_name]
                 ascending = [c not in set(self.reverse) for c in col_list]
                 subframe = res[col_list].reset_index(drop=True)
-                subframe["_data_algebra_orig_index"] = [
-                    i for i in range(subframe.shape[0])
-                ]
+                subframe["_data_algebra_orig_index"] = subframe.index
                 subframe = subframe.sort_values(by=col_list, ascending=ascending).reset_index(drop=True)
                 if len(self.partition_by) > 0:
                     opframe = subframe.groupby(self.partition_by)
