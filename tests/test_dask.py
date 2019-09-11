@@ -60,8 +60,6 @@ def test_dask():
     res_dask_p = ops_p.transform(d_dask)
     res_t_p = res_dask_p.compute()
 
-    # assert data_algebra.util.equivalent_frames(expect_t, res_t_p, float_tol=1e-3)
-
     # res_dask = ops.transform(d_dask)
     # res_t = res_dask.compute()
     #
