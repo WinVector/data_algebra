@@ -16,6 +16,7 @@ except ImportError:
 have_dask = False
 try:
     # noinspection PyUnresolvedReferences
+    import dask
     import dask.dataframe
 
     have_dask = True

@@ -6,6 +6,7 @@ import data_algebra
 
 try:
     # noinspection PyUnresolvedReferences
+    import dask
     import dask.dataframe
 except ImportError:
     pass

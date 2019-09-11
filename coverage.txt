@@ -2,18 +2,19 @@
 platform darwin -- Python 3.6.9, pytest-5.0.1, py-1.8.0, pluggy-0.12.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.7.1
-collected 14 items
+collected 15 items
 
-tests/test_apply.py .                                                    [  7%]
-tests/test_cdata1.py .                                                   [ 14%]
-tests/test_drop_columns.py .                                             [ 21%]
-tests/test_example_data_ops.py .                                         [ 28%]
-tests/test_natural_join.py .                                             [ 35%]
-tests/test_null_bad.py .                                                 [ 42%]
-tests/test_parse.py .                                                    [ 50%]
-tests/test_poject.py .                                                   [ 57%]
-tests/test_scoring_example.py .                                          [ 64%]
-tests/test_simple.py ....                                                [ 92%]
+tests/test_apply.py .                                                    [  6%]
+tests/test_cdata1.py .                                                   [ 13%]
+tests/test_dask.py .                                                     [ 20%]
+tests/test_drop_columns.py .                                             [ 26%]
+tests/test_example_data_ops.py .                                         [ 33%]
+tests/test_natural_join.py .                                             [ 40%]
+tests/test_null_bad.py .                                                 [ 46%]
+tests/test_parse.py .                                                    [ 53%]
+tests/test_poject.py .                                                   [ 60%]
+tests/test_scoring_example.py .                                          [ 66%]
+tests/test_simple.py ....                                                [ 93%]
 tests/test_sqlite.py .                                                   [100%]
 
 ---------- coverage: platform darwin, python 3.6.9-final-0 -----------
@@ -21,23 +22,23 @@ Name                           Stmts   Miss  Cover
 --------------------------------------------------
 data_algebra/PostgreSQL.py        21      4    81%
 data_algebra/SQLite.py            43      5    88%
-data_algebra/__init__.py          29      8    72%
+data_algebra/__init__.py          30      8    73%
 data_algebra/cdata.py             48      4    92%
 data_algebra/cdata_impl.py        92     15    84%
-data_algebra/dask_model.py         5      1    80%
-data_algebra/data_ops.py         634    135    79%
+data_algebra/dask_model.py        25      4    84%
+data_algebra/data_ops.py         634    120    81%
 data_algebra/data_pipe.py        158     33    79%
-data_algebra/data_types.py        44     31    30%
+data_algebra/data_types.py        45     27    40%
 data_algebra/db_model.py         352     76    78%
 data_algebra/env.py               54     12    78%
 data_algebra/expr_rep.py         294     89    70%
-data_algebra/pandas_model.py     126     18    86%
+data_algebra/pandas_model.py     128     18    86%
 data_algebra/pending_eval.py      34     34     0%
 data_algebra/pipe.py              65     19    71%
 data_algebra/util.py              72      6    92%
 data_algebra/yaml.py              76     11    86%
 --------------------------------------------------
-TOTAL                           2147    501    77%
+TOTAL                           2171    485    78%
 
 
-========================== 14 passed in 3.06 seconds ===========================
+========================== 15 passed in 3.97 seconds ===========================
