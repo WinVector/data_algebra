@@ -359,7 +359,7 @@ class TableDescription(ViewRepresentation):
                 "table descriptions used with eval_pandas() must not have qualifiers"
             )
         # make an index-free copy of the data to isolate side-effects and not deal with indices
-        res = data_map[self.table_name]
+        res = data_map[self.table_name].loc[:, self.column_names]
         res = res.reset_index(drop=True)
         return res
 
