@@ -186,14 +186,23 @@ class ViewRepresentation(OperatorPlatform):
             eval_env = globals()
         return eval_env
 
+    def eval_pandas_implementation(self, *, data_map, eval_env):
+        raise NotImplementedError("base method called")
+
     def eval_pandas(self, data_map, *, eval_env=None):
         """
-        Evaluate pipeline taking tables by name from data_map
-        :param data_map: Dict[str, pandas.DataFrame]
-        :param eval_env: environment to take values from
-        :return: pandas.DataFrame
+        Evaluate operators with respect ot given data frames.
+        :param data_map: map from table names to data frames
+        :param eval_env: environment to evaluate in
+        :return:
         """
-        raise NotImplementedError("base method called")
+
+        tables = self.get_tables()
+        for k in tables.keys():
+            if not k in data_map.keys():
+                raise ValueError("Required table " + k + " not in data_map")
+        eval_env = self._decide_eval_env(eval_env)
+        return self.eval_pandas_implementation(data_map=data_map, eval_env=eval_env)
 
     def __rrshift__(self, other):  # override other >> self
         if not data_algebra.data_types.is_acceptable_data_frame(other):
@@ -347,10 +356,10 @@ class TableDescription(ViewRepresentation):
             tables[self.key] = self
         return tables
 
-    def eval_pandas(self, data_map, *, eval_env=None):
+    def eval_pandas_implementation(self, *, data_map, eval_env):
         if len(self.qualifiers) > 0:
             raise ValueError(
-                "table descriptions used with eval_pandas() must not have qualifiers"
+                "table descriptions used with eval_pandas_implementation() must not have qualifiers"
             )
         # make an index-free copy of the data to isolate side-effects and not deal with indices
         res = data_map[self.table_name].loc[:, self.column_names]
@@ -514,8 +523,7 @@ class ExtendNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.extend_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_pandas(self, data_map, *, eval_env=None):
-        eval_env = self._decide_eval_env(eval_env)
+    def eval_pandas_implementation(self, *, data_map, eval_env):
         window_situation = (len(self.partition_by) > 0) or (len(self.order_by) > 0)
         if window_situation:
             # check these are forms we are prepared to work with
@@ -534,7 +542,7 @@ class ExtendNode(ViewRepresentation):
                             + ": "
                             + str(op)
                         )
-        res = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env)
+        res = self.sources[0].eval_pandas_implementation(data_map=data_map, eval_env=eval_env)
         res = res.reset_index(drop=True)
         if not window_situation:
             for (k, op) in self.ops.items():
@@ -678,8 +686,7 @@ class ProjectNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.project_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_pandas(self, data_map, *, eval_env=None):
-        eval_env = self._decide_eval_env(eval_env)
+    def eval_pandas_implementation(self, *, data_map, eval_env):
         # check these are forms we are prepared to work with, and build an aggregation dictionary
         # build an agg list: https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
         # https://stackoverflow.com/questions/44635626/rename-result-columns-from-pandas-aggregation-futurewarning-using-a-dict-with
@@ -695,7 +702,7 @@ class ProjectNode(ViewRepresentation):
                     + ": "
                     + str(op)
                 )
-        res = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env).reset_index(drop=True)
+        res = self.sources[0].eval_pandas_implementation(data_map=data_map, eval_env=eval_env).reset_index(drop=True)
         if len(self.order_by) > 0:
             res = res.sort_values(by=self.order_by)
             res = res.reset_index(drop=True)
@@ -769,9 +776,8 @@ class SelectRowsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_pandas(self, data_map, *, eval_env=None):
-        eval_env = self._decide_eval_env(eval_env)
-        res = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env)
+    def eval_pandas_implementation(self, *, data_map, eval_env):
+        res = self.sources[0].eval_pandas_implementation(data_map=data_map, eval_env=eval_env)
         res = res.query(self.expr.to_pandas()).reset_index(drop=True)
         return res
 
@@ -820,9 +826,8 @@ class SelectColumnsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_pandas(self, data_map, *, eval_env=None):
-        eval_env = self._decide_eval_env(eval_env)
-        res = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env)
+    def eval_pandas_implementation(self, *, data_map, eval_env):
+        res = self.sources[0].eval_pandas_implementation(data_map=data_map, eval_env=eval_env)
         return res[self.column_selection]
 
 
@@ -872,9 +877,8 @@ class DropColumnsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_pandas(self, data_map, *, eval_env=None):
-        eval_env = self._decide_eval_env(eval_env)
-        res = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env)
+    def eval_pandas_implementation(self, *, data_map, eval_env):
+        res = self.sources[0].eval_pandas_implementation(data_map=data_map, eval_env=eval_env)
         column_selection = [c for c in res.columns if c not in self.column_deletions]
         return res[column_selection]
 
@@ -932,9 +936,8 @@ class OrderRowsNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.order_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_pandas(self, data_map, *, eval_env=None):
-        eval_env = self._decide_eval_env(eval_env)
-        res = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env)
+    def eval_pandas_implementation(self, *, data_map, eval_env):
+        res = self.sources[0].eval_pandas_implementation(data_map=data_map, eval_env=eval_env)
         ascending = [
             False if ci in set(self.reverse) else True for ci in self.order_columns
         ]
@@ -994,9 +997,8 @@ class RenameColumnsNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.rename_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_pandas(self, data_map, *, eval_env=None):
-        eval_env = self._decide_eval_env(eval_env)
-        res = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env)
+    def eval_pandas_implementation(self, *, data_map, eval_env):
+        res = self.sources[0].eval_pandas_implementation(data_map=data_map, eval_env=eval_env)
         return res.rename(columns=self.reverse_mapping)
 
 
@@ -1066,10 +1068,9 @@ class NaturalJoinNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_pandas(self, data_map, *, eval_env=None):
-        eval_env = self._decide_eval_env(eval_env)
-        left = self.sources[0].eval_pandas(data_map=data_map, eval_env=eval_env)
-        right = self.sources[1].eval_pandas(data_map=data_map, eval_env=eval_env)
+    def eval_pandas_implementation(self, *, data_map, eval_env):
+        left = self.sources[0].eval_pandas_implementation(data_map=data_map, eval_env=eval_env)
+        right = self.sources[1].eval_pandas_implementation(data_map=data_map, eval_env=eval_env)
         common_cols = set([c for c in left.columns]).intersection(
             [c for c in right.columns]
         )
