@@ -47,7 +47,6 @@ class PandasModel:
         res = op.sources[0].eval_pandas_implementation(data_map=data_map,
                                                        eval_env=eval_env,
                                                        pandas_model=self)
-        res = res.reset_index(drop=True)
         if not window_situation:
             for (k, opk) in op.ops.items():
                 op_src = opk.to_pandas()
@@ -108,7 +107,7 @@ class PandasModel:
                 )
         res = op.sources[0].eval_pandas_implementation(data_map=data_map,
                                                        eval_env=eval_env,
-                                                       pandas_model=self).reset_index(drop=True)
+                                                       pandas_model=self)
         if len(op.order_by) > 0:
             res = res.sort_values(by=op.order_by)
             res = res.reset_index(drop=True)
