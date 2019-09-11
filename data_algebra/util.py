@@ -4,6 +4,7 @@ import pandas
 
 import data_algebra.data_types
 
+
 def od(**kwargs):
     """Capture arguments in order."""
     r = collections.OrderedDict()

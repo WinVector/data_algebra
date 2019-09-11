@@ -569,7 +569,7 @@ class ExtendNode(ViewRepresentation):
                         raise KeyError("not implemented: " + str(k) + ": " + str(op))
                 else:
                     # len(op.args) == 1
-                    subframe[k] = opframe[value_name].transform(op.op)
+                    subframe[k] = opframe[value_name].transform(op.op)  # Pandas transform, not data_algegra
                 subframe = subframe.reset_index(drop=True)
                 subframe = subframe.sort_values(by=["_data_algebra_orig_index"])
                 subframe = subframe.reset_index(drop=True)
