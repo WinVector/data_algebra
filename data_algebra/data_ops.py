@@ -5,6 +5,7 @@ import pandas
 
 import data_algebra
 import data_algebra.data_types
+import data_algebra.pandas_model
 import data_algebra.expr_rep
 import data_algebra.pipe
 import data_algebra.env
@@ -178,31 +179,33 @@ class ViewRepresentation(OperatorPlatform):
 
     # Pandas realization
 
-    # noinspection PyMethodMayBeStatic
-    def _decide_eval_env(self, eval_env=None):
-        if eval_env is None:
-            eval_env = data_algebra.env.outer_namespace()
-        if eval_env is None:
-            eval_env = globals()
-        return eval_env
-
-    def eval_pandas_implementation(self, *, data_map, eval_env):
+    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
         raise NotImplementedError("base method called")
 
-    def eval_pandas(self, data_map, *, eval_env=None):
+    def eval_pandas(self, data_map, *, eval_env=None, pandas_model=None):
         """
         Evaluate operators with respect ot given data frames.
         :param data_map: map from table names to data frames
         :param eval_env: environment to evaluate in
+        :param pandas_model: adaptor to Pandas dialect (possibly dask)
         :return:
         """
 
+        if not isinstance(data_map, Dict):
+            raise TypeError("data_map should be a dictionary")
+        if len(data_map) < 1:
+            raise ValueError("data_map should not be empty")
         tables = self.get_tables()
         for k in tables.keys():
-            if not k in data_map.keys():
+            if k not in data_map.keys():
                 raise ValueError("Required table " + k + " not in data_map")
-        eval_env = self._decide_eval_env(eval_env)
-        return self.eval_pandas_implementation(data_map=data_map, eval_env=eval_env)
+        if eval_env is None:
+            eval_env = data_algebra.env.outer_namespace()
+        if eval_env is None:
+            eval_env = globals()
+        if pandas_model is None:
+            pandas_model = data_algebra.pandas_model.PandasModel()  # TODO:  also default in dask model
+        return self.eval_pandas_implementation(data_map=data_map, eval_env=eval_env, pandas_model=pandas_model)
 
     def __rrshift__(self, other):  # override other >> self
         if not data_algebra.data_types.is_acceptable_data_frame(other):
@@ -212,8 +215,7 @@ class ViewRepresentation(OperatorPlatform):
     # implement builders for all non-initial node types on base class
 
     # noinspection PyPep8Naming
-    def transform(self, X):
-        eval_env = self._decide_eval_env()
+    def transform(self, X, *, eval_env=None, pandas_model=None):
         if data_algebra.data_types.is_acceptable_data_frame(X):
             tables = self.get_tables()
             if len(tables) != 1:
@@ -221,7 +223,7 @@ class ViewRepresentation(OperatorPlatform):
                     "transfrom(pandas.DataFrame) can only be applied to ops-dags with only one table def"
                 )
             k = [k for k in tables.keys()][0]
-            return self.eval_pandas(data_map={k: X}, eval_env=eval_env)
+            return self.eval_pandas(data_map={k: X}, eval_env=eval_env, pandas_model=pandas_model)
         raise TypeError("can not apply transform() to type " + str(type(X)))
 
     def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
@@ -356,15 +358,8 @@ class TableDescription(ViewRepresentation):
             tables[self.key] = self
         return tables
 
-    def eval_pandas_implementation(self, *, data_map, eval_env):
-        if len(self.qualifiers) > 0:
-            raise ValueError(
-                "table descriptions used with eval_pandas_implementation() must not have qualifiers"
-            )
-        # make an index-free copy of the data to isolate side-effects and not deal with indices
-        res = data_map[self.table_name].loc[:, self.column_names]
-        res = res.reset_index(drop=True)
-        return res
+    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
+        return pandas_model.table_step(op=self, data_map=data_map, eval_env=eval_env)
 
     def columns_used_from_sources(self, using=None):
         return []  # no inputs to table description
@@ -523,66 +518,8 @@ class ExtendNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.extend_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_pandas_implementation(self, *, data_map, eval_env):
-        window_situation = (len(self.partition_by) > 0) or (len(self.order_by) > 0)
-        if window_situation:
-            # check these are forms we are prepared to work with
-            for (k, op) in self.ops.items():
-                if len(op.args) > 1:
-                    raise ValueError(
-                        "non-trivial windows expression: " + str(k) + ": " + str(op)
-                    )
-                if len(op.args) == 1:
-                    if not isinstance(
-                        op.args[0], data_algebra.expr_rep.ColumnReference
-                    ):
-                        raise ValueError(
-                            "windows expression argument must be a column: "
-                            + str(k)
-                            + ": "
-                            + str(op)
-                        )
-        res = self.sources[0].eval_pandas_implementation(data_map=data_map, eval_env=eval_env)
-        res = res.reset_index(drop=True)
-        if not window_situation:
-            for (k, op) in self.ops.items():
-                op_src = op.to_pandas()
-                res[k] = res.eval(op_src, local_dict=data_algebra.expr_rep.pandas_eval_env, global_dict=eval_env)
-        else:
-            for (k, op) in self.ops.items():
-                # work on a slice of the data frame
-                col_list = [c for c in set(self.partition_by)]
-                for c in self.order_by:
-                    if c not in col_list:
-                        col_list = col_list + [c]
-                value_name = None
-                if len(op.args) > 0:
-                    value_name = op.args[0].to_pandas()
-                    if value_name not in set(col_list):
-                        col_list = col_list + [value_name]
-                ascending = [c not in set(self.reverse) for c in col_list]
-                subframe = res[col_list].reset_index(drop=True)
-                subframe["_data_algebra_orig_index"] = subframe.index
-                subframe = subframe.sort_values(by=col_list, ascending=ascending).reset_index(drop=True)
-                if len(self.partition_by) > 0:
-                    opframe = subframe.groupby(self.partition_by)
-                    #  Groupby preserves the order of rows within each group.
-                    # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.groupby.html
-                else:
-                    opframe = subframe
-                if len(op.args) == 0:
-                    if op.op == "row_number":
-                        subframe[k] = opframe.cumcount() + 1
-                    else:  # TODO: more of these
-                        raise KeyError("not implemented: " + str(k) + ": " + str(op))
-                else:
-                    # len(op.args) == 1
-                    subframe[k] = opframe[value_name].transform(op.op)  # Pandas transform, not data_algegra
-                subframe = subframe.reset_index(drop=True)
-                subframe = subframe.sort_values(by=["_data_algebra_orig_index"])
-                subframe = subframe.reset_index(drop=True)
-                res[k] = subframe[k]
-        return res
+    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
+        return pandas_model.extend_step(op=self, data_map=data_map, eval_env=eval_env)
 
 
 class ProjectNode(ViewRepresentation):
@@ -686,42 +623,8 @@ class ProjectNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.project_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_pandas_implementation(self, *, data_map, eval_env):
-        # check these are forms we are prepared to work with, and build an aggregation dictionary
-        # build an agg list: https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
-        # https://stackoverflow.com/questions/44635626/rename-result-columns-from-pandas-aggregation-futurewarning-using-a-dict-with
-        for (k, op) in self.ops.items():
-            if len(op.args) != 1:
-                raise ValueError(
-                    "non-trivial aggregation expression: " + str(k) + ": " + str(op)
-                )
-            if not isinstance(op.args[0], data_algebra.expr_rep.ColumnReference):
-                raise ValueError(
-                    "windows expression argument must be a column: "
-                    + str(k)
-                    + ": "
-                    + str(op)
-                )
-        res = self.sources[0].eval_pandas_implementation(data_map=data_map, eval_env=eval_env).reset_index(drop=True)
-        if len(self.order_by) > 0:
-            res = res.sort_values(by=self.order_by)
-            res = res.reset_index(drop=True)
-        if len(self.group_by) > 0:
-            res = res.groupby(self.group_by)
-        cols = {k: res[str(op.args[0])].agg(op.op) for (k, op) in self.ops.items()}
-
-        # agg can return scalars, which then can't be made into a pandas.DataFrame
-        def promote_scalar(v):
-            # noinspection PyBroadException
-            try:
-                len(v)
-            except Exception:
-                return [v]
-            return v
-
-        cols = {k: promote_scalar(v) for (k, v) in cols.items()}
-        res = pandas.DataFrame(cols).reset_index(drop=False)  # grouping variables in the index
-        return res
+    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
+        return pandas_model.project_step(op=self, data_map=data_map, eval_env=eval_env)
 
 
 class SelectRowsNode(ViewRepresentation):
@@ -776,10 +679,8 @@ class SelectRowsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_pandas_implementation(self, *, data_map, eval_env):
-        res = self.sources[0].eval_pandas_implementation(data_map=data_map, eval_env=eval_env)
-        res = res.query(self.expr.to_pandas()).reset_index(drop=True)
-        return res
+    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
+        return pandas_model.select_rows_step(op=self, data_map=data_map, eval_env=eval_env)
 
 
 class SelectColumnsNode(ViewRepresentation):
@@ -826,9 +727,8 @@ class SelectColumnsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_pandas_implementation(self, *, data_map, eval_env):
-        res = self.sources[0].eval_pandas_implementation(data_map=data_map, eval_env=eval_env)
-        return res[self.column_selection]
+    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
+        return pandas_model.select_columns_step(op=self, data_map=data_map, eval_env=eval_env)
 
 
 class DropColumnsNode(ViewRepresentation):
@@ -877,10 +777,8 @@ class DropColumnsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_pandas_implementation(self, *, data_map, eval_env):
-        res = self.sources[0].eval_pandas_implementation(data_map=data_map, eval_env=eval_env)
-        column_selection = [c for c in res.columns if c not in self.column_deletions]
-        return res[column_selection]
+    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
+        return pandas_model.drop_columns_step(op=self, data_map=data_map, eval_env=eval_env)
 
 
 class OrderRowsNode(ViewRepresentation):
@@ -936,13 +834,8 @@ class OrderRowsNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.order_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_pandas_implementation(self, *, data_map, eval_env):
-        res = self.sources[0].eval_pandas_implementation(data_map=data_map, eval_env=eval_env)
-        ascending = [
-            False if ci in set(self.reverse) else True for ci in self.order_columns
-        ]
-        res.sort_values(by=self.order_columns, ascending=ascending)
-        return res
+    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
+        return pandas_model.order_rows_step(op=self, data_map=data_map, eval_env=eval_env)
 
 
 class RenameColumnsNode(ViewRepresentation):
@@ -997,9 +890,8 @@ class RenameColumnsNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.rename_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_pandas_implementation(self, *, data_map, eval_env):
-        res = self.sources[0].eval_pandas_implementation(data_map=data_map, eval_env=eval_env)
-        return res.rename(columns=self.reverse_mapping)
+    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
+        return pandas_model.rename_columns_step(op=self, data_map=data_map, eval_env=eval_env)
 
 
 class NaturalJoinNode(ViewRepresentation):
@@ -1068,25 +960,5 @@ class NaturalJoinNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_pandas_implementation(self, *, data_map, eval_env):
-        left = self.sources[0].eval_pandas_implementation(data_map=data_map, eval_env=eval_env)
-        right = self.sources[1].eval_pandas_implementation(data_map=data_map, eval_env=eval_env)
-        common_cols = set([c for c in left.columns]).intersection(
-            [c for c in right.columns]
-        )
-        res = pandas.merge(
-            left=left,
-            right=right,
-            how=self.jointype.lower(),
-            on=self.by,
-            sort=False,
-            suffixes=("", "_tmp_right_col"),
-        )
-        res = res.reset_index(drop=True)
-        for c in common_cols:
-            if c not in self.by:
-                is_null = res[c].isnull()
-                res[c][is_null] = res[c + "_tmp_right_col"]
-                res = res.drop(c + "_tmp_right_col", axis=1)
-        res = res.reset_index(drop=True)
-        return res
+    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
+        return pandas_model.natural_join_step(op=self, data_map=data_map, eval_env=eval_env)
