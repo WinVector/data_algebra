@@ -2,21 +2,28 @@
 import pandas
 import numpy
 
-have_dask = False
+import data_algebra
+
 try:
     # noinspection PyUnresolvedReferences
     import dask.dataframe
-
-    have_dask = True
-except ImportError as ie:
+except ImportError:
     pass
 
 
 def is_acceptable_data_frame(d):
-    global have_dask
     if isinstance(d, pandas.DataFrame):
         return True
-    if have_dask:
+    if data_algebra.have_dask:
+        if isinstance(d, dask.dataframe.DataFrame):
+            return True
+    return False
+
+
+def is_dask_data_frame(d):
+    if isinstance(d, pandas.DataFrame):
+        return False
+    if data_algebra.have_dask:
         if isinstance(d, dask.dataframe.DataFrame):
             return True
     return False
@@ -37,7 +44,7 @@ def assert_is_acceptable_data_frame(d, arg_name=None):
 def convert_to_pandas_dataframe(d, arg_name=None):
     if isinstance(d, pandas.DataFrame):
         return d
-    if have_dask:
+    if data_algebra.have_dask:
         if isinstance(d, dask.dataframe.DataFrame):
             d = d.compute()
             if not isinstance(d, pandas.DataFrame):

@@ -1,14 +1,12 @@
 import collections
 
+import data_algebra
 import data_algebra.data_ops
 import data_algebra.data_pipe
 
-have_yaml = False
 try:
     # noinspection PyUnresolvedReferences
     import yaml  # supplied by PyYAML
-
-    have_yaml = True
 except ImportError:
     pass
 
@@ -21,9 +19,9 @@ except ImportError:
 def fix_ordered_dict_yaml_rep():
     """Writer OrderedDict as simple structure"""
     # derived from: https://stackoverflow.com/a/16782282/6901725
-    global have_yaml
-    if not have_yaml:
+    if not data_algebra.have_yaml:
         raise RuntimeError("yaml/PyYAML not installed")
+
     def represent_ordereddict(dumper, data):
         value = [
             (dumper.represent_data(node_key), dumper.represent_data(node_value))
@@ -121,20 +119,19 @@ def to_pipeline(obj, *, known_tables=None):
 def check_op_round_trip(o):
     if not isinstance(o, data_algebra.data_ops.ViewRepresentation):
         raise TypeError("expect o to be a data_algebra.data_ops.ViewRepresentation")
-    global have_yaml
-    if not have_yaml:
+    if not data_algebra.have_yaml:
         raise RuntimeError("yaml/PyYAML not installed")
     strr = o.to_python(strict=True, pretty=False)
     strp = o.to_python(strict=True, pretty=True)
     obj = o.collect_representation()
-    back = data_algebra.yaml.to_pipeline(obj)
+    back = to_pipeline(obj)
     strr_back = back.to_python(strict=True, pretty=False)
     assert strr == strr_back
     strp_back = back.to_python(strict=True, pretty=True)
     assert strp == strp_back
     dmp = yaml.dump(obj)
     ld = yaml.safe_load(dmp)
-    back = data_algebra.yaml.to_pipeline(ld)
+    back = to_pipeline(ld)
     if isinstance(o, data_algebra.data_ops.ExtendNode):
         if len(o.ops) == 1:
             strr_back = back.to_python(strict=True, pretty=False)

@@ -4,6 +4,45 @@ import numpy
 # noinspection PyUnresolvedReferences
 import pandas
 
+have_yaml = False
+try:
+    # noinspection PyUnresolvedReferences
+    import yaml  # supplied by PyYAML
+
+    have_yaml = True
+except ImportError:
+    pass
+
+have_dask = False
+try:
+    # noinspection PyUnresolvedReferences
+    import dask.dataframe
+
+    have_dask = True
+except ImportError:
+    pass
+
+have_black = False
+try:
+    # noinspection PyUnresolvedReferences
+    import black
+
+    have_black = True
+except ImportError:
+    pass
+
+have_sqlparse = False
+try:
+    # noinspection PyUnresolvedReferences
+    import sqlparse
+
+    have_sqlparse = True
+except ImportError:
+    pass
+
+
+
+
 
 __docformat__ = "restructuredtext"
 __version__ = "0.1.5"
@@ -23,3 +62,4 @@ the `rquery`<https://github.com/WinVector/rquery> and `rqdatatable`<https://gith
 
 Recommended packages include: Pandas, PyYAML (supplies yaml), sqlparse, and black. 
 """
+

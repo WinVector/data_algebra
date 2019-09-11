@@ -16,7 +16,7 @@ are subject to change.
 Mature, production ready [R](https://www.r-project.org) versions of the system are available as 
 the [rquery](https://github.com/WinVector/rquery) and [rqdatatable](https://github.com/WinVector/rqdatatable) packages.
 
-Recommended packages include: Pandas, PyYAML (supplies yaml), sqlparse, and black. 
+Recommended packages include: PyYAML (supplies yaml), sqlparse, black, and dask. 
 """
 
 setuptools.setup(
