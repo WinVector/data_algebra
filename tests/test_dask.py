@@ -46,8 +46,30 @@ def test_dask():
             select_columns(['subjectID', 'surveyCategory', 'probability']). \
             rename_columns({'diagnosis': 'surveyCategory'}). \
             order_rows(['subjectID'])
+        ops_p = TableDescription('d',
+                               ['subjectID',
+                                'surveyCategory',
+                                'assessmentTotal',
+                                'irrelevantCol1',
+                                'irrelevantCol2']). \
+            extend({'probability': '(assessmentTotal * scale).exp()'}). \
+            project({'total': 'probability.sum()'},
+                    group_by='subjectID')
 
     d_dask = dask.dataframe.from_pandas(d_local, npartitions=2)
+
+    res_dask_p = ops_p.transform(d_dask)
+    res_t_p = res_dask_p.compute()
+
+    expect_t = pandas.DataFrame(
+        {
+            "subjectID": [1, 2],
+            "total": [4.877094, 4.616570],
+        }
+    )
+
+    assert data_algebra.util.equivalent_frames(expect_t, res_t_p, float_tol=1e-3)
+
     res_dask = ops.transform(d_dask)
     res_t = res_dask.compute()
 

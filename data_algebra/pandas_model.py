@@ -87,6 +87,14 @@ class PandasModel:
                 res[k] = subframe[k]
         return res
 
+    def columns_to_frame(self, cols):
+        """
+
+        :param cols: dictionary mapping column names to columns
+        :return:
+        """
+        return pandas.DataFrame(cols)
+
     def project_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.ProjectNode):
             raise TypeError("op was supposed to be a data_algebra.data_ops.ProjectNode")
@@ -125,7 +133,7 @@ class PandasModel:
             return v
 
         cols = {k: promote_scalar(v) for (k, v) in cols.items()}
-        res = pandas.DataFrame(cols).reset_index(drop=False)  # grouping variables in the index
+        res = self.columns_to_frame(cols).reset_index(drop=False)  # grouping variables in the index
         return res
 
     def select_rows_step(self, op, *, data_map, eval_env):
