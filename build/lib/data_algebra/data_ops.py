@@ -576,8 +576,12 @@ class ProjectNode(ViewRepresentation):
         if isinstance(reverse, str):
             reverse = [reverse]
         self.reverse = reverse
-        column_names = source.column_names.copy()
+        column_names = group_by.copy()
         consumed_cols = set()
+        for c in group_by:
+            consumed_cols.add(c)
+        for c in order_by:
+            consumed_cols.add(c)
         for (k, o) in ops.items():
             o.get_column_names(consumed_cols)
         unknown_cols = consumed_cols - source.column_set
