@@ -3,6 +3,7 @@ import pandas
 
 import data_algebra
 import data_algebra.env
+import data_algebra.util
 from data_algebra.data_ops import *
 
 
@@ -38,14 +39,25 @@ def test_dask1():
             extend({'sort_key': '-1*probability'}). \
             extend({'row_number': '_row_number()'},
                    partition_by=['subjectID'],
-                   order_by=['sort_key'])
+                   order_by=['sort_key']). \
+            select_rows('row_number == 1'). \
+            select_columns(['subjectID', 'surveyCategory', 'probability'])
 
     res_local = ops.transform(d_local)
+
+    expect = pandas.DataFrame({
+        'subjectID': [1, 2],
+        'surveyCategory': ["withdrawal behavior", "positive re-framing"],
+        'probability': [0.670622, 0.558974],
+    })
+
+    assert data_algebra.util.equivalent_frames(res_local, expect, float_tol=1e-3)
 
     d_dask = dask.dataframe.from_pandas(d_local, npartitions=2)
     res_dask = ops.transform(d_dask)
     res_dask_local = res_dask.compute()
 
+    assert data_algebra.util.equivalent_frames(res_dask_local, expect, float_tol=1e-3)
 
 def test_dask2():
     have_dask = False

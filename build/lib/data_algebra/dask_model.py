@@ -53,41 +53,63 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
             raise RuntimeError("ExtendNode doesn't support more than one partition column over dask yet")
         if len(op.order_by) > 1:
             raise RuntimeError("ExtendNode doesn't support more than one order column over dask yet")
+        if len(op.reverse) > 0:
+            raise RuntimeError("ExtendNode on dask doesn't support reverse sorting yet")
+        # get incoming data
         res = op.sources[0].eval_pandas_implementation(data_map=data_map,
                                                        eval_env=eval_env,
                                                        pandas_model=self)
-        index_col_name = "_data_algebra_orig_index"
-        res[index_col_name] = res.index
-        res = res.set_index(res[index_col_name])
+        # move to case where we have exactly one ordering column and one grouping column
+        temp_col = '_data_algebra_temp_index'
+        res = res.reset_index(drop=True)
+        res[temp_col] = res.index
+        res = res.set_index(res[temp_col])
+        columns_to_remove = [temp_col]
+        if len(op.partition_by) < 1:
+            group_col = '_data_algebra_temp_group'
+            columns_to_remove.append(group_col)
+            res[group_col] = 1
+        else:
+            group_col = op.partition_by[0]
+        if len(op.order_by) < 1:
+            order_col = '_data_algebra_temp_order'
+            columns_to_remove.append(order_col)
+            res[order_col] = res.index
+        else:
+            order_col = op.order_by[0]
         # see: https://github.com/WinVector/data_algebra/blob/master/Examples/dask/dask_window_fn.ipynb
         for (k, opk) in op.ops.items():
-            # work on a slice of the data frame
-            col_list = [c for c in set(op.partition_by)]
-            for c in op.order_by:
-                if c not in col_list:
-                    col_list = col_list + [c]
+            result_col = k
             if len(opk.args) > 0:
-                raise RuntimeError("ExtendNode on dask doesn't support window-function arguments yet: " +
-                                   str(k) + ": " + str(opk))
-            if len(op.reverse) > 0:
-                raise RuntimeError("ExtendNode on dask doesn't support reverse sorting yet")
-            subframe = res.loc[:, col_list]
-            subframe[index_col_name] = subframe.index
-            if len(op.order_by) > 0:
-                subframe = subframe.set_index(subframe[op.order_by[0]])
-            if len(op.partition_by) > 0:
-                opframe = subframe.groupby(op.partition_by)
-                #  Groupby preserves the order of rows within each group.
-                # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.groupby.html
+                # aggregate column case
+                value_col = opk.args[0].to_pandas()
+                dsub = res.loc[:, [group_col, value_col]]
+                dsub[temp_col] = dsub.index
+                if opk.op == 'sum':
+                    dagg = dsub.groupby(dsub[group_col]).sum()
+                else:  # TODO: implement more of these
+                    raise KeyError("not implemented: " + str(k) + ": " + str(opk))
+                dagg = dagg.reset_index(drop=False)
+                dagg = dagg.set_index(dagg[group_col])
+                dsub = dsub.set_index(dsub[group_col])
+                dsub[result_col] = dagg[value_col]
+                dsub = dsub.set_index(dsub[temp_col])
+                res[result_col] = dsub[result_col]
             else:
-                opframe = subframe
-            if opk.op == "row_number":
-                subframe[k] = opframe.cumcount() + 1
-            else:  # TODO: more of these
-                raise KeyError("not implemented: " + str(k) + ": " + str(opk))
-            subframe = subframe.set_index(subframe[index_col_name])
-            res[k] = subframe[k]
-        return res.reset_index(drop=True)
+                # free window case such as rownumber or count
+                dsub = res.loc[:, [group_col, order_col]]
+                dsub[temp_col] = dsub.index
+                dsub = dsub.set_index(dsub[order_col])
+                if opk.op == "row_number":
+                    dsub[result_col] = dsub.groupby(group_col).cumcount() + 1
+                else:  # TODO: implement more of these
+                    raise KeyError("not implemented: " + str(k) + ": " + str(opk))
+                dsub = dsub.set_index(dsub[temp_col])
+                res[result_col] = dsub[result_col]
+        for c in columns_to_remove:
+            res[c] = None
+        res = res.reset_index(drop=True)
+        return res
 
     def natural_join_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.NaturalJoinNode):
