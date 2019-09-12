@@ -24,7 +24,7 @@ data_algebra/SQLite.py            43      5    88%
 data_algebra/__init__.py          30      8    73%
 data_algebra/cdata.py             48      4    92%
 data_algebra/cdata_impl.py        92     15    84%
-data_algebra/dask_model.py        96     84    12%
+data_algebra/dask_model.py        94     82    13%
 data_algebra/data_ops.py         638    136    79%
 data_algebra/data_pipe.py        158     33    79%
 data_algebra/data_types.py        45     31    31%
@@ -37,7 +37,7 @@ data_algebra/pipe.py              65     19    71%
 data_algebra/util.py              72      6    92%
 data_algebra/yaml.py              76     11    86%
 --------------------------------------------------
-TOTAL                           2257    587    74%
+TOTAL                           2255    585    74%
 
 
-========================== 14 passed in 2.70 seconds ===========================
+========================== 14 passed in 2.67 seconds ===========================

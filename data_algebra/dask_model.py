@@ -83,8 +83,7 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
             if len(opk.args) > 0:
                 # aggregate column case
                 value_col = opk.args[0].to_pandas()
-                dsub = res.loc[:, [group_col, value_col]]
-                dsub[temp_col] = dsub.index
+                dsub = res.loc[:, [group_col, value_col, temp_col]]
                 if opk.op == 'sum':
                     dagg = dsub.groupby(dsub[group_col]).sum()
                 else:  # TODO: implement more of these
@@ -97,8 +96,7 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
                 res[result_col] = dsub[result_col]
             else:
                 # free window case such as rownumber or count
-                dsub = res.loc[:, [group_col, order_col]]
-                dsub[temp_col] = dsub.index
+                dsub = res.loc[:, [group_col, order_col, temp_col]]
                 dsub = dsub.set_index(dsub[order_col])
                 if opk.op == "row_number":
                     dsub[result_col] = dsub.groupby(group_col).cumcount() + 1
