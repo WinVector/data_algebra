@@ -18,8 +18,14 @@ class PandasModel:
             raise ValueError(
                 "table descriptions used with eval_pandas_implementation() must not have qualifiers"
             )
+        df = data_map[op.table_name]
+        # check all columns we expect are present
+        columns_using = op.column_names
+        missing = set(columns_using) - set([c for c in df.columns])
+        if len(missing)>0:
+            raise ValueError("missing required columns: " + str(missing))
         # make an index-free copy of the data to isolate side-effects and not deal with indices
-        res = data_map[op.table_name].loc[:, op.column_names]
+        res = df.loc[:, columns_using]
         res = res.reset_index(drop=True)
         return res
 

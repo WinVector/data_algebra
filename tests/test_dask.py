@@ -5,7 +5,51 @@ import data_algebra
 import data_algebra.env
 from data_algebra.data_ops import *
 
-def test_dask():
+
+def test_dask1():
+    have_dask = False
+    try:
+        import dask
+        import dask.dataframe
+        have_dask = True
+    except ImportError:
+        have_dask = False
+
+    if not have_dask:
+        return
+
+    d_local = pandas.DataFrame({
+        'subjectID': [1, 1, 2, 2],
+        'surveyCategory': ["withdrawal behavior", "positive re-framing", "withdrawal behavior", "positive re-framing"],
+        'assessmentTotal': [5, 2, 3, 4],
+     })
+
+    scale = 0.237
+
+    with data_algebra.env.Env(locals()) as env:
+        ops1 = TableDescription('d',
+                               ['subjectID',
+                                'surveyCategory',
+                                'assessmentTotal']). \
+            extend({'probability': '(assessmentTotal * scale).exp()'}). \
+            extend({'total': 'probability.sum()'},
+                   partition_by='subjectID'). \
+            extend({'probability': 'probability/total'}). \
+            drop_columns(['total', 'assessmentTotal'])
+        ops2 = TableDescription('d',
+                               ['subjectID',
+                                'surveyCategory',
+                                'probability']). \
+            extend({'row_number': '_row_number()'},
+                   partition_by=['subjectID'],
+                   order_by=['probability', 'surveyCategory'],
+                   reverse=['probability'])
+
+    d_local_2 = ops1.transform(d_local)
+    d_local_3 = ops2.transform(d_local_2)
+
+
+def test_dask2():
     have_dask = False
     try:
         import dask
