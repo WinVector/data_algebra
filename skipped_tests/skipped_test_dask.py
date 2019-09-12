@@ -1,4 +1,7 @@
 
+# dask doesn't seem to be behaving deterministicly (even throwing inside its own world on some re-runs)
+# can't add it to the supported test line until we get around this
+
 import pandas
 
 import data_algebra
