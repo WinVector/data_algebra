@@ -29,7 +29,7 @@ class PandasModel:
         res = res.reset_index(drop=True)
         return res
 
-    def extend_step(self, op, *, data_map, eval_env):
+    def check_extend_window_fns(self, op):
         if not isinstance(op, data_algebra.data_ops.ExtendNode):
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
         window_situation = (len(op.partition_by) > 0) or (len(op.order_by) > 0)
@@ -50,6 +50,14 @@ class PandasModel:
                             + ": "
                             + str(opk)
                         )
+
+
+    def extend_step(self, op, *, data_map, eval_env):
+        if not isinstance(op, data_algebra.data_ops.ExtendNode):
+            raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
+        window_situation = (len(op.partition_by) > 0) or (len(op.order_by) > 0)
+        if window_situation:
+            self.check_extend_window_fns(op)
         res = op.sources[0].eval_pandas_implementation(data_map=data_map,
                                                        eval_env=eval_env,
                                                        pandas_model=self)

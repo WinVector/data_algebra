@@ -42,11 +42,14 @@ def test_dask1():
                                 'probability']). \
             extend({'row_number': '_row_number()'},
                    partition_by=['subjectID'],
-                   order_by=['probability', 'surveyCategory'],
-                   reverse=['probability'])
+                   order_by=['probability'])
 
     d_local_2 = ops1.transform(d_local)
     d_local_3 = ops2.transform(d_local_2)
+
+    d_dask_2 = dask.dataframe.from_pandas(d_local_2, npartitions=2)
+    d_dask_3 = ops2.transform(d_dask_2)
+    d_dask_3.compute()
 
 
 def test_dask2():
@@ -85,8 +88,7 @@ def test_dask2():
             extend({'probability': 'probability/total'}). \
             extend({'row_number': '_row_number()'},
                    partition_by=['subjectID'],
-                   order_by=['probability', 'surveyCategory'],
-                   reverse=['probability']). \
+                   order_by=['probability']). \
             select_rows('row_number==1'). \
             select_columns(['subjectID', 'surveyCategory', 'probability']). \
             rename_columns({'diagnosis': 'surveyCategory'}). \
