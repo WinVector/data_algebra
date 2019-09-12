@@ -45,11 +45,10 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
     def extend_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.ExtendNode):
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
-        if len(op.partition_by) > 0:
-            raise RuntimeError("ExtendNode doesn't support partition_by on dask yet")  # TODO: implement
-        if len(op.order_by) > 0:
-            raise RuntimeError("ExtendNode doesn't support order_by on dask yet")  # TODO: implement
-        return super().extend_step(op=op, data_map=data_map, eval_env=eval_env)
+        window_situation = (len(op.partition_by) > 0) or (len(op.order_by) > 0)
+        if not window_situation:
+            return super().extend_step(op=op, data_map=data_map, eval_env=eval_env)
+        raise RuntimeError("ExtendNode doesn't support this windowed operation on dask yet")  # TODO: implement
 
 
     def natural_join_step(self, op, *, data_map, eval_env):
