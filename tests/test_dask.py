@@ -27,29 +27,24 @@ def test_dask1():
     scale = 0.237
 
     with data_algebra.env.Env(locals()) as env:
-        ops1 = TableDescription('d',
+        ops = TableDescription('d',
                                ['subjectID',
                                 'surveyCategory',
                                 'assessmentTotal']). \
             extend({'probability': '(assessmentTotal * scale).exp()'}). \
             extend({'total': 'probability.sum()'},
-                   partition_by='subjectID')
-        ops2 = TableDescription('d2',
-                               ['subjectID',
-                                'surveyCategory',
-                                'probability',
-                                'total']). \
+                   partition_by='subjectID'). \
             extend({'probability': 'probability/total'}). \
             extend({'sort_key': '-1*probability'}). \
             extend({'row_number': '_row_number()'},
                    partition_by=['subjectID'],
                    order_by=['sort_key'])
 
-    d_local_2 = ops1.transform(d_local)
+    res_local = ops.transform(d_local)
 
-    d_dask_2 = dask.dataframe.from_pandas(d_local_2, npartitions=2)
-    d_dask_3 = ops2.transform(d_dask_2)
-    d_dask_3.compute()
+    d_dask = dask.dataframe.from_pandas(d_local, npartitions=2)
+    res_dask = ops.transform(d_dask)
+    res_dask_local = res_dask.compute()
 
 
 def test_dask2():
