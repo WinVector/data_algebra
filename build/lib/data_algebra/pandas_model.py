@@ -18,12 +18,18 @@ class PandasModel:
             raise ValueError(
                 "table descriptions used with eval_pandas_implementation() must not have qualifiers"
             )
+        df = data_map[op.table_name]
+        # check all columns we expect are present
+        columns_using = op.column_names
+        missing = set(columns_using) - set([c for c in df.columns])
+        if len(missing)>0:
+            raise ValueError("missing required columns: " + str(missing))
         # make an index-free copy of the data to isolate side-effects and not deal with indices
-        res = data_map[op.table_name].loc[:, op.column_names]
+        res = df.loc[:, columns_using]
         res = res.reset_index(drop=True)
         return res
 
-    def extend_step(self, op, *, data_map, eval_env):
+    def check_extend_window_fns(self, op):
         if not isinstance(op, data_algebra.data_ops.ExtendNode):
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
         window_situation = (len(op.partition_by) > 0) or (len(op.order_by) > 0)
@@ -44,6 +50,14 @@ class PandasModel:
                             + ": "
                             + str(opk)
                         )
+
+
+    def extend_step(self, op, *, data_map, eval_env):
+        if not isinstance(op, data_algebra.data_ops.ExtendNode):
+            raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
+        window_situation = (len(op.partition_by) > 0) or (len(op.order_by) > 0)
+        if window_situation:
+            self.check_extend_window_fns(op)
         res = op.sources[0].eval_pandas_implementation(data_map=data_map,
                                                        eval_env=eval_env,
                                                        pandas_model=self)

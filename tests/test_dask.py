@@ -33,19 +33,19 @@ def test_dask1():
                                 'assessmentTotal']). \
             extend({'probability': '(assessmentTotal * scale).exp()'}). \
             extend({'total': 'probability.sum()'},
-                   partition_by='subjectID'). \
-            extend({'probability': 'probability/total'}). \
-            drop_columns(['total', 'assessmentTotal'])
-        ops2 = TableDescription('d',
+                   partition_by='subjectID')
+        ops2 = TableDescription('d2',
                                ['subjectID',
                                 'surveyCategory',
-                                'probability']). \
+                                'probability',
+                                'total']). \
+            extend({'probability': 'probability/total'}). \
+            extend({'sort_key': '-1*probability'}). \
             extend({'row_number': '_row_number()'},
                    partition_by=['subjectID'],
-                   order_by=['probability'])
+                   order_by=['sort_key'])
 
     d_local_2 = ops1.transform(d_local)
-    d_local_3 = ops2.transform(d_local_2)
 
     d_dask_2 = dask.dataframe.from_pandas(d_local_2, npartitions=2)
     d_dask_3 = ops2.transform(d_dask_2)

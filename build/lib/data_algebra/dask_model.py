@@ -45,12 +45,49 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
     def extend_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.ExtendNode):
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
-        if len(op.partition_by) > 0:
-            raise RuntimeError("ExtendNode doesn't support partition_by on dask yet")  # TODO: implement
-        if len(op.order_by) > 0:
-            raise RuntimeError("ExtendNode doesn't support order_by on dask yet")  # TODO: implement
-        return super().extend_step(op=op, data_map=data_map, eval_env=eval_env)
-
+        window_situation = (len(op.partition_by) > 0) or (len(op.order_by) > 0)
+        if not window_situation:
+            return super().extend_step(op=op, data_map=data_map, eval_env=eval_env)
+        self.check_extend_window_fns(op)
+        if len(op.partition_by) > 1:
+            raise RuntimeError("ExtendNode doesn't support more than one partition column over dask yet")
+        if len(op.order_by) > 1:
+            raise RuntimeError("ExtendNode doesn't support more than one order column over dask yet")
+        res = op.sources[0].eval_pandas_implementation(data_map=data_map,
+                                                       eval_env=eval_env,
+                                                       pandas_model=self)
+        index_col_name = "_data_algebra_orig_index"
+        res[index_col_name] = res.index
+        res = res.set_index(res[index_col_name])
+        # see: https://github.com/WinVector/data_algebra/blob/master/Examples/dask/dask_window_fn.ipynb
+        for (k, opk) in op.ops.items():
+            # work on a slice of the data frame
+            col_list = [c for c in set(op.partition_by)]
+            for c in op.order_by:
+                if c not in col_list:
+                    col_list = col_list + [c]
+            if len(opk.args) > 0:
+                raise RuntimeError("ExtendNode on dask doesn't support window-function arguments yet: " +
+                                   str(k) + ": " + str(opk))
+            if len(op.reverse) > 0:
+                raise RuntimeError("ExtendNode on dask doesn't support reverse sorting yet")
+            subframe = res.loc[:, col_list]
+            subframe[index_col_name] = subframe.index
+            if len(op.order_by) > 0:
+                subframe = subframe.set_index(subframe[op.order_by[0]])
+            if len(op.partition_by) > 0:
+                opframe = subframe.groupby(op.partition_by)
+                #  Groupby preserves the order of rows within each group.
+                # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.groupby.html
+            else:
+                opframe = subframe
+            if opk.op == "row_number":
+                subframe[k] = opframe.cumcount() + 1
+            else:  # TODO: more of these
+                raise KeyError("not implemented: " + str(k) + ": " + str(opk))
+            subframe = subframe.set_index(subframe[index_col_name])
+            res[k] = subframe[k]
+        return res.reset_index(drop=True)
 
     def natural_join_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.NaturalJoinNode):
