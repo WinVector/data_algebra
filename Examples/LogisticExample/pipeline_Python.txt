@@ -5,8 +5,6 @@
   - subjectID
   - surveyCategory
   - assessmentTotal
-  - irrelevantCol1
-  - irrelevantCol2
   key: d
 - op: Extend
   ops:
@@ -29,14 +27,18 @@
   reverse: []
 - op: Extend
   ops:
+    sort_key: -1 * probability
+  partition_by: []
+  order_by: []
+  reverse: []
+- op: Extend
+  ops:
     row_number: _row_number()
   partition_by:
   - subjectID
   order_by:
-  - probability
-  - surveyCategory
-  reverse:
-  - probability
+  - sort_key
+  reverse: []
 - op: SelectRows
   expr: row_number == 1
 - op: SelectColumns
@@ -44,12 +46,4 @@
   - subjectID
   - surveyCategory
   - probability
-- op: Rename
-  column_remapping:
-    diagnosis: surveyCategory
-- op: Order
-  order_columns:
-  - subjectID
-  reverse: []
-  limit: null
 

@@ -13304,7 +13304,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">use_postgresql</span> <span class="o">=</span> <span class="kc">False</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">use_postgresql</span> <span class="o">=</span> <span class="kc">True</span>
 
 <span class="k">if</span> <span class="n">use_postgresql</span><span class="p">:</span>
     <span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
@@ -13314,12 +13314,12 @@ div#notebook {
         <span class="n">password</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
     <span class="p">)</span>
     <span class="n">conn</span><span class="o">.</span><span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span>
-    <span class="n">db_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">PostgreSQLModel</span><span class="p">()</span>
+    <span class="n">db_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">PostgreSQLModel</span><span class="p">()</span> 
 <span class="k">else</span><span class="p">:</span>
     <span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;:memory:&#39;</span><span class="p">)</span>
     <span class="n">db_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span>
-    <span class="c1"># https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.create_function</span>
-    <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;exp&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">)</span>
+
+<span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>  <span class="c1"># define any user functions and settings we want/need</span>
 </pre></div>
 
     </div>
@@ -13370,48 +13370,43 @@ div#notebook {
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>index</th>
-      <th>subjectID</th>
-      <th>surveyCategory</th>
-      <th>assessmentTotal</th>
-      <th>irrelevantCol1</th>
-      <th>irrelevantCol2</th>
+      <th>subjectid</th>
+      <th>surveycategory</th>
+      <th>assessmenttotal</th>
+      <th>irrelevantcol1</th>
+      <th>irrelevantcol2</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>0</td>
-      <td>1</td>
+      <td>1.0</td>
       <td>withdrawal behavior</td>
-      <td>5</td>
+      <td>5.0</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>1</td>
-      <td>1</td>
+      <td>1.0</td>
       <td>positive re-framing</td>
-      <td>2</td>
+      <td>2.0</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>2</td>
-      <td>2</td>
+      <td>2.0</td>
       <td>withdrawal behavior</td>
-      <td>3</td>
+      <td>3.0</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>3</td>
-      <td>2</td>
+      <td>2.0</td>
       <td>positive re-framing</td>
-      <td>4</td>
+      <td>4.0</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
@@ -13445,24 +13440,20 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">scale</span> <span class="o">=</span> <span class="mf">0.237</span>
 
 <span class="k">with</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">Env</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span> <span class="k">as</span> <span class="n">env</span><span class="p">:</span>
-    <span class="n">ops</span> <span class="o">=</span> <span class="n">TableDescription</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> 
-                     <span class="p">[</span><span class="s1">&#39;subjectID&#39;</span><span class="p">,</span>
-                      <span class="s1">&#39;surveyCategory&#39;</span><span class="p">,</span>
-                      <span class="s1">&#39;assessmentTotal&#39;</span><span class="p">,</span>
-                      <span class="s1">&#39;irrelevantCol1&#39;</span><span class="p">,</span>
-                      <span class="s1">&#39;irrelevantCol2&#39;</span><span class="p">])</span> <span class="o">.</span>\
-        <span class="n">extend</span><span class="p">({</span><span class="s1">&#39;probability&#39;</span><span class="p">:</span> <span class="s1">&#39;(assessmentTotal * scale).exp()&#39;</span><span class="p">})</span> <span class="o">.</span>\
+    <span class="n">ops</span> <span class="o">=</span> <span class="n">TableDescription</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span>
+                           <span class="p">[</span><span class="s1">&#39;subjectID&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;surveyCategory&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;assessmentTotal&#39;</span><span class="p">])</span><span class="o">.</span> \
+        <span class="n">extend</span><span class="p">({</span><span class="s1">&#39;probability&#39;</span><span class="p">:</span> <span class="s1">&#39;(assessmentTotal * scale).exp()&#39;</span><span class="p">})</span><span class="o">.</span> \
         <span class="n">extend</span><span class="p">({</span><span class="s1">&#39;total&#39;</span><span class="p">:</span> <span class="s1">&#39;probability.sum()&#39;</span><span class="p">},</span>
-               <span class="n">partition_by</span><span class="o">=</span><span class="s1">&#39;subjectID&#39;</span><span class="p">)</span>  <span class="o">.</span>\
-        <span class="n">extend</span><span class="p">({</span><span class="s1">&#39;probability&#39;</span><span class="p">:</span> <span class="s1">&#39;probability/total&#39;</span><span class="p">})</span>  <span class="o">.</span>\
-        <span class="n">extend</span><span class="p">({</span><span class="s1">&#39;row_number&#39;</span><span class="p">:</span><span class="s1">&#39;_row_number()&#39;</span><span class="p">},</span>
-                <span class="n">partition_by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;subjectID&#39;</span><span class="p">],</span>
-                <span class="n">order_by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;probability&#39;</span><span class="p">,</span> <span class="s1">&#39;surveyCategory&#39;</span><span class="p">],</span>
-                <span class="n">reverse</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;probability&#39;</span><span class="p">])</span>  <span class="o">.</span>\
-        <span class="n">select_rows</span><span class="p">(</span><span class="s1">&#39;row_number==1&#39;</span><span class="p">)</span>   <span class="o">.</span>\
-        <span class="n">select_columns</span><span class="p">([</span><span class="s1">&#39;subjectID&#39;</span><span class="p">,</span> <span class="s1">&#39;surveyCategory&#39;</span><span class="p">,</span> <span class="s1">&#39;probability&#39;</span><span class="p">])</span> <span class="o">.</span>\
-        <span class="n">rename_columns</span><span class="p">({</span><span class="s1">&#39;diagnosis&#39;</span><span class="p">:</span> <span class="s1">&#39;surveyCategory&#39;</span><span class="p">})</span>  <span class="o">.</span>\
-        <span class="n">order_rows</span><span class="p">([</span><span class="s1">&#39;subjectID&#39;</span><span class="p">])</span>
+               <span class="n">partition_by</span><span class="o">=</span><span class="s1">&#39;subjectID&#39;</span><span class="p">)</span><span class="o">.</span> \
+        <span class="n">extend</span><span class="p">({</span><span class="s1">&#39;probability&#39;</span><span class="p">:</span> <span class="s1">&#39;probability/total&#39;</span><span class="p">})</span><span class="o">.</span> \
+        <span class="n">extend</span><span class="p">({</span><span class="s1">&#39;sort_key&#39;</span><span class="p">:</span> <span class="s1">&#39;-1*probability&#39;</span><span class="p">})</span><span class="o">.</span> \
+        <span class="n">extend</span><span class="p">({</span><span class="s1">&#39;row_number&#39;</span><span class="p">:</span> <span class="s1">&#39;_row_number()&#39;</span><span class="p">},</span>
+               <span class="n">partition_by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;subjectID&#39;</span><span class="p">],</span>
+               <span class="n">order_by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sort_key&#39;</span><span class="p">])</span><span class="o">.</span> \
+        <span class="n">select_rows</span><span class="p">(</span><span class="s1">&#39;row_number == 1&#39;</span><span class="p">)</span><span class="o">.</span> \
+        <span class="n">select_columns</span><span class="p">([</span><span class="s1">&#39;subjectID&#39;</span><span class="p">,</span> <span class="s1">&#39;surveyCategory&#39;</span><span class="p">,</span> <span class="s1">&#39;probability&#39;</span><span class="p">])</span>
 </pre></div>
 
     </div>
@@ -13473,7 +13464,8 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>For a more pythonic way of writing the same pipeline we can show how the code would have been formatted by <a href="https://github.com/psf/black"><code>black</code></a>.</p>
+<p>We are deliberately writing a longer pipeline of simple steps, so we can use the same pipeline locally with Pandas, at (potentially) scale with dask, and (potentially) great scale with PostgreSQL or Apache Spark.  A more concise variation of this pipeline can be found in the R example <a href="https://github.com/WinVector/rquery">here</a>.</p>
+<p>For a more Pythonic way of writing the same pipeline we can show how the code would have been formatted by <a href="https://github.com/psf/black"><code>black</code></a>.</p>
 
 </div>
 </div>
@@ -13502,31 +13494,19 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>TableDescription(
-    table_name=&#34;d&#34;,
-    column_names=[
-        &#34;subjectID&#34;,
-        &#34;surveyCategory&#34;,
-        &#34;assessmentTotal&#34;,
-        &#34;irrelevantCol1&#34;,
-        &#34;irrelevantCol2&#34;,
-    ],
+    table_name=&#34;d&#34;, column_names=[&#34;subjectID&#34;, &#34;surveyCategory&#34;, &#34;assessmentTotal&#34;]
 ).extend({&#34;probability&#34;: &#34;(assessmentTotal * 0.237).exp()&#34;}).extend(
     {&#34;total&#34;: &#34;probability.sum()&#34;}, partition_by=[&#34;subjectID&#34;]
 ).extend(
     {&#34;probability&#34;: &#34;probability / total&#34;}
 ).extend(
-    {&#34;row_number&#34;: &#34;_row_number()&#34;},
-    partition_by=[&#34;subjectID&#34;],
-    order_by=[&#34;probability&#34;, &#34;surveyCategory&#34;],
-    reverse=[&#34;probability&#34;],
+    {&#34;sort_key&#34;: &#34;-1 * probability&#34;}
+).extend(
+    {&#34;row_number&#34;: &#34;_row_number()&#34;}, partition_by=[&#34;subjectID&#34;], order_by=[&#34;sort_key&#34;]
 ).select_rows(
     &#34;row_number == 1&#34;
 ).select_columns(
     [&#34;subjectID&#34;, &#34;surveyCategory&#34;, &#34;probability&#34;]
-).rename_columns(
-    {&#34;diagnosis&#34;: &#34;surveyCategory&#34;}
-).order_rows(
-    [&#34;subjectID&#34;]
 )
 
 </pre>
@@ -13583,43 +13563,44 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>SELECT &#34;subjectID&#34;,
-       &#34;diagnosis&#34;,
-       &#34;probability&#34;
+<pre>SELECT &#34;surveycategory&#34;,
+       &#34;probability&#34;,
+       &#34;subjectid&#34;
 FROM
-  (SELECT &#34;subjectID&#34;,
+  (SELECT &#34;surveycategory&#34;,
           &#34;probability&#34;,
-          &#34;surveyCategory&#34; AS &#34;diagnosis&#34;
+          &#34;subjectid&#34;
    FROM
-     (SELECT &#34;subjectID&#34;,
-             &#34;probability&#34;,
-             &#34;surveyCategory&#34;
+     (SELECT &#34;probability&#34;,
+             &#34;sort_key&#34;,
+             &#34;surveycategory&#34;,
+             &#34;subjectid&#34;,
+             ROW_NUMBER() OVER (PARTITION BY &#34;subjectid&#34;
+                                ORDER BY &#34;sort_key&#34;) AS &#34;row_number&#34;
       FROM
-        (SELECT &#34;subjectID&#34;,
-                &#34;probability&#34;,
-                &#34;surveyCategory&#34;
+        (SELECT &#34;probability&#34;,
+                &#34;surveycategory&#34;,
+                &#34;subjectid&#34;,
+                -1 * &#34;probability&#34; AS &#34;sort_key&#34;
          FROM
-           (SELECT &#34;subjectID&#34;,
-                   &#34;probability&#34;,
-                   &#34;surveyCategory&#34;,
-                   ROW_NUMBER() OVER (PARTITION BY &#34;subjectID&#34;
-                                      ORDER BY &#34;probability&#34; DESC, &#34;surveyCategory&#34;) AS &#34;row_number&#34;
+           (SELECT &#34;surveycategory&#34;,
+                   &#34;subjectid&#34;,
+                   &#34;probability&#34; / &#34;total&#34; AS &#34;probability&#34;
             FROM
-              (SELECT &#34;subjectID&#34;,
-                      &#34;surveyCategory&#34;,
-                      &#34;probability&#34; / &#34;total&#34; AS &#34;probability&#34;
+              (SELECT &#34;probability&#34;,
+                      &#34;surveycategory&#34;,
+                      &#34;subjectid&#34;,
+                      SUM(&#34;probability&#34;) OVER (PARTITION BY &#34;subjectid&#34;) AS &#34;total&#34;
                FROM
-                 (SELECT &#34;subjectID&#34;,
-                         &#34;probability&#34;,
-                         &#34;surveyCategory&#34;,
-                         SUM(&#34;probability&#34;) OVER (PARTITION BY &#34;subjectID&#34;) AS &#34;total&#34;
+                 (SELECT &#34;surveycategory&#34;,
+                         &#34;subjectid&#34;,
+                         EXP((&#34;assessmenttotal&#34; * 0.237)) AS &#34;probability&#34;
                   FROM
-                    (SELECT &#34;subjectID&#34;,
-                            &#34;surveyCategory&#34;,
-                            EXP((&#34;assessmentTotal&#34; * 0.237)) AS &#34;probability&#34;
-                     FROM (&#34;d&#34;) &#34;SQ_0&#34;) &#34;SQ_1&#34;) &#34;SQ_2&#34;) &#34;SQ_3&#34;) &#34;SQ_4&#34;
-         WHERE &#34;row_number&#34; = 1 ) &#34;SQ_5&#34;) &#34;SQ_6&#34;) &#34;SQ_7&#34;
-ORDER BY &#34;subjectID&#34;
+                    (SELECT &#34;assessmenttotal&#34;,
+                            &#34;surveycategory&#34;,
+                            &#34;subjectid&#34;
+                     FROM &#34;d&#34;) &#34;sq_0&#34;) &#34;sq_1&#34;) &#34;sq_2&#34;) &#34;sq_3&#34;) &#34;sq_4&#34;) &#34;sq_5&#34;
+   WHERE &#34;row_number&#34; = 1 ) &#34;sq_6&#34;
 </pre>
 </div>
 </div>
@@ -13678,23 +13659,23 @@ ORDER BY &#34;subjectID&#34;
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>subjectID</th>
-      <th>diagnosis</th>
+      <th>surveycategory</th>
       <th>probability</th>
+      <th>subjectid</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>1</td>
       <td>withdrawal behavior</td>
       <td>0.670622</td>
+      <td>1.0</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>2</td>
       <td>positive re-framing</td>
       <td>0.558974</td>
+      <td>2.0</td>
     </tr>
   </tbody>
 </table>
@@ -13759,7 +13740,7 @@ ORDER BY &#34;subjectID&#34;
     <tr style="text-align: right;">
       <th></th>
       <th>subjectID</th>
-      <th>diagnosis</th>
+      <th>surveyCategory</th>
       <th>probability</th>
     </tr>
   </thead>
@@ -13837,7 +13818,7 @@ ORDER BY &#34;subjectID&#34;
     <tr style="text-align: right;">
       <th></th>
       <th>subjectID</th>
-      <th>diagnosis</th>
+      <th>surveyCategory</th>
       <th>probability</th>
     </tr>
   </thead>
@@ -13868,7 +13849,171 @@ ORDER BY &#34;subjectID&#34;
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><code>eval_pandas</code> takes a dictionary of <code>Pandas</code> <code>DataFrame</code>s (names matching names specified in the pipeline) and returns the result of applying the pipeline to the data using <code>Pandas</code> commands.  Currently our <code>Pandas</code> implementation only allows very simple window functions.  This is why we didn't write <code>probability = probability/sum(probability)</code>, but instead broken the calculation into multiple steps by introducing the <code>total</code> column (the <code>SQL</code> realizaition does in fact support more complex window functions).  This is a small issue with the grammar: but our feeling encourange simple steps is in fact a good thing (improves debuggability), and in <code>SQL</code> the query optimizers likely optimize the different query styles into very similar realizations anyway.</p>
+<p><code>eval_pandas</code> takes a dictionary of <code>Pandas</code> <code>DataFrame</code>s (names matching names specified in the pipeline) and returns the result of applying the pipeline to the data using <code>Pandas</code> commands.  Currently our <code>Pandas</code> implementation only allows very simple window functions.  This is why we didn't write <code>probability = probability/sum(probability)</code>, but instead broken the calculation into multiple steps by introducing the <code>total</code> column (the <code>SQL</code> realization does in fact support more complex window functions).  This is a small issue with the grammar: but our feeling encourage simple steps is in fact a good thing (improves debuggability), and in <code>SQL</code> the query optimizers likely optimize the different query styles into very similar realizations anyway.</p>
+<h3 id="dask"><code>dask</code><a class="anchor-link" href="#dask">&#182;</a></h3><p>We can (in principle) also apply our transforms to <code>dask</code> objects, meaning we can work at a large range of data sizes (<code>Pandas</code>, <code>dask</code>, <code>SQL</code> <code>PostgreSQL</code>, and <code>Apache Spark</code>).</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">dask.dataframe</span>
+
+<span class="n">d_dask</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span><span class="n">d_local</span><span class="p">,</span> <span class="n">npartitions</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">res_dask</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">d_dask</span><span class="p">)</span>
+ 
+<span class="n">res_dask</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[11]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div><strong>Dask DataFrame Structure:</strong></div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>subjectID</th>
+      <th>surveyCategory</th>
+      <th>probability</th>
+    </tr>
+    <tr>
+      <th>npartitions=1</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th></th>
+      <td>int64</td>
+      <td>object</td>
+      <td>float64</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div>Dask Name: getitem, 119 tasks</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">res_dask</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[12]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>subjectID</th>
+      <th>surveyCategory</th>
+      <th>probability</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>withdrawal behavior</td>
+      <td>0.670622</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>positive re-framing</td>
+      <td>0.558974</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Notice the exact same pipeline can be used in all cases, because all three implementations share a large family of commands.</p>
+<p>Note: we have been seeing non-deterministic behavior from <code>dask</code>, we are currently unclear if it is from our <code>dask</code> version or bug in our adaptors.  So the <code>dask</code> path is <em>not</em> ready for general use.</p>
 <h2 id="Export/Import">Export/Import<a class="anchor-link" href="#Export/Import">&#182;</a></h2>
 </div>
 </div>
@@ -13885,7 +14030,7 @@ ORDER BY &#34;subjectID&#34;
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># convert pipeline to simple objects</span>
@@ -13912,11 +14057,7 @@ ORDER BY &#34;subjectID&#34;
               (&#39;table_name&#39;, &#39;d&#39;),
               (&#39;qualifiers&#39;, {}),
               (&#39;column_names&#39;,
-               [&#39;subjectID&#39;,
-                &#39;surveyCategory&#39;,
-                &#39;assessmentTotal&#39;,
-                &#39;irrelevantCol1&#39;,
-                &#39;irrelevantCol2&#39;]),
+               [&#39;subjectID&#39;, &#39;surveyCategory&#39;, &#39;assessmentTotal&#39;]),
               (&#39;key&#39;, &#39;d&#39;)]),
  OrderedDict([(&#39;op&#39;, &#39;Extend&#39;),
               (&#39;ops&#39;, {&#39;probability&#39;: &#39;exp(assessmentTotal * 0.237)&#39;}),
@@ -13934,19 +14075,18 @@ ORDER BY &#34;subjectID&#34;
               (&#39;order_by&#39;, []),
               (&#39;reverse&#39;, [])]),
  OrderedDict([(&#39;op&#39;, &#39;Extend&#39;),
+              (&#39;ops&#39;, {&#39;sort_key&#39;: &#39;-1 * probability&#39;}),
+              (&#39;partition_by&#39;, []),
+              (&#39;order_by&#39;, []),
+              (&#39;reverse&#39;, [])]),
+ OrderedDict([(&#39;op&#39;, &#39;Extend&#39;),
               (&#39;ops&#39;, {&#39;row_number&#39;: &#39;row_number()&#39;}),
               (&#39;partition_by&#39;, [&#39;subjectID&#39;]),
-              (&#39;order_by&#39;, [&#39;probability&#39;, &#39;surveyCategory&#39;]),
-              (&#39;reverse&#39;, [&#39;probability&#39;])]),
+              (&#39;order_by&#39;, [&#39;sort_key&#39;]),
+              (&#39;reverse&#39;, [])]),
  OrderedDict([(&#39;op&#39;, &#39;SelectRows&#39;), (&#39;expr&#39;, &#39;row_number == 1&#39;)]),
  OrderedDict([(&#39;op&#39;, &#39;SelectColumns&#39;),
-              (&#39;columns&#39;, [&#39;subjectID&#39;, &#39;surveyCategory&#39;, &#39;probability&#39;])]),
- OrderedDict([(&#39;op&#39;, &#39;Rename&#39;),
-              (&#39;column_remapping&#39;, {&#39;diagnosis&#39;: &#39;surveyCategory&#39;})]),
- OrderedDict([(&#39;op&#39;, &#39;Order&#39;),
-              (&#39;order_columns&#39;, [&#39;subjectID&#39;]),
-              (&#39;reverse&#39;, []),
-              (&#39;limit&#39;, None)])]
+              (&#39;columns&#39;, [&#39;subjectID&#39;, &#39;surveyCategory&#39;, &#39;probability&#39;])])]
 </pre>
 </div>
 </div>
@@ -13966,7 +14106,7 @@ ORDER BY &#34;subjectID&#34;
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># convert objects to a YAML string</span>
@@ -13991,7 +14131,7 @@ ORDER BY &#34;subjectID&#34;
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> rpy2.ipython
@@ -14004,7 +14144,7 @@ ORDER BY &#34;subjectID&#34;
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span> 
@@ -14037,9 +14177,7 @@ ORDER BY &#34;subjectID&#34;
 <pre>table(d; 
   subjectID,
   surveyCategory,
-  assessmentTotal,
-  irrelevantCol1,
-  irrelevantCol2) %.&gt;%
+  assessmentTotal) %.&gt;%
  extend(.,
   probability := exp(assessmentTotal * 0.237)) %.&gt;%
  extend(.,
@@ -14048,16 +14186,15 @@ ORDER BY &#34;subjectID&#34;
  extend(.,
   probability := probability / total) %.&gt;%
  extend(.,
+  sort_key := -(1) * probability) %.&gt;%
+ extend(.,
   row_number := row_number(),
   p= subjectID,
-  o= &#34;probability&#34; DESC, &#34;surveyCategory&#34;) %.&gt;%
+  o= &#34;sort_key&#34;) %.&gt;%
  select_rows(.,
    row_number == 1) %.&gt;%
  select_columns(.,
-   subjectID, surveyCategory, probability) %.&gt;%
- rename(.,
-  c(&#39;diagnosis&#39; = &#39;surveyCategory&#39;)) %.&gt;%
- orderby(., subjectID)
+   subjectID, surveyCategory, probability)
 </pre>
 </div>
 </div>
@@ -14076,7 +14213,7 @@ ORDER BY &#34;subjectID&#34;
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span> 
@@ -14128,7 +14265,7 @@ ORDER BY &#34;subjectID&#34;
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span> 
@@ -14152,7 +14289,7 @@ ORDER BY &#34;subjectID&#34;
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>   subjectID           diagnosis probability
+<pre>   subjectID      surveyCategory probability
 1:         1 withdrawal behavior   0.6706221
 2:         2 positive re-framing   0.5589742
 </pre>
@@ -14173,7 +14310,7 @@ ORDER BY &#34;subjectID&#34;
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="n">R</span>
@@ -14196,55 +14333,54 @@ ORDER BY &#34;subjectID&#34;
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>SELECT * FROM (
- SELECT
-  &#34;subjectID&#34; AS &#34;subjectID&#34;,
-  &#34;surveyCategory&#34; AS &#34;diagnosis&#34;,
-  &#34;probability&#34; AS &#34;probability&#34;
- FROM (
+<pre>SELECT
+ &#34;subjectID&#34;,
+ &#34;surveyCategory&#34;,
+ &#34;probability&#34;
+FROM (
+ SELECT * FROM (
   SELECT
    &#34;subjectID&#34;,
    &#34;surveyCategory&#34;,
-   &#34;probability&#34;
+   &#34;probability&#34;,
+   row_number ( ) OVER (  PARTITION BY &#34;subjectID&#34; ORDER BY &#34;sort_key&#34; ) AS &#34;row_number&#34;
   FROM (
-   SELECT * FROM (
+   SELECT
+    &#34;subjectID&#34;,
+    &#34;surveyCategory&#34;,
+    &#34;probability&#34;,
+    - ( 1 ) * &#34;probability&#34;  AS &#34;sort_key&#34;
+   FROM (
     SELECT
      &#34;subjectID&#34;,
      &#34;surveyCategory&#34;,
-     &#34;probability&#34;,
-     row_number ( ) OVER (  PARTITION BY &#34;subjectID&#34; ORDER BY &#34;probability&#34; DESC, &#34;surveyCategory&#34; ) AS &#34;row_number&#34;
+     &#34;probability&#34; / &#34;total&#34;  AS &#34;probability&#34;
     FROM (
      SELECT
       &#34;subjectID&#34;,
       &#34;surveyCategory&#34;,
-      &#34;probability&#34; / &#34;total&#34;  AS &#34;probability&#34;
+      &#34;probability&#34;,
+      sum ( &#34;probability&#34; ) OVER (  PARTITION BY &#34;subjectID&#34; ) AS &#34;total&#34;
      FROM (
       SELECT
        &#34;subjectID&#34;,
        &#34;surveyCategory&#34;,
-       &#34;probability&#34;,
-       sum ( &#34;probability&#34; ) OVER (  PARTITION BY &#34;subjectID&#34; ) AS &#34;total&#34;
+       exp ( &#34;assessmentTotal&#34; * 0.237 )  AS &#34;probability&#34;
       FROM (
        SELECT
         &#34;subjectID&#34;,
         &#34;surveyCategory&#34;,
-        exp ( &#34;assessmentTotal&#34; * 0.237 )  AS &#34;probability&#34;
-       FROM (
-        SELECT
-         &#34;subjectID&#34;,
-         &#34;surveyCategory&#34;,
-         &#34;assessmentTotal&#34;
-        FROM
-         &#34;d&#34;
-        ) tsql_30847316539397090681_0000000000
-       ) tsql_30847316539397090681_0000000001
-      ) tsql_30847316539397090681_0000000002
-     ) tsql_30847316539397090681_0000000003
-   ) tsql_30847316539397090681_0000000004
-   WHERE &#34;row_number&#34; = 1
-  ) tsql_30847316539397090681_0000000005
- ) tsql_30847316539397090681_0000000006
-) tsql_30847316539397090681_0000000007 ORDER BY &#34;subjectID&#34;
+        &#34;assessmentTotal&#34;
+       FROM
+        &#34;d&#34;
+       ) tsql_31865227688795524131_0000000000
+      ) tsql_31865227688795524131_0000000001
+     ) tsql_31865227688795524131_0000000002
+    ) tsql_31865227688795524131_0000000003
+   ) tsql_31865227688795524131_0000000004
+ ) tsql_31865227688795524131_0000000005
+ WHERE &#34;row_number&#34; = 1
+) tsql_31865227688795524131_0000000006
 </pre>
 </div>
 </div>
@@ -14282,79 +14418,11 @@ ORDER BY &#34;subjectID&#34;
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># report all tables used by the query, by name</span>
 <span class="n">ops</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[18]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>{&#39;d&#39;: TableDescription(table_name=&#39;d&#39;, column_names=[&#39;subjectID&#39;, &#39;surveyCategory&#39;, &#39;assessmentTotal&#39;, &#39;irrelevantCol1&#39;, &#39;irrelevantCol2&#39;])}</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[19]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># report all source table columns used by the query</span>
-<span class="n">ops</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[19]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>{&#39;d&#39;: {&#39;assessmentTotal&#39;, &#39;subjectID&#39;, &#39;surveyCategory&#39;}}</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[20]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># what columns does this operation produce?</span>
-<span class="n">ops</span><span class="o">.</span><span class="n">column_names</span>
 </pre></div>
 
     </div>
@@ -14373,7 +14441,75 @@ ORDER BY &#34;subjectID&#34;
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[&#39;subjectID&#39;, &#39;diagnosis&#39;, &#39;probability&#39;]</pre>
+<pre>{&#39;d&#39;: TableDescription(table_name=&#39;d&#39;, column_names=[&#39;subjectID&#39;, &#39;surveyCategory&#39;, &#39;assessmentTotal&#39;])}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># report all source table columns used by the query</span>
+<span class="n">ops</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[21]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{&#39;d&#39;: {&#39;assessmentTotal&#39;, &#39;subjectID&#39;, &#39;surveyCategory&#39;}}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># what columns does this operation produce?</span>
+<span class="n">ops</span><span class="o">.</span><span class="n">column_names</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[22]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&#39;subjectID&#39;, &#39;surveyCategory&#39;, &#39;probability&#39;]</pre>
 </div>
 
 </div>
@@ -14401,7 +14537,7 @@ ORDER BY &#34;subjectID&#34;
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># land the pipeline as a file</span>
@@ -14418,7 +14554,7 @@ ORDER BY &#34;subjectID&#34;
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># read back</span>
@@ -14443,31 +14579,19 @@ ORDER BY &#34;subjectID&#34;
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>TableDescription(
-    table_name=&#34;d&#34;,
-    column_names=[
-        &#34;subjectID&#34;,
-        &#34;surveyCategory&#34;,
-        &#34;assessmentTotal&#34;,
-        &#34;irrelevantCol1&#34;,
-        &#34;irrelevantCol2&#34;,
-    ],
+    table_name=&#34;d&#34;, column_names=[&#34;subjectID&#34;, &#34;surveyCategory&#34;, &#34;assessmentTotal&#34;]
 ).extend({&#34;probability&#34;: &#34;(assessmentTotal * 0.237).exp()&#34;}).extend(
     {&#34;total&#34;: &#34;probability.sum()&#34;}, partition_by=[&#34;subjectID&#34;]
 ).extend(
     {&#34;probability&#34;: &#34;probability / total&#34;}
 ).extend(
-    {&#34;row_number&#34;: &#34;_row_number()&#34;},
-    partition_by=[&#34;subjectID&#34;],
-    order_by=[&#34;probability&#34;, &#34;surveyCategory&#34;],
-    reverse=[&#34;probability&#34;],
+    {&#34;sort_key&#34;: &#34;-1 * probability&#34;}
+).extend(
+    {&#34;row_number&#34;: &#34;_row_number()&#34;}, partition_by=[&#34;subjectID&#34;], order_by=[&#34;sort_key&#34;]
 ).select_rows(
     &#34;row_number == 1&#34;
 ).select_columns(
     [&#34;subjectID&#34;, &#34;surveyCategory&#34;, &#34;probability&#34;]
-).rename_columns(
-    {&#34;diagnosis&#34;: &#34;surveyCategory&#34;}
-).order_rows(
-    [&#34;subjectID&#34;]
 )
 
 </pre>
@@ -14480,7 +14604,7 @@ ORDER BY &#34;subjectID&#34;
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># confirm we have a data_algebra.data_ops.ViewRepresentation</span>
@@ -14498,7 +14622,7 @@ ORDER BY &#34;subjectID&#34;
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[23]:</div>
+    <div class="prompt output_prompt">Out[25]:</div>
 
 
 
@@ -14515,7 +14639,7 @@ ORDER BY &#34;subjectID&#34;
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="prompt input_prompt">In&nbsp;[26]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># be neat</span>
