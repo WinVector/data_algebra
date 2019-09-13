@@ -203,6 +203,8 @@ class ViewRepresentation(OperatorPlatform):
             eval_env = globals()
         if data_model is None:
             data_model = data_algebra.pandas_model.PandasModel()
+        if not isinstance(data_model, data_algebra.pandas_model.PandasModel):
+            raise TypeError("Expected data_model to derive from data_algebra.pandas_model.PandasModel")
         tables = self.get_tables()
         for k in tables.keys():
             if k not in data_map.keys():
@@ -232,6 +234,8 @@ class ViewRepresentation(OperatorPlatform):
             eval_env = globals()
         if data_model is None:
             data_model = data_algebra.dask_model.DaskModel()
+        if not isinstance(data_model, data_algebra.dask_model.DaskModel):
+            raise TypeError("Expected data_model to derive from data_algebra.dask_model.DaskModel")
         tables = self.get_tables()
         for k in tables.keys():
             if k not in data_map.keys():
@@ -260,7 +264,9 @@ class ViewRepresentation(OperatorPlatform):
         if eval_env is None:
             eval_env = globals()
         if data_model is None:
-            data_model = data_algebra.dask_model.DataTableModel()
+            data_model = data_algebra.datatable_model.DataTableModel()
+        if not isinstance(data_model, data_algebra.datatable_model.DataTableModel):
+            raise TypeError("Expected data_model to derive from data_algebra.datatable_model.DataTableModel")
         tables = self.get_tables()
         for k in tables.keys():
             if k not in data_map.keys():
@@ -270,6 +276,25 @@ class ViewRepresentation(OperatorPlatform):
         return self.eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=data_model
         )
+
+    def eval(self, data_map, *, eval_env=None, data_model=None):
+        if len(data_map) < 1:
+            raise Exception("Expected data_map to be non-empty")
+        k = [k for k in data_map.keys()][0]
+        x = data_map[k]
+        if isinstance(x, pandas.DataFrame):
+            return self.eval_pandas(
+                data_map=data_map, eval_env=eval_env, data_model=data_model
+            )
+        if data_algebra.data_types.is_dask_data_frame(x):
+            return self.eval_dask(
+                data_map=data_map, eval_env=eval_env, data_model=data_model
+            )
+        if data_algebra.data_types.is_datatable_frame(x):
+            return self.eval_datatable(
+                data_map=data_map, eval_env=eval_env, data_model=data_model
+            )
+        raise TypeError("can not apply eval() to type " + str(type(x)))
 
     # implement builders for all non-initial node types on base class
 
