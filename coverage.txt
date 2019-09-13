@@ -2,20 +2,21 @@
 platform darwin -- Python 3.6.9, pytest-5.0.1, py-1.8.0, pluggy-0.12.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.7.1
-collected 18 items
+collected 19 items
 
 tests/test_apply.py .                                                    [  5%]
-tests/test_cdata1.py .                                                   [ 11%]
-tests/test_dask.py ..                                                    [ 22%]
-tests/test_drop_columns.py .                                             [ 27%]
-tests/test_example_data_ops.py .                                         [ 33%]
-tests/test_exp.py .                                                      [ 38%]
-tests/test_natural_join.py .                                             [ 44%]
-tests/test_neg.py .                                                      [ 50%]
-tests/test_null_bad.py .                                                 [ 55%]
-tests/test_parse.py .                                                    [ 61%]
-tests/test_poject.py .                                                   [ 66%]
-tests/test_scoring_example.py .                                          [ 72%]
+tests/test_cdata1.py .                                                   [ 10%]
+tests/test_dask.py ..                                                    [ 21%]
+tests/test_datatable.py .                                                [ 26%]
+tests/test_drop_columns.py .                                             [ 31%]
+tests/test_example_data_ops.py .                                         [ 36%]
+tests/test_exp.py .                                                      [ 42%]
+tests/test_natural_join.py .                                             [ 47%]
+tests/test_neg.py .                                                      [ 52%]
+tests/test_null_bad.py .                                                 [ 57%]
+tests/test_parse.py .                                                    [ 63%]
+tests/test_poject.py .                                                   [ 68%]
+tests/test_scoring_example.py .                                          [ 73%]
 tests/test_simple.py ....                                                [ 94%]
 tests/test_sqlite.py .                                                   [100%]
 
@@ -29,10 +30,10 @@ data_algebra/cdata.py                48      4    92%
 data_algebra/cdata_impl.py           92     15    84%
 data_algebra/dask_model.py          118     22    81%
 data_algebra/data_model.py           39     14    64%
-data_algebra/data_ops.py            660    149    77%
+data_algebra/data_ops.py            660    134    80%
 data_algebra/data_pipe.py           156     33    79%
-data_algebra/data_types.py           56     35    38%
-data_algebra/datatable_model.py      81     62    23%
+data_algebra/data_types.py           56     30    46%
+data_algebra/datatable_model.py      81     48    41%
 data_algebra/db_model.py            349     74    79%
 data_algebra/env.py                  54     12    78%
 data_algebra/expr_rep.py            294     86    71%
@@ -42,7 +43,7 @@ data_algebra/pipe.py                 65     19    71%
 data_algebra/util.py                 72      6    92%
 data_algebra/yaml.py                 76     11    86%
 -----------------------------------------------------
-TOTAL                              2424    611    75%
+TOTAL                              2424    577    76%
 
 
-========================== 18 passed in 7.45 seconds ===========================
+========================== 19 passed in 6.15 seconds ===========================

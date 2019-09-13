@@ -35,7 +35,7 @@ class DataTableModel(data_algebra.data_model.DataModel):
         self.assert_is_appropriate_data_instance(df, 'data_map[' + op.table_name + ']')
         # check all columns we expect are present
         columns_using = df.names
-        missing = set(columns_using) - set([c for c in df.columns])
+        missing = set(columns_using) - set([c for c in df.names])
         if len(missing) > 0:
             raise ValueError("missing required columns: " + str(missing))
         # make a copy of the data to isolate side-effects and not deal with indices
@@ -102,7 +102,7 @@ class DataTableModel(data_algebra.data_model.DataModel):
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self
         )
-        raise RuntimeError("not implemented yet")  # TODO: implement
+        return res[:, op.column_names]
 
     def drop_columns_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.DropColumnsNode):
@@ -112,8 +112,8 @@ class DataTableModel(data_algebra.data_model.DataModel):
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self
         )
-        column_selection = [c for c in res.columns if c not in op.column_deletions]
-        raise RuntimeError("not implemented yet")  # TODO: implement
+        column_selection = [c for c in res.names if c not in op.column_deletions]
+        return res[:, column_selection]
 
     def order_rows_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.OrderRowsNode):
@@ -149,7 +149,7 @@ class DataTableModel(data_algebra.data_model.DataModel):
         right = op.sources[1].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self
         )
-        common_cols = set([c for c in left.columns]).intersection(
-            [c for c in right.columns]
+        common_cols = set([c for c in left.names]).intersection(
+            [c for c in right.names]
         )
         raise RuntimeError("not implemented yet")  # TODO: implement
