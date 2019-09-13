@@ -13563,33 +13563,33 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>SELECT &#34;subjectid&#34;,
-       &#34;surveycategory&#34;,
+<pre>SELECT &#34;surveycategory&#34;,
+       &#34;subjectid&#34;,
        &#34;probability&#34;
 FROM
-  (SELECT &#34;subjectid&#34;,
-          &#34;surveycategory&#34;,
+  (SELECT &#34;surveycategory&#34;,
+          &#34;subjectid&#34;,
           &#34;probability&#34;
    FROM
-     (SELECT &#34;probability&#34;,
-             &#34;subjectid&#34;,
+     (SELECT &#34;subjectid&#34;,
              &#34;surveycategory&#34;,
+             &#34;probability&#34;,
              &#34;sort_key&#34;,
              ROW_NUMBER() OVER (PARTITION BY &#34;subjectid&#34;
                                 ORDER BY &#34;sort_key&#34;) AS &#34;row_number&#34;
       FROM
-        (SELECT &#34;subjectid&#34;,
+        (SELECT &#34;probability&#34;,
+                &#34;subjectid&#34;,
                 &#34;surveycategory&#34;,
-                &#34;probability&#34;,
                 -1 * &#34;probability&#34; AS &#34;sort_key&#34;
          FROM
-           (SELECT &#34;surveycategory&#34;,
-                   &#34;subjectid&#34;,
+           (SELECT &#34;subjectid&#34;,
+                   &#34;surveycategory&#34;,
                    &#34;probability&#34; / &#34;total&#34; AS &#34;probability&#34;
             FROM
-              (SELECT &#34;probability&#34;,
-                      &#34;surveycategory&#34;,
+              (SELECT &#34;surveycategory&#34;,
                       &#34;subjectid&#34;,
+                      &#34;probability&#34;,
                       SUM(&#34;probability&#34;) OVER (PARTITION BY &#34;subjectid&#34;) AS &#34;total&#34;
                FROM
                  (SELECT &#34;subjectid&#34;,
@@ -13659,22 +13659,22 @@ FROM
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>subjectid</th>
       <th>surveycategory</th>
+      <th>subjectid</th>
       <th>probability</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>1.0</td>
       <td>withdrawal behavior</td>
+      <td>1.0</td>
       <td>0.670622</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>2.0</td>
       <td>positive re-framing</td>
+      <td>2.0</td>
       <td>0.558974</td>
     </tr>
   </tbody>
@@ -13850,7 +13850,7 @@ FROM
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><code>eval_pandas</code> takes a dictionary of <code>Pandas</code> <code>DataFrame</code>s (names matching names specified in the pipeline) and returns the result of applying the pipeline to the data using <code>Pandas</code> commands.  Currently our <code>Pandas</code> implementation only allows very simple window functions.  This is why we didn't write <code>probability = probability/sum(probability)</code>, but instead broken the calculation into multiple steps by introducing the <code>total</code> column (the <code>SQL</code> realization does in fact support more complex window functions).  This is a small issue with the grammar: but our feeling encourage simple steps is in fact a good thing (improves debuggability), and in <code>SQL</code> the query optimizers likely optimize the different query styles into very similar realizations anyway.</p>
-<h3 id="dask"><code>dask</code><a class="anchor-link" href="#dask">&#182;</a></h3><p>We can (in principle) also apply our transforms to <code>dask</code> objects, meaning we can work at a large range of data sizes (<code>Pandas</code>, <code>dask</code>, <code>SQL</code> <code>PostgreSQL</code>, and <code>Apache Spark</code>).</p>
+<h3 id="dask"><code>dask</code><a class="anchor-link" href="#dask">&#182;</a></h3><p>We can also apply our transforms to <code>dask</code> objects, meaning we can work at a large range of data sizes (<code>Pandas</code>, <code>dask</code>, <code>SQL</code> <code>PostgreSQL</code>, and <code>Apache Spark</code>).</p>
 
 </div>
 </div>
@@ -13876,18 +13876,6 @@ FROM
 <div class="output_wrapper">
 <div class="output">
 
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>/Users/johnmount/anaconda3/envs/aiAcademy/lib/python3.6/site-packages/data_algebra/data_ops.py:553: RuntimeWarning: extend window functions over dask do not appear to be reliable yet
-  return pandas_model.extend_step(op=self, data_map=data_map, eval_env=eval_env)
-</pre>
-</div>
-</div>
 
 <div class="output_area">
 
@@ -13920,7 +13908,7 @@ FROM
       <th>probability</th>
     </tr>
     <tr>
-      <th>npartitions=1</th>
+      <th>npartitions=2</th>
       <th></th>
       <th></th>
       <th></th>
@@ -13939,10 +13927,16 @@ FROM
       <td>...</td>
       <td>...</td>
     </tr>
+    <tr>
+      <th></th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
   </tbody>
 </table>
 </div>
-<div>Dask Name: getitem, 113 tasks</div>
+<div>Dask Name: getitem, 164 tasks</div>
 </div>
 
 </div>
@@ -14005,7 +13999,7 @@ FROM
       <td>0.670622</td>
     </tr>
     <tr>
-      <th>1</th>
+      <th>0</th>
       <td>2</td>
       <td>positive re-framing</td>
       <td>0.558974</td>
@@ -14025,7 +14019,6 @@ FROM
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Notice the exact same pipeline can be used in all cases, because all three implementations share a large family of commands.</p>
-<p>Note: we have been seeing non-deterministic behavior from <code>dask</code>, we are currently unclear if it is from our <code>dask</code> version or bug in our adaptors.  So the <code>dask</code> path is <em>not</em> ready for general use.</p>
 <h2 id="Export/Import">Export/Import<a class="anchor-link" href="#Export/Import">&#182;</a></h2>
 </div>
 </div>
@@ -14385,14 +14378,14 @@ FROM (
         &#34;assessmentTotal&#34;
        FROM
         &#34;d&#34;
-       ) tsql_66636711838767033761_0000000000
-      ) tsql_66636711838767033761_0000000001
-     ) tsql_66636711838767033761_0000000002
-    ) tsql_66636711838767033761_0000000003
-   ) tsql_66636711838767033761_0000000004
- ) tsql_66636711838767033761_0000000005
+       ) tsql_42760821275482642023_0000000000
+      ) tsql_42760821275482642023_0000000001
+     ) tsql_42760821275482642023_0000000002
+    ) tsql_42760821275482642023_0000000003
+   ) tsql_42760821275482642023_0000000004
+ ) tsql_42760821275482642023_0000000005
  WHERE &#34;row_number&#34; = 1
-) tsql_66636711838767033761_0000000006
+) tsql_42760821275482642023_0000000006
 </pre>
 </div>
 </div>
