@@ -4,7 +4,9 @@ import collections
 import pandas
 
 import data_algebra
+import data_algebra.data_model
 import data_algebra.data_types
+import data_algebra.db_model
 import data_algebra.pandas_model
 import data_algebra.dask_model
 import data_algebra.datatable_model
@@ -170,6 +172,8 @@ class ViewRepresentation(OperatorPlatform):
     def to_sql(self, db_model, *, pretty=False, encoding=None, sqlparse_options=None):
         if sqlparse_options is None:
             sqlparse_options = {"reindent": True, "keyword_case": "upper"}
+        if not isinstance(db_model, data_algebra.db_model.DBModel):
+            raise TypeError("Expected db_model to be derived from data_algebra.db_model.DBModel")
         self.get_tables()  # for table consistency check/raise
         temp_id_source = [0]
         sql_str = self.to_sql_implementation(
@@ -279,7 +283,10 @@ class ViewRepresentation(OperatorPlatform):
 
     def eval(self, data_map, *, eval_env=None, data_model=None):
         if len(data_map) < 1:
-            raise Exception("Expected data_map to be non-empty")
+            raise ValueError("Expected data_map to be non-empty")
+        if data_model is not None:
+            if not isinstance(data_model, data_algebra.data_model.DataModel):
+                raise TypeError("Expected data_model to be derived from data_algebra.data_model.DataModel")
         k = [k for k in data_map.keys()][0]
         x = data_map[k]
         if isinstance(x, pandas.DataFrame):
@@ -300,6 +307,9 @@ class ViewRepresentation(OperatorPlatform):
 
     # noinspection PyPep8Naming
     def transform(self, X, *, eval_env=None, data_model=None):
+        if data_model is not None:
+            if not isinstance(data_model, data_algebra.data_model.DataModel):
+                raise TypeError("Expected data_model to be derived from data_algebra.data_model.DataModel")
         tables = self.get_tables()
         if len(tables) != 1:
             raise ValueError(

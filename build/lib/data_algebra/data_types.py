@@ -6,6 +6,7 @@ import data_algebra
 try:
     # noinspection PyUnresolvedReferences
     import dask
+    # noinspection PyUnresolvedReferences
     import dask.dataframe
 except ImportError:
     pass
@@ -71,7 +72,7 @@ def convert_to_pandas_dataframe(d, arg_name=None):
         if isinstance(d, dask.dataframe.DataFrame):
             d = d.compute()
             if not isinstance(d, pandas.DataFrame):
-                raise Exception(
+                raise RuntimeError(
                     "conversion from " + str(type(d)) + " to pandas.DataFrame failed"
                 )
             return d
