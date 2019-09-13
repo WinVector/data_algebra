@@ -13563,18 +13563,18 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>SELECT &#34;surveycategory&#34;,
+<pre>SELECT &#34;probability&#34;,
        &#34;subjectid&#34;,
-       &#34;probability&#34;
+       &#34;surveycategory&#34;
 FROM
-  (SELECT &#34;surveycategory&#34;,
+  (SELECT &#34;probability&#34;,
           &#34;subjectid&#34;,
-          &#34;probability&#34;
+          &#34;surveycategory&#34;
    FROM
-     (SELECT &#34;subjectid&#34;,
-             &#34;surveycategory&#34;,
+     (SELECT &#34;sort_key&#34;,
              &#34;probability&#34;,
-             &#34;sort_key&#34;,
+             &#34;subjectid&#34;,
+             &#34;surveycategory&#34;,
              ROW_NUMBER() OVER (PARTITION BY &#34;subjectid&#34;
                                 ORDER BY &#34;sort_key&#34;) AS &#34;row_number&#34;
       FROM
@@ -13587,9 +13587,9 @@ FROM
                    &#34;surveycategory&#34;,
                    &#34;probability&#34; / &#34;total&#34; AS &#34;probability&#34;
             FROM
-              (SELECT &#34;surveycategory&#34;,
+              (SELECT &#34;probability&#34;,
                       &#34;subjectid&#34;,
-                      &#34;probability&#34;,
+                      &#34;surveycategory&#34;,
                       SUM(&#34;probability&#34;) OVER (PARTITION BY &#34;subjectid&#34;) AS &#34;total&#34;
                FROM
                  (SELECT &#34;subjectid&#34;,
@@ -13597,8 +13597,8 @@ FROM
                          EXP((&#34;assessmenttotal&#34; * 0.237)) AS &#34;probability&#34;
                   FROM
                     (SELECT &#34;assessmenttotal&#34;,
-                            &#34;surveycategory&#34;,
-                            &#34;subjectid&#34;
+                            &#34;subjectid&#34;,
+                            &#34;surveycategory&#34;
                      FROM &#34;d&#34;) &#34;sq_0&#34;) &#34;sq_1&#34;) &#34;sq_2&#34;) &#34;sq_3&#34;) &#34;sq_4&#34;) &#34;sq_5&#34;
    WHERE &#34;row_number&#34; = 1 ) &#34;sq_6&#34;
 </pre>
@@ -13659,23 +13659,23 @@ FROM
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>surveycategory</th>
-      <th>subjectid</th>
       <th>probability</th>
+      <th>subjectid</th>
+      <th>surveycategory</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>withdrawal behavior</td>
-      <td>1.0</td>
       <td>0.670622</td>
+      <td>1.0</td>
+      <td>withdrawal behavior</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>positive re-framing</td>
-      <td>2.0</td>
       <td>0.558974</td>
+      <td>2.0</td>
+      <td>positive re-framing</td>
     </tr>
   </tbody>
 </table>
@@ -14378,14 +14378,14 @@ FROM (
         &#34;assessmentTotal&#34;
        FROM
         &#34;d&#34;
-       ) tsql_42760821275482642023_0000000000
-      ) tsql_42760821275482642023_0000000001
-     ) tsql_42760821275482642023_0000000002
-    ) tsql_42760821275482642023_0000000003
-   ) tsql_42760821275482642023_0000000004
- ) tsql_42760821275482642023_0000000005
+       ) tsql_04710387448375397725_0000000000
+      ) tsql_04710387448375397725_0000000001
+     ) tsql_04710387448375397725_0000000002
+    ) tsql_04710387448375397725_0000000003
+   ) tsql_04710387448375397725_0000000004
+ ) tsql_04710387448375397725_0000000005
  WHERE &#34;row_number&#34; = 1
-) tsql_42760821275482642023_0000000006
+) tsql_04710387448375397725_0000000006
 </pre>
 </div>
 </div>
@@ -14398,7 +14398,7 @@ FROM (
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The <code>R</code> implementation is mature, and appropriate to use in production.  The <a href="https://github.com/WinVector/rquery"><code>rquery</code></a> grammar is designed to have minimal state and minimal annotations (no grouping or ordering annotations!).  This makes the grammar, in my opinion, a good design choice. <code>rquery</code> has very good performance, often much faster than <code>dplyr</code> or base-<code>R</code> due to its query generation ideas and use of <a href="https://CRAN.R-project.org/package=data.table"><code>data.table</code></a> via <a href="https://CRAN.R-project.org/package=rqdatatable"><code>rqdatatable</code></a>.  <code>rquery</code> is a mature pure <code>R</code> package; <a href="https://github.com/WinVector/rquery/blob/master/README.md">here</a> is the same example being worked directly in <code>R</code>, with no translation from <code>Python</code>.</p>
-<p>The <code>R</code> implementation supports additional features such as converting a pipeline into a diagram (though that would also be easy to implement in <code>Python</code> on top of the <code>collect_representation()</code> objects).</p>
+<p>The <code>R</code> implementation supports additional features such as <a href="https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/BuildDiagram.md">converting a pipeline into a diagram</a> (though that would also be easy to implement in <code>Python</code> on top of the <code>collect_representation()</code> objects).</p>
 
 </div>
 </div>
@@ -14406,7 +14406,7 @@ FROM (
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><img src="https://github.com/WinVector/rquery/raw/master/Examples/yaml/yaml_files/figure-gfm/diagram-1.png" alt=""></p>
+<p><img src="https://github.com/WinVector/data_algebra/raw/master/Examples/LogisticExample/BuildDiagram_files/figure-gfm/diagram-1.png" alt=""></p>
 
 </div>
 </div>

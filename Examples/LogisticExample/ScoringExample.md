@@ -333,18 +333,18 @@ sql = ops.to_sql(db_model, pretty=True)
 print(sql)
 ```
 
-    SELECT "surveycategory",
+    SELECT "probability",
            "subjectid",
-           "probability"
+           "surveycategory"
     FROM
-      (SELECT "surveycategory",
+      (SELECT "probability",
               "subjectid",
-              "probability"
+              "surveycategory"
        FROM
-         (SELECT "subjectid",
-                 "surveycategory",
+         (SELECT "sort_key",
                  "probability",
-                 "sort_key",
+                 "subjectid",
+                 "surveycategory",
                  ROW_NUMBER() OVER (PARTITION BY "subjectid"
                                     ORDER BY "sort_key") AS "row_number"
           FROM
@@ -357,9 +357,9 @@ print(sql)
                        "surveycategory",
                        "probability" / "total" AS "probability"
                 FROM
-                  (SELECT "surveycategory",
+                  (SELECT "probability",
                           "subjectid",
-                          "probability",
+                          "surveycategory",
                           SUM("probability") OVER (PARTITION BY "subjectid") AS "total"
                    FROM
                      (SELECT "subjectid",
@@ -367,8 +367,8 @@ print(sql)
                              EXP(("assessmenttotal" * 0.237)) AS "probability"
                       FROM
                         (SELECT "assessmenttotal",
-                                "surveycategory",
-                                "subjectid"
+                                "subjectid",
+                                "surveycategory"
                          FROM "d") "sq_0") "sq_1") "sq_2") "sq_3") "sq_4") "sq_5"
        WHERE "row_number" = 1 ) "sq_6"
 
@@ -403,23 +403,23 @@ db_model.read_query(conn, sql)
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>surveycategory</th>
-      <th>subjectid</th>
       <th>probability</th>
+      <th>subjectid</th>
+      <th>surveycategory</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>withdrawal behavior</td>
-      <td>1.0</td>
       <td>0.670622</td>
+      <td>1.0</td>
+      <td>withdrawal behavior</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>positive re-framing</td>
-      <td>2.0</td>
       <td>0.558974</td>
+      <td>2.0</td>
+      <td>positive re-framing</td>
     </tr>
   </tbody>
 </table>
@@ -867,21 +867,21 @@ cat(sql)
             "assessmentTotal"
            FROM
             "d"
-           ) tsql_42760821275482642023_0000000000
-          ) tsql_42760821275482642023_0000000001
-         ) tsql_42760821275482642023_0000000002
-        ) tsql_42760821275482642023_0000000003
-       ) tsql_42760821275482642023_0000000004
-     ) tsql_42760821275482642023_0000000005
+           ) tsql_04710387448375397725_0000000000
+          ) tsql_04710387448375397725_0000000001
+         ) tsql_04710387448375397725_0000000002
+        ) tsql_04710387448375397725_0000000003
+       ) tsql_04710387448375397725_0000000004
+     ) tsql_04710387448375397725_0000000005
      WHERE "row_number" = 1
-    ) tsql_42760821275482642023_0000000006
+    ) tsql_04710387448375397725_0000000006
 
 
 The `R` implementation is mature, and appropriate to use in production.  The [`rquery`](https://github.com/WinVector/rquery) grammar is designed to have minimal state and minimal annotations (no grouping or ordering annotations!).  This makes the grammar, in my opinion, a good design choice. `rquery` has very good performance, often much faster than `dplyr` or base-`R` due to its query generation ideas and use of [`data.table`](https://CRAN.R-project.org/package=data.table) via [`rqdatatable`](https://CRAN.R-project.org/package=rqdatatable).  `rquery` is a mature pure `R` package; [here](https://github.com/WinVector/rquery/blob/master/README.md) is the same example being worked directly in `R`, with no translation from `Python`. 
 
-The `R` implementation supports additional features such as converting a pipeline into a diagram (though that would also be easy to implement in `Python` on top of the `collect_representation()` objects).  
+The `R` implementation supports additional features such as [converting a pipeline into a diagram](https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/BuildDiagram.md) (though that would also be easy to implement in `Python` on top of the `collect_representation()` objects).  
 
-![](https://github.com/WinVector/rquery/raw/master/Examples/yaml/yaml_files/figure-gfm/diagram-1.png)
+![](https://github.com/WinVector/data_algebra/raw/master/Examples/LogisticExample/BuildDiagram_files/figure-gfm/diagram-1.png)
 
 More of the `R` example (including how the diagram was produced) can be found [here](https://github.com/WinVector/rquery/blob/master/Examples/yaml/yaml.md).
 
