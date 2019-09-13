@@ -17,13 +17,12 @@ except ImportError:
     pass
 
 
-have_warned_about_dask = False
-
 # Some dask notes:
 #  https://examples.dask.org/dataframes/02-groupby.html#
 #  https://stackoverflow.com/questions/43207926/groupby-transform-doesnt-work-in-dask-dataframe
 #  https://github.com/dask/dask/issues/2536
 #
+
 
 class DaskModel(data_algebra.pandas_model.PandasModel):
     def __init__(self):
@@ -41,7 +40,6 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
         return res
 
     def extend_step(self, op, *, data_map, eval_env):
-        global have_warned_about_dask
         if not isinstance(op, data_algebra.data_ops.ExtendNode):
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
         window_situation = (len(op.partition_by) > 0) or (len(op.order_by) > 0)
@@ -54,20 +52,19 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
             raise RuntimeError("ExtendNode doesn't support more than one order column over dask yet")
         if len(op.reverse) > 0:
             raise RuntimeError("ExtendNode on dask doesn't support reverse sorting yet")
-        if not have_warned_about_dask:
-            warnings.warn("extend window functions over dask do not appear to be reliable yet",
-                          RuntimeWarning, stacklevel=2)
-            have_warned_about_dask = True
         # get incoming data
         res = op.sources[0].eval_pandas_implementation(data_map=data_map,
                                                        eval_env=eval_env,
                                                        pandas_model=self)
         # move to case where we have exactly one ordering column and one grouping column
-        temp_col = '_data_algebra_temp_index'
+        row_id_col = '_data_algebra_temp_row_id'
+
         res = res.reset_index(drop=True)
-        res[temp_col] = res.index
-        res = res.set_index(res[temp_col])
-        columns_to_remove = [temp_col]
+        # build unique row IDs
+        res[row_id_col] = 1
+        res[row_id_col] = res.groupby(row_id_col).cumcount()
+        res = res.set_index(res[row_id_col])
+        columns_to_remove = [row_id_col]
         if len(op.partition_by) < 1:
             group_col = '_data_algebra_temp_group'
             columns_to_remove.append(group_col)
@@ -86,29 +83,31 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
             if len(opk.args) > 0:
                 # aggregate column case
                 value_col = opk.args[0].to_pandas()
-                dsub = res.loc[:, [group_col, value_col, temp_col]]
+
+                dsub = res.loc[:, [group_col, value_col, row_id_col]]
                 if opk.op == 'sum':
                     dagg = dsub.groupby(dsub[group_col]).sum()
                 else:  # TODO: implement more of these
                     raise KeyError("not implemented: " + str(k) + ": " + str(opk))
-                dagg = dagg.reset_index(drop=False)
-                dagg = dagg.set_index(dagg[group_col])
-                dsub = dsub.set_index(dsub[group_col])
-                dsub[result_col] = dagg[value_col]
-                dsub = dsub.set_index(dsub[temp_col])
+                dagg = dagg.drop([row_id_col], axis=1)
+                dagg.columns = [result_col]
+                dsub = dsub.drop([value_col], axis=1)
+                dsub = dsub.join(dagg, on=[group_col])
+                dsub = dsub.set_index(dsub[row_id_col])
                 res[result_col] = dsub[result_col]
             else:
                 # free window case such as rownumber or count
-                dsub = res.loc[:, [group_col, order_col, temp_col]]
+                dsub = res.loc[:, [group_col, order_col, row_id_col]]
                 dsub = dsub.set_index(dsub[order_col])
                 if opk.op == "row_number":
                     dsub[result_col] = dsub.groupby(group_col).cumcount() + 1
                 else:  # TODO: implement more of these
                     raise KeyError("not implemented: " + str(k) + ": " + str(opk))
-                dsub = dsub.set_index(dsub[temp_col])
+                dsub = dsub.set_index(dsub[row_id_col])
                 res[result_col] = dsub[result_col]
         for c in columns_to_remove:
-            res[c] = None
+            if c in res.columns:
+                res = res.drop(c, axis=1)
         res = res.reset_index(drop=True)
         return res
 
