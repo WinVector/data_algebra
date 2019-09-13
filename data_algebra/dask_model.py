@@ -108,7 +108,8 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
                 dsub = dsub.set_index(dsub[temp_col])
                 res[result_col] = dsub[result_col]
         for c in columns_to_remove:
-            res[c] = None
+            if c in res.columns:
+                res = res.drop(c, axis=1)
         res = res.reset_index(drop=True)
         return res
 
