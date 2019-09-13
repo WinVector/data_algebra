@@ -95,9 +95,10 @@ def test_dask2():
             extend({'total': 'probability.sum()'},
                    partition_by='subjectID'). \
             extend({'probability': 'probability/total'}). \
+            extend({'sort_key': '-1*probability'}). \
             extend({'row_number': '_row_number()'},
                    partition_by=['subjectID'],
-                   order_by=['probability']). \
+                   order_by=['sort_key']). \
             select_rows('row_number==1'). \
             select_columns(['subjectID', 'surveyCategory', 'probability']). \
             rename_columns({'diagnosis': 'surveyCategory'}). \
@@ -115,14 +116,14 @@ def test_dask2():
     res_dask_p = ops_p.transform(d_dask)
     res_t_p = res_dask_p.compute()
 
-    # res_dask = ops.transform(d_dask)
-    # res_t = res_dask.compute()
-    #
-    # expect = pandas.DataFrame(
-    #     {
-    #         "subjectID": [1, 2],
-    #         "diagnosis": ["withdrawal behavior", "positive re-framing"],
-    #         "probability": [0.670622, 0.558974],
-    #     }
-    # )
-    # assert data_algebra.util.equivalent_frames(expect, res_t, float_tol=1e-3)
+    res_dask = ops.transform(d_dask)
+    res_t = res_dask.compute()
+
+    expect = pandas.DataFrame(
+        {
+            "subjectID": [1, 2],
+            "diagnosis": ["withdrawal behavior", "positive re-framing"],
+            "probability": [0.670622, 0.558974],
+        }
+    )
+    assert data_algebra.util.equivalent_frames(expect, res_t, float_tol=1e-3)
