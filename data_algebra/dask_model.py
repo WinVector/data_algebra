@@ -26,6 +26,32 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
     def __init__(self):
         data_algebra.pandas_model.PandasModel.__init__(self)
 
+    def assert_is_appropriate_data_instance(self, df, arg_name=''):
+        if not isinstance(df, dask.dataframe.DataFrame):
+            raise TypeError(arg_name + " was supposed to be a dask.dataframe.DataFrame")
+
+    # noinspection PyMethodMayBeStatic,PyUnusedLocal
+    def table_step(self, op, *, data_map, eval_env):
+        if not isinstance(op, data_algebra.data_ops.TableDescription):
+            raise TypeError(
+                "op was supposed to be a data_algebra.data_ops.TableDescription"
+            )
+        if len(op.qualifiers) > 0:
+            raise ValueError(
+                "table descriptions used with eval_implementation() must not have qualifiers"
+            )
+        df = data_map[op.table_name]
+        self.assert_is_appropriate_data_instance(df, 'data_map[' + op.table_name + ']')
+        # check all columns we expect are present
+        columns_using = op.column_names
+        missing = set(columns_using) - set([c for c in df.columns])
+        if len(missing) > 0:
+            raise ValueError("missing required columns: " + str(missing))
+        # make an index-free copy of the data to isolate side-effects and not deal with indices
+        res = df.loc[:, columns_using]
+        res = res.reset_index(drop=True)
+        return res
+
     def columns_to_frame(self, cols):
         def f(k, v):
             r = v.to_frame()

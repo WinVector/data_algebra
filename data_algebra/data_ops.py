@@ -7,6 +7,7 @@ import data_algebra
 import data_algebra.data_types
 import data_algebra.pandas_model
 import data_algebra.dask_model
+import data_algebra.datatable_model
 import data_algebra.expr_rep
 import data_algebra.pipe
 import data_algebra.env
@@ -196,16 +197,18 @@ class ViewRepresentation(OperatorPlatform):
             raise TypeError("data_map should be a dictionary")
         if len(data_map) < 1:
             raise ValueError("data_map should not be empty")
-        tables = self.get_tables()
-        for k in tables.keys():
-            if k not in data_map.keys():
-                raise ValueError("Required table " + k + " not in data_map")
         if eval_env is None:
             eval_env = data_algebra.env.outer_namespace()
         if eval_env is None:
             eval_env = globals()
         if pandas_model is None:
             pandas_model = data_algebra.pandas_model.PandasModel()
+        tables = self.get_tables()
+        for k in tables.keys():
+            if k not in data_map.keys():
+                raise ValueError("Required table " + k + " not in data_map")
+            else:
+                pandas_model.assert_is_appropriate_data_instance(data_map[k], "data_map[" + k + "]")
         return self.eval_implementation(
             data_map=data_map, eval_env=eval_env, pandas_model=pandas_model
         )
@@ -223,16 +226,47 @@ class ViewRepresentation(OperatorPlatform):
             raise TypeError("data_map should be a dictionary")
         if len(data_map) < 1:
             raise ValueError("data_map should not be empty")
-        tables = self.get_tables()
-        for k in tables.keys():
-            if k not in data_map.keys():
-                raise ValueError("Required table " + k + " not in data_map")
         if eval_env is None:
             eval_env = data_algebra.env.outer_namespace()
         if eval_env is None:
             eval_env = globals()
         if pandas_model is None:
             pandas_model = data_algebra.dask_model.DaskModel()
+        tables = self.get_tables()
+        for k in tables.keys():
+            if k not in data_map.keys():
+                raise ValueError("Required table " + k + " not in data_map")
+            else:
+                pandas_model.assert_is_appropriate_data_instance(data_map[k], "data_map[" + k + "]")
+        return self.eval_implementation(
+            data_map=data_map, eval_env=eval_env, pandas_model=pandas_model
+        )
+
+    def eval_datatable(self, data_map, *, eval_env=None, pandas_model=None):
+        """
+        Evaluate operators with respect to Python datatable data frames.
+        :param data_map: map from table names to data frames
+        :param eval_env: environment to evaluate in
+        :param pandas_model: adaptor to Pandas dialect (possibly dask)
+        :return:
+        """
+
+        if not isinstance(data_map, Dict):
+            raise TypeError("data_map should be a dictionary")
+        if len(data_map) < 1:
+            raise ValueError("data_map should not be empty")
+        if eval_env is None:
+            eval_env = data_algebra.env.outer_namespace()
+        if eval_env is None:
+            eval_env = globals()
+        if pandas_model is None:
+            pandas_model = data_algebra.dask_model.DataTableModel()
+        tables = self.get_tables()
+        for k in tables.keys():
+            if k not in data_map.keys():
+                raise ValueError("Required table " + k + " not in data_map")
+            else:
+                pandas_model.assert_is_appropriate_data_instance(data_map[k], "data_map[" + k + "]")
         return self.eval_implementation(
             data_map=data_map, eval_env=eval_env, pandas_model=pandas_model
         )
@@ -254,6 +288,10 @@ class ViewRepresentation(OperatorPlatform):
             )
         if data_algebra.data_types.is_dask_data_frame(X):
             return self.eval_dask(
+                data_map=data_map, eval_env=eval_env, pandas_model=pandas_model
+            )
+        if data_algebra.data_types.is_datatable_frame(X):
+            return self.eval_datatable(
                 data_map=data_map, eval_env=eval_env, pandas_model=pandas_model
             )
         raise TypeError("can not apply transform() to type " + str(type(X)))

@@ -1,4 +1,10 @@
-import pandas
+
+try:
+    # noinspection PyUnresolvedReferences
+    import datatable
+except ImportError:
+    pass
+
 
 import data_algebra
 import data_algebra.data_model
@@ -6,13 +12,13 @@ import data_algebra.expr_rep
 import data_algebra.data_ops
 
 
-class PandasModel(data_algebra.data_model.DataModel):
+class DataTableModel(data_algebra.data_model.DataModel):
     def __init__(self):
         data_algebra.data_model.DataModel.__init__(self)
 
     def assert_is_appropriate_data_instance(self, df, arg_name=''):
-        if not isinstance(df, pandas.DataFrame):
-            raise TypeError(arg_name + " was supposed to be a pandas.DataFrame")
+        if not isinstance(df, datatable.Frame):
+            raise TypeError(arg_name + " was supposed to be a datatable.Frame")
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def table_step(self, op, *, data_map, eval_env):
@@ -27,13 +33,12 @@ class PandasModel(data_algebra.data_model.DataModel):
         df = data_map[op.table_name]
         self.assert_is_appropriate_data_instance(df, 'data_map[' + op.table_name + ']')
         # check all columns we expect are present
-        columns_using = op.column_names
+        columns_using = df.names
         missing = set(columns_using) - set([c for c in df.columns])
         if len(missing) > 0:
             raise ValueError("missing required columns: " + str(missing))
-        # make an index-free copy of the data to isolate side-effects and not deal with indices
-        res = df.loc[:, columns_using]
-        res = res.reset_index(drop=True)
+        # make a copy of the data to isolate side-effects and not deal with indices
+        res = df[:, columns_using].copy()
         return res
 
     def extend_step(self, op, *, data_map, eval_env):
@@ -45,53 +50,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, pandas_model=self
         )
-        if not window_situation:
-            for (k, opk) in op.ops.items():
-                op_src = opk.to_pandas()
-                res[k] = res.eval(
-                    op_src,
-                    local_dict=data_algebra.expr_rep.pandas_eval_env,
-                    global_dict=eval_env,
-                )
-        else:
-            for (k, opk) in op.ops.items():
-                # work on a slice of the data frame
-                col_list = [c for c in set(op.partition_by)]
-                for c in op.order_by:
-                    if c not in col_list:
-                        col_list = col_list + [c]
-                value_name = None
-                if len(opk.args) > 0:
-                    value_name = opk.args[0].to_pandas()
-                    if value_name not in set(col_list):
-                        col_list = col_list + [value_name]
-                ascending = [c not in set(op.reverse) for c in col_list]
-                subframe = res[col_list].reset_index(drop=True)
-                subframe["_data_algebra_orig_index"] = subframe.index
-                subframe = subframe.sort_values(
-                    by=col_list, ascending=ascending
-                ).reset_index(drop=True)
-                if len(op.partition_by) > 0:
-                    opframe = subframe.groupby(op.partition_by)
-                    #  Groupby preserves the order of rows within each group.
-                    # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.groupby.html
-                else:
-                    opframe = subframe
-                if len(opk.args) == 0:
-                    if opk.op == "row_number":
-                        subframe[k] = opframe.cumcount() + 1
-                    else:  # TODO: more of these
-                        raise KeyError("not implemented: " + str(k) + ": " + str(opk))
-                else:
-                    # len(opk.args) == 1
-                    subframe[k] = opframe[value_name].transform(
-                        opk.op
-                    )  # Pandas transform, not data_algegra
-                subframe = subframe.reset_index(drop=True)
-                subframe = subframe.sort_values(by=["_data_algebra_orig_index"])
-                subframe = subframe.reset_index(drop=True)
-                res[k] = subframe[k]
-        return res
+        raise RuntimeError("not implemented yet")  # TODO: implement
 
     def columns_to_frame(self, cols):
         """
@@ -99,7 +58,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         :param cols: dictionary mapping column names to columns
         :return:
         """
-        return pandas.DataFrame(cols)
+        raise RuntimeError("not implemented yet")  # TODO: implement
 
     def project_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.ProjectNode):
@@ -122,24 +81,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, pandas_model=self
         )
-        if len(op.group_by) > 0:
-            res = res.groupby(op.group_by)
-        cols = {k: res[str(opk.args[0])].agg(opk.op) for (k, opk) in op.ops.items()}
-
-        # agg can return scalars, which then can't be made into a pandas.DataFrame
-        def promote_scalar(v):
-            # noinspection PyBroadException
-            try:
-                len(v)
-            except Exception:
-                return [v]
-            return v
-
-        cols = {k: promote_scalar(v) for (k, v) in cols.items()}
-        res = self.columns_to_frame(cols).reset_index(
-            drop=False
-        )  # grouping variables in the index
-        return res
+        raise RuntimeError("not implemented yet")  # TODO: implement
 
     def select_rows_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.SelectRowsNode):
@@ -149,8 +91,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, pandas_model=self
         )
-        res = res.query(op.expr.to_pandas()).reset_index(drop=True)
-        return res
+        raise RuntimeError("not implemented yet")  # TODO: implement
 
     def select_columns_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.SelectColumnsNode):
@@ -160,7 +101,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, pandas_model=self
         )
-        return res[op.column_selection]
+        raise RuntimeError("not implemented yet")  # TODO: implement
 
     def drop_columns_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.DropColumnsNode):
@@ -171,7 +112,7 @@ class PandasModel(data_algebra.data_model.DataModel):
             data_map=data_map, eval_env=eval_env, pandas_model=self
         )
         column_selection = [c for c in res.columns if c not in op.column_deletions]
-        return res[column_selection]
+        raise RuntimeError("not implemented yet")  # TODO: implement
 
     def order_rows_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.OrderRowsNode):
@@ -184,8 +125,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         ascending = [
             False if ci in set(op.reverse) else True for ci in op.order_columns
         ]
-        res.sort_values(by=op.order_columns, ascending=ascending).reset_index(drop=True)
-        return res
+        raise RuntimeError("not implemented yet")  # TODO: implement
 
     def rename_columns_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.RenameColumnsNode):
@@ -195,7 +135,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, pandas_model=self
         )
-        return res.rename(columns=op.reverse_mapping)
+        raise RuntimeError("not implemented yet")  # TODO: implement
 
     def natural_join_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.NaturalJoinNode):
@@ -211,19 +151,4 @@ class PandasModel(data_algebra.data_model.DataModel):
         common_cols = set([c for c in left.columns]).intersection(
             [c for c in right.columns]
         )
-        res = pandas.merge(
-            left=left,
-            right=right,
-            how=op.jointype.lower(),
-            on=op.by,
-            sort=False,
-            suffixes=("", "_tmp_right_col"),
-        )
-        res = res.reset_index(drop=True)
-        for c in common_cols:
-            if c not in op.by:
-                is_null = res[c].isnull()
-                res[c][is_null] = res[c + "_tmp_right_col"]
-                res = res.drop(c + "_tmp_right_col", axis=1)
-        res = res.reset_index(drop=True)
-        return res
+        raise RuntimeError("not implemented yet")  # TODO: implement

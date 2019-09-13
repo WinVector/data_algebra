@@ -11,6 +11,13 @@ except ImportError:
     pass
 
 
+try:
+    # noinspection PyUnresolvedReferences
+    import datatable
+except ImportError:
+    pass
+
+
 def is_acceptable_data_frame(d):
     if isinstance(d, pandas.DataFrame):
         return True
@@ -25,6 +32,15 @@ def is_dask_data_frame(d):
         return False
     if data_algebra.have_dask:
         if isinstance(d, dask.dataframe.DataFrame):
+            return True
+    return False
+
+
+def is_datatable_frame(d):
+    if isinstance(d, pandas.DataFrame):
+        return False
+    if data_algebra.have_datatable:
+        if isinstance(d, datatable.Frame):
             return True
     return False
 
