@@ -1,7 +1,5 @@
 
 
-import pandas
-
 import data_algebra
 import data_algebra.env
 import data_algebra.util

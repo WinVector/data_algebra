@@ -1,5 +1,7 @@
 
 # https://github.com/h2oai/datatable
+# https://datatable.readthedocs.io/en/latest/?badge=latest
+
 try:
     # noinspection PyUnresolvedReferences
     import datatable
@@ -59,7 +61,13 @@ class DataTableModel(data_algebra.data_model.DataModel):
         :param cols: dictionary mapping column names to columns
         :return:
         """
-        raise RuntimeError("not implemented yet")  # TODO: implement
+        keys = [k for k in cols.keys()]
+        res = datatable.Frame(x=cols[keys[0]])
+        res.names = [keys[0]]
+        for i in range(1, len(keys)):
+            k = keys[i]
+            res[k] = cols[k]
+        return res
 
     def project_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.ProjectNode):
@@ -136,7 +144,16 @@ class DataTableModel(data_algebra.data_model.DataModel):
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self
         )
-        raise RuntimeError("not implemented yet")  # TODO: implement
+
+        def mp(n):
+            try:
+                return op.column_remapping[n]
+            except KeyError:
+                return n
+
+        names = [mp(n) for n in res.names]
+        res.names = names
+        return res
 
     def natural_join_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.NaturalJoinNode):
