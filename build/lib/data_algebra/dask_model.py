@@ -1,4 +1,8 @@
 
+# Note: we are not yet seeing reliable behavior between the windowed extend and dask.
+
+import warnings
+
 import data_algebra
 import data_algebra.data_ops
 import data_algebra.pandas_model
@@ -12,6 +16,8 @@ try:
 except ImportError:
     pass
 
+
+have_warned_about_dask = False
 
 # Some dask notes:
 #  https://examples.dask.org/dataframes/02-groupby.html#
@@ -43,6 +49,7 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
 
 
     def extend_step(self, op, *, data_map, eval_env):
+        global have_warned_about_dask
         if not isinstance(op, data_algebra.data_ops.ExtendNode):
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
         window_situation = (len(op.partition_by) > 0) or (len(op.order_by) > 0)
@@ -55,6 +62,10 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
             raise RuntimeError("ExtendNode doesn't support more than one order column over dask yet")
         if len(op.reverse) > 0:
             raise RuntimeError("ExtendNode on dask doesn't support reverse sorting yet")
+        if not have_warned_about_dask:
+            warnings.warn("extend window functions over dask do not appear to be reliable yet",
+                          RuntimeWarning, stacklevel=2)
+            have_warned_about_dask = True
         # get incoming data
         res = op.sources[0].eval_pandas_implementation(data_map=data_map,
                                                        eval_env=eval_env,
