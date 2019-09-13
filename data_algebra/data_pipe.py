@@ -66,10 +66,7 @@ class Project(data_algebra.pipe.PipeStep):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
-        return other.project(
-            ops=self._ops,
-            group_by=self.group_by,
-        )
+        return other.project(ops=self._ops, group_by=self.group_by)
 
 
 class SelectRows(data_algebra.pipe.PipeStep):
@@ -219,7 +216,9 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
 
     def __rrshift__(self, other):  # override other >> self
         if not data_algebra.data_types.is_acceptable_data_frame(other):
-            raise TypeError("can not apply >> (transform()) to type " + str(type(other)))
+            raise TypeError(
+                "can not apply >> (transform()) to type " + str(type(other))
+            )
         return self.transform(other)
 
     # implement method chaining collection of pending operations

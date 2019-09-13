@@ -206,7 +206,9 @@ class ViewRepresentation(OperatorPlatform):
             eval_env = globals()
         if pandas_model is None:
             pandas_model = data_algebra.pandas_model.PandasModel()
-        return self.eval_implementation(data_map=data_map, eval_env=eval_env, pandas_model=pandas_model)
+        return self.eval_implementation(
+            data_map=data_map, eval_env=eval_env, pandas_model=pandas_model
+        )
 
     def eval_dask(self, data_map, *, eval_env=None, pandas_model=None):
         """
@@ -231,7 +233,9 @@ class ViewRepresentation(OperatorPlatform):
             eval_env = globals()
         if pandas_model is None:
             pandas_model = data_algebra.dask_model.DaskModel()
-        return self.eval_implementation(data_map=data_map, eval_env=eval_env, pandas_model=pandas_model)
+        return self.eval_implementation(
+            data_map=data_map, eval_env=eval_env, pandas_model=pandas_model
+        )
 
     # implement builders for all non-initial node types on base class
 
@@ -245,14 +249,20 @@ class ViewRepresentation(OperatorPlatform):
         k = [k for k in tables.keys()][0]
         data_map = {k: X}
         if isinstance(X, pandas.DataFrame):
-            return self.eval_pandas(data_map=data_map, eval_env=eval_env, pandas_model=pandas_model)
+            return self.eval_pandas(
+                data_map=data_map, eval_env=eval_env, pandas_model=pandas_model
+            )
         if data_algebra.data_types.is_dask_data_frame(X):
-            return self.eval_dask(data_map=data_map, eval_env=eval_env, pandas_model=pandas_model)
+            return self.eval_dask(
+                data_map=data_map, eval_env=eval_env, pandas_model=pandas_model
+            )
         raise TypeError("can not apply transform() to type " + str(type(X)))
 
     def __rrshift__(self, other):  # override other >> self
         if not data_algebra.data_types.is_acceptable_data_frame(other):
-            raise TypeError("can not apply >> (transform()) to type " + str(type(other)))
+            raise TypeError(
+                "can not apply >> (transform()) to type " + str(type(other))
+            )
         return self.transform(other)
 
     # nodes
@@ -267,9 +277,7 @@ class ViewRepresentation(OperatorPlatform):
         )
 
     def project(self, ops, *, group_by=None):
-        return ProjectNode(
-            source=self, ops=ops, group_by=group_by
-        )
+        return ProjectNode(source=self, ops=ops, group_by=group_by)
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
         if not isinstance(b, ViewRepresentation):
@@ -687,7 +695,9 @@ class SelectRowsNode(ViewRepresentation):
         )
 
     def eval_implementation(self, *, data_map, eval_env, pandas_model):
-        return pandas_model.select_rows_step(op=self, data_map=data_map, eval_env=eval_env)
+        return pandas_model.select_rows_step(
+            op=self, data_map=data_map, eval_env=eval_env
+        )
 
 
 class SelectColumnsNode(ViewRepresentation):
@@ -735,7 +745,9 @@ class SelectColumnsNode(ViewRepresentation):
         )
 
     def eval_implementation(self, *, data_map, eval_env, pandas_model):
-        return pandas_model.select_columns_step(op=self, data_map=data_map, eval_env=eval_env)
+        return pandas_model.select_columns_step(
+            op=self, data_map=data_map, eval_env=eval_env
+        )
 
 
 class DropColumnsNode(ViewRepresentation):
@@ -785,7 +797,9 @@ class DropColumnsNode(ViewRepresentation):
         )
 
     def eval_implementation(self, *, data_map, eval_env, pandas_model):
-        return pandas_model.drop_columns_step(op=self, data_map=data_map, eval_env=eval_env)
+        return pandas_model.drop_columns_step(
+            op=self, data_map=data_map, eval_env=eval_env
+        )
 
 
 class OrderRowsNode(ViewRepresentation):
@@ -842,7 +856,9 @@ class OrderRowsNode(ViewRepresentation):
         return db_model.order_to_sql(self, using=using, temp_id_source=temp_id_source)
 
     def eval_implementation(self, *, data_map, eval_env, pandas_model):
-        return pandas_model.order_rows_step(op=self, data_map=data_map, eval_env=eval_env)
+        return pandas_model.order_rows_step(
+            op=self, data_map=data_map, eval_env=eval_env
+        )
 
 
 class RenameColumnsNode(ViewRepresentation):
@@ -898,7 +914,9 @@ class RenameColumnsNode(ViewRepresentation):
         return db_model.rename_to_sql(self, using=using, temp_id_source=temp_id_source)
 
     def eval_implementation(self, *, data_map, eval_env, pandas_model):
-        return pandas_model.rename_columns_step(op=self, data_map=data_map, eval_env=eval_env)
+        return pandas_model.rename_columns_step(
+            op=self, data_map=data_map, eval_env=eval_env
+        )
 
 
 class NaturalJoinNode(ViewRepresentation):
@@ -968,4 +986,6 @@ class NaturalJoinNode(ViewRepresentation):
         )
 
     def eval_implementation(self, *, data_map, eval_env, pandas_model):
-        return pandas_model.natural_join_step(op=self, data_map=data_map, eval_env=eval_env)
+        return pandas_model.natural_join_step(
+            op=self, data_map=data_map, eval_env=eval_env
+        )

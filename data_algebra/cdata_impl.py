@@ -52,7 +52,7 @@ class RecordMap:
     def transform(
         self, X, *, check_blocks_in_keying=True, check_blocks_out_keying=False
     ):
-        X = data_algebra.data_types.convert_to_pandas_dataframe(X, 'X')
+        X = data_algebra.data_types.convert_to_pandas_dataframe(X, "X")
         X = X.reset_index(drop=True)
         db_model = data_algebra.SQLite.SQLiteModel()
         if self.blocks_in is not None:

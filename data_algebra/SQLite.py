@@ -10,13 +10,16 @@ import data_algebra.db_model
 
 # map from op-name to special SQL formatting code
 
+
 def _sqlite_is_bad_expr(dbmodel, expression):
-    return "is_bad(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ")"
+    return (
+        "is_bad("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
+    )
 
 
-SQLite_formatters = {
-    "is_bad": _sqlite_is_bad_expr,
-}
+SQLite_formatters = {"is_bad": _sqlite_is_bad_expr}
 
 
 def _check_scalar_bad(x):

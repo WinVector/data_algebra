@@ -73,8 +73,7 @@ def to_pipeline(obj, *, known_tables=None):
             )
         elif op == "Project":
             return data_algebra.data_pipe.Project(
-                ops=obj["ops"],
-                group_by=obj["group_by"],
+                ops=obj["ops"], group_by=obj["group_by"]
             )
         elif op == "NaturalJoin":
             return data_algebra.data_pipe.NaturalJoin(

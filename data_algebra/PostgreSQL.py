@@ -33,4 +33,6 @@ class PostgreSQLModel(data_algebra.db_model.DBModel):
         return qt
 
     def table_def_to_sql(self, table_def, *, using=None, force_sql=False):
-        return super().table_def_to_sql(table_def=table_def, using=using, force_sql=True)
+        return super().table_def_to_sql(
+            table_def=table_def, using=using, force_sql=True
+        )
