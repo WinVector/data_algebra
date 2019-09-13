@@ -333,24 +333,24 @@ sql = ops.to_sql(db_model, pretty=True)
 print(sql)
 ```
 
-    SELECT "surveycategory",
-           "probability",
-           "subjectid"
+    SELECT "subjectid",
+           "surveycategory",
+           "probability"
     FROM
-      (SELECT "surveycategory",
-              "probability",
-              "subjectid"
+      (SELECT "subjectid",
+              "surveycategory",
+              "probability"
        FROM
          (SELECT "probability",
-                 "sort_key",
-                 "surveycategory",
                  "subjectid",
+                 "surveycategory",
+                 "sort_key",
                  ROW_NUMBER() OVER (PARTITION BY "subjectid"
                                     ORDER BY "sort_key") AS "row_number"
           FROM
-            (SELECT "probability",
+            (SELECT "subjectid",
                     "surveycategory",
-                    "subjectid",
+                    "probability",
                     -1 * "probability" AS "sort_key"
              FROM
                (SELECT "surveycategory",
@@ -362,8 +362,8 @@ print(sql)
                           "subjectid",
                           SUM("probability") OVER (PARTITION BY "subjectid") AS "total"
                    FROM
-                     (SELECT "surveycategory",
-                             "subjectid",
+                     (SELECT "subjectid",
+                             "surveycategory",
                              EXP(("assessmenttotal" * 0.237)) AS "probability"
                       FROM
                         (SELECT "assessmenttotal",
@@ -403,23 +403,23 @@ db_model.read_query(conn, sql)
   <thead>
     <tr style="text-align: right;">
       <th></th>
+      <th>subjectid</th>
       <th>surveycategory</th>
       <th>probability</th>
-      <th>subjectid</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
+      <td>1.0</td>
       <td>withdrawal behavior</td>
       <td>0.670622</td>
-      <td>1.0</td>
     </tr>
     <tr>
       <th>1</th>
+      <td>2.0</td>
       <td>positive re-framing</td>
       <td>0.558974</td>
-      <td>2.0</td>
     </tr>
   </tbody>
 </table>
@@ -555,6 +555,10 @@ res_dask = ops.transform(d_dask)
 res_dask
 ```
 
+    /Users/johnmount/anaconda3/envs/aiAcademy/lib/python3.6/site-packages/data_algebra/data_ops.py:553: RuntimeWarning: extend window functions over dask do not appear to be reliable yet
+      return pandas_model.extend_step(op=self, data_map=data_map, eval_env=eval_env)
+
+
 
 
 
@@ -604,7 +608,7 @@ res_dask
   </tbody>
 </table>
 </div>
-<div>Dask Name: getitem, 119 tasks</div>
+<div>Dask Name: getitem, 113 tasks</div>
 
 
 
@@ -863,14 +867,14 @@ cat(sql)
             "assessmentTotal"
            FROM
             "d"
-           ) tsql_31865227688795524131_0000000000
-          ) tsql_31865227688795524131_0000000001
-         ) tsql_31865227688795524131_0000000002
-        ) tsql_31865227688795524131_0000000003
-       ) tsql_31865227688795524131_0000000004
-     ) tsql_31865227688795524131_0000000005
+           ) tsql_66636711838767033761_0000000000
+          ) tsql_66636711838767033761_0000000001
+         ) tsql_66636711838767033761_0000000002
+        ) tsql_66636711838767033761_0000000003
+       ) tsql_66636711838767033761_0000000004
+     ) tsql_66636711838767033761_0000000005
      WHERE "row_number" = 1
-    ) tsql_31865227688795524131_0000000006
+    ) tsql_66636711838767033761_0000000006
 
 
 The `R` implementation is mature, and appropriate to use in production.  The [`rquery`](https://github.com/WinVector/rquery) grammar is designed to have minimal state and minimal annotations (no grouping or ordering annotations!).  This makes the grammar, in my opinion, a good design choice. `rquery` has very good performance, often much faster than `dplyr` or base-`R` due to its query generation ideas and use of [`data.table`](https://CRAN.R-project.org/package=data.table) via [`rqdatatable`](https://CRAN.R-project.org/package=rqdatatable).  `rquery` is a mature pure `R` package; [here](https://github.com/WinVector/rquery/blob/master/README.md) is the same example being worked directly in `R`, with no translation from `Python`. 
