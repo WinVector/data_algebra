@@ -2,19 +2,20 @@
 platform darwin -- Python 3.6.9, pytest-5.0.1, py-1.8.0, pluggy-0.12.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.7.1
-collected 17 items
+collected 18 items
 
 tests/test_apply.py .                                                    [  5%]
 tests/test_cdata1.py .                                                   [ 11%]
-tests/test_dask.py ..                                                    [ 23%]
-tests/test_drop_columns.py .                                             [ 29%]
-tests/test_example_data_ops.py .                                         [ 35%]
-tests/test_natural_join.py .                                             [ 41%]
-tests/test_neg.py .                                                      [ 47%]
-tests/test_null_bad.py .                                                 [ 52%]
-tests/test_parse.py .                                                    [ 58%]
-tests/test_poject.py .                                                   [ 64%]
-tests/test_scoring_example.py .                                          [ 70%]
+tests/test_dask.py ..                                                    [ 22%]
+tests/test_drop_columns.py .                                             [ 27%]
+tests/test_example_data_ops.py .                                         [ 33%]
+tests/test_exp.py .                                                      [ 38%]
+tests/test_natural_join.py .                                             [ 44%]
+tests/test_neg.py .                                                      [ 50%]
+tests/test_null_bad.py .                                                 [ 55%]
+tests/test_parse.py .                                                    [ 61%]
+tests/test_poject.py .                                                   [ 66%]
+tests/test_scoring_example.py .                                          [ 72%]
 tests/test_simple.py ....                                                [ 94%]
 tests/test_sqlite.py .                                                   [100%]
 
@@ -42,4 +43,4 @@ data_algebra/yaml.py              76     11    86%
 TOTAL                           2226    484    78%
 
 
-========================== 17 passed in 6.88 seconds ===========================
+========================== 18 passed in 6.57 seconds ===========================
