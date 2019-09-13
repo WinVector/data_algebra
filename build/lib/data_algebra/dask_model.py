@@ -40,14 +40,6 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
         res = dask.dataframe.concat(col_values, axis=1)
         return res
 
-    def project_step(self, op, *, data_map, eval_env):
-        if not isinstance(op, data_algebra.data_ops.ProjectNode):
-            raise TypeError("op was supposed to be a data_algebra.data_ops.ProjectNode")
-        if len(op.order_by) > 0:
-            raise RuntimeError("ProjectNode order_by not implemented for dask yet")  # TODO: implement
-        return super().project_step(op=op, data_map=data_map, eval_env=eval_env)
-
-
     def extend_step(self, op, *, data_map, eval_env):
         global have_warned_about_dask
         if not isinstance(op, data_algebra.data_ops.ExtendNode):

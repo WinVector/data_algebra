@@ -24,20 +24,20 @@ data_algebra/SQLite.py            43      5    88%
 data_algebra/__init__.py          30      8    73%
 data_algebra/cdata.py             48      4    92%
 data_algebra/cdata_impl.py        92     15    84%
-data_algebra/dask_model.py        99     85    14%
-data_algebra/data_ops.py         638    136    79%
-data_algebra/data_pipe.py        158     33    79%
+data_algebra/dask_model.py        93     80    14%
+data_algebra/data_ops.py         610    127    79%
+data_algebra/data_pipe.py        156     33    79%
 data_algebra/data_types.py        45     31    31%
-data_algebra/db_model.py         352     76    78%
+data_algebra/db_model.py         349     74    79%
 data_algebra/env.py               54     12    78%
 data_algebra/expr_rep.py         294     89    70%
-data_algebra/pandas_model.py     139     20    86%
+data_algebra/pandas_model.py     136     18    87%
 data_algebra/pending_eval.py      34     34     0%
 data_algebra/pipe.py              65     19    71%
 data_algebra/util.py              72      6    92%
 data_algebra/yaml.py              76     11    86%
 --------------------------------------------------
-TOTAL                           2260    588    74%
+TOTAL                           2218    570    74%
 
 
-========================== 14 passed in 3.01 seconds ===========================
+========================== 14 passed in 2.58 seconds ===========================

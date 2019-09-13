@@ -130,9 +130,6 @@ class PandasModel:
         res = op.sources[0].eval_pandas_implementation(data_map=data_map,
                                                        eval_env=eval_env,
                                                        pandas_model=self)
-        if len(op.order_by) > 0:
-            res = res.sort_values(by=op.order_by)
-            res = res.reset_index(drop=True)
         if len(op.group_by) > 0:
             res = res.groupby(op.group_by)
         cols = {k: res[str(opk.args[0])].agg(opk.op) for (k, opk) in op.ops.items()}

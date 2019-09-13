@@ -41,7 +41,7 @@ class OperatorPlatform(data_algebra.pipe.PipeValue):
     def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
         raise NotImplementedError("base class called")
 
-    def project(self, ops, *, group_by=None, order_by=None, reverse=None):
+    def project(self, ops, *, group_by=None):
         raise NotImplementedError("base class called")
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
@@ -266,9 +266,9 @@ class ViewRepresentation(OperatorPlatform):
             reverse=reverse,
         )
 
-    def project(self, ops, *, group_by=None, order_by=None, reverse=None):
+    def project(self, ops, *, group_by=None):
         return ProjectNode(
-            source=self, ops=ops, group_by=group_by, order_by=order_by, reverse=reverse
+            source=self, ops=ops, group_by=group_by
         )
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
@@ -554,7 +554,7 @@ class ExtendNode(ViewRepresentation):
 
 
 class ProjectNode(ViewRepresentation):
-    def __init__(self, source, ops, *, group_by=None, order_by=None, reverse=None):
+    def __init__(self, source, ops, *, group_by=None):
         ops = data_algebra.expr_rep.check_convert_op_dictionary(
             ops, source.column_map.__dict__
         )
@@ -566,21 +566,9 @@ class ProjectNode(ViewRepresentation):
         if isinstance(group_by, str):
             group_by = [group_by]
         self.group_by = group_by
-        if order_by is None:
-            order_by = []
-        if isinstance(order_by, str):
-            order_by = [order_by]
-        self.order_by = order_by
-        if reverse is None:
-            reverse = []
-        if isinstance(reverse, str):
-            reverse = [reverse]
-        self.reverse = reverse
         column_names = group_by.copy()
         consumed_cols = set()
         for c in group_by:
-            consumed_cols.add(c)
-        for c in order_by:
             consumed_cols.add(c)
         for (k, o) in ops.items():
             o.get_column_names(consumed_cols)
@@ -593,19 +581,9 @@ class ProjectNode(ViewRepresentation):
                 column_names.append(ci)
         if len(group_by) != len(set(group_by)):
             raise ValueError("Duplicate name in group_by")
-        if len(order_by) != len(set(order_by)):
-            raise ValueError("Duplicate name in order_by")
-        if len(reverse) != len(set(reverse)):
-            raise ValueError("Duplicate name in reverse")
         unknown = set(group_by) - known_cols
         if len(unknown) > 0:
             raise ValueError("unknown partition_by columns: " + str(unknown))
-        unknown = set(order_by) - known_cols
-        if len(unknown) > 0:
-            raise ValueError("unknown order_by columns: " + str(unknown))
-        unknown = set(reverse) - set(order_by)
-        if len(unknown) > 0:
-            raise ValueError("reverse columns not in order_by: " + str(unknown))
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
 
     def columns_used_from_sources(self, using=None):
@@ -613,7 +591,7 @@ class ProjectNode(ViewRepresentation):
             subops = self.ops
         else:
             subops = {k: op for (k, op) in self.ops.items() if k in using}
-        columns_we_take = set().union(self.group_by, self.order_by)
+        columns_we_take = set(self.group_by)
         for (k, o) in subops.items():
             o.get_column_names(columns_we_take)
         return [columns_we_take]
@@ -625,8 +603,6 @@ class ProjectNode(ViewRepresentation):
         od["op"] = "Project"
         od["ops"] = {ci: vi.to_source(dialect=dialect) for (ci, vi) in self.ops.items()}
         od["group_by"] = self.group_by
-        od["order_by"] = self.order_by
-        od["reverse"] = self.reverse
         pipeline.insert(0, od)
         return self.sources[0].collect_representation_implementation(
             pipeline=pipeline, dialect=dialect
@@ -648,10 +624,6 @@ class ProjectNode(ViewRepresentation):
         )
         if len(self.group_by) > 0:
             s = s + ", group_by=" + self.group_by.__repr__()
-        if len(self.order_by) > 0:
-            s = s + ", order_by=" + self.order_by.__repr__()
-        if len(self.reverse) > 0:
-            s = s + ", reverse=" + self.reverse.__repr__()
         s = s + ")"
         return s
 

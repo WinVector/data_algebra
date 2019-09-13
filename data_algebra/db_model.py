@@ -260,12 +260,6 @@ class DBModel:
         if len(project_node.group_by) > 0:
             group_terms = [self.quote_identifier(c) for c in project_node.group_by]
             sql_str = sql_str + " GROUP BY " + ", ".join(group_terms)
-        if len(project_node.order_by) > 0:
-            order_terms = [
-                self.quote_identifier(c) + " DESC" if c in project_node.reverse else ""
-                for c in project_node.order_by
-            ]
-            sql_str = sql_str + " ORDER BY " + ", ".join(order_terms)
         return sql_str
 
     def select_rows_to_sql(self, select_rows_node, *, using=None, temp_id_source=None):

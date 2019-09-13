@@ -75,8 +75,6 @@ def to_pipeline(obj, *, known_tables=None):
             return data_algebra.data_pipe.Project(
                 ops=obj["ops"],
                 group_by=obj["group_by"],
-                order_by=obj["order_by"],
-                reverse=obj["reverse"],
             )
         elif op == "NaturalJoin":
             return data_algebra.data_pipe.NaturalJoin(

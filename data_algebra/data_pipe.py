@@ -56,12 +56,10 @@ class Project(data_algebra.pipe.PipeStep):
 
     ops: Dict[str, data_algebra.expr_rep.Expression]
 
-    def __init__(self, ops, *, group_by=None, order_by=None, reverse=None):
+    def __init__(self, ops, *, group_by=None):
         data_algebra.pipe.PipeStep.__init__(self, name="Project")
         self._ops = ops
         self.group_by = group_by
-        self.order_by = order_by
-        self.reverse = reverse
 
     def apply(self, other):
         if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
@@ -71,8 +69,6 @@ class Project(data_algebra.pipe.PipeStep):
         return other.project(
             ops=self._ops,
             group_by=self.group_by,
-            order_by=self.order_by,
-            reverse=self.reverse,
         )
 
 
@@ -235,8 +231,8 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
         self.ops.append(op)
         return self
 
-    def project(self, ops, *, group_by=None, order_by=None, reverse=None):
-        op = Project(ops=ops, group_by=group_by, order_by=order_by, reverse=reverse)
+    def project(self, ops, *, group_by=None):
+        op = Project(ops=ops, group_by=group_by)
         self.ops.append(op)
         return self
 
