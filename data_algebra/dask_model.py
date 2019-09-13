@@ -81,7 +81,7 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
             raise RuntimeError("ExtendNode on dask doesn't support reverse sorting yet")
         # get incoming data
         res = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, pandas_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self
         )
         # move to case where we have exactly one ordering column and one grouping column
         row_id_col = "_data_algebra_temp_row_id"
@@ -144,10 +144,10 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
                 "op was supposed to be a data_algebra.data_ops.NaturalJoinNode"
             )
         left = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, pandas_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self
         )
         right = op.sources[1].eval_implementation(
-            data_map=data_map, eval_env=eval_env, pandas_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self
         )
         common_cols = set([c for c in left.columns]).intersection(
             [c for c in right.columns]
@@ -180,7 +180,7 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
         if len(op.reverse) > 0:
             raise RuntimeError("sorting doesn't support reverse in dask yet")
         res = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, pandas_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self
         )
         res.set_index(op.order_columns[0])  # may cause problems in later steps
         return res

@@ -307,14 +307,12 @@ class ColumnReference(Term):
 
 
 # map from op-name to special Python formatting code
-py_formatters = {
-    "neg": lambda expr: "-(" + expr.args[0].to_pandas() + ")",
-}
+py_formatters = {"neg": lambda expr: "-(" + expr.args[0].to_pandas() + ")"}
 
 
 pandas_eval_env = {
-    'is_null': lambda x: pandas.isnull(x),
-    'is_bad': data_algebra.util.is_bad,
+    "is_null": lambda x: pandas.isnull(x),
+    "is_bad": data_algebra.util.is_bad,
 }
 
 
@@ -402,7 +400,9 @@ def _parse_by_eval(source_str, *, data_def, outter_environemnt=None):
     if outter_environemnt is None:
         outter_environemnt = {}
     else:
-        outter_environemnt = {k: v for (k, v) in outter_environemnt.items() if not k.startswith("_")}
+        outter_environemnt = {
+            k: v for (k, v) in outter_environemnt.items() if not k.startswith("_")
+        }
     # don't have to completely kill this environment, as the code is something
     # the user intends to run (and may have even typed in).
     # But let's cut down the builtins anyway.
@@ -447,9 +447,7 @@ def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
         ov = ops[k]
         v = ov
         if not isinstance(v, Term):
-            v = _parse_by_eval(
-                    source_str=v, data_def=mp, outter_environemnt=parse_env
-                )
+            v = _parse_by_eval(source_str=v, data_def=mp, outter_environemnt=parse_env)
         newops[k] = v
         used_here = set()
         v.get_column_names(used_here)

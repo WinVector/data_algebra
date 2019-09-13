@@ -181,15 +181,15 @@ class ViewRepresentation(OperatorPlatform):
 
     # Pandas realization
 
-    def eval_implementation(self, *, data_map, eval_env, pandas_model):
+    def eval_implementation(self, *, data_map, eval_env, data_model):
         raise NotImplementedError("base method called")
 
-    def eval_pandas(self, data_map, *, eval_env=None, pandas_model=None):
+    def eval_pandas(self, data_map, *, eval_env=None, data_model=None):
         """
         Evaluate operators with respect to Pandas data frames.
         :param data_map: map from table names to data frames
         :param eval_env: environment to evaluate in
-        :param pandas_model: adaptor to Pandas dialect (possibly dask)
+        :param data_model: adaptor to Pandas dialect (possibly dask)
         :return:
         """
 
@@ -201,24 +201,24 @@ class ViewRepresentation(OperatorPlatform):
             eval_env = data_algebra.env.outer_namespace()
         if eval_env is None:
             eval_env = globals()
-        if pandas_model is None:
-            pandas_model = data_algebra.pandas_model.PandasModel()
+        if data_model is None:
+            data_model = data_algebra.pandas_model.PandasModel()
         tables = self.get_tables()
         for k in tables.keys():
             if k not in data_map.keys():
                 raise ValueError("Required table " + k + " not in data_map")
             else:
-                pandas_model.assert_is_appropriate_data_instance(data_map[k], "data_map[" + k + "]")
+                data_model.assert_is_appropriate_data_instance(data_map[k], "data_map[" + k + "]")
         return self.eval_implementation(
-            data_map=data_map, eval_env=eval_env, pandas_model=pandas_model
+            data_map=data_map, eval_env=eval_env, data_model=data_model
         )
 
-    def eval_dask(self, data_map, *, eval_env=None, pandas_model=None):
+    def eval_dask(self, data_map, *, eval_env=None, data_model=None):
         """
         Evaluate operators with respect to dask data frames.
         :param data_map: map from table names to data frames
         :param eval_env: environment to evaluate in
-        :param pandas_model: adaptor to Pandas dialect (possibly dask)
+        :param data_model: adaptor to Pandas dialect (possibly dask)
         :return:
         """
 
@@ -230,24 +230,24 @@ class ViewRepresentation(OperatorPlatform):
             eval_env = data_algebra.env.outer_namespace()
         if eval_env is None:
             eval_env = globals()
-        if pandas_model is None:
-            pandas_model = data_algebra.dask_model.DaskModel()
+        if data_model is None:
+            data_model = data_algebra.dask_model.DaskModel()
         tables = self.get_tables()
         for k in tables.keys():
             if k not in data_map.keys():
                 raise ValueError("Required table " + k + " not in data_map")
             else:
-                pandas_model.assert_is_appropriate_data_instance(data_map[k], "data_map[" + k + "]")
+                data_model.assert_is_appropriate_data_instance(data_map[k], "data_map[" + k + "]")
         return self.eval_implementation(
-            data_map=data_map, eval_env=eval_env, pandas_model=pandas_model
+            data_map=data_map, eval_env=eval_env, data_model=data_model
         )
 
-    def eval_datatable(self, data_map, *, eval_env=None, pandas_model=None):
+    def eval_datatable(self, data_map, *, eval_env=None, data_model=None):
         """
         Evaluate operators with respect to Python datatable data frames.
         :param data_map: map from table names to data frames
         :param eval_env: environment to evaluate in
-        :param pandas_model: adaptor to Pandas dialect (possibly dask)
+        :param data_model: adaptor to Pandas dialect (possibly dask)
         :return:
         """
 
@@ -259,22 +259,22 @@ class ViewRepresentation(OperatorPlatform):
             eval_env = data_algebra.env.outer_namespace()
         if eval_env is None:
             eval_env = globals()
-        if pandas_model is None:
-            pandas_model = data_algebra.dask_model.DataTableModel()
+        if data_model is None:
+            data_model = data_algebra.dask_model.DataTableModel()
         tables = self.get_tables()
         for k in tables.keys():
             if k not in data_map.keys():
                 raise ValueError("Required table " + k + " not in data_map")
             else:
-                pandas_model.assert_is_appropriate_data_instance(data_map[k], "data_map[" + k + "]")
+                data_model.assert_is_appropriate_data_instance(data_map[k], "data_map[" + k + "]")
         return self.eval_implementation(
-            data_map=data_map, eval_env=eval_env, pandas_model=pandas_model
+            data_map=data_map, eval_env=eval_env, data_model=data_model
         )
 
     # implement builders for all non-initial node types on base class
 
     # noinspection PyPep8Naming
-    def transform(self, X, *, eval_env=None, pandas_model=None):
+    def transform(self, X, *, eval_env=None, data_model=None):
         tables = self.get_tables()
         if len(tables) != 1:
             raise ValueError(
@@ -284,15 +284,15 @@ class ViewRepresentation(OperatorPlatform):
         data_map = {k: X}
         if isinstance(X, pandas.DataFrame):
             return self.eval_pandas(
-                data_map=data_map, eval_env=eval_env, pandas_model=pandas_model
+                data_map=data_map, eval_env=eval_env, data_model=data_model
             )
         if data_algebra.data_types.is_dask_data_frame(X):
             return self.eval_dask(
-                data_map=data_map, eval_env=eval_env, pandas_model=pandas_model
+                data_map=data_map, eval_env=eval_env, data_model=data_model
             )
         if data_algebra.data_types.is_datatable_frame(X):
             return self.eval_datatable(
-                data_map=data_map, eval_env=eval_env, pandas_model=pandas_model
+                data_map=data_map, eval_env=eval_env, data_model=data_model
             )
         raise TypeError("can not apply transform() to type " + str(type(X)))
 
@@ -435,8 +435,8 @@ class TableDescription(ViewRepresentation):
             tables[self.key] = self
         return tables
 
-    def eval_implementation(self, *, data_map, eval_env, pandas_model):
-        return pandas_model.table_step(op=self, data_map=data_map, eval_env=eval_env)
+    def eval_implementation(self, *, data_map, eval_env, data_model):
+        return data_model.table_step(op=self, data_map=data_map, eval_env=eval_env)
 
     def columns_used_from_sources(self, using=None):
         return []  # no inputs to table description
@@ -595,8 +595,8 @@ class ExtendNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.extend_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_implementation(self, *, data_map, eval_env, pandas_model):
-        return pandas_model.extend_step(op=self, data_map=data_map, eval_env=eval_env)
+    def eval_implementation(self, *, data_map, eval_env, data_model):
+        return data_model.extend_step(op=self, data_map=data_map, eval_env=eval_env)
 
 
 class ProjectNode(ViewRepresentation):
@@ -676,8 +676,8 @@ class ProjectNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.project_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_implementation(self, *, data_map, eval_env, pandas_model):
-        return pandas_model.project_step(op=self, data_map=data_map, eval_env=eval_env)
+    def eval_implementation(self, *, data_map, eval_env, data_model):
+        return data_model.project_step(op=self, data_map=data_map, eval_env=eval_env)
 
 
 class SelectRowsNode(ViewRepresentation):
@@ -732,8 +732,8 @@ class SelectRowsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_implementation(self, *, data_map, eval_env, pandas_model):
-        return pandas_model.select_rows_step(
+    def eval_implementation(self, *, data_map, eval_env, data_model):
+        return data_model.select_rows_step(
             op=self, data_map=data_map, eval_env=eval_env
         )
 
@@ -782,8 +782,8 @@ class SelectColumnsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_implementation(self, *, data_map, eval_env, pandas_model):
-        return pandas_model.select_columns_step(
+    def eval_implementation(self, *, data_map, eval_env, data_model):
+        return data_model.select_columns_step(
             op=self, data_map=data_map, eval_env=eval_env
         )
 
@@ -834,8 +834,8 @@ class DropColumnsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_implementation(self, *, data_map, eval_env, pandas_model):
-        return pandas_model.drop_columns_step(
+    def eval_implementation(self, *, data_map, eval_env, data_model):
+        return data_model.drop_columns_step(
             op=self, data_map=data_map, eval_env=eval_env
         )
 
@@ -893,8 +893,8 @@ class OrderRowsNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.order_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_implementation(self, *, data_map, eval_env, pandas_model):
-        return pandas_model.order_rows_step(
+    def eval_implementation(self, *, data_map, eval_env, data_model):
+        return data_model.order_rows_step(
             op=self, data_map=data_map, eval_env=eval_env
         )
 
@@ -951,8 +951,8 @@ class RenameColumnsNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.rename_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_implementation(self, *, data_map, eval_env, pandas_model):
-        return pandas_model.rename_columns_step(
+    def eval_implementation(self, *, data_map, eval_env, data_model):
+        return data_model.rename_columns_step(
             op=self, data_map=data_map, eval_env=eval_env
         )
 
@@ -1023,7 +1023,7 @@ class NaturalJoinNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_implementation(self, *, data_map, eval_env, pandas_model):
-        return pandas_model.natural_join_step(
+    def eval_implementation(self, *, data_map, eval_env, data_model):
+        return data_model.natural_join_step(
             op=self, data_map=data_map, eval_env=eval_env
         )

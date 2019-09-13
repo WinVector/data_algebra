@@ -43,7 +43,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         if window_situation:
             self.check_extend_window_fns(op)
         res = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, pandas_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self
         )
         if not window_situation:
             for (k, opk) in op.ops.items():
@@ -120,7 +120,7 @@ class PandasModel(data_algebra.data_model.DataModel):
                     + str(opk)
                 )
         res = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, pandas_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self
         )
         if len(op.group_by) > 0:
             res = res.groupby(op.group_by)
@@ -147,7 +147,7 @@ class PandasModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.SelectRowsNode"
             )
         res = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, pandas_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self
         )
         res = res.query(op.expr.to_pandas()).reset_index(drop=True)
         return res
@@ -158,7 +158,7 @@ class PandasModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.SelectColumnsNode"
             )
         res = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, pandas_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self
         )
         return res[op.column_selection]
 
@@ -168,7 +168,7 @@ class PandasModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.DropColumnsNode"
             )
         res = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, pandas_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self
         )
         column_selection = [c for c in res.columns if c not in op.column_deletions]
         return res[column_selection]
@@ -179,7 +179,7 @@ class PandasModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.OrderRowsNode"
             )
         res = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, pandas_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self
         )
         ascending = [
             False if ci in set(op.reverse) else True for ci in op.order_columns
@@ -193,7 +193,7 @@ class PandasModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.RenameColumnsNode"
             )
         res = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, pandas_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self
         )
         return res.rename(columns=op.reverse_mapping)
 
@@ -203,10 +203,10 @@ class PandasModel(data_algebra.data_model.DataModel):
                 "op was supposed to be a data_algebra.data_ops.NaturalJoinNode"
             )
         left = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, pandas_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self
         )
         right = op.sources[1].eval_implementation(
-            data_map=data_map, eval_env=eval_env, pandas_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self
         )
         common_cols = set([c for c in left.columns]).intersection(
             [c for c in right.columns]

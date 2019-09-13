@@ -13,22 +13,39 @@ import data_algebra.cdata
 
 # map from op-name to special SQL formatting code
 
+
 def _db_is_null_expr(dbmodel, expression):
-    return "(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + " IS NULL)"
+    return (
+        "("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + " IS NULL)"
+    )
 
 
 def _db_is_bad_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
-    return "(" + subexpr + " IS NULL OR " + subexpr +\
-           " >= " + dbmodel.quote_literal('+infinity') + " OR " +\
-           subexpr + " <= " + dbmodel.quote_literal('-infinity') +\
-           " OR (" + subexpr + " != 0 AND " + subexpr + " = -" + subexpr + "))"
+    return (
+        "("
+        + subexpr
+        + " IS NULL OR "
+        + subexpr
+        + " >= "
+        + dbmodel.quote_literal("+infinity")
+        + " OR "
+        + subexpr
+        + " <= "
+        + dbmodel.quote_literal("-infinity")
+        + " OR ("
+        + subexpr
+        + " != 0 AND "
+        + subexpr
+        + " = -"
+        + subexpr
+        + "))"
+    )
 
 
-db_expr_formatters = {
-    "is_null": _db_is_null_expr,
-    "is_bad": _db_is_bad_expr,
-}
+db_expr_formatters = {"is_null": _db_is_null_expr, "is_bad": _db_is_bad_expr}
 
 
 class DBModel:
@@ -515,7 +532,7 @@ class DBModel:
         :return:
         """
 
-        data_algebra.data_types.assert_is_acceptable_data_frame(d, 'd')
+        data_algebra.data_types.assert_is_acceptable_data_frame(d, "d")
         cr = [
             d.columns[i].lower()
             + " "
