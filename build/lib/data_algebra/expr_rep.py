@@ -307,16 +307,23 @@ class ColumnReference(Term):
 
 
 # map from op-name to special Python formatting code
-py_formatters = {"___": lambda expr: expr.to_python()}
+py_formatters = {
+    "neg": lambda expr: "-(" + expr.args[0].to_pandas() + ")",
+}
+
 
 pandas_eval_env = {
     'is_null': lambda x: pandas.isnull(x),
-    'is_bad': data_algebra.util.is_bad
+    'is_bad': data_algebra.util.is_bad,
 }
+
+
 pd_formatters = {
     "is_bad": lambda expr: "@is_bad(" + expr.args[0].to_pandas() + ")",
     "is_null": lambda expr: "@is_null(" + expr.args[0].to_pandas() + ")",
+    "neg": lambda expr: "-(" + expr.args[0].to_pandas() + ")",
 }
+
 
 r_formatters = {"___": lambda expr: expr.to_R()}
 

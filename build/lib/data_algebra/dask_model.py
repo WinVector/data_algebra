@@ -137,3 +137,16 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
                 res = res.drop(c + "_tmp_right_col", axis=1)
         res = res.reset_index(drop=True)
         return res
+
+    def order_rows_step(self, op, *, data_map, eval_env):
+        if not isinstance(op, data_algebra.data_ops.OrderRowsNode):
+            raise TypeError("op was supposed to be a data_algebra.data_ops.OrderRowsNode")
+        if len(op.order_columns) > 1:
+            raise RuntimeError("sorting doesn't support more than one order column in dask yet")
+        if len(op.reverse) > 0:
+            raise RuntimeError("sorting doesn't support reverse in dask yet")
+        res = op.sources[0].eval_pandas_implementation(data_map=data_map,
+                                                       eval_env=eval_env,
+                                                       pandas_model=self)
+        res.set_index(op.order_columns[0])  # may cause problems in later steps
+        return res
