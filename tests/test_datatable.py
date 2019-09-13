@@ -25,6 +25,6 @@ def test_datatable1():
      )
 
     ops = TableDescription('d', ['subjectID', 'surveyCategory', 'assessmentTotal']). \
-        select_columns(['subjectID', 'surveyCategory'])
+        order_rows(['subjectID', 'assessmentTotal'])
 
     ops.transform(d)

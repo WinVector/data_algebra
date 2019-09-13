@@ -1,6 +1,7 @@
 
 # https://github.com/h2oai/datatable
 # https://datatable.readthedocs.io/en/latest/?badge=latest
+# https://datatable.readthedocs.io/en/latest/using-datatable.html
 
 try:
     # noinspection PyUnresolvedReferences
@@ -134,7 +135,10 @@ class DataTableModel(data_algebra.data_model.DataModel):
         ascending = [
             False if ci in set(op.reverse) else True for ci in op.order_columns
         ]
-        raise RuntimeError("not implemented yet")  # TODO: implement
+        if not all(ascending):
+            raise RuntimeError("reverse isn't implemented for datatable yet")
+        syms = [datatable.f[c] for c in op.order_columns]
+        return res.sort(*syms)
 
     def rename_columns_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.RenameColumnsNode):

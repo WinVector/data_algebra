@@ -33,7 +33,7 @@ data_algebra/data_model.py           39     14    64%
 data_algebra/data_ops.py            660    134    80%
 data_algebra/data_pipe.py           156     33    79%
 data_algebra/data_types.py           56     30    46%
-data_algebra/datatable_model.py      94     61    35%
+data_algebra/datatable_model.py      97     61    37%
 data_algebra/db_model.py            349     74    79%
 data_algebra/env.py                  54     12    78%
 data_algebra/expr_rep.py            294     86    71%
@@ -43,7 +43,7 @@ data_algebra/pipe.py                 65     19    71%
 data_algebra/util.py                 72      6    92%
 data_algebra/yaml.py                 76     11    86%
 -----------------------------------------------------
-TOTAL                              2437    590    76%
+TOTAL                              2440    590    76%
 
 
-========================== 19 passed in 6.14 seconds ===========================
+========================== 19 passed in 10.48 seconds ==========================
