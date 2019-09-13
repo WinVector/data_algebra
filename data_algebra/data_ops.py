@@ -180,7 +180,7 @@ class ViewRepresentation(OperatorPlatform):
 
     # Pandas realization
 
-    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
+    def eval_implementation(self, *, data_map, eval_env, pandas_model):
         raise NotImplementedError("base method called")
 
     def eval_pandas(self, data_map, *, eval_env=None, pandas_model=None):
@@ -206,7 +206,7 @@ class ViewRepresentation(OperatorPlatform):
             eval_env = globals()
         if pandas_model is None:
             pandas_model = data_algebra.pandas_model.PandasModel()
-        return self.eval_pandas_implementation(data_map=data_map, eval_env=eval_env, pandas_model=pandas_model)
+        return self.eval_implementation(data_map=data_map, eval_env=eval_env, pandas_model=pandas_model)
 
     def eval_dask(self, data_map, *, eval_env=None, pandas_model=None):
         """
@@ -231,7 +231,7 @@ class ViewRepresentation(OperatorPlatform):
             eval_env = globals()
         if pandas_model is None:
             pandas_model = data_algebra.dask_model.DaskModel()
-        return self.eval_pandas_implementation(data_map=data_map, eval_env=eval_env, pandas_model=pandas_model)
+        return self.eval_implementation(data_map=data_map, eval_env=eval_env, pandas_model=pandas_model)
 
     # implement builders for all non-initial node types on base class
 
@@ -389,7 +389,7 @@ class TableDescription(ViewRepresentation):
             tables[self.key] = self
         return tables
 
-    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
+    def eval_implementation(self, *, data_map, eval_env, pandas_model):
         return pandas_model.table_step(op=self, data_map=data_map, eval_env=eval_env)
 
     def columns_used_from_sources(self, using=None):
@@ -549,7 +549,7 @@ class ExtendNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.extend_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
+    def eval_implementation(self, *, data_map, eval_env, pandas_model):
         return pandas_model.extend_step(op=self, data_map=data_map, eval_env=eval_env)
 
 
@@ -630,7 +630,7 @@ class ProjectNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.project_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
+    def eval_implementation(self, *, data_map, eval_env, pandas_model):
         return pandas_model.project_step(op=self, data_map=data_map, eval_env=eval_env)
 
 
@@ -686,7 +686,7 @@ class SelectRowsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
+    def eval_implementation(self, *, data_map, eval_env, pandas_model):
         return pandas_model.select_rows_step(op=self, data_map=data_map, eval_env=eval_env)
 
 
@@ -734,7 +734,7 @@ class SelectColumnsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
+    def eval_implementation(self, *, data_map, eval_env, pandas_model):
         return pandas_model.select_columns_step(op=self, data_map=data_map, eval_env=eval_env)
 
 
@@ -784,7 +784,7 @@ class DropColumnsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
+    def eval_implementation(self, *, data_map, eval_env, pandas_model):
         return pandas_model.drop_columns_step(op=self, data_map=data_map, eval_env=eval_env)
 
 
@@ -841,7 +841,7 @@ class OrderRowsNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.order_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
+    def eval_implementation(self, *, data_map, eval_env, pandas_model):
         return pandas_model.order_rows_step(op=self, data_map=data_map, eval_env=eval_env)
 
 
@@ -897,7 +897,7 @@ class RenameColumnsNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.rename_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
+    def eval_implementation(self, *, data_map, eval_env, pandas_model):
         return pandas_model.rename_columns_step(op=self, data_map=data_map, eval_env=eval_env)
 
 
@@ -967,5 +967,5 @@ class NaturalJoinNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_pandas_implementation(self, *, data_map, eval_env, pandas_model):
+    def eval_implementation(self, *, data_map, eval_env, pandas_model):
         return pandas_model.natural_join_step(op=self, data_map=data_map, eval_env=eval_env)

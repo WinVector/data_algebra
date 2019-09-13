@@ -16,7 +16,7 @@ class PandasModel:
             raise TypeError("op was supposed to be a data_algebra.data_ops.TableDescription")
         if len(op.qualifiers) > 0:
             raise ValueError(
-                "table descriptions used with eval_pandas_implementation() must not have qualifiers"
+                "table descriptions used with eval_implementation() must not have qualifiers"
             )
         df = data_map[op.table_name]
         # check all columns we expect are present
@@ -58,7 +58,7 @@ class PandasModel:
         window_situation = (len(op.partition_by) > 0) or (len(op.order_by) > 0)
         if window_situation:
             self.check_extend_window_fns(op)
-        res = op.sources[0].eval_pandas_implementation(data_map=data_map,
+        res = op.sources[0].eval_implementation(data_map=data_map,
                                                        eval_env=eval_env,
                                                        pandas_model=self)
         if not window_situation:
@@ -127,7 +127,7 @@ class PandasModel:
                     + ": "
                     + str(opk)
                 )
-        res = op.sources[0].eval_pandas_implementation(data_map=data_map,
+        res = op.sources[0].eval_implementation(data_map=data_map,
                                                        eval_env=eval_env,
                                                        pandas_model=self)
         if len(op.group_by) > 0:
@@ -150,7 +150,7 @@ class PandasModel:
     def select_rows_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.SelectRowsNode):
             raise TypeError("op was supposed to be a data_algebra.data_ops.SelectRowsNode")
-        res = op.sources[0].eval_pandas_implementation(data_map=data_map,
+        res = op.sources[0].eval_implementation(data_map=data_map,
                                                        eval_env=eval_env,
                                                        pandas_model=self)
         res = res.query(op.expr.to_pandas()).reset_index(drop=True)
@@ -159,7 +159,7 @@ class PandasModel:
     def select_columns_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.SelectColumnsNode):
             raise TypeError("op was supposed to be a data_algebra.data_ops.SelectColumnsNode")
-        res = op.sources[0].eval_pandas_implementation(data_map=data_map,
+        res = op.sources[0].eval_implementation(data_map=data_map,
                                                        eval_env=eval_env,
                                                        pandas_model=self)
         return res[op.column_selection]
@@ -167,7 +167,7 @@ class PandasModel:
     def drop_columns_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.DropColumnsNode):
             raise TypeError("op was supposed to be a data_algebra.data_ops.DropColumnsNode")
-        res = op.sources[0].eval_pandas_implementation(data_map=data_map,
+        res = op.sources[0].eval_implementation(data_map=data_map,
                                                        eval_env=eval_env,
                                                        pandas_model=self)
         column_selection = [c for c in res.columns if c not in op.column_deletions]
@@ -176,7 +176,7 @@ class PandasModel:
     def order_rows_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.OrderRowsNode):
             raise TypeError("op was supposed to be a data_algebra.data_ops.OrderRowsNode")
-        res = op.sources[0].eval_pandas_implementation(data_map=data_map,
+        res = op.sources[0].eval_implementation(data_map=data_map,
                                                        eval_env=eval_env,
                                                        pandas_model=self)
         ascending = [
@@ -188,7 +188,7 @@ class PandasModel:
     def rename_columns_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.RenameColumnsNode):
             raise TypeError("op was supposed to be a data_algebra.data_ops.RenameColumnsNode")
-        res = op.sources[0].eval_pandas_implementation(data_map=data_map,
+        res = op.sources[0].eval_implementation(data_map=data_map,
                                                        eval_env=eval_env,
                                                        pandas_model=self)
         return res.rename(columns=op.reverse_mapping)
@@ -196,10 +196,10 @@ class PandasModel:
     def natural_join_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.NaturalJoinNode):
             raise TypeError("op was supposed to be a data_algebra.data_ops.NaturalJoinNode")
-        left = op.sources[0].eval_pandas_implementation(data_map=data_map,
+        left = op.sources[0].eval_implementation(data_map=data_map,
                                                         eval_env=eval_env,
                                                         pandas_model=self)
-        right = op.sources[1].eval_pandas_implementation(data_map=data_map,
+        right = op.sources[1].eval_implementation(data_map=data_map,
                                                          eval_env=eval_env,
                                                          pandas_model=self)
         common_cols = set([c for c in left.columns]).intersection(
