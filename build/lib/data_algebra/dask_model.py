@@ -1,5 +1,4 @@
 
-# Note: we are not yet seeing reliable behavior between the windowed extend and dask.
 
 import warnings
 
