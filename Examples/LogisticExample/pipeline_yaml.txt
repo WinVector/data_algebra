@@ -27,7 +27,7 @@
   reverse: []
 - op: Extend
   ops:
-    sort_key: -1 * probability
+    sort_key: -probability
   partition_by: []
   order_by: []
   reverse: []
@@ -46,4 +46,7 @@
   - subjectID
   - surveyCategory
   - probability
+- op: Rename
+  column_remapping:
+    diagnosis: surveyCategory
 

@@ -2,22 +2,23 @@
 platform darwin -- Python 3.6.9, pytest-5.0.1, py-1.8.0, pluggy-0.12.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.7.1
-collected 19 items
+collected 20 items
 
 tests/test_apply.py .                                                    [  5%]
 tests/test_cdata1.py .                                                   [ 10%]
-tests/test_dask.py ..                                                    [ 21%]
-tests/test_datatable.py .                                                [ 26%]
-tests/test_drop_columns.py .                                             [ 31%]
-tests/test_example_data_ops.py .                                         [ 36%]
-tests/test_exp.py .                                                      [ 42%]
-tests/test_natural_join.py .                                             [ 47%]
-tests/test_neg.py .                                                      [ 52%]
-tests/test_null_bad.py .                                                 [ 57%]
-tests/test_parse.py .                                                    [ 63%]
-tests/test_poject.py .                                                   [ 68%]
-tests/test_scoring_example.py .                                          [ 73%]
-tests/test_simple.py ....                                                [ 94%]
+tests/test_dask.py ..                                                    [ 20%]
+tests/test_datatable.py .                                                [ 25%]
+tests/test_drop_columns.py .                                             [ 30%]
+tests/test_example_data_ops.py .                                         [ 35%]
+tests/test_exp.py .                                                      [ 40%]
+tests/test_export_neg.py .                                               [ 45%]
+tests/test_natural_join.py .                                             [ 50%]
+tests/test_neg.py .                                                      [ 55%]
+tests/test_null_bad.py .                                                 [ 60%]
+tests/test_parse.py .                                                    [ 65%]
+tests/test_poject.py .                                                   [ 70%]
+tests/test_scoring_example.py .                                          [ 75%]
+tests/test_simple.py ....                                                [ 95%]
 tests/test_sqlite.py .                                                   [100%]
 
 ---------- coverage: platform darwin, python 3.6.9-final-0 -----------
@@ -30,20 +31,20 @@ data_algebra/cdata.py                48      4    92%
 data_algebra/cdata_impl.py           92     15    84%
 data_algebra/dask_model.py          117     22    81%
 data_algebra/data_model.py           39     14    64%
-data_algebra/data_ops.py            669    142    79%
-data_algebra/data_pipe.py           149     30    80%
+data_algebra/data_ops.py            669    161    76%
+data_algebra/data_pipe.py           149     37    75%
 data_algebra/data_types.py           39     19    51%
 data_algebra/datatable_model.py     129     80    38%
-data_algebra/db_model.py            347     73    79%
+data_algebra/db_model.py            350     85    76%
 data_algebra/env.py                  46      7    85%
-data_algebra/expr_rep.py            294     86    71%
-data_algebra/pandas_model.py        130     16    88%
+data_algebra/expr_rep.py            294     80    73%
+data_algebra/pandas_model.py        130     21    84%
 data_algebra/pending_eval.py         34     34     0%
 data_algebra/pipe.py                 65     19    71%
 data_algebra/util.py                 72      6    92%
-data_algebra/yaml.py                 76     11    86%
+data_algebra/yaml.py                 76     13    83%
 -----------------------------------------------------
-TOTAL                              2446    597    76%
+TOTAL                              2449    636    74%
 
 
-========================== 19 passed in 6.11 seconds ===========================
+========================== 20 passed in 7.30 seconds ===========================

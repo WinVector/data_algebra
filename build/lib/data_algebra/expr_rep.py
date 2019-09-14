@@ -307,7 +307,7 @@ class ColumnReference(Term):
 
 
 # map from op-name to special Python formatting code
-py_formatters = {"neg": lambda expr: "-(" + expr.args[0].to_pandas() + ")"}
+py_formatters = {"neg": lambda expr: "-" + expr.args[0].to_python(want_inline_parens=True)}
 
 
 pandas_eval_env = {
@@ -319,11 +319,11 @@ pandas_eval_env = {
 pd_formatters = {
     "is_bad": lambda expr: "@is_bad(" + expr.args[0].to_pandas() + ")",
     "is_null": lambda expr: "@is_null(" + expr.args[0].to_pandas() + ")",
-    "neg": lambda expr: "-(" + expr.args[0].to_pandas() + ")",
+    "neg": lambda expr: "-" + expr.args[0].to_pandas(want_inline_parens=True),
 }
 
 
-r_formatters = {"___": lambda expr: expr.to_R()}
+r_formatters = {"neg": lambda expr: "-" + expr.args[0].to_R(want_inline_parens=True)}
 
 
 class Expression(Term):

@@ -25,7 +25,7 @@ cat(format(r_ops))
     ##  extend(.,
     ##   probability := probability / total) %.>%
     ##  extend(.,
-    ##   sort_key := -(1) * probability) %.>%
+    ##   sort_key := -(probability)) %.>%
     ##  extend(.,
     ##   row_number := row_number(),
     ##   p= subjectID,
@@ -33,7 +33,9 @@ cat(format(r_ops))
     ##  select_rows(.,
     ##    row_number == 1) %.>%
     ##  select_columns(.,
-    ##    subjectID, surveyCategory, probability)
+    ##    subjectID, surveyCategory, probability) %.>%
+    ##  rename(.,
+    ##   c('diagnosis' = 'surveyCategory'))
 
 ``` r
 r_ops %.>%
