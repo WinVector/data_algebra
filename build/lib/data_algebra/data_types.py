@@ -19,18 +19,7 @@ except ImportError:
     pass
 
 
-def is_acceptable_data_frame(d):
-    if isinstance(d, pandas.DataFrame):
-        return True
-    if data_algebra.have_dask:
-        if isinstance(d, dask.dataframe.DataFrame):
-            return True
-    return False
-
-
 def is_dask_data_frame(d):
-    if isinstance(d, pandas.DataFrame):
-        return False
     if data_algebra.have_dask:
         if isinstance(d, dask.dataframe.DataFrame):
             return True
@@ -38,46 +27,17 @@ def is_dask_data_frame(d):
 
 
 def is_datatable_frame(d):
-    if isinstance(d, pandas.DataFrame):
-        return False
-    if data_algebra.have_datatable:
-        if isinstance(d, datatable.Frame):
-            return True
     if data_algebra.have_datatable:
         if isinstance(d, datatable.Frame):
             return True
     return False
 
 
-def assert_is_acceptable_data_frame(d, arg_name=None):
-    if not is_acceptable_data_frame(d):
-        if arg_name is not None:
-            raise TypeError(
-                "argument "
-                + str(arg_name)
-                + " should be a pandas.DataFrame or dask.dataframe.DataFrame (was "
-                + str(type(d))
-                + ")"
-            )
-        else:
-            raise TypeError(
-                "argument"
-                + " should be a pandas.DataFrame or dask.dataframe.DataFrame (was "
-                + str(type(d))
-                + ")"
-            )
-
-
 def convert_to_pandas_dataframe(d, arg_name=None):
     if isinstance(d, pandas.DataFrame):
         return d
     if isinstance(d, numpy.ndarray):
-        if d.dtype.names is None:
-            d = pandas.DataFrame(d)
-            d.columns = ["col_" + str(i) for i in range(d.shape[1])]
-        else:
-            d = pandas.DataFrame(d)
-        return d
+        return pandas.DataFrame(d)  # not likely to have column names
     if data_algebra.have_dask:
         if isinstance(d, dask.dataframe.DataFrame):
             d = d.compute()

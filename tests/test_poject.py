@@ -14,7 +14,7 @@ def test_project():
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
 
-    ops = describe_pandas_table(d, "d").project(
+    ops = describe_table(d, "d").project(
         od(ymax="y.max()", ymin="y.min()"), group_by=["c", "g"]
     )
 

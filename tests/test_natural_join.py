@@ -15,8 +15,8 @@ def test_natural_join_columns():
 
     d2 = pandas.DataFrame({"qq": [10, 20, 30], "y": [1.0, 2.0, 3.0], "x": [4, 5, 7]})
 
-    ops4 = describe_pandas_table(d, "d").natural_join(
-        b=describe_pandas_table(d2, "d2"), by=["y"], jointype="LEFT"
+    ops4 = describe_table(d, "d").natural_join(
+        b=describe_table(d2, "d2"), by=["y"], jointype="LEFT"
     )
 
     data_algebra.yaml.check_op_round_trip(ops4)

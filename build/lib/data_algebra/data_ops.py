@@ -342,10 +342,6 @@ class ViewRepresentation(OperatorPlatform):
         raise TypeError("can not apply transform() to type " + str(type(X)))
 
     def __rrshift__(self, other):  # override other >> self
-        if not data_algebra.data_types.is_acceptable_data_frame(other):
-            raise TypeError(
-                "can not apply >> (transform()) to type " + str(type(other))
-            )
         return self.transform(other)
 
     # nodes
@@ -527,8 +523,14 @@ class TableDescription(ViewRepresentation):
         return self.key.__hash__()
 
 
-def describe_pandas_table(d, table_name):
-    return TableDescription(table_name, [c for c in d.columns])
+def describe_table(d, table_name):
+    if isinstance(d, pandas.DataFrame):
+        return TableDescription(table_name, [c for c in d.columns])
+    if data_algebra.data_types.is_dask_data_frame(d):
+        return TableDescription(table_name, [c for c in d.columns])
+    if data_algebra.data_types.is_datatable_frame(d):
+        return TableDescription(table_name, [c for c in d.names])
+    raise TypeError("can't describe " + table_name + ": " + str(type(d)))
 
 
 class ExtendNode(ViewRepresentation):

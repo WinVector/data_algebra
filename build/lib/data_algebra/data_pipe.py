@@ -1,7 +1,5 @@
 from typing import Dict, List
 
-import pandas
-
 import data_algebra.pipe
 import data_algebra.data_ops
 import data_algebra.expr_rep
@@ -199,26 +197,18 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
 
     # noinspection PyPep8Naming
     def realize(self, X):
-        if data_algebra.data_types.is_acceptable_data_frame(X):
-            pipeline = data_algebra.data_ops.describe_pandas_table(X, table_name="X")
-            for s in self.ops:
-                # pipeline = pipeline >> s
-                pipeline = s.apply(pipeline)
-            return pipeline
-        raise TypeError("can not apply realize() to type " + str(type(X)))
+        pipeline = data_algebra.data_ops.describe_table(X, table_name="X")
+        for s in self.ops:
+            # pipeline = pipeline >> s
+            pipeline = s.apply(pipeline)
+        return pipeline
 
     # noinspection PyPep8Naming
     def transform(self, X):
-        if data_algebra.data_types.is_acceptable_data_frame(X):
-            pipeline = self.realize(X)
-            return pipeline.transform(X)
-        raise TypeError("can not apply transform() to type " + str(type(X)))
+        pipeline = self.realize(X)
+        return pipeline.transform(X)
 
     def __rrshift__(self, other):  # override other >> self
-        if not data_algebra.data_types.is_acceptable_data_frame(other):
-            raise TypeError(
-                "can not apply >> (transform()) to type " + str(type(other))
-            )
         return self.transform(other)
 
     # implement method chaining collection of pending operations

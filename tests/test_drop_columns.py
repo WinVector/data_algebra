@@ -12,7 +12,7 @@ def test_drop_columns():
 
     d = pandas.DataFrame({"x": [1], "y": [2]})
 
-    ops = describe_pandas_table(d, "d").drop_columns(["x"])
+    ops = describe_table(d, "d").drop_columns(["x"])
 
     sql = ops.to_sql(db_model)
 

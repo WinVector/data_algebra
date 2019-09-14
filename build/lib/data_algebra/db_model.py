@@ -4,7 +4,6 @@ import io
 
 import pandas
 
-import data_algebra.data_types
 import data_algebra.expr_rep
 import data_algebra.data_ops
 import data_algebra.util
@@ -45,7 +44,10 @@ def _db_is_bad_expr(dbmodel, expression):
     )
 
 
-db_expr_formatters = {"is_null": _db_is_null_expr, "is_bad": _db_is_bad_expr}
+db_expr_formatters = {
+    "is_null": _db_is_null_expr,
+    "is_bad": _db_is_bad_expr,
+}
 
 
 class DBModel:
@@ -532,7 +534,6 @@ class DBModel:
         :return:
         """
 
-        data_algebra.data_types.assert_is_acceptable_data_frame(d, "d")
         cr = [
             d.columns[i].lower()
             + " "

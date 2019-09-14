@@ -18,7 +18,7 @@ def table_is_keyed_by_columns(table, column_names):
     if len(column_names) < 1:
         return False
     ops = (
-        data_algebra.data_ops.describe_pandas_table(table, "table")
+        data_algebra.data_ops.describe_table(table, "table")
         .select_columns(column_names)
         .extend({"cdata_temp_one": 1})
         .project({"_cdata_temp_sum": "cdata_temp_one.sum()"}, group_by=column_names)
@@ -56,7 +56,7 @@ class RecordMap:
         X = X.reset_index(drop=True)
         db_model = data_algebra.SQLite.SQLiteModel()
         if self.blocks_in is not None:
-            x1_descr = data_algebra.data_ops.describe_pandas_table(
+            x1_descr = data_algebra.data_ops.describe_table(
                 X, table_name="x_blocks_in"
             )
             missing_cols = set(self.blocks_in.control_table_keys).union(
@@ -80,7 +80,7 @@ class RecordMap:
                 )
                 X = db_model.read_query(conn, to_blocks_sql)
         if self.blocks_out is not None:
-            x2_descr = data_algebra.data_ops.describe_pandas_table(
+            x2_descr = data_algebra.data_ops.describe_table(
                 X, table_name="x_blocks_out"
             )
             missing_cols = set(self.blocks_out.record_keys) - set(x2_descr.column_names)
