@@ -48,7 +48,7 @@ class Env:
 
 
 class SimpleNamespaceDict(types.SimpleNamespace):
-    """Allow square-bracket lookup on SimpleNamespace
+    """Allow square-bracket lookup on read-only types.SimpleNamespace
 
        Example:
            import data_algebra.env
