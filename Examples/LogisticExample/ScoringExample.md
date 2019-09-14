@@ -9,7 +9,7 @@ Parts of the project are in early development (and not yet ready for production 
 
 The project intent is to realize a modern data processing language based on [Codd's relational operators](https://en.wikipedia.org/wiki/Relational_model) that is easy to maintain, has helpful tooling, and has very similar realizations (or dialects) for:
 
-  * [`SQL`](https://en.wikipedia.org/wiki/SQL) databases accessed from [`Python`](https://www.python.org), useful working at scale with `PostgreSQL` or Apache `Spark`.
+  * [`SQL`](https://en.wikipedia.org/wiki/SQL) databases accessed from [`Python`](https://www.python.org), useful working at scale with `PostgreSQL` or Apache `Spark` (`Spark` example [here](https://github.com/WinVector/data_algebra/blob/master/Examples/Spark/pyspark_example.ipynb)).
   * [`Pandas`](https://pandas.pydata.org) `DataFrame` objects in `Python`.
   * [`dask`](https://dask.org) distributed `Pandas` structures.
   * `SQL` databases access from [`R`](https://www.r-project.org) (implementation is [here](https://github.com/WinVector/rquery), and is mature and ready for production use).
@@ -345,23 +345,23 @@ print(sql)
            "surveycategory" AS "diagnosis"
     FROM
       (SELECT "probability",
-              "surveycategory",
-              "subjectid"
+              "subjectid",
+              "surveycategory"
        FROM
          (SELECT "probability",
-                 "surveycategory",
-                 "subjectid"
+                 "subjectid",
+                 "surveycategory"
           FROM
             (SELECT "probability",
+                    "subjectid",
                     "sort_key",
                     "surveycategory",
-                    "subjectid",
                     ROW_NUMBER() OVER (PARTITION BY "subjectid"
                                        ORDER BY "sort_key") AS "row_number"
              FROM
                (SELECT "probability",
-                       "surveycategory",
                        "subjectid",
+                       "surveycategory",
                        (-"probability") AS "sort_key"
                 FROM
                   (SELECT "subjectid",
@@ -373,12 +373,12 @@ print(sql)
                              "surveycategory",
                              SUM("probability") OVER (PARTITION BY "subjectid") AS "total"
                       FROM
-                        (SELECT "surveycategory",
-                                "subjectid",
+                        (SELECT "subjectid",
+                                "surveycategory",
                                 EXP(("assessmenttotal" * 0.237)) AS "probability"
                          FROM
-                           (SELECT "assessmenttotal",
-                                   "subjectid",
+                           (SELECT "subjectid",
+                                   "assessmenttotal",
                                    "surveycategory"
                             FROM "d") "sq_0") "sq_1") "sq_2") "sq_3") "sq_4") "sq_5"
           WHERE "row_number" = 1 ) "sq_6") "sq_7"
@@ -893,15 +893,15 @@ cat(sql)
              "assessmentTotal"
             FROM
              "d"
-            ) tsql_73154282713650778460_0000000000
-           ) tsql_73154282713650778460_0000000001
-          ) tsql_73154282713650778460_0000000002
-         ) tsql_73154282713650778460_0000000003
-        ) tsql_73154282713650778460_0000000004
-      ) tsql_73154282713650778460_0000000005
+            ) tsql_92212314115132864025_0000000000
+           ) tsql_92212314115132864025_0000000001
+          ) tsql_92212314115132864025_0000000002
+         ) tsql_92212314115132864025_0000000003
+        ) tsql_92212314115132864025_0000000004
+      ) tsql_92212314115132864025_0000000005
       WHERE "row_number" = 1
-     ) tsql_73154282713650778460_0000000006
-    ) tsql_73154282713650778460_0000000007
+     ) tsql_92212314115132864025_0000000006
+    ) tsql_92212314115132864025_0000000007
 
 
 The `R` implementation is mature, and appropriate to use in production.  The [`rquery`](https://github.com/WinVector/rquery) grammar is designed to have minimal state and minimal annotations (no grouping or ordering annotations!).  This makes the grammar, in my opinion, a good design choice. `rquery` has very good performance, often much faster than `dplyr` or base-`R` due to its query generation ideas and use of [`data.table`](https://CRAN.R-project.org/package=data.table) via [`rqdatatable`](https://CRAN.R-project.org/package=rqdatatable).  `rquery` is a mature pure `R` package; [here](https://github.com/WinVector/rquery/blob/master/README.md) is the same example being worked directly in `R`, with no translation from `Python`. 

@@ -13121,7 +13121,7 @@ div#notebook {
 <h2 id="Introduction">Introduction<a class="anchor-link" href="#Introduction">&#182;</a></h2><p>Parts of the project are in early development (and not yet ready for production use), and other parts are mature and have been used in production.</p>
 <p>The project intent is to realize a modern data processing language based on <a href="https://en.wikipedia.org/wiki/Relational_model">Codd's relational operators</a> that is easy to maintain, has helpful tooling, and has very similar realizations (or dialects) for:</p>
 <ul>
-<li><a href="https://en.wikipedia.org/wiki/SQL"><code>SQL</code></a> databases accessed from <a href="https://www.python.org"><code>Python</code></a>, useful working at scale with <code>PostgreSQL</code> or Apache <code>Spark</code>.</li>
+<li><a href="https://en.wikipedia.org/wiki/SQL"><code>SQL</code></a> databases accessed from <a href="https://www.python.org"><code>Python</code></a>, useful working at scale with <code>PostgreSQL</code> or Apache <code>Spark</code> (<code>Spark</code> example <a href="https://github.com/WinVector/data_algebra/blob/master/Examples/Spark/pyspark_example.ipynb">here</a>).</li>
 <li><a href="https://pandas.pydata.org"><code>Pandas</code></a> <code>DataFrame</code> objects in <code>Python</code>.</li>
 <li><a href="https://dask.org"><code>dask</code></a> distributed <code>Pandas</code> structures.</li>
 <li><code>SQL</code> databases access from <a href="https://www.r-project.org"><code>R</code></a> (implementation is <a href="https://github.com/WinVector/rquery">here</a>, and is mature and ready for production use).</li>
@@ -13577,23 +13577,23 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
        &#34;surveycategory&#34; AS &#34;diagnosis&#34;
 FROM
   (SELECT &#34;probability&#34;,
-          &#34;surveycategory&#34;,
-          &#34;subjectid&#34;
+          &#34;subjectid&#34;,
+          &#34;surveycategory&#34;
    FROM
      (SELECT &#34;probability&#34;,
-             &#34;surveycategory&#34;,
-             &#34;subjectid&#34;
+             &#34;subjectid&#34;,
+             &#34;surveycategory&#34;
       FROM
         (SELECT &#34;probability&#34;,
+                &#34;subjectid&#34;,
                 &#34;sort_key&#34;,
                 &#34;surveycategory&#34;,
-                &#34;subjectid&#34;,
                 ROW_NUMBER() OVER (PARTITION BY &#34;subjectid&#34;
                                    ORDER BY &#34;sort_key&#34;) AS &#34;row_number&#34;
          FROM
            (SELECT &#34;probability&#34;,
-                   &#34;surveycategory&#34;,
                    &#34;subjectid&#34;,
+                   &#34;surveycategory&#34;,
                    (-&#34;probability&#34;) AS &#34;sort_key&#34;
             FROM
               (SELECT &#34;subjectid&#34;,
@@ -13605,12 +13605,12 @@ FROM
                          &#34;surveycategory&#34;,
                          SUM(&#34;probability&#34;) OVER (PARTITION BY &#34;subjectid&#34;) AS &#34;total&#34;
                   FROM
-                    (SELECT &#34;surveycategory&#34;,
-                            &#34;subjectid&#34;,
+                    (SELECT &#34;subjectid&#34;,
+                            &#34;surveycategory&#34;,
                             EXP((&#34;assessmenttotal&#34; * 0.237)) AS &#34;probability&#34;
                      FROM
-                       (SELECT &#34;assessmenttotal&#34;,
-                               &#34;subjectid&#34;,
+                       (SELECT &#34;subjectid&#34;,
+                               &#34;assessmenttotal&#34;,
                                &#34;surveycategory&#34;
                         FROM &#34;d&#34;) &#34;sq_0&#34;) &#34;sq_1&#34;) &#34;sq_2&#34;) &#34;sq_3&#34;) &#34;sq_4&#34;) &#34;sq_5&#34;
       WHERE &#34;row_number&#34; = 1 ) &#34;sq_6&#34;) &#34;sq_7&#34;
@@ -14406,15 +14406,15 @@ FROM (
          &#34;assessmentTotal&#34;
         FROM
          &#34;d&#34;
-        ) tsql_73154282713650778460_0000000000
-       ) tsql_73154282713650778460_0000000001
-      ) tsql_73154282713650778460_0000000002
-     ) tsql_73154282713650778460_0000000003
-    ) tsql_73154282713650778460_0000000004
-  ) tsql_73154282713650778460_0000000005
+        ) tsql_92212314115132864025_0000000000
+       ) tsql_92212314115132864025_0000000001
+      ) tsql_92212314115132864025_0000000002
+     ) tsql_92212314115132864025_0000000003
+    ) tsql_92212314115132864025_0000000004
+  ) tsql_92212314115132864025_0000000005
   WHERE &#34;row_number&#34; = 1
- ) tsql_73154282713650778460_0000000006
-) tsql_73154282713650778460_0000000007
+ ) tsql_92212314115132864025_0000000006
+) tsql_92212314115132864025_0000000007
 </pre>
 </div>
 </div>
