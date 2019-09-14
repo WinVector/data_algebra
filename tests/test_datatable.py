@@ -31,14 +31,14 @@ def test_datatable1():
                                ['subjectID',
                                 'surveyCategory',
                                 'assessmentTotal']). \
-            extend({'probability': '(assessmentTotal * scale).exp()'}) # . \   # TODO: implemenmt forward
+            extend({'probability': '(assessmentTotal * scale).exp()'})  # . \
             # extend({'total': 'probability.sum()'},
-            #        partition_by='subjectID'). \
+            #        partition_by='subjectID')  # . \
             # extend({'probability': 'probability/total'}). \
             # extend({'sort_key': '-1*probability'}). \
             # extend({'row_number': '_row_number()'},
             #        partition_by=['subjectID'],
-            #        order_by=['sort_key']). \
+            #        order_by=['sort_key']). \      # TODO: implemenmt forward
             # select_rows('row_number == 1'). \
             # select_columns(['subjectID', 'surveyCategory', 'probability'])
 

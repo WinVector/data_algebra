@@ -18,6 +18,7 @@ import data_algebra.data_ops
 
 expr_to_dt_expr_map = {
     'exp': lambda expr: datatable.exp(expr_to_dt_expr(expr.args[0])),
+    'sum': lambda expr: datatable.sum(expr_to_dt_expr(expr.args[0])),
     '+': lambda expr: expr_to_dt_expr(expr.args[0]) + expr_to_dt_expr(expr.args[1]),
     '-': lambda expr: expr_to_dt_expr(expr.args[0]) - expr_to_dt_expr(expr.args[1]),
     '*': lambda expr: expr_to_dt_expr(expr.args[0]) * expr_to_dt_expr(expr.args[1]),
@@ -71,13 +72,26 @@ class DataTableModel(data_algebra.data_model.DataModel):
         if window_situation:
             self.check_extend_window_fns(op)
         if window_situation:
-            raise RuntimeError("windowed extend not implemented for datatable yet")   # TODO: implement
+            raise RuntimeError("windowed extend not implemented yet")
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self
         )
-        for (col, expr) in op.ops.items():
-            dt_expr = expr_to_dt_expr(expr)
-            res[col] = res[:, {col: dt_expr}][col]
+        if len(op.order_by) > 0:
+            ascending = [
+                False if ci in set(op.reverse) else True for ci in op.order_by
+            ]
+            if not all(ascending):
+                raise RuntimeError("reverse isn't implemented for datatable yet")
+            syms = [datatable.f[c] for c in op.order_by]
+            res =  res.sort(*syms)
+        if len(op.partition_by) > 0:
+            for (col, expr) in op.ops.items():
+                dt_expr = expr_to_dt_expr(expr)
+                res[col] = res[:, {col: dt_expr}, datatable.by(*op.partition_by)][col]
+        else:
+            for (col, expr) in op.ops.items():
+                dt_expr = expr_to_dt_expr(expr)
+                res[col] = res[:, {col: dt_expr}][col]
         return res
 
     def columns_to_frame(self, cols):
@@ -115,7 +129,17 @@ class DataTableModel(data_algebra.data_model.DataModel):
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self
         )
-        raise RuntimeError("not implemented yet")  # TODO: implement
+        cols = []
+        if len(op.partition_by) > 0:
+            for (col, expr) in op.ops.items():
+                dt_expr = expr_to_dt_expr(expr)
+                cols.append(res[:, {col: dt_expr}, datatable.by(*op.partition_by)][col])
+        else:
+            for (col, expr) in op.ops.items():
+                dt_expr = expr_to_dt_expr(expr)
+                cols.append(res[:, {col: dt_expr}][col])
+        res = self.columns_to_frame(cols)
+        return res
 
     def select_rows_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.SelectRowsNode):
