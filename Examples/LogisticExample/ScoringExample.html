@@ -13121,12 +13121,13 @@ div#notebook {
 <h2 id="Introduction">Introduction<a class="anchor-link" href="#Introduction">&#182;</a></h2><p>Parts of the project are in early development (and not yet ready for production use), and other parts are mature and have been used in production.</p>
 <p>The project intent is to realize a modern data processing language based on <a href="https://en.wikipedia.org/wiki/Relational_model">Codd's relational operators</a> that is easy to maintain, has helpful tooling, and has very similar realizations (or dialects) for:</p>
 <ul>
-<li><a href="https://en.wikipedia.org/wiki/SQL"><code>SQL</code></a> databases accessed from <a href="https://www.python.org"><code>Python</code></a> (in development <a href="https://github.com/WinVector/data_algebra">here</a>, not yet ready for production use).</li>
-<li><code>Pandas</code> <code>Data.Frame</code> objects in <code>Python</code> (in development <a href="https://github.com/WinVector/data_algebra">here</a>, not yet ready for production use).</li>
+<li><a href="https://en.wikipedia.org/wiki/SQL"><code>SQL</code></a> databases accessed from <a href="https://www.python.org"><code>Python</code></a>, useful working at scale with <code>PostgreSQL</code> or Apache <code>Spark</code>.</li>
+<li><a href="https://pandas.pydata.org"><code>Pandas</code></a> <code>DataFrame</code> objects in <code>Python</code>.</li>
+<li><a href="https://dask.org"><code>dask</code></a> distributed <code>Pandas</code> structures.</li>
 <li><code>SQL</code> databases access from <a href="https://www.r-project.org"><code>R</code></a> (implementation is <a href="https://github.com/WinVector/rquery">here</a>, and is mature and ready for production use).</li>
 <li><a href="http://r-datatable.com"><code>data.table</code></a> objects in <code>R</code> (implementation is <a href="https://github.com/WinVector/rqdatatable">here</a>, and is mature and ready for production use).</li>
 </ul>
-<p>The idea is the notation should look idiomatic in each language.  Working in <code>Python</code> should feel like working in <code>Python</code>, and working in <code>R</code> should feel like working in <code>R</code>.  The data semantics, however, are designed to be close to the <code>SQL</code> realizations (given the close connection of <code>SQL</code> to the relational algebra; in particular row numbering starts at <code>1</code> and row and column order is not preserved except at row-order steps or select-columns steps respectively). The intent is: it should be very easy to use the system in either <code>Python</code> or <code>R</code> (a boon to multi-language data science projects) and it is easy to port either code or experience from one system to another (a boon for porting projects, or for data scientists working with more than one code base or computer language).</p>
+<p>The intent is the notation should look idiomatic in each language.  Working in <code>Python</code> should feel like working in <code>Python</code>, and working in <code>R</code> should feel like working in <code>R</code>.  The data semantics, however, are designed to be close to the <code>SQL</code> realizations (given the close connection of <code>SQL</code> to the relational algebra; in particular row numbering starts at <code>1</code> and row and column order is not preserved except at row-order steps or select-columns steps respectively). The intent is: it should be very easy to use the system in either <code>Python</code> or <code>R</code> (a boon to multi-language data science projects) and it is easy to port either code or experience from one system to another (a boon for porting projects, or for data scientists working with more than one code base or computer language).</p>
 <p>Related work includes:</p>
 <ul>
 <li><a href="https://en.wikipedia.org/wiki/Relational_algebra">Codd's relational algebra</a></li>
@@ -13462,7 +13463,8 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We are deliberately writing a longer pipeline of simple steps, so we can use the same pipeline locally with Pandas, at (potentially) scale with dask, and (potentially) great scale with PostgreSQL or Apache Spark.  A more concise variation of this pipeline can be found in the R example <a href="https://github.com/WinVector/rquery">here</a>.</p>
+<p>We are deliberately writing a longer pipeline of simple steps, so we can use the same pipeline locally with Pandas, at (potentially) scale with <code>dask</code>, and (potentially) great scale with <code>PostgreSQL</code> or Apache <code>Spark</code>.  A more concise variation of this pipeline can be found in the R example <a href="https://github.com/WinVector/rquery">here</a>.</p>
+<p>The intent is: the user can build up very sophisticated processing pipelines using a small number of primitive steps.  The pipelines tend to be long, but can still be very efficient- as they are well suited for use with <code>Pandas</code> and with <code>SQL</code> query optimizers.  Most of the heavy lifting is performed by the  very powerful "window functions" (triggered by use of <code>partition_by</code> and <code>order_by</code>) available on the <code>extend()</code> step.  Multiple statements can be combined into extend steps, but only when they have the same window-structure, and don't create and use the same value name in the same statement (except for replacement, which is shown in this example).  Many conditions are checked and enforced during pipeline construction, making debugging very easy.</p>
 <p>For a more Pythonic way of writing the same pipeline we can show how the code would have been formatted by <a href="https://github.com/psf/black"><code>black</code></a>.</p>
 
 </div>
@@ -13575,16 +13577,16 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
        &#34;surveycategory&#34; AS &#34;diagnosis&#34;
 FROM
   (SELECT &#34;probability&#34;,
-          &#34;subjectid&#34;,
-          &#34;surveycategory&#34;
+          &#34;surveycategory&#34;,
+          &#34;subjectid&#34;
    FROM
      (SELECT &#34;probability&#34;,
-             &#34;subjectid&#34;,
-             &#34;surveycategory&#34;
+             &#34;surveycategory&#34;,
+             &#34;subjectid&#34;
       FROM
         (SELECT &#34;probability&#34;,
-                &#34;surveycategory&#34;,
                 &#34;sort_key&#34;,
+                &#34;surveycategory&#34;,
                 &#34;subjectid&#34;,
                 ROW_NUMBER() OVER (PARTITION BY &#34;subjectid&#34;
                                    ORDER BY &#34;sort_key&#34;) AS &#34;row_number&#34;
@@ -13594,22 +13596,22 @@ FROM
                    &#34;subjectid&#34;,
                    (-&#34;probability&#34;) AS &#34;sort_key&#34;
             FROM
-              (SELECT &#34;surveycategory&#34;,
-                      &#34;subjectid&#34;,
+              (SELECT &#34;subjectid&#34;,
+                      &#34;surveycategory&#34;,
                       &#34;probability&#34; / &#34;total&#34; AS &#34;probability&#34;
                FROM
                  (SELECT &#34;probability&#34;,
-                         &#34;surveycategory&#34;,
                          &#34;subjectid&#34;,
+                         &#34;surveycategory&#34;,
                          SUM(&#34;probability&#34;) OVER (PARTITION BY &#34;subjectid&#34;) AS &#34;total&#34;
                   FROM
                     (SELECT &#34;surveycategory&#34;,
                             &#34;subjectid&#34;,
                             EXP((&#34;assessmenttotal&#34; * 0.237)) AS &#34;probability&#34;
                      FROM
-                       (SELECT &#34;surveycategory&#34;,
-                               &#34;assessmenttotal&#34;,
-                               &#34;subjectid&#34;
+                       (SELECT &#34;assessmenttotal&#34;,
+                               &#34;subjectid&#34;,
+                               &#34;surveycategory&#34;
                         FROM &#34;d&#34;) &#34;sq_0&#34;) &#34;sq_1&#34;) &#34;sq_2&#34;) &#34;sq_3&#34;) &#34;sq_4&#34;) &#34;sq_5&#34;
       WHERE &#34;row_number&#34; = 1 ) &#34;sq_6&#34;) &#34;sq_7&#34;
 </pre>
@@ -14404,15 +14406,15 @@ FROM (
          &#34;assessmentTotal&#34;
         FROM
          &#34;d&#34;
-        ) tsql_13027134793466810344_0000000000
-       ) tsql_13027134793466810344_0000000001
-      ) tsql_13027134793466810344_0000000002
-     ) tsql_13027134793466810344_0000000003
-    ) tsql_13027134793466810344_0000000004
-  ) tsql_13027134793466810344_0000000005
+        ) tsql_73154282713650778460_0000000000
+       ) tsql_73154282713650778460_0000000001
+      ) tsql_73154282713650778460_0000000002
+     ) tsql_73154282713650778460_0000000003
+    ) tsql_73154282713650778460_0000000004
+  ) tsql_73154282713650778460_0000000005
   WHERE &#34;row_number&#34; = 1
- ) tsql_13027134793466810344_0000000006
-) tsql_13027134793466810344_0000000007
+ ) tsql_73154282713650778460_0000000006
+) tsql_73154282713650778460_0000000007
 </pre>
 </div>
 </div>

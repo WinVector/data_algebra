@@ -9,12 +9,13 @@ Parts of the project are in early development (and not yet ready for production 
 
 The project intent is to realize a modern data processing language based on [Codd's relational operators](https://en.wikipedia.org/wiki/Relational_model) that is easy to maintain, has helpful tooling, and has very similar realizations (or dialects) for:
 
-  * [`SQL`](https://en.wikipedia.org/wiki/SQL) databases accessed from [`Python`](https://www.python.org) (in development [here](https://github.com/WinVector/data_algebra), not yet ready for production use).
-  * `Pandas` `Data.Frame` objects in `Python` (in development [here](https://github.com/WinVector/data_algebra), not yet ready for production use).
+  * [`SQL`](https://en.wikipedia.org/wiki/SQL) databases accessed from [`Python`](https://www.python.org), useful working at scale with `PostgreSQL` or Apache `Spark`.
+  * [`Pandas`](https://pandas.pydata.org) `DataFrame` objects in `Python`.
+  * [`dask`](https://dask.org) distributed `Pandas` structures.
   * `SQL` databases access from [`R`](https://www.r-project.org) (implementation is [here](https://github.com/WinVector/rquery), and is mature and ready for production use).
   * [`data.table`](http://r-datatable.com) objects in `R` (implementation is [here](https://github.com/WinVector/rqdatatable), and is mature and ready for production use).
   
-The idea is the notation should look idiomatic in each language.  Working in `Python` should feel like working in `Python`, and working in `R` should feel like working in `R`.  The data semantics, however, are designed to be close to the `SQL` realizations (given the close connection of `SQL` to the relational algebra; in particular row numbering starts at `1` and row and column order is not preserved except at row-order steps or select-columns steps respectively). The intent is: it should be very easy to use the system in either `Python` or `R` (a boon to multi-language data science projects) and it is easy to port either code or experience from one system to another (a boon for porting projects, or for data scientists working with more than one code base or computer language).
+The intent is the notation should look idiomatic in each language.  Working in `Python` should feel like working in `Python`, and working in `R` should feel like working in `R`.  The data semantics, however, are designed to be close to the `SQL` realizations (given the close connection of `SQL` to the relational algebra; in particular row numbering starts at `1` and row and column order is not preserved except at row-order steps or select-columns steps respectively). The intent is: it should be very easy to use the system in either `Python` or `R` (a boon to multi-language data science projects) and it is easy to port either code or experience from one system to another (a boon for porting projects, or for data scientists working with more than one code base or computer language).
 
 Related work includes:
 
@@ -276,11 +277,11 @@ with data_algebra.env.Env(locals()) as env:
         rename_columns({'diagnosis': 'surveyCategory'})
 ```
 
+We are deliberately writing a longer pipeline of simple steps, so we can use the same pipeline locally with Pandas, at (potentially) scale with `dask`, and (potentially) great scale with `PostgreSQL` or Apache `Spark`.  A more concise variation of this pipeline can be found in the R example [here](https://github.com/WinVector/rquery).
 
-We are deliberately writing a longer pipeline of simple steps, so we can use the same pipeline locally with Pandas, at (potentially) scale with dask, and (potentially) great scale with PostgreSQL or Apache Spark.  A more concise variation of this pipeline can be found in the R example [here](https://github.com/WinVector/rquery).
+The intent is: the user can build up very sophisticated processing pipelines using a small number of primitive steps.  The pipelines tend to be long, but can still be very efficient- as they are well suited for use with `Pandas` and with `SQL` query optimizers.  Most of the heavy lifting is performed by the  very powerful "window functions" (triggered by use of `partition_by` and `order_by`) available on the `extend()` step.  Multiple statements can be combined into extend steps, but only when they have the same window-structure, and don't create and use the same value name in the same statement (except for replacement, which is shown in this example).  Many conditions are checked and enforced during pipeline construction, making debugging very easy.
 
 For a more Pythonic way of writing the same pipeline we can show how the code would have been formatted by [`black`](https://github.com/psf/black).
-
 
 
 ```python
@@ -344,16 +345,16 @@ print(sql)
            "surveycategory" AS "diagnosis"
     FROM
       (SELECT "probability",
-              "subjectid",
-              "surveycategory"
+              "surveycategory",
+              "subjectid"
        FROM
          (SELECT "probability",
-                 "subjectid",
-                 "surveycategory"
+                 "surveycategory",
+                 "subjectid"
           FROM
             (SELECT "probability",
-                    "surveycategory",
                     "sort_key",
+                    "surveycategory",
                     "subjectid",
                     ROW_NUMBER() OVER (PARTITION BY "subjectid"
                                        ORDER BY "sort_key") AS "row_number"
@@ -363,22 +364,22 @@ print(sql)
                        "subjectid",
                        (-"probability") AS "sort_key"
                 FROM
-                  (SELECT "surveycategory",
-                          "subjectid",
+                  (SELECT "subjectid",
+                          "surveycategory",
                           "probability" / "total" AS "probability"
                    FROM
                      (SELECT "probability",
-                             "surveycategory",
                              "subjectid",
+                             "surveycategory",
                              SUM("probability") OVER (PARTITION BY "subjectid") AS "total"
                       FROM
                         (SELECT "surveycategory",
                                 "subjectid",
                                 EXP(("assessmenttotal" * 0.237)) AS "probability"
                          FROM
-                           (SELECT "surveycategory",
-                                   "assessmenttotal",
-                                   "subjectid"
+                           (SELECT "assessmenttotal",
+                                   "subjectid",
+                                   "surveycategory"
                             FROM "d") "sq_0") "sq_1") "sq_2") "sq_3") "sq_4") "sq_5"
           WHERE "row_number" = 1 ) "sq_6") "sq_7"
 
@@ -892,15 +893,15 @@ cat(sql)
              "assessmentTotal"
             FROM
              "d"
-            ) tsql_13027134793466810344_0000000000
-           ) tsql_13027134793466810344_0000000001
-          ) tsql_13027134793466810344_0000000002
-         ) tsql_13027134793466810344_0000000003
-        ) tsql_13027134793466810344_0000000004
-      ) tsql_13027134793466810344_0000000005
+            ) tsql_73154282713650778460_0000000000
+           ) tsql_73154282713650778460_0000000001
+          ) tsql_73154282713650778460_0000000002
+         ) tsql_73154282713650778460_0000000003
+        ) tsql_73154282713650778460_0000000004
+      ) tsql_73154282713650778460_0000000005
       WHERE "row_number" = 1
-     ) tsql_13027134793466810344_0000000006
-    ) tsql_13027134793466810344_0000000007
+     ) tsql_73154282713650778460_0000000006
+    ) tsql_73154282713650778460_0000000007
 
 
 The `R` implementation is mature, and appropriate to use in production.  The [`rquery`](https://github.com/WinVector/rquery) grammar is designed to have minimal state and minimal annotations (no grouping or ordering annotations!).  This makes the grammar, in my opinion, a good design choice. `rquery` has very good performance, often much faster than `dplyr` or base-`R` due to its query generation ideas and use of [`data.table`](https://CRAN.R-project.org/package=data.table) via [`rqdatatable`](https://CRAN.R-project.org/package=rqdatatable).  `rquery` is a mature pure `R` package; [here](https://github.com/WinVector/rquery/blob/master/README.md) is the same example being worked directly in `R`, with no translation from `Python`. 
