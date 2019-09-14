@@ -43,6 +43,9 @@ def is_datatable_frame(d):
     if data_algebra.have_datatable:
         if isinstance(d, datatable.Frame):
             return True
+    if data_algebra.have_datatable:
+        if isinstance(d, datatable.Frame):
+            return True
     return False
 
 
@@ -68,6 +71,13 @@ def assert_is_acceptable_data_frame(d, arg_name=None):
 def convert_to_pandas_dataframe(d, arg_name=None):
     if isinstance(d, pandas.DataFrame):
         return d
+    if isinstance(d, numpy.ndarray):
+        if d.dtype.names is None:
+            d = pandas.DataFrame(d)
+            d.columns = ["col_" + str(i) for i in range(d.shape[1])]
+        else:
+            d = pandas.DataFrame(d)
+        return d
     if data_algebra.have_dask:
         if isinstance(d, dask.dataframe.DataFrame):
             d = d.compute()
@@ -76,13 +86,9 @@ def convert_to_pandas_dataframe(d, arg_name=None):
                     "conversion from " + str(type(d)) + " to pandas.DataFrame failed"
                 )
             return d
-    if isinstance(d, numpy.ndarray):
-        if d.dtype.names is None:
-            d = pandas.DataFrame(d)
-            d.columns = ["col_" + str(i) for i in range(d.shape[1])]
-        else:
-            d = pandas.DataFrame(d)
-        return d
+    if data_algebra.have_datatable:
+        if isinstance(d, datatable.Frame):
+            return d.to_pandas()
     if arg_name is not None:
         raise TypeError(
             "can't convert argument "

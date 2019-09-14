@@ -98,6 +98,8 @@ class ViewRepresentation(OperatorPlatform):
         self.sources = [si for si in sources]
         OperatorPlatform.__init__(self)
 
+ 
+
     # characterization
 
     def get_tables(self, tables=None):
