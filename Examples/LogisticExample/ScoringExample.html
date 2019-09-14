@@ -13448,12 +13448,13 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
         <span class="n">extend</span><span class="p">({</span><span class="s1">&#39;total&#39;</span><span class="p">:</span> <span class="s1">&#39;probability.sum()&#39;</span><span class="p">},</span>
                <span class="n">partition_by</span><span class="o">=</span><span class="s1">&#39;subjectID&#39;</span><span class="p">)</span><span class="o">.</span> \
         <span class="n">extend</span><span class="p">({</span><span class="s1">&#39;probability&#39;</span><span class="p">:</span> <span class="s1">&#39;probability/total&#39;</span><span class="p">})</span><span class="o">.</span> \
-        <span class="n">extend</span><span class="p">({</span><span class="s1">&#39;sort_key&#39;</span><span class="p">:</span> <span class="s1">&#39;-1*probability&#39;</span><span class="p">})</span><span class="o">.</span> \
+        <span class="n">extend</span><span class="p">({</span><span class="s1">&#39;sort_key&#39;</span><span class="p">:</span> <span class="s1">&#39;-probability&#39;</span><span class="p">})</span><span class="o">.</span> \
         <span class="n">extend</span><span class="p">({</span><span class="s1">&#39;row_number&#39;</span><span class="p">:</span> <span class="s1">&#39;_row_number()&#39;</span><span class="p">},</span>
                <span class="n">partition_by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;subjectID&#39;</span><span class="p">],</span>
                <span class="n">order_by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sort_key&#39;</span><span class="p">])</span><span class="o">.</span> \
         <span class="n">select_rows</span><span class="p">(</span><span class="s1">&#39;row_number == 1&#39;</span><span class="p">)</span><span class="o">.</span> \
-        <span class="n">select_columns</span><span class="p">([</span><span class="s1">&#39;subjectID&#39;</span><span class="p">,</span> <span class="s1">&#39;surveyCategory&#39;</span><span class="p">,</span> <span class="s1">&#39;probability&#39;</span><span class="p">])</span>
+        <span class="n">select_columns</span><span class="p">([</span><span class="s1">&#39;subjectID&#39;</span><span class="p">,</span> <span class="s1">&#39;surveyCategory&#39;</span><span class="p">,</span> <span class="s1">&#39;probability&#39;</span><span class="p">])</span><span class="o">.</span> \
+            <span class="n">rename_columns</span><span class="p">({</span><span class="s1">&#39;diagnosis&#39;</span><span class="p">:</span> <span class="s1">&#39;surveyCategory&#39;</span><span class="p">})</span>
 </pre></div>
 
     </div>
@@ -13500,13 +13501,15 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
 ).extend(
     {&#34;probability&#34;: &#34;probability / total&#34;}
 ).extend(
-    {&#34;sort_key&#34;: &#34;-1 * probability&#34;}
+    {&#34;sort_key&#34;: &#34;-probability&#34;}
 ).extend(
     {&#34;row_number&#34;: &#34;_row_number()&#34;}, partition_by=[&#34;subjectID&#34;], order_by=[&#34;sort_key&#34;]
 ).select_rows(
     &#34;row_number == 1&#34;
 ).select_columns(
     [&#34;subjectID&#34;, &#34;surveyCategory&#34;, &#34;probability&#34;]
+).rename_columns(
+    {&#34;diagnosis&#34;: &#34;surveyCategory&#34;}
 )
 
 </pre>
@@ -13565,42 +13568,46 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>SELECT &#34;probability&#34;,
        &#34;subjectid&#34;,
-       &#34;surveycategory&#34;
+       &#34;surveycategory&#34; AS &#34;diagnosis&#34;
 FROM
   (SELECT &#34;probability&#34;,
-          &#34;subjectid&#34;,
-          &#34;surveycategory&#34;
+          &#34;surveycategory&#34;,
+          &#34;subjectid&#34;
    FROM
-     (SELECT &#34;sort_key&#34;,
-             &#34;probability&#34;,
-             &#34;subjectid&#34;,
+     (SELECT &#34;probability&#34;,
              &#34;surveycategory&#34;,
-             ROW_NUMBER() OVER (PARTITION BY &#34;subjectid&#34;
-                                ORDER BY &#34;sort_key&#34;) AS &#34;row_number&#34;
+             &#34;subjectid&#34;
       FROM
-        (SELECT &#34;probability&#34;,
-                &#34;subjectid&#34;,
+        (SELECT &#34;sort_key&#34;,
+                &#34;probability&#34;,
                 &#34;surveycategory&#34;,
-                -1 * &#34;probability&#34; AS &#34;sort_key&#34;
+                &#34;subjectid&#34;,
+                ROW_NUMBER() OVER (PARTITION BY &#34;subjectid&#34;
+                                   ORDER BY &#34;sort_key&#34;) AS &#34;row_number&#34;
          FROM
-           (SELECT &#34;subjectid&#34;,
+           (SELECT &#34;probability&#34;,
                    &#34;surveycategory&#34;,
-                   &#34;probability&#34; / &#34;total&#34; AS &#34;probability&#34;
+                   &#34;subjectid&#34;,
+                   (-&#34;probability&#34;) AS &#34;sort_key&#34;
             FROM
-              (SELECT &#34;probability&#34;,
+              (SELECT &#34;surveycategory&#34;,
                       &#34;subjectid&#34;,
-                      &#34;surveycategory&#34;,
-                      SUM(&#34;probability&#34;) OVER (PARTITION BY &#34;subjectid&#34;) AS &#34;total&#34;
+                      &#34;probability&#34; / &#34;total&#34; AS &#34;probability&#34;
                FROM
-                 (SELECT &#34;subjectid&#34;,
+                 (SELECT &#34;probability&#34;,
                          &#34;surveycategory&#34;,
-                         EXP((&#34;assessmenttotal&#34; * 0.237)) AS &#34;probability&#34;
+                         &#34;subjectid&#34;,
+                         SUM(&#34;probability&#34;) OVER (PARTITION BY &#34;subjectid&#34;) AS &#34;total&#34;
                   FROM
-                    (SELECT &#34;assessmenttotal&#34;,
+                    (SELECT &#34;surveycategory&#34;,
                             &#34;subjectid&#34;,
-                            &#34;surveycategory&#34;
-                     FROM &#34;d&#34;) &#34;sq_0&#34;) &#34;sq_1&#34;) &#34;sq_2&#34;) &#34;sq_3&#34;) &#34;sq_4&#34;) &#34;sq_5&#34;
-   WHERE &#34;row_number&#34; = 1 ) &#34;sq_6&#34;
+                            EXP((&#34;assessmenttotal&#34; * 0.237)) AS &#34;probability&#34;
+                     FROM
+                       (SELECT &#34;assessmenttotal&#34;,
+                               &#34;surveycategory&#34;,
+                               &#34;subjectid&#34;
+                        FROM &#34;d&#34;) &#34;sq_0&#34;) &#34;sq_1&#34;) &#34;sq_2&#34;) &#34;sq_3&#34;) &#34;sq_4&#34;) &#34;sq_5&#34;
+      WHERE &#34;row_number&#34; = 1 ) &#34;sq_6&#34;) &#34;sq_7&#34;
 </pre>
 </div>
 </div>
@@ -13661,7 +13668,7 @@ FROM
       <th></th>
       <th>probability</th>
       <th>subjectid</th>
-      <th>surveycategory</th>
+      <th>diagnosis</th>
     </tr>
   </thead>
   <tbody>
@@ -13740,7 +13747,7 @@ FROM
     <tr style="text-align: right;">
       <th></th>
       <th>subjectID</th>
-      <th>surveyCategory</th>
+      <th>diagnosis</th>
       <th>probability</th>
     </tr>
   </thead>
@@ -13818,7 +13825,7 @@ FROM
     <tr style="text-align: right;">
       <th></th>
       <th>subjectID</th>
-      <th>surveyCategory</th>
+      <th>diagnosis</th>
       <th>probability</th>
     </tr>
   </thead>
@@ -13904,7 +13911,7 @@ FROM
     <tr style="text-align: right;">
       <th></th>
       <th>subjectID</th>
-      <th>surveyCategory</th>
+      <th>diagnosis</th>
       <th>probability</th>
     </tr>
     <tr>
@@ -13936,7 +13943,7 @@ FROM
   </tbody>
 </table>
 </div>
-<div>Dask Name: getitem, 164 tasks</div>
+<div>Dask Name: rename, 166 tasks</div>
 </div>
 
 </div>
@@ -13987,7 +13994,7 @@ FROM
     <tr style="text-align: right;">
       <th></th>
       <th>subjectID</th>
-      <th>surveyCategory</th>
+      <th>diagnosis</th>
       <th>probability</th>
     </tr>
   </thead>
@@ -14080,7 +14087,7 @@ FROM
               (&#39;order_by&#39;, []),
               (&#39;reverse&#39;, [])]),
  OrderedDict([(&#39;op&#39;, &#39;Extend&#39;),
-              (&#39;ops&#39;, {&#39;sort_key&#39;: &#39;-1 * probability&#39;}),
+              (&#39;ops&#39;, {&#39;sort_key&#39;: &#39;-probability&#39;}),
               (&#39;partition_by&#39;, []),
               (&#39;order_by&#39;, []),
               (&#39;reverse&#39;, [])]),
@@ -14091,7 +14098,9 @@ FROM
               (&#39;reverse&#39;, [])]),
  OrderedDict([(&#39;op&#39;, &#39;SelectRows&#39;), (&#39;expr&#39;, &#39;row_number == 1&#39;)]),
  OrderedDict([(&#39;op&#39;, &#39;SelectColumns&#39;),
-              (&#39;columns&#39;, [&#39;subjectID&#39;, &#39;surveyCategory&#39;, &#39;probability&#39;])])]
+              (&#39;columns&#39;, [&#39;subjectID&#39;, &#39;surveyCategory&#39;, &#39;probability&#39;])]),
+ OrderedDict([(&#39;op&#39;, &#39;Rename&#39;),
+              (&#39;column_remapping&#39;, {&#39;diagnosis&#39;: &#39;surveyCategory&#39;})])]
 </pre>
 </div>
 </div>
@@ -14191,7 +14200,7 @@ FROM
  extend(.,
   probability := probability / total) %.&gt;%
  extend(.,
-  sort_key := -(1) * probability) %.&gt;%
+  sort_key := -(probability)) %.&gt;%
  extend(.,
   row_number := row_number(),
   p= subjectID,
@@ -14199,7 +14208,9 @@ FROM
  select_rows(.,
    row_number == 1) %.&gt;%
  select_columns(.,
-   subjectID, surveyCategory, probability)
+   subjectID, surveyCategory, probability) %.&gt;%
+ rename(.,
+  c(&#39;diagnosis&#39; = &#39;surveyCategory&#39;))
 </pre>
 </div>
 </div>
@@ -14263,7 +14274,7 @@ FROM
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We can use the <code>R</code> pipeline by piping data into the <code>r_ops</code> object.</p>
+<p>We can execute the <code>R</code> pipeline using <a href="http://r-datatable.com"><code>data.table</code></a> by piping data into the <code>r_ops</code> object.</p>
 
 </div>
 </div>
@@ -14294,7 +14305,7 @@ FROM
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>   subjectID      surveyCategory probability
+<pre>   subjectID           diagnosis probability
 1:         1 withdrawal behavior   0.6706221
 2:         2 positive re-framing   0.5589742
 </pre>
@@ -14339,53 +14350,59 @@ FROM
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>SELECT
- &#34;subjectID&#34;,
- &#34;surveyCategory&#34;,
- &#34;probability&#34;
+ &#34;subjectID&#34; AS &#34;subjectID&#34;,
+ &#34;surveyCategory&#34; AS &#34;diagnosis&#34;,
+ &#34;probability&#34; AS &#34;probability&#34;
 FROM (
- SELECT * FROM (
-  SELECT
-   &#34;subjectID&#34;,
-   &#34;surveyCategory&#34;,
-   &#34;probability&#34;,
-   row_number ( ) OVER (  PARTITION BY &#34;subjectID&#34; ORDER BY &#34;sort_key&#34; ) AS &#34;row_number&#34;
-  FROM (
+ SELECT
+  &#34;subjectID&#34;,
+  &#34;surveyCategory&#34;,
+  &#34;probability&#34;
+ FROM (
+  SELECT * FROM (
    SELECT
     &#34;subjectID&#34;,
     &#34;surveyCategory&#34;,
     &#34;probability&#34;,
-    - ( 1 ) * &#34;probability&#34;  AS &#34;sort_key&#34;
+    row_number ( ) OVER (  PARTITION BY &#34;subjectID&#34; ORDER BY &#34;sort_key&#34; ) AS &#34;row_number&#34;
    FROM (
     SELECT
      &#34;subjectID&#34;,
      &#34;surveyCategory&#34;,
-     &#34;probability&#34; / &#34;total&#34;  AS &#34;probability&#34;
+     &#34;probability&#34;,
+     - ( &#34;probability&#34; )  AS &#34;sort_key&#34;
     FROM (
      SELECT
       &#34;subjectID&#34;,
       &#34;surveyCategory&#34;,
-      &#34;probability&#34;,
-      sum ( &#34;probability&#34; ) OVER (  PARTITION BY &#34;subjectID&#34; ) AS &#34;total&#34;
+      &#34;probability&#34; / &#34;total&#34;  AS &#34;probability&#34;
      FROM (
       SELECT
        &#34;subjectID&#34;,
        &#34;surveyCategory&#34;,
-       exp ( &#34;assessmentTotal&#34; * 0.237 )  AS &#34;probability&#34;
+       &#34;probability&#34;,
+       sum ( &#34;probability&#34; ) OVER (  PARTITION BY &#34;subjectID&#34; ) AS &#34;total&#34;
       FROM (
        SELECT
         &#34;subjectID&#34;,
         &#34;surveyCategory&#34;,
-        &#34;assessmentTotal&#34;
-       FROM
-        &#34;d&#34;
-       ) tsql_04710387448375397725_0000000000
-      ) tsql_04710387448375397725_0000000001
-     ) tsql_04710387448375397725_0000000002
-    ) tsql_04710387448375397725_0000000003
-   ) tsql_04710387448375397725_0000000004
- ) tsql_04710387448375397725_0000000005
- WHERE &#34;row_number&#34; = 1
-) tsql_04710387448375397725_0000000006
+        exp ( &#34;assessmentTotal&#34; * 0.237 )  AS &#34;probability&#34;
+       FROM (
+        SELECT
+         &#34;subjectID&#34;,
+         &#34;surveyCategory&#34;,
+         &#34;assessmentTotal&#34;
+        FROM
+         &#34;d&#34;
+        ) tsql_65060802595527684000_0000000000
+       ) tsql_65060802595527684000_0000000001
+      ) tsql_65060802595527684000_0000000002
+     ) tsql_65060802595527684000_0000000003
+    ) tsql_65060802595527684000_0000000004
+  ) tsql_65060802595527684000_0000000005
+  WHERE &#34;row_number&#34; = 1
+ ) tsql_65060802595527684000_0000000006
+) tsql_65060802595527684000_0000000007
 </pre>
 </div>
 </div>
@@ -14415,8 +14432,9 @@ FROM (
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>More of the <code>R</code> example (including how the diagram was produced) can be found <a href="https://github.com/WinVector/rquery/blob/master/Examples/yaml/yaml.md">here</a>.</p>
-<h2 id="Advantages-of-data_algebra">Advantages of <code>data_algebra</code><a class="anchor-link" href="#Advantages-of-data_algebra">&#182;</a></h2><p>Multi-language data science is an important trend, so a cross-language query system that supports at least <code>R</code> and <code>Python</code> is going to be a useful tool or capability going forward. Obviously <code>SQL</code> itself is fairly cross-language, but <code>data_algebra</code> adds a few features we hope are real advantages.</p>
-<p>In addition to the features shown above, a <code>data_algebra</code> operator pipeline carries around usable knowledge of the data transform.  For example:</p>
+<h2 id="Advantages-of-data_algebra">Advantages of <code>data_algebra</code><a class="anchor-link" href="#Advantages-of-data_algebra">&#182;</a></h2><p>Multi-language data science is an important trend, so a cross-language query system that supports at least <code>R</code> and <code>Python</code> is going to be a useful tool or capability going forward. Obviously <code>SQL</code> itself is fairly cross-language, but <code>data_algebra</code> adds features that can be real advantages.</p>
+<p>In addition to the features shown above, a <code>data_algebra</code> operator pipeline carries around usable knowledge of the data transform.</p>
+<p>For example:</p>
 
 </div>
 </div>
@@ -14514,7 +14532,7 @@ FROM (
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[&#39;subjectID&#39;, &#39;surveyCategory&#39;, &#39;probability&#39;]</pre>
+<pre>[&#39;subjectID&#39;, &#39;diagnosis&#39;, &#39;probability&#39;]</pre>
 </div>
 
 </div>
@@ -14590,13 +14608,15 @@ FROM (
 ).extend(
     {&#34;probability&#34;: &#34;probability / total&#34;}
 ).extend(
-    {&#34;sort_key&#34;: &#34;-1 * probability&#34;}
+    {&#34;sort_key&#34;: &#34;-probability&#34;}
 ).extend(
     {&#34;row_number&#34;: &#34;_row_number()&#34;}, partition_by=[&#34;subjectID&#34;], order_by=[&#34;sort_key&#34;]
 ).select_rows(
     &#34;row_number == 1&#34;
 ).select_columns(
     [&#34;subjectID&#34;, &#34;surveyCategory&#34;, &#34;probability&#34;]
+).rename_columns(
+    {&#34;diagnosis&#34;: &#34;surveyCategory&#34;}
 )
 
 </pre>

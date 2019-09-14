@@ -270,13 +270,13 @@ with data_algebra.env.Env(locals()) as env:
         extend({'total': 'probability.sum()'},
                partition_by='subjectID'). \
         extend({'probability': 'probability/total'}). \
-        extend({'sort_key': '-1*probability'}). \
+        extend({'sort_key': '-probability'}). \
         extend({'row_number': '_row_number()'},
                partition_by=['subjectID'],
                order_by=['sort_key']). \
         select_rows('row_number == 1'). \
-        select_columns(['subjectID', 'surveyCategory', 'probability'])
-
+        select_columns(['subjectID', 'surveyCategory', 'probability']). \
+            rename_columns({'diagnosis': 'surveyCategory'})
 ```
 
 
@@ -298,13 +298,15 @@ print(py_source)
     ).extend(
         {"probability": "probability / total"}
     ).extend(
-        {"sort_key": "-1 * probability"}
+        {"sort_key": "-probability"}
     ).extend(
         {"row_number": "_row_number()"}, partition_by=["subjectID"], order_by=["sort_key"]
     ).select_rows(
         "row_number == 1"
     ).select_columns(
         ["subjectID", "surveyCategory", "probability"]
+    ).rename_columns(
+        {"diagnosis": "surveyCategory"}
     )
     
 
@@ -335,42 +337,46 @@ print(sql)
 
     SELECT "probability",
            "subjectid",
-           "surveycategory"
+           "surveycategory" AS "diagnosis"
     FROM
       (SELECT "probability",
-              "subjectid",
-              "surveycategory"
+              "surveycategory",
+              "subjectid"
        FROM
-         (SELECT "sort_key",
-                 "probability",
-                 "subjectid",
+         (SELECT "probability",
                  "surveycategory",
-                 ROW_NUMBER() OVER (PARTITION BY "subjectid"
-                                    ORDER BY "sort_key") AS "row_number"
+                 "subjectid"
           FROM
-            (SELECT "probability",
-                    "subjectid",
+            (SELECT "sort_key",
+                    "probability",
                     "surveycategory",
-                    -1 * "probability" AS "sort_key"
+                    "subjectid",
+                    ROW_NUMBER() OVER (PARTITION BY "subjectid"
+                                       ORDER BY "sort_key") AS "row_number"
              FROM
-               (SELECT "subjectid",
+               (SELECT "probability",
                        "surveycategory",
-                       "probability" / "total" AS "probability"
+                       "subjectid",
+                       (-"probability") AS "sort_key"
                 FROM
-                  (SELECT "probability",
+                  (SELECT "surveycategory",
                           "subjectid",
-                          "surveycategory",
-                          SUM("probability") OVER (PARTITION BY "subjectid") AS "total"
+                          "probability" / "total" AS "probability"
                    FROM
-                     (SELECT "subjectid",
+                     (SELECT "probability",
                              "surveycategory",
-                             EXP(("assessmenttotal" * 0.237)) AS "probability"
+                             "subjectid",
+                             SUM("probability") OVER (PARTITION BY "subjectid") AS "total"
                       FROM
-                        (SELECT "assessmenttotal",
+                        (SELECT "surveycategory",
                                 "subjectid",
-                                "surveycategory"
-                         FROM "d") "sq_0") "sq_1") "sq_2") "sq_3") "sq_4") "sq_5"
-       WHERE "row_number" = 1 ) "sq_6"
+                                EXP(("assessmenttotal" * 0.237)) AS "probability"
+                         FROM
+                           (SELECT "assessmenttotal",
+                                   "surveycategory",
+                                   "subjectid"
+                            FROM "d") "sq_0") "sq_1") "sq_2") "sq_3") "sq_4") "sq_5"
+          WHERE "row_number" = 1 ) "sq_6") "sq_7"
 
 
 The `SQL` can be hard to read, as `SQL` expresses composition by inner-nesting (inside `SELECT` statements happen first).  The operator pipeline expresses composition by sequencing or method-chaining, which can be a lot more legible.  However the huge advantage of the `SQL` is: we can send it to the database for execution, as we do now.
@@ -405,7 +411,7 @@ db_model.read_query(conn, sql)
       <th></th>
       <th>probability</th>
       <th>subjectid</th>
-      <th>surveycategory</th>
+      <th>diagnosis</th>
     </tr>
   </thead>
   <tbody>
@@ -462,7 +468,7 @@ ops.eval_pandas({'d': d_local})
     <tr style="text-align: right;">
       <th></th>
       <th>subjectID</th>
-      <th>surveyCategory</th>
+      <th>diagnosis</th>
       <th>probability</th>
     </tr>
   </thead>
@@ -515,7 +521,7 @@ ops.transform(d_local)
     <tr style="text-align: right;">
       <th></th>
       <th>subjectID</th>
-      <th>surveyCategory</th>
+      <th>diagnosis</th>
       <th>probability</th>
     </tr>
   </thead>
@@ -578,7 +584,7 @@ res_dask
     <tr style="text-align: right;">
       <th></th>
       <th>subjectID</th>
-      <th>surveyCategory</th>
+      <th>diagnosis</th>
       <th>probability</th>
     </tr>
     <tr>
@@ -610,7 +616,7 @@ res_dask
   </tbody>
 </table>
 </div>
-<div>Dask Name: getitem, 164 tasks</div>
+<div>Dask Name: rename, 166 tasks</div>
 
 
 
@@ -641,7 +647,7 @@ res_dask.compute()
     <tr style="text-align: right;">
       <th></th>
       <th>subjectID</th>
-      <th>surveyCategory</th>
+      <th>diagnosis</th>
       <th>probability</th>
     </tr>
   </thead>
@@ -704,7 +710,7 @@ pprint(objs_R)
                   ('order_by', []),
                   ('reverse', [])]),
      OrderedDict([('op', 'Extend'),
-                  ('ops', {'sort_key': '-1 * probability'}),
+                  ('ops', {'sort_key': '-probability'}),
                   ('partition_by', []),
                   ('order_by', []),
                   ('reverse', [])]),
@@ -715,7 +721,9 @@ pprint(objs_R)
                   ('reverse', [])]),
      OrderedDict([('op', 'SelectRows'), ('expr', 'row_number == 1')]),
      OrderedDict([('op', 'SelectColumns'),
-                  ('columns', ['subjectID', 'surveyCategory', 'probability'])])]
+                  ('columns', ['subjectID', 'surveyCategory', 'probability'])]),
+     OrderedDict([('op', 'Rename'),
+                  ('column_remapping', {'diagnosis': 'surveyCategory'})])]
 
 
 In the above data structure the recursive operator steps have been linearized into a list, and simplified to just ordered dictionaries of a few defining and derived fields. In particular, the `key` field of the `TableDescription` nodes is the unique identifier for the tables, two `TableDescription` with the same key are referring to the same table.
@@ -767,7 +775,7 @@ cat(format(r_ops))
      extend(.,
       probability := probability / total) %.>%
      extend(.,
-      sort_key := -(1) * probability) %.>%
+      sort_key := -(probability)) %.>%
      extend(.,
       row_number := row_number(),
       p= subjectID,
@@ -775,7 +783,9 @@ cat(format(r_ops))
      select_rows(.,
        row_number == 1) %.>%
      select_columns(.,
-       subjectID, surveyCategory, probability)
+       subjectID, surveyCategory, probability) %.>%
+     rename(.,
+      c('diagnosis' = 'surveyCategory'))
 
 
 The above representation is nearly "`R` code" (it is not actually executable, unlike the `Python` representation, but very similar to the actual `rquery` steps) written using [`wrapr` dot pipe](https://journal.r-project.org/archive/2018/RJ-2018-042/index.html) notation. However, it can be executed in `R`.
@@ -801,7 +811,7 @@ print(d_local)
     4         2 positive re-framing               4         irrel1         irrel2
 
 
-We can use the `R` pipeline by piping data into the `r_ops` object.
+We can execute the `R` pipeline using [`data.table`](http://r-datatable.com) by piping data into the `r_ops` object.
 
 
 ```r
@@ -812,7 +822,7 @@ d_local %.>%
   print(.)
 ```
 
-       subjectID      surveyCategory probability
+       subjectID           diagnosis probability
     1:         1 withdrawal behavior   0.6706221
     2:         2 positive re-framing   0.5589742
 
@@ -828,53 +838,59 @@ cat(sql)
 ```
 
     SELECT
-     "subjectID",
-     "surveyCategory",
-     "probability"
+     "subjectID" AS "subjectID",
+     "surveyCategory" AS "diagnosis",
+     "probability" AS "probability"
     FROM (
-     SELECT * FROM (
-      SELECT
-       "subjectID",
-       "surveyCategory",
-       "probability",
-       row_number ( ) OVER (  PARTITION BY "subjectID" ORDER BY "sort_key" ) AS "row_number"
-      FROM (
+     SELECT
+      "subjectID",
+      "surveyCategory",
+      "probability"
+     FROM (
+      SELECT * FROM (
        SELECT
         "subjectID",
         "surveyCategory",
         "probability",
-        - ( 1 ) * "probability"  AS "sort_key"
+        row_number ( ) OVER (  PARTITION BY "subjectID" ORDER BY "sort_key" ) AS "row_number"
        FROM (
         SELECT
          "subjectID",
          "surveyCategory",
-         "probability" / "total"  AS "probability"
+         "probability",
+         - ( "probability" )  AS "sort_key"
         FROM (
          SELECT
           "subjectID",
           "surveyCategory",
-          "probability",
-          sum ( "probability" ) OVER (  PARTITION BY "subjectID" ) AS "total"
+          "probability" / "total"  AS "probability"
          FROM (
           SELECT
            "subjectID",
            "surveyCategory",
-           exp ( "assessmentTotal" * 0.237 )  AS "probability"
+           "probability",
+           sum ( "probability" ) OVER (  PARTITION BY "subjectID" ) AS "total"
           FROM (
            SELECT
             "subjectID",
             "surveyCategory",
-            "assessmentTotal"
-           FROM
-            "d"
-           ) tsql_04710387448375397725_0000000000
-          ) tsql_04710387448375397725_0000000001
-         ) tsql_04710387448375397725_0000000002
-        ) tsql_04710387448375397725_0000000003
-       ) tsql_04710387448375397725_0000000004
-     ) tsql_04710387448375397725_0000000005
-     WHERE "row_number" = 1
-    ) tsql_04710387448375397725_0000000006
+            exp ( "assessmentTotal" * 0.237 )  AS "probability"
+           FROM (
+            SELECT
+             "subjectID",
+             "surveyCategory",
+             "assessmentTotal"
+            FROM
+             "d"
+            ) tsql_65060802595527684000_0000000000
+           ) tsql_65060802595527684000_0000000001
+          ) tsql_65060802595527684000_0000000002
+         ) tsql_65060802595527684000_0000000003
+        ) tsql_65060802595527684000_0000000004
+      ) tsql_65060802595527684000_0000000005
+      WHERE "row_number" = 1
+     ) tsql_65060802595527684000_0000000006
+    ) tsql_65060802595527684000_0000000007
 
 
 The `R` implementation is mature, and appropriate to use in production.  The [`rquery`](https://github.com/WinVector/rquery) grammar is designed to have minimal state and minimal annotations (no grouping or ordering annotations!).  This makes the grammar, in my opinion, a good design choice. `rquery` has very good performance, often much faster than `dplyr` or base-`R` due to its query generation ideas and use of [`data.table`](https://CRAN.R-project.org/package=data.table) via [`rqdatatable`](https://CRAN.R-project.org/package=rqdatatable).  `rquery` is a mature pure `R` package; [here](https://github.com/WinVector/rquery/blob/master/README.md) is the same example being worked directly in `R`, with no translation from `Python`. 
@@ -887,9 +903,11 @@ More of the `R` example (including how the diagram was produced) can be found [h
 
 ## Advantages of `data_algebra`
 
-Multi-language data science is an important trend, so a cross-language query system that supports at least `R` and `Python` is going to be a useful tool or capability going forward. Obviously `SQL` itself is fairly cross-language, but `data_algebra` adds a few features we hope are real advantages.
+Multi-language data science is an important trend, so a cross-language query system that supports at least `R` and `Python` is going to be a useful tool or capability going forward. Obviously `SQL` itself is fairly cross-language, but `data_algebra` adds features that can be real advantages.
 
-In addition to the features shown above, a `data_algebra` operator pipeline carries around usable knowledge of the data transform.  For example:
+In addition to the features shown above, a `data_algebra` operator pipeline carries around usable knowledge of the data transform.
+
+For example:
 
 
 ```python
@@ -926,7 +944,7 @@ ops.column_names
 
 
 
-    ['subjectID', 'surveyCategory', 'probability']
+    ['subjectID', 'diagnosis', 'probability']
 
 
 
@@ -965,13 +983,15 @@ print(ops_back.to_python(pretty=True))
     ).extend(
         {"probability": "probability / total"}
     ).extend(
-        {"sort_key": "-1 * probability"}
+        {"sort_key": "-probability"}
     ).extend(
         {"row_number": "_row_number()"}, partition_by=["subjectID"], order_by=["sort_key"]
     ).select_rows(
         "row_number == 1"
     ).select_columns(
         ["subjectID", "surveyCategory", "probability"]
+    ).rename_columns(
+        {"diagnosis": "surveyCategory"}
     )
     
 
