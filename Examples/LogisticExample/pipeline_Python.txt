@@ -5,6 +5,8 @@
   - subjectID
   - surveyCategory
   - assessmentTotal
+  - irrelevantCol1
+  - irrelevantCol2
   key: d
 - op: Extend
   ops:

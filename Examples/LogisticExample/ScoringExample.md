@@ -262,10 +262,7 @@ Now we use the `data_algebra` to define our processing pipeline: `ops`.  We are 
 scale = 0.237
 
 with data_algebra.env.Env(locals()) as env:
-    ops = TableDescription('d',
-                           ['subjectID',
-                            'surveyCategory',
-                            'assessmentTotal']). \
+    ops = data_algebra.data_ops.describe_table(d_local, 'd'). \
         extend({'probability': '(assessmentTotal * scale).exp()'}). \
         extend({'total': 'probability.sum()'},
                partition_by='subjectID'). \
@@ -276,7 +273,7 @@ with data_algebra.env.Env(locals()) as env:
                order_by=['sort_key']). \
         select_rows('row_number == 1'). \
         select_columns(['subjectID', 'surveyCategory', 'probability']). \
-            rename_columns({'diagnosis': 'surveyCategory'})
+        rename_columns({'diagnosis': 'surveyCategory'})
 ```
 
 
@@ -292,7 +289,14 @@ print(py_source)
 ```
 
     TableDescription(
-        table_name="d", column_names=["subjectID", "surveyCategory", "assessmentTotal"]
+        table_name="d",
+        column_names=[
+            "subjectID",
+            "surveyCategory",
+            "assessmentTotal",
+            "irrelevantCol1",
+            "irrelevantCol2",
+        ],
     ).extend({"probability": "(assessmentTotal * 0.237).exp()"}).extend(
         {"total": "probability.sum()"}, partition_by=["subjectID"]
     ).extend(
@@ -340,16 +344,16 @@ print(sql)
            "surveycategory" AS "diagnosis"
     FROM
       (SELECT "probability",
-              "surveycategory",
-              "subjectid"
+              "subjectid",
+              "surveycategory"
        FROM
          (SELECT "probability",
-                 "surveycategory",
-                 "subjectid"
+                 "subjectid",
+                 "surveycategory"
           FROM
-            (SELECT "sort_key",
-                    "probability",
+            (SELECT "probability",
                     "surveycategory",
+                    "sort_key",
                     "subjectid",
                     ROW_NUMBER() OVER (PARTITION BY "subjectid"
                                        ORDER BY "sort_key") AS "row_number"
@@ -372,8 +376,8 @@ print(sql)
                                 "subjectid",
                                 EXP(("assessmenttotal" * 0.237)) AS "probability"
                          FROM
-                           (SELECT "assessmenttotal",
-                                   "surveycategory",
+                           (SELECT "surveycategory",
+                                   "assessmenttotal",
                                    "subjectid"
                             FROM "d") "sq_0") "sq_1") "sq_2") "sq_3") "sq_4") "sq_5"
           WHERE "row_number" = 1 ) "sq_6") "sq_7"
@@ -692,7 +696,11 @@ pprint(objs_R)
                   ('table_name', 'd'),
                   ('qualifiers', {}),
                   ('column_names',
-                   ['subjectID', 'surveyCategory', 'assessmentTotal']),
+                   ['subjectID',
+                    'surveyCategory',
+                    'assessmentTotal',
+                    'irrelevantCol1',
+                    'irrelevantCol2']),
                   ('key', 'd')]),
      OrderedDict([('op', 'Extend'),
                   ('ops', {'probability': 'exp(assessmentTotal * 0.237)'}),
@@ -766,7 +774,9 @@ cat(format(r_ops))
     table(d; 
       subjectID,
       surveyCategory,
-      assessmentTotal) %.>%
+      assessmentTotal,
+      irrelevantCol1,
+      irrelevantCol2) %.>%
      extend(.,
       probability := exp(assessmentTotal * 0.237)) %.>%
      extend(.,
@@ -788,7 +798,7 @@ cat(format(r_ops))
       c('diagnosis' = 'surveyCategory'))
 
 
-The above representation is nearly "`R` code" (it is not actually executable, unlike the `Python` representation, but very similar to the actual `rquery` steps) written using [`wrapr` dot pipe](https://journal.r-project.org/archive/2018/RJ-2018-042/index.html) notation. However, it can be executed in `R`.
+The above representation is nearly "`R` code" (it is not what an `R` user would direclty type in, unlike the `Python` representation, but it is very similar to the actual `rquery` steps) written using [`wrapr` dot pipe](https://journal.r-project.org/archive/2018/RJ-2018-042/index.html) notation. However, the imported pipeline can be directly executed in `R`.
 
 
 ```r
@@ -882,15 +892,15 @@ cat(sql)
              "assessmentTotal"
             FROM
              "d"
-            ) tsql_65060802595527684000_0000000000
-           ) tsql_65060802595527684000_0000000001
-          ) tsql_65060802595527684000_0000000002
-         ) tsql_65060802595527684000_0000000003
-        ) tsql_65060802595527684000_0000000004
-      ) tsql_65060802595527684000_0000000005
+            ) tsql_13027134793466810344_0000000000
+           ) tsql_13027134793466810344_0000000001
+          ) tsql_13027134793466810344_0000000002
+         ) tsql_13027134793466810344_0000000003
+        ) tsql_13027134793466810344_0000000004
+      ) tsql_13027134793466810344_0000000005
       WHERE "row_number" = 1
-     ) tsql_65060802595527684000_0000000006
-    ) tsql_65060802595527684000_0000000007
+     ) tsql_13027134793466810344_0000000006
+    ) tsql_13027134793466810344_0000000007
 
 
 The `R` implementation is mature, and appropriate to use in production.  The [`rquery`](https://github.com/WinVector/rquery) grammar is designed to have minimal state and minimal annotations (no grouping or ordering annotations!).  This makes the grammar, in my opinion, a good design choice. `rquery` has very good performance, often much faster than `dplyr` or base-`R` due to its query generation ideas and use of [`data.table`](https://CRAN.R-project.org/package=data.table) via [`rqdatatable`](https://CRAN.R-project.org/package=rqdatatable).  `rquery` is a mature pure `R` package; [here](https://github.com/WinVector/rquery/blob/master/README.md) is the same example being worked directly in `R`, with no translation from `Python`. 
@@ -918,7 +928,7 @@ ops.get_tables()
 
 
 
-    {'d': TableDescription(table_name='d', column_names=['subjectID', 'surveyCategory', 'assessmentTotal'])}
+    {'d': TableDescription(table_name='d', column_names=['subjectID', 'surveyCategory', 'assessmentTotal', 'irrelevantCol1', 'irrelevantCol2'])}
 
 
 
@@ -977,7 +987,14 @@ print(ops_back.to_python(pretty=True))
 ```
 
     TableDescription(
-        table_name="d", column_names=["subjectID", "surveyCategory", "assessmentTotal"]
+        table_name="d",
+        column_names=[
+            "subjectID",
+            "surveyCategory",
+            "assessmentTotal",
+            "irrelevantCol1",
+            "irrelevantCol2",
+        ],
     ).extend({"probability": "(assessmentTotal * 0.237).exp()"}).extend(
         {"total": "probability.sum()"}, partition_by=["subjectID"]
     ).extend(
