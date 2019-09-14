@@ -22,8 +22,7 @@ class Term:
     def __init__(self,):
         self.source_string = None
 
-    def get_column_names(self, columns_seen):
-        pass
+    # builders
 
     def __op_expr__(self, op, other):
         if not isinstance(op, str):
@@ -44,6 +43,23 @@ class Term:
             raise TypeError("op is supposed to be a string")
         return Expression(op, (self,), params=params)
 
+    # tree re-write
+
+    def replace_view(self, view):
+        raise NotImplementedError("base class called")
+
+    # analysis
+
+    def get_column_names(self, columns_seen):
+        """
+        Add column names to columns_seen
+        :param columns_seen: set of strings
+        :return:
+        """
+        pass
+
+    # emitters
+
     def to_python(self, *, want_inline_parens=False):
         raise NotImplementedError("base class called")
 
@@ -63,6 +79,8 @@ class Term:
             return self.to_R(want_inline_parens=want_inline_parens)
         else:
             raise ValueError("unexpected dialect string: " + str(dialect))
+
+    # printing
 
     def __repr__(self):
         return self.to_python(want_inline_parens=False)
@@ -280,6 +298,9 @@ class Value(Term):
         self.value = value
         Term.__init__(self)
 
+    def replace_view(self, view):
+        return self
+
     def to_python(self, want_inline_parens=False):
         return self.value.__repr__()
 
@@ -295,9 +316,13 @@ class ColumnReference(Term):
         self.column_name = column_name
         if not isinstance(column_name, str):
             raise TypeError("column_name must be a string")
-        if column_name not in view.column_set:
-            raise KeyError("column_name must be a column of the given view")
+        if view is not None:
+            if column_name not in view.column_set:
+                raise KeyError("column_name must be a column of the given view")
         Term.__init__(self)
+
+    def replace_view(self, view):
+        return ColumnReference(view=view, column_name=self.column_name)
 
     def to_python(self, want_inline_parens=False):
         return self.column_name
@@ -335,6 +360,13 @@ class Expression(Term):
         self.params = params
         self.inline = inline
         Term.__init__(self)
+
+    def replace_view(self, view):
+        new_args = [oi.replace_view(view) for oi in self.args]
+        return Expression(op=self.op,
+                          args=new_args,
+                          params=self.params,
+                          inline=self.inline)
 
     def get_column_names(self, columns_seen):
         for a in self.args:
@@ -418,22 +450,25 @@ def _parse_by_eval(source_str, *, data_def, outter_environemnt=None):
     return v
 
 
-def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
+def parse_assignments_in_context(ops, view):
     """
     Convert all entries of ops map to Term-expressions
 
     Note: eval() is called to interpret expressions on some nodes, so this
        function is not safe to use on untrusted code (though a somewhat restricted
        version of eval() is used to try and catch some issues).
+    :param ops: dictionary from strings to expressions (either Terms or strings)
+    :param view: a data_algebra.data_ops.ViewRepresentation
+    :return:
     """
     if not isinstance(ops, dict):
         raise TypeError("ops should be a dictionary")
+    column_defs = view.column_map.__dict__
     if not isinstance(column_defs, dict):
         raise TypeError("column_defs should be a dictionary")
+    parse_env = data_algebra.env.outer_namespace()
     if parse_env is None:
-        parse_env = data_algebra.env.outer_namespace()
-        if parse_env is None:
-            parse_env = {}
+        parse_env = {}
     # first: make sure all entries are parsed
     columns_used = set()
     newops = collections.OrderedDict()
@@ -448,6 +483,8 @@ def check_convert_op_dictionary(ops, column_defs, *, parse_env=None):
         v = ov
         if not isinstance(v, Term):
             v = _parse_by_eval(source_str=v, data_def=mp, outter_environemnt=parse_env)
+        else:
+            v = v.replace_view(view)
         newops[k] = v
         used_here = set()
         v.get_column_names(used_here)

@@ -14,6 +14,7 @@ data_algebra/data_types.py
 data_algebra/datatable_model.py
 data_algebra/db_model.py
 data_algebra/env.py
+data_algebra/expr.py
 data_algebra/expr_rep.py
 data_algebra/pandas_model.py
 data_algebra/pending_eval.py

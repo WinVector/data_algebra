@@ -553,9 +553,7 @@ def describe_table(d, table_name):
 
 class ExtendNode(ViewRepresentation):
     def __init__(self, source, ops, *, partition_by=None, order_by=None, reverse=None):
-        ops = data_algebra.expr_rep.check_convert_op_dictionary(
-            ops, source.column_map.__dict__
-        )
+        ops = data_algebra.expr_rep.parse_assignments_in_context(ops, source)
         if len(ops) < 1:
             raise ValueError("no ops")
         self.ops = ops
@@ -666,9 +664,7 @@ class ExtendNode(ViewRepresentation):
 
 class ProjectNode(ViewRepresentation):
     def __init__(self, source, ops, *, group_by=None):
-        ops = data_algebra.expr_rep.check_convert_op_dictionary(
-            ops, source.column_map.__dict__
-        )
+        ops = data_algebra.expr_rep.parse_assignments_in_context(ops, source)
         if len(ops) < 1:
             raise ValueError("no ops")
         self.ops = ops
@@ -750,9 +746,7 @@ class SelectRowsNode(ViewRepresentation):
     decision_columns: Set[str]
 
     def __init__(self, source, expr):
-        ops = data_algebra.expr_rep.check_convert_op_dictionary(
-            {"expr": expr}, source.column_map.__dict__
-        )
+        ops = data_algebra.expr_rep.parse_assignments_in_context({"expr": expr}, source)
         if len(ops) < 1:
             raise ValueError("no ops")
         self.expr = ops["expr"]
