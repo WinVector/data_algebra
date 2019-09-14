@@ -1,4 +1,6 @@
 
+This is an [Apache `Spark`](https://spark.apache.org) variation of the [logistic scoring example](https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/ScoringExample.ipynb).
+
 
 ```python
 import pyspark
@@ -255,24 +257,24 @@ print(sql)
            `subjectid`,
            `surveycategory` AS `diagnosis`
     FROM (
-    SELECT `surveycategory`,
-           `probability`,
+    SELECT `probability`,
+           `surveycategory`,
            `subjectid`
     FROM (
-    SELECT `surveycategory`,
-           `probability`,
+    SELECT `probability`,
+           `surveycategory`,
            `subjectid`
     FROM (
-    SELECT `surveycategory`,
-           `probability`,
+    SELECT `probability`,
+           `surveycategory`,
            `sort_key`,
            `subjectid`,
            ROW_NUMBER() OVER (PARTITION BY `subjectid`
                               ORDER BY `sort_key`) AS `row_number`
     FROM (
-    SELECT `surveycategory`,
-           `probability`,
-           `subjectid`, ( -`probability` ) AS `sort_key` FROM ( SELECT `surveycategory`, `subjectid`, `probability` / `total` AS `probability` FROM ( SELECT `surveycategory`, `probability`, `subjectid`, SUM(`probability`) OVER ( PARTITION BY `subjectid`  )  AS `total` FROM ( SELECT `surveycategory`, `subjectid`, EXP((`assessmenttotal` * 0.237)) AS `probability` FROM ( SELECT `assessmenttotal`, `surveycategory`, `subjectid` FROM `d` ) `sq_0` ) `sq_1` ) `sq_2` ) `sq_3` ) `sq_4` ) `sq_5` WHERE `row_number` = 1 ) `sq_6` ) `sq_7`
+    SELECT `probability`,
+           `surveycategory`,
+           `subjectid`, ( -`probability` ) AS `sort_key` FROM ( SELECT `surveycategory`, `subjectid`, `probability` / `total` AS `probability` FROM ( SELECT `probability`, `surveycategory`, `subjectid`, SUM(`probability`) OVER ( PARTITION BY `subjectid`  )  AS `total` FROM ( SELECT `surveycategory`, `subjectid`, EXP((`assessmenttotal` * 0.237)) AS `probability` FROM ( SELECT `assessmenttotal`, `surveycategory`, `subjectid` FROM `d` ) `sq_0` ) `sq_1` ) `sq_2` ) `sq_3` ) `sq_4` ) `sq_5` WHERE `row_number` = 1 ) `sq_6` ) `sq_7`
 
 
 
