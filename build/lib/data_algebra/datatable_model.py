@@ -16,6 +16,25 @@ import data_algebra.expr_rep
 import data_algebra.data_ops
 
 
+expr_to_dt_expr_map = {
+    'exp': lambda expr: datatable.exp(expr_to_dt_expr(expr.args[0])),
+    '+': lambda expr: expr_to_dt_expr(expr.args[0]) + expr_to_dt_expr(expr.args[1]),
+    '-': lambda expr: expr_to_dt_expr(expr.args[0]) - expr_to_dt_expr(expr.args[1]),
+    '*': lambda expr: expr_to_dt_expr(expr.args[0]) * expr_to_dt_expr(expr.args[1]),
+    '/': lambda expr: expr_to_dt_expr(expr.args[0]) / expr_to_dt_expr(expr.args[1]),
+    'neg': lambda expr: -expr_to_dt_expr(expr.args[0]),
+}
+
+
+def expr_to_dt_expr(expr):
+    if isinstance(expr, data_algebra.expr_rep.ColumnReference):
+        return datatable.f[expr.column_name]
+    if isinstance(expr, data_algebra.expr_rep.Value):
+        return expr.value
+    f = expr_to_dt_expr_map[expr.op]
+    return f(expr)
+
+
 class DataTableModel(data_algebra.data_model.DataModel):
     def __init__(self):
         data_algebra.data_model.DataModel.__init__(self)
@@ -51,10 +70,15 @@ class DataTableModel(data_algebra.data_model.DataModel):
         window_situation = (len(op.partition_by) > 0) or (len(op.order_by) > 0)
         if window_situation:
             self.check_extend_window_fns(op)
+        if window_situation:
+            raise RuntimeError("windowed extend not implemented for datatable yet")   # TODO: implement
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self
         )
-        raise RuntimeError("not implemented yet")  # TODO: implement
+        for (col, expr) in op.ops.items():
+            dt_expr = expr_to_dt_expr(expr)
+            res[col] = res[:, {col: dt_expr}][col]
+        return res
 
     def columns_to_frame(self, cols):
         """

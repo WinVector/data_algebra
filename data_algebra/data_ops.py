@@ -98,7 +98,15 @@ class ViewRepresentation(OperatorPlatform):
         self.sources = [si for si in sources]
         OperatorPlatform.__init__(self)
 
- 
+    # adaptors
+
+    def get_column_symbols(self):
+        """Return a representation of this step as columns we can perform algebraic operations over.
+        These objects capture the operations as an expression tree."""
+        column_defs = self.column_map.__dict__
+        nd = column_defs.copy()
+        ns = data_algebra.env.SimpleNamespaceDict(**nd)
+        return ns
 
     # characterization
 

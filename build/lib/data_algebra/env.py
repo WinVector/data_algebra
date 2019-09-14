@@ -72,7 +72,7 @@ class SimpleNamespaceDict(types.SimpleNamespace):
         raise RuntimeError("__setattr__ not allowed")
 
 
-def populate_specials(*, column_defs, column_defs1=None, destination, user_values=None):
+def populate_specials(*, column_defs, destination, user_values=None):
     """populate a dictionary with special values
        column_defs is a dictionary,
          usually formed from a ViewRepresentation.column_map.__dict__
@@ -91,15 +91,6 @@ def populate_specials(*, column_defs, column_defs1=None, destination, user_value
     nd = column_defs.copy()
     ns = SimpleNamespaceDict(**nd)
     destination["_"] = ns
-    destination["_0"] = ns
-    if column_defs1 is not None:
-        if not isinstance(column_defs1, dict):
-            raise TypeError("column_defs1 should be a dictionary")
-        nd1 = column_defs1.copy()
-        ns1 = SimpleNamespaceDict(**nd1)
-        destination["_1"] = ns1
-    else:
-        destination["_1"] = None
     destination["_get"] = lambda key: user_values[key]
     destination["_row_number"] = lambda: data_algebra.expr_rep.Expression(
         op="row_number", args=[]
