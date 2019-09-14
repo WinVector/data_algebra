@@ -44,10 +44,7 @@ def _db_is_bad_expr(dbmodel, expression):
     )
 
 
-db_expr_formatters = {
-    "is_null": _db_is_null_expr,
-    "is_bad": _db_is_bad_expr,
-}
+db_expr_formatters = {"is_null": _db_is_null_expr, "is_bad": _db_is_bad_expr}
 
 
 class DBModel:

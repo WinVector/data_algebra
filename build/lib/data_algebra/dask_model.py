@@ -1,4 +1,3 @@
-import warnings
 
 import data_algebra
 import data_algebra.data_ops
@@ -26,7 +25,7 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
     def __init__(self):
         data_algebra.pandas_model.PandasModel.__init__(self)
 
-    def assert_is_appropriate_data_instance(self, df, arg_name=''):
+    def assert_is_appropriate_data_instance(self, df, arg_name=""):
         if not isinstance(df, dask.dataframe.DataFrame):
             raise TypeError(arg_name + " was supposed to be a dask.dataframe.DataFrame")
 
@@ -41,7 +40,7 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
                 "table descriptions used with eval_implementation() must not have qualifiers"
             )
         df = data_map[op.table_name]
-        self.assert_is_appropriate_data_instance(df, 'data_map[' + op.table_name + ']')
+        self.assert_is_appropriate_data_instance(df, "data_map[" + op.table_name + "]")
         # check all columns we expect are present
         columns_using = op.column_names
         missing = set(columns_using) - set([c for c in df.columns])

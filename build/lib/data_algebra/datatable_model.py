@@ -1,4 +1,3 @@
-
 # https://github.com/h2oai/datatable
 # https://datatable.readthedocs.io/en/latest/?badge=latest
 # https://datatable.readthedocs.io/en/latest/using-datatable.html
@@ -17,13 +16,13 @@ import data_algebra.data_ops
 
 
 expr_to_dt_expr_map = {
-    'exp': lambda expr: datatable.exp(expr_to_dt_expr(expr.args[0])),
-    'sum': lambda expr: datatable.sum(expr_to_dt_expr(expr.args[0])),
-    '+': lambda expr: expr_to_dt_expr(expr.args[0]) + expr_to_dt_expr(expr.args[1]),
-    '-': lambda expr: expr_to_dt_expr(expr.args[0]) - expr_to_dt_expr(expr.args[1]),
-    '*': lambda expr: expr_to_dt_expr(expr.args[0]) * expr_to_dt_expr(expr.args[1]),
-    '/': lambda expr: expr_to_dt_expr(expr.args[0]) / expr_to_dt_expr(expr.args[1]),
-    'neg': lambda expr: -expr_to_dt_expr(expr.args[0]),
+    "exp": lambda expr: datatable.exp(expr_to_dt_expr(expr.args[0])),
+    "sum": lambda expr: datatable.sum(expr_to_dt_expr(expr.args[0])),
+    "+": lambda expr: expr_to_dt_expr(expr.args[0]) + expr_to_dt_expr(expr.args[1]),
+    "-": lambda expr: expr_to_dt_expr(expr.args[0]) - expr_to_dt_expr(expr.args[1]),
+    "*": lambda expr: expr_to_dt_expr(expr.args[0]) * expr_to_dt_expr(expr.args[1]),
+    "/": lambda expr: expr_to_dt_expr(expr.args[0]) / expr_to_dt_expr(expr.args[1]),
+    "neg": lambda expr: -expr_to_dt_expr(expr.args[0]),
 }
 
 
@@ -40,7 +39,7 @@ class DataTableModel(data_algebra.data_model.DataModel):
     def __init__(self):
         data_algebra.data_model.DataModel.__init__(self)
 
-    def assert_is_appropriate_data_instance(self, df, arg_name=''):
+    def assert_is_appropriate_data_instance(self, df, arg_name=""):
         if not isinstance(df, datatable.Frame):
             raise TypeError(arg_name + " was supposed to be a datatable.Frame")
 
@@ -55,7 +54,7 @@ class DataTableModel(data_algebra.data_model.DataModel):
                 "table descriptions used with eval_implementation() must not have qualifiers"
             )
         df = data_map[op.table_name]
-        self.assert_is_appropriate_data_instance(df, 'data_map[' + op.table_name + ']')
+        self.assert_is_appropriate_data_instance(df, "data_map[" + op.table_name + "]")
         # check all columns we expect are present
         columns_using = df.names
         missing = set(columns_using) - set([c for c in df.names])
@@ -72,18 +71,19 @@ class DataTableModel(data_algebra.data_model.DataModel):
         if window_situation:
             self.check_extend_window_fns(op)
         if window_situation:
-            raise RuntimeError("windowed extend not implemented yet")
+            raise RuntimeError("windowed extend not implemented yet")  # TODO: implement
+        # datatable doesn't seem to have per-group transform yet (other than the whole dataframe)
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self
         )
         if len(op.order_by) > 0:
-            ascending = [
-                False if ci in set(op.reverse) else True for ci in op.order_by
-            ]
+            ascending = [False if ci in set(op.reverse) else True for ci in op.order_by]
             if not all(ascending):
-                raise RuntimeError("reverse isn't implemented for datatable yet")
+                raise RuntimeError(
+                    "reverse isn't implemented for datatable yet"
+                )  # TODO: implement
             syms = [datatable.f[c] for c in op.order_by]
-            res =  res.sort(*syms)
+            res = res.sort(*syms)
         if len(op.partition_by) > 0:
             for (col, expr) in op.ops.items():
                 dt_expr = expr_to_dt_expr(expr)
@@ -130,10 +130,10 @@ class DataTableModel(data_algebra.data_model.DataModel):
             data_map=data_map, eval_env=eval_env, data_model=self
         )
         cols = []
-        if len(op.partition_by) > 0:
+        if len(op.group_by) > 0:
             for (col, expr) in op.ops.items():
                 dt_expr = expr_to_dt_expr(expr)
-                cols.append(res[:, {col: dt_expr}, datatable.by(*op.partition_by)][col])
+                cols.append(res[:, {col: dt_expr}, datatable.by(*op.group_by)][col])
         else:
             for (col, expr) in op.ops.items():
                 dt_expr = expr_to_dt_expr(expr)
@@ -184,7 +184,9 @@ class DataTableModel(data_algebra.data_model.DataModel):
             False if ci in set(op.reverse) else True for ci in op.order_columns
         ]
         if not all(ascending):
-            raise RuntimeError("reverse isn't implemented for datatable yet")
+            raise RuntimeError(
+                "reverse isn't implemented for datatable yet"
+            )  # TODO: implement
         syms = [datatable.f[c] for c in op.order_columns]
         return res.sort(*syms)
 

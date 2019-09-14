@@ -1,4 +1,3 @@
-
 import data_algebra
 import data_algebra.expr_rep
 import data_algebra.data_ops
@@ -8,7 +7,7 @@ class DataModel:
     def __init__(self):
         pass
 
-    def assert_is_appropriate_data_instance(self, df, arg_name=''):
+    def assert_is_appropriate_data_instance(self, df, arg_name=""):
         raise NotImplementedError("base method called")
 
     def table_step(self, op, *, data_map, eval_env):

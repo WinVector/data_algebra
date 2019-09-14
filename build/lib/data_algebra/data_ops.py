@@ -183,7 +183,9 @@ class ViewRepresentation(OperatorPlatform):
         if sqlparse_options is None:
             sqlparse_options = {"reindent": True, "keyword_case": "upper"}
         if not isinstance(db_model, data_algebra.db_model.DBModel):
-            raise TypeError("Expected db_model to be derived from data_algebra.db_model.DBModel")
+            raise TypeError(
+                "Expected db_model to be derived from data_algebra.db_model.DBModel"
+            )
         self.get_tables()  # for table consistency check/raise
         temp_id_source = [0]
         sql_str = self.to_sql_implementation(
@@ -218,13 +220,17 @@ class ViewRepresentation(OperatorPlatform):
         if data_model is None:
             data_model = data_algebra.pandas_model.PandasModel()
         if not isinstance(data_model, data_algebra.pandas_model.PandasModel):
-            raise TypeError("Expected data_model to derive from data_algebra.pandas_model.PandasModel")
+            raise TypeError(
+                "Expected data_model to derive from data_algebra.pandas_model.PandasModel"
+            )
         tables = self.get_tables()
         for k in tables.keys():
             if k not in data_map.keys():
                 raise ValueError("Required table " + k + " not in data_map")
             else:
-                data_model.assert_is_appropriate_data_instance(data_map[k], "data_map[" + k + "]")
+                data_model.assert_is_appropriate_data_instance(
+                    data_map[k], "data_map[" + k + "]"
+                )
         return self.eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=data_model
         )
@@ -249,13 +255,17 @@ class ViewRepresentation(OperatorPlatform):
         if data_model is None:
             data_model = data_algebra.dask_model.DaskModel()
         if not isinstance(data_model, data_algebra.dask_model.DaskModel):
-            raise TypeError("Expected data_model to derive from data_algebra.dask_model.DaskModel")
+            raise TypeError(
+                "Expected data_model to derive from data_algebra.dask_model.DaskModel"
+            )
         tables = self.get_tables()
         for k in tables.keys():
             if k not in data_map.keys():
                 raise ValueError("Required table " + k + " not in data_map")
             else:
-                data_model.assert_is_appropriate_data_instance(data_map[k], "data_map[" + k + "]")
+                data_model.assert_is_appropriate_data_instance(
+                    data_map[k], "data_map[" + k + "]"
+                )
         return self.eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=data_model
         )
@@ -280,13 +290,17 @@ class ViewRepresentation(OperatorPlatform):
         if data_model is None:
             data_model = data_algebra.datatable_model.DataTableModel()
         if not isinstance(data_model, data_algebra.datatable_model.DataTableModel):
-            raise TypeError("Expected data_model to derive from data_algebra.datatable_model.DataTableModel")
+            raise TypeError(
+                "Expected data_model to derive from data_algebra.datatable_model.DataTableModel"
+            )
         tables = self.get_tables()
         for k in tables.keys():
             if k not in data_map.keys():
                 raise ValueError("Required table " + k + " not in data_map")
             else:
-                data_model.assert_is_appropriate_data_instance(data_map[k], "data_map[" + k + "]")
+                data_model.assert_is_appropriate_data_instance(
+                    data_map[k], "data_map[" + k + "]"
+                )
         return self.eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=data_model
         )
@@ -296,7 +310,9 @@ class ViewRepresentation(OperatorPlatform):
             raise ValueError("Expected data_map to be non-empty")
         if data_model is not None:
             if not isinstance(data_model, data_algebra.data_model.DataModel):
-                raise TypeError("Expected data_model to be derived from data_algebra.data_model.DataModel")
+                raise TypeError(
+                    "Expected data_model to be derived from data_algebra.data_model.DataModel"
+                )
         k = [k for k in data_map.keys()][0]
         x = data_map[k]
         if isinstance(x, pandas.DataFrame):
@@ -319,7 +335,9 @@ class ViewRepresentation(OperatorPlatform):
     def transform(self, X, *, eval_env=None, data_model=None):
         if data_model is not None:
             if not isinstance(data_model, data_algebra.data_model.DataModel):
-                raise TypeError("Expected data_model to be derived from data_algebra.data_model.DataModel")
+                raise TypeError(
+                    "Expected data_model to be derived from data_algebra.data_model.DataModel"
+                )
         tables = self.get_tables()
         if len(tables) != 1:
             raise ValueError(
@@ -941,9 +959,7 @@ class OrderRowsNode(ViewRepresentation):
         return db_model.order_to_sql(self, using=using, temp_id_source=temp_id_source)
 
     def eval_implementation(self, *, data_map, eval_env, data_model):
-        return data_model.order_rows_step(
-            op=self, data_map=data_map, eval_env=eval_env
-        )
+        return data_model.order_rows_step(op=self, data_map=data_map, eval_env=eval_env)
 
 
 class RenameColumnsNode(ViewRepresentation):

@@ -10,7 +10,7 @@ class PandasModel(data_algebra.data_model.DataModel):
     def __init__(self):
         data_algebra.data_model.DataModel.__init__(self)
 
-    def assert_is_appropriate_data_instance(self, df, arg_name=''):
+    def assert_is_appropriate_data_instance(self, df, arg_name=""):
         if not isinstance(df, pandas.DataFrame):
             raise TypeError(arg_name + " was supposed to be a pandas.DataFrame")
 
@@ -25,7 +25,7 @@ class PandasModel(data_algebra.data_model.DataModel):
                 "table descriptions used with eval_implementation() must not have qualifiers"
             )
         df = data_map[op.table_name]
-        self.assert_is_appropriate_data_instance(df, 'data_map[' + op.table_name + ']')
+        self.assert_is_appropriate_data_instance(df, "data_map[" + op.table_name + "]")
         # check all columns we expect are present
         columns_using = op.column_names
         missing = set(columns_using) - set([c for c in df.columns])

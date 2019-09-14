@@ -56,9 +56,7 @@ class RecordMap:
         X = X.reset_index(drop=True)
         db_model = data_algebra.SQLite.SQLiteModel()
         if self.blocks_in is not None:
-            x1_descr = data_algebra.data_ops.describe_table(
-                X, table_name="x_blocks_in"
-            )
+            x1_descr = data_algebra.data_ops.describe_table(X, table_name="x_blocks_in")
             missing_cols = set(self.blocks_in.control_table_keys).union(
                 self.blocks_in.record_keys
             ) - set(x1_descr.column_names)
