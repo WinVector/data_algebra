@@ -340,22 +340,22 @@ sql = ops.to_sql(db_model, pretty=True)
 print(sql)
 ```
 
-    SELECT "probability",
-           "subjectid",
+    SELECT "subjectid",
+           "probability",
            "surveycategory" AS "diagnosis"
     FROM
-      (SELECT "probability",
-              "subjectid",
+      (SELECT "subjectid",
+              "probability",
               "surveycategory"
        FROM
-         (SELECT "probability",
-                 "subjectid",
+         (SELECT "subjectid",
+                 "probability",
                  "surveycategory"
           FROM
-            (SELECT "surveycategory",
+            (SELECT "sort_key",
                     "subjectid",
-                    "sort_key",
                     "probability",
+                    "surveycategory",
                     ROW_NUMBER() OVER (PARTITION BY "subjectid"
                                        ORDER BY "sort_key") AS "row_number"
              FROM
@@ -414,22 +414,22 @@ db_model.read_query(conn, sql)
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>probability</th>
       <th>subjectid</th>
+      <th>probability</th>
       <th>diagnosis</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.670622</td>
       <td>1.0</td>
+      <td>0.670622</td>
       <td>withdrawal behavior</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>0.558974</td>
       <td>2.0</td>
+      <td>0.558974</td>
       <td>positive re-framing</td>
     </tr>
   </tbody>
@@ -851,15 +851,15 @@ cat(sql)
              "assessmentTotal"
             FROM
              "d"
-            ) tsql_21995480598153962875_0000000000
-           ) tsql_21995480598153962875_0000000001
-          ) tsql_21995480598153962875_0000000002
-         ) tsql_21995480598153962875_0000000003
-        ) tsql_21995480598153962875_0000000004
-      ) tsql_21995480598153962875_0000000005
+            ) tsql_85982078297649144292_0000000000
+           ) tsql_85982078297649144292_0000000001
+          ) tsql_85982078297649144292_0000000002
+         ) tsql_85982078297649144292_0000000003
+        ) tsql_85982078297649144292_0000000004
+      ) tsql_85982078297649144292_0000000005
       WHERE "row_number" = 1
-     ) tsql_21995480598153962875_0000000006
-    ) tsql_21995480598153962875_0000000007
+     ) tsql_85982078297649144292_0000000006
+    ) tsql_85982078297649144292_0000000007
 
 
 The `R` implementation is mature, and appropriate to use in production.  The [`rquery`](https://github.com/WinVector/rquery) grammar is designed to have minimal state and minimal annotations (no grouping or ordering annotations!).  This makes the grammar, in my opinion, a good design choice. `rquery` has very good performance, often much faster than `dplyr` or base-`R` due to its query generation ideas and use of [`data.table`](https://CRAN.R-project.org/package=data.table) via [`rqdatatable`](https://CRAN.R-project.org/package=rqdatatable).  `rquery` is a mature pure `R` package; [here](https://github.com/WinVector/rquery/blob/master/README.md) is the same example being worked directly in `R`, with no translation from `Python`. 
