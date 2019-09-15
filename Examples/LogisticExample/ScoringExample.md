@@ -344,24 +344,24 @@ print(sql)
            "subjectid",
            "surveycategory" AS "diagnosis"
     FROM
-      (SELECT "surveycategory",
-              "probability",
-              "subjectid"
+      (SELECT "probability",
+              "subjectid",
+              "surveycategory"
        FROM
-         (SELECT "surveycategory",
-                 "probability",
-                 "subjectid"
+         (SELECT "probability",
+                 "subjectid",
+                 "surveycategory"
           FROM
             (SELECT "surveycategory",
-                    "probability",
-                    "sort_key",
                     "subjectid",
+                    "sort_key",
+                    "probability",
                     ROW_NUMBER() OVER (PARTITION BY "subjectid"
                                        ORDER BY "sort_key") AS "row_number"
              FROM
                (SELECT "surveycategory",
-                       "probability",
                        "subjectid",
+                       "probability",
                        (-"probability") AS "sort_key"
                 FROM
                   (SELECT "surveycategory",
@@ -369,8 +369,8 @@ print(sql)
                           "probability" / "total" AS "probability"
                    FROM
                      (SELECT "surveycategory",
-                             "probability",
                              "subjectid",
+                             "probability",
                              SUM("probability") OVER (PARTITION BY "subjectid") AS "total"
                       FROM
                         (SELECT "surveycategory",
@@ -378,8 +378,8 @@ print(sql)
                                 EXP(("assessmenttotal" * 0.237)) AS "probability"
                          FROM
                            (SELECT "surveycategory",
-                                   "assessmenttotal",
-                                   "subjectid"
+                                   "subjectid",
+                                   "assessmenttotal"
                             FROM "d") "sq_0") "sq_1") "sq_2") "sq_3") "sq_4") "sq_5"
           WHERE "row_number" = 1 ) "sq_6") "sq_7"
 
@@ -727,34 +727,37 @@ r_ops <- convert_yaml_to_pipeline(r_yaml)
 cat(format(r_ops))
 ```
 
-    table(d; 
-      subjectID,
-      surveyCategory,
-      assessmentTotal,
-      irrelevantCol1,
-      irrelevantCol2) %.>%
+    mk_td("d", c(
+      "subjectID",
+      "surveyCategory",
+      "assessmentTotal",
+      "irrelevantCol1",
+      "irrelevantCol2")) %.>%
      extend(.,
       probability %:=% exp(assessmentTotal * 0.237)) %.>%
      extend(.,
       total %:=% sum(probability),
-      p= subjectID) %.>%
+      partitionby = c('subjectID'),
+      orderby = c(),
+      reverse = c()) %.>%
      extend(.,
       probability %:=% probability / total) %.>%
      extend(.,
       sort_key %:=% -(probability)) %.>%
      extend(.,
       row_number %:=% row_number(),
-      p= subjectID,
-      o= "sort_key") %.>%
+      partitionby = c('subjectID'),
+      orderby = c('sort_key'),
+      reverse = c()) %.>%
      select_rows(.,
        row_number == 1) %.>%
-     select_columns(.,
-       subjectID, surveyCategory, probability) %.>%
+     select_columns(., c(
+       "subjectID", "surveyCategory", "probability")) %.>%
      rename_columns(.,
       c('diagnosis' = 'surveyCategory'))
 
 
-The above representation is nearly "`R` code" (it is not what an `R` user would direclty type in, unlike the `Python` representation, but it is very similar to the actual `rquery` steps) written using [`wrapr` dot pipe](https://journal.r-project.org/archive/2018/RJ-2018-042/index.html) notation. However, the imported pipeline can be directly executed in `R`.
+The above representation is now the equivalent "`R` code", written using [`wrapr` dot pipe](https://journal.r-project.org/archive/2018/RJ-2018-042/index.html)/[`rquery`](https://github.com/WinVector/rquery) notation. The imported pipeline can be directly executed in `R`.
 
 
 ```r
@@ -848,15 +851,15 @@ cat(sql)
              "assessmentTotal"
             FROM
              "d"
-            ) tsql_93728866411077021482_0000000000
-           ) tsql_93728866411077021482_0000000001
-          ) tsql_93728866411077021482_0000000002
-         ) tsql_93728866411077021482_0000000003
-        ) tsql_93728866411077021482_0000000004
-      ) tsql_93728866411077021482_0000000005
+            ) tsql_21995480598153962875_0000000000
+           ) tsql_21995480598153962875_0000000001
+          ) tsql_21995480598153962875_0000000002
+         ) tsql_21995480598153962875_0000000003
+        ) tsql_21995480598153962875_0000000004
+      ) tsql_21995480598153962875_0000000005
       WHERE "row_number" = 1
-     ) tsql_93728866411077021482_0000000006
-    ) tsql_93728866411077021482_0000000007
+     ) tsql_21995480598153962875_0000000006
+    ) tsql_21995480598153962875_0000000007
 
 
 The `R` implementation is mature, and appropriate to use in production.  The [`rquery`](https://github.com/WinVector/rquery) grammar is designed to have minimal state and minimal annotations (no grouping or ordering annotations!).  This makes the grammar, in my opinion, a good design choice. `rquery` has very good performance, often much faster than `dplyr` or base-`R` due to its query generation ideas and use of [`data.table`](https://CRAN.R-project.org/package=data.table) via [`rqdatatable`](https://CRAN.R-project.org/package=rqdatatable).  `rquery` is a mature pure `R` package; [here](https://github.com/WinVector/rquery/blob/master/README.md) is the same example being worked directly in `R`, with no translation from `Python`. 
