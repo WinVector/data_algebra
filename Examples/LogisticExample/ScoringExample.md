@@ -344,42 +344,42 @@ print(sql)
            "subjectid",
            "surveycategory" AS "diagnosis"
     FROM
-      (SELECT "probability",
-              "subjectid",
-              "surveycategory"
+      (SELECT "surveycategory",
+              "probability",
+              "subjectid"
        FROM
-         (SELECT "probability",
-                 "subjectid",
-                 "surveycategory"
+         (SELECT "surveycategory",
+                 "probability",
+                 "subjectid"
           FROM
-            (SELECT "probability",
-                    "subjectid",
+            (SELECT "surveycategory",
+                    "probability",
                     "sort_key",
-                    "surveycategory",
+                    "subjectid",
                     ROW_NUMBER() OVER (PARTITION BY "subjectid"
                                        ORDER BY "sort_key") AS "row_number"
              FROM
-               (SELECT "probability",
+               (SELECT "surveycategory",
+                       "probability",
                        "subjectid",
-                       "surveycategory",
                        (-"probability") AS "sort_key"
                 FROM
-                  (SELECT "subjectid",
-                          "surveycategory",
+                  (SELECT "surveycategory",
+                          "subjectid",
                           "probability" / "total" AS "probability"
                    FROM
-                     (SELECT "probability",
+                     (SELECT "surveycategory",
+                             "probability",
                              "subjectid",
-                             "surveycategory",
                              SUM("probability") OVER (PARTITION BY "subjectid") AS "total"
                       FROM
-                        (SELECT "subjectid",
-                                "surveycategory",
+                        (SELECT "surveycategory",
+                                "subjectid",
                                 EXP(("assessmenttotal" * 0.237)) AS "probability"
                          FROM
-                           (SELECT "subjectid",
+                           (SELECT "surveycategory",
                                    "assessmenttotal",
-                                   "surveycategory"
+                                   "subjectid"
                             FROM "d") "sq_0") "sq_1") "sq_2") "sq_3") "sq_4") "sq_5"
           WHERE "row_number" = 1 ) "sq_6") "sq_7"
 
@@ -689,51 +689,7 @@ We will demonstrate this next.
 ```python
 # convert pipeline to simple objects
 objs_R = ops.collect_representation(dialect='R')
-# print these objects
-pprint(objs_R)
 ```
-
-    [OrderedDict([('op', 'TableDescription'),
-                  ('table_name', 'd'),
-                  ('qualifiers', {}),
-                  ('column_names',
-                   ['subjectID',
-                    'surveyCategory',
-                    'assessmentTotal',
-                    'irrelevantCol1',
-                    'irrelevantCol2']),
-                  ('key', 'd')]),
-     OrderedDict([('op', 'Extend'),
-                  ('ops', {'probability': 'exp(assessmentTotal * 0.237)'}),
-                  ('partition_by', []),
-                  ('order_by', []),
-                  ('reverse', [])]),
-     OrderedDict([('op', 'Extend'),
-                  ('ops', {'total': 'sum(probability)'}),
-                  ('partition_by', ['subjectID']),
-                  ('order_by', []),
-                  ('reverse', [])]),
-     OrderedDict([('op', 'Extend'),
-                  ('ops', {'probability': 'probability / total'}),
-                  ('partition_by', []),
-                  ('order_by', []),
-                  ('reverse', [])]),
-     OrderedDict([('op', 'Extend'),
-                  ('ops', {'sort_key': '-probability'}),
-                  ('partition_by', []),
-                  ('order_by', []),
-                  ('reverse', [])]),
-     OrderedDict([('op', 'Extend'),
-                  ('ops', {'row_number': 'row_number()'}),
-                  ('partition_by', ['subjectID']),
-                  ('order_by', ['sort_key']),
-                  ('reverse', [])]),
-     OrderedDict([('op', 'SelectRows'), ('expr', 'row_number == 1')]),
-     OrderedDict([('op', 'SelectColumns'),
-                  ('columns', ['subjectID', 'surveyCategory', 'probability'])]),
-     OrderedDict([('op', 'Rename'),
-                  ('column_remapping', {'diagnosis': 'surveyCategory'})])]
-
 
 In the above data structure the recursive operator steps have been linearized into a list, and simplified to just ordered dictionaries of a few defining and derived fields. In particular, the `key` field of the `TableDescription` nodes is the unique identifier for the tables, two `TableDescription` with the same key are referring to the same table.
 
@@ -765,7 +721,6 @@ library(yaml)
 library(wrapr)
 library(rquery)
 library(rqdatatable)
-source('R_fns.R')  # https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/R_fns.R
 
 r_yaml <- yaml.load_file("pipeline_yaml.txt")
 r_ops <- convert_yaml_to_pipeline(r_yaml)
@@ -779,23 +734,23 @@ cat(format(r_ops))
       irrelevantCol1,
       irrelevantCol2) %.>%
      extend(.,
-      probability := exp(assessmentTotal * 0.237)) %.>%
+      probability %:=% exp(assessmentTotal * 0.237)) %.>%
      extend(.,
-      total := sum(probability),
+      total %:=% sum(probability),
       p= subjectID) %.>%
      extend(.,
-      probability := probability / total) %.>%
+      probability %:=% probability / total) %.>%
      extend(.,
-      sort_key := -(probability)) %.>%
+      sort_key %:=% -(probability)) %.>%
      extend(.,
-      row_number := row_number(),
+      row_number %:=% row_number(),
       p= subjectID,
       o= "sort_key") %.>%
      select_rows(.,
        row_number == 1) %.>%
      select_columns(.,
        subjectID, surveyCategory, probability) %.>%
-     rename(.,
+     rename_columns(.,
       c('diagnosis' = 'surveyCategory'))
 
 
@@ -893,15 +848,15 @@ cat(sql)
              "assessmentTotal"
             FROM
              "d"
-            ) tsql_92212314115132864025_0000000000
-           ) tsql_92212314115132864025_0000000001
-          ) tsql_92212314115132864025_0000000002
-         ) tsql_92212314115132864025_0000000003
-        ) tsql_92212314115132864025_0000000004
-      ) tsql_92212314115132864025_0000000005
+            ) tsql_93728866411077021482_0000000000
+           ) tsql_93728866411077021482_0000000001
+          ) tsql_93728866411077021482_0000000002
+         ) tsql_93728866411077021482_0000000003
+        ) tsql_93728866411077021482_0000000004
+      ) tsql_93728866411077021482_0000000005
       WHERE "row_number" = 1
-     ) tsql_92212314115132864025_0000000006
-    ) tsql_92212314115132864025_0000000007
+     ) tsql_93728866411077021482_0000000006
+    ) tsql_93728866411077021482_0000000007
 
 
 The `R` implementation is mature, and appropriate to use in production.  The [`rquery`](https://github.com/WinVector/rquery) grammar is designed to have minimal state and minimal annotations (no grouping or ordering annotations!).  This makes the grammar, in my opinion, a good design choice. `rquery` has very good performance, often much faster than `dplyr` or base-`R` due to its query generation ideas and use of [`data.table`](https://CRAN.R-project.org/package=data.table) via [`rqdatatable`](https://CRAN.R-project.org/package=rqdatatable).  `rquery` is a mature pure `R` package; [here](https://github.com/WinVector/rquery/blob/master/README.md) is the same example being worked directly in `R`, with no translation from `Python`. 
@@ -967,7 +922,7 @@ The `data_algebra` is part of a powerful cross-language and mutli-implementaiton
 
 ## Appendix:
 
-Demonstrate we can round-trip a `data_algebra` through `YAML` and recover the code.
+Demonstrate that we can round-trip a `data_algebra` through `YAML` and recover the code.
 
 
 ```python

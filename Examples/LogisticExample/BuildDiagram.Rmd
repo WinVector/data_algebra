@@ -8,7 +8,6 @@ library(yaml)
 library(wrapr)
 library(rquery)
 library(rqdatatable)
-source('R_fns.R')  # https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/R_fns.R
 
 r_yaml <- yaml.load_file("pipeline_yaml.txt")
 r_ops <- convert_yaml_to_pipeline(r_yaml)

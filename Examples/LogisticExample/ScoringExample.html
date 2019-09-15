@@ -13576,42 +13576,42 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
        &#34;subjectid&#34;,
        &#34;surveycategory&#34; AS &#34;diagnosis&#34;
 FROM
-  (SELECT &#34;probability&#34;,
-          &#34;subjectid&#34;,
-          &#34;surveycategory&#34;
+  (SELECT &#34;surveycategory&#34;,
+          &#34;probability&#34;,
+          &#34;subjectid&#34;
    FROM
-     (SELECT &#34;probability&#34;,
-             &#34;subjectid&#34;,
-             &#34;surveycategory&#34;
+     (SELECT &#34;surveycategory&#34;,
+             &#34;probability&#34;,
+             &#34;subjectid&#34;
       FROM
-        (SELECT &#34;probability&#34;,
-                &#34;subjectid&#34;,
+        (SELECT &#34;surveycategory&#34;,
+                &#34;probability&#34;,
                 &#34;sort_key&#34;,
-                &#34;surveycategory&#34;,
+                &#34;subjectid&#34;,
                 ROW_NUMBER() OVER (PARTITION BY &#34;subjectid&#34;
                                    ORDER BY &#34;sort_key&#34;) AS &#34;row_number&#34;
          FROM
-           (SELECT &#34;probability&#34;,
+           (SELECT &#34;surveycategory&#34;,
+                   &#34;probability&#34;,
                    &#34;subjectid&#34;,
-                   &#34;surveycategory&#34;,
                    (-&#34;probability&#34;) AS &#34;sort_key&#34;
             FROM
-              (SELECT &#34;subjectid&#34;,
-                      &#34;surveycategory&#34;,
+              (SELECT &#34;surveycategory&#34;,
+                      &#34;subjectid&#34;,
                       &#34;probability&#34; / &#34;total&#34; AS &#34;probability&#34;
                FROM
-                 (SELECT &#34;probability&#34;,
+                 (SELECT &#34;surveycategory&#34;,
+                         &#34;probability&#34;,
                          &#34;subjectid&#34;,
-                         &#34;surveycategory&#34;,
                          SUM(&#34;probability&#34;) OVER (PARTITION BY &#34;subjectid&#34;) AS &#34;total&#34;
                   FROM
-                    (SELECT &#34;subjectid&#34;,
-                            &#34;surveycategory&#34;,
+                    (SELECT &#34;surveycategory&#34;,
+                            &#34;subjectid&#34;,
                             EXP((&#34;assessmenttotal&#34; * 0.237)) AS &#34;probability&#34;
                      FROM
-                       (SELECT &#34;subjectid&#34;,
+                       (SELECT &#34;surveycategory&#34;,
                                &#34;assessmenttotal&#34;,
-                               &#34;surveycategory&#34;
+                               &#34;subjectid&#34;
                         FROM &#34;d&#34;) &#34;sq_0&#34;) &#34;sq_1&#34;) &#34;sq_2&#34;) &#34;sq_3&#34;) &#34;sq_4&#34;) &#34;sq_5&#34;
       WHERE &#34;row_number&#34; = 1 ) &#34;sq_6&#34;) &#34;sq_7&#34;
 </pre>
@@ -14053,68 +14053,9 @@ FROM
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># convert pipeline to simple objects</span>
 <span class="n">objs_R</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">collect_representation</span><span class="p">(</span><span class="n">dialect</span><span class="o">=</span><span class="s1">&#39;R&#39;</span><span class="p">)</span>
-<span class="c1"># print these objects</span>
-<span class="n">pprint</span><span class="p">(</span><span class="n">objs_R</span><span class="p">)</span>
 </pre></div>
 
     </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>[OrderedDict([(&#39;op&#39;, &#39;TableDescription&#39;),
-              (&#39;table_name&#39;, &#39;d&#39;),
-              (&#39;qualifiers&#39;, {}),
-              (&#39;column_names&#39;,
-               [&#39;subjectID&#39;,
-                &#39;surveyCategory&#39;,
-                &#39;assessmentTotal&#39;,
-                &#39;irrelevantCol1&#39;,
-                &#39;irrelevantCol2&#39;]),
-              (&#39;key&#39;, &#39;d&#39;)]),
- OrderedDict([(&#39;op&#39;, &#39;Extend&#39;),
-              (&#39;ops&#39;, {&#39;probability&#39;: &#39;exp(assessmentTotal * 0.237)&#39;}),
-              (&#39;partition_by&#39;, []),
-              (&#39;order_by&#39;, []),
-              (&#39;reverse&#39;, [])]),
- OrderedDict([(&#39;op&#39;, &#39;Extend&#39;),
-              (&#39;ops&#39;, {&#39;total&#39;: &#39;sum(probability)&#39;}),
-              (&#39;partition_by&#39;, [&#39;subjectID&#39;]),
-              (&#39;order_by&#39;, []),
-              (&#39;reverse&#39;, [])]),
- OrderedDict([(&#39;op&#39;, &#39;Extend&#39;),
-              (&#39;ops&#39;, {&#39;probability&#39;: &#39;probability / total&#39;}),
-              (&#39;partition_by&#39;, []),
-              (&#39;order_by&#39;, []),
-              (&#39;reverse&#39;, [])]),
- OrderedDict([(&#39;op&#39;, &#39;Extend&#39;),
-              (&#39;ops&#39;, {&#39;sort_key&#39;: &#39;-probability&#39;}),
-              (&#39;partition_by&#39;, []),
-              (&#39;order_by&#39;, []),
-              (&#39;reverse&#39;, [])]),
- OrderedDict([(&#39;op&#39;, &#39;Extend&#39;),
-              (&#39;ops&#39;, {&#39;row_number&#39;: &#39;row_number()&#39;}),
-              (&#39;partition_by&#39;, [&#39;subjectID&#39;]),
-              (&#39;order_by&#39;, [&#39;sort_key&#39;]),
-              (&#39;reverse&#39;, [])]),
- OrderedDict([(&#39;op&#39;, &#39;SelectRows&#39;), (&#39;expr&#39;, &#39;row_number == 1&#39;)]),
- OrderedDict([(&#39;op&#39;, &#39;SelectColumns&#39;),
-              (&#39;columns&#39;, [&#39;subjectID&#39;, &#39;surveyCategory&#39;, &#39;probability&#39;])]),
- OrderedDict([(&#39;op&#39;, &#39;Rename&#39;),
-              (&#39;column_remapping&#39;, {&#39;diagnosis&#39;: &#39;surveyCategory&#39;})])]
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 
@@ -14177,7 +14118,6 @@ FROM
 <span class="nf">library</span><span class="p">(</span><span class="n">wrapr</span><span class="p">)</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">rquery</span><span class="p">)</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">rqdatatable</span><span class="p">)</span>
-<span class="nf">source</span><span class="p">(</span><span class="s">&#39;R_fns.R&#39;</span><span class="p">)</span>  <span class="c1"># https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/R_fns.R</span>
 
 <span class="n">r_yaml</span> <span class="o">&lt;-</span> <span class="nf">yaml.load_file</span><span class="p">(</span><span class="s">&quot;pipeline_yaml.txt&quot;</span><span class="p">)</span>
 <span class="n">r_ops</span> <span class="o">&lt;-</span> <span class="nf">convert_yaml_to_pipeline</span><span class="p">(</span><span class="n">r_yaml</span><span class="p">)</span>
@@ -14205,23 +14145,23 @@ FROM
   irrelevantCol1,
   irrelevantCol2) %.&gt;%
  extend(.,
-  probability := exp(assessmentTotal * 0.237)) %.&gt;%
+  probability %:=% exp(assessmentTotal * 0.237)) %.&gt;%
  extend(.,
-  total := sum(probability),
+  total %:=% sum(probability),
   p= subjectID) %.&gt;%
  extend(.,
-  probability := probability / total) %.&gt;%
+  probability %:=% probability / total) %.&gt;%
  extend(.,
-  sort_key := -(probability)) %.&gt;%
+  sort_key %:=% -(probability)) %.&gt;%
  extend(.,
-  row_number := row_number(),
+  row_number %:=% row_number(),
   p= subjectID,
   o= &#34;sort_key&#34;) %.&gt;%
  select_rows(.,
    row_number == 1) %.&gt;%
  select_columns(.,
    subjectID, surveyCategory, probability) %.&gt;%
- rename(.,
+ rename_columns(.,
   c(&#39;diagnosis&#39; = &#39;surveyCategory&#39;))
 </pre>
 </div>
@@ -14406,15 +14346,15 @@ FROM (
          &#34;assessmentTotal&#34;
         FROM
          &#34;d&#34;
-        ) tsql_92212314115132864025_0000000000
-       ) tsql_92212314115132864025_0000000001
-      ) tsql_92212314115132864025_0000000002
-     ) tsql_92212314115132864025_0000000003
-    ) tsql_92212314115132864025_0000000004
-  ) tsql_92212314115132864025_0000000005
+        ) tsql_93728866411077021482_0000000000
+       ) tsql_93728866411077021482_0000000001
+      ) tsql_93728866411077021482_0000000002
+     ) tsql_93728866411077021482_0000000003
+    ) tsql_93728866411077021482_0000000004
+  ) tsql_93728866411077021482_0000000005
   WHERE &#34;row_number&#34; = 1
- ) tsql_92212314115132864025_0000000006
-) tsql_92212314115132864025_0000000007
+ ) tsql_93728866411077021482_0000000006
+) tsql_93728866411077021482_0000000007
 </pre>
 </div>
 </div>
@@ -14565,7 +14505,7 @@ FROM (
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Appendix:">Appendix:<a class="anchor-link" href="#Appendix:">&#182;</a></h2><p>Demonstrate we can round-trip a <code>data_algebra</code> through <code>YAML</code> and recover the code.</p>
+<h2 id="Appendix:">Appendix:<a class="anchor-link" href="#Appendix:">&#182;</a></h2><p>Demonstrate that we can round-trip a <code>data_algebra</code> through <code>YAML</code> and recover the code.</p>
 
 </div>
 </div>
