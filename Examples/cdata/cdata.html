@@ -13957,10 +13957,10 @@ to row records of the form:
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">db_model</span><span class="o">.</span><span class="n">row_recs_to_blocks_query</span><span class="p">(</span>
-    <span class="n">source_view</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">describe_pandas_table</span><span class="p">(</span>
+    <span class="n">source_view</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">describe_table</span><span class="p">(</span>
         <span class="n">iris</span><span class="p">,</span> <span class="s1">&#39;iris&#39;</span><span class="p">),</span>
     <span class="n">record_spec</span><span class="o">=</span><span class="n">record_spec</span><span class="p">,</span>
-    <span class="n">record_view</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">describe_pandas_table</span><span class="p">(</span>
+    <span class="n">record_view</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">describe_table</span><span class="p">(</span>
         <span class="n">record_spec</span><span class="o">.</span><span class="n">control_table</span><span class="p">,</span> <span class="s2">&quot;control_table&quot;</span><span class="p">)</span>
 <span class="p">))</span>
 </pre></div>
@@ -14009,7 +14009,7 @@ CROSS JOIN (
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">db_model</span><span class="o">.</span><span class="n">blocks_to_row_recs_query</span><span class="p">(</span>
-    <span class="n">source_view</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">describe_pandas_table</span><span class="p">(</span>
+    <span class="n">source_view</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">describe_table</span><span class="p">(</span>
         <span class="n">iris</span><span class="p">,</span> <span class="s1">&#39;iris&#39;</span><span class="p">),</span>
     <span class="n">record_spec</span><span class="o">=</span><span class="n">record_spec</span>
 <span class="p">))</span>
@@ -14120,8 +14120,6 @@ This packages support both in-memory operations and translation of the transform
 <span class="c1"># install.packages(&quot;cdata&quot;)</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">cdata</span><span class="p">)</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">yaml</span><span class="p">)</span>
-<span class="c1"># https://github.com/WinVector/data_algebra/blob/master/Examples/cdata/cdata_yaml.R</span>
-<span class="nf">source</span><span class="p">(</span><span class="s">&quot;cdata_yaml.R&quot;</span><span class="p">)</span>
 
 <span class="n">iris</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&#39;iris_small.csv&#39;</span><span class="p">)</span>
 <span class="nf">print</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>

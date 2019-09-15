@@ -629,10 +629,10 @@ db_model = data_algebra.SQLite.SQLiteModel()
 
 ```python
 print(db_model.row_recs_to_blocks_query(
-    source_view=data_algebra.data_ops.describe_pandas_table(
+    source_view=data_algebra.data_ops.describe_table(
         iris, 'iris'),
     record_spec=record_spec,
-    record_view=data_algebra.data_ops.describe_pandas_table(
+    record_view=data_algebra.data_ops.describe_table(
         record_spec.control_table, "control_table")
 ))
 ```
@@ -658,7 +658,7 @@ print(db_model.row_recs_to_blocks_query(
 
 ```python
 print(db_model.blocks_to_row_recs_query(
-    source_view=data_algebra.data_ops.describe_pandas_table(
+    source_view=data_algebra.data_ops.describe_table(
         iris, 'iris'),
     record_spec=record_spec
 ))
@@ -723,12 +723,9 @@ Now we we start up our R environment and read in the transform specification and
 # install.packages("cdata")
 library(cdata)
 library(yaml)
-# https://github.com/WinVector/data_algebra/blob/master/Examples/cdata/cdata_yaml.R
-source("cdata_yaml.R")
 
 iris <- read.csv('iris_small.csv')
 print(iris)
-
 ```
 
       Sepal.Length Sepal.Width Petal.Length Petal.Width Species id
