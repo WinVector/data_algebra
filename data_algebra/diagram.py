@@ -8,7 +8,25 @@ try:
 except ImportError:
     have_graphviz = False
 
+have_black = False
+try:
+    # noinspection PyUnresolvedReferences
+    import black
+
+    have_black = True
+except ImportError:
+    have_black = False
+
+
 import data_algebra.data_ops
+
+
+def _get_op_str(op):
+    op_str = op.to_python_implementation(print_sources=False)
+    if have_black:
+        black_mode = black.FileMode(line_length=60)
+        op_str = black.format_str(op_str, mode=black_mode)
+    return op_str
 
 
 def _to_digraph_r_nodes(ops, dot, table_keys, nextid, edges):
@@ -19,7 +37,7 @@ def _to_digraph_r_nodes(ops, dot, table_keys, nextid, edges):
         node_id = nextid[0]
         nextid[0] = node_id + 1
         dot.attr('node', shape="folder", color='blue')
-        dot.node(str(node_id), ops.to_python_implementation(print_sources=False))
+        dot.node(str(node_id), _get_op_str(ops))
         return node_id
     source_ids = [_to_digraph_r_nodes(ops=op,
                                       dot=dot,
@@ -35,7 +53,7 @@ def _to_digraph_r_nodes(ops, dot, table_keys, nextid, edges):
         for sub_id in source_ids:
             edges.append((str(sub_id), str(node_id), None))
     dot.attr('node', shape='note', color='darkgreen')
-    dot.node(str(node_id), ops.to_python_implementation(print_sources=False))
+    dot.node(str(node_id), _get_op_str(ops))
     return node_id
 
 

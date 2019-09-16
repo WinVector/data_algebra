@@ -344,18 +344,18 @@ print(sql)
            "subjectid",
            "surveycategory" AS "diagnosis"
     FROM
-      (SELECT "probability",
-              "surveycategory",
+      (SELECT "surveycategory",
+              "probability",
               "subjectid"
        FROM
-         (SELECT "probability",
-                 "surveycategory",
+         (SELECT "surveycategory",
+                 "probability",
                  "subjectid"
           FROM
-            (SELECT "probability",
-                    "surveycategory",
-                    "subjectid",
+            (SELECT "surveycategory",
                     "sort_key",
+                    "probability",
+                    "subjectid",
                     ROW_NUMBER() OVER (PARTITION BY "subjectid"
                                        ORDER BY "sort_key") AS "row_number"
              FROM
@@ -368,8 +368,8 @@ print(sql)
                           "subjectid",
                           "probability" / "total" AS "probability"
                    FROM
-                     (SELECT "probability",
-                             "surveycategory",
+                     (SELECT "surveycategory",
+                             "probability",
                              "subjectid",
                              SUM("probability") OVER (PARTITION BY "subjectid") AS "total"
                       FROM
@@ -870,15 +870,15 @@ cat(sql)
              "assessmentTotal"
             FROM
              "d"
-            ) tsql_93613129980102949482_0000000000
-           ) tsql_93613129980102949482_0000000001
-          ) tsql_93613129980102949482_0000000002
-         ) tsql_93613129980102949482_0000000003
-        ) tsql_93613129980102949482_0000000004
-      ) tsql_93613129980102949482_0000000005
+            ) tsql_54269497545776586273_0000000000
+           ) tsql_54269497545776586273_0000000001
+          ) tsql_54269497545776586273_0000000002
+         ) tsql_54269497545776586273_0000000003
+        ) tsql_54269497545776586273_0000000004
+      ) tsql_54269497545776586273_0000000005
       WHERE "row_number" = 1
-     ) tsql_93613129980102949482_0000000006
-    ) tsql_93613129980102949482_0000000007
+     ) tsql_54269497545776586273_0000000006
+    ) tsql_54269497545776586273_0000000007
 
 
 The `R` implementation is mature, and appropriate to use in production.  The [`rquery`](https://github.com/WinVector/rquery) grammar is designed to have minimal state and minimal annotations (no grouping or ordering annotations!).  This makes the grammar, in my opinion, a good design choice. `rquery` has very good performance, often much faster than `dplyr` or base-`R` due to its query generation ideas and use of [`data.table`](https://CRAN.R-project.org/package=data.table) via [`rqdatatable`](https://CRAN.R-project.org/package=rqdatatable).  `rquery` is a mature pure `R` package; [here](https://github.com/WinVector/rquery/blob/master/README.md) is the same example being worked directly in `R`, with no translation from `Python`. 
