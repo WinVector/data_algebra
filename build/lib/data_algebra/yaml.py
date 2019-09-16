@@ -42,6 +42,25 @@ def to_pipeline(obj, *, known_tables=None):
     """
     if known_tables is None:
         known_tables = {}
+
+    def maybe_get_dict(map, key):
+        try:
+            return map[key]
+        except KeyError:
+            return {}
+
+    def maybe_get_list(map, key):
+        try:
+            return map[key]
+        except KeyError:
+            return []
+
+    def maybe_get_none(map, key):
+        try:
+            return map[key]
+        except KeyError:
+            return None
+
     if isinstance(obj, dict):
         # a pipe stage
         op = obj["op"]
@@ -50,8 +69,8 @@ def to_pipeline(obj, *, known_tables=None):
             tab = data_algebra.data_ops.TableDescription(
                 table_name=obj["table_name"],
                 column_names=obj["column_names"],
-                qualifiers=obj["qualifiers"],
-            )
+                qualifiers=maybe_get_dict(obj, "qualifiers"),
+                )
             # canonicalize to one object per table
             k = tab.key
             if k in known_tables.keys():
@@ -67,13 +86,14 @@ def to_pipeline(obj, *, known_tables=None):
         elif op == "Extend":
             return data_algebra.data_pipe.Extend(
                 ops=obj["ops"],
-                partition_by=obj["partition_by"],
-                order_by=obj["order_by"],
-                reverse=obj["reverse"],
+                partition_by=maybe_get_list(obj, "partition_by"),
+                order_by=maybe_get_list(obj,"order_by"),
+                reverse=maybe_get_list(obj, "reverse"),
             )
         elif op == "Project":
             return data_algebra.data_pipe.Project(
-                ops=obj["ops"], group_by=obj["group_by"]
+                ops=obj["ops"],
+                group_by=maybe_get_list(obj, "group_by"),
             )
         elif op == "NaturalJoin":
             return data_algebra.data_pipe.NaturalJoin(
@@ -95,7 +115,9 @@ def to_pipeline(obj, *, known_tables=None):
             )
         elif op == "Order":
             return data_algebra.data_pipe.OrderRows(
-                columns=obj["order_columns"], reverse=obj["reverse"], limit=obj["limit"]
+                columns=maybe_get_list(obj, "order_columns"),
+                reverse=maybe_get_list(obj, "reverse"),
+                limit=maybe_get_none(obj, "limit"),
             )
         else:
             raise TypeError("Unexpected op name: " + op)
