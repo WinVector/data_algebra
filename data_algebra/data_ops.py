@@ -155,14 +155,14 @@ class ViewRepresentation(OperatorPlatform):
 
     # printing
 
-    def to_python_implementation(self, *, indent=0, strict=True):
+    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
         return "ViewRepresentation(" + self.column_names.__repr__() + ")"
 
     def to_python(self, *, indent=0, strict=True, pretty=False, black_mode=None):
         self.get_tables()  # for table consistency check/raise
         if pretty:
             strict = True
-        python_str = self.to_python_implementation(indent=indent, strict=strict)
+        python_str = self.to_python_implementation(indent=indent, strict=strict, print_sources=True)
         if pretty and data_algebra.have_black:
             if black_mode is None:
                 black_mode = black.FileMode()
@@ -456,7 +456,7 @@ class TableDescription(ViewRepresentation):
         pipeline.insert(0, od)
         return pipeline
 
-    def to_python_implementation(self, *, indent=0, strict=True):
+    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
         nc = min(len(self.column_names), 20)
         if (not strict) and (nc < len(self.column_names)):
             cols_str = (
@@ -633,12 +633,16 @@ class ExtendNode(ViewRepresentation):
             pipeline=pipeline, dialect=dialect
         )
 
-    def to_python_implementation(self, *, indent=0, strict=True):
-        s = (
+    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+        s = ''
+        if print_sources:
+            s = (
             self.sources[0].to_python_implementation(indent=indent, strict=strict)
             + " .\\\n"
             + " " * (indent + 3)
-            + "extend({"
+            )
+        s = s + (
+            "extend({"
             + ", ".join(
                 [
                     k.__repr__() + ": " + opi.to_python().__repr__()
@@ -716,12 +720,16 @@ class ProjectNode(ViewRepresentation):
             pipeline=pipeline, dialect=dialect
         )
 
-    def to_python_implementation(self, *, indent=0, strict=True):
-        s = (
-            self.sources[0].to_python_implementation(indent=indent, strict=strict)
-            + " .\\\n"
-            + " " * (indent + 3)
-            + "project({"
+    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+        s = ''
+        if print_sources:
+            s = (
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
+            )
+        s = s + (
+            "project({"
             + ", ".join(
                 [
                     k.__repr__() + ": " + opi.to_python().__repr__()
@@ -776,12 +784,16 @@ class SelectRowsNode(ViewRepresentation):
             pipeline=pipeline, dialect=dialect
         )
 
-    def to_python_implementation(self, *, indent=0, strict=True):
-        s = (
-            self.sources[0].to_python_implementation(indent=indent, strict=strict)
-            + " .\\\n"
-            + " " * (indent + 3)
-            + "select_rows("
+    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+        s = ''
+        if print_sources:
+            s = (
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
+            )
+        s = s + (
+            "select_rows("
             + self.expr.to_python().__repr__()
             + ")"
         )
@@ -826,12 +838,16 @@ class SelectColumnsNode(ViewRepresentation):
             pipeline=pipeline, dialect=dialect
         )
 
-    def to_python_implementation(self, *, indent=0, strict=True):
-        s = (
-            self.sources[0].to_python_implementation(indent=indent, strict=strict)
-            + " .\\\n"
-            + " " * (indent + 3)
-            + "select_columns("
+    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+        s = ''
+        if print_sources:
+            s = (
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
+            )
+        s = s + (
+            "select_columns("
             + self.column_selection.__repr__()
             + ")"
         )
@@ -878,12 +894,16 @@ class DropColumnsNode(ViewRepresentation):
             pipeline=pipeline, dialect=dialect
         )
 
-    def to_python_implementation(self, *, indent=0, strict=True):
-        s = (
-            self.sources[0].to_python_implementation(indent=indent, strict=strict)
-            + " .\\\n"
-            + " " * (indent + 3)
-            + "drop_columns("
+    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+        s = ''
+        if print_sources:
+            s = (
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
+            )
+        s = s + (
+            "drop_columns("
             + self.column_deletions.__repr__()
             + ")"
         )
@@ -935,12 +955,16 @@ class OrderRowsNode(ViewRepresentation):
             pipeline=pipeline, dialect=dialect
         )
 
-    def to_python_implementation(self, *, indent=0, strict=True):
-        s = (
-            self.sources[0].to_python_implementation(indent=indent, strict=strict)
-            + " .\\\n"
-            + " " * (indent + 3)
-            + "order_rows("
+    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+        s = ''
+        if print_sources:
+            s = (
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
+            )
+        s = s + (
+            "order_rows("
             + self.order_columns.__repr__()
         )
         if len(self.reverse) > 0:
@@ -995,12 +1019,16 @@ class RenameColumnsNode(ViewRepresentation):
             pipeline=pipeline, dialect=dialect
         )
 
-    def to_python_implementation(self, *, indent=0, strict=True):
-        s = (
-            self.sources[0].to_python_implementation(indent=indent, strict=strict)
-            + " .\\\n"
-            + " " * (indent + 3)
-            + "rename_columns("
+    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+        s = ''
+        if print_sources:
+            s = (
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
+            )
+        s = s + (
+            "rename_columns("
             + self.column_remapping.__repr__()
             + ")"
         )
@@ -1059,22 +1087,34 @@ class NaturalJoinNode(ViewRepresentation):
             pipeline=pipeline, dialect=dialect
         )
 
-    def to_python_implementation(self, *, indent=0, strict=True):
-        return (
-            self.sources[0].to_python_implementation(indent=indent, strict=strict)
-            + " .\\\n"
-            + " " * (indent + 3)
-            + "natural_join(b=\n"
+    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+        s = '_0.'
+        if print_sources:
+            s = (
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
+            )
+        s = s + (
+            "natural_join(b=\n"
             + " " * (indent + 6)
-            + self.sources[1].to_python_implementation(indent=indent + 6, strict=strict)
-            + ",\n"
-            + " " * (indent + 6)
-            + "by="
+        )
+        if print_sources:
+            s = s + (
+                    self.sources[1].to_python_implementation(indent=indent + 6, strict=strict)
+                    + ",\n"
+                    + " " * (indent + 6)
+            )
+        else:
+            s = s + " _1 "
+        s = s + (
+            "by="
             + self.by.__repr__()
             + ", jointype="
             + self.jointype.__repr__()
             + ")"
         )
+        return s
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.natural_join_to_sql(

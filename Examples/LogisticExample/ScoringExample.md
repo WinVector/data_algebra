@@ -340,37 +340,37 @@ sql = ops.to_sql(db_model, pretty=True)
 print(sql)
 ```
 
-    SELECT "subjectid",
-           "probability",
+    SELECT "probability",
+           "subjectid",
            "surveycategory" AS "diagnosis"
     FROM
-      (SELECT "subjectid",
-              "probability",
-              "surveycategory"
+      (SELECT "probability",
+              "surveycategory",
+              "subjectid"
        FROM
-         (SELECT "subjectid",
-                 "probability",
-                 "surveycategory"
+         (SELECT "probability",
+                 "surveycategory",
+                 "subjectid"
           FROM
-            (SELECT "sort_key",
-                    "subjectid",
-                    "probability",
+            (SELECT "probability",
                     "surveycategory",
+                    "subjectid",
+                    "sort_key",
                     ROW_NUMBER() OVER (PARTITION BY "subjectid"
                                        ORDER BY "sort_key") AS "row_number"
              FROM
-               (SELECT "surveycategory",
+               (SELECT "probability",
+                       "surveycategory",
                        "subjectid",
-                       "probability",
                        (-"probability") AS "sort_key"
                 FROM
                   (SELECT "surveycategory",
                           "subjectid",
                           "probability" / "total" AS "probability"
                    FROM
-                     (SELECT "surveycategory",
+                     (SELECT "probability",
+                             "surveycategory",
                              "subjectid",
-                             "probability",
                              SUM("probability") OVER (PARTITION BY "subjectid") AS "total"
                       FROM
                         (SELECT "surveycategory",
@@ -378,8 +378,8 @@ print(sql)
                                 EXP(("assessmenttotal" * 0.237)) AS "probability"
                          FROM
                            (SELECT "surveycategory",
-                                   "subjectid",
-                                   "assessmenttotal"
+                                   "assessmenttotal",
+                                   "subjectid"
                             FROM "d") "sq_0") "sq_1") "sq_2") "sq_3") "sq_4") "sq_5"
           WHERE "row_number" = 1 ) "sq_6") "sq_7"
 
@@ -414,22 +414,22 @@ db_model.read_query(conn, sql)
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>subjectid</th>
       <th>probability</th>
+      <th>subjectid</th>
       <th>diagnosis</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>1.0</td>
       <td>0.670622</td>
+      <td>1.0</td>
       <td>withdrawal behavior</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>2.0</td>
       <td>0.558974</td>
+      <td>2.0</td>
       <td>positive re-framing</td>
     </tr>
   </tbody>
@@ -681,6 +681,25 @@ Notice the exact same pipeline can be used in all cases, because all three imple
 
 Because our operator pipeline is a `Python` object with no references to external objects (such as the database connection), it can be saved through standard methods such as "[pickling](https://docs.python.org/3/library/pickle.html)."
 
+We can also diagram the pipleline using graphviz.
+
+
+```python
+import graphviz
+
+import data_algebra.diagram
+
+dot = data_algebra.diagram.to_digraph(ops)
+dot
+```
+
+
+
+
+![svg](output_24_0.svg)
+
+
+
 However, `data_algebra` also supports exporting a pipeline to and from simple structures that are in turn optimized for conversion  to [`YAML`](https://yaml.org).  The simple structure format is particularly useful for writing more `data_algebra` tools (such as pipeline analysis and presentation tools).  And the `YAML` tooling makes moving a processing pipeline to another a language (such as `R`) quite easy.
 
 We will demonstrate this next.
@@ -851,24 +870,20 @@ cat(sql)
              "assessmentTotal"
             FROM
              "d"
-            ) tsql_85982078297649144292_0000000000
-           ) tsql_85982078297649144292_0000000001
-          ) tsql_85982078297649144292_0000000002
-         ) tsql_85982078297649144292_0000000003
-        ) tsql_85982078297649144292_0000000004
-      ) tsql_85982078297649144292_0000000005
+            ) tsql_93613129980102949482_0000000000
+           ) tsql_93613129980102949482_0000000001
+          ) tsql_93613129980102949482_0000000002
+         ) tsql_93613129980102949482_0000000003
+        ) tsql_93613129980102949482_0000000004
+      ) tsql_93613129980102949482_0000000005
       WHERE "row_number" = 1
-     ) tsql_85982078297649144292_0000000006
-    ) tsql_85982078297649144292_0000000007
+     ) tsql_93613129980102949482_0000000006
+    ) tsql_93613129980102949482_0000000007
 
 
 The `R` implementation is mature, and appropriate to use in production.  The [`rquery`](https://github.com/WinVector/rquery) grammar is designed to have minimal state and minimal annotations (no grouping or ordering annotations!).  This makes the grammar, in my opinion, a good design choice. `rquery` has very good performance, often much faster than `dplyr` or base-`R` due to its query generation ideas and use of [`data.table`](https://CRAN.R-project.org/package=data.table) via [`rqdatatable`](https://CRAN.R-project.org/package=rqdatatable).  `rquery` is a mature pure `R` package; [here](https://github.com/WinVector/rquery/blob/master/README.md) is the same example being worked directly in `R`, with no translation from `Python`. 
 
-The `R` implementation supports additional features such as [converting a pipeline into a diagram](https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/BuildDiagram.md) (though that would also be easy to implement in `Python` on top of the `collect_representation()` objects).  
-
-![](https://github.com/WinVector/data_algebra/raw/master/Examples/LogisticExample/BuildDiagram_files/figure-gfm/diagram-1.png)
-
-More of the `R` example (including how the diagram was produced) can be found [here](https://github.com/WinVector/rquery/blob/master/Examples/yaml/yaml.md).
+More of the `R` example (including how another diagram can be produced) can be found [here](https://github.com/WinVector/rquery/blob/master/Examples/yaml/yaml.md).
 
 ## Advantages of `data_algebra`
 
