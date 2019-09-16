@@ -450,7 +450,7 @@ def _parse_by_eval(source_str, *, data_def, outter_environemnt=None):
     return v
 
 
-def parse_assignments_in_context(ops, view):
+def parse_assignments_in_context(ops, view, *, parse_env=None):
     """
     Convert all entries of ops map to Term-expressions
 
@@ -466,7 +466,8 @@ def parse_assignments_in_context(ops, view):
     column_defs = view.column_map.__dict__
     if not isinstance(column_defs, dict):
         raise TypeError("column_defs should be a dictionary")
-    parse_env = data_algebra.env.outer_namespace()
+    if parse_env is None:
+        parse_env = data_algebra.env.outer_namespace()
     if parse_env is None:
         parse_env = {}
     # first: make sure all entries are parsed

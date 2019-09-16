@@ -36,16 +36,18 @@ class Extend(data_algebra.pipe.PipeStep):
         self.order_by = order_by
         self.reverse = reverse
 
-    def apply(self, other):
+    def apply(self, other, **kwargs):
         if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
+        parse_env = kwargs.get('parse_env', None)
         return other.extend(
             ops=self._ops,
             partition_by=self.partition_by,
             order_by=self.order_by,
             reverse=self.reverse,
+            parse_env=parse_env,
         )
 
 
@@ -59,12 +61,13 @@ class Project(data_algebra.pipe.PipeStep):
         self._ops = ops
         self.group_by = group_by
 
-    def apply(self, other):
+    def apply(self, other, **kwargs):
         if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
-        return other.project(ops=self._ops, group_by=self.group_by)
+        parse_env = kwargs.get('parse_env', None)
+        return other.project(ops=self._ops, group_by=self.group_by, parse_env=parse_env)
 
 
 class SelectRows(data_algebra.pipe.PipeStep):
@@ -77,12 +80,13 @@ class SelectRows(data_algebra.pipe.PipeStep):
         data_algebra.pipe.PipeStep.__init__(self, name="SelectRows")
         self.expr = expr
 
-    def apply(self, other):
+    def apply(self, other, **kwargs):
         if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
-        return other.select_rows(expr=self.expr)
+        parse_env = kwargs.get('parse_env', None)
+        return other.select_rows(expr=self.expr, parse_env=parse_env)
 
 
 class SelectColumns(data_algebra.pipe.PipeStep):
@@ -96,7 +100,7 @@ class SelectColumns(data_algebra.pipe.PipeStep):
         self.column_selection = column_selection
         data_algebra.pipe.PipeStep.__init__(self, name="SelectColumns")
 
-    def apply(self, other):
+    def apply(self, other, **kwargs):
         if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
@@ -115,7 +119,7 @@ class DropColumns(data_algebra.pipe.PipeStep):
         self.column_deletions = column_deletions
         data_algebra.pipe.PipeStep.__init__(self, name="DropColumns")
 
-    def apply(self, other):
+    def apply(self, other, **kwargs):
         if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
@@ -138,7 +142,7 @@ class OrderRows(data_algebra.pipe.PipeStep):
         self.limit = limit
         data_algebra.pipe.PipeStep.__init__(self, name="OrderRows")
 
-    def apply(self, other):
+    def apply(self, other, **kwargs):
         if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
@@ -158,7 +162,7 @@ class RenameColumns(data_algebra.pipe.PipeStep):
         self.column_remapping = column_remapping.copy()
         data_algebra.pipe.PipeStep.__init__(self, name="RenameColumns")
 
-    def apply(self, other):
+    def apply(self, other, **kwargs):
         if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
@@ -179,7 +183,7 @@ class NaturalJoin(data_algebra.pipe.PipeStep):
         self._b = b
         data_algebra.pipe.PipeStep.__init__(self, name="NaturalJoin")
 
-    def apply(self, other):
+    def apply(self, other, **kwargs):
         if not isinstance(other, data_algebra.data_ops.OperatorPlatform):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
@@ -213,14 +217,18 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
 
     # implement method chaining collection of pending operations
 
-    def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
+    def extend(self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None):
+        if parse_env is not None:
+            raise ValueError("Expected parse_env to be None")
         op = Extend(
             ops=ops, partition_by=partition_by, order_by=order_by, reverse=reverse
         )
         self.ops.append(op)
         return self
 
-    def project(self, ops, *, group_by=None):
+    def project(self, ops, *, group_by=None, parse_env=None):
+        if parse_env is not None:
+            raise ValueError("Expected parse_env to be None")
         op = Project(ops=ops, group_by=group_by)
         self.ops.append(op)
         return self
@@ -232,7 +240,9 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
         self.ops.append(op)
         return self
 
-    def select_rows(self, expr):
+    def select_rows(self, expr, parse_env=None):
+        if parse_env is not None:
+            raise ValueError("Expected parse_env to be None")
         op = SelectRows(expr=expr)
         self.ops.append(op)
         return self

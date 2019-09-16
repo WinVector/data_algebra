@@ -32,7 +32,7 @@ def fix_ordered_dict_yaml_rep():
     yaml.add_representer(collections.OrderedDict, represent_ordereddict)
 
 
-def to_pipeline(obj, *, known_tables=None):
+def to_pipeline(obj, *, known_tables=None, parse_env=None):
     """De-serialize data_algebra operator pipeline from a collect_representation() form.
        This form is good for yaml serialization/de-serialization.
 
@@ -61,13 +61,19 @@ def to_pipeline(obj, *, known_tables=None):
         except KeyError:
             return None
 
+    def get_char_scalar(map, key):
+        v = map[key]
+        if isinstance(v, list):
+            v = v[0]
+        return v
+
     if isinstance(obj, dict):
         # a pipe stage
-        op = obj["op"]
+        op = get_char_scalar(obj, "op")
         # ugly switch statement
         if op == "TableDescription":
             tab = data_algebra.data_ops.TableDescription(
-                table_name=obj["table_name"],
+                table_name=get_char_scalar(obj, "table_name"),
                 column_names=obj["column_names"],
                 qualifiers=maybe_get_dict(obj, "qualifiers"),
                 )
@@ -97,9 +103,9 @@ def to_pipeline(obj, *, known_tables=None):
             )
         elif op == "NaturalJoin":
             return data_algebra.data_pipe.NaturalJoin(
-                by=obj["by"],
+                by=maybe_get_list(obj, "by"),
                 jointype=obj["jointype"],
-                b=to_pipeline(obj["b"], known_tables=known_tables),
+                b=to_pipeline(obj["b"], known_tables=known_tables, parse_env=parse_env),
             )
         elif op == "SelectRows":
             return data_algebra.data_pipe.SelectRows(expr=obj["expr"])
@@ -123,11 +129,11 @@ def to_pipeline(obj, *, known_tables=None):
             raise TypeError("Unexpected op name: " + op)
     if isinstance(obj, list):
         # a pipeline, assumed non empty
-        res = to_pipeline(obj[0], known_tables=known_tables)
+        res = to_pipeline(obj[0], known_tables=known_tables, parse_env=parse_env)
         for i in range(1, len(obj)):
-            nxt = to_pipeline(obj[i], known_tables=known_tables)
+            nxt = to_pipeline(obj[i], known_tables=known_tables, parse_env=parse_env)
             # res = res >> nxt
-            res = nxt.apply(res)
+            res = nxt.apply(res, parse_env=parse_env)
         return res
     raise TypeError("unexpected type: " + str(obj))
 

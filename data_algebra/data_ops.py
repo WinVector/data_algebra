@@ -42,16 +42,16 @@ class OperatorPlatform(data_algebra.pipe.PipeValue):
 
     # define builders for all non-initial node types on base class
 
-    def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
+    def extend(self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None):
         raise NotImplementedError("base class called")
 
-    def project(self, ops, *, group_by=None):
+    def project(self, ops, *, group_by=None, parse_env=None):
         raise NotImplementedError("base class called")
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
         raise NotImplementedError("base class called")
 
-    def select_rows(self, expr):
+    def select_rows(self, expr, parse_env=None):
         raise NotImplementedError("base class called")
 
     def drop_columns(self, column_deletions):
@@ -365,17 +365,18 @@ class ViewRepresentation(OperatorPlatform):
 
     # nodes
 
-    def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
+    def extend(self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None):
         return ExtendNode(
             source=self,
             ops=ops,
             partition_by=partition_by,
             order_by=order_by,
             reverse=reverse,
+            parse_env=parse_env,
         )
 
-    def project(self, ops, *, group_by=None):
-        return ProjectNode(source=self, ops=ops, group_by=group_by)
+    def project(self, ops, *, group_by=None, parse_env=None):
+        return ProjectNode(source=self, ops=ops, group_by=group_by, parse_env=parse_env)
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
         if not isinstance(b, ViewRepresentation):
@@ -384,8 +385,8 @@ class ViewRepresentation(OperatorPlatform):
             )
         return NaturalJoinNode(a=self, b=b, by=by, jointype=jointype)
 
-    def select_rows(self, expr):
-        return SelectRowsNode(source=self, expr=expr)
+    def select_rows(self, expr, parse_env=None):
+        return SelectRowsNode(source=self, expr=expr, parse_env=parse_env)
 
     def drop_columns(self, column_deletions):
         return DropColumnsNode(source=self, column_deletions=column_deletions)
@@ -553,8 +554,8 @@ def describe_table(d, table_name):
 
 
 class ExtendNode(ViewRepresentation):
-    def __init__(self, source, ops, *, partition_by=None, order_by=None, reverse=None):
-        ops = data_algebra.expr_rep.parse_assignments_in_context(ops, source)
+    def __init__(self, source, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None):
+        ops = data_algebra.expr_rep.parse_assignments_in_context(ops, source, parse_env=parse_env)
         if len(ops) < 1:
             raise ValueError("no ops")
         self.ops = ops
@@ -637,9 +638,9 @@ class ExtendNode(ViewRepresentation):
         s = ''
         if print_sources:
             s = (
-            self.sources[0].to_python_implementation(indent=indent, strict=strict)
-            + " .\\\n"
-            + " " * (indent + 3)
+                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                    + " .\\\n"
+                    + " " * (indent + 3)
             )
         s = s + (
             "extend({"
@@ -668,8 +669,8 @@ class ExtendNode(ViewRepresentation):
 
 
 class ProjectNode(ViewRepresentation):
-    def __init__(self, source, ops, *, group_by=None):
-        ops = data_algebra.expr_rep.parse_assignments_in_context(ops, source)
+    def __init__(self, source, ops, *, group_by=None, parse_env=None):
+        ops = data_algebra.expr_rep.parse_assignments_in_context(ops, source, parse_env=parse_env)
         if len(ops) < 1:
             raise ValueError("no ops")
         self.ops = ops
@@ -754,8 +755,8 @@ class SelectRowsNode(ViewRepresentation):
     expr: data_algebra.expr_rep.Expression
     decision_columns: Set[str]
 
-    def __init__(self, source, expr):
-        ops = data_algebra.expr_rep.parse_assignments_in_context({"expr": expr}, source)
+    def __init__(self, source, expr, *, parse_env=None):
+        ops = data_algebra.expr_rep.parse_assignments_in_context({"expr": expr}, source, parse_env=parse_env)
         if len(ops) < 1:
             raise ValueError("no ops")
         self.expr = ops["expr"]

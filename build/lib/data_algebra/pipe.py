@@ -18,7 +18,7 @@ class PipeStep:
             name = "PipeStep"
         self.__name__ = name
 
-    def apply(self, other):
+    def apply(self, other, **kwargs):
         raise NotImplementedError("base method called")
 
     def __rrshift__(self, other):  # override other >> self
@@ -72,7 +72,7 @@ class PipeFunction(PipeStep):
         else:
             PipeStep.__init__(self, name=name)
 
-    def apply(self, other):
+    def apply(self, other, **kwargs):
         if len(self._args_to_override) < 1:
             # place argument in first position
             return self._func(other, **self._partial_args)
