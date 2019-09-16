@@ -23,7 +23,8 @@ import pandas
 # PyYAML from https://pyyaml.org
 import yaml
 
-# pip install https://github.com/WinVector/data_algebra/raw/master/dist/data_algebra-0.1.3.tar.gz
+# pip install data_algebra
+# data_algebra from https://github.com/WinVector/data_algebra/
 import data_algebra.cdata
 import data_algebra.cdata_impl
 import data_algebra.data_ops
@@ -830,4 +831,4 @@ print(yaml.dump(mp_to_blocks.to_simple_obj()))
 
 ## Conclusion
 
-The [`cdata`](https://github.com/WinVector/cdata) and [`data_algebra`](https://github.com/WinVector/data_algebra) systems yield powerful implementations, and deep understanding of the nature of record transformations.  They allow one to reshape data quickly and conveniently either in R. Python/[Pandas](https://pandas.pydata.org), or even SQL.
+The [`cdata`](https://github.com/WinVector/cdata) and [`data_algebra`](https://github.com/WinVector/data_algebra) systems offer powerful implementations, and deep understanding of the nature of record transformations.  They allow one to reshape data quickly and conveniently either in R. Python/[Pandas](https://pandas.pydata.org), or even SQL.
