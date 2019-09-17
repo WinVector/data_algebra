@@ -931,7 +931,13 @@ class OrderRowsNode(ViewRepresentation):
             reverse = []
         self.reverse = [c for c in reverse]
         self.limit = limit
-        # TODO: check column conditions
+        have = source.column_names
+        unknown = set(self.order_columns) - set(have)
+        if len(unknown) > 0:
+            raise ValueError("missing required columns: " + str(unknown))
+        not_order = set(self.reverse) - set(self.order_columns)
+        if len(not_order) > 0:
+            raise ValueError("columns declared reverse, but not order: " + str(unknown))
         ViewRepresentation.__init__(
             self, column_names=source.column_names, sources=[source]
         )

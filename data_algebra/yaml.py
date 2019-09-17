@@ -1,3 +1,5 @@
+
+import re
 import collections
 
 import data_algebra
@@ -51,7 +53,12 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
 
     def maybe_get_list(map, key):
         try:
-            return map[key]
+            v = map[key]
+            if v is None:
+                return []
+            if not isinstance(v, list):
+                v = [v]
+            return v
         except KeyError:
             return []
 
@@ -65,6 +72,8 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
         v = map[key]
         if isinstance(v, list):
             v = v[0]
+        if isinstance(v, dict):
+            v = [vi for vi in v.values()][0]
         return v
 
     if isinstance(obj, dict):
@@ -90,15 +99,19 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
                 known_tables[k] = tab
             return tab
         elif op == "Extend":
+            ops = obj["ops"]
+            ops = {k: re.sub('=+', '==', o) for (k, o) in ops.items()}
             return data_algebra.data_pipe.Extend(
-                ops=obj["ops"],
+                ops=ops,
                 partition_by=maybe_get_list(obj, "partition_by"),
                 order_by=maybe_get_list(obj,"order_by"),
                 reverse=maybe_get_list(obj, "reverse"),
             )
         elif op == "Project":
+            ops = obj["ops"]
+            ops = {k: re.sub('=+', '==', o) for (k, o) in ops.items()}
             return data_algebra.data_pipe.Project(
-                ops=obj["ops"],
+                ops=ops,
                 group_by=maybe_get_list(obj, "group_by"),
             )
         elif op == "NaturalJoin":
@@ -108,7 +121,9 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
                 b=to_pipeline(obj["b"], known_tables=known_tables, parse_env=parse_env),
             )
         elif op == "SelectRows":
-            return data_algebra.data_pipe.SelectRows(expr=obj["expr"])
+            expr = get_char_scalar(obj, "expr")
+            expr = re.sub('=+', '==', expr)
+            return data_algebra.data_pipe.SelectRows(expr=expr)
         elif op == "SelectColumns":
             return data_algebra.data_pipe.SelectColumns(columns=obj["columns"])
         elif op == "DropColumns":

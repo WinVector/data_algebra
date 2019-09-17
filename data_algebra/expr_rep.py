@@ -459,6 +459,7 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
        version of eval() is used to try and catch some issues).
     :param ops: dictionary from strings to expressions (either Terms or strings)
     :param view: a data_algebra.data_ops.ViewRepresentation
+    :param parse_env map of names to values to add to parsing environment
     :return:
     """
     if not isinstance(ops, dict):
