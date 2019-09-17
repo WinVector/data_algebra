@@ -1,6 +1,7 @@
 
 from typing import Set, Any, Dict, List
 import collections
+import re
 
 import pandas
 
@@ -26,6 +27,12 @@ try:
     import sqlparse
 except ImportError:
     pass
+
+
+op_list = [
+    'extend', 'project', 'natural_join', 'select_rows',
+    'drop_columns', 'select_columns', 'rename_columns', 'order_rows'
+]
 
 
 class OperatorPlatform(data_algebra.pipe.PipeValue):
@@ -163,10 +170,17 @@ class ViewRepresentation(OperatorPlatform):
         if pretty:
             strict = True
         python_str = self.to_python_implementation(indent=indent, strict=strict, print_sources=True)
-        if pretty and data_algebra.have_black:
-            if black_mode is None:
-                black_mode = black.FileMode()
-            python_str = black.format_str(python_str, mode=black_mode)
+        if pretty:
+            if data_algebra.have_black:
+                if black_mode is None:
+                    black_mode = black.FileMode()
+                python_str = black.format_str(python_str, mode=black_mode)
+            python_str = re.sub(
+                '[)].(' + '|'.join(op_list) + ')[(]',
+                '\n).\\1(\n    ',
+                python_str
+            )
+            python_str = re.sub('\n+[ \t]*\n+', '\n', python_str)
         return python_str
 
     def __repr__(self):
