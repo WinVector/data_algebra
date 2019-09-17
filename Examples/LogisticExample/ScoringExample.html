@@ -13572,46 +13572,46 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>SELECT &#34;probability&#34;,
-       &#34;subjectid&#34;,
+<pre>SELECT &#34;subjectid&#34;,
+       &#34;probability&#34;,
        &#34;surveycategory&#34; AS &#34;diagnosis&#34;
 FROM
-  (SELECT &#34;surveycategory&#34;,
+  (SELECT &#34;subjectid&#34;,
           &#34;probability&#34;,
-          &#34;subjectid&#34;
+          &#34;surveycategory&#34;
    FROM
-     (SELECT &#34;surveycategory&#34;,
+     (SELECT &#34;subjectid&#34;,
              &#34;probability&#34;,
-             &#34;subjectid&#34;
+             &#34;surveycategory&#34;
       FROM
-        (SELECT &#34;surveycategory&#34;,
-                &#34;sort_key&#34;,
+        (SELECT &#34;subjectid&#34;,
                 &#34;probability&#34;,
-                &#34;subjectid&#34;,
+                &#34;sort_key&#34;,
+                &#34;surveycategory&#34;,
                 ROW_NUMBER() OVER (PARTITION BY &#34;subjectid&#34;
                                    ORDER BY &#34;sort_key&#34;) AS &#34;row_number&#34;
          FROM
-           (SELECT &#34;probability&#34;,
+           (SELECT &#34;subjectid&#34;,
+                   &#34;probability&#34;,
                    &#34;surveycategory&#34;,
-                   &#34;subjectid&#34;,
                    (-&#34;probability&#34;) AS &#34;sort_key&#34;
             FROM
-              (SELECT &#34;surveycategory&#34;,
-                      &#34;subjectid&#34;,
+              (SELECT &#34;subjectid&#34;,
+                      &#34;surveycategory&#34;,
                       &#34;probability&#34; / &#34;total&#34; AS &#34;probability&#34;
                FROM
-                 (SELECT &#34;surveycategory&#34;,
+                 (SELECT &#34;subjectid&#34;,
                          &#34;probability&#34;,
-                         &#34;subjectid&#34;,
+                         &#34;surveycategory&#34;,
                          SUM(&#34;probability&#34;) OVER (PARTITION BY &#34;subjectid&#34;) AS &#34;total&#34;
                   FROM
-                    (SELECT &#34;surveycategory&#34;,
-                            &#34;subjectid&#34;,
+                    (SELECT &#34;subjectid&#34;,
+                            &#34;surveycategory&#34;,
                             EXP((&#34;assessmenttotal&#34; * 0.237)) AS &#34;probability&#34;
                      FROM
-                       (SELECT &#34;surveycategory&#34;,
-                               &#34;assessmenttotal&#34;,
-                               &#34;subjectid&#34;
+                       (SELECT &#34;assessmenttotal&#34;,
+                               &#34;subjectid&#34;,
+                               &#34;surveycategory&#34;
                         FROM &#34;d&#34;) &#34;sq_0&#34;) &#34;sq_1&#34;) &#34;sq_2&#34;) &#34;sq_3&#34;) &#34;sq_4&#34;) &#34;sq_5&#34;
       WHERE &#34;row_number&#34; = 1 ) &#34;sq_6&#34;) &#34;sq_7&#34;
 </pre>
@@ -13672,22 +13672,22 @@ FROM
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>probability</th>
       <th>subjectid</th>
+      <th>probability</th>
       <th>diagnosis</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.670622</td>
       <td>1.0</td>
+      <td>0.670622</td>
       <td>withdrawal behavior</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>0.558974</td>
       <td>2.0</td>
+      <td>0.558974</td>
       <td>positive re-framing</td>
     </tr>
   </tbody>
@@ -14543,15 +14543,15 @@ FROM (
          &#34;assessmentTotal&#34;
         FROM
          &#34;d&#34;
-        ) tsql_54269497545776586273_0000000000
-       ) tsql_54269497545776586273_0000000001
-      ) tsql_54269497545776586273_0000000002
-     ) tsql_54269497545776586273_0000000003
-    ) tsql_54269497545776586273_0000000004
-  ) tsql_54269497545776586273_0000000005
+        ) tsql_93278766306853966582_0000000000
+       ) tsql_93278766306853966582_0000000001
+      ) tsql_93278766306853966582_0000000002
+     ) tsql_93278766306853966582_0000000003
+    ) tsql_93278766306853966582_0000000004
+  ) tsql_93278766306853966582_0000000005
   WHERE &#34;row_number&#34; = 1
- ) tsql_54269497545776586273_0000000006
-) tsql_54269497545776586273_0000000007
+ ) tsql_93278766306853966582_0000000006
+) tsql_93278766306853966582_0000000007
 </pre>
 </div>
 </div>
@@ -14571,7 +14571,7 @@ FROM (
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>More of the <code>R</code> example (including how another diagram can be produced) can be found <a href="https://github.com/WinVector/rquery/blob/master/Examples/yaml/yaml.md">here</a>.</p>
+<p>More of the <code>R</code> example (including how another diagram can be produced) can be found <a href="https://github.com/WinVector/rquery/blob/master/Examples/yaml/yaml.md">here</a>.  An example of moving a pipeline from <code>R</code> to <code>Python</code> can be found <a href="https://github.com/WinVector/rquery/blob/master/Examples/data_algebra/interop.md">here</a>.</p>
 <h2 id="Advantages-of-data_algebra">Advantages of <code>data_algebra</code><a class="anchor-link" href="#Advantages-of-data_algebra">&#182;</a></h2><p>Multi-language data science is an important trend, so a cross-language query system that supports at least <code>R</code> and <code>Python</code> is going to be a useful tool or capability going forward. Obviously <code>SQL</code> itself is fairly cross-language, but <code>data_algebra</code> adds features that can be real advantages.</p>
 <p>In addition to the features shown above, a <code>data_algebra</code> operator pipeline carries around usable knowledge of the data transform.</p>
 <p>For example:</p>
