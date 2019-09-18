@@ -1211,7 +1211,6 @@ class ConvertRecordsNode(ViewRepresentation):
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         res = self.sources[0].to_sql_implementation(
-            self,
             db_model=db_model,
             using=using,
             temp_id_source=temp_id_source)
