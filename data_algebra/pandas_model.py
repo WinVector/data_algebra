@@ -233,4 +233,7 @@ class PandasModel(data_algebra.data_model.DataModel):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.ConvertRecordsNode"
             )
-        # TODO: implement
+        res = op.sources[0].eval_implementation(
+            data_map=data_map, eval_env=eval_env, data_model=self
+        )
+        return op.record_map.transform(res)

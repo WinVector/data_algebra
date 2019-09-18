@@ -1182,7 +1182,7 @@ class ConvertRecordsNode(ViewRepresentation):
         )
 
     def columns_used_from_sources(self, using=None):
-        pass  # TODO: implement
+        return [self.sources[0].column_names]  # TODO: calculate instead of using broad net
 
     def collect_representation_implementation(self, *, pipeline=None, dialect="Python"):
         if pipeline is None:
