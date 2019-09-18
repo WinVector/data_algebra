@@ -44,6 +44,10 @@ class RecordMap:
             raise ValueError(
                 "At least one of blocks_in or blocks_out should not be None"
             )
+        if (blocks_in is not None) and (blocks_out is not None):
+            unknown = set(blocks_out.row_columns) - set(blocks_in.row_columns)
+            if len(unknown) > 0:
+                raise ValueError("column mismatch from blocks_in to blocks_out" + str(unknown))
         self.blocks_in = blocks_in
         self.blocks_out = blocks_out
         self.fmt_string = self.fmt()
