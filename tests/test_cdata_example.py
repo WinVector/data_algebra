@@ -7,6 +7,7 @@ import pandas
 from data_algebra.data_ops import *
 from data_algebra.cdata_impl import RecordMap
 import data_algebra.yaml
+from data_algebra.cdata_impl import record_map_from_simple_obj
 
 
 def test_cdata_example():
@@ -47,3 +48,10 @@ def test_cdata_example():
 
     yaml_obj = ops.collect_representation()
     back = data_algebra.yaml.to_pipeline(yaml_obj)
+
+
+def test_cdata_transport():
+    obj = {'blocks_out': {'record_keys': 'epoch', 'control_table_keys': 'measure',
+                    'control_table': {'measure': ['minus binary cross entropy', 'accuracy'],
+                                      'training': ['loss', 'acc'], 'validation': ['val_loss', 'val_acc']}}}
+    record_map_from_simple_obj(obj)
