@@ -33,12 +33,12 @@ class RecordSpecification:
                 for v in self.control_table[c]:
                     if not v in cvs:
                         cvs.append(v)
-        confused = set(record_keys + control_table_keys).intersection(cvs)
+        confused = set(record_keys).intersection(cvs)
         if len(confused) > 0:
             raise ValueError(
                 "control table entries confused with row keys or control table keys"
             )
-        self.row_columns = self.record_keys + self.control_table_keys + cvs
+        self.row_columns = self.record_keys + cvs
 
     def row_version(self, *, include_record_keys=True):
         cols = []

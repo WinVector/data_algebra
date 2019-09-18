@@ -51,12 +51,19 @@ class RecordMap:
         self.blocks_in = blocks_in
         self.blocks_out = blocks_out
         self.fmt_string = self.fmt()
+        if self.blocks_in is not None:
+            self.columns_needed = self.blocks_in.block_columns
+        else:
+            self.columns_needed = self.blocks_out.row_columns
 
     # noinspection PyPep8Naming
     def transform(
         self, X, *, check_blocks_in_keying=True, check_blocks_out_keying=False
     ):
         X = data_algebra.data_types.convert_to_pandas_dataframe(X, "X")
+        unknown = set(self.columns_needed) - set(X.columns)
+        if len(unknown) > 0:
+            raise ValueError("missing required columns: " + str(unknown))
         X = X.reset_index(drop=True)
         db_model = data_algebra.SQLite.SQLiteModel()
         if self.blocks_in is not None:
