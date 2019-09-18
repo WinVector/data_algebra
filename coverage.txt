@@ -1,13 +1,13 @@
 ============================= test session starts ==============================
-platform linux -- Python 3.6.9, pytest-5.0.1, py-1.8.0, pluggy-0.12.0
-rootdir: /home/john/Documents/work/data_algebra
+platform darwin -- Python 3.6.9, pytest-5.0.1, py-1.8.0, pluggy-0.12.0
+rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.7.1
 collected 23 items
 
 tests/test_R_yaml.py .                                                   [  4%]
 tests/test_apply.py .                                                    [  8%]
 tests/test_cdata1.py .                                                   [ 13%]
-tests/test_cdata_example.py F                                            [ 17%]
+tests/test_cdata_example.py .                                            [ 17%]
 tests/test_dask.py ..                                                    [ 26%]
 tests/test_datatable.py .                                                [ 30%]
 tests/test_drop_columns.py .                                             [ 34%]
@@ -24,98 +24,33 @@ tests/test_scoring_example.py .                                          [ 78%]
 tests/test_simple.py ....                                                [ 95%]
 tests/test_sqlite.py .                                                   [100%]
 
-=================================== FAILURES ===================================
-______________________________ test_cdata_example ______________________________
-
-    def test_cdata_example():
-    
-        buf = io.StringIO(
-            re.sub(
-                "[ \\t]+",
-                "",
-                """
-        Sepal.Length,Sepal.Width,Petal.Length,Petal.Width,Species,id
-        5.1,3.5,1.4,0.2,setosa,0
-        4.9,3.0,1.4,0.2,setosa,1
-        4.7,3.2,1.3,0.2,setosa,2
-        """,
-            )
-        )
-        iris = pandas.read_csv(buf)
-    
-        td = describe_table(iris, 'iris')
-    
-        control_table = pandas.DataFrame(
-            {
-                "Part": ["Sepal", "Sepal", "Petal", "Petal"],
-                "Measure": ["Length", "Width", "Length", "Width"],
-                "Value": ["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"],
-            }
-        )
-    
-        record_spec = data_algebra.cdata.RecordSpecification(
-            control_table,
-            control_table_keys=['Part', 'Measure'],
-            record_keys=['id', 'Species']
-        )
-    
-        ops = td.convert_records(record_map=RecordMap(blocks_out=record_spec))
-    
-        res = iris >> ops
-    
-        yaml_obj = ops.collect_representation()
->       back = data_algebra.yaml.to_pipeline(yaml_obj)
-
-tests/test_cdata_example.py:49: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-data_algebra/yaml.py:155: in to_pipeline
-    nxt = to_pipeline(obj[i], known_tables=known_tables, parse_env=parse_env)
-data_algebra/yaml.py:146: in to_pipeline
-    record_map=data_algebra.cdata_impl.record_map_from_simple_obj(obj['record_map'])
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-obj = Transform row records of the form:
-  record_keys: ['id', 'Species']
- ['id', 'Species', 'Sepal.Length', 'Sepal.Width', ...th  Sepal.Length
-   1  Sepal   Width   Sepal.Width
-   2  Petal  Length  Petal.Length
-   3  Petal   Width   Petal.Width
-
-
-    def record_map_from_simple_obj(obj):
-        blocks_in = None
-        blocks_out = None
->       if "blocks_in" in obj.keys():
-E       AttributeError: 'RecordMap' object has no attribute 'keys'
-
-data_algebra/cdata_impl.py:178: AttributeError
-
------------ coverage: platform linux, python 3.6.9-final-0 -----------
+---------- coverage: platform darwin, python 3.6.9-final-0 -----------
 Name                              Stmts   Miss  Cover
 -----------------------------------------------------
 data_algebra/PostgreSQL.py           21      4    81%
 data_algebra/SQLite.py               43      5    88%
 data_algebra/SparkSQL.py             21     21     0%
-data_algebra/__init__.py             36      6    83%
+data_algebra/__init__.py             36     10    72%
 data_algebra/cdata.py                62      6    90%
-data_algebra/cdata_impl.py          104     16    85%
-data_algebra/dask_model.py          119    102    14%
+data_algebra/cdata_impl.py          106     18    83%
+data_algebra/dask_model.py          119     23    81%
 data_algebra/data_model.py           41     15    63%
-data_algebra/data_ops.py            761    211    72%
-data_algebra/data_pipe.py           170     42    75%
-data_algebra/data_types.py           39     22    44%
-data_algebra/datatable_model.py     131    107    18%
+data_algebra/data_ops.py            761    175    77%
+data_algebra/data_pipe.py           170     38    78%
+data_algebra/data_types.py           39     19    51%
+data_algebra/datatable_model.py     131     81    38%
 data_algebra/db_model.py            346     82    76%
 data_algebra/diagram.py              52     52     0%
 data_algebra/env.py                  46      7    85%
 data_algebra/expr.py                 21      4    81%
-data_algebra/expr_rep.py            306     82    73%
+data_algebra/expr_rep.py            306     81    74%
 data_algebra/pandas_model.py        135     22    84%
 data_algebra/pending_eval.py         34     34     0%
 data_algebra/pipe.py                 65     19    71%
 data_algebra/util.py                 72      6    92%
 data_algebra/yaml.py                113     13    88%
 -----------------------------------------------------
-TOTAL                              2738    878    68%
+TOTAL                              2740    735    73%
 
-===================== 1 failed, 22 passed in 2.78 seconds ======================
+
+========================== 23 passed in 7.79 seconds ===========================

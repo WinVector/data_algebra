@@ -1189,7 +1189,7 @@ class ConvertRecordsNode(ViewRepresentation):
             pipeline = []
         od = collections.OrderedDict()
         od["op"] = "ConvertRecords"
-        od["record_map"] = self.record_map
+        od["record_map"] = self.record_map.to_simple_obj()
         pipeline.insert(0, od)
         return self.sources[0].collect_representation_implementation(
             pipeline=pipeline, dialect=dialect

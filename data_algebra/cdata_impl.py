@@ -116,6 +116,9 @@ class RecordMap:
                 X = db_model.read_query(conn, to_rows_sql)
         return X
 
+    def __rrshift__(self, other):  # override other >> self
+        return self.transform(other)
+
     def fmt(self):
         if (self.blocks_in is None) and (self.blocks_out is None):
             return "RecordMap(no-op)"
