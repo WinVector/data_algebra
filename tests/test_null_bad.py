@@ -2,8 +2,6 @@ import math
 import numpy
 import sqlite3
 
-import psycopg2
-
 import data_algebra.util
 from data_algebra.data_ops import *
 import data_algebra.SQLite
@@ -11,6 +9,12 @@ import data_algebra.PostgreSQL
 
 
 def test_null_bad():
+
+    try:
+        import psycopg2
+    except ImportError:
+        return
+
     ops = TableDescription("d", ["x"]).extend(
         {"x_is_null": "x.is_null()", "x_is_bad": "x.is_bad()"}
     )
