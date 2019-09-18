@@ -5,6 +5,7 @@ import collections
 import data_algebra
 import data_algebra.data_ops
 import data_algebra.data_pipe
+import data_algebra.cdata_impl
 
 try:
     # noinspection PyUnresolvedReferences
@@ -139,6 +140,11 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
                 columns=maybe_get_list(obj, "order_columns"),
                 reverse=maybe_get_list(obj, "reverse"),
                 limit=maybe_get_none(obj, "limit"),
+            )
+        elif op == "ConvertRecords":
+            return data_algebra.data_pipe.ConvertRecords(
+                record_map=data_algebra.cdata_impl.record_map_from_simple_obj(obj['record_map'])
+                # TODO: add temp name to I/O
             )
         else:
             raise TypeError("Unexpected op name: " + op)

@@ -6,6 +6,7 @@ import pandas
 
 from data_algebra.data_ops import *
 from data_algebra.cdata_impl import RecordMap
+import data_algebra.yaml
 
 
 def test_cdata_example():
@@ -42,4 +43,7 @@ def test_cdata_example():
 
     ops = td.convert_records(record_map=RecordMap(blocks_out=record_spec))
 
-    iris >> ops
+    res = iris >> ops
+
+    yaml_obj = ops.collect_representation()
+    back = data_algebra.yaml.to_pipeline(yaml_obj)
