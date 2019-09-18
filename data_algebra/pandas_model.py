@@ -228,7 +228,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = res.reset_index(drop=True)
         return res
 
-    def convert_records(self, op, *, data_map, eval_env):
+    def convert_records_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.ConvertRecordsNode):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.ConvertRecordsNode"

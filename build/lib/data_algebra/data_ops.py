@@ -1171,10 +1171,10 @@ class ConvertRecordsNode(ViewRepresentation):
     blocks_out_table: TableDescription
 
     def __init__(self, source, record_map, *, blocks_out_table=None):
-        if blocks_out_table is None and record_map.blocks_out_table is not None:
+        if blocks_out_table is None and record_map.blocks_out.control_table is not None:
             blocks_out_table = TableDescription(
                 'cdata_temp_record',
-                record_map.blocks_out.record_keys + record_map.blocks_out.control_table.columns)
+                [c for c in record_map.blocks_out.record_keys] + [c for c in record_map.blocks_out.control_table])
         self.record_map = record_map
         self.blocks_out_table = blocks_out_table
         ViewRepresentation.__init__(

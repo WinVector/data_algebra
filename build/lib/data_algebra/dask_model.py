@@ -184,5 +184,5 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
         res.set_index(op.order_columns[0])  # may cause problems in later steps
         return res
 
-    def convert_records(self, op, *, data_map, eval_env):
+    def convert_records_step(self, op, *, data_map, eval_env):
         raise NotImplementedError("convert_records not implemented for dask yet")
