@@ -31,7 +31,8 @@ except ImportError:
 
 op_list = [
     'extend', 'project', 'natural_join', 'select_rows',
-    'drop_columns', 'select_columns', 'rename_columns', 'order_rows'
+    'drop_columns', 'select_columns', 'rename_columns',
+    'order_rows', 'convert_records'
 ]
 
 
@@ -71,6 +72,9 @@ class OperatorPlatform(data_algebra.pipe.PipeValue):
         raise NotImplementedError("base class called")
 
     def order_rows(self, columns, *, reverse=None, limit=None):
+        raise NotImplementedError("base class called")
+
+    def convert_records(self, record_map, *, blocks_out_table=None):
         raise NotImplementedError("base class called")
 
 
@@ -413,6 +417,9 @@ class ViewRepresentation(OperatorPlatform):
 
     def order_rows(self, columns, *, reverse=None, limit=None):
         return OrderRowsNode(source=self, columns=columns, reverse=reverse, limit=limit)
+
+    def convert_records(self, record_map, *, blocks_out_table=None):
+        return ConvertRecordsNode(source=self, record_map=record_map, blocks_out_table=blocks_out_table)
 
 
 # Could also have general query as starting node, but don't see a lot of point to
@@ -831,7 +838,9 @@ class SelectColumnsNode(ViewRepresentation):
     def __init__(self, source, columns):
         column_selection = [c for c in columns]
         self.column_selection = column_selection
-        # TODO: check column conditions
+        unknown = set(column_selection) - set(source.column_names)
+        if len(unknown) > 0:
+            raise ValueError("selecting unknown columns " + str(unknown))
         ViewRepresentation.__init__(
             self, column_names=column_selection, sources=[source]
         )
@@ -888,7 +897,9 @@ class DropColumnsNode(ViewRepresentation):
         remaining_columns = [
             c for c in source.column_names if c not in column_deletions
         ]
-        # TODO: check column conditions
+        unknown = set(column_deletions) - set(source.column_names)
+        if len(unknown) > 0:
+            raise ValueError("dropping unknown columns " + str(unknown))
         ViewRepresentation.__init__(
             self, column_names=remaining_columns, sources=[source]
         )
@@ -1013,11 +1024,19 @@ class RenameColumnsNode(ViewRepresentation):
         self.mapped_columns = set(self.column_remapping.keys()).union(
             set(self.reverse_mapping.keys())
         )
+        new_cols = [k for k in column_remapping.keys()]
+        orig_cols = [k for k in column_remapping.values()]
+        unknown = set(orig_cols) - set(source.column_names)
+        if len(unknown) > 0:
+            raise ValueError("Tried to rename unknown columns: " + str(unknown))
+        collisions = (set(source.column_names) - set(new_cols).intersection(orig_cols)).intersection(new_cols)
+        if len(collisions) > 0:
+            raise ValueError("Mapping " + str(self.column_remapping) +
+                             " collides with existing columns " + str(collisions))
         column_names = [
             (k if k not in self.reverse_mapping.keys() else self.reverse_mapping[k])
             for k in source.column_names
         ]
-        # TODO: check column conditions, don't allow name collisions
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
 
     def columns_used_from_sources(self, using=None):
@@ -1146,3 +1165,64 @@ class NaturalJoinNode(ViewRepresentation):
         return data_model.natural_join_step(
             op=self, data_map=data_map, eval_env=eval_env
         )
+
+
+class ConvertRecordsNode(ViewRepresentation):
+    blocks_out_table: TableDescription
+
+    def __init__(self, source, record_map, *, blocks_out_table=None):
+        if blocks_out_table is None and record_map.blocks_out_table is not None:
+            blocks_out_table = TableDescription(
+                'cdata_temp_record',
+                record_map.blocks_out.record_keys + record_map.blocks_out.control_table.columns)
+        self.record_map = record_map
+        self.blocks_out_table = blocks_out_table
+        ViewRepresentation.__init__(
+            self, column_names=source.column_names, sources=[source]
+        )
+
+    def columns_used_from_sources(self, using=None):
+        return [self.sources[0].column_names]  # TODO: calculate instead of using broad net
+
+    def collect_representation_implementation(self, *, pipeline=None, dialect="Python"):
+        if pipeline is None:
+            pipeline = []
+        od = collections.OrderedDict()
+        od["op"] = "ConvertRecords"
+        od["record_map"] = self.record_map
+        pipeline.insert(0, od)
+        return self.sources[0].collect_representation_implementation(
+            pipeline=pipeline, dialect=dialect
+        )
+
+    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+        s = ''
+        if print_sources:
+            s = (
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
+            )
+        s = s + (
+            "convert_record("
+            + str(self.record_map) + ")"
+        )
+        return s
+
+    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+        res = self.sources[0].to_sql_implementation(
+            self,
+            db_model=db_model,
+            using=using,
+            temp_id_source=temp_id_source)
+        if self.record_map.blocks_in is not None:
+            res = db_model.blocks_to_row_recs_query(res,
+                                                    record_spec=self.record_map.blocks_in)
+        if self.record_map.blocks_out is not None:
+            res = db_model.row_recs_to_blocks_query(res,
+                                                    record_spec=self.record_map.blocks_out,
+                                                    record_view=self.blocks_out_table)
+        return res
+
+    def eval_implementation(self, *, data_map, eval_env, data_model):
+        return data_model.convert_records_step(op=self, data_map=data_map, eval_env=eval_env)

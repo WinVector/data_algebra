@@ -18,11 +18,27 @@ class RecordSpecification:
         if control_table_keys is None:
             control_table_keys = [control_table.columns[0]]
         self.control_table_keys = [k for k in control_table_keys]
+        unknown =  set(self.control_table_keys) - set(control_table.columns)
+        if len(unknown) > 0:
+            raise ValueError("control table keys that are not in the control table: " + str(unknown))
         confused = set(record_keys).intersection(control_table_keys)
         if len(confused) > 0:
             raise ValueError(
                 "columns common to record_keys and control_table_keys: " + str(confused)
             )
+        self.block_columns = self.record_keys + [c for c in self.control_table.columns]
+        cvs = []
+        for c in self.control_table:
+            if not c in self.control_table_keys:
+                for v in self.control_table[c]:
+                    if not v in cvs:
+                        cvs.append(v)
+        confused = set(record_keys).intersection(cvs)
+        if len(confused) > 0:
+            raise ValueError(
+                "control table entries confused with row keys or control table keys"
+            )
+        self.row_columns = self.record_keys + cvs
 
     def row_version(self, *, include_record_keys=True):
         cols = []

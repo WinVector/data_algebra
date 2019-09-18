@@ -630,8 +630,8 @@ db_model = data_algebra.SQLite.SQLiteModel()
 
 ```python
 print(db_model.row_recs_to_blocks_query(
-    source_view=data_algebra.data_ops.describe_table(
-        iris, 'iris'),
+    source_sql=data_algebra.data_ops.describe_table(
+        iris, 'iris').to_sql(db_model),
     record_spec=record_spec,
     record_view=data_algebra.data_ops.describe_table(
         record_spec.control_table, "control_table")
@@ -650,7 +650,7 @@ print(db_model.row_recs_to_blocks_query(
       WHEN b."Value" = 'Sepal.Width' THEN a."Sepal.Width"
       ELSE NULL END AS "Value"
     FROM (
-      "iris" ) a
+      SELECT "id", "Petal.Width", "Sepal.Length", "Species", "Sepal.Width", "Petal.Length" FROM "iris" ) a
     CROSS JOIN (
       "control_table" ) b
      ORDER BY a."id", a."Species", b."Part", b."Measure"
@@ -659,8 +659,8 @@ print(db_model.row_recs_to_blocks_query(
 
 ```python
 print(db_model.blocks_to_row_recs_query(
-    source_view=data_algebra.data_ops.describe_table(
-        iris, 'iris'),
+    source_sql=data_algebra.data_ops.describe_table(
+        iris, 'iris').to_sql(db_model),
     record_spec=record_spec
 ))
 ```
@@ -673,7 +673,7 @@ print(db_model.blocks_to_row_recs_query(
      MAX(CASE WHEN  ( "Part" = 'Sepal' )  AND  ( "Measure" = 'Length' )  THEN "Value" ELSE NULL END) AS "Sepal.Length",
      MAX(CASE WHEN  ( "Part" = 'Sepal' )  AND  ( "Measure" = 'Width' )  THEN "Value" ELSE NULL END) AS "Sepal.Width"
     FROM (
-      "iris"
+      SELECT "id", "Petal.Width", "Sepal.Length", "Species", "Sepal.Width", "Petal.Length" FROM "iris"
      )
      GROUP BY "id", "Species"
      ORDER BY "id", "Species"
