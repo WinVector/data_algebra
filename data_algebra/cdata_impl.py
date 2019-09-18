@@ -57,6 +57,7 @@ class RecordMap:
         db_model = data_algebra.SQLite.SQLiteModel()
         if self.blocks_in is not None:
             x1_descr = data_algebra.data_ops.describe_table(X, table_name="x_blocks_in")
+            x1_sql = x1_descr.to_sql(db_model)
             missing_cols = set(self.blocks_in.control_table_keys).union(
                 self.blocks_in.record_keys
             ) - set(x1_descr.column_names)
@@ -74,13 +75,14 @@ class RecordMap:
             with sqlite3.connect(":memory:") as conn:
                 db_model.insert_table(conn, X, x1_descr.table_name)
                 to_blocks_sql = db_model.blocks_to_row_recs_query(
-                    x1_descr, self.blocks_in
+                    x1_sql, self.blocks_in
                 )
                 X = db_model.read_query(conn, to_blocks_sql)
         if self.blocks_out is not None:
             x2_descr = data_algebra.data_ops.describe_table(
                 X, table_name="x_blocks_out"
             )
+            x2_sql = x2_descr.to_sql(db_model)
             missing_cols = set(self.blocks_out.record_keys) - set(x2_descr.column_names)
             if len(missing_cols) > 0:
                 raise KeyError("missing required columns: " + str(missing_cols))
@@ -98,7 +100,7 @@ class RecordMap:
                     conn, self.blocks_out.control_table, temp_table.table_name
                 )
                 to_rows_sql = db_model.row_recs_to_blocks_query(
-                    x2_descr, self.blocks_out, temp_table
+                    x2_sql, self.blocks_out, temp_table
                 )
                 X = db_model.read_query(conn, to_rows_sql)
         return X

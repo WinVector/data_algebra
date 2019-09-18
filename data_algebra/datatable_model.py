@@ -224,3 +224,6 @@ class DataTableModel(data_algebra.data_model.DataModel):
             [c for c in right.names]
         )
         raise RuntimeError("not implemented yet")  # TODO: implement
+
+    def convert_records(self, op, *, data_map, eval_env):
+        raise NotImplementedError("convert_records not implemented for dask yet")

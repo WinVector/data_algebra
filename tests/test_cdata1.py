@@ -84,7 +84,7 @@ def test_cdata1():
 
     source_table = data_algebra.data_ops.TableDescription(
         "iris",
-        ["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width", "Species"],
+        ["id", "Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width", "Species"],
     )
 
     temp_table = data_algebra.data_ops.TableDescription(
@@ -93,7 +93,10 @@ def test_cdata1():
 
     conn = sqlite3.connect(":memory:")
 
-    sql = db_model.row_recs_to_blocks_query(source_table, record_spec, temp_table)
+    sql = db_model.row_recs_to_blocks_query(
+        source_table.to_sql(db_model),
+        record_spec,
+        temp_table)
     waste_str = str(sql)
 
     # %%
@@ -109,10 +112,12 @@ def test_cdata1():
 
     db_model.insert_table(conn, res_blocks, "res_blocks")
     source_table2 = data_algebra.data_ops.TableDescription(
-        "res_blocks", ["Species", "Part", "Measure", "Value"]
+        "res_blocks", ["id", "Species", "Part", "Measure", "Value"]
     )
 
-    sql_back = db_model.blocks_to_row_recs_query(source_table2, record_spec)
+    sql_back = db_model.blocks_to_row_recs_query(
+        source_table2.to_sql(db_model),
+        record_spec)
     waste_str = str(sql_back)
 
     # %%
