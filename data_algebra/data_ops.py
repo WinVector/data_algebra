@@ -1177,12 +1177,15 @@ class ConvertRecordsNode(ViewRepresentation):
                 [c for c in record_map.blocks_out.record_keys] + [c for c in record_map.blocks_out.control_table])
         self.record_map = record_map
         self.blocks_out_table = blocks_out_table
+        unknown = set(self.record_map.columns_needed) - set(source.column_names)
+        if len(unknown) > 0:
+            raise ValueError("missing required columns: " + str(unknown))
         ViewRepresentation.__init__(
-            self, column_names=source.column_names, sources=[source]
+            self, column_names=record_map.columns_produced, sources=[source]
         )
 
     def columns_used_from_sources(self, using=None):
-        return [self.sources[0].column_names]  # TODO: calculate instead of using broad net
+        return [self.record_map.columns_needed]
 
     def collect_representation_implementation(self, *, pipeline=None, dialect="Python"):
         if pipeline is None:

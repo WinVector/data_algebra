@@ -55,6 +55,10 @@ class RecordMap:
             self.columns_needed = self.blocks_in.block_columns
         else:
             self.columns_needed = self.blocks_out.row_columns
+        if self.blocks_out is not None:
+            self.columns_produced = self.blocks_out.block_columns
+        else:
+            self.columns_produced = self.blocks_in.row_columns
 
     # noinspection PyPep8Naming
     def transform(

@@ -32,10 +32,10 @@ data_algebra/SQLite.py               43      5    88%
 data_algebra/SparkSQL.py             21     21     0%
 data_algebra/__init__.py             36     10    72%
 data_algebra/cdata.py                62      6    90%
-data_algebra/cdata_impl.py          106     18    83%
+data_algebra/cdata_impl.py          109     18    83%
 data_algebra/dask_model.py          119     23    81%
 data_algebra/data_model.py           41     15    63%
-data_algebra/data_ops.py            761    175    77%
+data_algebra/data_ops.py            764    176    77%
 data_algebra/data_pipe.py           170     38    78%
 data_algebra/data_types.py           39     19    51%
 data_algebra/datatable_model.py     131     81    38%
@@ -50,7 +50,7 @@ data_algebra/pipe.py                 65     19    71%
 data_algebra/util.py                 72      6    92%
 data_algebra/yaml.py                113     13    88%
 -----------------------------------------------------
-TOTAL                              2740    735    73%
+TOTAL                              2746    736    73%
 
 
-========================== 23 passed in 6.49 seconds ===========================
+========================== 23 passed in 6.51 seconds ===========================
