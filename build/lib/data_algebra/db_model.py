@@ -652,17 +652,21 @@ class DBModel:
             )
         for result_col in control_value_cols:
             cstmt = " CASE\n"
-            for source_col in record_spec.control_table[result_col]:
-                col_sql = (
-                    "  WHEN b."
-                    + self.quote_identifier(result_col)
-                    + " = "
-                    + self.quote_string(source_col)
-                    + " THEN a."
-                    + self.quote_identifier(source_col)
-                    + "\n"
-                )
-                cstmt = cstmt + col_sql
+            col = record_spec.control_table[result_col]
+            isnull = col.isnull()
+            for i in range(len(col)):
+                if not(isnull[i]):
+                    source_col = col[i]
+                    col_sql = (
+                        "  WHEN b."
+                        + self.quote_identifier(result_col)
+                        + " = "
+                        + self.quote_string(source_col)
+                        + " THEN a."
+                        + self.quote_identifier(source_col)
+                        + "\n"
+                    )
+                    cstmt = cstmt + col_sql
             cstmt = cstmt + "  ELSE NULL END AS " + self.quote_identifier(result_col)
             col_stmts.append(cstmt)
         sql = (
@@ -704,24 +708,27 @@ class DBModel:
             )
         for i in range(record_spec.control_table.shape[0]):
             for vc in control_value_cols:
-                clauses = []
-                for cc in record_spec.control_table_keys:
-                    clauses.append(
-                        " ( "
-                        + self.quote_identifier(cc)
-                        + " = "
-                        + self.quote_string(record_spec.control_table[cc][i])
-                        + " ) "
+                col = record_spec.control_table[vc]
+                isnull = col.isnull()
+                if not isnull[i]:
+                    clauses = []
+                    for cc in record_spec.control_table_keys:
+                        clauses.append(
+                            " ( "
+                            + self.quote_identifier(cc)
+                            + " = "
+                            + self.quote_string(record_spec.control_table[cc][i])
+                            + " ) "
+                        )
+                    cstmt = (
+                        " MAX(CASE WHEN "
+                        + " AND ".join(clauses)
+                        + " THEN "
+                        + self.quote_identifier(vc)
+                        + " ELSE NULL END) AS "
+                        + self.quote_identifier(col[i])
                     )
-                cstmt = (
-                    " MAX(CASE WHEN "
-                    + " AND ".join(clauses)
-                    + " THEN "
-                    + self.quote_identifier(vc)
-                    + " ELSE NULL END) AS "
-                    + self.quote_identifier(record_spec.control_table[vc][i])
-                )
-                col_stmts.append(cstmt)
+                    col_stmts.append(cstmt)
         sql = (
             "SELECT\n"
             + ",\n".join(col_stmts)

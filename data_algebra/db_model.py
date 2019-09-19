@@ -708,24 +708,27 @@ class DBModel:
             )
         for i in range(record_spec.control_table.shape[0]):
             for vc in control_value_cols:
-                clauses = []
-                for cc in record_spec.control_table_keys:
-                    clauses.append(
-                        " ( "
-                        + self.quote_identifier(cc)
-                        + " = "
-                        + self.quote_string(record_spec.control_table[cc][i])
-                        + " ) "
+                col = record_spec.control_table[vc]
+                isnull = col.isnull()
+                if not isnull[i]:
+                    clauses = []
+                    for cc in record_spec.control_table_keys:
+                        clauses.append(
+                            " ( "
+                            + self.quote_identifier(cc)
+                            + " = "
+                            + self.quote_string(record_spec.control_table[cc][i])
+                            + " ) "
+                        )
+                    cstmt = (
+                        " MAX(CASE WHEN "
+                        + " AND ".join(clauses)
+                        + " THEN "
+                        + self.quote_identifier(vc)
+                        + " ELSE NULL END) AS "
+                        + self.quote_identifier(col[i])
                     )
-                cstmt = (
-                    " MAX(CASE WHEN "
-                    + " AND ".join(clauses)
-                    + " THEN "
-                    + self.quote_identifier(vc)
-                    + " ELSE NULL END) AS "
-                    + self.quote_identifier(record_spec.control_table[vc][i])
-                )
-                col_stmts.append(cstmt)
+                    col_stmts.append(cstmt)
         sql = (
             "SELECT\n"
             + ",\n".join(col_stmts)

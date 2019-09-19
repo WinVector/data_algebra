@@ -63,14 +63,21 @@ class RecordSpecification:
         cvs = []
         for c in self.control_table:
             if c not in self.control_table_keys:
-                for v in self.control_table[c]:
-                    if v not in cvs:
-                        cvs.append(v)
+                col = self.control_table[c]
+                isnull = col.isnull()
+                for i in range(len(col)):
+                    if not isnull[i]:
+                        v = col[i]
+                        if v not in cvs:
+                            cvs.append(v)
         confused = set(record_keys).intersection(cvs)
         if len(confused) > 0:
             raise ValueError(
                 "control table entries confused with row keys or control table keys"
             )
+        if strict:
+            if len(set(cvs)) != len(cvs):
+                raise ValueError("duplicate content keys")
         self.content_keys = cvs
         self.row_columns = self.record_keys + cvs
 
@@ -78,10 +85,7 @@ class RecordSpecification:
         cols = []
         if include_record_keys:
             cols = cols + self.record_keys
-        for ci in self.control_table.columns:
-            if ci not in self.control_table_keys:
-                for c in self.control_table[ci]:
-                    cols.append(c)
+        cols = cols + self.content_keys
         return cols
 
     def fmt(self):
