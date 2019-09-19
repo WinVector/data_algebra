@@ -51,8 +51,6 @@ class RecordSpecification:
         unknown = set(self.control_table_keys) - set(control_table.columns)
         if len(unknown) > 0:
             raise ValueError("control table keys that are not in the control table: " + str(unknown))
-        if len(self.control_table_keys) >= control_table.shape[1]:
-            raise ValueError("control table should have at least one non-key column")
         confused = set(record_keys).intersection(control_table_keys)
         if len(confused) > 0:
             raise ValueError(

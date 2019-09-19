@@ -10,7 +10,7 @@ import data_algebra.SQLite
 
 
 class RecordMap:
-    def __init__(self, *, blocks_in=None, blocks_out=None):
+    def __init__(self, *, blocks_in=None, blocks_out=None, strict=False):
         if blocks_in is not None:
             if not isinstance(blocks_in, data_algebra.cdata.RecordSpecification):
                 raise TypeError(
@@ -29,8 +29,9 @@ class RecordMap:
             unknown = set(blocks_out.row_columns) - set(blocks_in.row_columns)
             if len(unknown) > 0:
                 raise ValueError("column mismatch from blocks_in to blocks_out" + str(unknown))
-            if set(blocks_in.record_keys) != set(blocks_out.record_keys):
-                raise ValueError("record keys must match when using both blocks in and blocks out")
+            if strict:
+                if set(blocks_in.record_keys) != set(blocks_out.record_keys):
+                    raise ValueError("record keys must match when using both blocks in and blocks out")
         self.blocks_in = blocks_in
         self.blocks_out = blocks_out
         if self.blocks_in is not None:
