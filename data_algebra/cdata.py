@@ -65,6 +65,8 @@ class RecordSpecification:
             if c not in self.control_table_keys:
                 col = self.control_table[c]
                 isnull = col.isnull()
+                if all(isnull):
+                    raise ValueError("column " + c + " was all null")
                 for i in range(len(col)):
                     if not isnull[i]:
                         v = col[i]
