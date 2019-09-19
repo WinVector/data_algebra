@@ -130,9 +130,61 @@ class RecordMap:
                 X = db_model.read_query(conn, to_rows_sql)
         return X
 
+    def compose(self, other):
+        """
+        Compose transforms
+        (self.compose(other)).transform(data) == self.transform(other.transform(data))
+
+        :param other: another data_algebra.cdata_impl.RecordMap
+        :return:
+        """
+
+        if not isinstance(other, RecordMap):
+            raise TypeError("expected other to be data_algebra.cdata_impl.RecordMap")
+        # (s2.compose(s1)).transform(data) == s2.transform(s1.transform(data))
+        s1 = other
+        s2 = self
+        rk = s1.record_keys()
+        if set(rk) != set(s2.record_keys()):
+            raise ValueError("can only compose operations with matching record_keys")
+        inp = s1.example_input()
+        out = s2.transform(s1.transform(inp))
+        rsi = inp.drop(rk, axis=1, inplace=False)
+        rso = out.drop(rk, axis=1, inplace=False)
+        if inp.shape[0] < 2:
+            if out.shape[0] < 2:
+                return None
+            else:
+                return RecordMap(
+                    blocks_out=data_algebra.cdata.RecordSpecification(
+                        control_table=rso,
+                        record_keys=rk,
+                        control_table_keys=s2.blocks_out.control_table_keys))
+        else:
+            if out.shape[0] < 2:
+                return RecordMap(
+                    blocks_in=data_algebra.cdata.RecordSpecification(
+                        control_table=rsi,
+                        record_keys=rk,
+                        control_table_keys=s1.blocks_in.control_table_keys))
+            else:
+                return RecordMap(
+                    blocks_in=data_algebra.cdata.RecordSpecification(
+                        control_table=rsi,
+                        record_keys=rk,
+                        control_table_keys=s1.blocks_in.control_table_keys),
+                    blocks_out=data_algebra.cdata.RecordSpecification(
+                        control_table=rso,
+                        record_keys=rk,
+                        control_table_keys=s2.blocks_out.control_table_keys)
+                )
+
     def __rrshift__(self, other):  # override other >> self
         if other is None:
             return self
+        if isinstance(other, RecordMap):
+            # data >> other >> self
+            return self.compose(other)
         return self.transform(other)
 
     def inverse(self):
