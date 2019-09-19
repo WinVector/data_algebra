@@ -71,6 +71,9 @@ class RecordSpecification:
             raise ValueError(
                 "control table entries confused with row keys or control table keys"
             )
+        if strict:
+            if len(set(cvs)) != len(cvs):
+                raise ValueError("duplicate content keys")
         self.content_keys = cvs
         self.row_columns = self.record_keys + cvs
 
