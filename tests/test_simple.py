@@ -71,3 +71,15 @@ def test_simple():
     res = ops.eval_pandas(data_map={"d": d_local}, eval_env=locals())
     expect = pandas.DataFrame({"x": [1, 2], "y": [3, 4], "z": [1.25, 2.25]})
     assert data_algebra.util.equivalent_frames(res, expect)
+
+def test_pandas_to_example():
+    d = pandas.DataFrame({
+        'record_id': [1, 1, 1, 2, 2, 2],
+        'column_label': ['rec_col1', 'rec_col2', 'rec_col3', 'rec_col1', 'rec_col2', 'rec_col3'],
+        'c_row1': [1.0, None, 3.0, 11.0, None, 13.0],
+        'c_row2': [4, 5, 6, 14, 15, 16],
+        'c_row3': [7, 8, 9, 17, 18, 19],
+    })
+    d_str = data_algebra.util.pandas_to_example_str(d)
+    d_back = eval(d_str)
+    assert data_algebra.util.equivalent_frames(d, d_back)

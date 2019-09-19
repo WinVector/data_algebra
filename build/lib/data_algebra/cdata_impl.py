@@ -132,7 +132,7 @@ class RecordMap:
 
     def compose(self, other):
         """
-        Compose transforms
+        Experimental method to compose transforms
         (self.compose(other)).transform(data) == self.transform(other.transform(data))
 
         :param other: another data_algebra.cdata_impl.RecordMap
@@ -183,7 +183,7 @@ class RecordMap:
         if other is None:
             return self
         if isinstance(other, RecordMap):
-            # data >> other >> self
+            # (data >> other) >> self == data >> (other >> self)
             return self.compose(other)
         return self.transform(other)
 
