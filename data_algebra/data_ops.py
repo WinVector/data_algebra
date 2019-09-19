@@ -1185,6 +1185,8 @@ class ConvertRecordsNode(ViewRepresentation):
                 [c for c in record_map.blocks_out.record_keys]
                 + [c for c in record_map.blocks_out.control_table],
             )
+        if not isinstance(blocks_out_table, TableDescription):
+            raise TypeError("expected blocks_out_table to be a data_algebra.data_ops.TableDescription")
         self.record_map = record_map
         self.blocks_out_table = blocks_out_table
         unknown = set(self.record_map.columns_needed) - set(source.column_names)
@@ -1218,7 +1220,10 @@ class ConvertRecordsNode(ViewRepresentation):
             )
         rm_str = self.record_map.__repr__()
         rm_str = re.sub("\n", "\n   ", rm_str)
-        s = s + ("convert_record(" + rm_str + ")")
+        s = s + ("convert_record(" + rm_str +
+                 "\n,   blocks_out_table=" +
+                 self.blocks_out_table.to_python_implementation(indent=indent+3, strict=strict) +
+                 ")")
         return s
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
