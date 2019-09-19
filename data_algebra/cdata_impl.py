@@ -26,12 +26,17 @@ class RecordMap:
                 "At least one of blocks_in or blocks_out should not be None"
             )
         if (blocks_in is not None) and (blocks_out is not None):
-            unknown = set(blocks_out.row_columns) - set(blocks_in.row_columns)
+            unknown = set(blocks_out.record_keys) - set(blocks_in.record_keys)
             if len(unknown) > 0:
-                raise ValueError("column mismatch from blocks_in to blocks_out" + str(unknown))
+                raise ValueError("unknown outgoing record_keys:" + str(unknown))
+            unknown = set(blocks_out.content_keys) - set(blocks_in.content_keys)
+            if len(unknown) > 0:
+                raise ValueError("unknown outgoing content_keys" + str(unknown))
             if strict:
                 if set(blocks_in.record_keys) != set(blocks_out.record_keys):
                     raise ValueError("record keys must match when using both blocks in and blocks out")
+                if set(blocks_in.content_keys) != set(blocks_out.content_keys):
+                    raise ValueError("content keys must match when using both blocks in and blocks out")
         self.blocks_in = blocks_in
         self.blocks_out = blocks_out
         if self.blocks_in is not None:

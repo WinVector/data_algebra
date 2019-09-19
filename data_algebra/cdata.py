@@ -71,6 +71,7 @@ class RecordSpecification:
             raise ValueError(
                 "control table entries confused with row keys or control table keys"
             )
+        self.content_keys = cvs
         self.row_columns = self.record_keys + cvs
 
     def row_version(self, *, include_record_keys=True):
