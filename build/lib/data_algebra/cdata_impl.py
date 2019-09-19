@@ -1,31 +1,12 @@
 import sqlite3
 import collections
 
+import pandas
+
 import data_algebra.data_types
 import data_algebra.data_ops
 import data_algebra.cdata
 import data_algebra.SQLite
-
-
-def table_is_keyed_by_columns(table, column_names):
-    # check for ill-condition
-    missing_columns = set(column_names) - set([c for c in table.columns])
-    if len(missing_columns) > 0:
-        raise KeyError("missing columns: " + str(missing_columns))
-    # get rid of some corner cases
-    if table.shape[0] < 2:
-        return True
-    if len(column_names) < 1:
-        return False
-    ops = (
-        data_algebra.data_ops.describe_table(table, "table")
-        .select_columns(column_names)
-        .extend({"cdata_temp_one": 1})
-        .project({"_cdata_temp_sum": "cdata_temp_one.sum()"}, group_by=column_names)
-        .project({"_cdata_temp_sum": "_cdata_temp_sum.max()"})
-    )
-    t2s = ops.transform(table)
-    return t2s.iloc[0, 0] <= 1
 
 
 class RecordMap:
@@ -48,9 +29,10 @@ class RecordMap:
             unknown = set(blocks_out.row_columns) - set(blocks_in.row_columns)
             if len(unknown) > 0:
                 raise ValueError("column mismatch from blocks_in to blocks_out" + str(unknown))
+            if set(blocks_in.record_keys) != set(blocks_out.record_keys):
+                raise ValueError("record keys must match when using both blocks in and blocks out")
         self.blocks_in = blocks_in
         self.blocks_out = blocks_out
-        self.fmt_string = self.fmt()
         if self.blocks_in is not None:
             self.columns_needed = self.blocks_in.block_columns
         else:
@@ -59,6 +41,28 @@ class RecordMap:
             self.columns_produced = self.blocks_out.block_columns
         else:
             self.columns_produced = self.blocks_in.row_columns
+        self.fmt_string = self.fmt()
+
+    def record_keys(self):
+        if self.blocks_in is not None:
+            return self.blocks_in.record_keys.copy()
+        if self.blocks_out is not None:
+            return self.blocks_out.record_keys.copy()
+        return None
+
+    def example_input(self):
+        if self.blocks_in is not None:
+            example = self.blocks_in.control_table.copy()
+            nrow = example.shape[0]
+            for rk in self.blocks_in.record_keys:
+                example[rk] = [rk] * nrow
+            return example
+        if self.blocks_in is not None:
+            example = pandas.DataFrame()
+            for k in self.blocks_out.row_columns:
+                example[k] = [k]
+            return example
+        return None
 
     # noinspection PyPep8Naming
     def transform(
@@ -81,7 +85,7 @@ class RecordMap:
             # convert to row-records
             if check_blocks_in_keying:
                 # table should be keyed by record_keys + control_table_keys
-                if not table_is_keyed_by_columns(
+                if not data_algebra.cdata.table_is_keyed_by_columns(
                     X, self.blocks_in.record_keys + self.blocks_in.control_table_keys
                 ):
                     raise ValueError(
@@ -103,7 +107,7 @@ class RecordMap:
                 raise KeyError("missing required columns: " + str(missing_cols))
             if check_blocks_out_keying:
                 # table should be keyed by record_keys
-                if not table_is_keyed_by_columns(X, self.blocks_out.record_keys):
+                if not data_algebra.cdata.table_is_keyed_by_columns(X, self.blocks_out.record_keys):
                     raise ValueError("table is not keyed by blocks_out.record_keys")
             # convert to block records
             with sqlite3.connect(":memory:") as conn:
@@ -121,7 +125,12 @@ class RecordMap:
         return X
 
     def __rrshift__(self, other):  # override other >> self
+        if other is None:
+            return self
         return self.transform(other)
+
+    def inverse(self):
+        return RecordMap(blocks_in=self.blocks_out, blocks_out=self.blocks_in)
 
     def fmt(self):
         if (self.blocks_in is None) and (self.blocks_out is None):

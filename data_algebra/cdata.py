@@ -4,7 +4,7 @@ import collections
 import pandas
 
 import data_algebra.data_types
-
+import data_algebra.data_ops
 
 
 def table_is_keyed_by_columns(table, column_names):
@@ -35,8 +35,8 @@ class RecordSpecification:
             control_table, "control_table"
         )
         control_table = control_table.reset_index(inplace=False, drop=True)
-        if control_table.shape[0] < 2:
-            raise ValueError("control table should have at least 2 rows")
+        if control_table.shape[0] < 1:
+            raise ValueError("control table should have at least 1 row")
         self.control_table = control_table.reset_index(drop=True)
         if record_keys is None:
             record_keys = []
@@ -48,9 +48,7 @@ class RecordSpecification:
         if not isinstance(control_table_keys, list):
             record_keys = [control_table_keys]
         self.control_table_keys = [k for k in control_table_keys]
-        if len(self.control_table_keys) < 1:
-            raise ValueError("control table should have at least one key column")
-        unknown =  set(self.control_table_keys) - set(control_table.columns)
+        unknown = set(self.control_table_keys) - set(control_table.columns)
         if len(unknown) > 0:
             raise ValueError("control table keys that are not in the control table: " + str(unknown))
         if len(self.control_table_keys) >= control_table.shape[1]:
@@ -66,9 +64,9 @@ class RecordSpecification:
         self.block_columns = self.record_keys + [c for c in self.control_table.columns]
         cvs = []
         for c in self.control_table:
-            if not c in self.control_table_keys:
+            if c not in self.control_table_keys:
                 for v in self.control_table[c]:
-                    if not v in cvs:
+                    if v not in cvs:
                         cvs.append(v)
         confused = set(record_keys).intersection(cvs)
         if len(confused) > 0:
@@ -128,9 +126,9 @@ def record_spec_from_simple_obj(obj):
     for k in obj["control_table"].keys():
         control_table[k] = obj["control_table"][k]
 
-    def maybe_get_list(map, key):
+    def maybe_get_list(omap, key):
         try:
-            v = map[key]
+            v = omap[key]
             if v is None:
                 return []
             if not isinstance(v, list):

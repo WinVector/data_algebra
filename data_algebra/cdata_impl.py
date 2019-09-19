@@ -29,9 +29,10 @@ class RecordMap:
             unknown = set(blocks_out.row_columns) - set(blocks_in.row_columns)
             if len(unknown) > 0:
                 raise ValueError("column mismatch from blocks_in to blocks_out" + str(unknown))
+            if set(blocks_in.record_keys) != set(blocks_out.record_keys):
+                raise ValueError("record keys must match when using both blocks in and blocks out")
         self.blocks_in = blocks_in
         self.blocks_out = blocks_out
-        self.fmt_string = self.fmt()
         if self.blocks_in is not None:
             self.columns_needed = self.blocks_in.block_columns
         else:
@@ -40,27 +41,28 @@ class RecordMap:
             self.columns_produced = self.blocks_out.block_columns
         else:
             self.columns_produced = self.blocks_in.row_columns
+        self.fmt_string = self.fmt()
+
+    def record_keys(self):
+        if self.blocks_in is not None:
+            return self.blocks_in.record_keys.copy()
+        if self.blocks_out is not None:
+            return self.blocks_out.record_keys.copy()
+        return None
 
     def example_input(self):
         if self.blocks_in is not None:
             example = self.blocks_in.control_table.copy()
+            nrow = example.shape[0]
             for rk in self.blocks_in.record_keys:
-                example[rk] = rk
+                example[rk] = [rk] * nrow
             return example
-        example = pandas.DataFrame()
-        for k in self.blocks_out.row_columns:
-            example[k] = [k]
-        return example
-
-    def incoming_record_keys(self):
         if self.blocks_in is not None:
-            return self.blocks_in.record_keys.copy()
-        return self.blocks_out.record_keys.copy()
-
-    def outgoing_record_keys(self):
-        if self.blocks_out is not None:
-            return self.blocks_out.record_keys.copy()
-        return self.blocks_in.record_keys.copy()
+            example = pandas.DataFrame()
+            for k in self.blocks_out.row_columns:
+                example[k] = [k]
+            return example
+        return None
 
     # noinspection PyPep8Naming
     def transform(
@@ -122,25 +124,9 @@ class RecordMap:
                 X = db_model.read_query(conn, to_rows_sql)
         return X
 
-    def compose(self, other):
-        """
-        Build a new RecordMap composite such that:
-          (self.transform(other)).transform(data) == self.transform(other.transform(data)).
-        :param other:
-        :return:
-        """
-        if not isinstance(other, RecordMap):
-            raise TypeError("Expected other to be a data_algebra.cdata_impl.RecordMap")
-        inp = other.example_input()
-        out = self.transform(other.transform(inp))
-        ictl = inp.drop([other.incoming_record_keys()], axis=1, inplace=False)
-        otcl = out.drop([self.outgoing_record_keys()], axis=1, inplace=False)
-
-
     def __rrshift__(self, other):  # override other >> self
-        if isinstance(other, RecordMap):
-            # (data >> other) >> self == data >> (other >> self)
-            return self.compose(other)
+        if other is None:
+            return self
         return self.transform(other)
 
     def inverse(self):
