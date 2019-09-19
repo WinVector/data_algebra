@@ -208,15 +208,15 @@ class RecordMap:
         if (self.blocks_in is not None) and (self.blocks_out is not None):
             s = (
                 "Transform block records of structure:\n"
-                + self.blocks_in.fmt()
+                + str(self.blocks_in)
                 + "to block records of structure:\n"
-                + self.blocks_out.fmt()
+                + str(self.blocks_out)
             )
             return s
         if self.blocks_in is not None:
             s = (
                 "Transform block records of structure:\n"
-                + self.blocks_in.fmt()
+                + str(self.blocks_in)
                 + "to row records of the form:\n"
                 + "  record_keys: "
                 + str(self.blocks_in.record_keys)
@@ -236,12 +236,18 @@ class RecordMap:
                 + str(self.blocks_out.row_version(include_record_keys=True))
                 + "\n"
                 + "to block records of structure:\n"
-                + self.blocks_out.fmt()
+                + str(self.blocks_out)
             )
             return s
 
     def __repr__(self):
-        return self.fmt_string
+        s = (
+            'data_algebra.cdata_impl.RecordMap('
+            + '\n    blocks_in=' + self.blocks_in.__repr__()
+            + ',\n    blocks_out=' + self.blocks_out.__repr__()
+            + ')'
+            )
+        return s
 
     def __str__(self):
         return self.fmt_string

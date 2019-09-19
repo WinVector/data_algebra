@@ -1216,7 +1216,9 @@ class ConvertRecordsNode(ViewRepresentation):
                 + " .\\\n"
                 + " " * (indent + 3)
             )
-        s = s + ("convert_record(" + str(self.record_map) + ")")
+        rm_str = self.record_map.__repr__()
+        rm_str = re.sub("\n", "\n   ", rm_str)
+        s = s + ("convert_record(" + rm_str + ")")
         return s
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
