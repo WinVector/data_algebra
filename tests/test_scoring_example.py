@@ -36,21 +36,21 @@ def test_scoring_example():
     scale = 0.237
 
     with data_algebra.env.Env(locals()) as env:
-        ops = TableDescription('d',
-                               ['subjectID',
-                                'surveyCategory',
-                                'assessmentTotal']). \
-            extend({'probability': '(assessmentTotal * scale).exp()'}). \
-            extend({'total': 'probability.sum()'},
-                   partition_by='subjectID'). \
-            extend({'probability': 'probability/total'}). \
-            extend({'sort_key': '-probability'}). \
-            extend({'row_number': '_row_number()'},
-                   partition_by=['subjectID'],
-                   order_by=['sort_key']). \
-            select_rows('row_number == 1'). \
-            select_columns(['subjectID', 'surveyCategory', 'probability']). \
-            rename_columns({'diagnosis': 'surveyCategory'})
+        ops = (
+            TableDescription("d", ["subjectID", "surveyCategory", "assessmentTotal"])
+            .extend({"probability": "(assessmentTotal * scale).exp()"})
+            .extend({"total": "probability.sum()"}, partition_by="subjectID")
+            .extend({"probability": "probability/total"})
+            .extend({"sort_key": "-probability"})
+            .extend(
+                {"row_number": "_row_number()"},
+                partition_by=["subjectID"],
+                order_by=["sort_key"],
+            )
+            .select_rows("row_number == 1")
+            .select_columns(["subjectID", "surveyCategory", "probability"])
+            .rename_columns({"diagnosis": "surveyCategory"})
+        )
 
     data_algebra.yaml.check_op_round_trip(ops)
 

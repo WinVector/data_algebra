@@ -332,7 +332,9 @@ class ColumnReference(Term):
 
 
 # map from op-name to special Python formatting code
-py_formatters = {"neg": lambda expr: "-" + expr.args[0].to_python(want_inline_parens=True)}
+py_formatters = {
+    "neg": lambda expr: "-" + expr.args[0].to_python(want_inline_parens=True)
+}
 
 
 pandas_eval_env = {
@@ -363,10 +365,9 @@ class Expression(Term):
 
     def replace_view(self, view):
         new_args = [oi.replace_view(view) for oi in self.args]
-        return Expression(op=self.op,
-                          args=new_args,
-                          params=self.params,
-                          inline=self.inline)
+        return Expression(
+            op=self.op, args=new_args, params=self.params, inline=self.inline
+        )
 
     def get_column_names(self, columns_seen):
         for a in self.args:

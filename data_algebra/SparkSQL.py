@@ -12,7 +12,7 @@ class SparkSQLModel(data_algebra.db_model.DBModel):
     def __init__(self):
         data_algebra.db_model.DBModel.__init__(
             self,
-            identifier_quote='`',
+            identifier_quote="`",
             string_quote='"',
             sql_formatters=SparkSQL_formatters,
         )

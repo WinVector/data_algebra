@@ -1,4 +1,3 @@
-
 have_graphviz = False
 try:
     # noinspection PyUnresolvedReferences
@@ -36,13 +35,15 @@ def _to_digraph_r_nodes(ops, dot, table_keys, nextid, edges):
         table_keys.add(ops.key)
         node_id = nextid[0]
         nextid[0] = node_id + 1
-        dot.attr('node', shape="folder", color='blue')
+        dot.attr("node", shape="folder", color="blue")
         dot.node(str(node_id), _get_op_str(ops))
         return node_id
-    source_ids = [_to_digraph_r_nodes(ops=op,
-                                      dot=dot,
-                                      table_keys=table_keys,
-                                      nextid=nextid, edges=edges) for op in ops.sources]
+    source_ids = [
+        _to_digraph_r_nodes(
+            ops=op, dot=dot, table_keys=table_keys, nextid=nextid, edges=edges
+        )
+        for op in ops.sources
+    ]
     node_id = nextid[0]
     nextid[0] = node_id + 1
     if len(source_ids) > 1:
@@ -52,7 +53,7 @@ def _to_digraph_r_nodes(ops, dot, table_keys, nextid, edges):
     else:
         for sub_id in source_ids:
             edges.append((str(sub_id), str(node_id), None))
-    dot.attr('node', shape='note', color='darkgreen')
+    dot.attr("node", shape="note", color="darkgreen")
     dot.node(str(node_id), _get_op_str(ops))
     return node_id
 

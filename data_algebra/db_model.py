@@ -46,11 +46,7 @@ def _db_is_bad_expr(dbmodel, expression):
 
 def _db_neg_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
-    return (
-        "( -"
-        + subexpr
-        + " )"
-    )
+    return "( -" + subexpr + " )"
 
 
 db_expr_formatters = {
@@ -659,7 +655,7 @@ class DBModel:
             col = record_spec.control_table[result_col]
             isnull = col.isnull()
             for i in range(len(col)):
-                if not(isnull[i]):
+                if not (isnull[i]):
                     source_col = col[i]
                     col_sql = (
                         "  WHEN b."

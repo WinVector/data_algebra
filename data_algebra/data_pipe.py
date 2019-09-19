@@ -41,7 +41,7 @@ class Extend(data_algebra.pipe.PipeStep):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
-        parse_env = kwargs.get('parse_env', None)
+        parse_env = kwargs.get("parse_env", None)
         return other.extend(
             ops=self._ops,
             partition_by=self.partition_by,
@@ -66,7 +66,7 @@ class Project(data_algebra.pipe.PipeStep):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
-        parse_env = kwargs.get('parse_env', None)
+        parse_env = kwargs.get("parse_env", None)
         return other.project(ops=self._ops, group_by=self.group_by, parse_env=parse_env)
 
 
@@ -85,7 +85,7 @@ class SelectRows(data_algebra.pipe.PipeStep):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
-        parse_env = kwargs.get('parse_env', None)
+        parse_env = kwargs.get("parse_env", None)
         return other.select_rows(expr=self.expr, parse_env=parse_env)
 
 
@@ -192,7 +192,6 @@ class NaturalJoin(data_algebra.pipe.PipeStep):
 
 
 class ConvertRecords(data_algebra.pipe.PipeStep):
-
     def __init__(self, record_map):
         self.record_map = record_map
         data_algebra.pipe.PipeStep.__init__(self, name="ConvertRecords")
@@ -231,7 +230,9 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
 
     # implement method chaining collection of pending operations
 
-    def extend(self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None):
+    def extend(
+        self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
+    ):
         if parse_env is not None:
             raise ValueError("Expected parse_env to be None")
         op = Extend(
@@ -281,7 +282,9 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
         self.ops.append(op)
         return self
 
-    def convert_records(self, record_map, *, blocks_out_temp_name='cdata_blocks_out_temp'):
+    def convert_records(
+        self, record_map, *, blocks_out_temp_name="cdata_blocks_out_temp"
+    ):
         op = ConvertRecords(columns=columns, reverse=reverse, limit=limit)
         self.ops.append(op)
         return self

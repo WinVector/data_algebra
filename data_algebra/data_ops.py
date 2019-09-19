@@ -1,4 +1,3 @@
-
 from typing import Set, Any, Dict, List
 import collections
 import re
@@ -30,9 +29,15 @@ except ImportError:
 
 
 op_list = [
-    'extend', 'project', 'natural_join', 'select_rows',
-    'drop_columns', 'select_columns', 'rename_columns',
-    'order_rows', 'convert_records'
+    "extend",
+    "project",
+    "natural_join",
+    "select_rows",
+    "drop_columns",
+    "select_columns",
+    "rename_columns",
+    "order_rows",
+    "convert_records",
 ]
 
 
@@ -50,7 +55,9 @@ class OperatorPlatform(data_algebra.pipe.PipeValue):
 
     # define builders for all non-initial node types on base class
 
-    def extend(self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None):
+    def extend(
+        self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
+    ):
         raise NotImplementedError("base class called")
 
     def project(self, ops, *, group_by=None, parse_env=None):
@@ -173,18 +180,18 @@ class ViewRepresentation(OperatorPlatform):
         self.get_tables()  # for table consistency check/raise
         if pretty:
             strict = True
-        python_str = self.to_python_implementation(indent=indent, strict=strict, print_sources=True)
+        python_str = self.to_python_implementation(
+            indent=indent, strict=strict, print_sources=True
+        )
         if pretty:
             if data_algebra.have_black:
                 if black_mode is None:
                     black_mode = black.FileMode()
                 python_str = black.format_str(python_str, mode=black_mode)
             python_str = re.sub(
-                '[)].(' + '|'.join(op_list) + ')[(]',
-                '\n).\\1(\n    ',
-                python_str
+                "[)].(" + "|".join(op_list) + ")[(]", "\n).\\1(\n    ", python_str
             )
-            python_str = re.sub('\n+[ \t]*\n+', '\n', python_str)
+            python_str = re.sub("\n+[ \t]*\n+", "\n", python_str)
         return python_str
 
     def __repr__(self):
@@ -383,7 +390,9 @@ class ViewRepresentation(OperatorPlatform):
 
     # nodes
 
-    def extend(self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None):
+    def extend(
+        self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
+    ):
         return ExtendNode(
             source=self,
             ops=ops,
@@ -419,7 +428,9 @@ class ViewRepresentation(OperatorPlatform):
         return OrderRowsNode(source=self, columns=columns, reverse=reverse, limit=limit)
 
     def convert_records(self, record_map, *, blocks_out_table=None):
-        return ConvertRecordsNode(source=self, record_map=record_map, blocks_out_table=blocks_out_table)
+        return ConvertRecordsNode(
+            source=self, record_map=record_map, blocks_out_table=blocks_out_table
+        )
 
 
 # Could also have general query as starting node, but don't see a lot of point to
@@ -575,8 +586,19 @@ def describe_table(d, table_name):
 
 
 class ExtendNode(ViewRepresentation):
-    def __init__(self, source, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None):
-        ops = data_algebra.expr_rep.parse_assignments_in_context(ops, source, parse_env=parse_env)
+    def __init__(
+        self,
+        source,
+        ops,
+        *,
+        partition_by=None,
+        order_by=None,
+        reverse=None,
+        parse_env=None
+    ):
+        ops = data_algebra.expr_rep.parse_assignments_in_context(
+            ops, source, parse_env=parse_env
+        )
         if len(ops) < 1:
             raise ValueError("no ops")
         self.ops = ops
@@ -656,12 +678,12 @@ class ExtendNode(ViewRepresentation):
         )
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
-        s = ''
+        s = ""
         if print_sources:
             s = (
-                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                    + " .\\\n"
-                    + " " * (indent + 3)
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
             )
         s = s + (
             "extend({"
@@ -691,7 +713,9 @@ class ExtendNode(ViewRepresentation):
 
 class ProjectNode(ViewRepresentation):
     def __init__(self, source, ops, *, group_by=None, parse_env=None):
-        ops = data_algebra.expr_rep.parse_assignments_in_context(ops, source, parse_env=parse_env)
+        ops = data_algebra.expr_rep.parse_assignments_in_context(
+            ops, source, parse_env=parse_env
+        )
         if len(ops) < 1:
             raise ValueError("no ops")
         self.ops = ops
@@ -743,7 +767,7 @@ class ProjectNode(ViewRepresentation):
         )
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
-        s = ''
+        s = ""
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
@@ -777,7 +801,9 @@ class SelectRowsNode(ViewRepresentation):
     decision_columns: Set[str]
 
     def __init__(self, source, expr, *, parse_env=None):
-        ops = data_algebra.expr_rep.parse_assignments_in_context({"expr": expr}, source, parse_env=parse_env)
+        ops = data_algebra.expr_rep.parse_assignments_in_context(
+            {"expr": expr}, source, parse_env=parse_env
+        )
         if len(ops) < 1:
             raise ValueError("no ops")
         self.expr = ops["expr"]
@@ -807,18 +833,14 @@ class SelectRowsNode(ViewRepresentation):
         )
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
-        s = ''
+        s = ""
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
                 + " .\\\n"
                 + " " * (indent + 3)
             )
-        s = s + (
-            "select_rows("
-            + self.expr.to_python().__repr__()
-            + ")"
-        )
+        s = s + ("select_rows(" + self.expr.to_python().__repr__() + ")")
         return s
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
@@ -863,18 +885,14 @@ class SelectColumnsNode(ViewRepresentation):
         )
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
-        s = ''
+        s = ""
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
                 + " .\\\n"
                 + " " * (indent + 3)
             )
-        s = s + (
-            "select_columns("
-            + self.column_selection.__repr__()
-            + ")"
-        )
+        s = s + ("select_columns(" + self.column_selection.__repr__() + ")")
         return s
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
@@ -921,18 +939,14 @@ class DropColumnsNode(ViewRepresentation):
         )
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
-        s = ''
+        s = ""
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
                 + " .\\\n"
                 + " " * (indent + 3)
             )
-        s = s + (
-            "drop_columns("
-            + self.column_deletions.__repr__()
-            + ")"
-        )
+        s = s + ("drop_columns(" + self.column_deletions.__repr__() + ")")
         return s
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
@@ -988,17 +1002,14 @@ class OrderRowsNode(ViewRepresentation):
         )
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
-        s = ''
+        s = ""
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
                 + " .\\\n"
                 + " " * (indent + 3)
             )
-        s = s + (
-            "order_rows("
-            + self.order_columns.__repr__()
-        )
+        s = s + ("order_rows(" + self.order_columns.__repr__())
         if len(self.reverse) > 0:
             s = s + ", reverse=" + self.reverse.__repr__()
         if self.limit is not None:
@@ -1029,10 +1040,16 @@ class RenameColumnsNode(ViewRepresentation):
         unknown = set(orig_cols) - set(source.column_names)
         if len(unknown) > 0:
             raise ValueError("Tried to rename unknown columns: " + str(unknown))
-        collisions = (set(source.column_names) - set(new_cols).intersection(orig_cols)).intersection(new_cols)
+        collisions = (
+            set(source.column_names) - set(new_cols).intersection(orig_cols)
+        ).intersection(new_cols)
         if len(collisions) > 0:
-            raise ValueError("Mapping " + str(self.column_remapping) +
-                             " collides with existing columns " + str(collisions))
+            raise ValueError(
+                "Mapping "
+                + str(self.column_remapping)
+                + " collides with existing columns "
+                + str(collisions)
+            )
         column_names = [
             (k if k not in self.reverse_mapping.keys() else self.reverse_mapping[k])
             for k in source.column_names
@@ -1060,18 +1077,14 @@ class RenameColumnsNode(ViewRepresentation):
         )
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
-        s = ''
+        s = ""
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
                 + " .\\\n"
                 + " " * (indent + 3)
             )
-        s = s + (
-            "rename_columns("
-            + self.column_remapping.__repr__()
-            + ")"
-        )
+        s = s + ("rename_columns(" + self.column_remapping.__repr__() + ")")
         return s
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
@@ -1128,31 +1141,26 @@ class NaturalJoinNode(ViewRepresentation):
         )
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
-        s = '_0.'
+        s = "_0."
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
                 + " .\\\n"
                 + " " * (indent + 3)
             )
-        s = s + (
-            "natural_join(b=\n"
-            + " " * (indent + 6)
-        )
+        s = s + ("natural_join(b=\n" + " " * (indent + 6))
         if print_sources:
             s = s + (
-                    self.sources[1].to_python_implementation(indent=indent + 6, strict=strict)
-                    + ",\n"
-                    + " " * (indent + 6)
+                self.sources[1].to_python_implementation(
+                    indent=indent + 6, strict=strict
+                )
+                + ",\n"
+                + " " * (indent + 6)
             )
         else:
             s = s + " _1 "
         s = s + (
-            "by="
-            + self.by.__repr__()
-            + ", jointype="
-            + self.jointype.__repr__()
-            + ")"
+            "by=" + self.by.__repr__() + ", jointype=" + self.jointype.__repr__() + ")"
         )
         return s
 
@@ -1173,8 +1181,10 @@ class ConvertRecordsNode(ViewRepresentation):
     def __init__(self, source, record_map, *, blocks_out_table=None):
         if blocks_out_table is None and record_map.blocks_out.control_table is not None:
             blocks_out_table = TableDescription(
-                'cdata_temp_record',
-                [c for c in record_map.blocks_out.record_keys] + [c for c in record_map.blocks_out.control_table])
+                "cdata_temp_record",
+                [c for c in record_map.blocks_out.record_keys]
+                + [c for c in record_map.blocks_out.control_table],
+            )
         self.record_map = record_map
         self.blocks_out_table = blocks_out_table
         unknown = set(self.record_map.columns_needed) - set(source.column_names)
@@ -1199,32 +1209,33 @@ class ConvertRecordsNode(ViewRepresentation):
         )
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
-        s = ''
+        s = ""
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
                 + " .\\\n"
                 + " " * (indent + 3)
             )
-        s = s + (
-            "convert_record("
-            + str(self.record_map) + ")"
-        )
+        s = s + ("convert_record(" + str(self.record_map) + ")")
         return s
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         res = self.sources[0].to_sql_implementation(
-            db_model=db_model,
-            using=using,
-            temp_id_source=temp_id_source)
+            db_model=db_model, using=using, temp_id_source=temp_id_source
+        )
         if self.record_map.blocks_in is not None:
-            res = db_model.blocks_to_row_recs_query(res,
-                                                    record_spec=self.record_map.blocks_in)
+            res = db_model.blocks_to_row_recs_query(
+                res, record_spec=self.record_map.blocks_in
+            )
         if self.record_map.blocks_out is not None:
-            res = db_model.row_recs_to_blocks_query(res,
-                                                    record_spec=self.record_map.blocks_out,
-                                                    record_view=self.blocks_out_table)
+            res = db_model.row_recs_to_blocks_query(
+                res,
+                record_spec=self.record_map.blocks_out,
+                record_view=self.blocks_out_table,
+            )
         return res
 
     def eval_implementation(self, *, data_map, eval_env, data_model):
-        return data_model.convert_records_step(op=self, data_map=data_map, eval_env=eval_env)
+        return data_model.convert_records_step(
+            op=self, data_map=data_map, eval_env=eval_env
+        )

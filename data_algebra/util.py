@@ -34,13 +34,14 @@ def is_bad(x):
 
 # for testing
 
+
 def pandas_to_example_str(obj):
     if not isinstance(obj, pandas.DataFrame):
         raise TypeError("Expect obj to be pandas.DataFrame")
-    pstr = 'pandas.DataFrame({'
+    pstr = "pandas.DataFrame({"
     for k in obj.columns:
-        cells = ['None' if pandas.isnull(v) else v.__repr__() for v in obj[k]]
-        pstr = pstr + "\n    " + k.__repr__() + ": [" + ', '.join(cells) + "],"
+        cells = ["None" if pandas.isnull(v) else v.__repr__() for v in obj[k]]
+        pstr = pstr + "\n    " + k.__repr__() + ": [" + ", ".join(cells) + "],"
     pstr = pstr + "\n    })"
     return pstr
 

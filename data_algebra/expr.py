@@ -1,4 +1,3 @@
-
 # adapters uses can use to avoid parsing path
 
 import types
@@ -16,10 +15,10 @@ def row_number():
 
 def r_parse_env():
     return {
-        'exp': lambda x: x.exp(),
-        'sum': lambda x: x.sum(),
-        '_row_number': _row_number,
-        'row_number': row_number,
+        "exp": lambda x: x.exp(),
+        "sum": lambda x: x.sum(),
+        "_row_number": _row_number,
+        "row_number": row_number,
     }
 
 

@@ -29,8 +29,9 @@ def table_is_keyed_by_columns(table, column_names):
 
 
 class RecordSpecification:
-    def __init__(self, control_table, *,
-                 record_keys=None, control_table_keys=None, strict=False):
+    def __init__(
+        self, control_table, *, record_keys=None, control_table_keys=None, strict=False
+    ):
         control_table = data_algebra.data_types.convert_to_pandas_dataframe(
             control_table, "control_table"
         )
@@ -50,14 +51,18 @@ class RecordSpecification:
         self.control_table_keys = [k for k in control_table_keys]
         unknown = set(self.control_table_keys) - set(control_table.columns)
         if len(unknown) > 0:
-            raise ValueError("control table keys that are not in the control table: " + str(unknown))
+            raise ValueError(
+                "control table keys that are not in the control table: " + str(unknown)
+            )
         confused = set(record_keys).intersection(control_table_keys)
         if len(confused) > 0:
             raise ValueError(
                 "columns common to record_keys and control_table_keys: " + str(confused)
             )
         if strict:
-            if not table_is_keyed_by_columns(self.control_table, self.control_table_keys):
+            if not table_is_keyed_by_columns(
+                self.control_table, self.control_table_keys
+            ):
                 raise ValueError("control table wasn't keyed by control table keys")
         self.block_columns = self.record_keys + [c for c in self.control_table.columns]
         cvs = []

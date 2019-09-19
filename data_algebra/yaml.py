@@ -1,4 +1,3 @@
-
 import re
 import collections
 
@@ -86,7 +85,7 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
                 table_name=get_char_scalar(obj, "table_name"),
                 column_names=obj["column_names"],
                 qualifiers=maybe_get_dict(obj, "qualifiers"),
-                )
+            )
             # canonicalize to one object per table
             k = tab.key
             if k in known_tables.keys():
@@ -101,19 +100,18 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
             return tab
         elif op == "Extend":
             ops = obj["ops"]
-            ops = {k: re.sub('=+', '==', o) for (k, o) in ops.items()}
+            ops = {k: re.sub("=+", "==", o) for (k, o) in ops.items()}
             return data_algebra.data_pipe.Extend(
                 ops=ops,
                 partition_by=maybe_get_list(obj, "partition_by"),
-                order_by=maybe_get_list(obj,"order_by"),
+                order_by=maybe_get_list(obj, "order_by"),
                 reverse=maybe_get_list(obj, "reverse"),
             )
         elif op == "Project":
             ops = obj["ops"]
-            ops = {k: re.sub('=+', '==', o) for (k, o) in ops.items()}
+            ops = {k: re.sub("=+", "==", o) for (k, o) in ops.items()}
             return data_algebra.data_pipe.Project(
-                ops=ops,
-                group_by=maybe_get_list(obj, "group_by"),
+                ops=ops, group_by=maybe_get_list(obj, "group_by")
             )
         elif op == "NaturalJoin":
             return data_algebra.data_pipe.NaturalJoin(
@@ -123,7 +121,7 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
             )
         elif op == "SelectRows":
             expr = get_char_scalar(obj, "expr")
-            expr = re.sub('=+', '==', expr)
+            expr = re.sub("=+", "==", expr)
             return data_algebra.data_pipe.SelectRows(expr=expr)
         elif op == "SelectColumns":
             return data_algebra.data_pipe.SelectColumns(columns=obj["columns"])
@@ -143,7 +141,9 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
             )
         elif op == "ConvertRecords":
             return data_algebra.data_pipe.ConvertRecords(
-                record_map=data_algebra.cdata_impl.record_map_from_simple_obj(obj['record_map'])
+                record_map=data_algebra.cdata_impl.record_map_from_simple_obj(
+                    obj["record_map"]
+                )
                 # TODO: add temp name to I/O
             )
         else:

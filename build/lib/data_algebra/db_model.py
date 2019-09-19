@@ -46,11 +46,7 @@ def _db_is_bad_expr(dbmodel, expression):
 
 def _db_neg_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
-    return (
-        "( -"
-        + subexpr
-        + " )"
-    )
+    return "( -" + subexpr + " )"
 
 
 db_expr_formatters = {
@@ -650,12 +646,16 @@ class DBModel:
                 + " AS "
                 + self.quote_identifier(key_col)
             )
+        seen = set()
         for result_col in control_value_cols:
+            if result_col in seen:
+                continue
+            seen.add(result_col)
             cstmt = " CASE\n"
             col = record_spec.control_table[result_col]
             isnull = col.isnull()
             for i in range(len(col)):
-                if not(isnull[i]):
+                if not (isnull[i]):
                     source_col = col[i]
                     col_sql = (
                         "  WHEN b."
@@ -706,11 +706,13 @@ class DBModel:
             col_stmts.append(
                 " " + self.quote_identifier(c) + " AS " + self.quote_identifier(c)
             )
+        seen = set()
         for i in range(record_spec.control_table.shape[0]):
             for vc in control_value_cols:
                 col = record_spec.control_table[vc]
                 isnull = col.isnull()
-                if not isnull[i]:
+                if col[i] not in seen and not isnull[i]:
+                    seen.add(col[i])
                     clauses = []
                     for cc in record_spec.control_table_keys:
                         clauses.append(

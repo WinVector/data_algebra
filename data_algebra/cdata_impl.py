@@ -34,9 +34,13 @@ class RecordMap:
                 raise ValueError("unknown outgoing content_keys" + str(unknown))
             if strict:
                 if set(blocks_in.record_keys) != set(blocks_out.record_keys):
-                    raise ValueError("record keys must match when using both blocks in and blocks out")
+                    raise ValueError(
+                        "record keys must match when using both blocks in and blocks out"
+                    )
                 if set(blocks_in.content_keys) != set(blocks_out.content_keys):
-                    raise ValueError("content keys must match when using both blocks in and blocks out")
+                    raise ValueError(
+                        "content keys must match when using both blocks in and blocks out"
+                    )
         self.blocks_in = blocks_in
         self.blocks_out = blocks_out
         if self.blocks_in is not None:
@@ -113,7 +117,9 @@ class RecordMap:
                 raise KeyError("missing required columns: " + str(missing_cols))
             if check_blocks_out_keying:
                 # table should be keyed by record_keys
-                if not data_algebra.cdata.table_is_keyed_by_columns(X, self.blocks_out.record_keys):
+                if not data_algebra.cdata.table_is_keyed_by_columns(
+                    X, self.blocks_out.record_keys
+                ):
                     raise ValueError("table is not keyed by blocks_out.record_keys")
             # convert to block records
             with sqlite3.connect(":memory:") as conn:
@@ -159,24 +165,30 @@ class RecordMap:
                     blocks_out=data_algebra.cdata.RecordSpecification(
                         control_table=rso,
                         record_keys=rk,
-                        control_table_keys=s2.blocks_out.control_table_keys))
+                        control_table_keys=s2.blocks_out.control_table_keys,
+                    )
+                )
         else:
             if out.shape[0] < 2:
                 return RecordMap(
                     blocks_in=data_algebra.cdata.RecordSpecification(
                         control_table=rsi,
                         record_keys=rk,
-                        control_table_keys=s1.blocks_in.control_table_keys))
+                        control_table_keys=s1.blocks_in.control_table_keys,
+                    )
+                )
             else:
                 return RecordMap(
                     blocks_in=data_algebra.cdata.RecordSpecification(
                         control_table=rsi,
                         record_keys=rk,
-                        control_table_keys=s1.blocks_in.control_table_keys),
+                        control_table_keys=s1.blocks_in.control_table_keys,
+                    ),
                     blocks_out=data_algebra.cdata.RecordSpecification(
                         control_table=rso,
                         record_keys=rk,
-                        control_table_keys=s2.blocks_out.control_table_keys)
+                        control_table_keys=s2.blocks_out.control_table_keys,
+                    ),
                 )
 
     def __rrshift__(self, other):  # override other >> self
