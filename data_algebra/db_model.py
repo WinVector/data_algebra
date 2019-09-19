@@ -650,7 +650,11 @@ class DBModel:
                 + " AS "
                 + self.quote_identifier(key_col)
             )
+        seen = set()
         for result_col in control_value_cols:
+            if result_col in seen:
+                continue
+            seen.add(result_col)
             cstmt = " CASE\n"
             col = record_spec.control_table[result_col]
             isnull = col.isnull()
@@ -706,11 +710,13 @@ class DBModel:
             col_stmts.append(
                 " " + self.quote_identifier(c) + " AS " + self.quote_identifier(c)
             )
+        seen = set()
         for i in range(record_spec.control_table.shape[0]):
             for vc in control_value_cols:
                 col = record_spec.control_table[vc]
                 isnull = col.isnull()
-                if not isnull[i]:
+                if col[i] not in seen and not isnull[i]:
+                    seen.add(col[i])
                     clauses = []
                     for cc in record_spec.control_table_keys:
                         clauses.append(
