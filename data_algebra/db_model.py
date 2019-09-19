@@ -652,17 +652,21 @@ class DBModel:
             )
         for result_col in control_value_cols:
             cstmt = " CASE\n"
-            for source_col in record_spec.control_table[result_col]:
-                col_sql = (
-                    "  WHEN b."
-                    + self.quote_identifier(result_col)
-                    + " = "
-                    + self.quote_string(source_col)
-                    + " THEN a."
-                    + self.quote_identifier(source_col)
-                    + "\n"
-                )
-                cstmt = cstmt + col_sql
+            col = record_spec.control_table[result_col]
+            isnull = col.isnull()
+            for i in range(len(col)):
+                if not(isnull[i]):
+                    source_col = col[i]
+                    col_sql = (
+                        "  WHEN b."
+                        + self.quote_identifier(result_col)
+                        + " = "
+                        + self.quote_string(source_col)
+                        + " THEN a."
+                        + self.quote_identifier(source_col)
+                        + "\n"
+                    )
+                    cstmt = cstmt + col_sql
             cstmt = cstmt + "  ELSE NULL END AS " + self.quote_identifier(result_col)
             col_stmts.append(cstmt)
         sql = (
