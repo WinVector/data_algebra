@@ -209,10 +209,9 @@ class ConvertRecords(data_algebra.pipe.PipeStep):
 class Locum(data_algebra.data_ops.OperatorPlatform):
     """Class to represent future opertions."""
 
-    def __init__(self, name=None):
+    def __init__(self):
         data_algebra.data_ops.OperatorPlatform.__init__(self)
         self.ops = []
-        self.name = name
 
     # noinspection PyPep8Naming
     def realize(self, X):
@@ -229,6 +228,28 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
 
     def __rrshift__(self, other):  # override other >> self
         return self.transform(other)
+
+    def __add__(self, other):
+        if not isinstance(other, Locum):
+            raise TypeError("Expected other to be of type data_algebra.data_pipe.Locum")
+        res = Locum()
+        for o in self.ops:
+            res.ops.append(o)
+        for o in other.ops:
+            res.ops.append(o)
+        return res
+
+    # print
+
+    def __repr__(self):
+        return '[\n    ' + \
+               '\n    '.join([str(o) + ',' for o in self.ops]) + \
+               '\n]'
+
+    def __str__(self):
+        return '[\n    ' + \
+                '\n    '.join([str(o) + ',' for o in self.ops]) + \
+                '\n]'
 
     # implement method chaining collection of pending operations
 

@@ -59,7 +59,7 @@ def test_apply():
 
     assert data_algebra.util.equivalent_frames(expect_1, res_2_2)
 
-    ops3 = Locum("dtab") >> Extend({"z": "x / y"}) >> SelectRows("z >= 0")
+    ops3 = Locum() >> Extend({"z": "x / y"}) >> SelectRows("z >= 0")
 
     res_3_1 = ops3.transform(d)
 
@@ -92,3 +92,11 @@ def test_apply():
     )
 
     assert data_algebra.util.equivalent_frames(expect_2, res_7)
+
+    s1 = Locum().extend({"z": "x / y"}).select_rows("z >= 0")
+    s2 = Locum().extend({"q": "y - z"})
+
+    res_8 = d >> (s1 + s2)
+
+    assert data_algebra.util.equivalent_frames(expect_2, res_8)
+
