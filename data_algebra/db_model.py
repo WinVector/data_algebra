@@ -686,11 +686,10 @@ class DBModel:
         )
         return sql
 
+    # noinspection PyUnusedLocal
     def blocks_to_row_recs_query(
         self, source_sql, record_spec, *, using=None, temp_id_source=None
     ):
-        if temp_id_source is None:
-            temp_id_source = [0]
         if not isinstance(record_spec, data_algebra.cdata.RecordSpecification):
             raise TypeError(
                 "record_spec should be a data_algebra.cdata.RecordSpecification"
@@ -738,7 +737,7 @@ class DBModel:
             + "FROM (\n  "
             + source_sql
             + "\n"
-            + " )\n"
+            + " ) a\n"
             + " GROUP BY "
             + ", ".join(control_cols)
             + "\n"

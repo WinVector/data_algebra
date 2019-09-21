@@ -192,8 +192,9 @@ class NaturalJoin(data_algebra.pipe.PipeStep):
 
 
 class ConvertRecords(data_algebra.pipe.PipeStep):
-    def __init__(self, record_map):
+    def __init__(self, record_map, *, blocks_out_table=None):
         self.record_map = record_map
+        self.blocks_out_table = blocks_out_table
         data_algebra.pipe.PipeStep.__init__(self, name="ConvertRecords")
 
     def apply(self, other, **kwargs):
@@ -201,7 +202,8 @@ class ConvertRecords(data_algebra.pipe.PipeStep):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
-        return other.convert_records(self.record_map)
+        return other.convert_records(record_map=self.record_map,
+                                     blocks_out_table=self.blocks_out_table)
 
 
 class Locum(data_algebra.data_ops.OperatorPlatform):
@@ -283,9 +285,9 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
         return self
 
     def convert_records(
-        self, record_map, *, blocks_out_temp_name="cdata_blocks_out_temp"
+        self, record_map, *, blocks_out_table=None
     ):
-        op = ConvertRecords(columns=columns, reverse=reverse, limit=limit)
+        op = ConvertRecords(record_map=record_map, blocks_out_table=blocks_out_table)
         self.ops.append(op)
         return self
 

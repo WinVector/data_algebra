@@ -1,6 +1,5 @@
 # adapters uses can use to avoid parsing path
 
-import types
 
 import data_algebra.expr_rep
 

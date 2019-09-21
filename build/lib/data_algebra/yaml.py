@@ -45,15 +45,15 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
     if known_tables is None:
         known_tables = {}
 
-    def maybe_get_dict(map, key):
+    def maybe_get_dict(omap, key):
         try:
-            return map[key]
+            return omap[key]
         except KeyError:
             return {}
 
-    def maybe_get_list(map, key):
+    def maybe_get_list(omap, key):
         try:
-            v = map[key]
+            v = omap[key]
             if v is None:
                 return []
             if not isinstance(v, list):
@@ -62,14 +62,14 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
         except KeyError:
             return []
 
-    def maybe_get_none(map, key):
+    def maybe_get_none(omap, key):
         try:
-            return map[key]
+            return omap[key]
         except KeyError:
             return None
 
-    def get_char_scalar(map, key):
-        v = map[key]
+    def get_char_scalar(omap, key):
+        v = omap[key]
         if isinstance(v, list):
             v = v[0]
         if isinstance(v, dict):
@@ -140,12 +140,21 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
                 limit=maybe_get_none(obj, "limit"),
             )
         elif op == "ConvertRecords":
+            blocks_out_table = None
+            try:
+                blocks_out_table = obj['blocks_out_table']
+                if blocks_out_table is not None:
+                    blocks_out_table = to_pipeline(blocks_out_table,
+                                                   known_tables=known_tables,
+                                                   parse_env=parse_env)
+            except KeyError:
+                pass
             return data_algebra.data_pipe.ConvertRecords(
-                record_map=data_algebra.cdata_impl.record_map_from_simple_obj(
-                    obj["record_map"]
-                )
-                # TODO: add temp name to I/O
-            )
+                    record_map=data_algebra.cdata_impl.record_map_from_simple_obj(
+                        obj["record_map"]
+                    ),
+                    blocks_out_table=blocks_out_table
+                    )
         else:
             raise TypeError("Unexpected op name: " + op)
     if isinstance(obj, list):
