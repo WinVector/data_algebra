@@ -13139,6 +13139,8 @@ div#notebook {
 <li><a href="https://github.com/asardaes/table.express"><code>table.express</code></a></li>
 <li><a href="https://pandas.pydata.org"><code>Pandas</code></a></li>
 <li><a href="https://www.sqlalchemy.org"><code>SQLAlchemy</code></a></li>
+<li><a href="https://github.com/WinVector/rquery/"><code>rquery</code></a></li>
+<li><a href="https://github.com/WinVector/cdata/"><code>cdata</code></a></li>
 </ul>
 <p>The <code>data_algebra</code> principles include:</p>
 <ul>
@@ -13146,7 +13148,12 @@ div#notebook {
 <li>Treating data transform pipelines or directed acyclic graphs (DAGs) as themselves being sharable data.</li>
 <li>Being able to use the same transform specification many places (in memory, on databases, in <code>R</code>, in <code>Python</code>).</li>
 </ul>
-<h2 id="Example">Example<a class="anchor-link" href="#Example">&#182;</a></h2><p>Let's start with an example in <code>Python</code>.</p>
+<p>The <code>data_algebra</code> supplies two primary services:</p>
+<ul>
+<li>Building composite data processing pipelines (which we demonstrate in this note).</li>
+<li>Building record transforms (which we demonstrate <a href="https://github.com/WinVector/data_algebra/blob/master/Examples/cdata/cdata_general_example.ipynb">here</a>).</li>
+</ul>
+<h2 id="Example">Example<a class="anchor-link" href="#Example">&#182;</a></h2><p>Let's start with a pipeline example in <code>Python</code> (for a record transform example, please see <a href="https://github.com/WinVector/data_algebra/blob/master/Examples/cdata/cdata_general_example.ipynb">here</a>).</p>
 <p>For our example we will assume we have a data set of how many points different subjects score in a psychological survey.  The goal is transform the data so that we see what fraction of the subjects answers are in each category (subject to an exponential transform, as often used in <a href="https://en.wikipedia.org/wiki/Logistic_regression">logistic regression</a>).  We then treat the per-subject renormalized data as a probabilty or diagnosis.</p>
 <p>The exact meaning of such a scoring method are not the topic of this note.  It is a notional example to show a non-trivial data transformation need.  In particular: having to normalize per-subject (divide some set of scores per-subject by a per-subject total) is a classic pain point in data-processing.  In classic <code>SQL</code> this can only be done by joining against a summary table, or in more modern <code>SQL</code> with a "<a href="https://en.wikipedia.org/wiki/SQL_window_function">window function</a>." We want to show by working in small enough steps this can be done simply.</p>
 <h3 id="Set-up">Set up<a class="anchor-link" href="#Set-up">&#182;</a></h3><p>Let's start our <code>Python</code> example.  First we import the packages we are going to use, and set a few options.</p>
@@ -13586,33 +13593,33 @@ FROM
              &#34;surveycategory&#34;,
              &#34;probability&#34;
       FROM
-        (SELECT &#34;probability&#34;,
+        (SELECT &#34;subjectid&#34;,
                 &#34;surveycategory&#34;,
-                &#34;subjectid&#34;,
+                &#34;probability&#34;,
                 &#34;sort_key&#34;,
                 ROW_NUMBER() OVER (PARTITION BY &#34;subjectid&#34;
                                    ORDER BY &#34;sort_key&#34;) AS &#34;row_number&#34;
          FROM
-           (SELECT &#34;probability&#34;,
+           (SELECT &#34;subjectid&#34;,
                    &#34;surveycategory&#34;,
-                   &#34;subjectid&#34;,
+                   &#34;probability&#34;,
                    (-&#34;probability&#34;) AS &#34;sort_key&#34;
             FROM
               (SELECT &#34;subjectid&#34;,
                       &#34;surveycategory&#34;,
                       &#34;probability&#34; / &#34;total&#34; AS &#34;probability&#34;
                FROM
-                 (SELECT &#34;probability&#34;,
+                 (SELECT &#34;subjectid&#34;,
                          &#34;surveycategory&#34;,
-                         &#34;subjectid&#34;,
+                         &#34;probability&#34;,
                          SUM(&#34;probability&#34;) OVER (PARTITION BY &#34;subjectid&#34;) AS &#34;total&#34;
                   FROM
                     (SELECT &#34;subjectid&#34;,
                             &#34;surveycategory&#34;,
                             EXP((&#34;assessmenttotal&#34; * 0.237)) AS &#34;probability&#34;
                      FROM
-                       (SELECT &#34;surveycategory&#34;,
-                               &#34;subjectid&#34;,
+                       (SELECT &#34;subjectid&#34;,
+                               &#34;surveycategory&#34;,
                                &#34;assessmenttotal&#34;
                         FROM &#34;d&#34;) &#34;sq_0&#34;) &#34;sq_1&#34;) &#34;sq_2&#34;) &#34;sq_3&#34;) &#34;sq_4&#34;) &#34;sq_5&#34;
       WHERE &#34;row_number&#34; = 1 ) &#34;sq_6&#34;) &#34;sq_7&#34;
@@ -14545,15 +14552,15 @@ FROM (
          &#34;assessmentTotal&#34;
         FROM
          &#34;d&#34;
-        ) tsql_15290774307777602458_0000000000
-       ) tsql_15290774307777602458_0000000001
-      ) tsql_15290774307777602458_0000000002
-     ) tsql_15290774307777602458_0000000003
-    ) tsql_15290774307777602458_0000000004
-  ) tsql_15290774307777602458_0000000005
+        ) tsql_13462271417183976603_0000000000
+       ) tsql_13462271417183976603_0000000001
+      ) tsql_13462271417183976603_0000000002
+     ) tsql_13462271417183976603_0000000003
+    ) tsql_13462271417183976603_0000000004
+  ) tsql_13462271417183976603_0000000005
   WHERE &#34;row_number&#34; = 1
- ) tsql_15290774307777602458_0000000006
-) tsql_15290774307777602458_0000000007
+ ) tsql_13462271417183976603_0000000006
+) tsql_13462271417183976603_0000000007
 </pre>
 </div>
 </div>
@@ -14586,8 +14593,8 @@ FROM (
 <div class="prompt input_prompt">In&nbsp;[21]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># report all tables used by the query, by name</span>
-<span class="n">ops</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># report all source table columns used by the query</span>
+<span class="n">ops</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>
 </pre></div>
 
     </div>
@@ -14606,40 +14613,6 @@ FROM (
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>{&#39;d&#39;: TableDescription(table_name=&#39;d&#39;, column_names=[&#39;subjectID&#39;, &#39;surveyCategory&#39;, &#39;assessmentTotal&#39;, &#39;irrelevantCol1&#39;, &#39;irrelevantCol2&#39;])}</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[22]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># report all source table columns used by the query</span>
-<span class="n">ops</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt output_prompt">Out[22]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
 <pre>{&#39;d&#39;: {&#39;assessmentTotal&#39;, &#39;subjectID&#39;, &#39;surveyCategory&#39;}}</pre>
 </div>
 
@@ -14651,7 +14624,7 @@ FROM (
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># what columns does this operation produce?</span>
@@ -14668,7 +14641,7 @@ FROM (
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[23]:</div>
+    <div class="prompt output_prompt">Out[22]:</div>
 
 
 
@@ -14702,7 +14675,7 @@ FROM (
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># land the pipeline as a file</span>
@@ -14719,7 +14692,7 @@ FROM (
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># read back</span>
@@ -14780,7 +14753,7 @@ FROM (
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># confirm we have a data_algebra.data_ops.ViewRepresentation</span>
@@ -14798,7 +14771,7 @@ FROM (
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[26]:</div>
+    <div class="prompt output_prompt">Out[25]:</div>
 
 
 
@@ -14815,7 +14788,7 @@ FROM (
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[27]:</div>
+<div class="prompt input_prompt">In&nbsp;[26]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># be neat</span>
@@ -14826,6 +14799,14 @@ FROM (
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Note: as with <code>SQL</code> the <code>data_algebra</code> assumes the processing pipeline is a <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph"><code>DAG</code></a> with only table-nodes used more than once.</p>
+
+</div>
+</div>
 </div>
     </div>
   </div>

@@ -28,16 +28,23 @@ Related work includes:
   * [`table.express`](https://github.com/asardaes/table.express)
   * [`Pandas`](https://pandas.pydata.org)
   * [`SQLAlchemy`](https://www.sqlalchemy.org)
+  * [`rquery`](https://github.com/WinVector/rquery/)
+  * [`cdata`](https://github.com/WinVector/cdata/)
   
 The `data_algebra` principles include:
 
   * Writing data transforms as a pipeline or method-chain of many simple transform steps.
   * Treating data transform pipelines or directed acyclic graphs (DAGs) as themselves being sharable data.
   * Being able to use the same transform specification many places (in memory, on databases, in `R`, in `Python`).
-  
+
+The `data_algebra` supplies two primary services:
+
+  * Building composite data processing pipelines (which we demonstrate in this note).
+  * Building record transforms (which we demonstrate [here](https://github.com/WinVector/data_algebra/blob/master/Examples/cdata/cdata_general_example.ipynb)).
+
 ## Example
 
-Let's start with an example in `Python`.
+Let's start with a pipeline example in `Python` (for a record transform example, please see [here](https://github.com/WinVector/data_algebra/blob/master/Examples/cdata/cdata_general_example.ipynb)).
 
 For our example we will assume we have a data set of how many points different subjects score in a psychological survey.  The goal is transform the data so that we see what fraction of the subjects answers are in each category (subject to an exponential transform, as often used in [logistic regression](https://en.wikipedia.org/wiki/Logistic_regression)).  We then treat the per-subject renormalized data as a probabilty or diagnosis.
 
@@ -88,19 +95,7 @@ d_local
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -186,19 +181,7 @@ db_model.read_table(conn, 'd')
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -354,33 +337,33 @@ print(sql)
                  "surveycategory",
                  "probability"
           FROM
-            (SELECT "probability",
+            (SELECT "subjectid",
                     "surveycategory",
-                    "subjectid",
+                    "probability",
                     "sort_key",
                     ROW_NUMBER() OVER (PARTITION BY "subjectid"
                                        ORDER BY "sort_key") AS "row_number"
              FROM
-               (SELECT "probability",
+               (SELECT "subjectid",
                        "surveycategory",
-                       "subjectid",
+                       "probability",
                        (-"probability") AS "sort_key"
                 FROM
                   (SELECT "subjectid",
                           "surveycategory",
                           "probability" / "total" AS "probability"
                    FROM
-                     (SELECT "probability",
+                     (SELECT "subjectid",
                              "surveycategory",
-                             "subjectid",
+                             "probability",
                              SUM("probability") OVER (PARTITION BY "subjectid") AS "total"
                       FROM
                         (SELECT "subjectid",
                                 "surveycategory",
                                 EXP(("assessmenttotal" * 0.237)) AS "probability"
                          FROM
-                           (SELECT "surveycategory",
-                                   "subjectid",
+                           (SELECT "subjectid",
+                                   "surveycategory",
                                    "assessmenttotal"
                             FROM "d") "sq_0") "sq_1") "sq_2") "sq_3") "sq_4") "sq_5"
           WHERE "row_number" = 1 ) "sq_6") "sq_7"
@@ -399,19 +382,7 @@ db_model.read_query(conn, sql)
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -457,19 +428,7 @@ ops.eval_pandas({'d': d_local})
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -510,19 +469,7 @@ ops.transform(d_local)
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -573,19 +520,7 @@ res_dask
 
 <div><strong>Dask DataFrame Structure:</strong></div>
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -636,19 +571,7 @@ res_dask.compute()
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -872,15 +795,15 @@ cat(sql)
              "assessmentTotal"
             FROM
              "d"
-            ) tsql_15290774307777602458_0000000000
-           ) tsql_15290774307777602458_0000000001
-          ) tsql_15290774307777602458_0000000002
-         ) tsql_15290774307777602458_0000000003
-        ) tsql_15290774307777602458_0000000004
-      ) tsql_15290774307777602458_0000000005
+            ) tsql_13462271417183976603_0000000000
+           ) tsql_13462271417183976603_0000000001
+          ) tsql_13462271417183976603_0000000002
+         ) tsql_13462271417183976603_0000000003
+        ) tsql_13462271417183976603_0000000004
+      ) tsql_13462271417183976603_0000000005
       WHERE "row_number" = 1
-     ) tsql_15290774307777602458_0000000006
-    ) tsql_15290774307777602458_0000000007
+     ) tsql_13462271417183976603_0000000006
+    ) tsql_13462271417183976603_0000000007
 
 
 The `R` implementation is mature, and appropriate to use in production.  The [`rquery`](https://github.com/WinVector/rquery) grammar is designed to have minimal state and minimal annotations (no grouping or ordering annotations!).  This makes the grammar, in my opinion, a good design choice. `rquery` has very good performance, often much faster than `dplyr` or base-`R` due to its query generation ideas and use of [`data.table`](https://CRAN.R-project.org/package=data.table) via [`rqdatatable`](https://CRAN.R-project.org/package=rqdatatable).  `rquery` is a mature pure `R` package; [here](https://github.com/WinVector/rquery/blob/master/README.md) is the same example being worked directly in `R`, with no translation from `Python`. 
@@ -894,19 +817,6 @@ Multi-language data science is an important trend, so a cross-language query sys
 In addition to the features shown above, a `data_algebra` operator pipeline carries around usable knowledge of the data transform.
 
 For example:
-
-
-```python
-# report all tables used by the query, by name
-ops.get_tables()
-```
-
-
-
-
-    {'d': TableDescription(table_name='d', column_names=['subjectID', 'surveyCategory', 'assessmentTotal', 'irrelevantCol1', 'irrelevantCol2'])}
-
-
 
 
 ```python
@@ -1010,3 +920,5 @@ isinstance(ops_back, data_algebra.data_ops.ViewRepresentation)
 # be neat
 conn.close()
 ```
+
+Note: as with `SQL` the `data_algebra` assumes the processing pipeline is a [`DAG`](https://en.wikipedia.org/wiki/Directed_acyclic_graph) with only table-nodes used more than once.

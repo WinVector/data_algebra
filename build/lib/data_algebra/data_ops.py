@@ -130,8 +130,8 @@ class ViewRepresentation(OperatorPlatform):
     # characterization
 
     def get_tables(self, tables=None):
-        """get a dictionary of all tables used in an operator DAG,
-        raise an exception if the values are not consistent"""
+        """Get a dictionary of all tables used in an operator DAG,
+        raise an exception if the values are not consistent."""
         if tables is None:
             tables = {}
         for s in self.sources:
