@@ -45,8 +45,6 @@ def test_cdata_example():
 
     ops = td.convert_records(record_map=RecordMap(blocks_out=record_spec))
 
-    res = iris >> ops
-
     yaml_obj = ops.collect_representation()
     back = data_algebra.yaml.to_pipeline(yaml_obj)
 

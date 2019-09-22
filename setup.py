@@ -5,10 +5,11 @@ DESCRIPTION="data_algebra is a data manipulation language that can both generate
 
 LONG_DESCRIPTION = """
 [data_algebra](https://github.com/WinVector/data_algebra) is a piped data wrangling system
-based on Codd's relational algebra and experience working with dplyr at scale.  The primary 
-purpose of the package is to support an easy to compose and maintain grammar of data processing
-steps that in turn can be used to generate database specific SQL.  The package also implements
-the same transforms for Pandas DataFrames. 
+based on Codd's relational algebra and experience working with dplyr at scale, and a general 
+data record transform engine.  The primary purpose of the package is to support an easy to 
+compose and maintain grammar of data processing steps that in turn can be used to generate
+database specific SQL. The package also implements the same transforms for Pandas DataFrames 
+and Dask.
 
 This package is still under initial development, so some parts are not yet implemented or tested, and APIs
 are subject to change.

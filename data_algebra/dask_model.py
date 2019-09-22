@@ -42,6 +42,8 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
         self.assert_is_appropriate_data_instance(df, "data_map[" + op.table_name + "]")
         # check all columns we expect are present
         columns_using = op.column_names
+        if op.columns_currently_used is not None and len(op.columns_currently_used) > 0:
+            columns_using = [c for c in op.columns_currently_used]
         missing = set(columns_using) - set([c for c in df.columns])
         if len(missing) > 0:
             raise ValueError("missing required columns: " + str(missing))

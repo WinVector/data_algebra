@@ -93,6 +93,7 @@ class ViewRepresentation(OperatorPlatform):
     column_set: Set[str]
     column_map: data_algebra.env.SimpleNamespaceDict
     sources: List[Any]  # actually ViewRepresentation
+    columns_currently_used: Set[str]  # transient field, operations can update this
 
     def __init__(self, column_names, *, sources=None):
         self.column_names = [c for c in column_names]
@@ -115,6 +116,7 @@ class ViewRepresentation(OperatorPlatform):
             if not isinstance(si, ViewRepresentation):
                 raise ValueError("all sources must be of class ViewRepresentation")
         self.sources = [si for si in sources]
+        self.columns_currently_used = set()
         OperatorPlatform.__init__(self)
 
     # adaptors
@@ -139,22 +141,36 @@ class ViewRepresentation(OperatorPlatform):
         return tables
 
     def columns_used_from_sources(self, using=None):
-        """Give column names used from source nodes when this node is exececuted
+        """Get column names used from direct source nodes when this node is exececuted
         with the using columns (None means all)."""
         raise NotImplementedError("base method called")
 
-    def columns_used_implementation(self, *, columns_used, using=None):
-        cu_list = self.columns_used_from_sources(using)
+    def _clear_columns_currently_used(self):
+        self.columns_currently_used = set()
+        for si in self.sources:
+            si._clear_columns_currently_used()
+
+    def _columns_used_implementation(self, *, using=None):
+        if using is None:
+            self.columns_currently_used.update(self.column_names)
+        else:
+            unknown = set(using) - set(self.column_names)
+            if len(unknown) > 0:
+                raise ValueError("asked for unknown columns: " + str(unknown))
+            self.columns_currently_used.update(using)
+        cu_list = self.columns_used_from_sources(self.columns_currently_used.copy())
         for i in range(len(self.sources)):
-            self.sources[i].columns_used_implementation(
-                columns_used=columns_used, using=cu_list[i]
+            self.sources[i]._columns_used_implementation(
+                using=cu_list[i]
             )
 
-    def columns_used(self):
-        """Determine which columns are used from source tables."""
+    def columns_used(self, *, using=None):
+        """Determine which columns are used from source tables.
+        Sets nodes' columns_currently_used values as a side-effect."""
+        self._clear_columns_currently_used()
+        self._columns_used_implementation(using=using)
         tables = self.get_tables()
-        columns_used = {ki: set() for ki in tables.keys()}
-        self.columns_used_implementation(columns_used=columns_used, using=None)
+        columns_used = {k: v.columns_currently_used.copy() for (k, v) in tables.items()}
         return columns_used
 
     # collect as simple structures for YAML I/O and other generic tasks
@@ -166,7 +182,7 @@ class ViewRepresentation(OperatorPlatform):
         """Collect a representation of the operator DAG as simple serializable objects.
                    These objects can be saved/loaded in YAML format and also can rebuild the
                    pipeline via data_algebra.yaml.to_pipeline()."""
-        self.get_tables()  # for table consistency check/raise
+        self.columns_used()  # for table consistency check/raise
         return self.collect_representation_implementation(
             pipeline=pipeline, dialect=dialect
         )
@@ -177,7 +193,7 @@ class ViewRepresentation(OperatorPlatform):
         return "ViewRepresentation(" + self.column_names.__repr__() + ")"
 
     def to_python(self, *, indent=0, strict=True, pretty=False, black_mode=None):
-        self.get_tables()  # for table consistency check/raise
+        self.columns_used()  # for table consistency check/raise
         if pretty:
             strict = True
         python_str = self.to_python_implementation(
@@ -212,7 +228,7 @@ class ViewRepresentation(OperatorPlatform):
             raise TypeError(
                 "Expected db_model to be derived from data_algebra.db_model.DBModel"
             )
-        self.get_tables()  # for table consistency check/raise
+        self.columns_used()  # for table consistency check/raise
         temp_id_source = [0]
         sql_str = self.to_sql_implementation(
             db_model=db_model, using=None, temp_id_source=temp_id_source
@@ -249,6 +265,7 @@ class ViewRepresentation(OperatorPlatform):
             raise TypeError(
                 "Expected data_model to derive from data_algebra.pandas_model.PandasModel"
             )
+        self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
         for k in tables.keys():
             if k not in data_map.keys():
@@ -284,6 +301,7 @@ class ViewRepresentation(OperatorPlatform):
             raise TypeError(
                 "Expected data_model to derive from data_algebra.dask_model.DaskModel"
             )
+        self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
         for k in tables.keys():
             if k not in data_map.keys():
@@ -319,6 +337,7 @@ class ViewRepresentation(OperatorPlatform):
             raise TypeError(
                 "Expected data_model to derive from data_algebra.datatable_model.DataTableModel"
             )
+        self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
         for k in tables.keys():
             if k not in data_map.keys():
@@ -364,6 +383,7 @@ class ViewRepresentation(OperatorPlatform):
                 raise TypeError(
                     "Expected data_model to be derived from data_algebra.data_model.DataModel"
                 )
+        self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
         if len(tables) != 1:
             raise ValueError(
@@ -524,6 +544,8 @@ class TableDescription(ViewRepresentation):
                 raise ValueError(
                     "Two tables with key " + self.key + " have different column sets."
                 )
+            if other is not self:
+                raise ValueError("Two different table definitions for table: " + self.key)
         else:
             tables[self.key] = self
         return tables
@@ -534,19 +556,10 @@ class TableDescription(ViewRepresentation):
     def columns_used_from_sources(self, using=None):
         return []  # no inputs to table description
 
-    def columns_used_implementation(self, *, columns_used, using=None):
-        cset = columns_used[self.key]
-        if using is None:
-            using = self.column_set
-        unexpected = using - self.column_set
-        if len(unexpected) > 0:
-            raise KeyError("asked for undefined columns: " + str(unexpected))
-        cset.update(using)
-
     def to_sql(self, db_model, *, pretty=False, encoding=None, sqlparse_options=None):
         if sqlparse_options is None:
             sqlparse_options = {"reindent": True, "keyword_case": "upper"}
-        self.get_tables()  # for table consistency check/raise
+        self.columns_used()  # for table consistency check/raise
         temp_id_source = [0]
         sql_str = self.to_sql_implementation(
             db_model=db_model, using=None, temp_id_source=temp_id_source, force_sql=True
@@ -1101,6 +1114,12 @@ class NaturalJoinNode(ViewRepresentation):
     jointype: str
 
     def __init__(self, a, b, *, by=None, jointype="INNER"):
+        a_tables = a.get_tables()
+        b_tables = b.get_tables()
+        common_keys = set(a_tables.keys()).intersection(b_tables.keys())
+        for k in common_keys:
+            if a_tables[k] is not b_tables[k]:
+                raise ValueError("Different definition of table object on a/b for: " + k)
         sources = [a, b]
         column_names = sources[0].column_names.copy()
         for ci in sources[1].column_names:
@@ -1179,25 +1198,44 @@ class ConvertRecordsNode(ViewRepresentation):
     blocks_out_table: TableDescription
 
     def __init__(self, source, record_map, *, blocks_out_table=None):
+        sources = [source]
         if blocks_out_table is None and record_map.blocks_out.control_table is not None:
             blocks_out_table = TableDescription(
                 "cdata_temp_record",
                 [c for c in record_map.blocks_out.record_keys]
-                + [c for c in record_map.blocks_out.control_table],
+                + [c for c in record_map.blocks_out.control_table.columns],
             )
-        if not isinstance(blocks_out_table, TableDescription):
-            raise TypeError("expected blocks_out_table to be a data_algebra.data_ops.TableDescription")
+        if blocks_out_table is not None:
+            sources = sources + [blocks_out_table]
+            # check blocks_out_table is a direct table
+            if not isinstance(blocks_out_table, TableDescription):
+                raise TypeError("expected blocks_out_table to be a data_algebra.data_ops.TableDescription")
+            # check it is the exact same definition object if already present
+            a_tables = source.get_tables()
+            if blocks_out_table.key in a_tables.keys():
+                a_table = a_tables[blocks_out_table.key]
+                if not blocks_out_table is a_table:
+                    raise ValueError("different definiton object for: " + blocks_out_table.key)
+            # check it has at least the columns we expect
+            expect = [c for c in record_map.blocks_out.record_keys] + \
+                        [c for c in record_map.blocks_out.control_table.columns]
+            unknown = set(expect) - set(blocks_out_table.column_names)
+            if len(unknown) > 0:
+                raise ValueError("blocks_out_table missing columns: " + str(unknown))
         self.record_map = record_map
         self.blocks_out_table = blocks_out_table
         unknown = set(self.record_map.columns_needed) - set(source.column_names)
         if len(unknown) > 0:
             raise ValueError("missing required columns: " + str(unknown))
         ViewRepresentation.__init__(
-            self, column_names=record_map.columns_produced, sources=[source]
+            self, column_names=record_map.columns_produced, sources=sources
         )
 
     def columns_used_from_sources(self, using=None):
-        return [self.record_map.columns_needed]
+        return [self.record_map.columns_needed,
+                [c for c in self.record_map.blocks_out.record_keys] + \
+                [c for c in self.record_map.blocks_out.control_table.columns]
+        ]
 
     def collect_representation_implementation(self, *, pipeline=None, dialect="Python"):
         if pipeline is None:
