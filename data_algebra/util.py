@@ -107,8 +107,11 @@ def equivalent_frames(
             if not all([ca_null[i] == cb_null[i] for i in range(a.shape[0])]):
                 return False
         if can_convert_v_to_numeric(ca):
+            ca = numpy.asarray(ca, dtype=float)
+            cb = numpy.asarray(cb, dtype=float)
             dif = ca - cb
-            if dif.abs().max() > float_tol:
+            dif = numpy.asarray([abs(d) for d in dif if not pandas.isnull(d)])
+            if dif.max() > float_tol:
                 return False
         else:
             if not all([ca[i] == cb[i] for i in range(a.shape[0])]):

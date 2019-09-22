@@ -1,8 +1,6 @@
 from typing import Union
 import collections
 
-import pandas
-
 import data_algebra.util
 import data_algebra.env
 
@@ -42,6 +40,15 @@ class Term:
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
         return Expression(op, (self,), params=params)
+
+    def __triop_expr__(self, op, x, y):
+        if not isinstance(op, str):
+            raise TypeError("op is supposed to be a string")
+        if not isinstance(x, Term):
+            x = Value(x)
+        if not isinstance(y, Term):
+            y = Value(y)
+        return Expression(op, (self, x, y), inline=False)
 
     # tree re-write
 
@@ -289,6 +296,9 @@ class Term:
     def is_bad(self):
         return self.__uop_expr__("is_bad")
 
+    def if_else(self, x, y):
+        return self.__triop_expr__("if_else", x, y)
+
 
 class Value(Term):
     def __init__(self, value):
@@ -337,15 +347,12 @@ py_formatters = {
 }
 
 
-pandas_eval_env = {
-    "is_null": lambda x: pandas.isnull(x),
-    "is_bad": data_algebra.util.is_bad,
-}
-
-
 pd_formatters = {
     "is_bad": lambda expr: "@is_bad(" + expr.args[0].to_pandas() + ")",
     "is_null": lambda expr: "@is_null(" + expr.args[0].to_pandas() + ")",
+    "if_else": lambda expr: "@if_else(" + expr.args[0].to_pandas() +\
+                            ", " + expr.args[1].to_pandas() +\
+                            ", " + expr.args[2].to_pandas()+ ")",
     "neg": lambda expr: "-" + expr.args[0].to_pandas(want_inline_parens=True),
 }
 
