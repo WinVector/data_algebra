@@ -44,6 +44,18 @@ def _db_is_bad_expr(dbmodel, expression):
     )
 
 
+def _db_if_else_expr(dbmodel, expression):
+    if_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    x_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
+    y_expr = dbmodel.expr_to_sql(expression.args[2], want_inline_parens=True)
+    return (
+            "CASE" +
+            " WHEN " + if_expr + " THEN " + x_expr +
+            " WHEN NOT " + if_expr + " THEN " + y_expr +
+            " ELSE NULL END"
+    )
+
+
 def _db_neg_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     return "( -" + subexpr + " )"
@@ -53,6 +65,7 @@ db_expr_formatters = {
     "is_null": _db_is_null_expr,
     "is_bad": _db_is_bad_expr,
     "neg": _db_neg_expr,
+    "if_else": _db_if_else_expr,
 }
 
 
@@ -237,9 +250,9 @@ class DBModel:
             self.expr_to_sql(oi) + window_term + " AS " + self.quote_identifier(ci)
             for (ci, oi) in subops.items()
         ]
-        origcols = {k for k in using if k not in subops.keys()}
+        origcols = [k for k in using if k not in subops.keys()]
         if len(origcols) > 0:
-            derived = [self.quote_identifier(ci) for ci in origcols] + derived
+            derived = [self.quote_identifier(ci) for ci in set(origcols)] + derived
         sql_str = (
             "SELECT "
             + ", ".join(derived)

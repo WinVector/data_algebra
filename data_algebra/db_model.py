@@ -250,9 +250,9 @@ class DBModel:
             self.expr_to_sql(oi) + window_term + " AS " + self.quote_identifier(ci)
             for (ci, oi) in subops.items()
         ]
-        origcols = {k for k in using if k not in subops.keys()}
+        origcols = [k for k in using if k not in subops.keys()]
         if len(origcols) > 0:
-            derived = [self.quote_identifier(ci) for ci in origcols] + derived
+            derived = [self.quote_identifier(ci) for ci in set(origcols)] + derived
         sql_str = (
             "SELECT "
             + ", ".join(derived)

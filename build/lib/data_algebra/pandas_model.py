@@ -1,9 +1,19 @@
+
+import numpy
 import pandas
 
 import data_algebra
+import data_algebra.util
 import data_algebra.data_model
 import data_algebra.expr_rep
 import data_algebra.data_ops
+
+
+pandas_eval_env = {
+    "is_null": lambda x: pandas.isnull(x),
+    "is_bad": data_algebra.util.is_bad,
+    "if_else": lambda c, x, y: numpy.where(c, x, y)
+}
 
 
 class PandasModel(data_algebra.data_model.DataModel):
@@ -52,7 +62,7 @@ class PandasModel(data_algebra.data_model.DataModel):
                 op_src = opk.to_pandas()
                 res[k] = res.eval(
                     op_src,
-                    local_dict=data_algebra.expr_rep.pandas_eval_env,
+                    local_dict=pandas_eval_env,
                     global_dict=eval_env,
                 )
         else:
