@@ -192,7 +192,8 @@ class DBModel:
             missing = using - table_def.column_set
             if len(missing) > 0:
                 raise KeyError("referred to unknown columns: " + str(missing))
-            cols = [self.quote_identifier(ci) for ci in using]
+            cols_using = [c for c in table_def.column_names if c in using]
+            cols = [self.quote_identifier(ci) for ci in cols_using]
             sql_str = (
                 "SELECT "
                 + ", ".join(cols)
@@ -252,7 +253,8 @@ class DBModel:
         ]
         origcols = [k for k in using if k not in subops.keys()]
         if len(origcols) > 0:
-            derived = [self.quote_identifier(ci) for ci in set(origcols)] + derived
+            ordered_orig = [c for c in extend_node.column_names if c in set(origcols)]
+            derived = [self.quote_identifier(ci) for ci in ordered_orig] + derived
         sql_str = (
             "SELECT "
             + ", ".join(derived)

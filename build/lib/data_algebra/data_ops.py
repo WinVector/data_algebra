@@ -131,13 +131,26 @@ class ViewRepresentation(OperatorPlatform):
 
     # characterization
 
-    def get_tables(self, tables=None):
+    def get_tables(self, *, replacements=None):
         """Get a dictionary of all tables used in an operator DAG,
         raise an exception if the values are not consistent."""
-        if tables is None:
-            tables = {}
-        for s in self.sources:
-            tables = s.get_tables(tables)
+        tables = {}
+        for i in range(len(self.sources)):
+            s = self.sources[i]
+            if isinstance(s, TableDescription):
+                if replacements is not None and s.key in replacements:
+                    orig_table = replacements[s.key]
+                    if s.column_set != orig_table.column_set:
+                        raise ValueError("table " + s.key + " has two incompatible definitions")
+                    self.sources[i] = orig_table
+                    s = orig_table
+            ti = s.get_tables(replacements=replacements)
+            for (k, v) in ti.items():
+                if k in tables.keys():
+                    if not tables[k] is v:
+                        raise ValueError("Table " + k + " has two different representation objects")
+                else:
+                    tables[k] = v
         return tables
 
     def columns_used_from_sources(self, using=None):
@@ -533,22 +546,12 @@ class TableDescription(ViewRepresentation):
         s = s + ")"
         return s
 
-    def get_tables(self, tables=None):
+    def get_tables(self, *, replacements=None):
         """get a dictionary of all tables used in an operator DAG,
         raise an exception if the values are not consistent"""
-        if tables is None:
-            tables = {}
-        if self.key in tables.keys():
-            other = tables[self.key]
-            if self.column_set != other.column_set:
-                raise ValueError(
-                    "Two tables with key " + self.key + " have different column sets."
-                )
-            if other is not self:
-                raise ValueError("Two different table definitions for table: " + self.key)
-        else:
-            tables[self.key] = self
-        return tables
+        if replacements is not None and self.key in replacements.keys():
+            return {self.key: replacements[self.key]}
+        return {self.key: self}
 
     def eval_implementation(self, *, data_map, eval_env, data_model):
         return data_model.table_step(op=self, data_map=data_map, eval_env=eval_env)
@@ -1115,7 +1118,7 @@ class NaturalJoinNode(ViewRepresentation):
 
     def __init__(self, a, b, *, by=None, jointype="INNER"):
         a_tables = a.get_tables()
-        b_tables = b.get_tables()
+        b_tables = b.get_tables(replacements=a_tables)
         common_keys = set(a_tables.keys()).intersection(b_tables.keys())
         for k in common_keys:
             if a_tables[k] is not b_tables[k]:
@@ -1195,7 +1198,6 @@ class NaturalJoinNode(ViewRepresentation):
 
 
 class ConvertRecordsNode(ViewRepresentation):
-    blocks_out_table: TableDescription
 
     def __init__(self, source, record_map, *, blocks_out_table=None):
         sources = [source]
@@ -1206,24 +1208,28 @@ class ConvertRecordsNode(ViewRepresentation):
                 + [c for c in record_map.blocks_out.control_table.columns],
             )
         if blocks_out_table is not None:
-            sources = sources + [blocks_out_table]
             # check blocks_out_table is a direct table
             if not isinstance(blocks_out_table, TableDescription):
                 raise TypeError("expected blocks_out_table to be a data_algebra.data_ops.TableDescription")
-            # check it is the exact same definition object if already present
+            # ensure table is the exact same definition object if already present
             a_tables = source.get_tables()
             if blocks_out_table.key in a_tables.keys():
                 a_table = a_tables[blocks_out_table.key]
+                if not a_table.column_set == blocks_out_table.column_set:
+                    raise ValueError("blocks_out_table column definition does not match table already in op DAG")
                 if not blocks_out_table is a_table:
-                    raise ValueError("different definiton object for: " + blocks_out_table.key)
+                    blocks_out_table = a_table
+            # check blocks_out_table is a direct table
+            if not isinstance(blocks_out_table, TableDescription):
+                raise TypeError("expected blocks_out_table to be a data_algebra.data_ops.TableDescription")
             # check it has at least the columns we expect
             expect = [c for c in record_map.blocks_out.record_keys] + \
                         [c for c in record_map.blocks_out.control_table.columns]
             unknown = set(expect) - set(blocks_out_table.column_names)
             if len(unknown) > 0:
                 raise ValueError("blocks_out_table missing columns: " + str(unknown))
+            sources = sources + [blocks_out_table]
         self.record_map = record_map
-        self.blocks_out_table = blocks_out_table
         unknown = set(self.record_map.columns_needed) - set(source.column_names)
         if len(unknown) > 0:
             raise ValueError("missing required columns: " + str(unknown))
@@ -1244,8 +1250,11 @@ class ConvertRecordsNode(ViewRepresentation):
         od["op"] = "ConvertRecords"
         od["record_map"] = self.record_map.to_simple_obj()
         od['blocks_out_table'] = None
-        if self.blocks_out_table is not None:
-            od['blocks_out_table'] = self.blocks_out_table.collect_representation(dialect=dialect)[0]
+        blocks_out_table = None
+        if len(self.sources) > 1:
+            blocks_out_table = self.sources[1]
+        if blocks_out_table is not None:
+            od['blocks_out_table'] = blocks_out_table.collect_representation(dialect=dialect)[0]
         pipeline.insert(0, od)
         return self.sources[0].collect_representation_implementation(
             pipeline=pipeline, dialect=dialect
@@ -1261,10 +1270,13 @@ class ConvertRecordsNode(ViewRepresentation):
             )
         rm_str = self.record_map.__repr__()
         rm_str = re.sub("\n", "\n   ", rm_str)
-        s = s + ("convert_record(" + rm_str +
+        s = s + "convert_record(" + rm_str
+        if len(self.sources) > 1:
+            s = s + (
                  "\n,   blocks_out_table=" +
-                 self.blocks_out_table.to_python_implementation(indent=indent+3, strict=strict) +
-                 ")")
+                 self.sources[1].to_python_implementation(indent=indent+3, strict=strict)
+            )
+        s = s + ")"
         return s
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
@@ -1279,7 +1291,7 @@ class ConvertRecordsNode(ViewRepresentation):
             res = db_model.row_recs_to_blocks_query(
                 res,
                 record_spec=self.record_map.blocks_out,
-                record_view=self.blocks_out_table,
+                record_view=self.sources[1],
             )
         return res
 

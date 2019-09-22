@@ -39,7 +39,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         # check all columns we expect are present
         columns_using = op.column_names
         if op.columns_currently_used is not None and len(op.columns_currently_used) > 0:
-            columns_using = [c for c in op.columns_currently_used]
+            columns_using = [c for c in columns_using if c in op.columns_currently_used]
         missing = set(columns_using) - set([c for c in df.columns])
         if len(missing) > 0:
             raise ValueError("missing required columns: " + str(missing))
