@@ -49,11 +49,11 @@ def _db_if_else_expr(dbmodel, expression):
     x_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
     y_expr = dbmodel.expr_to_sql(expression.args[2], want_inline_parens=True)
     return (
-        "CASE" +\
-            " WHEN " + if_expr + " THEN " + x_expr +\
-            " WHEN NOT " + if_expr + " THEN " + y_expr +\
-            " ELSE NULL END")
-
+            "CASE" +
+            " WHEN " + if_expr + " THEN " + x_expr +
+            " WHEN NOT " + if_expr + " THEN " + y_expr +
+            " ELSE NULL END"
+    )
 
 
 def _db_neg_expr(dbmodel, expression):
