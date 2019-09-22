@@ -95,5 +95,10 @@ def test_scoring_example():
 
     assert data_algebra.util.equivalent_frames(expect, res_sql, float_tol=1e-3)
 
+    # test instrumentation
+
+    tables = ops.get_tables()
+    cols_used = ops.columns_used()
+
     # be neat
     conn.close()

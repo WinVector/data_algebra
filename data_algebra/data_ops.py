@@ -93,6 +93,7 @@ class ViewRepresentation(OperatorPlatform):
     column_set: Set[str]
     column_map: data_algebra.env.SimpleNamespaceDict
     sources: List[Any]  # actually ViewRepresentation
+    columns_currently_used: Set[str]  # transient field, operations can update this
 
     def __init__(self, column_names, *, sources=None):
         self.column_names = [c for c in column_names]
@@ -115,6 +116,7 @@ class ViewRepresentation(OperatorPlatform):
             if not isinstance(si, ViewRepresentation):
                 raise ValueError("all sources must be of class ViewRepresentation")
         self.sources = [si for si in sources]
+        self.columns_currently_used = set()
         OperatorPlatform.__init__(self)
 
     # adaptors
@@ -139,22 +141,36 @@ class ViewRepresentation(OperatorPlatform):
         return tables
 
     def columns_used_from_sources(self, using=None):
-        """Give column names used from source nodes when this node is exececuted
+        """Get column names used from direct source nodes when this node is exececuted
         with the using columns (None means all)."""
         raise NotImplementedError("base method called")
 
-    def columns_used_implementation(self, *, columns_used, using=None):
-        cu_list = self.columns_used_from_sources(using)
+    def clear_columns_currently_used(self):
+        self.columns_currently_used = set()
+        for si in self.sources:
+            si.clear_columns_currently_used()
+
+    def _columns_used_implementation(self, *, using=None):
+        if using is None:
+            self.columns_currently_used.update(self.column_names)
+        else:
+            unknown = set(using) - set(self.column_names)
+            if len(unknown) > 0:
+                raise ValueError("asked for unknown columns: " + str(unknown))
+            self.columns_currently_used.update(using)
+        cu_list = self.columns_used_from_sources(self.columns_currently_used.copy())
         for i in range(len(self.sources)):
-            self.sources[i].columns_used_implementation(
-                columns_used=columns_used, using=cu_list[i]
+            self.sources[i]._columns_used_implementation(
+                using=cu_list[i]
             )
 
-    def columns_used(self):
-        """Determine which columns are used from source tables."""
+    def columns_used(self, *, using=None):
+        """Determine which columns are used from source tables.
+        Sets nodes' columns_currently_used values as a side-effect."""
+        self.clear_columns_currently_used()
+        self._columns_used_implementation(using=using)
         tables = self.get_tables()
-        columns_used = {ki: set() for ki in tables.keys()}
-        self.columns_used_implementation(columns_used=columns_used, using=None)
+        columns_used = {k: v.columns_currently_used for (k, v) in tables.items()}
         return columns_used
 
     # collect as simple structures for YAML I/O and other generic tasks
@@ -533,15 +549,6 @@ class TableDescription(ViewRepresentation):
 
     def columns_used_from_sources(self, using=None):
         return []  # no inputs to table description
-
-    def columns_used_implementation(self, *, columns_used, using=None):
-        cset = columns_used[self.key]
-        if using is None:
-            using = self.column_set
-        unexpected = using - self.column_set
-        if len(unexpected) > 0:
-            raise KeyError("asked for undefined columns: " + str(unexpected))
-        cset.update(using)
 
     def to_sql(self, db_model, *, pretty=False, encoding=None, sqlparse_options=None):
         if sqlparse_options is None:
