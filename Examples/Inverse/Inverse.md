@@ -1,5 +1,5 @@
 
-`Python` example of the [`Keras` record transform example](http://winvector.github.io/FluidData/FluidDataReshapingWithCdata.html), for the `R` version please see [here]().
+`Python` example of the [`Keras` record transform example](http://winvector.github.io/FluidData/FluidDataReshapingWithCdata.html), for the `R` version please see [here](https://github.com/WinVector/rquery/blob/master/Examples/Inverse/Inverse.md).
 
 
 ```python
