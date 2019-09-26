@@ -1,5 +1,8 @@
 
-`Python` example of the [`Keras` record transform example](http://winvector.github.io/FluidData/FluidDataReshapingWithCdata.html), for the `R` version please see [here](https://github.com/WinVector/cdata/blob/master/Examples/Inverse/Inverse.md).
+This is a quick re-work of the [`Keras` record transform example](http://winvector.github.io/FluidData/FluidDataReshapingWithCdata.html) in `Python`. For an `R` version please see [here](https://github.com/WinVector/cdata/blob/master/Examples/Inverse/Inverse.md).
+
+
+In the [original article](http://winvector.github.io/FluidData/FluidDataReshapingWithCdata.html) we had `Keras` model performance data, which looked like the following.
 
 
 ```python
@@ -103,6 +106,20 @@ df
 
 
 
+But for plotting, it is more convenient to have the data in the following form:
+
+| epoch | measure                    | training | validation |
+| ----: | :------------------------- | -------: | ---------: |
+|     1 | minus binary cross entropy | \-0.5067 |   \-0.3770 |
+|     1 | accuracy                   |   0.7852 |     0.8722 |
+| ...                                                        |
+
+[The article](http://winvector.github.io/FluidData/FluidDataReshapingWithCdata.html) uses ideas similar to [these](https://winvector.github.io/cdata/articles/design.html) to visualize the desired record structure and then write down this visualization as a concrete data record example.
+
+The principle is: if you have a visualization of the input and output, it is then trivial to marshal these into a graphical representation of the desired transform. And if you can't work out what the input and output look like, then you really are not quite ready to perform the transform.  Knowing what we want is the minimum requirement and with this methodology it is also all that is needed.
+
+
+
 ```python
 shape = pandas.DataFrame({
     'measure': ['minus binary cross entropy', 'accuracy'],
@@ -158,6 +175,8 @@ shape
 
 
 
+This description of the desired record shape is easily transformed into a data transformation specification.
+
 
 ```python
 record_map = data_algebra.cdata_impl.RecordMap(
@@ -204,6 +223,10 @@ print(str(record_map))
        1                    accuracy      acc    val_acc
     
 
+
+Just about any transfrom we want can be specified through `data_algebra.cdata_impl.RecordMap` by specifying the `blocks_in` and `blocks_out` shapes (leaving these as `None` specifies the corresponding shape is a row record or record that is entirely in a single row).
+
+We can easily apply this transform to our data.
 
 
 ```python
@@ -330,6 +353,8 @@ res
 
 
 
+And it is simple to build an inverse transform.
+
 
 ```python
 inv = record_map.inverse()
@@ -350,6 +375,8 @@ print(str(inv))
      ['epoch', 'loss', 'acc', 'val_loss', 'val_acc']
     
 
+
+And equally easy to apply this inverse transform to data.
 
 
 ```python
@@ -438,3 +465,5 @@ inv.transform(res)
 </div>
 
 
+
+Notice how each step can be inspected and checked as we worked. I would definitely recommend re-reading [the original article](http://winvector.github.io/FluidData/FluidDataReshapingWithCdata.html) with the new transform notation in mind. In any case, please check out the `cdata` [package](https://github.com/WinVector/cdata) and [documentation](https://winvector.github.io/cdata/).
