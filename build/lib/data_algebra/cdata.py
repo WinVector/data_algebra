@@ -44,12 +44,12 @@ class RecordSpecification:
         self.control_table = control_table.reset_index(drop=True)
         if record_keys is None:
             record_keys = []
-        if not isinstance(record_keys, list):
+        if isinstance(record_keys, str):
             record_keys = [record_keys]
         self.record_keys = [k for k in record_keys]
         if control_table_keys is None:
             control_table_keys = [control_table.columns[0]]
-        if not isinstance(control_table_keys, list):
+        if isinstance(control_table_keys, str):
             record_keys = [control_table_keys]
         self.control_table_keys = [k for k in control_table_keys]
         unknown = set(self.control_table_keys) - set(control_table.columns)
@@ -151,7 +151,7 @@ def record_spec_from_simple_obj(obj):
             v = omap[key]
             if v is None:
                 return []
-            if not isinstance(v, list):
+            if isinstance(v, str):
                 v = [v]
             return v
         except KeyError:
