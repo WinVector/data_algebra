@@ -213,31 +213,46 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
         data_algebra.data_ops.OperatorPlatform.__init__(self)
         self.ops = []
 
-    # noinspection PyPep8Naming
-    def realize(self, X):
-        pipeline = data_algebra.data_ops.describe_table(X, table_name="X")
+    def apply_to(self, pipeline):
+        if not isinstance(pipeline, data_algebra.data_ops.OperatorPlatform):
+            raise TypeError("Expected othter to be a data_algebra.data_ops.OperatorPlatform")
         for s in self.ops:
             # pipeline = pipeline >> s
             pipeline = s.apply(pipeline)
         return pipeline
 
+    def append(self, other):
+        if isinstance(other, Locum):
+            for o in other.ops:
+                self.ops.append(o)
+        elif isinstance(other, data_algebra.pipe.PipeStep):
+            self.ops.append(other)
+        else:
+            raise TypeError("unexpeted type for Locum + " + str(type(other)))
+        return self
+
+    def realize(self, x):
+        pipeline = data_algebra.data_ops.describe_table(x, table_name="x")
+        return self.apply_to(pipeline)
+
     # noinspection PyPep8Naming
     def transform(self, X):
+        if isinstance(X, data_algebra.data_ops.OperatorPlatform):
+            return self.apply_to(X)
         pipeline = self.realize(X)
         return pipeline.transform(X)
 
     def __rrshift__(self, other):  # override other >> self
         return self.transform(other)
 
-    def __add__(self, other):
-        if not isinstance(other, Locum):
-            raise TypeError("Expected other to be of type data_algebra.data_pipe.Locum")
+    def __add__(self, other):  # override self + other
         res = Locum()
-        for o in self.ops:
-            res.ops.append(o)
-        for o in other.ops:
-            res.ops.append(o)
+        res.append(self)
+        res.append(other)
         return res
+
+    def __radd__(self, other):  # override other + self
+        return self.apply_to(other)
 
     # print
 
