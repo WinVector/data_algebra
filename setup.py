@@ -22,7 +22,7 @@ Recommended packages include: PyYAML (supplies yaml), sqlparse, black, and dask.
 
 setuptools.setup(
     name='data_algebra',
-    version='0.2.2',
+    version='0.2.3',
     author='John Mount',
     author_email='jmount@win-vector.com',
     url='https://github.com/WinVector/data_algebra',
