@@ -30,6 +30,18 @@ class Extend(data_algebra.pipe.PipeStep):
     ops: Dict[str, data_algebra.expr_rep.Expression]
 
     def __init__(self, ops, *, partition_by=None, order_by=None, reverse=None):
+        if isinstance(partition_by, str):
+            partition_by = [partition_by]
+        if isinstance(order_by, str):
+            order_by = [order_by]
+        if isinstance(reverse, str):
+            reverse = [reverse]
+        if reverse is not None and len(reverse) > 0:
+            if order_by is None:
+                raise ValueError("set is None when order_by is not None")
+            unknown = set(reverse) - set(order_by)
+            if len(unknown) > 0:
+                raise ValueError("columns in reverse that are not in order_by: "  + str(unknown))
         data_algebra.pipe.PipeStep.__init__(self, name="Extend")
         self._ops = ops
         self.partition_by = partition_by
@@ -68,6 +80,8 @@ class Project(data_algebra.pipe.PipeStep):
     ops: Dict[str, data_algebra.expr_rep.Expression]
 
     def __init__(self, ops, *, group_by=None):
+        if isinstance(group_by, str):
+            group_by = [group_by]
         data_algebra.pipe.PipeStep.__init__(self, name="Project")
         self._ops = ops
         self.group_by = group_by
@@ -124,6 +138,8 @@ class SelectColumns(data_algebra.pipe.PipeStep):
     column_selection: List[str]
 
     def __init__(self, columns):
+        if isinstance(columns, str):
+            columns = [columns]
         column_selection = [c for c in columns]
         self.column_selection = column_selection
         data_algebra.pipe.PipeStep.__init__(self, name="SelectColumns")
@@ -151,6 +167,8 @@ class DropColumns(data_algebra.pipe.PipeStep):
     column_deletions: List[str]
 
     def __init__(self, column_deletions):
+        if isinstance(column_deletions, str):
+            column_deletions = [column_deletions]
         column_deletions = [c for c in column_deletions]
         self.column_deletions = column_deletions
         data_algebra.pipe.PipeStep.__init__(self, name="DropColumns")
@@ -179,6 +197,16 @@ class OrderRows(data_algebra.pipe.PipeStep):
     reverse: List[str]
 
     def __init__(self, columns, *, reverse=None, limit=None):
+        if isinstance(columns, str):
+            columns = [columns]
+        if isinstance(reverse, str):
+            reverse = [reverse]
+        if reverse is not None and len(reverse) > 0:
+            if columns is None:
+                raise ValueError("set is None when order_by is not None")
+            unknown = set(reverse) - set(columns)
+            if len(unknown) > 0:
+                raise ValueError("columns in reverse that are not in order_by: "  + str(unknown))
         self.order_columns = [c for c in columns]
         if reverse is None:
             reverse = []
@@ -239,6 +267,8 @@ class NaturalJoin(data_algebra.pipe.PipeStep):
     def __init__(self, *, b=None, by=None, jointype="INNER"):
         if not isinstance(b, data_algebra.data_ops.ViewRepresentation):
             raise TypeError("b must be a data_algebra.data_ops.ViewRepresentation")
+        if isinstance(by, str):
+            by = [by]
         self._by = by
         self._jointype = jointype
         self._b = b
