@@ -879,6 +879,8 @@ class SelectColumnsNode(ViewRepresentation):
         unknown = set(column_selection) - set(source.column_names)
         if len(unknown) > 0:
             raise ValueError("selecting unknown columns " + str(unknown))
+        if isinstance(source, SelectColumnsNode):
+            source = source.sources[0]
         ViewRepresentation.__init__(
             self, column_names=column_selection, sources=[source]
         )
