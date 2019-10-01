@@ -149,7 +149,7 @@ class PandasModel(data_algebra.data_model.DataModel):
 
         cols = {k: promote_scalar(v) for (k, v) in cols.items()}
         res = self.columns_to_frame(cols).reset_index(
-            drop=False
+            drop=len(op.group_by) < 1
         )  # grouping variables in the index
         return res
 
