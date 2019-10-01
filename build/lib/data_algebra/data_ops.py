@@ -594,7 +594,7 @@ class TableDescription(ViewRepresentation):
         return self.key.__hash__()
 
 
-def describe_table(d, table_name):
+def describe_table(d, table_name='data_frame'):
     if isinstance(d, pandas.DataFrame):
         return TableDescription(table_name, [c for c in d.columns])
     if data_algebra.data_types.is_dask_data_frame(d):
