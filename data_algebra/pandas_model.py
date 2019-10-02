@@ -89,6 +89,8 @@ class PandasModel(data_algebra.data_model.DataModel):
                     # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.groupby.html
                 else:
                     opframe = subframe
+                # TODO: document exactly which of these are available
+                # TODO: look into variable-free per-group count
                 if len(opk.args) == 0:
                     if opk.op == "row_number":
                         subframe[k] = opframe.cumcount() + 1

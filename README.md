@@ -3,8 +3,6 @@
 
 [Codd style operators](https://en.wikipedia.org/wiki/Relational_algebra) in a [piped](https://en.wikipedia.org/wiki/Pipeline_(Unix)) or [method-chained](https://en.wikipedia.org/wiki/Method_chaining) notation (or [dplyr](https://CRAN.R-project.org/package=dplyr)-esque) data processing in Python
 
-`Python` version in development, and not ready for use yet (`R` versions mature and already used in production).
-
 
 [This](https://github.com/WinVector/data_algebra) is to be the [`Python`](https://www.python.org) equivalent of the [`R`](https://www.r-project.org) packages [`rquery`](https://github.com/WinVector/rquery/) and [`rqdatatable`](https://github.com/WinVector/rqdatatable).  This package will supply piped Codd-transform style notation that 
 can perform data engineering in [`Pandas`](https://pandas.pydata.org) and generate [`SQL`](https://en.wikipedia.org/wiki/SQL) queries from the same specification.
@@ -26,9 +24,7 @@ In particular we will discuss the `Python` implementation (also called `data_alg
 
 ## Introduction
 
-Parts of the project are in early development (and not yet ready for production use), and other parts are mature and have been used in production.
-
-The project intent is to realize a modern data processing language based on [Codd's relational operators](https://en.wikipedia.org/wiki/Relational_model) that is easy to maintain, has helpful tooling, and has very similar realizations (or dialects) for:
+The project intent is to realize a method chained data processing language based on [Codd's relational operators](https://en.wikipedia.org/wiki/Relational_model) that is easy to maintain, has helpful tooling, and has very similar realizations (or dialects) for:
 
   * [`SQL`](https://en.wikipedia.org/wiki/SQL) databases accessed from [`Python`](https://www.python.org), useful working at scale with `PostgreSQL` or Apache `Spark` (`Spark` example [here](https://github.com/WinVector/data_algebra/blob/master/Examples/Spark/pyspark_example.ipynb)).
   * [`Pandas`](https://pandas.pydata.org) `DataFrame` objects in `Python`.

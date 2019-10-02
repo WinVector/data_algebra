@@ -1,8 +1,6 @@
 
-import sqlite3
 import pandas
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
-import data_algebra.SQLite
 import data_algebra.util
 
 
@@ -49,3 +47,5 @@ def test_window_fns():
         })
 
     assert data_algebra.util.equivalent_frames(res1, expect1)
+
+    # TODO: try these through the DB (probably PostgreSQL)
