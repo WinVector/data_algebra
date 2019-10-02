@@ -55,7 +55,7 @@ class OperatorPlatform(data_algebra.pipe.PipeValue):
     # define builders for all non-initial node types on base class
 
     def extend(
-            self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
+        self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
     ):
         raise NotImplementedError("base class called")
 
@@ -142,14 +142,18 @@ class ViewRepresentation(OperatorPlatform):
                 if replacements is not None and s.key in replacements:
                     orig_table = replacements[s.key]
                     if s.column_set != orig_table.column_set:
-                        raise ValueError("table " + s.key + " has two incompatible definitions")
+                        raise ValueError(
+                            "table " + s.key + " has two incompatible definitions"
+                        )
                     self.sources[i] = orig_table
                     s = orig_table
             ti = s.get_tables(replacements=replacements)
             for (k, v) in ti.items():
                 if k in tables.keys():
                     if not tables[k] is v:
-                        raise ValueError("Table " + k + " has two different representation objects")
+                        raise ValueError(
+                            "Table " + k + " has two different representation objects"
+                        )
                 else:
                     tables[k] = v
         return tables
@@ -174,9 +178,7 @@ class ViewRepresentation(OperatorPlatform):
             self.columns_currently_used.update(using)
         cu_list = self.columns_used_from_sources(self.columns_currently_used.copy())
         for i in range(len(self.sources)):
-            self.sources[i]._columns_used_implementation(
-                using=cu_list[i]
-            )
+            self.sources[i]._columns_used_implementation(using=cu_list[i])
 
     def columns_used(self, *, using=None):
         """Determine which columns are used from source tables.
@@ -425,7 +427,7 @@ class ViewRepresentation(OperatorPlatform):
     # nodes
 
     def extend(
-            self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
+        self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
     ):
         return ExtendNode(
             source=self,
@@ -529,20 +531,20 @@ class TableDescription(ViewRepresentation):
         nc = min(len(self.column_names), 20)
         if (not strict) and (nc < len(self.column_names)):
             cols_str = (
-                    "["
-                    + ", ".join([self.column_names[i].__repr__() for i in range(nc)])
-                    + ", + "
-                    + str(len(self.column_names) - nc)
-                    + " more]"
+                "["
+                + ", ".join([self.column_names[i].__repr__() for i in range(nc)])
+                + ", + "
+                + str(len(self.column_names) - nc)
+                + " more]"
             )
         else:
             cols_str = self.column_names.__repr__()
         s = (
-                "TableDescription("
-                + "table_name="
-                + self.table_name.__repr__()
-                + ", column_names="
-                + cols_str
+            "TableDescription("
+            + "table_name="
+            + self.table_name.__repr__()
+            + ", column_names="
+            + cols_str
         )
         if len(self.qualifiers) > 0:
             s = s + ", qualifiers=" + self.qualifiers.__repr__()
@@ -575,7 +577,7 @@ class TableDescription(ViewRepresentation):
         return sql_str
 
     def to_sql_implementation(
-            self, db_model, *, using, temp_id_source, force_sql=False
+        self, db_model, *, using, temp_id_source, force_sql=False
     ):
         return db_model.table_def_to_sql(self, using=using, force_sql=force_sql)
 
@@ -594,7 +596,7 @@ class TableDescription(ViewRepresentation):
         return self.key.__hash__()
 
 
-def describe_table(d, table_name='data_frame'):
+def describe_table(d, table_name="data_frame"):
     if isinstance(d, pandas.DataFrame):
         return TableDescription(table_name, [c for c in d.columns])
     if data_algebra.data_types.is_dask_data_frame(d):
@@ -606,14 +608,14 @@ def describe_table(d, table_name='data_frame'):
 
 class ExtendNode(ViewRepresentation):
     def __init__(
-            self,
-            source,
-            ops,
-            *,
-            partition_by=None,
-            order_by=None,
-            reverse=None,
-            parse_env=None
+        self,
+        source,
+        ops,
+        *,
+        partition_by=None,
+        order_by=None,
+        reverse=None,
+        parse_env=None
     ):
         ops = data_algebra.expr_rep.parse_assignments_in_context(
             ops, source, parse_env=parse_env
@@ -700,19 +702,19 @@ class ExtendNode(ViewRepresentation):
         s = ""
         if print_sources:
             s = (
-                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                    + " .\\\n"
-                    + " " * (indent + 3)
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
             )
         s = s + (
-                "extend({"
-                + ", ".join(
-            [
-                k.__repr__() + ": " + opi.to_python().__repr__()
-                for (k, opi) in self.ops.items()
-            ]
-        )
-                + "}"
+            "extend({"
+            + ", ".join(
+                [
+                    k.__repr__() + ": " + opi.to_python().__repr__()
+                    for (k, opi) in self.ops.items()
+                ]
+            )
+            + "}"
         )
         if len(self.partition_by) > 0:
             s = s + ", partition_by=" + self.partition_by.__repr__()
@@ -789,19 +791,19 @@ class ProjectNode(ViewRepresentation):
         s = ""
         if print_sources:
             s = (
-                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                    + " .\\\n"
-                    + " " * (indent + 3)
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
             )
         s = s + (
-                "project({"
-                + ", ".join(
-            [
-                k.__repr__() + ": " + opi.to_python().__repr__()
-                for (k, opi) in self.ops.items()
-            ]
-        )
-                + "}"
+            "project({"
+            + ", ".join(
+                [
+                    k.__repr__() + ": " + opi.to_python().__repr__()
+                    for (k, opi) in self.ops.items()
+                ]
+            )
+            + "}"
         )
         if len(self.group_by) > 0:
             s = s + ", group_by=" + self.group_by.__repr__()
@@ -855,9 +857,9 @@ class SelectRowsNode(ViewRepresentation):
         s = ""
         if print_sources:
             s = (
-                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                    + " .\\\n"
-                    + " " * (indent + 3)
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
             )
         s = s + ("select_rows(" + self.expr.to_python().__repr__() + ")")
         return s
@@ -911,9 +913,9 @@ class SelectColumnsNode(ViewRepresentation):
         s = ""
         if print_sources:
             s = (
-                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                    + " .\\\n"
-                    + " " * (indent + 3)
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
             )
         s = s + ("select_columns(" + self.column_selection.__repr__() + ")")
         return s
@@ -967,9 +969,9 @@ class DropColumnsNode(ViewRepresentation):
         s = ""
         if print_sources:
             s = (
-                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                    + " .\\\n"
-                    + " " * (indent + 3)
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
             )
         s = s + ("drop_columns(" + self.column_deletions.__repr__() + ")")
         return s
@@ -1034,9 +1036,9 @@ class OrderRowsNode(ViewRepresentation):
         s = ""
         if print_sources:
             s = (
-                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                    + " .\\\n"
-                    + " " * (indent + 3)
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
             )
         s = s + ("order_rows(" + self.order_columns.__repr__())
         if len(self.reverse) > 0:
@@ -1070,7 +1072,7 @@ class RenameColumnsNode(ViewRepresentation):
         if len(unknown) > 0:
             raise ValueError("Tried to rename unknown columns: " + str(unknown))
         collisions = (
-                set(source.column_names) - set(new_cols).intersection(orig_cols)
+            set(source.column_names) - set(new_cols).intersection(orig_cols)
         ).intersection(new_cols)
         if len(collisions) > 0:
             raise ValueError(
@@ -1109,9 +1111,9 @@ class RenameColumnsNode(ViewRepresentation):
         s = ""
         if print_sources:
             s = (
-                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                    + " .\\\n"
-                    + " " * (indent + 3)
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
             )
         s = s + ("rename_columns(" + self.column_remapping.__repr__() + ")")
         return s
@@ -1135,7 +1137,9 @@ class NaturalJoinNode(ViewRepresentation):
         common_keys = set(a_tables.keys()).intersection(b_tables.keys())
         for k in common_keys:
             if a_tables[k] is not b_tables[k]:
-                raise ValueError("Different definition of table object on a/b for: " + k)
+                raise ValueError(
+                    "Different definition of table object on a/b for: " + k
+                )
         sources = [a, b]
         column_names = sources[0].column_names.copy()
         for ci in sources[1].column_names:
@@ -1179,23 +1183,23 @@ class NaturalJoinNode(ViewRepresentation):
         s = "_0."
         if print_sources:
             s = (
-                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                    + " .\\\n"
-                    + " " * (indent + 3)
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
             )
         s = s + ("natural_join(b=\n" + " " * (indent + 6))
         if print_sources:
             s = s + (
-                    self.sources[1].to_python_implementation(
-                        indent=indent + 6, strict=strict
-                    )
-                    + ",\n"
-                    + " " * (indent + 6)
+                self.sources[1].to_python_implementation(
+                    indent=indent + 6, strict=strict
+                )
+                + ",\n"
+                + " " * (indent + 6)
             )
         else:
             s = s + " _1 "
         s = s + (
-                "by=" + self.by.__repr__() + ", jointype=" + self.jointype.__repr__() + ")"
+            "by=" + self.by.__repr__() + ", jointype=" + self.jointype.__repr__() + ")"
         )
         return s
 
@@ -1211,7 +1215,6 @@ class NaturalJoinNode(ViewRepresentation):
 
 
 class ConvertRecordsNode(ViewRepresentation):
-
     def __init__(self, source, record_map, *, blocks_out_table=None):
         sources = [source]
         if blocks_out_table is None and record_map.blocks_out.control_table is not None:
@@ -1223,21 +1226,28 @@ class ConvertRecordsNode(ViewRepresentation):
         if blocks_out_table is not None:
             # check blocks_out_table is a direct table
             if not isinstance(blocks_out_table, TableDescription):
-                raise TypeError("expected blocks_out_table to be a data_algebra.data_ops.TableDescription")
+                raise TypeError(
+                    "expected blocks_out_table to be a data_algebra.data_ops.TableDescription"
+                )
             # ensure table is the exact same definition object if already present
             a_tables = source.get_tables()
             if blocks_out_table.key in a_tables.keys():
                 a_table = a_tables[blocks_out_table.key]
                 if not a_table.column_set == blocks_out_table.column_set:
-                    raise ValueError("blocks_out_table column definition does not match table already in op DAG")
+                    raise ValueError(
+                        "blocks_out_table column definition does not match table already in op DAG"
+                    )
                 if blocks_out_table is not a_table:
                     blocks_out_table = a_table
             # check blocks_out_table is a direct table
             if not isinstance(blocks_out_table, TableDescription):
-                raise TypeError("expected blocks_out_table to be a data_algebra.data_ops.TableDescription")
+                raise TypeError(
+                    "expected blocks_out_table to be a data_algebra.data_ops.TableDescription"
+                )
             # check it has at least the columns we expect
-            expect = [c for c in record_map.blocks_out.record_keys] + \
-                     [c for c in record_map.blocks_out.control_table.columns]
+            expect = [c for c in record_map.blocks_out.record_keys] + [
+                c for c in record_map.blocks_out.control_table.columns
+            ]
             unknown = set(expect) - set(blocks_out_table.column_names)
             if len(unknown) > 0:
                 raise ValueError("blocks_out_table missing columns: " + str(unknown))
@@ -1251,10 +1261,11 @@ class ConvertRecordsNode(ViewRepresentation):
         )
 
     def columns_used_from_sources(self, using=None):
-        return [self.record_map.columns_needed,
-                [c for c in self.record_map.blocks_out.record_keys] +
-                [c for c in self.record_map.blocks_out.control_table.columns]
-                ]
+        return [
+            self.record_map.columns_needed,
+            [c for c in self.record_map.blocks_out.record_keys]
+            + [c for c in self.record_map.blocks_out.control_table.columns],
+        ]
 
     def collect_representation_implementation(self, *, pipeline=None, dialect="Python"):
         if pipeline is None:
@@ -1262,12 +1273,14 @@ class ConvertRecordsNode(ViewRepresentation):
         od = collections.OrderedDict()
         od["op"] = "ConvertRecords"
         od["record_map"] = self.record_map.to_simple_obj()
-        od['blocks_out_table'] = None
+        od["blocks_out_table"] = None
         blocks_out_table = None
         if len(self.sources) > 1:
             blocks_out_table = self.sources[1]
         if blocks_out_table is not None:
-            od['blocks_out_table'] = blocks_out_table.collect_representation(dialect=dialect)[0]
+            od["blocks_out_table"] = blocks_out_table.collect_representation(
+                dialect=dialect
+            )[0]
         pipeline.insert(0, od)
         return self.sources[0].collect_representation_implementation(
             pipeline=pipeline, dialect=dialect
@@ -1277,17 +1290,19 @@ class ConvertRecordsNode(ViewRepresentation):
         s = ""
         if print_sources:
             s = (
-                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                    + " .\\\n"
-                    + " " * (indent + 3)
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
             )
         rm_str = self.record_map.__repr__()
         rm_str = re.sub("\n", "\n   ", rm_str)
         s = s + "convert_record(" + rm_str
         if len(self.sources) > 1:
             s = s + (
-                    "\n,   blocks_out_table=" +
-                    self.sources[1].to_python_implementation(indent=indent + 3, strict=strict)
+                "\n,   blocks_out_table="
+                + self.sources[1].to_python_implementation(
+                    indent=indent + 3, strict=strict
+                )
             )
         s = s + ")"
         return s
@@ -1302,9 +1317,7 @@ class ConvertRecordsNode(ViewRepresentation):
             )
         if self.record_map.blocks_out is not None:
             res = db_model.row_recs_to_blocks_query(
-                res,
-                record_spec=self.record_map.blocks_out,
-                record_view=self.sources[1],
+                res, record_spec=self.record_map.blocks_out, record_view=self.sources[1]
             )
         return res
 

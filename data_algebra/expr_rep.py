@@ -284,277 +284,277 @@ class Term:
     # https://docs.scipy.org/doc/numpy-1.13.0/reference/routines.math.html
 
     def sin(self):
-        return self.__uop_expr__('sin')
+        return self.__uop_expr__("sin")
 
     def cos(self):
-        return self.__uop_expr__('cos')
+        return self.__uop_expr__("cos")
 
     def tan(self):
-        return self.__uop_expr__('tan')
+        return self.__uop_expr__("tan")
 
     def arcsin(self):
-        return self.__uop_expr__('arcsin')
+        return self.__uop_expr__("arcsin")
 
     def arccos(self):
-        return self.__uop_expr__('arccos')
+        return self.__uop_expr__("arccos")
 
     def arctan(self):
-        return self.__uop_expr__('arctan')
+        return self.__uop_expr__("arctan")
 
     def hypot(self):
-        return self.__uop_expr__('hypot')
+        return self.__uop_expr__("hypot")
 
     def arctan2(self, other):
-        return self.__op_expr__('arctan2', other)
+        return self.__op_expr__("arctan2", other)
 
     def degrees(self):
-        return self.__uop_expr__('degrees')
+        return self.__uop_expr__("degrees")
 
     def radians(self):
-        return self.__uop_expr__('radians')
+        return self.__uop_expr__("radians")
 
     def unwrap(self):
-        return self.__uop_expr__('unwrap')
+        return self.__uop_expr__("unwrap")
 
     def deg2rad(self):
-        return self.__uop_expr__('deg2rad')
+        return self.__uop_expr__("deg2rad")
 
     def rad2deg(self):
-        return self.__uop_expr__('rad2deg')
+        return self.__uop_expr__("rad2deg")
 
     def sinh(self):
-        return self.__uop_expr__('sinh')
+        return self.__uop_expr__("sinh")
 
     def cosh(self):
-        return self.__uop_expr__('cosh')
+        return self.__uop_expr__("cosh")
 
     def tanh(self):
-        return self.__uop_expr__('tanh')
+        return self.__uop_expr__("tanh")
 
     def arcsinh(self):
-        return self.__uop_expr__('arcsinh')
+        return self.__uop_expr__("arcsinh")
 
     def arccosh(self):
-        return self.__uop_expr__('arccosh')
+        return self.__uop_expr__("arccosh")
 
     def arctanh(self):
-        return self.__uop_expr__('arctanh')
+        return self.__uop_expr__("arctanh")
 
     def around(self):
-        return self.__uop_expr__('around')
+        return self.__uop_expr__("around")
 
     def round_(self):
-        return self.__uop_expr__('round_')
+        return self.__uop_expr__("round_")
 
     def rint(self):
-        return self.__uop_expr__('rint')
+        return self.__uop_expr__("rint")
 
     def fix(self):
-        return self.__uop_expr__('fix')
+        return self.__uop_expr__("fix")
 
     def floor(self):
-        return self.__uop_expr__('floor')
+        return self.__uop_expr__("floor")
 
     def ceil(self):
-        return self.__uop_expr__('ceil')
+        return self.__uop_expr__("ceil")
 
     def trunc(self):
-        return self.__uop_expr__('trunc')
+        return self.__uop_expr__("trunc")
 
     def prod(self):
-        return self.__uop_expr__('prod')
+        return self.__uop_expr__("prod")
 
     def sum(self):
-        return self.__uop_expr__('sum')
+        return self.__uop_expr__("sum")
 
     def nanprod(self):
-        return self.__uop_expr__('nanprod')
+        return self.__uop_expr__("nanprod")
 
     def nansum(self):
-        return self.__uop_expr__('nansum')
+        return self.__uop_expr__("nansum")
 
     def cumprod(self):
-        return self.__uop_expr__('cumprod')
+        return self.__uop_expr__("cumprod")
 
     def cumsum(self):
-        return self.__uop_expr__('cumsum')
+        return self.__uop_expr__("cumsum")
 
     def nancumprod(self):
-        return self.__uop_expr__('nancumprod')
+        return self.__uop_expr__("nancumprod")
 
     def nancumsum(self):
-        return self.__uop_expr__('nancumsum')
+        return self.__uop_expr__("nancumsum")
 
     def diff(self):
-        return self.__uop_expr__('diff')
+        return self.__uop_expr__("diff")
 
     def ediff1d(self):
-        return self.__uop_expr__('ediff1d')
+        return self.__uop_expr__("ediff1d")
 
     def gradient(self):
-        return self.__uop_expr__('gradient')
+        return self.__uop_expr__("gradient")
 
     def cross(self, other):
-        return self.__op_expr__('cross', other)
+        return self.__op_expr__("cross", other)
 
     def trapz(self):
-        return self.__uop_expr__('trapz')
+        return self.__uop_expr__("trapz")
 
     def exp(self):
-        return self.__uop_expr__('exp')
+        return self.__uop_expr__("exp")
 
     def expm1(self):
-        return self.__uop_expr__('expm1')
+        return self.__uop_expr__("expm1")
 
     def exp2(self):
-        return self.__uop_expr__('exp2')
+        return self.__uop_expr__("exp2")
 
     def log(self):
-        return self.__uop_expr__('log')
+        return self.__uop_expr__("log")
 
     def log10(self):
-        return self.__uop_expr__('log10')
+        return self.__uop_expr__("log10")
 
     def log2(self):
-        return self.__uop_expr__('log2')
+        return self.__uop_expr__("log2")
 
     def log1p(self):
-        return self.__uop_expr__('log1p')
+        return self.__uop_expr__("log1p")
 
     def logaddexp(self, other):
-        return self.__op_expr__('logaddexp', other)
+        return self.__op_expr__("logaddexp", other)
 
     def logaddexp2(self, other):
-        return self.__op_expr__('logaddexp2', other)
+        return self.__op_expr__("logaddexp2", other)
 
     def i0(self):
-        return self.__uop_expr__('i0')
+        return self.__uop_expr__("i0")
 
     def sinc(self):
-        return self.__uop_expr__('sinc')
+        return self.__uop_expr__("sinc")
 
     def signbit(self):
-        return self.__uop_expr__('signbit')
+        return self.__uop_expr__("signbit")
 
     def copysign(self):
-        return self.__uop_expr__('copysign')
+        return self.__uop_expr__("copysign")
 
     def frexp(self):
-        return self.__uop_expr__('frexp')
+        return self.__uop_expr__("frexp")
 
     def ldexp(self, other):
-        return self.__op_expr__('ldexp', other)
+        return self.__op_expr__("ldexp", other)
 
     def nextafter(self, other):
-        return self.__op_expr__('nextafter', other)
+        return self.__op_expr__("nextafter", other)
 
     def spacing(self):
-        return self.__uop_expr__('spacing')
+        return self.__uop_expr__("spacing")
 
     def add(self, other):
-        return self.__op_expr__('add', other)
+        return self.__op_expr__("add", other)
 
     def reciprocal(self):
-        return self.__uop_expr__('reciprocal')
+        return self.__uop_expr__("reciprocal")
 
     def negative(self):
-        return self.__uop_expr__('negative')
+        return self.__uop_expr__("negative")
 
     def multiply(self, other):
-        return self.__op_expr__('multiply', other)
+        return self.__op_expr__("multiply", other)
 
     def divide(self, other):
-        return self.__op_expr__('divide', other)
+        return self.__op_expr__("divide", other)
 
     def power(self, other):
-        return self.__op_expr__('power', other)
+        return self.__op_expr__("power", other)
 
     def subtract(self, other):
-        return self.__op_expr__('subtract', other)
+        return self.__op_expr__("subtract", other)
 
     def true_divide(self, other):
-        return self.__op_expr__('true_divide', other)
+        return self.__op_expr__("true_divide", other)
 
     def floor_divide(self, other):
-        return self.__op_expr__('floor_divide', other)
+        return self.__op_expr__("floor_divide", other)
 
     def float_power(self, other):
-        return self.__op_expr__('float_power', other)
+        return self.__op_expr__("float_power", other)
 
     def fmod(self, other):
-        return self.__op_expr__('fmod', other)
+        return self.__op_expr__("fmod", other)
 
     def mod(self, other):
-        return self.__op_expr__('mod', other)
+        return self.__op_expr__("mod", other)
 
     def modf(self):
-        return self.__uop_expr__('modf')
+        return self.__uop_expr__("modf")
 
     def remainder(self, other):
-        return self.__op_expr__('remainder', other)
+        return self.__op_expr__("remainder", other)
 
     def divmod(self, other):
-        return self.__op_expr__('divmod', other)
+        return self.__op_expr__("divmod", other)
 
     def angle(self):
-        return self.__uop_expr__('angle')
+        return self.__uop_expr__("angle")
 
     def real(self):
-        return self.__uop_expr__('real')
+        return self.__uop_expr__("real")
 
     def imag(self):
-        return self.__uop_expr__('imag')
+        return self.__uop_expr__("imag")
 
     def conj(self):
-        return self.__uop_expr__('conj')
+        return self.__uop_expr__("conj")
 
     def convolve(self, other):
-        return self.__op_expr__('convolve', other)
+        return self.__op_expr__("convolve", other)
 
     def clip(self, x, y):
-        return self.__triop_expr__('clip', x, y)
+        return self.__triop_expr__("clip", x, y)
 
     def sqrt(self):
-        return self.__uop_expr__('sqrt')
+        return self.__uop_expr__("sqrt")
 
     def cbrt(self):
-        return self.__uop_expr__('cbrt')
+        return self.__uop_expr__("cbrt")
 
     def square(self):
-        return self.__uop_expr__('square')
+        return self.__uop_expr__("square")
 
     def absolute(self):
-        return self.__uop_expr__('absolute')
+        return self.__uop_expr__("absolute")
 
     def fabs(self):
-        return self.__uop_expr__('fabs')
+        return self.__uop_expr__("fabs")
 
     def sign(self):
-        return self.__uop_expr__('sign')
+        return self.__uop_expr__("sign")
 
     def heaviside(self, other):
-        return self.__op_expr__('heaviside', other)
+        return self.__op_expr__("heaviside", other)
 
     def maximum(self, other):
-        return self.__op_expr__('maximum', other)
+        return self.__op_expr__("maximum", other)
 
     def minimum(self, other):
-        return self.__op_expr__('minimum', other)
+        return self.__op_expr__("minimum", other)
 
     def fmax(self, other):
-        return self.__op_expr__('fmax', other)
+        return self.__op_expr__("fmax", other)
 
     def fmin(self, other):
-        return self.__op_expr__('fmin', other)
+        return self.__op_expr__("fmin", other)
 
     def nan_to_num(self):
-        return self.__uop_expr__('nan_to_num')
+        return self.__uop_expr__("nan_to_num")
 
     def real_if_close(self):
-        return self.__uop_expr__('real_if_close')
+        return self.__uop_expr__("real_if_close")
 
     def interp(self, xp, fp):
-        return self.__triop_expr__('interp', xp, fp)
+        return self.__triop_expr__("interp", xp, fp)
 
     # pandas style definitions
     # https://pandas.pydata.org/pandas-docs/stable/reference/groupby.html
@@ -722,9 +722,13 @@ py_formatters = {
 pd_formatters = {
     "is_bad": lambda expr: "@is_bad(" + expr.args[0].to_pandas() + ")",
     "is_null": lambda expr: "@is_null(" + expr.args[0].to_pandas() + ")",
-    "if_else": lambda expr: "@if_else(" + expr.args[0].to_pandas() +
-                            ", " + expr.args[1].to_pandas() +
-                            ", " + expr.args[2].to_pandas() + ")",
+    "if_else": lambda expr: "@if_else("
+    + expr.args[0].to_pandas()
+    + ", "
+    + expr.args[1].to_pandas()
+    + ", "
+    + expr.args[2].to_pandas()
+    + ")",
     "neg": lambda expr: "-" + expr.args[0].to_pandas(want_inline_parens=True),
 }
 

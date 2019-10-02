@@ -142,19 +142,19 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
         elif op == "ConvertRecords":
             blocks_out_table = None
             try:
-                blocks_out_table = obj['blocks_out_table']
+                blocks_out_table = obj["blocks_out_table"]
                 if blocks_out_table is not None:
-                    blocks_out_table = to_pipeline(blocks_out_table,
-                                                   known_tables=known_tables,
-                                                   parse_env=parse_env)
+                    blocks_out_table = to_pipeline(
+                        blocks_out_table, known_tables=known_tables, parse_env=parse_env
+                    )
             except KeyError:
                 pass
             return data_algebra.data_pipe.ConvertRecords(
-                    record_map=data_algebra.cdata_impl.record_map_from_simple_obj(
-                        obj["record_map"]
-                    ),
-                    blocks_out_table=blocks_out_table
-                    )
+                record_map=data_algebra.cdata_impl.record_map_from_simple_obj(
+                    obj["record_map"]
+                ),
+                blocks_out_table=blocks_out_table,
+            )
         else:
             raise TypeError("Unexpected op name: " + op)
     if isinstance(obj, list):

@@ -1,4 +1,3 @@
-
 import numpy
 import pandas
 
@@ -12,7 +11,7 @@ import data_algebra.data_ops
 pandas_eval_env = {
     "is_null": lambda x: pandas.isnull(x),
     "is_bad": data_algebra.util.is_bad,
-    "if_else": lambda c, x, y: numpy.where(c, x, y)
+    "if_else": lambda c, x, y: numpy.where(c, x, y),
 }
 
 
@@ -57,14 +56,14 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self
         )
-        standin_name = op.sources[0].column_names[0]  # name of an arbitrary input variable
+        standin_name = op.sources[0].column_names[
+            0
+        ]  # name of an arbitrary input variable
         if not window_situation:
             for (k, opk) in op.ops.items():
                 op_src = opk.to_pandas()
                 res[k] = res.eval(
-                    op_src,
-                    local_dict=pandas_eval_env,
-                    global_dict=eval_env,
+                    op_src, local_dict=pandas_eval_env, global_dict=eval_env
                 )
         else:
             for (k, opk) in op.ops.items():

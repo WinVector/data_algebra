@@ -41,7 +41,9 @@ class Extend(data_algebra.pipe.PipeStep):
                 raise ValueError("set is None when order_by is not None")
             unknown = set(reverse) - set(order_by)
             if len(unknown) > 0:
-                raise ValueError("columns in reverse that are not in order_by: "  + str(unknown))
+                raise ValueError(
+                    "columns in reverse that are not in order_by: " + str(unknown)
+                )
         data_algebra.pipe.PipeStep.__init__(self, name="Extend")
         self._ops = ops
         self.partition_by = partition_by
@@ -63,12 +65,17 @@ class Extend(data_algebra.pipe.PipeStep):
         )
 
     def __repr__(self):
-        return ("Extend(" + self._ops.__repr__()
-                + ", partition_by=" + self.partition_by.__repr__()
-                + ", order_by=" + self.order_by.__repr__()
-                + ", reverse=" + self.reverse.__repr__()
-                + ")"
-                )
+        return (
+            "Extend("
+            + self._ops.__repr__()
+            + ", partition_by="
+            + self.partition_by.__repr__()
+            + ", order_by="
+            + self.order_by.__repr__()
+            + ", reverse="
+            + self.reverse.__repr__()
+            + ")"
+        )
 
     def __str__(self):
         return self.__repr__()
@@ -95,10 +102,13 @@ class Project(data_algebra.pipe.PipeStep):
         return other.project(ops=self._ops, group_by=self.group_by, parse_env=parse_env)
 
     def __repr__(self):
-        return ("Project(" + self._ops.__repr__()
-                + ", group_by=" + self.group_by.__repr__()
-                + ")"
-                )
+        return (
+            "Project("
+            + self._ops.__repr__()
+            + ", group_by="
+            + self.group_by.__repr__()
+            + ")"
+        )
 
     def __str__(self):
         return self.__repr__()
@@ -123,9 +133,7 @@ class SelectRows(data_algebra.pipe.PipeStep):
         return other.select_rows(expr=self.expr, parse_env=parse_env)
 
     def __repr__(self):
-        return ("SelectRows(" + self.expr.__repr__()
-                + ")"
-                )
+        return "SelectRows(" + self.expr.__repr__() + ")"
 
     def __str__(self):
         return self.__repr__()
@@ -152,9 +160,7 @@ class SelectColumns(data_algebra.pipe.PipeStep):
         return other.select_columns(self.column_selection)
 
     def __repr__(self):
-        return ("SelectColumns(" + self.column_selection.__repr__()
-                + ")"
-                )
+        return "SelectColumns(" + self.column_selection.__repr__() + ")"
 
     def __str__(self):
         return self.__repr__()
@@ -181,9 +187,7 @@ class DropColumns(data_algebra.pipe.PipeStep):
         return other.drop_columns(self.column_deletions)
 
     def __repr__(self):
-        return ("DropColumns(" + self.column_deletions.__repr__()
-                + ")"
-                )
+        return "DropColumns(" + self.column_deletions.__repr__() + ")"
 
     def __str__(self):
         return self.__repr__()
@@ -206,7 +210,9 @@ class OrderRows(data_algebra.pipe.PipeStep):
                 raise ValueError("set is None when order_by is not None")
             unknown = set(reverse) - set(columns)
             if len(unknown) > 0:
-                raise ValueError("columns in reverse that are not in order_by: "  + str(unknown))
+                raise ValueError(
+                    "columns in reverse that are not in order_by: " + str(unknown)
+                )
         self.order_columns = [c for c in columns]
         if reverse is None:
             reverse = []
@@ -224,10 +230,13 @@ class OrderRows(data_algebra.pipe.PipeStep):
         )
 
     def __repr__(self):
-        return ("OrderRows(" + self.order_columns.__repr__()
-                + ", reverse=" + self.reverse.__repr__()
-                + ")"
-                )
+        return (
+            "OrderRows("
+            + self.order_columns.__repr__()
+            + ", reverse="
+            + self.reverse.__repr__()
+            + ")"
+        )
 
     def __str__(self):
         return self.__repr__()
@@ -251,9 +260,7 @@ class RenameColumns(data_algebra.pipe.PipeStep):
         return other.rename_columns(column_remapping=self.column_remapping)
 
     def __repr__(self):
-        return ("RenameColumns(" + self.column_remapping.__repr__()
-                + ")"
-                )
+        return "RenameColumns(" + self.column_remapping.__repr__() + ")"
 
     def __str__(self):
         return self.__repr__()
@@ -282,12 +289,16 @@ class NaturalJoin(data_algebra.pipe.PipeStep):
         return other.natural_join(b=self._b, by=self._by, jointype=self._jointype)
 
     def __repr__(self):
-        return ("NaturalJoin("
-                + ", b=" + self._b.__repr__()
-                + ", by=" + self._by.__repr__()
-                + ", jointype=" + self._jointype.__repr__()
-                + ")"
-                )
+        return (
+            "NaturalJoin("
+            + ", b="
+            + self._b.__repr__()
+            + ", by="
+            + self._by.__repr__()
+            + ", jointype="
+            + self._jointype.__repr__()
+            + ")"
+        )
 
     def __str__(self):
         return self.__repr__()
@@ -304,15 +315,20 @@ class ConvertRecords(data_algebra.pipe.PipeStep):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
-        return other.convert_records(record_map=self.record_map,
-                                     blocks_out_table=self.blocks_out_table)
+        return other.convert_records(
+            record_map=self.record_map, blocks_out_table=self.blocks_out_table
+        )
 
     def __repr__(self):
-        return ("ConvertRecords(" + self.record_map.__repr__()
-                + ", record_map=" + self.record_map.__repr__()
-                + ", blocks_out_table=" + self.blocks_out_table.__repr__()
-                + ")"
-                )
+        return (
+            "ConvertRecords("
+            + self.record_map.__repr__()
+            + ", record_map="
+            + self.record_map.__repr__()
+            + ", blocks_out_table="
+            + self.blocks_out_table.__repr__()
+            + ")"
+        )
 
     def __str__(self):
         return self.__repr__()
@@ -327,7 +343,9 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
 
     def apply_to(self, pipeline):
         if not isinstance(pipeline, data_algebra.data_ops.OperatorPlatform):
-            raise TypeError("Expected othter to be a data_algebra.data_ops.OperatorPlatform")
+            raise TypeError(
+                "Expected othter to be a data_algebra.data_ops.OperatorPlatform"
+            )
         for s in self.ops:
             # pipeline = pipeline >> s
             pipeline = s.apply(pipeline)
@@ -369,19 +387,15 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
     # print
 
     def __repr__(self):
-        return '[\n    ' + \
-               '\n    '.join([str(o) + ',' for o in self.ops]) + \
-               '\n]'
+        return "[\n    " + "\n    ".join([str(o) + "," for o in self.ops]) + "\n]"
 
     def __str__(self):
-        return '[\n    ' + \
-               '\n    '.join([str(o) + ',' for o in self.ops]) + \
-               '\n]'
+        return "[\n    " + "\n    ".join([str(o) + "," for o in self.ops]) + "\n]"
 
     # implement method chaining collection of pending operations
 
     def extend(
-            self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
+        self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
     ):
         if parse_env is not None:
             raise ValueError("Expected parse_env to be None")
@@ -432,9 +446,7 @@ class Locum(data_algebra.data_ops.OperatorPlatform):
         self.ops.append(op)
         return self
 
-    def convert_records(
-            self, record_map, *, blocks_out_table=None
-    ):
+    def convert_records(self, record_map, *, blocks_out_table=None):
         op = ConvertRecords(record_map=record_map, blocks_out_table=blocks_out_table)
         self.ops.append(op)
         return self
