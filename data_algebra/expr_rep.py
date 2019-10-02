@@ -276,19 +276,128 @@ class Term:
     def __ceil__(self):
         return self.__uop_expr__("ceil")
 
-    # ad-hoc defs
-
-    def max(self):
-        return self.__uop_expr__("max")
-
-    def min(self):
-        return self.__uop_expr__("min")
+    # math functions
 
     def exp(self):
         return self.__uop_expr__("exp")
 
+    # pandas style definitions
+    # https://pandas.pydata.org/pandas-docs/stable/reference/groupby.html
+
+    def all(self):
+        return self.__uop_expr__("all")
+
+    def any(self):
+        return self.__uop_expr__("any")
+
+    def bfill(self):
+        return self.__uop_expr__("bfill")
+
+    def count(self):
+        return self.__uop_expr__("count")
+
+    def cumcount(self):
+        return self.__uop_expr__("cumcount")
+
+    def cummax(self):
+        return self.__uop_expr__("cummax")
+
+    def cummin(self):
+        return self.__uop_expr__("cummin")
+
+    def cumprod(self):
+        return self.__uop_expr__("cumprod")
+
+    def cumsum(self):
+        return self.__uop_expr__("cumsum")
+
+    def ffill(self):
+        return self.__uop_expr__("ffill")
+
+    def first(self):
+        return self.__uop_expr__("first")
+
+    def head(self):
+        return self.__uop_expr__("head")
+
+    def is_monotonic_decreasing(self):
+        return self.__uop_expr__("is_monotonic_decreasing")
+
+    def is_monotonic_increasing(self):
+        return self.__uop_expr__("is_monotonic_increasing")
+
+    def last(self):
+        return self.__uop_expr__("last")
+
+    def max(self):
+        return self.__uop_expr__("max")
+
+    def mean(self):
+        return self.__uop_expr__("mean")
+
+    def median(self):
+        return self.__uop_expr__("median")
+
+    def min(self):
+        return self.__uop_expr__("min")
+
+    def ngroup(self):
+        return self.__uop_expr__("ngroup")
+
+    def nlargest(self):
+        return self.__uop_expr__("nlargest")
+
+    def nsmallest(self):
+        return self.__uop_expr__("nsmallest")
+
+    def nth(self):
+        return self.__uop_expr__("nth")
+
+    def nunique(self):
+        return self.__uop_expr__("nunique")
+
+    def ohlc(self):
+        return self.__uop_expr__("ohlc")
+
+    def pct_change(self):
+        return self.__uop_expr__("pct_change")
+
+    def prod(self):
+        return self.__uop_expr__("prod")
+
+    def rank(self):
+        return self.__uop_expr__("rank")
+
+    def sem(self):
+        return self.__uop_expr__("sem")
+
+    def size(self):
+        return self.__uop_expr__("size")
+
+    def std(self):
+        return self.__uop_expr__("std")
+
     def sum(self):
         return self.__uop_expr__("sum")
+
+    def tail(self):
+        return self.__uop_expr__("tail")
+
+    def unique(self):
+        return self.__uop_expr__("unique")
+
+    def value_counts(self):
+        return self.__uop_expr__("value_counts")
+
+    def var(self):
+        return self.__uop_expr__("var")
+
+    # pandas shift
+
+    def shift(self):
+        return self.__uop_expr__("shift")
+
+    # our ad-hoc definitions
 
     def is_null(self):
         return self.__uop_expr__("is_null")
