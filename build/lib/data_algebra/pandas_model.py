@@ -92,7 +92,9 @@ class PandasModel(data_algebra.data_model.DataModel):
                 if len(opk.args) == 0:
                     if opk.op == "row_number":
                         subframe[k] = opframe.cumcount() + 1
-                    else:  # TODO: more of these
+                    elif opk.op == "ngroup":
+                        subframe[k] = opframe.ngroup()
+                    else:
                         raise KeyError("not implemented: " + str(k) + ": " + str(opk))
                 else:
                     # len(opk.args) == 1

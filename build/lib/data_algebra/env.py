@@ -95,3 +95,6 @@ def populate_specials(*, column_defs, destination, user_values=None):
     destination["_row_number"] = lambda: data_algebra.expr_rep.Expression(
         op="row_number", args=[]
     )
+    destination["_ngroup"] = lambda: data_algebra.expr_rep.Expression(
+        op="ngroup", args=[]
+    )
