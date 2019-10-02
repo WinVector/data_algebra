@@ -17,6 +17,8 @@ def test_window_fns():
     ops = describe_table(d). \
         extend({
             'row_number': '_row_number()',
+            'ngroup': '_ngroup()',
+            'size': '_size()',
             'max_v': 'v.max()',
             'min_v': 'v.min()',
             'sum_v': 'v.sum()',
@@ -24,7 +26,6 @@ def test_window_fns():
             'shift_v': 'v.shift()',
             'count_v': 'v.count()',
             'size_v': 'v.size()',
-            'ngroup': '_ngroup()',
         },
         order_by=['x'],
         partition_by=['g'])
@@ -36,6 +37,8 @@ def test_window_fns():
         'x': [1, 4, 5, 7, 8, 9],
         'v': [10, 40, 50, 70, 80, 90],
         'row_number': [1, 1, 2, 1, 2, 3],
+        'ngroup': [0, 1, 1, 2, 2, 2],
+        'size': [1, 2, 2, 3, 3, 3],
         'max_v': [10, 50, 50, 90, 90, 90],
         'min_v': [10, 40, 40, 70, 70, 70],
         'sum_v': [10, 90, 90, 240, 240, 240],
@@ -43,8 +46,7 @@ def test_window_fns():
         'shift_v': [None, None, 40.0, None, 70.0, 80.0],
         'count_v': [1, 2, 2, 3, 3, 3],
         'size_v': [1, 2, 2, 3, 3, 3],
-        'ngroup': [0, 1, 1, 2, 2, 2],
-        })
+    })
 
     assert data_algebra.util.equivalent_frames(res1, expect1)
 
