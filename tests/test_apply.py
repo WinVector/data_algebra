@@ -2,7 +2,6 @@ import pandas
 import numpy
 import data_algebra.util
 from data_algebra.data_ops import *
-from data_algebra.data_pipe import *
 import data_algebra.PostgreSQL
 from data_algebra.util import od
 import data_algebra.yaml
@@ -40,6 +39,14 @@ def test_apply():
     res_1_1 = ops1.eval_pandas(data_map={"t1": d}, eval_env=locals())
 
     assert data_algebra.util.equivalent_frames(expect_1, res_1_1)
+
+    ops1b = TableDescription("t1", ["x", "y"]). \
+        add(Extend({"z": "x / y"})). \
+        add(SelectRows("z >= 0"))
+
+    res_1b = ops1b.transform(d)
+
+    assert data_algebra.util.equivalent_frames(expect_1, res_1b)
 
     res_1_2 = ops1.transform(d)
 

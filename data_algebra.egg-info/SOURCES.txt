@@ -9,7 +9,6 @@ data_algebra/cdata_impl.py
 data_algebra/dask_model.py
 data_algebra/data_model.py
 data_algebra/data_ops.py
-data_algebra/data_pipe.py
 data_algebra/data_types.py
 data_algebra/datatable_model.py
 data_algebra/db_model.py

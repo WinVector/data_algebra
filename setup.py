@@ -1,7 +1,8 @@
 # setup.py
 import setuptools
 
-DESCRIPTION="data_algebra is a data manipulation language that can both generate SQL queries and work on Pandas DataFrames. "
+DESCRIPTION=\
+    "data_algebra is a data manipulation language that can both generate SQL queries and work on Pandas DataFrames. "
 
 LONG_DESCRIPTION = """
 [data_algebra](https://github.com/WinVector/data_algebra) is a piped data wrangling system
@@ -11,11 +12,9 @@ compose and maintain grammar of data processing steps that in turn can be used t
 database specific SQL. The package also implements the same transforms for Pandas DataFrames 
 and Dask.
 
-This package is still under initial development, so some parts are not yet implemented or tested, and APIs
-are subject to change.
-
-Mature, production ready [R](https://www.r-project.org) versions of the system are available as 
-the [rquery](https://github.com/WinVector/rquery) and [rqdatatable](https://github.com/WinVector/rqdatatable) packages.
+[R](https://www.r-project.org) versions of the system are available as 
+the [rquery](https://github.com/WinVector/rquery) and 
+[rqdatatable](https://github.com/WinVector/rqdatatable) packages.
 
 Recommended packages include: PyYAML (supplies yaml), sqlparse, black, and dask. 
 """

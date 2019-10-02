@@ -242,11 +242,13 @@ class RecordMap:
 
     def __repr__(self):
         s = (
-            'data_algebra.cdata_impl.RecordMap('
-            + '\n    blocks_in=' + self.blocks_in.__repr__()
-            + ',\n    blocks_out=' + self.blocks_out.__repr__()
-            + ')'
-            )
+            "data_algebra.cdata_impl.RecordMap("
+            + "\n    blocks_in="
+            + self.blocks_in.__repr__()
+            + ",\n    blocks_out="
+            + self.blocks_out.__repr__()
+            + ")"
+        )
         return s
 
     def __str__(self):

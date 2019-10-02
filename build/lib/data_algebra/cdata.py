@@ -100,27 +100,30 @@ class RecordSpecification:
 
     def __repr__(self):
         s = (
-                "data_algebra.cdata.RecordSpecification(\n"
-                + '    record_keys=' + self.record_keys.__repr__()
-                + ',\n    control_table=' + data_algebra.util.pandas_to_example_str(self.control_table)
-                + ',\n    control_table_keys=' + self.control_table_keys.__repr__()
-                + ')'
+            "data_algebra.cdata.RecordSpecification(\n"
+            + "    record_keys="
+            + self.record_keys.__repr__()
+            + ",\n    control_table="
+            + data_algebra.util.pandas_to_example_str(self.control_table)
+            + ",\n    control_table_keys="
+            + self.control_table_keys.__repr__()
+            + ")"
         )
         return s
 
     def fmt(self):
         s = (
-                "RecordSpecification\n"
-                + "   record_keys: "
-                + str(self.record_keys)
-                + "\n"
-                + "   control_table_keys: "
-                + str(self.control_table_keys)
-                + "\n"
-                + "   control_table:\n"
-                + "   "
-                + re.sub("\n", "\n   ", str(self.control_table))
-                + "\n"
+            "RecordSpecification\n"
+            + "   record_keys: "
+            + str(self.record_keys)
+            + "\n"
+            + "   control_table_keys: "
+            + str(self.control_table_keys)
+            + "\n"
+            + "   control_table:\n"
+            + "   "
+            + re.sub("\n", "\n   ", str(self.control_table))
+            + "\n"
         )
         return s
 

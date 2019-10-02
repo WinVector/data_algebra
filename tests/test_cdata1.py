@@ -7,7 +7,6 @@ import data_algebra.cdata
 import data_algebra.cdata_impl
 import data_algebra.SQLite
 from data_algebra.data_ops import *
-from data_algebra.data_pipe import *
 import data_algebra.util
 
 

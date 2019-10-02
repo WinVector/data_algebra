@@ -1,5 +1,4 @@
 from data_algebra.data_ops import *
-from data_algebra.data_pipe import *
 from data_algebra.util import od
 import data_algebra.env
 import data_algebra.yaml

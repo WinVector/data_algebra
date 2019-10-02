@@ -3,7 +3,6 @@ import collections
 
 import data_algebra
 import data_algebra.data_ops
-import data_algebra.data_pipe
 import data_algebra.cdata_impl
 
 try:
@@ -101,7 +100,7 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
         elif op == "Extend":
             ops = obj["ops"]
             ops = {k: re.sub("=+", "==", o) for (k, o) in ops.items()}
-            return data_algebra.data_pipe.Extend(
+            return data_algebra.data_ops.Extend(
                 ops=ops,
                 partition_by=maybe_get_list(obj, "partition_by"),
                 order_by=maybe_get_list(obj, "order_by"),
@@ -110,11 +109,11 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
         elif op == "Project":
             ops = obj["ops"]
             ops = {k: re.sub("=+", "==", o) for (k, o) in ops.items()}
-            return data_algebra.data_pipe.Project(
+            return data_algebra.data_ops.Project(
                 ops=ops, group_by=maybe_get_list(obj, "group_by")
             )
         elif op == "NaturalJoin":
-            return data_algebra.data_pipe.NaturalJoin(
+            return data_algebra.data_ops.NaturalJoin(
                 by=maybe_get_list(obj, "by"),
                 jointype=obj["jointype"],
                 b=to_pipeline(obj["b"], known_tables=known_tables, parse_env=parse_env),
@@ -122,19 +121,19 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
         elif op == "SelectRows":
             expr = get_char_scalar(obj, "expr")
             expr = re.sub("=+", "==", expr)
-            return data_algebra.data_pipe.SelectRows(expr=expr)
+            return data_algebra.data_ops.SelectRows(expr=expr)
         elif op == "SelectColumns":
-            return data_algebra.data_pipe.SelectColumns(columns=obj["columns"])
+            return data_algebra.data_ops.SelectColumns(columns=obj["columns"])
         elif op == "DropColumns":
-            return data_algebra.data_pipe.DropColumns(
+            return data_algebra.data_ops.DropColumns(
                 column_deletions=obj["column_deletions"]
             )
         elif op == "Rename":
-            return data_algebra.data_pipe.RenameColumns(
+            return data_algebra.data_ops.RenameColumns(
                 column_remapping=obj["column_remapping"]
             )
         elif op == "Order":
-            return data_algebra.data_pipe.OrderRows(
+            return data_algebra.data_ops.OrderRows(
                 columns=maybe_get_list(obj, "order_columns"),
                 reverse=maybe_get_list(obj, "reverse"),
                 limit=maybe_get_none(obj, "limit"),
@@ -142,19 +141,19 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
         elif op == "ConvertRecords":
             blocks_out_table = None
             try:
-                blocks_out_table = obj['blocks_out_table']
+                blocks_out_table = obj["blocks_out_table"]
                 if blocks_out_table is not None:
-                    blocks_out_table = to_pipeline(blocks_out_table,
-                                                   known_tables=known_tables,
-                                                   parse_env=parse_env)
+                    blocks_out_table = to_pipeline(
+                        blocks_out_table, known_tables=known_tables, parse_env=parse_env
+                    )
             except KeyError:
                 pass
-            return data_algebra.data_pipe.ConvertRecords(
-                    record_map=data_algebra.cdata_impl.record_map_from_simple_obj(
-                        obj["record_map"]
-                    ),
-                    blocks_out_table=blocks_out_table
-                    )
+            return data_algebra.data_ops.ConvertRecords(
+                record_map=data_algebra.cdata_impl.record_map_from_simple_obj(
+                    obj["record_map"]
+                ),
+                blocks_out_table=blocks_out_table,
+            )
         else:
             raise TypeError("Unexpected op name: " + op)
     if isinstance(obj, list):
