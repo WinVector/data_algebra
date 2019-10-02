@@ -1,7 +1,11 @@
 
+import sqlite3
 import pandas
+
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 import data_algebra.util
+import data_algebra.SQLite
+
 
 # https://docs.scipy.org/doc/numpy-1.13.0/reference/routines.math.html
 # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html
@@ -14,7 +18,8 @@ def test_math():
         'v': [10, 40, 50, 70, 80, 90],
     })
 
-    ops = describe_table(d). \
+    table_desciption = describe_table(d)
+    ops = table_desciption. \
         extend({
             'v_exp': 'v.exp()',
             'v_sin': 'v.sin()',
@@ -37,4 +42,15 @@ def test_math():
 
     assert data_algebra.util.equivalent_frames(res1, expect1)
 
-    # TODO: try these through the DB (probably PostgreSQL)
+    conn = sqlite3.connect(":memory:")
+    db_model = data_algebra.SQLite.SQLiteModel()
+    db_model.prepare_connection(conn)
+
+    db_model.insert_table(conn, d, table_desciption.table_name)
+    sql1 = ops.to_sql(db_model)
+    res1_db = db_model.read_query(conn, sql1)
+
+    # clean up
+    conn.close()
+
+    assert data_algebra.util.equivalent_frames(res1_db, expect1)

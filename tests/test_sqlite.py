@@ -36,7 +36,7 @@ def test_sqlite():
 
     res = db_model.read_query(conn, sql)
 
-    # neaten up
+    # clean up
     conn.close()
 
     expect = pandas.DataFrame(
