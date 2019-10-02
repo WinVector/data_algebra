@@ -23,6 +23,7 @@ class Term:
     # builders
 
     def __op_expr__(self, op, other):
+        """binary expression"""
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
         if not isinstance(other, Term):
@@ -30,6 +31,7 @@ class Term:
         return Expression(op, (self, other), inline=True)
 
     def __rop_expr__(self, op, other):
+        """reversed binary expression"""
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
         if not isinstance(other, Term):
@@ -37,11 +39,13 @@ class Term:
         return Expression(op, (other, self), inline=True)
 
     def __uop_expr__(self, op, *, params=None):
+        """unary expression"""
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
         return Expression(op, (self,), params=params)
 
     def __triop_expr__(self, op, x, y):
+        """three argument expression"""
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
         if not isinstance(x, Term):
@@ -278,7 +282,6 @@ class Term:
 
     # math functions
     # https://docs.scipy.org/doc/numpy-1.13.0/reference/routines.math.html
-    # TODO: deal with higher airity fns
 
     def sin(self):
         return self.__uop_expr__('sin')
@@ -301,8 +304,8 @@ class Term:
     def hypot(self):
         return self.__uop_expr__('hypot')
 
-    def arctan2(self):
-        return self.__uop_expr__('arctan2')
+    def arctan2(self, other):
+        return self.__op_expr__('arctan2', other)
 
     def degrees(self):
         return self.__uop_expr__('degrees')
@@ -340,8 +343,8 @@ class Term:
     def around(self):
         return self.__uop_expr__('around')
 
-    def roun_d(self):
-        return self.__uop_expr__('roun_d')
+    def round_(self):
+        return self.__uop_expr__('round_')
 
     def rint(self):
         return self.__uop_expr__('rint')
@@ -391,8 +394,8 @@ class Term:
     def gradient(self):
         return self.__uop_expr__('gradient')
 
-    def cross(self):
-        return self.__uop_expr__('cross')
+    def cross(self, other):
+        return self.__op_expr__('cross', other)
 
     def trapz(self):
         return self.__uop_expr__('trapz')
@@ -418,11 +421,17 @@ class Term:
     def log1p(self):
         return self.__uop_expr__('log1p')
 
-    def logaddexp(self):
-        return self.__uop_expr__('logaddexp')
+    def logaddexp(self, other):
+        return self.__op_expr__('logaddexp', other)
 
-    def logaddexp2(self):
-        return self.__uop_expr__('logaddexp2')
+    def logaddexp2(self, other):
+        return self.__op_expr__('logaddexp2', other)
+
+    def i0(self):
+        return self.__uop_expr__('i0')
+
+    def sinc(self):
+        return self.__uop_expr__('sinc')
 
     def signbit(self):
         return self.__uop_expr__('signbit')
@@ -433,17 +442,17 @@ class Term:
     def frexp(self):
         return self.__uop_expr__('frexp')
 
-    def ldexp(self):
-        return self.__uop_expr__('ldexp')
+    def ldexp(self, other):
+        return self.__op_expr__('ldexp', other)
 
-    def nextafter(self):
-        return self.__uop_expr__('nextafter')
+    def nextafter(self, other):
+        return self.__op_expr__('nextafter', other)
 
     def spacing(self):
         return self.__uop_expr__('spacing')
 
-    def add(self):
-        return self.__uop_expr__('add')
+    def add(self, other):
+        return self.__op_expr__('add', other)
 
     def reciprocal(self):
         return self.__uop_expr__('reciprocal')
@@ -451,41 +460,41 @@ class Term:
     def negative(self):
         return self.__uop_expr__('negative')
 
-    def multiply(self):
-        return self.__uop_expr__('multiply')
+    def multiply(self, other):
+        return self.__op_expr__('multiply', other)
 
-    def divide(self):
-        return self.__uop_expr__('divide')
+    def divide(self, other):
+        return self.__op_expr__('divide', other)
 
-    def power(self):
-        return self.__uop_expr__('power')
+    def power(self, other):
+        return self.__op_expr__('power', other)
 
-    def subtract(self):
-        return self.__uop_expr__('subtract')
+    def subtract(self, other):
+        return self.__op_expr__('subtract', other)
 
-    def true_divide(self):
-        return self.__uop_expr__('true_divide')
+    def true_divide(self, other):
+        return self.__op_expr__('true_divide', other)
 
-    def floor_divide(self):
-        return self.__uop_expr__('floor_divide')
+    def floor_divide(self, other):
+        return self.__op_expr__('floor_divide', other)
 
-    def float_power(self):
-        return self.__uop_expr__('float_power')
+    def float_power(self, other):
+        return self.__op_expr__('float_power', other)
 
-    def fmod(self):
-        return self.__uop_expr__('fmod')
+    def fmod(self, other):
+        return self.__op_expr__('fmod', other)
 
-    def mod(self):
-        return self.__uop_expr__('mod')
+    def mod(self, other):
+        return self.__op_expr__('mod', other)
 
     def modf(self):
         return self.__uop_expr__('modf')
 
-    def remainder(self):
-        return self.__uop_expr__('remainder')
+    def remainder(self, other):
+        return self.__op_expr__('remainder', other)
 
-    def divmod(self):
-        return self.__uop_expr__('divmod')
+    def divmod(self, other):
+        return self.__op_expr__('divmod', other)
 
     def angle(self):
         return self.__uop_expr__('angle')
@@ -499,11 +508,11 @@ class Term:
     def conj(self):
         return self.__uop_expr__('conj')
 
-    def convolve(self):
-        return self.__uop_expr__('convolve')
+    def convolve(self, other):
+        return self.__op_expr__('convolve', other)
 
-    def clip(self):
-        return self.__uop_expr__('clip')
+    def clip(self, x, y):
+        return self.__triop_expr__('clip', x, y)
 
     def sqrt(self):
         return self.__uop_expr__('sqrt')
@@ -523,20 +532,20 @@ class Term:
     def sign(self):
         return self.__uop_expr__('sign')
 
-    def heaviside(self):
-        return self.__uop_expr__('heaviside')
+    def heaviside(self, other):
+        return self.__op_expr__('heaviside', other)
 
-    def maximum(self):
-        return self.__uop_expr__('maximum')
+    def maximum(self, other):
+        return self.__op_expr__('maximum', other)
 
-    def minimum(self):
-        return self.__uop_expr__('minimum')
+    def minimum(self, other):
+        return self.__op_expr__('minimum', other)
 
-    def fmax(self):
-        return self.__uop_expr__('fmax')
+    def fmax(self, other):
+        return self.__op_expr__('fmax', other)
 
-    def fmin(self):
-        return self.__uop_expr__('fmin')
+    def fmin(self, other):
+        return self.__op_expr__('fmin', other)
 
     def nan_to_num(self):
         return self.__uop_expr__('nan_to_num')
@@ -544,8 +553,8 @@ class Term:
     def real_if_close(self):
         return self.__uop_expr__('real_if_close')
 
-    def interp(self):
-        return self.__uop_expr__('interp')
+    def interp(self, xp, fp):
+        return self.__triop_expr__('interp', xp, fp)
 
     # pandas style definitions
     # https://pandas.pydata.org/pandas-docs/stable/reference/groupby.html
@@ -570,12 +579,6 @@ class Term:
 
     def cummin(self):
         return self.__uop_expr__("cummin")
-
-    def cumprod(self):
-        return self.__uop_expr__("cumprod")
-
-    def cumsum(self):
-        return self.__uop_expr__("cumsum")
 
     def ffill(self):
         return self.__uop_expr__("ffill")
@@ -628,9 +631,6 @@ class Term:
     def pct_change(self):
         return self.__uop_expr__("pct_change")
 
-    def prod(self):
-        return self.__uop_expr__("prod")
-
     def rank(self):
         return self.__uop_expr__("rank")
 
@@ -642,9 +642,6 @@ class Term:
 
     def std(self):
         return self.__uop_expr__("std")
-
-    def sum(self):
-        return self.__uop_expr__("sum")
 
     def tail(self):
         return self.__uop_expr__("tail")
