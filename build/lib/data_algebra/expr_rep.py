@@ -459,9 +459,9 @@ py_formatters = {
 pd_formatters = {
     "is_bad": lambda expr: "@is_bad(" + expr.args[0].to_pandas() + ")",
     "is_null": lambda expr: "@is_null(" + expr.args[0].to_pandas() + ")",
-    "if_else": lambda expr: "@if_else(" + expr.args[0].to_pandas() +\
-                            ", " + expr.args[1].to_pandas() +\
-                            ", " + expr.args[2].to_pandas()+ ")",
+    "if_else": lambda expr: "@if_else(" + expr.args[0].to_pandas() +
+                            ", " + expr.args[1].to_pandas() +
+                            ", " + expr.args[2].to_pandas() + ")",
     "neg": lambda expr: "-" + expr.args[0].to_pandas(want_inline_parens=True),
 }
 
