@@ -18,8 +18,18 @@ def _sqlite_is_bad_expr(dbmodel, expression):
         + ")"
     )
 
+def _sqlite_mean_expr(dbmodel, expression):
+    return (
+        "avg("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
+    )
 
-SQLite_formatters = {"is_bad": _sqlite_is_bad_expr}
+
+SQLite_formatters = {
+    "is_bad": _sqlite_is_bad_expr,
+    "mean": _sqlite_mean_expr
+}
 
 
 def _check_scalar_bad(x):
