@@ -24,13 +24,13 @@ d = pandas.DataFrame({
 })
 ```
 
-And we can run a number of ordered and un-ordered window functions (the distinction is given by if ther is an `order_by` argument present).
+And we can run a number of ordered and un-ordered window functions (the distinction is given by if there is an `order_by` argument present).
 
 
 ```python
-table_desciption = describe_table(d)
+table_description = describe_table(d)
 
-ops = table_desciption. \
+ops = table_description. \
     extend({
         'row_number': '_row_number()',
         'shift_v': 'v.shift()',
@@ -221,7 +221,7 @@ print(ops.to_python(pretty=True))
     
 
 
-And thiese commands can be re-used and even exported to SQL (including large scale SQL such as PostgreSQL, Apache Spark, or Google Big Query).
+And these commands can be re-used and even exported to SQL (including large scale SQL such as PostgreSQL, Apache Spark, or Google Big Query).
 
 For a simple demonstration we will use small-scale SQL as realized in SQLite.
 
@@ -231,7 +231,7 @@ conn = sqlite3.connect(":memory:")
 db_model = data_algebra.SQLite.SQLiteModel()
 db_model.prepare_connection(conn)
 
-ops_db = table_desciption. \
+ops_db = table_description. \
     extend({
         'row_number': '_row_number()',
         'shift_v': 'v.shift()',
@@ -250,7 +250,7 @@ ops_db = table_desciption. \
     },
     partition_by=['g'])
 
-db_model.insert_table(conn, d, table_desciption.table_name)
+db_model.insert_table(conn, d, table_description.table_name)
 sql1 = ops_db.to_sql(db_model, pretty=True)
 
 print(sql1)
@@ -424,14 +424,14 @@ Notice we didn't calculate the group-id `rgroup` in the `SQL` version.  This is 
 
 
 ```python
-id_ops_a = table_desciption. \
+id_ops_a = table_description. \
     project(group_by=['g']). \
     extend({
         'ngroup': '_row_number()',
     },
     order_by=['g'])
 
-id_ops_b = table_desciption. \
+id_ops_b = table_description. \
     natural_join(id_ops_a, by=['g'], jointype='LEFT')
 
 print(id_ops_b.to_python(pretty=True))
@@ -448,6 +448,8 @@ print(id_ops_b.to_python(pretty=True))
     
 
 
+Here we land the result in the database, without moving data through Python.
+
 
 ```python
 sql2 = id_ops_b.to_sql(db_model)
@@ -459,9 +461,11 @@ cur.execute('CREATE TABLE remote_result AS ' + sql2)
 
 
 
-    <sqlite3.Cursor at 0x31e617ea0>
+    <sqlite3.Cursor at 0x31f765ea0>
 
 
+
+And we later copy it over to look at.
 
 
 ```python
@@ -492,8 +496,8 @@ res2_db
     <tr style="text-align: right;">
       <th></th>
       <th>g</th>
-      <th>x</th>
       <th>v</th>
+      <th>x</th>
       <th>ngroup</th>
     </tr>
   </thead>
@@ -501,43 +505,43 @@ res2_db
     <tr>
       <th>0</th>
       <td>1</td>
-      <td>1</td>
       <td>10</td>
+      <td>1</td>
       <td>1</td>
     </tr>
     <tr>
       <th>1</th>
       <td>2</td>
-      <td>4</td>
       <td>40</td>
+      <td>4</td>
       <td>2</td>
     </tr>
     <tr>
       <th>2</th>
       <td>2</td>
-      <td>5</td>
       <td>50</td>
+      <td>5</td>
       <td>2</td>
     </tr>
     <tr>
       <th>3</th>
       <td>3</td>
-      <td>7</td>
       <td>70</td>
+      <td>7</td>
       <td>3</td>
     </tr>
     <tr>
       <th>4</th>
       <td>3</td>
-      <td>8</td>
       <td>80</td>
+      <td>8</td>
       <td>3</td>
     </tr>
     <tr>
       <th>5</th>
       <td>3</td>
-      <td>9</td>
       <td>90</td>
+      <td>9</td>
       <td>3</td>
     </tr>
   </tbody>
@@ -644,7 +648,7 @@ dot
 
 
 
-![svg](output_19_0.svg)
+![svg](output_21_0.svg)
 
 
 
@@ -677,9 +681,11 @@ dot
 
 
 
-![svg](output_21_0.svg)
+![svg](output_23_0.svg)
 
 
+
+And we can run this whole sequence with Pandas.
 
 
 ```python
@@ -824,6 +830,8 @@ all_ops.transform(d)
 </div>
 
 
+
+Or in the database.
 
 
 ```python
