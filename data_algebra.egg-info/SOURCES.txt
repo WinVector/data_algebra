@@ -4,6 +4,7 @@ data_algebra/PostgreSQL.py
 data_algebra/SQLite.py
 data_algebra/SparkSQL.py
 data_algebra/__init__.py
+data_algebra/arrow.py
 data_algebra/cdata.py
 data_algebra/cdata_impl.py
 data_algebra/dask_model.py

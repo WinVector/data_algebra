@@ -57,7 +57,7 @@ except ImportError:
 
 
 __docformat__ = "restructuredtext"
-__version__ = "0.2.4"
+__version__ = "0.2.5"
 
 __doc__ = """
 `data_algebra`<https://github.com/WinVector/data_algebra> is a piped data wrangling system
