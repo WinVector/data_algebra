@@ -72,13 +72,13 @@ def test_window_fns():
         partition_by=['g']). \
         extend({
             # 'ngroup': '_ngroup()',
-            # 'size': '_size()',
+            'size': '_size()',
             'max_v': 'v.max()',
             'min_v': 'v.min()',
             'sum_v': 'v.sum()',
             'mean_v': 'v.mean()',
             'count_v': 'v.count()',
-            #'size_v': 'v.size()',
+            'size_v': 'v.size()',
         },
         partition_by=['g'])
 
@@ -87,7 +87,7 @@ def test_window_fns():
     res1_db = db_model.read_query(conn, sql1)
 
     expect2 = expect1[['g', 'x', 'v', 'row_number', 'shift_v',
-                       'max_v', 'min_v', 'sum_v', 'mean_v', 'count_v']]
+                       'size', 'max_v', 'min_v', 'sum_v', 'mean_v', 'count_v', 'size_v']]
 
     assert data_algebra.util.equivalent_frames(res1_db, expect2)
 

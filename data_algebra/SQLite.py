@@ -18,6 +18,7 @@ def _sqlite_is_bad_expr(dbmodel, expression):
         + ")"
     )
 
+
 def _sqlite_mean_expr(dbmodel, expression):
     return (
         "avg("
@@ -34,10 +35,15 @@ def _sqlite_lag_expr(dbmodel, expression):
     )
 
 
+def _sqlite_size_expr(dbmodel, expression):
+    return "SUM(1)"
+
+
 SQLite_formatters = {
     "is_bad": _sqlite_is_bad_expr,
     "mean": _sqlite_mean_expr,
     "shift": _sqlite_lag_expr,
+    "size": _sqlite_size_expr,
 }
 
 
