@@ -7,7 +7,9 @@ Let's work an example. First bring in our packages.
 ```python
 import sqlite3
 import pandas
+import graphviz
 
+import data_algebra.diagram
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 import data_algebra.util
 import data_algebra.SQLite
@@ -219,6 +221,21 @@ print(ops.to_python(pretty=True))
         partition_by=["g"],
     )
     
+
+
+We can also present a diagram of the operator chain.
+
+
+```python
+dot_1 = data_algebra.diagram.to_digraph(ops)
+dot_1
+```
+
+
+
+
+![svg](output_9_0.svg)
+
 
 
 And these commands can be re-used and even exported to SQL (including large scale SQL such as PostgreSQL, Apache Spark, or Google Big Query).
@@ -461,7 +478,7 @@ cur.execute('CREATE TABLE remote_result AS ' + sql2)
 
 
 
-    <sqlite3.Cursor at 0x31f765ea0>
+    <sqlite3.Cursor at 0x31cb2dab0>
 
 
 
@@ -637,18 +654,14 @@ And we can diagram the group labeling operation.
 
 
 ```python
-import graphviz
-
-import data_algebra.diagram
-
-dot = data_algebra.diagram.to_digraph(id_ops_b)
-dot
+dot_b = data_algebra.diagram.to_digraph(id_ops_b)
+dot_b
 ```
 
 
 
 
-![svg](output_21_0.svg)
+![svg](output_23_0.svg)
 
 
 
@@ -674,14 +687,14 @@ all_ops = id_ops_b. \
     },
     partition_by=['g'])
 
-dot = data_algebra.diagram.to_digraph(all_ops)
-dot
+dot_all = data_algebra.diagram.to_digraph(all_ops)
+dot_all
 ```
 
 
 
 
-![svg](output_23_0.svg)
+![svg](output_25_0.svg)
 
 
 
