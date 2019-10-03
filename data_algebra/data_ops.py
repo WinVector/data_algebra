@@ -1203,7 +1203,7 @@ class NaturalJoinNode(ViewRepresentation):
                 + " " * (indent + 6)
             )
         else:
-            s = s + " _1 "
+            s = s + " _1, "
         s = s + (
             "by=" + self.by.__repr__() + ", jointype=" + self.jointype.__repr__() + ")"
         )
@@ -1621,7 +1621,7 @@ class NaturalJoin(data_algebra.pipe.PipeStep):
     def __repr__(self):
         return (
             "NaturalJoin("
-            + ", b="
+            + "b="
             + self._b.__repr__()
             + ", by="
             + self._by.__repr__()

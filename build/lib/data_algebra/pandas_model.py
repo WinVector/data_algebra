@@ -88,7 +88,8 @@ class PandasModel(data_algebra.data_model.DataModel):
                     #  Groupby preserves the order of rows within each group.
                     # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.groupby.html
                 else:
-                    opframe = subframe
+                    subframe['_data_algebra_temp_g'] = 1
+                    opframe = subframe.groupby(['_data_algebra_temp_g'])
                 # TODO: document exactly which of these are available
                 if len(opk.args) == 0:
                     if opk.op == "row_number":
@@ -143,7 +144,12 @@ class PandasModel(data_algebra.data_model.DataModel):
         )
         if len(op.group_by) > 0:
             res = res.groupby(op.group_by)
-        cols = {k: res[str(opk.args[0])].agg(opk.op) for (k, opk) in op.ops.items()}
+        remove_temp_col = False
+        if len(op.ops) > 0:
+            cols = {k: res[str(opk.args[0])].agg(opk.op) for (k, opk) in op.ops.items()}
+        else:
+            cols = {'_data_table_temp_col': res[op.sources[0].column_names[0]].agg('sum') }
+            remove_temp_col = True
 
         # agg can return scalars, which then can't be made into a pandas.DataFrame
         def promote_scalar(v):
@@ -158,6 +164,8 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = self.columns_to_frame(cols).reset_index(
             drop=len(op.group_by) < 1
         )  # grouping variables in the index
+        if remove_temp_col:
+            res = res.drop('_data_table_temp_col', 1)
         return res
 
     def select_rows_step(self, op, *, data_map, eval_env):

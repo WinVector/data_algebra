@@ -1,9 +1,28 @@
+
 import pandas
 import data_algebra.util
 from data_algebra.data_ops import *
 import data_algebra.PostgreSQL
 from data_algebra.util import od
 import data_algebra.yaml
+
+
+def test_project0():
+    d = pandas.DataFrame(
+        {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
+    )
+
+    ops = describe_table(d, "d").project(
+        group_by=["c", "g"]
+    )
+
+    res = ops.transform(d)
+
+    expect = pandas.DataFrame(
+        {"c": [1, 1], "g": ["a", "b"]}
+    )
+
+    assert data_algebra.util.equivalent_frames(expect, res)
 
 
 def test_project():

@@ -23,21 +23,25 @@ import data_algebra.data_ops
 def _get_op_str(op):
     op_str = op.to_python_implementation(print_sources=False)
     if have_black:
-        black_mode = black.FileMode(line_length=60)
-        op_str = black.format_str(op_str, mode=black_mode)
+        try:
+            black_mode = black.FileMode(line_length=60)
+            op_str = black.format_str(op_str, mode=black_mode)
+        except Exception:
+            pass
     return op_str
 
 
 def _to_digraph_r_nodes(ops, dot, table_keys, nextid, edges):
     if isinstance(ops, data_algebra.data_ops.TableDescription):
-        if ops.key in table_keys:
+        try:
             return table_keys[ops.key]
-        table_keys.add(ops.key)
-        node_id = nextid[0]
-        nextid[0] = node_id + 1
-        dot.attr("node", shape="folder", color="blue")
-        dot.node(str(node_id), _get_op_str(ops))
-        return node_id
+        except KeyError:
+            node_id = nextid[0]
+            table_keys[ops.key] = node_id
+            nextid[0] = node_id + 1
+            dot.attr("node", shape="folder", color="blue")
+            dot.node(str(node_id), _get_op_str(ops))
+            return node_id
     source_ids = [
         _to_digraph_r_nodes(
             ops=op, dot=dot, table_keys=table_keys, nextid=nextid, edges=edges
@@ -63,7 +67,7 @@ def to_digraph(ops):
         raise RuntimeError("graphviz not installed")
     dot = graphviz.Digraph()
     edges = []
-    _to_digraph_r_nodes(ops=ops, dot=dot, table_keys=set(), nextid=[0], edges=edges)
+    _to_digraph_r_nodes(ops=ops, dot=dot, table_keys={}, nextid=[0], edges=edges)
     for (sub_id, node_id, label) in edges:
         if label is None:
             dot.edge(sub_id, node_id)
