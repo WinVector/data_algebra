@@ -65,7 +65,7 @@ class OperatorPlatform(data_algebra.pipe.PipeValue):
     ):
         raise NotImplementedError("base class called")
 
-    def project(self, ops, *, group_by=None, parse_env=None):
+    def project(self, ops=None, *, group_by=None, parse_env=None):
         raise NotImplementedError("base class called")
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
@@ -444,7 +444,7 @@ class ViewRepresentation(OperatorPlatform):
             parse_env=parse_env,
         )
 
-    def project(self, ops, *, group_by=None, parse_env=None):
+    def project(self, ops=None, *, group_by=None, parse_env=None):
         return ProjectNode(source=self, ops=ops, group_by=group_by, parse_env=parse_env)
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
@@ -739,12 +739,12 @@ class ExtendNode(ViewRepresentation):
 
 
 class ProjectNode(ViewRepresentation):
-    def __init__(self, source, ops, *, group_by=None, parse_env=None):
+    def __init__(self, source, ops=None, *, group_by=None, parse_env=None):
+        if ops is None:
+            ops = {}
         ops = data_algebra.expr_rep.parse_assignments_in_context(
             ops, source, parse_env=parse_env
         )
-        if len(ops) < 1:
-            raise ValueError("no ops")
         self.ops = ops
         if group_by is None:
             group_by = []
@@ -1414,9 +1414,11 @@ class Project(data_algebra.pipe.PipeStep):
 
     ops: Dict[str, data_algebra.expr_rep.Expression]
 
-    def __init__(self, ops, *, group_by=None):
+    def __init__(self, ops=None, *, group_by=None):
         if isinstance(group_by, str):
             group_by = [group_by]
+        if ops is None:
+            ops = {}
         data_algebra.pipe.PipeStep.__init__(self, name="Project")
         self._ops = ops
         self.group_by = group_by
@@ -1733,9 +1735,11 @@ class Locum(OperatorPlatform):
         self.ops.append(op)
         return self
 
-    def project(self, ops, *, group_by=None, parse_env=None):
+    def project(self, ops=None, *, group_by=None, parse_env=None):
         if parse_env is not None:
             raise ValueError("Expected parse_env to be None")
+        if ops is None:
+            ops = {}
         op = Project(ops=ops, group_by=group_by)
         self.ops.append(op)
         return self

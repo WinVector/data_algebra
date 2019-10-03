@@ -57,8 +57,6 @@ def test_window_fns():
 
     assert data_algebra.util.equivalent_frames(res1, expect1)
 
-    # TODO: see if we can at least get _size and .shift() working
-
     conn = sqlite3.connect(":memory:")
     db_model = data_algebra.SQLite.SQLiteModel()
     db_model.prepare_connection(conn)

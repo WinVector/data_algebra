@@ -846,6 +846,8 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
     :param parse_env map of names to values to add to parsing environment
     :return:
     """
+    if ops is None:
+        ops = {}
     if not isinstance(ops, dict):
         raise TypeError("ops should be a dictionary")
     column_defs = view.column_map.__dict__

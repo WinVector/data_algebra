@@ -281,11 +281,10 @@ class DBModel:
         if using is None:
             using = project_node.column_set
         subops = {k: op for (k, op) in project_node.ops.items() if k in using}
-        if len(subops) < 1:
-            raise ValueError("must produce at least one column")
         subusing = project_node.columns_used_from_sources(using=using)[0]
-        if len(subusing) < 1:
+        if (len(project_node.group_by) + len(subusing)) < 1:
             raise ValueError("must use at least one column")
+        grouping = [g for g in project_node.group_by]
         derived = [
             self.expr_to_sql(oi) + " AS " + self.quote_identifier(ci)
             for (ci, oi) in subops.items()
@@ -297,7 +296,7 @@ class DBModel:
         temp_id_source[0] = temp_id_source[0] + 1
         sql_str = (
             "SELECT "
-            + ", ".join(derived)
+            + ", ".join(grouping + derived)
             + " FROM ( "
             + subsql
             + " ) "
