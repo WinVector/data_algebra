@@ -29,8 +29,12 @@ class DataOpArrow:
         node.sources = [self._r_copy_replace(s) for s in node.sources]
         return node
 
-    def apply_to(self, other):
+    def transform(self, other):
         """replace self input table with other"""
+        if isinstance(other, pandas.DataFrame):
+            return self.v.transform(other)
+        if isinstance(other, data_algebra.data_ops.ViewRepresentation):
+            other = DataOpArrow(other)
         if not isinstance(other, DataOpArrow):
             raise TypeError("other must be a DataOpArrow")
         if set(self.incoming_columns) != set(other.outgoing_columns):
@@ -38,12 +42,10 @@ class DataOpArrow:
         return DataOpArrow(other._r_copy_replace(self.v))
 
     def __rrshift__(self, other):  # override other >> self
-        if isinstance(other, pandas.DataFrame):
-            return self.v.transform(other)
-        return self.apply_to(other)
+        return self.transform(other)
 
     def __rshift__(self, other):  # override self >> other
-        return other.apply_to(self)
+        return other.transform(self)
 
     def __repr__(self):
         return "DataOpArrow(" + self.v.__repr__() + ")"
