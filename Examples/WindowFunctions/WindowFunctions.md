@@ -459,7 +459,7 @@ cur.execute('CREATE TABLE remote_result AS ' + sql2)
 
 
 
-    <sqlite3.Cursor at 0x322308ea0>
+    <sqlite3.Cursor at 0x31e617ea0>
 
 
 
@@ -545,12 +545,6 @@ res2_db
 </div>
 
 
-
-
-```python
-# clean up
-conn.close()
-```
 
 And we can execute the same pipeline in Pandas.
 
@@ -650,11 +644,333 @@ dot
 
 
 
-![svg](output_20_0.svg)
+![svg](output_19_0.svg)
+
+
+
+Or all the steps in one sequence.
+
+
+```python
+all_ops = id_ops_b. \
+    extend({
+        'row_number': '_row_number()',
+        'shift_v': 'v.shift()',
+    },
+    order_by=['x'],
+    partition_by=['g']). \
+    extend({
+        'size': '_size()',
+        'max_v': 'v.max()',
+        'min_v': 'v.min()',
+        'sum_v': 'v.sum()',
+        'mean_v': 'v.mean()',
+        'count_v': 'v.count()',
+        'size_v': 'v.size()',
+    },
+    partition_by=['g'])
+
+dot = data_algebra.diagram.to_digraph(all_ops)
+dot
+```
+
+
+
+
+![svg](output_21_0.svg)
 
 
 
 
 ```python
+all_ops.transform(d)
+```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>g</th>
+      <th>x</th>
+      <th>v</th>
+      <th>ngroup</th>
+      <th>row_number</th>
+      <th>shift_v</th>
+      <th>size</th>
+      <th>max_v</th>
+      <th>min_v</th>
+      <th>sum_v</th>
+      <th>mean_v</th>
+      <th>count_v</th>
+      <th>size_v</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>1</td>
+      <td>10</td>
+      <td>1</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>1</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>4</td>
+      <td>40</td>
+      <td>2</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>2</td>
+      <td>50</td>
+      <td>40</td>
+      <td>90</td>
+      <td>45</td>
+      <td>2</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>5</td>
+      <td>50</td>
+      <td>2</td>
+      <td>2</td>
+      <td>40.0</td>
+      <td>2</td>
+      <td>50</td>
+      <td>40</td>
+      <td>90</td>
+      <td>45</td>
+      <td>2</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3</td>
+      <td>7</td>
+      <td>70</td>
+      <td>3</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>3</td>
+      <td>90</td>
+      <td>70</td>
+      <td>240</td>
+      <td>80</td>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>3</td>
+      <td>8</td>
+      <td>80</td>
+      <td>3</td>
+      <td>2</td>
+      <td>70.0</td>
+      <td>3</td>
+      <td>90</td>
+      <td>70</td>
+      <td>240</td>
+      <td>80</td>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>3</td>
+      <td>9</td>
+      <td>90</td>
+      <td>3</td>
+      <td>3</td>
+      <td>80.0</td>
+      <td>3</td>
+      <td>90</td>
+      <td>70</td>
+      <td>240</td>
+      <td>80</td>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+db_model.read_query(conn, all_ops.to_sql(db_model))
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>g</th>
+      <th>x</th>
+      <th>v</th>
+      <th>ngroup</th>
+      <th>row_number</th>
+      <th>shift_v</th>
+      <th>size</th>
+      <th>max_v</th>
+      <th>min_v</th>
+      <th>sum_v</th>
+      <th>mean_v</th>
+      <th>count_v</th>
+      <th>size_v</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>1</td>
+      <td>10</td>
+      <td>1</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>1</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10.0</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>4</td>
+      <td>40</td>
+      <td>2</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>2</td>
+      <td>50</td>
+      <td>40</td>
+      <td>90</td>
+      <td>45.0</td>
+      <td>2</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>5</td>
+      <td>50</td>
+      <td>2</td>
+      <td>2</td>
+      <td>40.0</td>
+      <td>2</td>
+      <td>50</td>
+      <td>40</td>
+      <td>90</td>
+      <td>45.0</td>
+      <td>2</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3</td>
+      <td>7</td>
+      <td>70</td>
+      <td>3</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>3</td>
+      <td>90</td>
+      <td>70</td>
+      <td>240</td>
+      <td>80.0</td>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>3</td>
+      <td>8</td>
+      <td>80</td>
+      <td>3</td>
+      <td>2</td>
+      <td>70.0</td>
+      <td>3</td>
+      <td>90</td>
+      <td>70</td>
+      <td>240</td>
+      <td>80.0</td>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>3</td>
+      <td>9</td>
+      <td>90</td>
+      <td>3</td>
+      <td>3</td>
+      <td>80.0</td>
+      <td>3</td>
+      <td>90</td>
+      <td>70</td>
+      <td>240</td>
+      <td>80.0</td>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+# clean up
+conn.close()
 ```
