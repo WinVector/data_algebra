@@ -66,7 +66,7 @@ def test_window_fns():
     ops_db = table_desciption. \
         extend({
             'row_number': '_row_number()',
-            # 'shift_v': 'v.shift()',
+            'shift_v': 'v.shift()',
         },
         order_by=['x'],
         partition_by=['g']). \
@@ -86,7 +86,8 @@ def test_window_fns():
     sql1 = ops_db.to_sql(db_model)
     res1_db = db_model.read_query(conn, sql1)
 
-    expect2 = expect1[['g', 'x', 'v', 'row_number', 'max_v', 'min_v', 'sum_v', 'mean_v', 'count_v']]
+    expect2 = expect1[['g', 'x', 'v', 'row_number', 'shift_v',
+                       'max_v', 'min_v', 'sum_v', 'mean_v', 'count_v']]
 
     assert data_algebra.util.equivalent_frames(res1_db, expect2)
 

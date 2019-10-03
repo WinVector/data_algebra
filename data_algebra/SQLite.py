@@ -26,9 +26,18 @@ def _sqlite_mean_expr(dbmodel, expression):
     )
 
 
+def _sqlite_lag_expr(dbmodel, expression):
+    return (
+        "LAG("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
+    )
+
+
 SQLite_formatters = {
     "is_bad": _sqlite_is_bad_expr,
-    "mean": _sqlite_mean_expr
+    "mean": _sqlite_mean_expr,
+    "shift": _sqlite_lag_expr,
 }
 
 
