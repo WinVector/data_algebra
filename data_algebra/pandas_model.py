@@ -128,28 +128,31 @@ class PandasModel(data_algebra.data_model.DataModel):
         # build an agg list: https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
         # https://stackoverflow.com/questions/44635626/rename-result-columns-from-pandas-aggregation-futurewarning-using-a-dict-with
         for (k, opk) in op.ops.items():
-            if len(opk.args) != 1:
+            if len(opk.args) > 1:
                 raise ValueError(
                     "non-trivial aggregation expression: " + str(k) + ": " + str(opk)
                 )
-            if not isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
-                raise ValueError(
-                    "windows expression argument must be a column: "
-                    + str(k)
-                    + ": "
-                    + str(opk)
-                )
+            if len(opk.args) > 0:
+                if not isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
+                    raise ValueError(
+                        "windows expression argument must be a column: "
+                        + str(k)
+                        + ": "
+                        + str(opk)
+                    )
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self
         )
+        res['_data_table_temp_col'] = 1
         if len(op.group_by) > 0:
             res = res.groupby(op.group_by)
-        remove_temp_col = False
         if len(op.ops) > 0:
-            cols = {k: res[str(opk.args[0])].agg(opk.op) for (k, opk) in op.ops.items()}
+            cols = {k: (res[str(opk.args[0])].agg(opk.op) if
+                        len(opk.args)>0 else
+                        res['_data_table_temp_col'].agg(opk.op))
+                    for (k, opk) in op.ops.items()}
         else:
-            cols = {'_data_table_temp_col': res[op.sources[0].column_names[0]].agg('sum') }
-            remove_temp_col = True
+            cols = {'_data_table_temp_col': res['_data_table_temp_col'].agg('sum') }
 
         # agg can return scalars, which then can't be made into a pandas.DataFrame
         def promote_scalar(v):
@@ -164,7 +167,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = self.columns_to_frame(cols).reset_index(
             drop=len(op.group_by) < 1
         )  # grouping variables in the index
-        if remove_temp_col:
+        if '_data_table_temp_col' in res.columns:
             res = res.drop('_data_table_temp_col', 1)
         return res
 
