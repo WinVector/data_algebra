@@ -62,10 +62,10 @@ class DataOpArrow:
         return DataOpArrow(other._r_copy_replace(self.pipeline))
 
     def __rshift__(self, other):  # override self >> other
-        return other.transform(self)
+        return other.transform(self, strict=True)
 
     def __rrshift__(self, other):  # override other >> self
-        return self.transform(other)
+        return self.transform(other, strict=True)
 
     def __repr__(self):
         return "DataOpArrow(" + self.pipeline.__repr__() + ")"
