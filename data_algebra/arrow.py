@@ -29,14 +29,17 @@ class DataOpArrow:
         node.sources = [self._r_copy_replace(s) for s in node.sources]
         return node
 
-    def transform(self, other):
+    def transform(self, other, *, strict=True):
         """replace self input table with other"""
         if isinstance(other, pandas.DataFrame):
             cols = set(other.columns)
             missing = set(self.incoming_columns) - cols
             if len(missing) > 0:
                 raise ValueError("missing required columns: " + str(missing))
-            if len(cols - set(self.incoming_columns)):
+            excess = cols - set(self.incoming_columns)
+            if len(excess):
+                if strict:
+                    raise ValueError("extra incoming columns: " + str(excess))
                 other = other[self.incoming_columns]
             return self.pipeline.transform(other)
         if isinstance(other, data_algebra.data_ops.ViewRepresentation):
@@ -46,7 +49,10 @@ class DataOpArrow:
         missing = set(self.incoming_columns) - set(other.outgoing_columns)
         if len(missing) > 0:
             raise ValueError("missing required columns: " + str(missing))
-        if len(set(other.outgoing_columns) - set(self.incoming_columns)):
+        excess = set(other.outgoing_columns) - set(self.incoming_columns)
+        if len(excess):
+            if strict:
+                raise ValueError("extra incoming columns: " + str(excess))
             # extra columns, in a strict categorical formulation we would
             # reject this. instead insert a select columns node to get the match
             other = DataOpArrow(other.pipeline.select_columns([c for c in self.incoming_columns]))
