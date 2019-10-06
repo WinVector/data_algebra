@@ -56,9 +56,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self
         )
-        standin_name = op.sources[0].column_names[
-            0
-        ]  # name of an arbitrary input variable
+        standin_name = '_data_algebra_temp_g'  # name of an arbitrary input variable
         if not window_situation:
             for (k, opk) in op.ops.items():
                 op_src = opk.to_pandas()
@@ -83,13 +81,13 @@ class PandasModel(data_algebra.data_model.DataModel):
                 subframe = subframe.sort_values(
                     by=col_list, ascending=ascending
                 ).reset_index(drop=True)
+                subframe[standin_name] = 1
                 if len(op.partition_by) > 0:
                     opframe = subframe.groupby(op.partition_by)
                     #  Groupby preserves the order of rows within each group.
                     # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.groupby.html
                 else:
-                    subframe['_data_algebra_temp_g'] = 1
-                    opframe = subframe.groupby(['_data_algebra_temp_g'])
+                    opframe = subframe.groupby([standin_name])
                 # TODO: document exactly which of these are available
                 if len(opk.args) == 0:
                     if opk.op == "row_number":
