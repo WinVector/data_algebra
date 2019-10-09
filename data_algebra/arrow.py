@@ -6,7 +6,6 @@ import pandas
 import data_algebra.data_ops
 
 
-
 class DataOpArrow:
     """ Represent a section of operators as a categorical arrow."""
 
@@ -14,12 +13,17 @@ class DataOpArrow:
         if not isinstance(pipeline, data_algebra.data_ops.ViewRepresentation):
             raise TypeError("expected pipeline to be data_algebra.data_ops")
         self.pipeline = pipeline
-        cused = pipeline.columns_used()
-        if len(cused) != 1:
+        t_used = pipeline.get_tables()
+        if len(t_used) != 1:
             raise ValueError("pipeline must use exactly one table")
-        k = [k for k in cused.keys()][0]
-        self.incoming_columns = cused[k]
+        k = [k for k in t_used.keys()][0]
+        c_used = pipeline.columns_used()
+        if len(c_used) != 1:
+            raise ValueError("pipeline must use exactly one table")
+        self.incoming_columns = c_used[k]
+        self.incoming_types = t_used[k].column_types
         self.outgoing_columns = pipeline.column_names
+        self.outgoing_types = None
 
     def _r_copy_replace(self, ops):
         """re-write ops replacing any TableDescription with self.pipeline"""
@@ -29,37 +33,60 @@ class DataOpArrow:
         node.sources = [self._r_copy_replace(s) for s in node.sources]
         return node
 
-    def transform(self, other, *, strict=True):
-        """replace self input table with other"""
-        if isinstance(other, pandas.DataFrame):
-            cols = set(other.columns)
-            missing = set(self.incoming_columns) - cols
+    # noinspection PyPep8Naming
+    def transform(self, X, *, strict=True):
+        """replace self input table with X"""
+        if isinstance(X, data_algebra.data_ops.ViewRepresentation):
+            X = DataOpArrow(X)
+        if isinstance(X, DataOpArrow):
+            missing = set(self.incoming_columns) - set(X.outgoing_columns)
             if len(missing) > 0:
                 raise ValueError("missing required columns: " + str(missing))
-            excess = cols - set(self.incoming_columns)
+            excess = set(X.outgoing_columns) - set(self.incoming_columns)
             if len(excess):
                 if strict:
                     raise ValueError("extra incoming columns: " + str(excess))
-                other = other[self.incoming_columns]
-            return self.pipeline.transform(other)
-        if isinstance(other, data_algebra.data_ops.ViewRepresentation):
-            other = DataOpArrow(other)
-        if not isinstance(other, DataOpArrow):
-            raise TypeError("other must be a DataOpArrow")
-        missing = set(self.incoming_columns) - set(other.outgoing_columns)
+                # extra columns, in a strict categorical formulation we would
+                # reject this. instead insert a select columns node to get the match
+                X = DataOpArrow(X.pipeline.select_columns([c for c in self.incoming_columns]))
+            # check categorical arrow composition conditions
+            if set(self.incoming_columns) != set(X.outgoing_columns):
+                raise ValueError("arrow composition conditions not met (incoming column set doesn't match outgoing)")
+            return DataOpArrow(X._r_copy_replace(self.pipeline))
+        # assume a pandas.DataFrame compatible object
+        cols = set(X.columns)
+        missing = set(self.incoming_columns) - cols
         if len(missing) > 0:
             raise ValueError("missing required columns: " + str(missing))
-        excess = set(other.outgoing_columns) - set(self.incoming_columns)
+        excess = cols - set(self.incoming_columns)
         if len(excess):
             if strict:
                 raise ValueError("extra incoming columns: " + str(excess))
-            # extra columns, in a strict categorical formulation we would
-            # reject this. instead insert a select columns node to get the match
-            other = DataOpArrow(other.pipeline.select_columns([c for c in self.incoming_columns]))
-        # check categorical arrow composition conditions
-        if set(self.incoming_columns) != set(other.outgoing_columns):
-            raise ValueError("arrow composition conditions not met (incoming column set doesn't match outgoing)")
-        return DataOpArrow(other._r_copy_replace(self.pipeline))
+            X = X[self.incoming_columns]
+        return self.pipeline.transform(X)
+
+    def learn_types(self, data_in, data_out):
+        if(data_in.shape[0]>0):
+            types_in = {k: type(data_in.loc[0, k]) for k in self.incoming_columns}
+            self.incoming_types = types_in
+        if (data_out.shape[0] > 0):
+            types_out = {k: type(data_out.loc[0, k]) for k in self.outgoing_columns}
+            self.outgoing_types = types_out
+
+    # noinspection PyPep8Naming
+    def fit(self, X):
+        """Learn input and output types from example, and return self"""
+        # assume a pandas.DataFrame compatible object
+        out = self.transform(X)
+        self.learn_types(X, out)
+        return self
+
+    # noinspection PyPep8Naming
+    def fit_transform(self, X):
+        """Learn input and output types from example, and return transform."""
+        out = self.transform(X)
+        self.learn_types(X, out)
+        return self.transform(X)
 
     def __rshift__(self, other):  # override self >> other
         return other.transform(self, strict=True)
@@ -71,4 +98,12 @@ class DataOpArrow:
         return "DataOpArrow(" + self.pipeline.__repr__() + ")"
 
     def __str__(self):
-        return "[" + str(self.incoming_columns) + " -> " + str(self.outgoing_columns) + "]"
+        if self.incoming_types is not None:
+            in_rep = str(self.incoming_types)
+        else:
+            in_rep = str([c for c in self.incoming_columns])
+        if self.outgoing_types is not None:
+            out_rep = str(self.outgoing_types)
+        else:
+            out_rep = str([c for c in self.outgoing_columns])
+        return "[" + in_rep + " -> " + out_rep + "]"

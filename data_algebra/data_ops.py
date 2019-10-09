@@ -495,10 +495,14 @@ class TableDescription(ViewRepresentation):
     """
 
     table_name: str
+    column_names: List[str]
     qualifiers: Dict[str, str]
     key: str
 
-    def __init__(self, table_name, column_names, *, qualifiers=None):
+    def __init__(self, table_name, column_names,
+                 *,
+                 qualifiers=None,
+                 column_types=None):
         ViewRepresentation.__init__(self, column_names=column_names)
         if (table_name is not None) and (not isinstance(table_name, str)):
             raise TypeError("table_name must be a string")
@@ -506,6 +510,9 @@ class TableDescription(ViewRepresentation):
         if isinstance(column_names, str):
             column_names = [column_names]
         self.column_names = [c for c in column_names]
+        self.column_types = None
+        if column_types is not None:
+            self.column_types = column_types.copy()
         if qualifiers is None:
             qualifiers = {}
         if not isinstance(qualifiers, dict):
@@ -604,7 +611,12 @@ class TableDescription(ViewRepresentation):
 
 def describe_table(d, table_name="data_frame"):
     if isinstance(d, pandas.DataFrame):
-        return TableDescription(table_name, [c for c in d.columns])
+        column_names = [c for c in d.columns]
+        column_types = None
+        if d.shape[0]>0:
+            column_types = {k: type(d.loc[0, k]) for k in column_names}
+        return TableDescription(table_name, column_names,
+                                column_types=column_types)
     if data_algebra.data_types.is_dask_data_frame(d):
         return TableDescription(table_name, [c for c in d.columns])
     if data_algebra.data_types.is_datatable_frame(d):
