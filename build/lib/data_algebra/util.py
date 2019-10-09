@@ -117,3 +117,20 @@ def equivalent_frames(
             if not all([ca[i] == cb[i] for i in range(a.shape[0])]):
                 return False
     return True
+
+
+
+def table_is_keyed_by_columns(table, column_names):
+    # check for ill-condition
+    if isinstance(column_names, str):
+        column_names = [column_names]
+    missing_columns = set(column_names) - set([c for c in table.columns])
+    if len(missing_columns) > 0:
+        raise KeyError("missing columns: " + str(missing_columns))
+    # get rid of some corner cases
+    if table.shape[0] < 2:
+        return True
+    if len(column_names) < 1:
+        return False
+    counts = table.groupby(column_names).size()
+    return counts.max() <= 1

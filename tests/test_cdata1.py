@@ -3,8 +3,8 @@ import io
 import sqlite3
 import yaml
 import pandas
-import data_algebra.cdata
-import data_algebra.cdata_impl
+from data_algebra.cdata import *
+from data_algebra.cdata_impl import record_map_from_simple_obj
 import data_algebra.SQLite
 from data_algebra.data_ops import *
 import data_algebra.util
@@ -134,7 +134,7 @@ def test_cdata1():
 
     # %%
 
-    mp_to_blocks = data_algebra.cdata_impl.RecordMap(blocks_out=record_spec)
+    mp_to_blocks = RecordMap(blocks_out=record_spec)
     waste_str = str(mp_to_blocks)
     arranged_blocks = mp_to_blocks.transform(iris)
     assert data_algebra.util.equivalent_frames(arranged_blocks, iris_blocks_orig)
@@ -142,7 +142,7 @@ def test_cdata1():
 
     # %%
 
-    mp_to_rows = data_algebra.cdata_impl.RecordMap(blocks_in=record_spec)
+    mp_to_rows = RecordMap(blocks_in=record_spec)
     waste_str = str(mp_to_rows)
     arranged_rows = mp_to_rows.transform(arranged_blocks)
     assert data_algebra.util.equivalent_frames(arranged_rows, iris_orig)
@@ -150,7 +150,7 @@ def test_cdata1():
 
     # %%
 
-    mp_to_and_back = data_algebra.cdata_impl.RecordMap(
+    mp_to_and_back = RecordMap(
         blocks_in=record_spec, blocks_out=record_spec
     )
     waste_str = str(mp_to_and_back)
@@ -165,5 +165,5 @@ def test_cdata1():
 
     #%%
 
-    recovered_transform = data_algebra.cdata_impl.record_map_from_simple_obj(obj)
+    recovered_transform = record_map_from_simple_obj(obj)
     waste_str = str(recovered_transform)

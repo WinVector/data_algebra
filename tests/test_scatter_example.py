@@ -1,8 +1,8 @@
 import pandas
 
 import data_algebra.util
-import data_algebra.cdata
-import data_algebra.cdata_impl
+from data_algebra.cdata import *
+from data_algebra.cdata_impl import record_map_from_simple_obj
 
 # https://github.com/WinVector/cdata
 
@@ -15,7 +15,7 @@ def test_scatter_example():
     )
     control_table["value_1"] = control_table["v1"]
     control_table["value_2"] = control_table["v2"]
-    record_map = data_algebra.cdata_impl.RecordMap(
+    record_map = RecordMap(
         blocks_out=data_algebra.cdata.RecordSpecification(
             control_table,
             record_keys=["iris_id", "Species"],

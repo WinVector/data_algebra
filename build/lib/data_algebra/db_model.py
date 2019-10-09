@@ -7,7 +7,7 @@ import pandas
 import data_algebra.expr_rep
 import data_algebra.data_ops
 import data_algebra.util
-import data_algebra.cdata
+#import data_algebra.cdata
 
 
 # map from op-name to special SQL formatting code
@@ -635,10 +635,10 @@ class DBModel:
     ):
         if temp_id_source is None:
             temp_id_source = [0]
-        if not isinstance(record_spec, data_algebra.cdata.RecordSpecification):
-            raise TypeError(
-                "record_spec should be a data_algebra.cdata.RecordSpecification"
-            )
+        # if not isinstance(record_spec, data_algebra.cdata.RecordSpecification):
+        #     raise TypeError(
+        #         "record_spec should be a data_algebra.cdata.RecordSpecification"
+        #     )
         if not isinstance(record_view, data_algebra.data_ops.ViewRepresentation):
             raise TypeError(
                 "record_view should be a data_algebra.data_ops.ViewRepresentation"
@@ -710,10 +710,10 @@ class DBModel:
     def blocks_to_row_recs_query(
         self, source_sql, record_spec, *, using=None, temp_id_source=None
     ):
-        if not isinstance(record_spec, data_algebra.cdata.RecordSpecification):
-            raise TypeError(
-                "record_spec should be a data_algebra.cdata.RecordSpecification"
-            )
+        # if not isinstance(record_spec, data_algebra.cdata.RecordSpecification):
+        #     raise TypeError(
+        #         "record_spec should be a data_algebra.cdata.RecordSpecification"
+        #     )
         control_value_cols = [
             c
             for c in record_spec.control_table.columns

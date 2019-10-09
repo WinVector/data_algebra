@@ -5,7 +5,7 @@ import numpy
 import pandas
 
 from data_algebra.data_ops import *
-from data_algebra.cdata_impl import RecordMap
+from data_algebra.cdata import *
 import data_algebra.yaml
 from data_algebra.cdata_impl import record_map_from_simple_obj
 import data_algebra.util
@@ -37,7 +37,7 @@ def test_cdata_example():
         }
     )
 
-    record_spec = data_algebra.cdata.RecordSpecification(
+    record_spec = RecordSpecification(
         control_table,
         control_table_keys=["Part", "Measure"],
         record_keys=["id", "Species"],
@@ -119,11 +119,11 @@ def test_cdata_block():
         }
     )
 
-    record_map = data_algebra.cdata_impl.RecordMap(
-        blocks_in=data_algebra.cdata.RecordSpecification(
+    record_map = RecordMap(
+        blocks_in=RecordSpecification(
             control_table=incoming_shape, record_keys=record_keys
         ),
-        blocks_out=data_algebra.cdata.RecordSpecification(
+        blocks_out=RecordSpecification(
             control_table=outgoing_shape, record_keys=record_keys
         ),
     )
@@ -168,11 +168,11 @@ def test_cdata_missing():
         }
     )
 
-    record_map = data_algebra.cdata_impl.RecordMap(
-        blocks_in=data_algebra.cdata.RecordSpecification(
+    record_map = RecordMap(
+        blocks_in=RecordSpecification(
             control_table=incoming_shape, record_keys=record_keys
         ),
-        blocks_out=data_algebra.cdata.RecordSpecification(
+        blocks_out=RecordSpecification(
             control_table=outgoing_shape, record_keys=record_keys
         ),
     )

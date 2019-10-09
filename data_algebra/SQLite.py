@@ -4,7 +4,6 @@ import numbers
 
 import data_algebra.data_types
 import data_algebra.util
-import data_algebra.data_ops
 import data_algebra.db_model
 
 
@@ -35,6 +34,7 @@ def _sqlite_lag_expr(dbmodel, expression):
     )
 
 
+# noinspection PyUnusedLocal
 def _sqlite_size_expr(dbmodel, expression):
     return "SUM(1)"
 
