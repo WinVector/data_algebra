@@ -48,11 +48,25 @@ class DataOpArrow:
                     raise ValueError("extra incoming columns: " + str(excess))
                 # extra columns, in a strict categorical formulation we would
                 # reject this. instead insert a select columns node to get the match
+                x_outgoing_types = X.outgoing_types
                 X = DataOpArrow(X.pipeline.select_columns([c for c in self.incoming_columns]))
+                if x_outgoing_types is not None:
+                    X.outgoing_types = {k: x_outgoing_types[k] for k in X.outgoing_columns}
             # check categorical arrow composition conditions
             if set(self.incoming_columns) != set(X.outgoing_columns):
                 raise ValueError("arrow composition conditions not met (incoming column set doesn't match outgoing)")
-            return DataOpArrow(X._r_copy_replace(self.pipeline))
+            if (self.incoming_types is not None) and (X.outgoing_types is not None):
+                for c in self.incoming_columns:
+                    st = self.incoming_types[c]
+                    xt = X.outgoing_types[c]
+                    if st != xt:
+                        raise ValueError("column " + c +
+                                         " self incoming type is " + str(st) +
+                                         ", while X outgoing type is " + str(xt))
+            res = DataOpArrow(X._r_copy_replace(self.pipeline))
+            res.incoming_types = X.incoming_types
+            res.outgoing_types = self.outgoing_types
+            return res
         # assume a pandas.DataFrame compatible object
         cols = set(X.columns)
         missing = set(self.incoming_columns) - cols
