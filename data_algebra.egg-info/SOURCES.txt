@@ -17,6 +17,7 @@ data_algebra/diagram.py
 data_algebra/env.py
 data_algebra/expr.py
 data_algebra/expr_rep.py
+data_algebra/flow_text.py
 data_algebra/pandas_model.py
 data_algebra/pending_eval.py
 data_algebra/pipe.py

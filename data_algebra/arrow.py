@@ -4,6 +4,7 @@ import copy
 import pandas
 
 import data_algebra.data_ops
+import data_algebra.flow_text
 
 
 class DataOpArrow:
@@ -112,12 +113,22 @@ class DataOpArrow:
         return "DataOpArrow(" + self.pipeline.__repr__() + ")"
 
     def __str__(self):
+        align_right = 70
+        sep_width = 2
         if self.incoming_types is not None:
-            in_rep = str(self.incoming_types)
+            in_rep = [str(k) + ': ' + str(v) for (k, v) in self.incoming_types.items()]
         else:
-            in_rep = str([c for c in self.incoming_columns])
+            in_rep = [str(c) for c in self.incoming_columns]
+        in_rep = data_algebra.flow_text.flow_text(in_rep,
+                                                  align_right=align_right, sep_width=sep_width)
+        in_rep = [', '.join(line) for line in in_rep]
+        in_rep = ' [ ' + ',\n    '.join(in_rep) + ' ]'
         if self.outgoing_types is not None:
-            out_rep = str(self.outgoing_types)
+            out_rep = [str(k) + ': ' + str(v) for (k, v) in self.outgoing_types.items()]
         else:
-            out_rep = str([c for c in self.outgoing_columns])
-        return "[" + in_rep + " -> " + out_rep + "]"
+            out_rep = [str(c) for c in self.outgoing_columns]
+        out_rep = data_algebra.flow_text.flow_text(out_rep,
+                                                   align_right=align_right, sep_width=sep_width)
+        out_rep = [', '.join(line) for line in out_rep]
+        out_rep = ' [ ' + ',\n    '.join(out_rep) + ' ]'
+        return "[\n " + in_rep + "\n   ->\n " + out_rep + "\n]\n"
