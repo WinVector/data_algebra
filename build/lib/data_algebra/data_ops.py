@@ -1270,6 +1270,7 @@ class ConvertRecordsNode(ViewRepresentation):
             if len(unknown) > 0:
                 raise ValueError("blocks_out_table missing columns: " + str(unknown))
             sources = sources + [blocks_out_table]
+        self.blocks_out_table = blocks_out_table
         self.record_map = record_map
         unknown = set(self.record_map.columns_needed) - set(source.column_names)
         if len(unknown) > 0:

@@ -1,4 +1,4 @@
-type: data_algebra.cdata_impl.RecordMap
+type: data_algebra.cdata.RecordMap
 blocks_out:
   type: data_algebra.cdata.RecordSpecification
   record_keys:

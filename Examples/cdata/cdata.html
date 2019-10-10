@@ -13145,8 +13145,7 @@ div#notebook {
 
 <span class="c1"># pip install data_algebra</span>
 <span class="c1"># data_algebra from https://github.com/WinVector/data_algebra/</span>
-<span class="kn">import</span> <span class="nn">data_algebra.cdata</span>
-<span class="kn">import</span> <span class="nn">data_algebra.cdata_impl</span>
+<span class="kn">from</span> <span class="nn">data_algebra.cdata</span> <span class="k">import</span> <span class="o">*</span>
 <span class="kn">import</span> <span class="nn">data_algebra.data_ops</span>
 <span class="kn">import</span> <span class="nn">data_algebra.yaml</span>
 <span class="kn">import</span> <span class="nn">data_algebra.SQLite</span>
@@ -13543,15 +13542,14 @@ and others. Many <a href="https://www.r-project.org">R</a> packages supply relat
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>RecordSpecification
-   record_keys: [&#39;id&#39;, &#39;Species&#39;]
-   control_table_keys: [&#39;Part&#39;, &#39;Measure&#39;]
-   control_table:
-       Part Measure         Value
-   0  Petal  Length  Petal.Length
-   1  Petal   Width   Petal.Width
-   2  Sepal  Length  Sepal.Length
-   3  Sepal   Width   Sepal.Width</pre>
+<pre>data_algebra.cdata.RecordSpecification(
+    record_keys=[&#39;id&#39;, &#39;Species&#39;],
+    control_table=pandas.DataFrame({
+    &#39;Part&#39;: [&#39;Petal&#39;, &#39;Petal&#39;, &#39;Sepal&#39;, &#39;Sepal&#39;],
+    &#39;Measure&#39;: [&#39;Length&#39;, &#39;Width&#39;, &#39;Length&#39;, &#39;Width&#39;],
+    &#39;Value&#39;: [&#39;Petal.Length&#39;, &#39;Petal.Width&#39;, &#39;Sepal.Length&#39;, &#39;Sepal.Width&#39;],
+    }),
+    control_table_keys=[&#39;Part&#39;, &#39;Measure&#39;])</pre>
 </div>
 
 </div>
@@ -13574,7 +13572,7 @@ and others. Many <a href="https://www.r-project.org">R</a> packages supply relat
 <div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mp_to_blocks</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata_impl</span><span class="o">.</span><span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_out</span><span class="o">=</span><span class="n">record_spec</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mp_to_blocks</span> <span class="o">=</span> <span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_out</span><span class="o">=</span><span class="n">record_spec</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">mp_to_blocks</span><span class="p">))</span>
 </pre></div>
 
@@ -13594,7 +13592,7 @@ and others. Many <a href="https://www.r-project.org">R</a> packages supply relat
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Transform row records of the form:
   record_keys: [&#39;id&#39;, &#39;Species&#39;]
- [&#39;id&#39;, &#39;Species&#39;, &#39;Petal.Length&#39;, &#39;Petal.Width&#39;, &#39;Sepal.Length&#39;, &#39;Sepal.Width&#39;]
+ [&#39;Petal.Length&#39;, &#39;Petal.Width&#39;, &#39;Sepal.Length&#39;, &#39;Sepal.Width&#39;]
 to block records of structure:
 RecordSpecification
    record_keys: [&#39;id&#39;, &#39;Species&#39;]
@@ -13800,7 +13798,7 @@ RecordSpecification
 <div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mp_to_rows</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata_impl</span><span class="o">.</span><span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">=</span><span class="n">record_spec</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mp_to_rows</span> <span class="o">=</span> <span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">=</span><span class="n">record_spec</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">mp_to_rows</span><span class="p">))</span>
 </pre></div>
 
@@ -13830,7 +13828,7 @@ RecordSpecification
    3  Sepal   Width   Sepal.Width
 to row records of the form:
   record_keys: [&#39;id&#39;, &#39;Species&#39;]
- [&#39;id&#39;, &#39;Species&#39;, &#39;Petal.Length&#39;, &#39;Petal.Width&#39;, &#39;Sepal.Length&#39;, &#39;Sepal.Width&#39;]
+ [&#39;Petal.Length&#39;, &#39;Petal.Width&#39;, &#39;Sepal.Length&#39;, &#39;Sepal.Width&#39;]
 
 </pre>
 </div>
@@ -13992,7 +13990,7 @@ to row records of the form:
   WHEN b.&#34;Value&#34; = &#39;Sepal.Width&#39; THEN a.&#34;Sepal.Width&#34;
   ELSE NULL END AS &#34;Value&#34;
 FROM (
-  SELECT &#34;id&#34;, &#34;Petal.Width&#34;, &#34;Sepal.Length&#34;, &#34;Species&#34;, &#34;Sepal.Width&#34;, &#34;Petal.Length&#34; FROM &#34;iris&#34; ) a
+  SELECT &#34;Sepal.Length&#34;, &#34;Sepal.Width&#34;, &#34;Petal.Length&#34;, &#34;Petal.Width&#34;, &#34;Species&#34;, &#34;id&#34; FROM &#34;iris&#34; ) a
 CROSS JOIN (
   &#34;control_table&#34; ) b
  ORDER BY a.&#34;id&#34;, a.&#34;Species&#34;, b.&#34;Part&#34;, b.&#34;Measure&#34;
@@ -14038,8 +14036,8 @@ CROSS JOIN (
  MAX(CASE WHEN  ( &#34;Part&#34; = &#39;Sepal&#39; )  AND  ( &#34;Measure&#34; = &#39;Length&#39; )  THEN &#34;Value&#34; ELSE NULL END) AS &#34;Sepal.Length&#34;,
  MAX(CASE WHEN  ( &#34;Part&#34; = &#39;Sepal&#39; )  AND  ( &#34;Measure&#34; = &#39;Width&#39; )  THEN &#34;Value&#34; ELSE NULL END) AS &#34;Sepal.Width&#34;
 FROM (
-  SELECT &#34;id&#34;, &#34;Petal.Width&#34;, &#34;Sepal.Length&#34;, &#34;Species&#34;, &#34;Sepal.Width&#34;, &#34;Petal.Length&#34; FROM &#34;iris&#34;
- )
+  SELECT &#34;Sepal.Length&#34;, &#34;Sepal.Width&#34;, &#34;Petal.Length&#34;, &#34;Petal.Width&#34;, &#34;Species&#34;, &#34;id&#34; FROM &#34;iris&#34;
+ ) a
  GROUP BY &#34;id&#34;, &#34;Species&#34;
  ORDER BY &#34;id&#34;, &#34;Species&#34;
 </pre>
@@ -14290,7 +14288,7 @@ This packages support both in-memory operations and translation of the transform
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>type: data_algebra.cdata_impl.RecordMap
+<pre>type: data_algebra.cdata.RecordMap
 blocks_out:
   type: data_algebra.cdata.RecordSpecification
   record_keys:

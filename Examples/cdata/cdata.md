@@ -25,8 +25,7 @@ import yaml
 
 # pip install data_algebra
 # data_algebra from https://github.com/WinVector/data_algebra/
-import data_algebra.cdata
-import data_algebra.cdata_impl
+from data_algebra.cdata import *
 import data_algebra.data_ops
 import data_algebra.yaml
 import data_algebra.SQLite
@@ -338,15 +337,14 @@ record_spec
 
 
 
-    RecordSpecification
-       record_keys: ['id', 'Species']
-       control_table_keys: ['Part', 'Measure']
-       control_table:
-           Part Measure         Value
-       0  Petal  Length  Petal.Length
-       1  Petal   Width   Petal.Width
-       2  Sepal  Length  Sepal.Length
-       3  Sepal   Width   Sepal.Width
+    data_algebra.cdata.RecordSpecification(
+        record_keys=['id', 'Species'],
+        control_table=pandas.DataFrame({
+        'Part': ['Petal', 'Petal', 'Sepal', 'Sepal'],
+        'Measure': ['Length', 'Width', 'Length', 'Width'],
+        'Value': ['Petal.Length', 'Petal.Width', 'Sepal.Length', 'Sepal.Width'],
+        }),
+        control_table_keys=['Part', 'Measure'])
 
 
 
@@ -356,13 +354,13 @@ Now we can transform our original row-record oriented data into general block re
 
 
 ```python
-mp_to_blocks = data_algebra.cdata_impl.RecordMap(blocks_out=record_spec)
+mp_to_blocks = RecordMap(blocks_out=record_spec)
 print(str(mp_to_blocks))
 ```
 
     Transform row records of the form:
       record_keys: ['id', 'Species']
-     ['id', 'Species', 'Petal.Length', 'Petal.Width', 'Sepal.Length', 'Sepal.Width']
+     ['Petal.Length', 'Petal.Width', 'Sepal.Length', 'Sepal.Width']
     to block records of structure:
     RecordSpecification
        record_keys: ['id', 'Species']
@@ -523,7 +521,7 @@ An inverse transform is simply expressed by reversing the roles of the `blocks_o
 
 
 ```python
-mp_to_rows = data_algebra.cdata_impl.RecordMap(blocks_in=record_spec)
+mp_to_rows = RecordMap(blocks_in=record_spec)
 print(str(mp_to_rows))
 ```
 
@@ -539,7 +537,7 @@ print(str(mp_to_rows))
        3  Sepal   Width   Sepal.Width
     to row records of the form:
       record_keys: ['id', 'Species']
-     ['id', 'Species', 'Petal.Length', 'Petal.Width', 'Sepal.Length', 'Sepal.Width']
+     ['Petal.Length', 'Petal.Width', 'Sepal.Length', 'Sepal.Width']
     
 
 
@@ -650,7 +648,7 @@ print(db_model.row_recs_to_blocks_query(
       WHEN b."Value" = 'Sepal.Width' THEN a."Sepal.Width"
       ELSE NULL END AS "Value"
     FROM (
-      SELECT "id", "Petal.Width", "Sepal.Length", "Species", "Sepal.Width", "Petal.Length" FROM "iris" ) a
+      SELECT "Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width", "Species", "id" FROM "iris" ) a
     CROSS JOIN (
       "control_table" ) b
      ORDER BY a."id", a."Species", b."Part", b."Measure"
@@ -673,8 +671,8 @@ print(db_model.blocks_to_row_recs_query(
      MAX(CASE WHEN  ( "Part" = 'Sepal' )  AND  ( "Measure" = 'Length' )  THEN "Value" ELSE NULL END) AS "Sepal.Length",
      MAX(CASE WHEN  ( "Part" = 'Sepal' )  AND  ( "Measure" = 'Width' )  THEN "Value" ELSE NULL END) AS "Sepal.Width"
     FROM (
-      SELECT "id", "Petal.Width", "Sepal.Length", "Species", "Sepal.Width", "Petal.Length" FROM "iris"
-     )
+      SELECT "Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width", "Species", "id" FROM "iris"
+     ) a
      GROUP BY "id", "Species"
      ORDER BY "id", "Species"
 
@@ -801,7 +799,7 @@ As the record transform specifications, both in Python `data_algebra` and R `cat
 print(yaml.dump(mp_to_blocks.to_simple_obj()))
 ```
 
-    type: data_algebra.cdata_impl.RecordMap
+    type: data_algebra.cdata.RecordMap
     blocks_out:
       type: data_algebra.cdata.RecordSpecification
       record_keys:
