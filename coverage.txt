@@ -24,8 +24,7 @@ tests/test_natural_join.py .                                             [ 52%]
 tests/test_neg.py .                                                      [ 55%]
 tests/test_null_bad.py .                                                 [ 57%]
 tests/test_parse.py .                                                    [ 60%]
-tests/test_poject.py ..                                                  [ 65%]
-tests/test_project.py .                                                  [ 67%]
+tests/test_project.py ...                                                [ 67%]
 tests/test_scatter_example.py .                                          [ 70%]
 tests/test_scoring_example.py .                                          [ 72%]
 tests/test_select_stacking.py .                                          [ 75%]
@@ -48,7 +47,7 @@ data_algebra/cdata.py               231     77    67%
 data_algebra/cdata_impl.py           14      1    93%
 data_algebra/dask_model.py          121     23    81%
 data_algebra/data_model.py           41     15    63%
-data_algebra/data_ops.py           1101    265    76%
+data_algebra/data_ops.py           1115    269    76%
 data_algebra/data_types.py           39     19    51%
 data_algebra/datatable_model.py     131     81    38%
 data_algebra/db_model.py            358     80    78%
@@ -63,7 +62,7 @@ data_algebra/pipe.py                 65     19    71%
 data_algebra/util.py                 96     11    89%
 data_algebra/yaml.py                119     15    87%
 -----------------------------------------------------
-TOTAL                              3467   1071    69%
+TOTAL                              3481   1075    69%
 
 
-========================== 40 passed in 7.64 seconds ===========================
+========================== 40 passed in 7.99 seconds ===========================

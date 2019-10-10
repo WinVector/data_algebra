@@ -5,6 +5,7 @@ import re
 import pandas
 
 import data_algebra
+import data_algebra.flow_text
 import data_algebra.data_model
 import data_algebra.data_types
 import data_algebra.db_model
@@ -214,6 +215,7 @@ class ViewRepresentation(OperatorPlatform):
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
         return "ViewRepresentation(" + self.column_names.__repr__() + ")"
 
+    # noinspection PyBroadException
     def to_python(self, *, indent=0, strict=True, pretty=False, black_mode=None):
         self.columns_used()  # for table consistency check/raise
         if pretty:
@@ -223,13 +225,12 @@ class ViewRepresentation(OperatorPlatform):
         )
         if pretty:
             if data_algebra.have_black:
-                if black_mode is None:
-                    black_mode = black.FileMode()
-                python_str = black.format_str(python_str, mode=black_mode)
-            python_str = re.sub(
-                "[)].(" + "|".join(op_list) + ")[(]", "\n).\\1(\n    ", python_str
-            )
-            python_str = re.sub("\n+[ \t]*\n+", "\n", python_str)
+                try:
+                    if black_mode is None:
+                        black_mode = black.FileMode()
+                    python_str = black.format_str(python_str, mode=black_mode)
+                except Exception:
+                    pass
         return python_str
 
     def __repr__(self):
@@ -243,6 +244,7 @@ class ViewRepresentation(OperatorPlatform):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         raise NotImplementedError("base method called")
 
+    # noinspection PyBroadException
     def to_sql(self, db_model, *, pretty=False, encoding=None, sqlparse_options=None):
         if sqlparse_options is None:
             sqlparse_options = {"reindent": True, "keyword_case": "upper"}
@@ -256,7 +258,10 @@ class ViewRepresentation(OperatorPlatform):
             db_model=db_model, using=None, temp_id_source=temp_id_source
         )
         if pretty and data_algebra.have_sqlparse:
-            sql_str = sqlparse.format(sql_str, encoding=encoding, **sqlparse_options)
+            try:
+                sql_str = sqlparse.format(sql_str, encoding=encoding, **sqlparse_options)
+            except Exception:
+                pass
         return sql_str
 
     # Pandas realization
@@ -541,26 +546,27 @@ class TableDescription(ViewRepresentation):
         return pipeline
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
-        nc = min(len(self.column_names), 20)
-        if (not strict) and (nc < len(self.column_names)):
-            cols_str = (
-                "["
-                + ", ".join([self.column_names[i].__repr__() for i in range(nc)])
-                + ", + "
-                + str(len(self.column_names) - nc)
-                + " more]"
-            )
+        spacer = '\n ' + ' '*indent
+        column_limit = 20
+        truncated = (not strict) and (column_limit < len(self.column_names))
+        if truncated:
+            cols_to_print = [self.column_names[i].__repr__() for i in range(column_limit)] + \
+               ['+ ' + str(len(self.column_names)) + ' more']
         else:
-            cols_str = self.column_names.__repr__()
+            cols_to_print = [c.__repr__() for c in self.column_names]
+        col_text = data_algebra.flow_text.flow_text(cols_to_print,
+                                                    align_right=70 - indent,
+                                                    sep_width=2)
+        col_text = [', '.join(line) for line in col_text]
+        col_text = (',  ' + spacer).join(col_text)
         s = (
             "TableDescription("
-            + "table_name="
-            + self.table_name.__repr__()
-            + ", column_names="
-            + cols_str
+            + spacer + "table_name=" + self.table_name.__repr__() + ","
+            + spacer + "column_names=["
+            + spacer + '  ' + col_text + "]"
         )
         if len(self.qualifiers) > 0:
-            s = s + ", qualifiers=" + self.qualifiers.__repr__()
+            s = s + "," + spacer + "qualifiers=" + self.qualifiers.__repr__()
         s = s + ")"
         return s
 
@@ -613,7 +619,7 @@ def describe_table(d, table_name="data_frame"):
     if isinstance(d, pandas.DataFrame):
         column_names = [c for c in d.columns]
         column_types = None
-        if d.shape[0]>0:
+        if d.shape[0] > 0:
             column_types = {k: type(d.loc[0, k]) for k in column_names}
         return TableDescription(table_name, column_names,
                                 column_types=column_types)
@@ -717,29 +723,27 @@ class ExtendNode(ViewRepresentation):
         )
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+        spacer = '\n   ' + ' '*indent
         s = ""
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                + " .\\\n"
-                + " " * (indent + 3)
+                + " .\\"
+                + spacer
             )
+        ops = [k.__repr__() + ": " + opi.to_python().__repr__() for (k, opi) in self.ops.items()]
+        flowed = (',' + spacer + ' ').join(ops)
         s = s + (
             "extend({"
-            + ", ".join(
-                [
-                    k.__repr__() + ": " + opi.to_python().__repr__()
-                    for (k, opi) in self.ops.items()
-                ]
-            )
+            + spacer + ' ' + flowed
             + "}"
         )
         if len(self.partition_by) > 0:
-            s = s + ", partition_by=" + self.partition_by.__repr__()
+            s = s + "," + spacer + "partition_by=" + self.partition_by.__repr__()
         if len(self.order_by) > 0:
-            s = s + ", order_by=" + self.order_by.__repr__()
+            s = s + "," + spacer + "order_by=" + self.order_by.__repr__()
         if len(self.reverse) > 0:
-            s = s + ", reverse=" + self.reverse.__repr__()
+            s = s + "," + spacer + "reverse=" + self.reverse.__repr__()
         s = s + ")"
         return s
 
@@ -806,6 +810,7 @@ class ProjectNode(ViewRepresentation):
         )
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+        spacer = '\n   ' + ' ' * indent
         s = ""
         if print_sources:
             s = (
@@ -814,8 +819,8 @@ class ProjectNode(ViewRepresentation):
                 + " " * (indent + 3)
             )
         s = s + (
-            "project({"
-            + ", ".join(
+            "project({" + spacer + ' '
+            + ("," + spacer + ' ').join(
                 [
                     k.__repr__() + ": " + opi.to_python().__repr__()
                     for (k, opi) in self.ops.items()
@@ -824,7 +829,7 @@ class ProjectNode(ViewRepresentation):
             + "}"
         )
         if len(self.group_by) > 0:
-            s = s + ", group_by=" + self.group_by.__repr__()
+            s = s + "," + spacer + "group_by=" + self.group_by.__repr__()
         s = s + ")"
         return s
 
