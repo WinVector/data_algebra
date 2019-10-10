@@ -1,6 +1,6 @@
 ============================= test session starts ==============================
-platform darwin -- Python 3.6.9, pytest-5.0.1, py-1.8.0, pluggy-0.12.0
-rootdir: /Users/johnmount/Documents/work/data_algebra
+platform linux -- Python 3.6.9, pytest-5.0.1, py-1.8.0, pluggy-0.12.0
+rootdir: /home/john/Documents/work/data_algebra
 plugins: cov-2.7.1
 collected 39 items
 
@@ -35,33 +35,33 @@ tests/test_table_is_key_by_columns.py .                                  [ 94%]
 tests/test_window2.py .                                                  [ 97%]
 tests/test_window_fns.py .                                               [100%]
 
----------- coverage: platform darwin, python 3.6.9-final-0 -----------
+----------- coverage: platform linux, python 3.6.9-final-0 -----------
 Name                              Stmts   Miss  Cover
 -----------------------------------------------------
 data_algebra/PostgreSQL.py           21      4    81%
 data_algebra/SQLite.py               90      5    94%
 data_algebra/SparkSQL.py             21     21     0%
-data_algebra/__init__.py             36     10    72%
+data_algebra/__init__.py             36      6    83%
 data_algebra/arrow.py                79     79     0%
-data_algebra/cdata.py               231     76    67%
+data_algebra/cdata.py               231     77    67%
 data_algebra/cdata_impl.py           14      1    93%
-data_algebra/dask_model.py          121     23    81%
+data_algebra/dask_model.py          121    104    14%
 data_algebra/data_model.py           41     15    63%
-data_algebra/data_ops.py           1100    265    76%
-data_algebra/data_types.py           39     19    51%
-data_algebra/datatable_model.py     131     81    38%
+data_algebra/data_ops.py           1101    305    72%
+data_algebra/data_types.py           39     22    44%
+data_algebra/datatable_model.py     131    107    18%
 data_algebra/db_model.py            358     80    78%
 data_algebra/diagram.py              56     56     0%
 data_algebra/env.py                  48      7    85%
 data_algebra/expr.py                 20      4    80%
-data_algebra/expr_rep.py            556    200    64%
+data_algebra/expr_rep.py            556    201    64%
 data_algebra/pandas_model.py        152     24    84%
 data_algebra/pending_eval.py         34     34     0%
 data_algebra/pipe.py                 65     19    71%
 data_algebra/util.py                 96     11    89%
 data_algebra/yaml.py                119     15    87%
 -----------------------------------------------------
-TOTAL                              3428   1049    69%
+TOTAL                              3429   1197    65%
 
 
-========================== 39 passed in 8.31 seconds ===========================
+========================== 39 passed in 3.96 seconds ===========================

@@ -360,7 +360,7 @@ class RecordMap:
                 + str(self.blocks_in.record_keys)
                 + "\n"
                 + " "
-                + str(self.blocks_in.row_version(include_record_keys=True))
+                + str(self.blocks_in.row_version(include_record_keys=False))
                 + "\n"
             )
             return s
@@ -371,7 +371,7 @@ class RecordMap:
                 + str(self.blocks_out.record_keys)
                 + "\n"
                 + " "
-                + str(self.blocks_out.row_version(include_record_keys=True))
+                + str(self.blocks_out.row_version(include_record_keys=False))
                 + "\n"
                 + "to block records of structure:\n"
                 + str(self.blocks_out)
