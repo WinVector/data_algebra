@@ -7,8 +7,6 @@ The [Python `data_algebra` package](https://github.com/WinVector/data_algebra) s
 
 An interesting point is: while the `data_algebra` operators are fairly generic: the operator pipelines that map a single table to a single table form a category over a nice set of objects.
 
-I've been working 
-
 The objects of this category can be either of:
 
  * Sets of column names.
@@ -322,7 +320,7 @@ print(a1)
 ```
 
     [
-      [ g, v, i, x ]
+      [ g, x, i, v ]
        ->
       [ g, x, v, i, ngroup ]
     ]
@@ -339,8 +337,8 @@ print(a1)
 ```
 
     [
-      [ g: <class 'str'>, v: <class 'numpy.float64'>, i: <class 'numpy.bool_'>,
-        x: <class 'numpy.int64'> ]
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
@@ -483,9 +481,9 @@ print(a2)
 ```
 
     [
-      [ g, v, ngroup, x ]
+      [ g, ngroup, x, v ]
        ->
-      [ g, v, ngroup, x, row_number, shift_v ]
+      [ g, ngroup, x, v, row_number, shift_v ]
     ]
     
 
@@ -517,7 +515,7 @@ print(a2)
 ```
 
     [
-      [ g, q, x, ngroup, v, i ]
+      [ q, ngroup, x, i, g, v ]
        ->
       [ g, x, v, i, ngroup, q, row_number, shift_v ]
     ]
@@ -554,7 +552,7 @@ print(a2)
 ```
 
     [
-      [ g, i, x, v, ngroup ]
+      [ ngroup, x, i, g, v ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -567,7 +565,7 @@ print(a2)
 ```
 
     [
-      [ g, i, x, v, ngroup ]
+      [ ngroup, x, i, g, v ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -580,10 +578,64 @@ print(a1 >> a2)
 ```
 
     [
-      [ g: <class 'str'>, v: <class 'numpy.float64'>, i: <class 'numpy.bool_'>,
-        x: <class 'numpy.int64'> ]
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
+    ]
+    
+
+
+We can also enforce type invarients.
+
+
+```python
+wrong_example = pandas.DataFrame({
+    'g': ['a'],
+    'v': [1.0],
+    'x': ['b'],
+    'i': [True],
+    'ngroup': [1]
+})
+
+a2.fit(wrong_example)
+print(a2)
+```
+
+    [
+      [ ngroup: <class 'numpy.int64'>, x: <class 'str'>,
+        i: <class 'numpy.bool_'>, g: <class 'str'>, v: <class 'numpy.float64'> ]
+       ->
+      [ g: <class 'str'>, x: <class 'str'>, v: <class 'numpy.float64'>,
+        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
+        row_number: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'> ]
+    ]
+    
+
+
+
+```python
+try:
+    a1 >> a2
+except Exception as ex:
+    print(str(ex))
+```
+
+    column x self incoming type is <class 'str'>, while X outgoing type is <class 'numpy.int64'>
+
+
+
+```python
+print(a2.fit(a1.transform(d)))
+```
+
+    [
+      [ ngroup: <class 'numpy.int64'>, x: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'>, g: <class 'str'>, v: <class 'numpy.float64'> ]
+       ->
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
+        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
+        row_number: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'> ]
     ]
     
 
@@ -606,10 +658,32 @@ print(a3)
 ```
 
     [
-      [ g, shift_v, x, ngroup, v, i, row_number ]
+      [ ngroup, x, shift_v, i, g, row_number, v ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v, size, max_v, min_v, sum_v,
         mean_v, count_v, size_v ]
+    ]
+    
+
+
+
+```python
+print(a3.fit(a2.transform(a1.transform(d))))
+```
+
+    [
+      [ ngroup: <class 'numpy.int64'>, x: <class 'numpy.int64'>,
+        shift_v: <class 'numpy.float64'>, i: <class 'numpy.bool_'>,
+        g: <class 'str'>, row_number: <class 'numpy.int64'>,
+        v: <class 'numpy.float64'> ]
+       ->
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
+        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
+        row_number: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'>,
+        size: <class 'numpy.int64'>, max_v: <class 'numpy.float64'>,
+        min_v: <class 'numpy.float64'>, sum_v: <class 'numpy.float64'>,
+        mean_v: <class 'numpy.float64'>, count_v: <class 'numpy.int64'>,
+        size_v: <class 'numpy.int64'> ]
     ]
     
 
@@ -620,11 +694,16 @@ print(a1 >> a2 >> a3)
 ```
 
     [
-      [ g: <class 'str'>, v: <class 'numpy.float64'>, i: <class 'numpy.bool_'>,
-        x: <class 'numpy.int64'> ]
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
        ->
-      [ g, x, v, i, ngroup, row_number, shift_v, size, max_v, min_v, sum_v,
-        mean_v, count_v, size_v ]
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
+        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
+        row_number: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'>,
+        size: <class 'numpy.int64'>, max_v: <class 'numpy.float64'>,
+        min_v: <class 'numpy.float64'>, sum_v: <class 'numpy.float64'>,
+        mean_v: <class 'numpy.float64'>, count_v: <class 'numpy.int64'>,
+        size_v: <class 'numpy.int64'> ]
     ]
     
 
@@ -635,11 +714,16 @@ print((a1 >> a2) >> a3)
 ```
 
     [
-      [ g: <class 'str'>, v: <class 'numpy.float64'>, i: <class 'numpy.bool_'>,
-        x: <class 'numpy.int64'> ]
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
        ->
-      [ g, x, v, i, ngroup, row_number, shift_v, size, max_v, min_v, sum_v,
-        mean_v, count_v, size_v ]
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
+        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
+        row_number: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'>,
+        size: <class 'numpy.int64'>, max_v: <class 'numpy.float64'>,
+        min_v: <class 'numpy.float64'>, sum_v: <class 'numpy.float64'>,
+        mean_v: <class 'numpy.float64'>, count_v: <class 'numpy.int64'>,
+        size_v: <class 'numpy.int64'> ]
     ]
     
 
@@ -650,11 +734,16 @@ print(a1 >> (a2 >> a3))
 ```
 
     [
-      [ g: <class 'str'>, v: <class 'numpy.float64'>, i: <class 'numpy.bool_'>,
-        x: <class 'numpy.int64'> ]
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
        ->
-      [ g, x, v, i, ngroup, row_number, shift_v, size, max_v, min_v, sum_v,
-        mean_v, count_v, size_v ]
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
+        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
+        row_number: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'>,
+        size: <class 'numpy.int64'>, max_v: <class 'numpy.float64'>,
+        min_v: <class 'numpy.float64'>, sum_v: <class 'numpy.float64'>,
+        mean_v: <class 'numpy.float64'>, count_v: <class 'numpy.int64'>,
+        size_v: <class 'numpy.int64'> ]
     ]
     
 
