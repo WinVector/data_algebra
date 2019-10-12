@@ -47,14 +47,24 @@ class OperatorPlatform():
     def __init__(self):
         pass
 
-    # Pandas interface
-
     # noinspection PyPep8Naming
     def transform(self, X):
         raise NotImplementedError("base class called")
 
+    def __rrshift__(self, other):  # override other >> self
+        return self.transform(other)
+
+    def __rshift__(self, other):  # override self >> other
+        # can't use type >> type if only __rrshift__ is defined (must have __rshift__ in this case)
+        if isinstance(other, OperatorPlatform):
+            return other.transform(self)
+        if isinstance(other, PipeStep):
+            other.apply(self)
+        raise TypeError("unexpected type: " + str(type(other)))
+
     # composition
     def add(self, other):
+        """interface to what we used to call PipeStep nodes"""
         return other.apply(self)
 
     # define builders for all non-initial node types on base class
@@ -452,9 +462,6 @@ class ViewRepresentation(OperatorPlatform):
                 data_map=data_map, eval_env=eval_env, data_model=data_model
             )
         raise TypeError("can not apply transform() to type " + str(type(X)))
-
-    def __rrshift__(self, other):  # override other >> self
-        return self.transform(other)
 
     # nodes
 
@@ -1372,7 +1379,15 @@ class ConvertRecordsNode(ViewRepresentation):
         )
 
 
-class Extend:
+class PipeStep:
+    def __init__(self):
+        pass
+
+    def apply(self, other, **kwargs):
+        raise NotImplementedError("base class called")
+
+
+class Extend(PipeStep):
     """Class to specify adding or altering columns.
 
        If outer namespace is set user values are visible and
@@ -1397,6 +1412,7 @@ class Extend:
     ops: Dict[str, data_algebra.expr_rep.Expression]
 
     def __init__(self, ops, *, partition_by=None, order_by=None, reverse=None):
+        PipeStep.__init__(self)
         if isinstance(partition_by, str):
             partition_by = [partition_by]
         if isinstance(order_by, str):
@@ -1447,12 +1463,13 @@ class Extend:
         return self.__repr__()
 
 
-class Project:
+class Project(PipeStep):
     """Class to specify aggregating or summarizing columns."""
 
     ops: Dict[str, data_algebra.expr_rep.Expression]
 
     def __init__(self, ops=None, *, group_by=None):
+        PipeStep.__init__(self)
         if isinstance(group_by, str):
             group_by = [group_by]
         if ops is None:
@@ -1481,13 +1498,14 @@ class Project:
         return self.__repr__()
 
 
-class SelectRows:
+class SelectRows(PipeStep):
     """Class to specify a choice of rows.
     """
 
     expr: data_algebra.expr_rep.Expression
 
     def __init__(self, expr):
+        PipeStep.__init__(self)
         self.expr = expr
 
     def apply(self, other, **kwargs):
@@ -1505,13 +1523,14 @@ class SelectRows:
         return self.__repr__()
 
 
-class SelectColumns:
+class SelectColumns(PipeStep):
     """Class to specify a choice of columns.
     """
 
     column_selection: List[str]
 
     def __init__(self, columns):
+        PipeStep.__init__(self)
         if isinstance(columns, str):
             columns = [columns]
         column_selection = [c for c in columns]
@@ -1531,13 +1550,14 @@ class SelectColumns:
         return self.__repr__()
 
 
-class DropColumns:
+class DropColumns(PipeStep):
     """Class to specify removal of columns.
     """
 
     column_deletions: List[str]
 
     def __init__(self, column_deletions):
+        PipeStep.__init__(self)
         if isinstance(column_deletions, str):
             column_deletions = [column_deletions]
         column_deletions = [c for c in column_deletions]
@@ -1557,7 +1577,7 @@ class DropColumns:
         return self.__repr__()
 
 
-class OrderRows:
+class OrderRows(PipeStep):
     """Class to specify a columns to determine row order.
     """
 
@@ -1565,6 +1585,7 @@ class OrderRows:
     reverse: List[str]
 
     def __init__(self, columns, *, reverse=None, limit=None):
+        PipeStep.__init__(self)
         if isinstance(columns, str):
             columns = [columns]
         if isinstance(reverse, str):
@@ -1605,13 +1626,14 @@ class OrderRows:
         return self.__repr__()
 
 
-class RenameColumns:
+class RenameColumns(PipeStep):
     """Class to rename columns.
     """
 
     column_remapping: Dict[str, str]
 
     def __init__(self, column_remapping):
+        PipeStep.__init__(self)
         self.column_remapping = column_remapping.copy()
 
     def apply(self, other, **kwargs):
@@ -1628,12 +1650,13 @@ class RenameColumns:
         return self.__repr__()
 
 
-class NaturalJoin:
+class NaturalJoin(PipeStep):
     _by: List[str]
     _jointype: str
     _b: OperatorPlatform
 
     def __init__(self, *, b=None, by=None, jointype="INNER"):
+        PipeStep.__init__(self)
         if not isinstance(b, ViewRepresentation):
             raise TypeError("b must be a data_algebra.data_ops.ViewRepresentation")
         if isinstance(by, str):
@@ -1665,8 +1688,9 @@ class NaturalJoin:
         return self.__repr__()
 
 
-class ConvertRecords:
+class ConvertRecords(PipeStep):
     def __init__(self, record_map, *, blocks_out_table=None):
+        PipeStep.__init__(self)
         self.record_map = record_map
         self.blocks_out_table = blocks_out_table
 
