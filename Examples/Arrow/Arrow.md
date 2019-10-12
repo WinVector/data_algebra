@@ -39,7 +39,19 @@ d
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -124,7 +136,19 @@ id_ops_a.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -174,7 +198,19 @@ id_ops_b.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -312,14 +348,14 @@ print(a1)
 ```
 
     [
-      [ g, i, x, v ]
+      [ v, g, x, i ]
        ->
       [ g, x, v, i, ngroup ]
     ]
     
 
 
-The arrow has a detailed presenation, which is the realizing operator pipeline.
+The arrow has a detailed presentation, which is the realizing operator pipeline.
 
 
 ```python
@@ -334,7 +370,7 @@ a1.__repr__()
 
 
 So we can think of our arrows (or obvious mappings of them) as being able to be applied to:
-  * More arrrows of the same type (composition).
+  * More arrows of the same type (composition).
   * Data (action or application).
   * Single table schemas
   
@@ -348,8 +384,8 @@ print(a1)
 ```
 
     [
-      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
-        v: <class 'numpy.float64'> ]
+      [ v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
@@ -364,11 +400,11 @@ print(identity_left)
 ```
 
     [
-      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
-        v: <class 'numpy.float64'> ]
+      [ v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'> ]
        ->
-      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
-        v: <class 'numpy.float64'> ]
+      [ v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'> ]
     ]
     
 
@@ -400,7 +436,19 @@ a1.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -476,7 +524,19 @@ d >> a1
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -545,7 +605,7 @@ d >> a1
 
 Up until now we have been showing how we work to obey the category theory axioms.  From here on we look at what does category theory do for us.  What it does is check correct composition and ensure full associativity of operations.
 
-As is typical in category theory, there can be more than one arrow from a given object to given object.  For example the following is a different arrow tith the same start and end.
+As is typical in category theory, there can be more than one arrow from a given object to given object.  For example the following is a different arrow with the same start and end.
 
 
 ```python
@@ -559,8 +619,8 @@ print(a1b)
 ```
 
     [
-      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
-        v: <class 'numpy.float64'> ]
+      [ v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
@@ -579,7 +639,19 @@ a1b.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -665,9 +737,9 @@ print(a2)
 ```
 
     [
-      [ g, x, ngroup, v ]
+      [ v, g, ngroup, x ]
        ->
-      [ g, ngroup, v, x, row_number, shift_v ]
+      [ v, g, ngroup, x, row_number, shift_v ]
     ]
     
 
@@ -698,7 +770,7 @@ print(a2)
 ```
 
     [
-      [ i, ngroup, x, g, v, q ]
+      [ v, g, ngroup, x, q, i ]
        ->
       [ g, x, v, i, ngroup, q, row_number, shift_v ]
     ]
@@ -735,7 +807,7 @@ print(a2)
 ```
 
     [
-      [ i, ngroup, x, g, v ]
+      [ v, ngroup, x, g, i ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -748,7 +820,7 @@ print(a2)
 ```
 
     [
-      [ i, ngroup, x, g, v ]
+      [ v, ngroup, x, g, i ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -761,15 +833,15 @@ print(a1 >> a2)
 ```
 
     [
-      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
-        v: <class 'numpy.float64'> ]
+      [ v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
     
 
 
-We can also enforce type invarients.
+We can also enforce type invariants.
 
 
 ```python
@@ -786,8 +858,8 @@ print(a2)
 ```
 
     [
-      [ i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
-        x: <class 'str'>, g: <class 'str'>, v: <class 'numpy.float64'> ]
+      [ v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'>,
+        x: <class 'str'>, g: <class 'str'>, i: <class 'numpy.bool_'> ]
        ->
       [ g: <class 'str'>, x: <class 'str'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -813,8 +885,8 @@ print(a2.fit(a1.transform(d)))
 ```
 
     [
-      [ i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
-        x: <class 'numpy.int64'>, g: <class 'str'>, v: <class 'numpy.float64'> ]
+      [ v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'>,
+        x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -835,7 +907,7 @@ print(a3)
 ```
 
     [
-      [ shift_v, i, ngroup, x, row_number, g, v ]
+      [ v, ngroup, x, shift_v, g, row_number, i ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v, mean_v ]
     ]
@@ -848,10 +920,10 @@ print(a3.fit(a2.transform(a1.transform(d))))
 ```
 
     [
-      [ shift_v: <class 'numpy.float64'>, i: <class 'numpy.bool_'>,
-        ngroup: <class 'numpy.int64'>, x: <class 'numpy.int64'>,
-        row_number: <class 'numpy.int64'>, g: <class 'str'>,
-        v: <class 'numpy.float64'> ]
+      [ v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'>,
+        x: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'>,
+        g: <class 'str'>, row_number: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -867,8 +939,8 @@ print(a1 >> a2 >> a3)
 ```
 
     [
-      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
-        v: <class 'numpy.float64'> ]
+      [ v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -884,8 +956,8 @@ print((a1 >> a2) >> a3)
 ```
 
     [
-      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
-        v: <class 'numpy.float64'> ]
+      [ v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -901,8 +973,8 @@ print(a1 >> (a2 >> a3))
 ```
 
     [
-      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
-        v: <class 'numpy.float64'> ]
+      [ v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -912,7 +984,7 @@ print(a1 >> (a2 >> a3))
     
 
 
-All three compositions are in fact the same arrow. I.e. the implent the same transform in the same way.
+All three compositions are in fact the same arrow. I.e. the implement the same transform in the same way.
 
 
 ```python
@@ -923,7 +995,19 @@ All three compositions are in fact the same arrow. I.e. the implent the same tra
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1020,7 +1104,19 @@ All three compositions are in fact the same arrow. I.e. the implent the same tra
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1119,7 +1215,19 @@ The payoff is: we can use this composite arrow on data.
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1217,4 +1325,4 @@ The data arrows operate over three different value domains:
  * data frames (transforming data)
  * single table schemas (transforming single table schemas)
 
-I think we have that if we consider the arrows operating on data and the arrows operating on signle table schemas we have a faithfull embedding (in the sense of Saunders Mac Lane *Categories for the Working Mathematician, 2nd Edition*, Springer, 1997, page 15) from data to single table schemas.
+I think we have that if we consider the arrows operating on data and the arrows operating on single table schemas we have a faithful embedding (in the sense of Saunders Mac Lane *Categories for the Working Mathematician, 2nd Edition*, Springer, 1997, page 15) from data to single table schemas.
