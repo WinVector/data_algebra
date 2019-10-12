@@ -12,7 +12,7 @@ The objects of this category can be either of:
  * Sets of column names.
  * Maps of column names to column types (schema-like objects).
  
-I will take a liberty and call these objects (with or without types) "schemas."
+I will take a liberty and call these objects (with or without types) "single table schemas."
 
 Our setup is easiest to explain with an example.  Let's work an example in `Python`.
 
@@ -21,12 +21,9 @@ First we import our packages and instantiate an example data frame.
 
 ```python
 import pandas
-import graphviz
 
-import data_algebra.diagram
-from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
-import data_algebra.util
-import data_algebra.arrow
+from data_algebra.data_ops import *
+from data_algebra.arrow import *
 
 d = pandas.DataFrame({
     'g': ['a', 'b', 'b', 'c', 'c', 'c'],
@@ -42,7 +39,19 @@ d
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -127,7 +136,19 @@ id_ops_a.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -177,7 +198,19 @@ id_ops_b.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -278,20 +311,70 @@ This is where we seem to have nice opportunity to use category theory to manage 
 
 
 ```python
-a1 = data_algebra.arrow.DataOpArrow(id_ops_b)
+a1 = DataOpArrow(id_ops_b)
+```
 
+`a1` is a categorical theory arrow, it has the usual domain (arrow base, or incoming object), and co-domain (arrow head, or outgoing object) in a category of single-table schemas.
+
+
+```python
+a1.dom()
+```
+
+
+
+
+    {'g', 'i', 'v', 'x'}
+
+
+
+
+```python
+a1.cod()
+```
+
+
+
+
+    ['g', 'x', 'v', 'i', 'ngroup']
+
+
+
+These are what are presented in the succinct presentation of the arrow.
+
+
+```python
 print(a1)
 ```
 
     [
-      [ i, x, v, g ]
+      [ g, i, x, v ]
        ->
       [ g, x, v, i, ngroup ]
     ]
     
 
 
-`a1` is an arrow in a category whose objects are sets of column names (or alternately in a category whose objects are maps from column names to column types).
+The arrow has a detailed presenation, which is the realizing operator pipeline.
+
+
+```python
+a1.__repr__()
+```
+
+
+
+
+    "DataOpArrow(TableDescription(\n table_name='d',\n column_names=[\n   'g', 'x', 'v', 'i']) .\\\n   natural_join(b=\n      TableDescription(\n       table_name='d',\n       column_names=[\n         'g', 'x', 'v', 'i']) .\\\n         project({\n          },\n         group_by=['g']) .\\\n         extend({\n          'ngroup': '_row_number()'},\n         order_by=['g']),\n      by=['g'], jointype='LEFT'))"
+
+
+
+So we can think of our arrows (or obvious mappings of them) as being able to be applied to:
+  * More arrrows of the same type (composition).
+  * Data (action or application).
+  * Single table schemas
+  
+The arrow can be converted to a more detailed arrow that records both incoming and outgoing column types in the domain and co-domain by the `.fit()` function.
 
 
 ```python
@@ -301,8 +384,8 @@ print(a1)
 ```
 
     [
-      [ i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
-        v: <class 'numpy.float64'>, g: <class 'str'> ]
+      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
@@ -310,32 +393,39 @@ print(a1)
     
 
 
-As is typical in category theory, there can be more than one arrow from a given object to given object.  Our particular arrow is more fully described as follows.
+
+```python
+identity_left = a1.identity_arrow(a1.dom())
+print(identity_left)
+```
+
+    [
+      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
+        v: <class 'numpy.float64'> ]
+       ->
+      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
+        v: <class 'numpy.float64'> ]
+    ]
+    
+
 
 
 ```python
-print(a1.__repr__())
+identity_right = a1.identity_arrow(a1.cod())
+print(identity_right)
 ```
 
-    DataOpArrow(TableDescription(
-     table_name='d',
-     column_names=[
-       'g', 'x', 'v', 'i']) .\
-       natural_join(b=
-          TableDescription(
-           table_name='d',
-           column_names=[
-             'g', 'x', 'v', 'i']) .\
-             project({
-              },
-             group_by=['g']) .\
-             extend({
-              'ngroup': '_row_number()'},
-             order_by=['g']),
-          by=['g'], jointype='LEFT'))
+    [
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
+        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
+       ->
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
+        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
+    ]
+    
 
 
-So our arrows are arrows in a category whose objects are sets of column names (or alternately maps from column names to column types).  These arrows also act on data frames that meet the required column pre conditions.
+Arrows can be composed or applied by using the notation `a1.transform(d)` or the equivalent notation `d >> a1`. Note: we are not thinking of `>>` itself as an arrow, but as a symbol for composition of arrows (we used `>>` as it is one of the few operators not used by `Pandas`, which means using this operator makes it easier for our notation to work with `Pandas`).
 
 
 ```python
@@ -346,7 +436,19 @@ a1.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -413,9 +515,212 @@ a1.transform(d)
 
 
 
+
+```python
+d >> a1
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>g</th>
+      <th>x</th>
+      <th>v</th>
+      <th>i</th>
+      <th>ngroup</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>a</td>
+      <td>1</td>
+      <td>10.0</td>
+      <td>True</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>b</td>
+      <td>4</td>
+      <td>40.0</td>
+      <td>True</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>b</td>
+      <td>5</td>
+      <td>50.0</td>
+      <td>False</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>c</td>
+      <td>7</td>
+      <td>70.0</td>
+      <td>False</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>c</td>
+      <td>8</td>
+      <td>80.0</td>
+      <td>False</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>c</td>
+      <td>9</td>
+      <td>90.0</td>
+      <td>False</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+Up until now we have been showing how we work to obey the category theory axioms.  From here on we look at what does category theory do for us.  What it does is check correct composition and ensure full associativity of operations.
+
+As is typical in category theory, there can be more than one arrow from a given object to given object.  For example the following is a different arrow tith the same start and end.
+
+
+```python
+a1b = DataOpArrow(
+    table_description. \
+        extend({
+            'ngroup': 0
+        }))
+a1b.fit(d)
+print(a1b)
+```
+
+    [
+      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
+        v: <class 'numpy.float64'> ]
+       ->
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
+        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
+    ]
+    
+
+
+However, the `a1b` arrow represents a different operation:
+
+
+```python
+a1b.transform(d)
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>g</th>
+      <th>x</th>
+      <th>v</th>
+      <th>i</th>
+      <th>ngroup</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>a</td>
+      <td>1</td>
+      <td>10.0</td>
+      <td>True</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>b</td>
+      <td>4</td>
+      <td>40.0</td>
+      <td>True</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>b</td>
+      <td>5</td>
+      <td>50.0</td>
+      <td>False</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>c</td>
+      <td>7</td>
+      <td>70.0</td>
+      <td>False</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>c</td>
+      <td>8</td>
+      <td>80.0</td>
+      <td>False</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>c</td>
+      <td>9</td>
+      <td>90.0</td>
+      <td>False</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 The arrows compose exactly when the pre-conditions meet the post conditions.  
 
-Here are two examples of violating the pre and post conditions.
+Here are two examples of violating the pre and post conditions.  The point is, the categorical conditions enforce the checking for us.  We can't compose arrows that don't match domain and range.
 
 
 ```python
@@ -427,15 +732,14 @@ ordered_ops = TableDescription('d2', cols2_too_small). \
     },
     order_by=['x'],
     partition_by=['g'])
-a2 = data_algebra.arrow.DataOpArrow(ordered_ops)
+a2 = DataOpArrow(ordered_ops)
 print(a2)
-
 ```
 
     [
-      [ x, ngroup, v, g ]
+      [ g, x, ngroup, v ]
        ->
-      [ x, ngroup, v, g, row_number, shift_v ]
+      [ g, ngroup, v, x, row_number, shift_v ]
     ]
     
 
@@ -446,7 +750,6 @@ try:
     a1 >> a2
 except ValueError as e:
     print(str(e))
-    
 ```
 
     extra incoming columns: {'i'}
@@ -462,12 +765,12 @@ ordered_ops = TableDescription('d2', cols2_too_large). \
     },
     order_by=['x'],
     partition_by=['g'])
-a2 = data_algebra.arrow.DataOpArrow(ordered_ops)
+a2 = DataOpArrow(ordered_ops)
 print(a2)
 ```
 
     [
-      [ q, g, i, x, v, ngroup ]
+      [ i, ngroup, x, g, v, q ]
        ->
       [ g, x, v, i, ngroup, q, row_number, shift_v ]
     ]
@@ -499,12 +802,12 @@ ordered_ops = TableDescription('d2', id_ops_b.column_names). \
     },
     order_by=['x'],
     partition_by=['g'])
-a2 = data_algebra.arrow.DataOpArrow(ordered_ops)
+a2 = DataOpArrow(ordered_ops)
 print(a2)
 ```
 
     [
-      [ g, i, x, v, ngroup ]
+      [ i, ngroup, x, g, v ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -517,7 +820,7 @@ print(a2)
 ```
 
     [
-      [ g, i, x, v, ngroup ]
+      [ i, ngroup, x, g, v ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -530,8 +833,8 @@ print(a1 >> a2)
 ```
 
     [
-      [ i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
-        v: <class 'numpy.float64'>, g: <class 'str'> ]
+      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -555,8 +858,8 @@ print(a2)
 ```
 
     [
-      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'str'>,
-        v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'> ]
+      [ i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
+        x: <class 'str'>, g: <class 'str'>, v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'str'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -582,8 +885,8 @@ print(a2.fit(a1.transform(d)))
 ```
 
     [
-      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
-        v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'> ]
+      [ i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
+        x: <class 'numpy.int64'>, g: <class 'str'>, v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -596,24 +899,17 @@ print(a2.fit(a1.transform(d)))
 ```python
 unordered_ops = TableDescription('d3', ordered_ops.column_names). \
     extend({
-        'size': '_size()',
-        'max_v': 'v.max()',
-        'min_v': 'v.min()',
-        'sum_v': 'v.sum()',
         'mean_v': 'v.mean()',
-        'count_v': 'v.count()',
-        'size_v': 'v.size()',
     },
     partition_by=['g'])
-a3 = data_algebra.arrow.DataOpArrow(unordered_ops)
+a3 = DataOpArrow(unordered_ops)
 print(a3)
 ```
 
     [
-      [ shift_v, row_number, g, i, x, v, ngroup ]
+      [ shift_v, i, ngroup, x, row_number, g, v ]
        ->
-      [ g, x, v, i, ngroup, row_number, shift_v, size, max_v, min_v, sum_v,
-        mean_v, count_v, size_v ]
+      [ g, x, v, i, ngroup, row_number, shift_v, mean_v ]
     ]
     
 
@@ -624,17 +920,15 @@ print(a3.fit(a2.transform(a1.transform(d))))
 ```
 
     [
-      [ shift_v: <class 'numpy.float64'>, row_number: <class 'numpy.int64'>,
-        g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
-        v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'> ]
+      [ shift_v: <class 'numpy.float64'>, i: <class 'numpy.bool_'>,
+        ngroup: <class 'numpy.int64'>, x: <class 'numpy.int64'>,
+        row_number: <class 'numpy.int64'>, g: <class 'str'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
         row_number: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'>,
-        size: <class 'numpy.int64'>, max_v: <class 'numpy.float64'>,
-        min_v: <class 'numpy.float64'>, sum_v: <class 'numpy.float64'>,
-        mean_v: <class 'numpy.float64'>, count_v: <class 'numpy.int64'>,
-        size_v: <class 'numpy.int64'> ]
+        mean_v: <class 'numpy.float64'> ]
     ]
     
 
@@ -645,16 +939,13 @@ print(a1 >> a2 >> a3)
 ```
 
     [
-      [ i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
-        v: <class 'numpy.float64'>, g: <class 'str'> ]
+      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
         row_number: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'>,
-        size: <class 'numpy.int64'>, max_v: <class 'numpy.float64'>,
-        min_v: <class 'numpy.float64'>, sum_v: <class 'numpy.float64'>,
-        mean_v: <class 'numpy.float64'>, count_v: <class 'numpy.int64'>,
-        size_v: <class 'numpy.int64'> ]
+        mean_v: <class 'numpy.float64'> ]
     ]
     
 
@@ -665,16 +956,13 @@ print((a1 >> a2) >> a3)
 ```
 
     [
-      [ i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
-        v: <class 'numpy.float64'>, g: <class 'str'> ]
+      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
         row_number: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'>,
-        size: <class 'numpy.int64'>, max_v: <class 'numpy.float64'>,
-        min_v: <class 'numpy.float64'>, sum_v: <class 'numpy.float64'>,
-        mean_v: <class 'numpy.float64'>, count_v: <class 'numpy.int64'>,
-        size_v: <class 'numpy.int64'> ]
+        mean_v: <class 'numpy.float64'> ]
     ]
     
 
@@ -685,101 +973,234 @@ print(a1 >> (a2 >> a3))
 ```
 
     [
-      [ i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
-        v: <class 'numpy.float64'>, g: <class 'str'> ]
+      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
         row_number: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'>,
-        size: <class 'numpy.int64'>, max_v: <class 'numpy.float64'>,
-        min_v: <class 'numpy.float64'>, sum_v: <class 'numpy.float64'>,
-        mean_v: <class 'numpy.float64'>, count_v: <class 'numpy.int64'>,
-        size_v: <class 'numpy.int64'> ]
+        mean_v: <class 'numpy.float64'> ]
     ]
     
 
 
-All three compositions are in fact the same arrow.
+All three compositions are in fact the same arrow. I.e. the implent the same transform in the same way.
 
 
 ```python
-(a1 >> a2) >> a3
+((a1 >> a2) >> a3).transform(d)
 ```
 
 
 
 
-    DataOpArrow(TableDescription(
-     table_name='d',
-     column_names=[
-       'g', 'x', 'v', 'i']) .\
-       natural_join(b=
-          TableDescription(
-           table_name='d',
-           column_names=[
-             'g', 'x', 'v', 'i']) .\
-             project({
-              },
-             group_by=['g']) .\
-             extend({
-              'ngroup': '_row_number()'},
-             order_by=['g']),
-          by=['g'], jointype='LEFT') .\
-       extend({
-        'row_number': '_row_number()',
-        'shift_v': 'v.shift()'},
-       partition_by=['g'],
-       order_by=['x']) .\
-       extend({
-        'size': '_size()',
-        'max_v': 'v.max()',
-        'min_v': 'v.min()',
-        'sum_v': 'v.sum()',
-        'mean_v': 'v.mean()',
-        'count_v': 'v.count()',
-        'size_v': 'v.size()'},
-       partition_by=['g']))
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>g</th>
+      <th>x</th>
+      <th>v</th>
+      <th>i</th>
+      <th>ngroup</th>
+      <th>row_number</th>
+      <th>shift_v</th>
+      <th>mean_v</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>a</td>
+      <td>1</td>
+      <td>10.0</td>
+      <td>True</td>
+      <td>1</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>10.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>b</td>
+      <td>4</td>
+      <td>40.0</td>
+      <td>True</td>
+      <td>2</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>45.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>b</td>
+      <td>5</td>
+      <td>50.0</td>
+      <td>False</td>
+      <td>2</td>
+      <td>2</td>
+      <td>40.0</td>
+      <td>45.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>c</td>
+      <td>7</td>
+      <td>70.0</td>
+      <td>False</td>
+      <td>3</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>80.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>c</td>
+      <td>8</td>
+      <td>80.0</td>
+      <td>False</td>
+      <td>3</td>
+      <td>2</td>
+      <td>70.0</td>
+      <td>80.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>c</td>
+      <td>9</td>
+      <td>90.0</td>
+      <td>False</td>
+      <td>3</td>
+      <td>3</td>
+      <td>80.0</td>
+      <td>80.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 
 
 
 ```python
-a1 >> (a2 >> a3)
+(a1 >> (a2 >> a3)).transform(d)
 ```
 
 
 
 
-    DataOpArrow(TableDescription(
-     table_name='d',
-     column_names=[
-       'g', 'x', 'v', 'i']) .\
-       natural_join(b=
-          TableDescription(
-           table_name='d',
-           column_names=[
-             'g', 'x', 'v', 'i']) .\
-             project({
-              },
-             group_by=['g']) .\
-             extend({
-              'ngroup': '_row_number()'},
-             order_by=['g']),
-          by=['g'], jointype='LEFT') .\
-       extend({
-        'row_number': '_row_number()',
-        'shift_v': 'v.shift()'},
-       partition_by=['g'],
-       order_by=['x']) .\
-       extend({
-        'size': '_size()',
-        'max_v': 'v.max()',
-        'min_v': 'v.min()',
-        'sum_v': 'v.sum()',
-        'mean_v': 'v.mean()',
-        'count_v': 'v.count()',
-        'size_v': 'v.size()'},
-       partition_by=['g']))
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>g</th>
+      <th>x</th>
+      <th>v</th>
+      <th>i</th>
+      <th>ngroup</th>
+      <th>row_number</th>
+      <th>shift_v</th>
+      <th>mean_v</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>a</td>
+      <td>1</td>
+      <td>10.0</td>
+      <td>True</td>
+      <td>1</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>10.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>b</td>
+      <td>4</td>
+      <td>40.0</td>
+      <td>True</td>
+      <td>2</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>45.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>b</td>
+      <td>5</td>
+      <td>50.0</td>
+      <td>False</td>
+      <td>2</td>
+      <td>2</td>
+      <td>40.0</td>
+      <td>45.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>c</td>
+      <td>7</td>
+      <td>70.0</td>
+      <td>False</td>
+      <td>3</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>80.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>c</td>
+      <td>8</td>
+      <td>80.0</td>
+      <td>False</td>
+      <td>3</td>
+      <td>2</td>
+      <td>70.0</td>
+      <td>80.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>c</td>
+      <td>9</td>
+      <td>90.0</td>
+      <td>False</td>
+      <td>3</td>
+      <td>3</td>
+      <td>80.0</td>
+      <td>80.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 
 
@@ -794,7 +1215,19 @@ The payoff is: we can use this composite arrow on data.
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -806,13 +1239,7 @@ The payoff is: we can use this composite arrow on data.
       <th>ngroup</th>
       <th>row_number</th>
       <th>shift_v</th>
-      <th>size</th>
-      <th>max_v</th>
-      <th>min_v</th>
-      <th>sum_v</th>
       <th>mean_v</th>
-      <th>count_v</th>
-      <th>size_v</th>
     </tr>
   </thead>
   <tbody>
@@ -825,13 +1252,7 @@ The payoff is: we can use this composite arrow on data.
       <td>1</td>
       <td>1</td>
       <td>NaN</td>
-      <td>1</td>
       <td>10.0</td>
-      <td>10.0</td>
-      <td>10.0</td>
-      <td>10.0</td>
-      <td>1</td>
-      <td>1</td>
     </tr>
     <tr>
       <th>1</th>
@@ -842,13 +1263,7 @@ The payoff is: we can use this composite arrow on data.
       <td>2</td>
       <td>1</td>
       <td>NaN</td>
-      <td>2</td>
-      <td>50.0</td>
-      <td>40.0</td>
-      <td>90.0</td>
       <td>45.0</td>
-      <td>2</td>
-      <td>2</td>
     </tr>
     <tr>
       <th>2</th>
@@ -859,13 +1274,7 @@ The payoff is: we can use this composite arrow on data.
       <td>2</td>
       <td>2</td>
       <td>40.0</td>
-      <td>2</td>
-      <td>50.0</td>
-      <td>40.0</td>
-      <td>90.0</td>
       <td>45.0</td>
-      <td>2</td>
-      <td>2</td>
     </tr>
     <tr>
       <th>3</th>
@@ -876,13 +1285,7 @@ The payoff is: we can use this composite arrow on data.
       <td>3</td>
       <td>1</td>
       <td>NaN</td>
-      <td>3</td>
-      <td>90.0</td>
-      <td>70.0</td>
-      <td>240.0</td>
       <td>80.0</td>
-      <td>3</td>
-      <td>3</td>
     </tr>
     <tr>
       <th>4</th>
@@ -893,13 +1296,7 @@ The payoff is: we can use this composite arrow on data.
       <td>3</td>
       <td>2</td>
       <td>70.0</td>
-      <td>3</td>
-      <td>90.0</td>
-      <td>70.0</td>
-      <td>240.0</td>
       <td>80.0</td>
-      <td>3</td>
-      <td>3</td>
     </tr>
     <tr>
       <th>5</th>
@@ -910,13 +1307,7 @@ The payoff is: we can use this composite arrow on data.
       <td>3</td>
       <td>3</td>
       <td>80.0</td>
-      <td>3</td>
-      <td>90.0</td>
-      <td>70.0</td>
-      <td>240.0</td>
       <td>80.0</td>
-      <td>3</td>
-      <td>3</td>
     </tr>
   </tbody>
 </table>
@@ -926,320 +1317,12 @@ The payoff is: we can use this composite arrow on data.
 
 The combination operator `>>` is fully associative over the combination of data and arrows.
 
-
-```python
-# Python default associates left to right so this is:
-# ((d >> a1) >> a2) >> a3
-d >> a1 >> a2 >> a3
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>g</th>
-      <th>x</th>
-      <th>v</th>
-      <th>i</th>
-      <th>ngroup</th>
-      <th>row_number</th>
-      <th>shift_v</th>
-      <th>size</th>
-      <th>max_v</th>
-      <th>min_v</th>
-      <th>sum_v</th>
-      <th>mean_v</th>
-      <th>count_v</th>
-      <th>size_v</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>a</td>
-      <td>1</td>
-      <td>10.0</td>
-      <td>True</td>
-      <td>1</td>
-      <td>1</td>
-      <td>NaN</td>
-      <td>1</td>
-      <td>10.0</td>
-      <td>10.0</td>
-      <td>10.0</td>
-      <td>10.0</td>
-      <td>1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>b</td>
-      <td>4</td>
-      <td>40.0</td>
-      <td>True</td>
-      <td>2</td>
-      <td>1</td>
-      <td>NaN</td>
-      <td>2</td>
-      <td>50.0</td>
-      <td>40.0</td>
-      <td>90.0</td>
-      <td>45.0</td>
-      <td>2</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>b</td>
-      <td>5</td>
-      <td>50.0</td>
-      <td>False</td>
-      <td>2</td>
-      <td>2</td>
-      <td>40.0</td>
-      <td>2</td>
-      <td>50.0</td>
-      <td>40.0</td>
-      <td>90.0</td>
-      <td>45.0</td>
-      <td>2</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>c</td>
-      <td>7</td>
-      <td>70.0</td>
-      <td>False</td>
-      <td>3</td>
-      <td>1</td>
-      <td>NaN</td>
-      <td>3</td>
-      <td>90.0</td>
-      <td>70.0</td>
-      <td>240.0</td>
-      <td>80.0</td>
-      <td>3</td>
-      <td>3</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>c</td>
-      <td>8</td>
-      <td>80.0</td>
-      <td>False</td>
-      <td>3</td>
-      <td>2</td>
-      <td>70.0</td>
-      <td>3</td>
-      <td>90.0</td>
-      <td>70.0</td>
-      <td>240.0</td>
-      <td>80.0</td>
-      <td>3</td>
-      <td>3</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>c</td>
-      <td>9</td>
-      <td>90.0</td>
-      <td>False</td>
-      <td>3</td>
-      <td>3</td>
-      <td>80.0</td>
-      <td>3</td>
-      <td>90.0</td>
-      <td>70.0</td>
-      <td>240.0</td>
-      <td>80.0</td>
-      <td>3</td>
-      <td>3</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-
-```python
-# the preferred notation, work in operator space
-d >> (a1 >> a2 >> a3)
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>g</th>
-      <th>x</th>
-      <th>v</th>
-      <th>i</th>
-      <th>ngroup</th>
-      <th>row_number</th>
-      <th>shift_v</th>
-      <th>size</th>
-      <th>max_v</th>
-      <th>min_v</th>
-      <th>sum_v</th>
-      <th>mean_v</th>
-      <th>count_v</th>
-      <th>size_v</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>a</td>
-      <td>1</td>
-      <td>10.0</td>
-      <td>True</td>
-      <td>1</td>
-      <td>1</td>
-      <td>NaN</td>
-      <td>1</td>
-      <td>10.0</td>
-      <td>10.0</td>
-      <td>10.0</td>
-      <td>10.0</td>
-      <td>1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>b</td>
-      <td>4</td>
-      <td>40.0</td>
-      <td>True</td>
-      <td>2</td>
-      <td>1</td>
-      <td>NaN</td>
-      <td>2</td>
-      <td>50.0</td>
-      <td>40.0</td>
-      <td>90.0</td>
-      <td>45.0</td>
-      <td>2</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>b</td>
-      <td>5</td>
-      <td>50.0</td>
-      <td>False</td>
-      <td>2</td>
-      <td>2</td>
-      <td>40.0</td>
-      <td>2</td>
-      <td>50.0</td>
-      <td>40.0</td>
-      <td>90.0</td>
-      <td>45.0</td>
-      <td>2</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>c</td>
-      <td>7</td>
-      <td>70.0</td>
-      <td>False</td>
-      <td>3</td>
-      <td>1</td>
-      <td>NaN</td>
-      <td>3</td>
-      <td>90.0</td>
-      <td>70.0</td>
-      <td>240.0</td>
-      <td>80.0</td>
-      <td>3</td>
-      <td>3</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>c</td>
-      <td>8</td>
-      <td>80.0</td>
-      <td>False</td>
-      <td>3</td>
-      <td>2</td>
-      <td>70.0</td>
-      <td>3</td>
-      <td>90.0</td>
-      <td>70.0</td>
-      <td>240.0</td>
-      <td>80.0</td>
-      <td>3</td>
-      <td>3</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>c</td>
-      <td>9</td>
-      <td>90.0</td>
-      <td>False</td>
-      <td>3</td>
-      <td>3</td>
-      <td>80.0</td>
-      <td>3</td>
-      <td>90.0</td>
-      <td>70.0</td>
-      <td>240.0</td>
-      <td>80.0</td>
-      <td>3</td>
-      <td>3</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
 The underlying `data_algebra` steps compute and check very similar pre and post conditions, the arrow class is just making this look more explicitly like arrows moving through objects in category.
 
-There is more to be gotten from how the data relates to the schema descriptions.  I think we have that if we consider the arrows operating on data and the arrows operating on schemas we have a faithfull embedding (in the sense of Saunders Mac Lane *Categories for the Working Mathematician, 2nd Edition*, Springer, 1997, page 15) from data to schemas.
+The data arrows operate over three different value domains:
 
+ * their own arrow space (i.e. composition)
+ * data frames (transforming data)
+ * single table schemas (transforming single table schemas)
 
-```python
-# check pipelines compose
-a2.pipeline.transform(a1.pipeline)
-```
-
-
-
-
-    TableDescription(
-     table_name='d',
-     column_names=[
-       'g', 'x', 'v', 'i']) .\
-       natural_join(b=
-          TableDescription(
-           table_name='d',
-           column_names=[
-             'g', 'x', 'v', 'i']) .\
-             project({
-              },
-             group_by=['g']) .\
-             extend({
-              'ngroup': '_row_number()'},
-             order_by=['g']),
-          by=['g'], jointype='LEFT') .\
-       extend({
-        'row_number': '_row_number()',
-        'shift_v': 'v.shift()'},
-       partition_by=['g'],
-       order_by=['x'])
-
-
+I think we have that if we consider the arrows operating on data and the arrows operating on signle table schemas we have a faithfull embedding (in the sense of Saunders Mac Lane *Categories for the Working Mathematician, 2nd Edition*, Springer, 1997, page 15) from data to single table schemas.

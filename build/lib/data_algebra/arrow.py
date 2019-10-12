@@ -7,7 +7,40 @@ import data_algebra.data_ops
 import data_algebra.flow_text
 
 
-class DataOpArrow:
+class Arrow:
+    """Arrow from category theory: see Steve Awody, "Category Theory, 2nd Edition", Oxford Univ. Press, 2010 pg. 4."""
+
+    def __init__(self):
+        pass
+
+    def dom(self):
+        """return domain, object at base of arrow"""
+        raise NotImplementedError("base class called")
+
+    def cod(self):
+        """return co-domain, object at head of arrow"""
+        raise NotImplementedError("base class called")
+
+    def identity_arrow(self, obj):
+        """convert object to an identity arrow """
+        raise NotImplementedError("base class called")
+
+    # noinspection PyPep8Naming
+    def transform(self, X, *, strict=True):
+        """ transform X, compose arrows (right to left) """
+        raise NotImplementedError("base class called")
+
+    def __rshift__(self, other):  # override self >> other
+        return other.transform(self, strict=True)
+
+    def __rrshift__(self, other):  # override other >> self
+        return self.transform(other, strict=True)
+
+
+
+
+
+class DataOpArrow(Arrow):
     """ Represent a section of operators as a categorical arrow."""
 
     def __init__(self, pipeline):
@@ -25,6 +58,7 @@ class DataOpArrow:
         self.incoming_types = t_used[k].column_types
         self.outgoing_columns = pipeline.column_names
         self.outgoing_types = None
+        Arrow.__init__(self)
 
     # noinspection PyPep8Naming
     def transform(self, X, *, strict=True):
@@ -95,14 +129,32 @@ class DataOpArrow:
         self.learn_types(X, out)
         return self.transform(X)
 
-    def __rshift__(self, other):  # override self >> other
-        return other.transform(self, strict=True)
-
-    def __rrshift__(self, other):  # override other >> self
-        return self.transform(other, strict=True)
-
     def __repr__(self):
         return "DataOpArrow(" + self.pipeline.__repr__() + ")"
+
+    def dom(self):
+        if self.incoming_types is not None:
+            return self.incoming_types.copy()
+        return self.incoming_columns.copy()
+
+    def cod(self):
+        if self.incoming_types is not None:
+            return self.outgoing_types.copy()
+        return self.outgoing_columns.copy()
+
+    def identity_arrow(self, obj):
+        """build identity arrow from object"""
+        if isinstance(obj, data_algebra.data_ops.TableDescription):
+            return DataOpArrow(obj)
+        if isinstance(obj, list) or isinstance(obj, tuple):
+            td = data_algebra.data_ops.TableDescription("obj", obj)
+            return DataOpArrow(td)
+        if isinstance(obj, dict):
+            td = data_algebra.data_ops.TableDescription("obj", obj.keys(), column_types=obj)
+            res = DataOpArrow(td)
+            res.outgoing_types = obj.copy()
+            return res
+        raise TypeError("unexpected type: " + str(type(obj)))
 
     def __str__(self):
         align_right = 70
