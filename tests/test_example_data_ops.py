@@ -2,7 +2,6 @@ from data_algebra.data_ops import *
 from data_algebra.util import od
 import data_algebra.env
 import data_algebra.yaml
-import data_algebra.pipe
 
 
 # test representation paths
@@ -23,20 +22,8 @@ def test_example_data_ops_extend():
         ]
 
         ops = ops + [
-            TableDescription("d", ["x", "y"])
-            >> Extend({"z": "1/q + x"})
-            >> SelectColumns(["y", "z"])
-        ]
-
-        ops = ops + [
             TableDescription("d", ["x", "y"]).extend(
                 od(z="1/q + _.x/_[var_name]", f=1, g='"2"', h=True)
-            )
-        ]
-
-        ops = ops + [
-            data_algebra.pipe.build_pipeline(
-                TableDescription("d", ["x", "y"]), Extend(od(z="1/_.y + 1/q", x="x+1"))
             )
         ]
 

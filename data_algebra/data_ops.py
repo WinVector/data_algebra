@@ -14,7 +14,6 @@ import data_algebra.pandas_model
 import data_algebra.dask_model
 import data_algebra.datatable_model
 import data_algebra.expr_rep
-import data_algebra.pipe
 import data_algebra.env
 
 try:
@@ -42,11 +41,11 @@ op_list = [
 ]
 
 
-class OperatorPlatform(data_algebra.pipe.PipeValue):
+class OperatorPlatform():
     """Abstract class representing ability to apply data_algebra operations."""
 
     def __init__(self):
-        data_algebra.pipe.PipeValue.__init__(self)
+        pass
 
     # Pandas interface
 
@@ -56,8 +55,6 @@ class OperatorPlatform(data_algebra.pipe.PipeValue):
 
     # composition
     def add(self, other):
-        if not isinstance(other, data_algebra.pipe.PipeStep):
-            raise TypeError("other should be of type data_algebra.pipe.PipeStep")
         return other.apply(self)
 
     # define builders for all non-initial node types on base class
@@ -1375,7 +1372,7 @@ class ConvertRecordsNode(ViewRepresentation):
         )
 
 
-class Extend(data_algebra.pipe.PipeStep):
+class Extend:
     """Class to specify adding or altering columns.
 
        If outer namespace is set user values are visible and
@@ -1414,7 +1411,6 @@ class Extend(data_algebra.pipe.PipeStep):
                 raise ValueError(
                     "columns in reverse that are not in order_by: " + str(unknown)
                 )
-        data_algebra.pipe.PipeStep.__init__(self, name="Extend")
         self._ops = ops
         self.partition_by = partition_by
         self.order_by = order_by
@@ -1451,7 +1447,7 @@ class Extend(data_algebra.pipe.PipeStep):
         return self.__repr__()
 
 
-class Project(data_algebra.pipe.PipeStep):
+class Project:
     """Class to specify aggregating or summarizing columns."""
 
     ops: Dict[str, data_algebra.expr_rep.Expression]
@@ -1461,7 +1457,6 @@ class Project(data_algebra.pipe.PipeStep):
             group_by = [group_by]
         if ops is None:
             ops = {}
-        data_algebra.pipe.PipeStep.__init__(self, name="Project")
         self._ops = ops
         self.group_by = group_by
 
@@ -1486,14 +1481,13 @@ class Project(data_algebra.pipe.PipeStep):
         return self.__repr__()
 
 
-class SelectRows(data_algebra.pipe.PipeStep):
+class SelectRows:
     """Class to specify a choice of rows.
     """
 
     expr: data_algebra.expr_rep.Expression
 
     def __init__(self, expr):
-        data_algebra.pipe.PipeStep.__init__(self, name="SelectRows")
         self.expr = expr
 
     def apply(self, other, **kwargs):
@@ -1511,7 +1505,7 @@ class SelectRows(data_algebra.pipe.PipeStep):
         return self.__repr__()
 
 
-class SelectColumns(data_algebra.pipe.PipeStep):
+class SelectColumns:
     """Class to specify a choice of columns.
     """
 
@@ -1522,7 +1516,6 @@ class SelectColumns(data_algebra.pipe.PipeStep):
             columns = [columns]
         column_selection = [c for c in columns]
         self.column_selection = column_selection
-        data_algebra.pipe.PipeStep.__init__(self, name="SelectColumns")
 
     def apply(self, other, **kwargs):
         if not isinstance(other, OperatorPlatform):
@@ -1538,7 +1531,7 @@ class SelectColumns(data_algebra.pipe.PipeStep):
         return self.__repr__()
 
 
-class DropColumns(data_algebra.pipe.PipeStep):
+class DropColumns:
     """Class to specify removal of columns.
     """
 
@@ -1549,7 +1542,6 @@ class DropColumns(data_algebra.pipe.PipeStep):
             column_deletions = [column_deletions]
         column_deletions = [c for c in column_deletions]
         self.column_deletions = column_deletions
-        data_algebra.pipe.PipeStep.__init__(self, name="DropColumns")
 
     def apply(self, other, **kwargs):
         if not isinstance(other, OperatorPlatform):
@@ -1565,7 +1557,7 @@ class DropColumns(data_algebra.pipe.PipeStep):
         return self.__repr__()
 
 
-class OrderRows(data_algebra.pipe.PipeStep):
+class OrderRows:
     """Class to specify a columns to determine row order.
     """
 
@@ -1590,7 +1582,6 @@ class OrderRows(data_algebra.pipe.PipeStep):
             reverse = []
         self.reverse = [c for c in reverse]
         self.limit = limit
-        data_algebra.pipe.PipeStep.__init__(self, name="OrderRows")
 
     def apply(self, other, **kwargs):
         if not isinstance(other, OperatorPlatform):
@@ -1614,7 +1605,7 @@ class OrderRows(data_algebra.pipe.PipeStep):
         return self.__repr__()
 
 
-class RenameColumns(data_algebra.pipe.PipeStep):
+class RenameColumns:
     """Class to rename columns.
     """
 
@@ -1622,7 +1613,6 @@ class RenameColumns(data_algebra.pipe.PipeStep):
 
     def __init__(self, column_remapping):
         self.column_remapping = column_remapping.copy()
-        data_algebra.pipe.PipeStep.__init__(self, name="RenameColumns")
 
     def apply(self, other, **kwargs):
         if not isinstance(other, OperatorPlatform):
@@ -1638,7 +1628,7 @@ class RenameColumns(data_algebra.pipe.PipeStep):
         return self.__repr__()
 
 
-class NaturalJoin(data_algebra.pipe.PipeStep):
+class NaturalJoin:
     _by: List[str]
     _jointype: str
     _b: OperatorPlatform
@@ -1651,7 +1641,6 @@ class NaturalJoin(data_algebra.pipe.PipeStep):
         self._by = by
         self._jointype = jointype
         self._b = b
-        data_algebra.pipe.PipeStep.__init__(self, name="NaturalJoin")
 
     def apply(self, other, **kwargs):
         if not isinstance(other, OperatorPlatform):
@@ -1676,11 +1665,10 @@ class NaturalJoin(data_algebra.pipe.PipeStep):
         return self.__repr__()
 
 
-class ConvertRecords(data_algebra.pipe.PipeStep):
+class ConvertRecords:
     def __init__(self, record_map, *, blocks_out_table=None):
         self.record_map = record_map
         self.blocks_out_table = blocks_out_table
-        data_algebra.pipe.PipeStep.__init__(self, name="ConvertRecords")
 
     def apply(self, other, **kwargs):
         if not isinstance(other, OperatorPlatform):
@@ -1704,134 +1692,3 @@ class ConvertRecords(data_algebra.pipe.PipeStep):
 
     def __str__(self):
         return self.__repr__()
-
-
-class Locum(OperatorPlatform):
-    """Class to represent future opertions."""
-
-    def __init__(self):
-        OperatorPlatform.__init__(self)
-        self.ops = []
-
-    def apply_to(self, pipeline):
-        if not isinstance(pipeline, OperatorPlatform):
-            raise TypeError(
-                "Expected othter to be a data_algebra.data_ops.OperatorPlatform"
-            )
-        for s in self.ops:
-            # pipeline = pipeline >> s
-            pipeline = s.apply(pipeline)
-        return pipeline
-
-    def append(self, other):
-        if isinstance(other, Locum):
-            for o in other.ops:
-                self.ops.append(o)
-        elif isinstance(other, data_algebra.pipe.PipeStep):
-            self.ops.append(other)
-        else:
-            raise TypeError("unexpeted type for Locum + " + str(type(other)))
-        return self
-
-    def realize(self, x):
-        pipeline = describe_table(x, table_name="x")
-        return self.apply_to(pipeline)
-
-    # noinspection PyPep8Naming
-    def transform(self, X):
-        if isinstance(X, OperatorPlatform):
-            return self.apply_to(X)
-        pipeline = self.realize(X)
-        return pipeline.transform(X)
-
-    def __rrshift__(self, other):  # override other >> self
-        return self.transform(other)
-
-    def __add__(self, other):  # override self + other
-        res = Locum()
-        res.append(self)
-        res.append(other)
-        return res
-
-    def __radd__(self, other):  # override other + self
-        return self.apply_to(other)
-
-    # print
-
-    def __repr__(self):
-        return "[\n    " + "\n    ".join([str(o) + "," for o in self.ops]) + "\n]"
-
-    def __str__(self):
-        return "[\n    " + "\n    ".join([str(o) + "," for o in self.ops]) + "\n]"
-
-    # implement method chaining collection of pending operations
-
-    def extend(
-        self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
-    ):
-        if parse_env is not None:
-            raise ValueError("Expected parse_env to be None")
-        op = Extend(
-            ops=ops, partition_by=partition_by, order_by=order_by, reverse=reverse
-        )
-        self.ops.append(op)
-        return self
-
-    def project(self, ops=None, *, group_by=None, parse_env=None):
-        if parse_env is not None:
-            raise ValueError("Expected parse_env to be None")
-        if ops is None:
-            ops = {}
-        op = Project(ops=ops, group_by=group_by)
-        self.ops.append(op)
-        return self
-
-    def natural_join(self, b, *, by=None, jointype="INNER"):
-        if not isinstance(b, ViewRepresentation):
-            raise TypeError("b must be a data_algebra.data_ops.ViewRepresentation")
-        op = NaturalJoin(by=by, jointype=jointype, b=b)
-        self.ops.append(op)
-        return self
-
-    def select_rows(self, expr, parse_env=None):
-        if parse_env is not None:
-            raise ValueError("Expected parse_env to be None")
-        op = SelectRows(expr=expr)
-        self.ops.append(op)
-        return self
-
-    def drop_columns(self, column_deletions):
-        op = DropColumns(column_deletions=column_deletions)
-        self.ops.append(op)
-        return self
-
-    def select_columns(self, columns):
-        op = SelectColumns(columns=columns)
-        self.ops.append(op)
-        return self
-
-    def rename_columns(self, column_remapping):
-        op = RenameColumns(column_remapping=column_remapping)
-        self.ops.append(op)
-        return self
-
-    def order_rows(self, columns, *, reverse=None, limit=None):
-        op = OrderRows(columns=columns, reverse=reverse, limit=limit)
-        self.ops.append(op)
-        return self
-
-    def convert_records(self, record_map, *, blocks_out_table=None):
-        op = ConvertRecords(record_map=record_map, blocks_out_table=blocks_out_table)
-        self.ops.append(op)
-        return self
-
-
-def wrap_pipeline(ops):
-    return ops.apply(Locum())
-
-
-def wrap_ops(*args):
-    r = Locum()
-    for s in args:
-        s.apply(r)
-    return r

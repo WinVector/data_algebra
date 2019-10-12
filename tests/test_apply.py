@@ -30,16 +30,6 @@ def test_apply():
 
     assert data_algebra.util.equivalent_frames(expect_1, res_0_2)
 
-    ops1 = (
-        TableDescription("t1", ["x", "y"])
-        >> Extend({"z": "x / y"})
-        >> SelectRows("z >= 0")
-    )
-
-    res_1_1 = ops1.eval_pandas(data_map={"t1": d}, eval_env=locals())
-
-    assert data_algebra.util.equivalent_frames(expect_1, res_1_1)
-
     ops1b = TableDescription("t1", ["x", "y"]). \
         add(Extend({"z": "x / y"})). \
         add(SelectRows("z >= 0"))
@@ -47,63 +37,3 @@ def test_apply():
     res_1b = ops1b.transform(d)
 
     assert data_algebra.util.equivalent_frames(expect_1, res_1b)
-
-    res_1_2 = ops1.transform(d)
-
-    assert data_algebra.util.equivalent_frames(expect_1, res_1_2)
-
-    res_1_3 = d >> ops1
-
-    assert data_algebra.util.equivalent_frames(expect_1, res_1_3)
-
-    ops2 = Locum().extend({"z": "x / y"}).select_rows("z >= 0")
-
-    res_2_1 = ops2.transform(d)
-
-    assert data_algebra.util.equivalent_frames(expect_1, res_2_1)
-
-    res_2_2 = d >> ops2
-
-    assert data_algebra.util.equivalent_frames(expect_1, res_2_2)
-
-    ops3 = Locum() >> Extend({"z": "x / y"}) >> SelectRows("z >= 0")
-
-    res_3_1 = ops3.transform(d)
-
-    assert data_algebra.util.equivalent_frames(expect_1, res_3_1)
-
-    res_3_2 = d >> ops3
-
-    assert data_algebra.util.equivalent_frames(expect_1, res_3_2)
-
-    res_4 = d >> wrap_pipeline(
-        Extend({"z": "x / y"}) >> SelectRows("z >= 0") >> Extend({"q": "y - z"})
-    )
-
-    assert data_algebra.util.equivalent_frames(expect_2, res_4)
-
-    res_5 = d >> (
-        Locum().extend({"z": "x / y"}).select_rows("z >= 0").extend({"q": "y - z"})
-    )
-
-    assert data_algebra.util.equivalent_frames(expect_2, res_5)
-
-    res_6 = d >> wrap_ops(
-        Extend({"z": "x / y"}), SelectRows("z >= 0"), Extend({"q": "y - z"})
-    )
-
-    assert data_algebra.util.equivalent_frames(expect_2, res_6)
-
-    res_7 = d >> (
-        Locum().extend({"z": "x / y"}).select_rows("z >= 0").extend({"q": "y - z"})
-    )
-
-    assert data_algebra.util.equivalent_frames(expect_2, res_7)
-
-    s1 = Locum().extend({"z": "x / y"}).select_rows("z >= 0")
-    s2 = Locum().extend({"q": "y - z"})
-
-    res_8 = d >> (s1 + s2)
-
-    assert data_algebra.util.equivalent_frames(expect_2, res_8)
-
