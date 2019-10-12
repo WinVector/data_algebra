@@ -1,6 +1,7 @@
 from typing import Set, Any, Dict, List
 import collections
 import re
+import copy
 
 import pandas
 
@@ -403,6 +404,14 @@ class ViewRepresentation(OperatorPlatform):
 
     # implement builders for all non-initial node types on base class
 
+    def _r_copy_replace(self, ops):
+        """re-write ops replacing any TableDescription with self"""
+        if isinstance(ops, data_algebra.data_ops.TableDescription):
+            return self
+        node = copy.copy(ops)
+        node.sources = [self._r_copy_replace(s) for s in node.sources]
+        return node
+
     # noinspection PyPep8Naming
     def transform(self, X, *, eval_env=None, data_model=None):
         if data_model is not None:
@@ -410,13 +419,28 @@ class ViewRepresentation(OperatorPlatform):
                 raise TypeError(
                     "Expected data_model to be derived from data_algebra.data_model.DataModel"
                 )
-        self.columns_used()  # for table consistency check/raise
+        cols_used = self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
         if len(tables) != 1:
             raise ValueError(
                 "transfrom(pandas.DataFrame) can only be applied to ops-dags with only one table def"
             )
         k = [k for k in tables.keys()][0]
+        if isinstance(X, ViewRepresentation):
+            # replace self input table with X
+            incoming_columns = cols_used[k]
+            missing = set(incoming_columns) - set(X.column_names)
+            if len(missing) > 0:
+                raise ValueError("missing required columns: " + str(missing))
+            excess = set(X.column_names) - set(incoming_columns)
+            if len(excess):
+                # insert a select columns node to get the match columns
+                X = X.select_columns([c for c in incoming_columns])
+            # check categorical arrow composition conditions
+            if set(incoming_columns) != set(X.column_names):
+                raise ValueError("arrow composition conditions not met (incoming column set doesn't match outgoing)")
+            res = X._r_copy_replace(self)
+            return res
         data_map = {k: X}
         if isinstance(X, pandas.DataFrame):
             return self.eval_pandas(

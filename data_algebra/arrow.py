@@ -26,14 +26,6 @@ class DataOpArrow:
         self.outgoing_columns = pipeline.column_names
         self.outgoing_types = None
 
-    def _r_copy_replace(self, ops):
-        """re-write ops replacing any TableDescription with self.pipeline"""
-        if isinstance(ops, data_algebra.data_ops.TableDescription):
-            return self.pipeline
-        node = copy.copy(ops)
-        node.sources = [self._r_copy_replace(s) for s in node.sources]
-        return node
-
     # noinspection PyPep8Naming
     def transform(self, X, *, strict=True):
         """replace self input table with X"""
@@ -64,7 +56,7 @@ class DataOpArrow:
                         raise ValueError("column " + c +
                                          " self incoming type is " + str(st) +
                                          ", while X outgoing type is " + str(xt))
-            res = DataOpArrow(X._r_copy_replace(self.pipeline))
+            res = DataOpArrow(X.pipeline._r_copy_replace(self.pipeline))
             res.incoming_types = X.incoming_types
             res.outgoing_types = self.outgoing_types
             return res

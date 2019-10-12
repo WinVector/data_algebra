@@ -42,6 +42,19 @@ d
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -126,6 +139,19 @@ id_ops_a.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -175,6 +201,19 @@ id_ops_b.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -281,7 +320,7 @@ print(a1)
 ```
 
     [
-      [ g, x, i, v ]
+      [ i, x, v, g ]
        ->
       [ g, x, v, i, ngroup ]
     ]
@@ -298,8 +337,8 @@ print(a1)
 ```
 
     [
-      [ g: <class 'str'>, x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'> ]
+      [ i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
+        v: <class 'numpy.float64'>, g: <class 'str'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
@@ -343,6 +382,19 @@ a1.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -429,9 +481,9 @@ print(a2)
 ```
 
     [
-      [ g, ngroup, x, v ]
+      [ x, ngroup, v, g ]
        ->
-      [ g, ngroup, x, v, row_number, shift_v ]
+      [ x, ngroup, v, g, row_number, shift_v ]
     ]
     
 
@@ -463,7 +515,7 @@ print(a2)
 ```
 
     [
-      [ q, ngroup, x, i, g, v ]
+      [ q, g, i, x, v, ngroup ]
        ->
       [ g, x, v, i, ngroup, q, row_number, shift_v ]
     ]
@@ -500,7 +552,7 @@ print(a2)
 ```
 
     [
-      [ ngroup, x, i, g, v ]
+      [ g, i, x, v, ngroup ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -513,7 +565,7 @@ print(a2)
 ```
 
     [
-      [ ngroup, x, i, g, v ]
+      [ g, i, x, v, ngroup ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -526,8 +578,8 @@ print(a1 >> a2)
 ```
 
     [
-      [ g: <class 'str'>, x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'> ]
+      [ i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
+        v: <class 'numpy.float64'>, g: <class 'str'> ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -551,8 +603,8 @@ print(a2)
 ```
 
     [
-      [ ngroup: <class 'numpy.int64'>, x: <class 'str'>,
-        i: <class 'numpy.bool_'>, g: <class 'str'>, v: <class 'numpy.float64'> ]
+      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'str'>,
+        v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'> ]
        ->
       [ g: <class 'str'>, x: <class 'str'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -578,8 +630,8 @@ print(a2.fit(a1.transform(d)))
 ```
 
     [
-      [ ngroup: <class 'numpy.int64'>, x: <class 'numpy.int64'>,
-        i: <class 'numpy.bool_'>, g: <class 'str'>, v: <class 'numpy.float64'> ]
+      [ g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
+        v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -606,7 +658,7 @@ print(a3)
 ```
 
     [
-      [ ngroup, x, shift_v, i, g, row_number, v ]
+      [ shift_v, row_number, g, i, x, v, ngroup ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v, size, max_v, min_v, sum_v,
         mean_v, count_v, size_v ]
@@ -620,10 +672,9 @@ print(a3.fit(a2.transform(a1.transform(d))))
 ```
 
     [
-      [ ngroup: <class 'numpy.int64'>, x: <class 'numpy.int64'>,
-        shift_v: <class 'numpy.float64'>, i: <class 'numpy.bool_'>,
-        g: <class 'str'>, row_number: <class 'numpy.int64'>,
-        v: <class 'numpy.float64'> ]
+      [ shift_v: <class 'numpy.float64'>, row_number: <class 'numpy.int64'>,
+        g: <class 'str'>, i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
+        v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -642,8 +693,8 @@ print(a1 >> a2 >> a3)
 ```
 
     [
-      [ g: <class 'str'>, x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'> ]
+      [ i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
+        v: <class 'numpy.float64'>, g: <class 'str'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -662,8 +713,8 @@ print((a1 >> a2) >> a3)
 ```
 
     [
-      [ g: <class 'str'>, x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'> ]
+      [ i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
+        v: <class 'numpy.float64'>, g: <class 'str'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -682,8 +733,8 @@ print(a1 >> (a2 >> a3))
 ```
 
     [
-      [ g: <class 'str'>, x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'> ]
+      [ i: <class 'numpy.bool_'>, x: <class 'numpy.int64'>,
+        v: <class 'numpy.float64'>, g: <class 'str'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -791,6 +842,19 @@ The payoff is: we can use this composite arrow on data.
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -933,6 +997,19 @@ d >> a1 >> a2 >> a3
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1072,6 +1149,19 @@ d >> (a1 >> a2 >> a3)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1204,3 +1294,36 @@ d >> (a1 >> a2 >> a3)
 The underlying `data_algebra` steps compute and check very similar pre and post conditions, the arrow class is just making this look more explicitly like arrows moving through objects in category.
 
 There is more to be gotten from how the data relates to the schema descriptions.  I think we have that if we consider the arrows operating on data and the arrows operating on schemas we have a faithfull embedding (in the sense of Saunders Mac Lane *Categories for the Working Mathematician, 2nd Edition*, Springer, 1997, page 15) from data to schemas.
+
+
+```python
+# check pipelines compose
+a2.pipeline.transform(a1.pipeline)
+```
+
+
+
+
+    TableDescription(
+     table_name='d',
+     column_names=[
+       'g', 'x', 'v', 'i']) .\
+       natural_join(b=
+          TableDescription(
+           table_name='d',
+           column_names=[
+             'g', 'x', 'v', 'i']) .\
+             project({
+              },
+             group_by=['g']) .\
+             extend({
+              'ngroup': '_row_number()'},
+             order_by=['g']),
+          by=['g'], jointype='LEFT') .\
+       extend({
+        'row_number': '_row_number()',
+        'shift_v': 'v.shift()'},
+       partition_by=['g'],
+       order_by=['x'])
+
+
