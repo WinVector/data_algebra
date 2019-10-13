@@ -1,5 +1,5 @@
 
-The [data_algebra](https://github.com/WinVector/data_algebra) provides a simplified (though verbose) unified interface to Pandas and SQL windows functions.
+The [data_algebra](https://github.com/WinVector/data_algebra) provides a simplified (though verbose) unified interface to Pandas and SQL data transforms, including windows functions.
 
 Let's work an example. First bring in our packages.
 
@@ -20,7 +20,7 @@ Now some example data.
 
 ```python
 d = pandas.DataFrame({
-    'g': [1, 2, 2, 3, 3, 3],
+    'g': ['a', 'b', 'b', 'c', 'c', 'c'],
     'x': [1, 4, 5, 7, 8, 9],
     'v': [10, 40, 50, 70, 80, 90],
 })
@@ -46,8 +46,6 @@ ops = table_description. \
         'min_v': 'v.min()',
         'sum_v': 'v.sum()',
         'mean_v': 'v.mean()',
-        'count_v': 'v.count()',
-        'size_v': 'v.size()',
     },
     partition_by=['g'])
 
@@ -60,6 +58,19 @@ res1
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -75,14 +86,12 @@ res1
       <th>min_v</th>
       <th>sum_v</th>
       <th>mean_v</th>
-      <th>count_v</th>
-      <th>size_v</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>1</td>
+      <td>a</td>
       <td>1</td>
       <td>10</td>
       <td>1</td>
@@ -93,12 +102,10 @@ res1
       <td>10</td>
       <td>10</td>
       <td>10</td>
-      <td>1</td>
-      <td>1</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>2</td>
+      <td>b</td>
       <td>4</td>
       <td>40</td>
       <td>1</td>
@@ -109,12 +116,10 @@ res1
       <td>40</td>
       <td>90</td>
       <td>45</td>
-      <td>2</td>
-      <td>2</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>2</td>
+      <td>b</td>
       <td>5</td>
       <td>50</td>
       <td>2</td>
@@ -125,12 +130,10 @@ res1
       <td>40</td>
       <td>90</td>
       <td>45</td>
-      <td>2</td>
-      <td>2</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>3</td>
+      <td>c</td>
       <td>7</td>
       <td>70</td>
       <td>1</td>
@@ -141,12 +144,10 @@ res1
       <td>70</td>
       <td>240</td>
       <td>80</td>
-      <td>3</td>
-      <td>3</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>3</td>
+      <td>c</td>
       <td>8</td>
       <td>80</td>
       <td>2</td>
@@ -157,12 +158,10 @@ res1
       <td>70</td>
       <td>240</td>
       <td>80</td>
-      <td>3</td>
-      <td>3</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>3</td>
+      <td>c</td>
       <td>9</td>
       <td>90</td>
       <td>3</td>
@@ -173,8 +172,6 @@ res1
       <td>70</td>
       <td>240</td>
       <td>80</td>
-      <td>3</td>
-      <td>3</td>
     </tr>
   </tbody>
 </table>
@@ -182,7 +179,7 @@ res1
 
 
 
-One of the benefits of the data_algebra is the commands are saved in an object.
+One of the benefits of the `data_algebra` is the commands are saved in an object.
 
 
 ```python
@@ -201,8 +198,6 @@ print(ops.to_python(pretty=True))
             "min_v": "v.min()",
             "sum_v": "v.sum()",
             "mean_v": "v.mean()",
-            "count_v": "v.count()",
-            "size_v": "v.size()",
         },
         partition_by=["g"],
     )
@@ -248,8 +243,6 @@ ops_db = table_description. \
         'min_v': 'v.min()',
         'sum_v': 'v.sum()',
         'mean_v': 'v.mean()',
-        'count_v': 'v.count()',
-        'size_v': 'v.size()',
     },
     partition_by=['g'])
 
@@ -268,9 +261,7 @@ print(sql1)
                        MAX("v") OVER (PARTITION BY "g") AS "max_v",
                                      MIN("v") OVER (PARTITION BY "g") AS "min_v",
                                                    SUM("v") OVER (PARTITION BY "g") AS "sum_v",
-                                                                 avg("v") OVER (PARTITION BY "g") AS "mean_v",
-                                                                               COUNT("v") OVER (PARTITION BY "g") AS "count_v",
-                                                                                               SUM(1) OVER (PARTITION BY "g") AS "size_v"
+                                                                 avg("v") OVER (PARTITION BY "g") AS "mean_v"
     FROM
       (SELECT "g",
               "x",
@@ -295,6 +286,19 @@ res1_db
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -309,14 +313,12 @@ res1_db
       <th>min_v</th>
       <th>sum_v</th>
       <th>mean_v</th>
-      <th>count_v</th>
-      <th>size_v</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>1</td>
+      <td>a</td>
       <td>1</td>
       <td>10</td>
       <td>1</td>
@@ -326,12 +328,10 @@ res1_db
       <td>10</td>
       <td>10</td>
       <td>10.0</td>
-      <td>1</td>
-      <td>1</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>2</td>
+      <td>b</td>
       <td>4</td>
       <td>40</td>
       <td>1</td>
@@ -341,12 +341,10 @@ res1_db
       <td>40</td>
       <td>90</td>
       <td>45.0</td>
-      <td>2</td>
-      <td>2</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>2</td>
+      <td>b</td>
       <td>5</td>
       <td>50</td>
       <td>2</td>
@@ -356,12 +354,10 @@ res1_db
       <td>40</td>
       <td>90</td>
       <td>45.0</td>
-      <td>2</td>
-      <td>2</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>3</td>
+      <td>c</td>
       <td>7</td>
       <td>70</td>
       <td>1</td>
@@ -371,12 +367,10 @@ res1_db
       <td>70</td>
       <td>240</td>
       <td>80.0</td>
-      <td>3</td>
-      <td>3</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>3</td>
+      <td>c</td>
       <td>8</td>
       <td>80</td>
       <td>2</td>
@@ -386,12 +380,10 @@ res1_db
       <td>70</td>
       <td>240</td>
       <td>80.0</td>
-      <td>3</td>
-      <td>3</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>3</td>
+      <td>c</td>
       <td>9</td>
       <td>90</td>
       <td>3</td>
@@ -401,8 +393,6 @@ res1_db
       <td>70</td>
       <td>240</td>
       <td>80.0</td>
-      <td>3</td>
-      <td>3</td>
     </tr>
   </tbody>
 </table>
@@ -450,7 +440,7 @@ cur.execute('CREATE TABLE remote_result AS ' + sql2)
 
 
 
-    <sqlite3.Cursor at 0x10dcb8730>
+    <sqlite3.Cursor at 0x10d35f730>
 
 
 
@@ -467,6 +457,19 @@ res2_db
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -480,42 +483,42 @@ res2_db
   <tbody>
     <tr>
       <th>0</th>
-      <td>1</td>
+      <td>a</td>
       <td>1</td>
       <td>10</td>
       <td>1</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>2</td>
+      <td>b</td>
       <td>4</td>
       <td>40</td>
       <td>2</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>2</td>
+      <td>b</td>
       <td>5</td>
       <td>50</td>
       <td>2</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>3</td>
+      <td>c</td>
       <td>7</td>
       <td>70</td>
       <td>3</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>3</td>
+      <td>c</td>
       <td>8</td>
       <td>80</td>
       <td>3</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>3</td>
+      <td>c</td>
       <td>9</td>
       <td>90</td>
       <td>3</td>
@@ -537,6 +540,19 @@ id_ops_b.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -550,42 +566,42 @@ id_ops_b.transform(d)
   <tbody>
     <tr>
       <th>0</th>
-      <td>1</td>
+      <td>a</td>
       <td>1</td>
       <td>10</td>
       <td>1</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>2</td>
+      <td>b</td>
       <td>4</td>
       <td>40</td>
       <td>2</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>2</td>
+      <td>b</td>
       <td>5</td>
       <td>50</td>
       <td>2</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>3</td>
+      <td>c</td>
       <td>7</td>
       <td>70</td>
       <td>3</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>3</td>
+      <td>c</td>
       <td>8</td>
       <td>80</td>
       <td>3</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>3</td>
+      <td>c</td>
       <td>9</td>
       <td>90</td>
       <td>3</td>
@@ -628,8 +644,6 @@ all_ops = id_ops_b. \
         'min_v': 'v.min()',
         'sum_v': 'v.sum()',
         'mean_v': 'v.mean()',
-        'count_v': 'v.count()',
-        'size_v': 'v.size()',
     },
     partition_by=['g'])
 
@@ -655,6 +669,19 @@ all_ops.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -670,14 +697,12 @@ all_ops.transform(d)
       <th>min_v</th>
       <th>sum_v</th>
       <th>mean_v</th>
-      <th>count_v</th>
-      <th>size_v</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>1</td>
+      <td>a</td>
       <td>1</td>
       <td>10</td>
       <td>1</td>
@@ -688,12 +713,10 @@ all_ops.transform(d)
       <td>10</td>
       <td>10</td>
       <td>10</td>
-      <td>1</td>
-      <td>1</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>2</td>
+      <td>b</td>
       <td>4</td>
       <td>40</td>
       <td>2</td>
@@ -704,12 +727,10 @@ all_ops.transform(d)
       <td>40</td>
       <td>90</td>
       <td>45</td>
-      <td>2</td>
-      <td>2</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>2</td>
+      <td>b</td>
       <td>5</td>
       <td>50</td>
       <td>2</td>
@@ -720,12 +741,10 @@ all_ops.transform(d)
       <td>40</td>
       <td>90</td>
       <td>45</td>
-      <td>2</td>
-      <td>2</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>3</td>
+      <td>c</td>
       <td>7</td>
       <td>70</td>
       <td>3</td>
@@ -736,12 +755,10 @@ all_ops.transform(d)
       <td>70</td>
       <td>240</td>
       <td>80</td>
-      <td>3</td>
-      <td>3</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>3</td>
+      <td>c</td>
       <td>8</td>
       <td>80</td>
       <td>3</td>
@@ -752,12 +769,10 @@ all_ops.transform(d)
       <td>70</td>
       <td>240</td>
       <td>80</td>
-      <td>3</td>
-      <td>3</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>3</td>
+      <td>c</td>
       <td>9</td>
       <td>90</td>
       <td>3</td>
@@ -768,8 +783,6 @@ all_ops.transform(d)
       <td>70</td>
       <td>240</td>
       <td>80</td>
-      <td>3</td>
-      <td>3</td>
     </tr>
   </tbody>
 </table>
@@ -777,7 +790,7 @@ all_ops.transform(d)
 
 
 
-Or in the database.
+Or in the database (via automatic `SQL` generation).
 
 
 ```python
@@ -788,6 +801,19 @@ db_model.read_query(conn, all_ops.to_sql(db_model))
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -803,14 +829,12 @@ db_model.read_query(conn, all_ops.to_sql(db_model))
       <th>min_v</th>
       <th>sum_v</th>
       <th>mean_v</th>
-      <th>count_v</th>
-      <th>size_v</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>1</td>
+      <td>a</td>
       <td>1</td>
       <td>10</td>
       <td>1</td>
@@ -821,12 +845,10 @@ db_model.read_query(conn, all_ops.to_sql(db_model))
       <td>10</td>
       <td>10</td>
       <td>10.0</td>
-      <td>1</td>
-      <td>1</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>2</td>
+      <td>b</td>
       <td>4</td>
       <td>40</td>
       <td>2</td>
@@ -837,12 +859,10 @@ db_model.read_query(conn, all_ops.to_sql(db_model))
       <td>40</td>
       <td>90</td>
       <td>45.0</td>
-      <td>2</td>
-      <td>2</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>2</td>
+      <td>b</td>
       <td>5</td>
       <td>50</td>
       <td>2</td>
@@ -853,12 +873,10 @@ db_model.read_query(conn, all_ops.to_sql(db_model))
       <td>40</td>
       <td>90</td>
       <td>45.0</td>
-      <td>2</td>
-      <td>2</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>3</td>
+      <td>c</td>
       <td>7</td>
       <td>70</td>
       <td>3</td>
@@ -869,12 +887,10 @@ db_model.read_query(conn, all_ops.to_sql(db_model))
       <td>70</td>
       <td>240</td>
       <td>80.0</td>
-      <td>3</td>
-      <td>3</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>3</td>
+      <td>c</td>
       <td>8</td>
       <td>80</td>
       <td>3</td>
@@ -885,12 +901,10 @@ db_model.read_query(conn, all_ops.to_sql(db_model))
       <td>70</td>
       <td>240</td>
       <td>80.0</td>
-      <td>3</td>
-      <td>3</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>3</td>
+      <td>c</td>
       <td>9</td>
       <td>90</td>
       <td>3</td>
@@ -901,8 +915,6 @@ db_model.read_query(conn, all_ops.to_sql(db_model))
       <td>70</td>
       <td>240</td>
       <td>80.0</td>
-      <td>3</td>
-      <td>3</td>
     </tr>
   </tbody>
 </table>
