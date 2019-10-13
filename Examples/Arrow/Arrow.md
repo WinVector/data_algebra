@@ -5,7 +5,7 @@ Example of data transforms as categorical arrows ([`R` version](https://github.c
 
 The [Python `data_algebra` package](https://github.com/WinVector/data_algebra) supplies a number of operators for working with tabular data.  The operators are picked in reference to [Codd's relational algebra](https://en.wikipedia.org/wiki/Relational_algebra), though (as with [`SQL`](https://en.wikipedia.org/wiki/SQL)) we do not insist on table rows being unique. Many of the operations are simple: selecting rows, selecting columns, joining tables.  Two of the operations stand out: projecting or aggregating rows, and extending tables with new derived columns.
 
-An interesting point is: while the `data_algebra` operators are fairly generic: the operator pipelines that map a single table to a single table form a category over a nice set of objects.
+An interesting point is: while the `data_algebra` operators are fairly generic: the operator pipelines that map a single table to a single table form the arrows of a category over a nice set of objects.
 
 The objects of this category can be either of:
 
@@ -312,14 +312,14 @@ print(a1)
 ```
 
     [
-      [ x, i, v, g ]
+      [ g, v, x, i ]
        ->
       [ g, x, v, i, ngroup ]
     ]
     
 
 
-The arrow has a more detailed presentation, which is the realization of the operator pipeline.
+The arrow has a more detailed presentation, which is the realization of the operator pipeline as code.
 
 
 ```python
@@ -344,10 +344,10 @@ print(a1.__repr__())
           by=['g'], jointype='LEFT'))
 
 
-So we can think of our arrows (or obvious mappings of them) as being able to be applied to:
+We can think of our arrows (or obvious mappings of them) as being able to be applied to:
   * More arrows of the same type (composition).
   * Data (action or application).
-  * Single table schemas
+  * Single table schemas (managing pre and post conditions).
   
 The arrow can be converted to a more detailed arrow that records both incoming and outgoing column types in the domain and co-domain by the `.fit()` function.
 
@@ -359,8 +359,8 @@ print(a1)
 ```
 
     [
-      [ x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'>, g: <class 'str'> ]
+      [ g: <class 'str'>, v: <class 'numpy.float64'>, x: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
@@ -375,11 +375,11 @@ print(identity_left)
 ```
 
     [
-      [ x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'>, g: <class 'str'> ]
+      [ g: <class 'str'>, v: <class 'numpy.float64'>, x: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'> ]
        ->
-      [ x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'>, g: <class 'str'> ]
+      [ g: <class 'str'>, v: <class 'numpy.float64'>, x: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'> ]
     ]
     
 
@@ -570,8 +570,8 @@ print(a1b)
 ```
 
     [
-      [ x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'>, g: <class 'str'> ]
+      [ g: <class 'str'>, v: <class 'numpy.float64'>, x: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
@@ -579,7 +579,7 @@ print(a1b)
     
 
 
-However, the `a1b` arrow represents a different operation:
+However, the `a1b` arrow represents a different operation than `a1`:
 
 
 ```python
@@ -657,7 +657,7 @@ a1b.transform(d)
 
 
 
-The arrows compose exactly when the pre-conditions meet the post conditions.  
+The arrows can be composed exactly when the pre-conditions meet the post conditions.  
 
 Here are two examples of violating the pre and post conditions.  The point is, the categorical conditions enforce the checking for us.  We can't compose arrows that don't match domain and range.  Up until now we have been setting things up to make the categorical machinery work, now this machinery will work for us and make the job of managing complex data transformations easier.
 
@@ -676,9 +676,9 @@ print(a2)
 ```
 
     [
-      [ x, ngroup, g, v ]
+      [ g, v, ngroup, x ]
        ->
-      [ x, ngroup, g, v, row_number, shift_v ]
+      [ v, ngroup, x, g, row_number, shift_v ]
     ]
     
 
@@ -709,7 +709,7 @@ print(a2)
 ```
 
     [
-      [ q, v, x, i, ngroup, g ]
+      [ v, x, q, i, g, ngroup ]
        ->
       [ g, x, v, i, ngroup, q, row_number, shift_v ]
     ]
@@ -746,7 +746,7 @@ print(a2)
 ```
 
     [
-      [ ngroup, x, i, v, g ]
+      [ v, ngroup, x, i, g ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -759,8 +759,8 @@ print(a1 >> a2)
 ```
 
     [
-      [ x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'>, g: <class 'str'> ]
+      [ g: <class 'str'>, v: <class 'numpy.float64'>, x: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -784,8 +784,8 @@ print(a2)
 ```
 
     [
-      [ ngroup: <class 'numpy.int64'>, x: <class 'str'>,
-        i: <class 'numpy.bool_'>, v: <class 'numpy.float64'>, g: <class 'str'> ]
+      [ v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'>,
+        x: <class 'str'>, i: <class 'numpy.bool_'>, g: <class 'str'> ]
        ->
       [ g: <class 'str'>, x: <class 'str'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -811,8 +811,8 @@ print(a2.fit(a1.transform(d)))
 ```
 
     [
-      [ ngroup: <class 'numpy.int64'>, x: <class 'numpy.int64'>,
-        i: <class 'numpy.bool_'>, v: <class 'numpy.float64'>, g: <class 'str'> ]
+      [ v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'>,
+        x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>, g: <class 'str'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -820,6 +820,8 @@ print(a2.fit(a1.transform(d)))
     ]
     
 
+
+We can add yet another set of operations to our pipeline: computing a per-group variable `mean`.
 
 
 ```python
@@ -833,7 +835,7 @@ print(a3)
 ```
 
     [
-      [ row_number, shift_v, v, x, i, ngroup, g ]
+      [ v, shift_v, x, row_number, i, g, ngroup ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v, mean_v ]
     ]
@@ -846,10 +848,10 @@ print(a3.fit(a2.transform(a1.transform(d))))
 ```
 
     [
-      [ row_number: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'>,
-        v: <class 'numpy.float64'>, x: <class 'numpy.int64'>,
-        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
-        g: <class 'str'> ]
+      [ v: <class 'numpy.float64'>, shift_v: <class 'numpy.float64'>,
+        x: <class 'numpy.int64'>, row_number: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'>, g: <class 'str'>,
+        ngroup: <class 'numpy.int64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -858,6 +860,8 @@ print(a3.fit(a2.transform(a1.transform(d))))
     ]
     
 
+
+The three arrows can form a composite pipeline that computes a number of interesting per-group statistics all at once.
 
 
 ```python
@@ -865,8 +869,8 @@ print(a1 >> a2 >> a3)
 ```
 
     [
-      [ x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'>, g: <class 'str'> ]
+      [ g: <class 'str'>, v: <class 'numpy.float64'>, x: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -876,14 +880,16 @@ print(a1 >> a2 >> a3)
     
 
 
+And, we the methods are fully associative (can be grouped in any sequence that is still in the original order).
+
 
 ```python
 print((a1 >> a2) >> a3)
 ```
 
     [
-      [ x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'>, g: <class 'str'> ]
+      [ g: <class 'str'>, v: <class 'numpy.float64'>, x: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -899,8 +905,8 @@ print(a1 >> (a2 >> a3))
 ```
 
     [
-      [ x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'>, g: <class 'str'> ]
+      [ g: <class 'str'>, v: <class 'numpy.float64'>, x: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -910,7 +916,7 @@ print(a1 >> (a2 >> a3))
     
 
 
-All three compositions are in fact the same arrow. I.e. the implement the same transform in the same way.
+All the compositions are in fact the same arrow, aswe can see by using it on data.
 
 
 ```python
