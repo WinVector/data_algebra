@@ -312,7 +312,7 @@ print(a1)
 ```
 
     [
-      [ v, g, x, i ]
+      [ x, g, i, v ]
        ->
       [ g, x, v, i, ngroup ]
     ]
@@ -348,8 +348,8 @@ print(a1)
 ```
 
     [
-      [ v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'numpy.int64'>,
-        i: <class 'numpy.bool_'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
@@ -364,11 +364,11 @@ print(identity_left)
 ```
 
     [
-      [ v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'numpy.int64'>,
-        i: <class 'numpy.bool_'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
        ->
-      [ v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'numpy.int64'>,
-        i: <class 'numpy.bool_'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
     ]
     
 
@@ -559,8 +559,8 @@ print(a1b)
 ```
 
     [
-      [ v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'numpy.int64'>,
-        i: <class 'numpy.bool_'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
@@ -648,7 +648,7 @@ a1b.transform(d)
 
 The arrows compose exactly when the pre-conditions meet the post conditions.  
 
-Here are two examples of violating the pre and post conditions.  The point is, the categorical conditions enforce the checking for us.  We can't compose arrows that don't match domain and range.
+Here are two examples of violating the pre and post conditions.  The point is, the categorical conditions enforce the checking for us.  We can't compose arrows that don't match domain and range.  Up until now we have been setting things up to make the categorical machinery work, now this machinery will work for us and make the job of managing complex data transformations easier.
 
 
 ```python
@@ -665,9 +665,9 @@ print(a2)
 ```
 
     [
-      [ v, g, ngroup, x ]
+      [ ngroup, x, g, v ]
        ->
-      [ v, g, ngroup, x, row_number, shift_v ]
+      [ ngroup, x, g, v, row_number, shift_v ]
     ]
     
 
@@ -698,7 +698,7 @@ print(a2)
 ```
 
     [
-      [ v, g, ngroup, x, q, i ]
+      [ ngroup, i, v, q, g, x ]
        ->
       [ g, x, v, i, ngroup, q, row_number, shift_v ]
     ]
@@ -735,20 +735,7 @@ print(a2)
 ```
 
     [
-      [ v, ngroup, x, g, i ]
-       ->
-      [ g, x, v, i, ngroup, row_number, shift_v ]
-    ]
-    
-
-
-
-```python
-print(a2)
-```
-
-    [
-      [ v, ngroup, x, g, i ]
+      [ ngroup, i, v, g, x ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -761,8 +748,8 @@ print(a1 >> a2)
 ```
 
     [
-      [ v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'numpy.int64'>,
-        i: <class 'numpy.bool_'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -786,8 +773,8 @@ print(a2)
 ```
 
     [
-      [ v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'>,
-        x: <class 'str'>, g: <class 'str'>, i: <class 'numpy.bool_'> ]
+      [ ngroup: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'str'> ]
        ->
       [ g: <class 'str'>, x: <class 'str'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -813,8 +800,8 @@ print(a2.fit(a1.transform(d)))
 ```
 
     [
-      [ v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'>,
-        x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'> ]
+      [ ngroup: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'numpy.int64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -835,7 +822,7 @@ print(a3)
 ```
 
     [
-      [ v, ngroup, x, shift_v, g, row_number, i ]
+      [ shift_v, ngroup, i, v, row_number, g, x ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v, mean_v ]
     ]
@@ -848,10 +835,10 @@ print(a3.fit(a2.transform(a1.transform(d))))
 ```
 
     [
-      [ v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'>,
-        x: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'>,
-        g: <class 'str'>, row_number: <class 'numpy.int64'>,
-        i: <class 'numpy.bool_'> ]
+      [ shift_v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'>, v: <class 'numpy.float64'>,
+        row_number: <class 'numpy.int64'>, g: <class 'str'>,
+        x: <class 'numpy.int64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -867,8 +854,8 @@ print(a1 >> a2 >> a3)
 ```
 
     [
-      [ v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'numpy.int64'>,
-        i: <class 'numpy.bool_'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -884,8 +871,8 @@ print((a1 >> a2) >> a3)
 ```
 
     [
-      [ v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'numpy.int64'>,
-        i: <class 'numpy.bool_'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -901,8 +888,8 @@ print(a1 >> (a2 >> a3))
 ```
 
     [
-      [ v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'numpy.int64'>,
-        i: <class 'numpy.bool_'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -1014,105 +1001,6 @@ All three compositions are in fact the same arrow. I.e. the implement the same t
 
 ```python
 (a1 >> (a2 >> a3)).transform(d)
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>g</th>
-      <th>x</th>
-      <th>v</th>
-      <th>i</th>
-      <th>ngroup</th>
-      <th>row_number</th>
-      <th>shift_v</th>
-      <th>mean_v</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>a</td>
-      <td>1</td>
-      <td>10.0</td>
-      <td>True</td>
-      <td>1</td>
-      <td>1</td>
-      <td>NaN</td>
-      <td>10.0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>b</td>
-      <td>4</td>
-      <td>40.0</td>
-      <td>True</td>
-      <td>2</td>
-      <td>1</td>
-      <td>NaN</td>
-      <td>45.0</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>b</td>
-      <td>5</td>
-      <td>50.0</td>
-      <td>False</td>
-      <td>2</td>
-      <td>2</td>
-      <td>40.0</td>
-      <td>45.0</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>c</td>
-      <td>7</td>
-      <td>70.0</td>
-      <td>False</td>
-      <td>3</td>
-      <td>1</td>
-      <td>NaN</td>
-      <td>80.0</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>c</td>
-      <td>8</td>
-      <td>80.0</td>
-      <td>False</td>
-      <td>3</td>
-      <td>2</td>
-      <td>70.0</td>
-      <td>80.0</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>c</td>
-      <td>9</td>
-      <td>90.0</td>
-      <td>False</td>
-      <td>3</td>
-      <td>3</td>
-      <td>80.0</td>
-      <td>80.0</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-The payoff is: we can use this composite arrow on data.
-
-
-```python
-(a1 >> a2 >> a3).transform(d)
 ```
 
 
