@@ -74,6 +74,10 @@ db_expr_formatters = {
     "if_else": _db_if_else_expr,
 }
 
+db_default_op_replacements = {
+    "==": "=",
+    "cumsum": "sum"
+}
 
 class DBModel:
     """A model of how SQL should be generated for a given database.
@@ -101,7 +105,7 @@ class DBModel:
             if k not in self.sql_formatters.keys():
                 self.sql_formatters[k] = db_expr_formatters[k]
         if op_replacements is None:
-            op_replacements = {"==": "="}
+            op_replacements = db_default_op_replacements
         self.op_replacements = op_replacements
 
     def prepare_connection(self, conn):

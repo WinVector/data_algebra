@@ -65,19 +65,7 @@ res1
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -193,6 +181,8 @@ res1
 
 
 
+Note: we are taking care in separating opeations beween the ordered block and un-ordered block. In databases, the presence of an order constraint in the window function often switches the operation to a cumulative mode.
+
 One of the benefits of the `data_algebra` is the commands are saved in an object.
 
 
@@ -235,7 +225,7 @@ dot_1
 
 And these commands can be re-used and even exported to SQL (including large scale SQL such as PostgreSQL, Apache Spark, or Google Big Query).
 
-For a simple demonstration we will use small-scale SQL as realized in SQLite. For now we are skipping the `cumsum()` example (it is implemented by `.sum()` in databases and `.cumsum()` in `Pandas`, so we are looking for non-confusing ways to set up this translation).
+For a simple demonstration we will use small-scale SQL as realized in SQLite.
 
 
 ```python
@@ -247,7 +237,7 @@ ops_db = table_description. \
     extend({
         'row_number': '_row_number()',
         'shift_v': 'v.shift()',
-        #'cumsum_v': 'v.sum()',
+        'cumsum_v': 'v.cumsum()',
     },
     order_by=['x'],
     partition_by=['g']). \
@@ -272,6 +262,7 @@ print(sql1)
            "v",
            "row_number",
            "shift_v",
+           "cumsum_v",
            SUM(1) OVER (PARTITION BY "g") AS "size",
                        MAX("v") OVER (PARTITION BY "g") AS "max_v",
                                      MIN("v") OVER (PARTITION BY "g") AS "min_v",
@@ -284,7 +275,9 @@ print(sql1)
               ROW_NUMBER() OVER (PARTITION BY "g"
                                  ORDER BY "x") AS "row_number",
                                 LAG("v") OVER (PARTITION BY "g"
-                                               ORDER BY "x") AS "shift_v"
+                                               ORDER BY "x") AS "shift_v",
+                                              SUM("v") OVER (PARTITION BY "g"
+                                                             ORDER BY "x") AS "cumsum_v"
        FROM ("data_frame") "SQ_0") "SQ_1"
 
 
@@ -301,19 +294,7 @@ res1_db
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -323,6 +304,7 @@ res1_db
       <th>v</th>
       <th>row_number</th>
       <th>shift_v</th>
+      <th>cumsum_v</th>
       <th>size</th>
       <th>max_v</th>
       <th>min_v</th>
@@ -338,6 +320,7 @@ res1_db
       <td>10</td>
       <td>1</td>
       <td>NaN</td>
+      <td>10</td>
       <td>1</td>
       <td>10</td>
       <td>10</td>
@@ -351,6 +334,7 @@ res1_db
       <td>40</td>
       <td>1</td>
       <td>NaN</td>
+      <td>40</td>
       <td>2</td>
       <td>50</td>
       <td>40</td>
@@ -364,6 +348,7 @@ res1_db
       <td>50</td>
       <td>2</td>
       <td>40.0</td>
+      <td>90</td>
       <td>2</td>
       <td>50</td>
       <td>40</td>
@@ -377,6 +362,7 @@ res1_db
       <td>70</td>
       <td>1</td>
       <td>NaN</td>
+      <td>70</td>
       <td>3</td>
       <td>90</td>
       <td>70</td>
@@ -390,6 +376,7 @@ res1_db
       <td>80</td>
       <td>2</td>
       <td>70.0</td>
+      <td>150</td>
       <td>3</td>
       <td>90</td>
       <td>70</td>
@@ -403,6 +390,7 @@ res1_db
       <td>90</td>
       <td>3</td>
       <td>80.0</td>
+      <td>240</td>
       <td>3</td>
       <td>90</td>
       <td>70</td>
@@ -455,7 +443,7 @@ cur.execute('CREATE TABLE remote_result AS ' + sql2)
 
 
 
-    <sqlite3.Cursor at 0x105e08730>
+    <sqlite3.Cursor at 0x107c92730>
 
 
 
@@ -472,19 +460,7 @@ res2_db
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -555,19 +531,7 @@ id_ops_b.transform(d)
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -650,7 +614,7 @@ all_ops = id_ops_b. \
     extend({
         'row_number': '_row_number()',
         'shift_v': 'v.shift()',
-        #'cumsum_v': 'v.sum()',
+        'cumsum_v': 'v.cumsum()',
     },
     order_by=['x'],
     partition_by=['g']). \
@@ -685,19 +649,7 @@ all_ops.transform(d)
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -708,6 +660,7 @@ all_ops.transform(d)
       <th>ngroup</th>
       <th>row_number</th>
       <th>shift_v</th>
+      <th>cumsum_v</th>
       <th>size</th>
       <th>max_v</th>
       <th>min_v</th>
@@ -724,6 +677,7 @@ all_ops.transform(d)
       <td>1</td>
       <td>1</td>
       <td>NaN</td>
+      <td>10</td>
       <td>1</td>
       <td>10</td>
       <td>10</td>
@@ -738,6 +692,7 @@ all_ops.transform(d)
       <td>2</td>
       <td>1</td>
       <td>NaN</td>
+      <td>40</td>
       <td>2</td>
       <td>50</td>
       <td>40</td>
@@ -752,6 +707,7 @@ all_ops.transform(d)
       <td>2</td>
       <td>2</td>
       <td>40.0</td>
+      <td>90</td>
       <td>2</td>
       <td>50</td>
       <td>40</td>
@@ -766,6 +722,7 @@ all_ops.transform(d)
       <td>3</td>
       <td>1</td>
       <td>NaN</td>
+      <td>70</td>
       <td>3</td>
       <td>90</td>
       <td>70</td>
@@ -780,6 +737,7 @@ all_ops.transform(d)
       <td>3</td>
       <td>2</td>
       <td>70.0</td>
+      <td>150</td>
       <td>3</td>
       <td>90</td>
       <td>70</td>
@@ -794,6 +752,7 @@ all_ops.transform(d)
       <td>3</td>
       <td>3</td>
       <td>80.0</td>
+      <td>240</td>
       <td>3</td>
       <td>90</td>
       <td>70</td>
@@ -817,19 +776,7 @@ db_model.read_query(conn, all_ops.to_sql(db_model))
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -840,6 +787,7 @@ db_model.read_query(conn, all_ops.to_sql(db_model))
       <th>ngroup</th>
       <th>row_number</th>
       <th>shift_v</th>
+      <th>cumsum_v</th>
       <th>size</th>
       <th>max_v</th>
       <th>min_v</th>
@@ -856,6 +804,7 @@ db_model.read_query(conn, all_ops.to_sql(db_model))
       <td>1</td>
       <td>1</td>
       <td>NaN</td>
+      <td>10</td>
       <td>1</td>
       <td>10</td>
       <td>10</td>
@@ -870,6 +819,7 @@ db_model.read_query(conn, all_ops.to_sql(db_model))
       <td>2</td>
       <td>1</td>
       <td>NaN</td>
+      <td>40</td>
       <td>2</td>
       <td>50</td>
       <td>40</td>
@@ -884,6 +834,7 @@ db_model.read_query(conn, all_ops.to_sql(db_model))
       <td>2</td>
       <td>2</td>
       <td>40.0</td>
+      <td>90</td>
       <td>2</td>
       <td>50</td>
       <td>40</td>
@@ -898,6 +849,7 @@ db_model.read_query(conn, all_ops.to_sql(db_model))
       <td>3</td>
       <td>1</td>
       <td>NaN</td>
+      <td>70</td>
       <td>3</td>
       <td>90</td>
       <td>70</td>
@@ -912,6 +864,7 @@ db_model.read_query(conn, all_ops.to_sql(db_model))
       <td>3</td>
       <td>2</td>
       <td>70.0</td>
+      <td>150</td>
       <td>3</td>
       <td>90</td>
       <td>70</td>
@@ -926,6 +879,7 @@ db_model.read_query(conn, all_ops.to_sql(db_model))
       <td>3</td>
       <td>3</td>
       <td>80.0</td>
+      <td>240</td>
       <td>3</td>
       <td>90</td>
       <td>70</td>
