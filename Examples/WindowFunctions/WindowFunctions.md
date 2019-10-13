@@ -202,8 +202,7 @@ One of the benefits of the data_algebra is the commands are saved in an object.
 print(ops.to_python(pretty=True))
 ```
 
-    TableDescription(table_name="data_frame", column_names=["g", "x", "v"]
-    ).extend(
+    TableDescription(table_name="data_frame", column_names=["g", "x", "v"]).extend(
         {"row_number": "_row_number()", "shift_v": "v.shift()"},
         partition_by=["g"],
         order_by=["x"],
@@ -454,8 +453,7 @@ id_ops_b = table_description. \
 print(id_ops_b.to_python(pretty=True))
 ```
 
-    TableDescription(table_name="data_frame", column_names=["g", "x", "v"]
-    ).natural_join(
+    TableDescription(table_name="data_frame", column_names=["g", "x", "v"]).natural_join(
         b=TableDescription(table_name="data_frame", column_names=["g", "x", "v"])
         .project({}, group_by=["g"])
         .extend({"ngroup": "_row_number()"}, order_by=["g"]),
@@ -478,7 +476,7 @@ cur.execute('CREATE TABLE remote_result AS ' + sql2)
 
 
 
-    <sqlite3.Cursor at 0x31cb2dab0>
+    <sqlite3.Cursor at 0x10dcb8730>
 
 
 
@@ -513,8 +511,8 @@ res2_db
     <tr style="text-align: right;">
       <th></th>
       <th>g</th>
-      <th>v</th>
       <th>x</th>
+      <th>v</th>
       <th>ngroup</th>
     </tr>
   </thead>
@@ -522,43 +520,43 @@ res2_db
     <tr>
       <th>0</th>
       <td>1</td>
-      <td>10</td>
       <td>1</td>
+      <td>10</td>
       <td>1</td>
     </tr>
     <tr>
       <th>1</th>
       <td>2</td>
-      <td>40</td>
       <td>4</td>
+      <td>40</td>
       <td>2</td>
     </tr>
     <tr>
       <th>2</th>
       <td>2</td>
-      <td>50</td>
       <td>5</td>
+      <td>50</td>
       <td>2</td>
     </tr>
     <tr>
       <th>3</th>
       <td>3</td>
-      <td>70</td>
       <td>7</td>
+      <td>70</td>
       <td>3</td>
     </tr>
     <tr>
       <th>4</th>
       <td>3</td>
-      <td>80</td>
       <td>8</td>
+      <td>80</td>
       <td>3</td>
     </tr>
     <tr>
       <th>5</th>
       <td>3</td>
-      <td>90</td>
       <td>9</td>
+      <td>90</td>
       <td>3</td>
     </tr>
   </tbody>
