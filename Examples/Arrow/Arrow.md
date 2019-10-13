@@ -312,25 +312,36 @@ print(a1)
 ```
 
     [
-      [ x, g, i, v ]
+      [ x, i, v, g ]
        ->
       [ g, x, v, i, ngroup ]
     ]
     
 
 
-The arrow has a detailed presentation, which is the realizing operator pipeline.
+The arrow has a more detailed presentation, which is the realization of the operator pipeline.
 
 
 ```python
-a1.__repr__()
+print(a1.__repr__())
 ```
 
-
-
-
-    "DataOpArrow(TableDescription(\n table_name='d',\n column_names=[\n   'g', 'x', 'v', 'i']) .\\\n   natural_join(b=\n      TableDescription(\n       table_name='d',\n       column_names=[\n         'g', 'x', 'v', 'i']) .\\\n         project({\n          },\n         group_by=['g']) .\\\n         extend({\n          'ngroup': '_row_number()'},\n         order_by=['g']),\n      by=['g'], jointype='LEFT'))"
-
+    DataOpArrow(TableDescription(
+     table_name='d',
+     column_names=[
+       'g', 'x', 'v', 'i']) .\
+       natural_join(b=
+          TableDescription(
+           table_name='d',
+           column_names=[
+             'g', 'x', 'v', 'i']) .\
+             project({
+              },
+             group_by=['g']) .\
+             extend({
+              'ngroup': '_row_number()'},
+             order_by=['g']),
+          by=['g'], jointype='LEFT'))
 
 
 So we can think of our arrows (or obvious mappings of them) as being able to be applied to:
@@ -348,8 +359,8 @@ print(a1)
 ```
 
     [
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'> ]
+      [ x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'>, g: <class 'str'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
@@ -364,11 +375,11 @@ print(identity_left)
 ```
 
     [
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'> ]
+      [ x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'>, g: <class 'str'> ]
        ->
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'> ]
+      [ x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'>, g: <class 'str'> ]
     ]
     
 
@@ -559,8 +570,8 @@ print(a1b)
 ```
 
     [
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'> ]
+      [ x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'>, g: <class 'str'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
@@ -665,9 +676,9 @@ print(a2)
 ```
 
     [
-      [ ngroup, x, g, v ]
+      [ x, ngroup, g, v ]
        ->
-      [ ngroup, x, g, v, row_number, shift_v ]
+      [ x, ngroup, g, v, row_number, shift_v ]
     ]
     
 
@@ -698,7 +709,7 @@ print(a2)
 ```
 
     [
-      [ ngroup, i, v, q, g, x ]
+      [ q, v, x, i, ngroup, g ]
        ->
       [ g, x, v, i, ngroup, q, row_number, shift_v ]
     ]
@@ -735,7 +746,7 @@ print(a2)
 ```
 
     [
-      [ ngroup, i, v, g, x ]
+      [ ngroup, x, i, v, g ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -748,8 +759,8 @@ print(a1 >> a2)
 ```
 
     [
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'> ]
+      [ x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'>, g: <class 'str'> ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -773,8 +784,8 @@ print(a2)
 ```
 
     [
-      [ ngroup: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'str'> ]
+      [ ngroup: <class 'numpy.int64'>, x: <class 'str'>,
+        i: <class 'numpy.bool_'>, v: <class 'numpy.float64'>, g: <class 'str'> ]
        ->
       [ g: <class 'str'>, x: <class 'str'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -800,8 +811,8 @@ print(a2.fit(a1.transform(d)))
 ```
 
     [
-      [ ngroup: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'>, g: <class 'str'>, x: <class 'numpy.int64'> ]
+      [ ngroup: <class 'numpy.int64'>, x: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'>, v: <class 'numpy.float64'>, g: <class 'str'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -822,7 +833,7 @@ print(a3)
 ```
 
     [
-      [ shift_v, ngroup, i, v, row_number, g, x ]
+      [ row_number, shift_v, v, x, i, ngroup, g ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v, mean_v ]
     ]
@@ -835,10 +846,10 @@ print(a3.fit(a2.transform(a1.transform(d))))
 ```
 
     [
-      [ shift_v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'>,
-        i: <class 'numpy.bool_'>, v: <class 'numpy.float64'>,
-        row_number: <class 'numpy.int64'>, g: <class 'str'>,
-        x: <class 'numpy.int64'> ]
+      [ row_number: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'>,
+        v: <class 'numpy.float64'>, x: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
+        g: <class 'str'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -854,8 +865,8 @@ print(a1 >> a2 >> a3)
 ```
 
     [
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'> ]
+      [ x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'>, g: <class 'str'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -871,8 +882,8 @@ print((a1 >> a2) >> a3)
 ```
 
     [
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'> ]
+      [ x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'>, g: <class 'str'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -888,8 +899,8 @@ print(a1 >> (a2 >> a3))
 ```
 
     [
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'> ]
+      [ x: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'>, g: <class 'str'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
