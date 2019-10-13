@@ -1,4 +1,10 @@
 
+John Mount
+October 13, 2019
+
+[This](https://github.com/WinVector/data_algebra/blob/master/Examples/WindowFunctions/WindowFunctions.md) is an tutorial on how to use window functions in either the `R` [`rquery`](https://github.com/WinVector/rquery) package, or in the `Python` [`data_algebra`](https://github.com/WinVector/data_algebra) package (`R` example [here](https://github.com/WinVector/rquery/blob/master/Examples/WindowFunctions/WindowFunctions.md), `Python` example [here](https://github.com/WinVector/data_algebra/blob/master/Examples/WindowFunctions/WindowFunctions.md)).
+
+
 The [data_algebra](https://github.com/WinVector/data_algebra) provides a simplified (though verbose) unified interface to Pandas and SQL data transforms, including windows functions.
 
 Let's work an example. First bring in our packages.
@@ -440,7 +446,7 @@ cur.execute('CREATE TABLE remote_result AS ' + sql2)
 
 
 
-    <sqlite3.Cursor at 0x10d35f730>
+    <sqlite3.Cursor at 0x1089b7730>
 
 
 
@@ -475,8 +481,8 @@ res2_db
     <tr style="text-align: right;">
       <th></th>
       <th>g</th>
-      <th>x</th>
       <th>v</th>
+      <th>x</th>
       <th>ngroup</th>
     </tr>
   </thead>
@@ -484,43 +490,43 @@ res2_db
     <tr>
       <th>0</th>
       <td>a</td>
-      <td>1</td>
       <td>10</td>
+      <td>1</td>
       <td>1</td>
     </tr>
     <tr>
       <th>1</th>
       <td>b</td>
-      <td>4</td>
       <td>40</td>
+      <td>4</td>
       <td>2</td>
     </tr>
     <tr>
       <th>2</th>
       <td>b</td>
-      <td>5</td>
       <td>50</td>
+      <td>5</td>
       <td>2</td>
     </tr>
     <tr>
       <th>3</th>
       <td>c</td>
-      <td>7</td>
       <td>70</td>
+      <td>7</td>
       <td>3</td>
     </tr>
     <tr>
       <th>4</th>
       <td>c</td>
-      <td>8</td>
       <td>80</td>
+      <td>8</td>
       <td>3</td>
     </tr>
     <tr>
       <th>5</th>
       <td>c</td>
-      <td>9</td>
       <td>90</td>
+      <td>9</td>
       <td>3</td>
     </tr>
   </tbody>
