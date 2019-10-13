@@ -42,6 +42,7 @@ ops = table_description. \
     extend({
         'row_number': '_row_number()',
         'shift_v': 'v.shift()',
+        'cumsum_v': 'v.cumsum()',
     },
     order_by=['x'],
     partition_by=['g']). \
@@ -86,6 +87,7 @@ res1
       <th>v</th>
       <th>row_number</th>
       <th>shift_v</th>
+      <th>cumsum_v</th>
       <th>ngroup</th>
       <th>size</th>
       <th>max_v</th>
@@ -102,6 +104,7 @@ res1
       <td>10</td>
       <td>1</td>
       <td>NaN</td>
+      <td>10</td>
       <td>0</td>
       <td>1</td>
       <td>10</td>
@@ -116,6 +119,7 @@ res1
       <td>40</td>
       <td>1</td>
       <td>NaN</td>
+      <td>40</td>
       <td>1</td>
       <td>2</td>
       <td>50</td>
@@ -130,6 +134,7 @@ res1
       <td>50</td>
       <td>2</td>
       <td>40.0</td>
+      <td>90</td>
       <td>1</td>
       <td>2</td>
       <td>50</td>
@@ -144,6 +149,7 @@ res1
       <td>70</td>
       <td>1</td>
       <td>NaN</td>
+      <td>70</td>
       <td>2</td>
       <td>3</td>
       <td>90</td>
@@ -158,6 +164,7 @@ res1
       <td>80</td>
       <td>2</td>
       <td>70.0</td>
+      <td>150</td>
       <td>2</td>
       <td>3</td>
       <td>90</td>
@@ -172,6 +179,7 @@ res1
       <td>90</td>
       <td>3</td>
       <td>80.0</td>
+      <td>240</td>
       <td>2</td>
       <td>3</td>
       <td>90</td>
@@ -193,7 +201,7 @@ print(ops.to_python(pretty=True))
 ```
 
     TableDescription(table_name="data_frame", column_names=["g", "x", "v"]).extend(
-        {"row_number": "_row_number()", "shift_v": "v.shift()"},
+        {"row_number": "_row_number()", "shift_v": "v.shift()", "cumsum_v": "v.cumsum()"},
         partition_by=["g"],
         order_by=["x"],
     ).extend(
@@ -227,7 +235,7 @@ dot_1
 
 And these commands can be re-used and even exported to SQL (including large scale SQL such as PostgreSQL, Apache Spark, or Google Big Query).
 
-For a simple demonstration we will use small-scale SQL as realized in SQLite.
+For a simple demonstration we will use small-scale SQL as realized in SQLite. For now we are skipping the `cumsum()` example (it is implemented by `.sum()` in databases and `.cumsum()` in `Pandas`, so we are looking for non-confusing ways to set up this translation).
 
 
 ```python
@@ -239,6 +247,7 @@ ops_db = table_description. \
     extend({
         'row_number': '_row_number()',
         'shift_v': 'v.shift()',
+        #'cumsum_v': 'v.sum()',
     },
     order_by=['x'],
     partition_by=['g']). \
@@ -446,7 +455,7 @@ cur.execute('CREATE TABLE remote_result AS ' + sql2)
 
 
 
-    <sqlite3.Cursor at 0x1089b7730>
+    <sqlite3.Cursor at 0x105e08730>
 
 
 
@@ -641,6 +650,7 @@ all_ops = id_ops_b. \
     extend({
         'row_number': '_row_number()',
         'shift_v': 'v.shift()',
+        #'cumsum_v': 'v.sum()',
     },
     order_by=['x'],
     partition_by=['g']). \
