@@ -2,7 +2,7 @@
 platform darwin -- Python 3.6.9, pytest-5.0.1, py-1.8.0, pluggy-0.12.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.7.1
-collected 41 items
+collected 42 items
 
 tests/test_R_yaml.py .                                                   [  2%]
 tests/test_apply.py .                                                    [  4%]
@@ -11,25 +11,26 @@ tests/test_cdata1.py .                                                   [  9%]
 tests/test_cdata_example.py ....                                         [ 19%]
 tests/test_cols_used.py .                                                [ 21%]
 tests/test_dask.py ..                                                    [ 26%]
-tests/test_datatable.py .                                                [ 29%]
-tests/test_drop_columns.py .                                             [ 31%]
-tests/test_example_data_ops.py .                                         [ 34%]
-tests/test_exp.py .                                                      [ 36%]
-tests/test_export_neg.py .                                               [ 39%]
-tests/test_flow_text.py .                                                [ 41%]
-tests/test_free_expr.py .                                                [ 43%]
-tests/test_ghost_col_issue.py .                                          [ 46%]
-tests/test_if_else.py .                                                  [ 48%]
-tests/test_math.py .                                                     [ 51%]
-tests/test_natural_join.py .                                             [ 53%]
-tests/test_neg.py .                                                      [ 56%]
-tests/test_null_bad.py .                                                 [ 58%]
-tests/test_parse.py .                                                    [ 60%]
-tests/test_project.py ...                                                [ 68%]
-tests/test_scatter_example.py .                                          [ 70%]
+tests/test_datatable.py .                                                [ 28%]
+tests/test_drop_columns.py .                                             [ 30%]
+tests/test_example_data_ops.py .                                         [ 33%]
+tests/test_exp.py .                                                      [ 35%]
+tests/test_export_neg.py .                                               [ 38%]
+tests/test_flow_text.py .                                                [ 40%]
+tests/test_free_expr.py .                                                [ 42%]
+tests/test_ghost_col_issue.py .                                          [ 45%]
+tests/test_if_else.py .                                                  [ 47%]
+tests/test_join_check.py .                                               [ 50%]
+tests/test_math.py .                                                     [ 52%]
+tests/test_natural_join.py .                                             [ 54%]
+tests/test_neg.py .                                                      [ 57%]
+tests/test_null_bad.py .                                                 [ 59%]
+tests/test_parse.py .                                                    [ 61%]
+tests/test_project.py ...                                                [ 69%]
+tests/test_scatter_example.py .                                          [ 71%]
 tests/test_scoring_example.py .                                          [ 73%]
-tests/test_select_stacking.py .                                          [ 75%]
-tests/test_simple.py .....                                               [ 87%]
+tests/test_select_stacking.py .                                          [ 76%]
+tests/test_simple.py .....                                               [ 88%]
 tests/test_sqlite.py .                                                   [ 90%]
 tests/test_strat_example.py .                                            [ 92%]
 tests/test_table_is_key_by_columns.py .                                  [ 95%]
@@ -43,12 +44,12 @@ data_algebra/PostgreSQL.py           21      4    81%
 data_algebra/SQLite.py               90      5    94%
 data_algebra/SparkSQL.py             21     21     0%
 data_algebra/__init__.py             36     10    72%
-data_algebra/arrow.py               128     55    57%
+data_algebra/arrow.py               126     54    57%
 data_algebra/cdata.py               231     77    67%
 data_algebra/cdata_impl.py           14      1    93%
 data_algebra/dask_model.py          121     23    81%
 data_algebra/data_model.py           41     15    63%
-data_algebra/data_ops.py           1052    240    77%
+data_algebra/data_ops.py           1053    239    77%
 data_algebra/data_types.py           39     19    51%
 data_algebra/datatable_model.py     131     81    38%
 data_algebra/db_model.py            359     80    78%
@@ -61,7 +62,7 @@ data_algebra/pandas_model.py        152     24    84%
 data_algebra/util.py                 96     11    89%
 data_algebra/yaml.py                119     15    87%
 -----------------------------------------------------
-TOTAL                              3348    937    72%
+TOTAL                              3347    935    72%
 
 
-========================== 41 passed in 9.28 seconds ===========================
+========================== 42 passed in 10.26 seconds ==========================

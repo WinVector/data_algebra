@@ -1213,6 +1213,7 @@ class NaturalJoinNode(ViewRepresentation):
         self.by = by
         self.jointype = jointype
         ViewRepresentation.__init__(self, column_names=column_names, sources=sources)
+        self.get_tables() # causes a throw if left and right table descriptions are inconsistent
 
     def columns_used_from_sources(self, using=None):
         if using is None:

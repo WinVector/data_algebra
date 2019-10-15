@@ -49,8 +49,6 @@ class DataOpArrow(Arrow):
             if free_table_key not in t_used.keys():
                 raise ValueError("free_table_key must be a table key used in the pipeline")
         c_used = pipeline.columns_used()
-        if len(c_used) != 1:
-            raise ValueError("pipeline must use exactly one table")
         self.free_table_key = free_table_key
         self.incoming_columns = c_used[free_table_key]
         self.incoming_types = t_used[free_table_key].column_types
