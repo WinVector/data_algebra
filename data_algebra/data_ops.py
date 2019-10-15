@@ -411,12 +411,15 @@ class ViewRepresentation(OperatorPlatform):
 
     # implement builders for all non-initial node types on base class
 
-    def _r_copy_replace(self, ops):
-        """re-write ops replacing any TableDescription with self"""
+    def stand_in_for_table(self, ops, table_key):
+        """re-write ops replacing any TableDescription with matching id with self"""
         if isinstance(ops, data_algebra.data_ops.TableDescription):
-            return self
+            if(ops.key == table_key):
+                return self
+            else:
+                return ops
         node = copy.copy(ops)
-        node.sources = [self._r_copy_replace(s) for s in node.sources]
+        node.sources = [self.stand_in_for_table(ops=s, table_key=table_key) for s in node.sources]
         return node
 
     # noinspection PyPep8Naming
@@ -446,7 +449,7 @@ class ViewRepresentation(OperatorPlatform):
             # check categorical arrow composition conditions
             if set(incoming_columns) != set(X.column_names):
                 raise ValueError("arrow composition conditions not met (incoming column set doesn't match outgoing)")
-            res = X._r_copy_replace(self)
+            res = X.stand_in_for_table(ops=self, table_key=k)
             return res
         data_map = {k: X}
         if isinstance(X, pandas.DataFrame):

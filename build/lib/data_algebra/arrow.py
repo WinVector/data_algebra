@@ -1,8 +1,4 @@
 
-import copy
-
-import pandas
-
 import data_algebra.data_ops
 import data_algebra.flow_text
 
@@ -37,25 +33,27 @@ class Arrow:
         return self.transform(other, strict=True)
 
 
-
-
-
 class DataOpArrow(Arrow):
     """ Represent a section of operators as a categorical arrow."""
 
-    def __init__(self, pipeline):
+    def __init__(self, pipeline, *, free_table_key=None):
         if not isinstance(pipeline, data_algebra.data_ops.ViewRepresentation):
             raise TypeError("expected pipeline to be data_algebra.data_ops")
         self.pipeline = pipeline
         t_used = pipeline.get_tables()
-        if len(t_used) != 1:
-            raise ValueError("pipeline must use exactly one table")
-        k = [k for k in t_used.keys()][0]
+        if free_table_key is None:
+            if len(t_used) != 1:
+                raise ValueError("pipeline must use exactly one table if free_table_key is not specified")
+            free_table_key =  [k for k in t_used.keys()][0]
+        else:
+            if free_table_key not in t_used.keys():
+                raise ValueError("free_table_key must be a table key used in the pipeline")
         c_used = pipeline.columns_used()
         if len(c_used) != 1:
             raise ValueError("pipeline must use exactly one table")
-        self.incoming_columns = c_used[k]
-        self.incoming_types = t_used[k].column_types
+        self.free_table_key = free_table_key
+        self.incoming_columns = c_used[free_table_key]
+        self.incoming_types = t_used[free_table_key].column_types
         self.outgoing_columns = pipeline.column_names
         self.outgoing_types = None
         Arrow.__init__(self)
@@ -90,7 +88,7 @@ class DataOpArrow(Arrow):
                         raise ValueError("column " + c +
                                          " self incoming type is " + str(st) +
                                          ", while X outgoing type is " + str(xt))
-            res = DataOpArrow(X.pipeline._r_copy_replace(self.pipeline))
+            res = DataOpArrow(X.pipeline.stand_in_for_table(ops=self.pipeline, table_key=self.free_table_key))
             res.incoming_types = X.incoming_types
             res.outgoing_types = self.outgoing_types
             return res
@@ -107,10 +105,10 @@ class DataOpArrow(Arrow):
         return self.pipeline.transform(X)
 
     def learn_types(self, data_in, data_out):
-        if(data_in.shape[0]>0):
+        if data_in.shape[0] > 0:
             types_in = {k: type(data_in.loc[0, k]) for k in self.incoming_columns}
             self.incoming_types = types_in
-        if (data_out.shape[0] > 0):
+        if data_out.shape[0] > 0:
             types_out = {k: type(data_out.loc[0, k]) for k in self.outgoing_columns}
             self.outgoing_types = types_out
 
@@ -128,9 +126,6 @@ class DataOpArrow(Arrow):
         out = self.transform(X)
         self.learn_types(X, out)
         return self.transform(X)
-
-    def __repr__(self):
-        return "DataOpArrow(" + self.pipeline.__repr__() + ")"
 
     def dom(self):
         if self.incoming_types is not None:
@@ -155,6 +150,9 @@ class DataOpArrow(Arrow):
             res.outgoing_types = obj.copy()
             return res
         raise TypeError("unexpected type: " + str(type(obj)))
+
+    def __repr__(self):
+        return "DataOpArrow(" + self.pipeline.__repr__() + ")"
 
     def __str__(self):
         align_right = 70
