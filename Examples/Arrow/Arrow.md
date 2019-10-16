@@ -312,7 +312,8 @@ print(a1)
 ```
 
     [
-      [ x, g, i, v ]
+     'd':
+      [ i, g, x, v ]
        ->
       [ g, x, v, i, ngroup ]
     ]
@@ -326,7 +327,8 @@ The arrow has a more detailed presentation, which is the realization of the oper
 print(a1.__repr__())
 ```
 
-    DataOpArrow(TableDescription(
+    DataOpArrow(
+     TableDescription(
      table_name='d',
      column_names=[
        'g', 'x', 'v', 'i']) .\
@@ -341,7 +343,8 @@ print(a1.__repr__())
              extend({
               'ngroup': '_row_number()'},
              order_by=['g']),
-          by=['g'], jointype='LEFT'))
+          by=['g'], jointype='LEFT'),
+     free_table_key='d')
 
 
 We can think of our arrows (or obvious mappings of them) as being able to be applied to:
@@ -359,7 +362,8 @@ print(a1)
 ```
 
     [
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+     'd':
+      [ i: <class 'numpy.bool_'>, g: <class 'str'>, x: <class 'numpy.int64'>,
         v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
@@ -375,10 +379,11 @@ print(identity_left)
 ```
 
     [
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+     'obj':
+      [ i: <class 'numpy.bool_'>, g: <class 'str'>, x: <class 'numpy.int64'>,
         v: <class 'numpy.float64'> ]
        ->
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+      [ i: <class 'numpy.bool_'>, g: <class 'str'>, x: <class 'numpy.int64'>,
         v: <class 'numpy.float64'> ]
     ]
     
@@ -391,6 +396,7 @@ print(identity_right)
 ```
 
     [
+     'obj':
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
        ->
@@ -570,8 +576,9 @@ print(a1b)
 ```
 
     [
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
-        v: <class 'numpy.float64'> ]
+     'd':
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
@@ -676,9 +683,10 @@ print(a2)
 ```
 
     [
-      [ x, g, ngroup, v ]
+     'd2':
+      [ ngroup, g, x, v ]
        ->
-      [ x, g, ngroup, v, row_number, shift_v ]
+      [ ngroup, g, x, v, row_number, shift_v ]
     ]
     
 
@@ -709,7 +717,8 @@ print(a2)
 ```
 
     [
-      [ q, ngroup, x, g, i, v ]
+     'd2':
+      [ q, x, ngroup, g, i, v ]
        ->
       [ g, x, v, i, ngroup, q, row_number, shift_v ]
     ]
@@ -746,7 +755,8 @@ print(a2)
 ```
 
     [
-      [ ngroup, x, g, i, v ]
+     'd2':
+      [ x, ngroup, i, g, v ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -759,7 +769,8 @@ print(a1 >> a2)
 ```
 
     [
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+     'd':
+      [ i: <class 'numpy.bool_'>, g: <class 'str'>, x: <class 'numpy.int64'>,
         v: <class 'numpy.float64'> ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
@@ -784,8 +795,9 @@ print(a2)
 ```
 
     [
-      [ ngroup: <class 'numpy.int64'>, x: <class 'str'>, g: <class 'str'>,
-        i: <class 'numpy.bool_'>, v: <class 'numpy.float64'> ]
+     'd2':
+      [ x: <class 'str'>, ngroup: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'>, g: <class 'str'>, v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'str'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -807,12 +819,14 @@ except Exception as ex:
 
 
 ```python
-print(a2.fit(a1.transform(d)))
+a2.fit(a1.transform(d))
+print(a2)
 ```
 
     [
-      [ ngroup: <class 'numpy.int64'>, x: <class 'numpy.int64'>,
-        g: <class 'str'>, i: <class 'numpy.bool_'>, v: <class 'numpy.float64'> ]
+     'd2':
+      [ x: <class 'numpy.int64'>, ngroup: <class 'numpy.int64'>,
+        i: <class 'numpy.bool_'>, g: <class 'str'>, v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -835,7 +849,8 @@ print(a3)
 ```
 
     [
-      [ ngroup, x, g, shift_v, i, v, row_number ]
+     'd3':
+      [ shift_v, x, row_number, ngroup, g, i, v ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v, mean_v ]
     ]
@@ -844,14 +859,15 @@ print(a3)
 
 
 ```python
-print(a3.fit(a2.transform(a1.transform(d))))
+a3.fit(a2.transform(a1.transform(d)))
+print(a3)
 ```
 
     [
-      [ ngroup: <class 'numpy.int64'>, x: <class 'numpy.int64'>,
-        g: <class 'str'>, shift_v: <class 'numpy.float64'>,
-        i: <class 'numpy.bool_'>, v: <class 'numpy.float64'>,
-        row_number: <class 'numpy.int64'> ]
+     'd3':
+      [ shift_v: <class 'numpy.float64'>, x: <class 'numpy.int64'>,
+        row_number: <class 'numpy.int64'>, ngroup: <class 'numpy.int64'>,
+        g: <class 'str'>, i: <class 'numpy.bool_'>, v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -869,7 +885,8 @@ print(a1 >> a2 >> a3)
 ```
 
     [
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+     'd':
+      [ i: <class 'numpy.bool_'>, g: <class 'str'>, x: <class 'numpy.int64'>,
         v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
@@ -888,7 +905,8 @@ print((a1 >> a2) >> a3)
 ```
 
     [
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+     'd':
+      [ i: <class 'numpy.bool_'>, g: <class 'str'>, x: <class 'numpy.int64'>,
         v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
@@ -905,7 +923,8 @@ print(a1 >> (a2 >> a3))
 ```
 
     [
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+     'd':
+      [ i: <class 'numpy.bool_'>, g: <class 'str'>, x: <class 'numpy.int64'>,
         v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
@@ -1121,4 +1140,3 @@ The data arrows operate over three different value domains:
  * single table schemas (transforming single table schemas)
  * their own arrow space (i.e. composition)
  * data frames (transforming data as an action)
-

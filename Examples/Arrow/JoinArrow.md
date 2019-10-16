@@ -108,6 +108,7 @@ print(arrow_1)
 ```
 
     [
+     'd1':
       [ key: <class 'str'>, x: <class 'numpy.int64'> ]
        ->
       [ key, x, y ]
@@ -123,6 +124,7 @@ print(arrow_2)
 ```
 
     [
+     'd2':
       [ key: <class 'str'>, y: <class 'numpy.int64'> ]
        ->
       [ key, x, y ]
