@@ -146,11 +146,11 @@ class PandasModel(data_algebra.data_model.DataModel):
             res = res.groupby(op.group_by)
         if len(op.ops) > 0:
             cols = {k: (res[str(opk.args[0])].agg(opk.op) if
-                        len(opk.args)>0 else
+                        len(opk.args) > 0 else
                         res['_data_table_temp_col'].agg(opk.op))
                     for (k, opk) in op.ops.items()}
         else:
-            cols = {'_data_table_temp_col': res['_data_table_temp_col'].agg('sum') }
+            cols = {'_data_table_temp_col': res['_data_table_temp_col'].agg('sum')}
 
         # agg can return scalars, which then can't be made into a pandas.DataFrame
         def promote_scalar(v):
@@ -225,6 +225,20 @@ class PandasModel(data_algebra.data_model.DataModel):
         )
         return res.rename(columns=op.reverse_mapping)
 
+    # noinspection PyMethodMayBeStatic
+    def standarardize_join_code(self, jointype):
+        if not isinstance(jointype, str):
+            raise TypeError("expected jointype to be a string")
+        jointype = jointype.lower()
+        mp = {
+            'full': 'outer'
+        }
+        try:
+            return mp[jointype]
+        except KeyError:
+            pass
+        return jointype
+
     def natural_join_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.NaturalJoinNode):
             raise TypeError(
@@ -242,7 +256,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = pandas.merge(
             left=left,
             right=right,
-            how=op.jointype.lower(),
+            how=self.standarardize_join_code(op.jointype),
             on=op.by,
             sort=False,
             suffixes=("", "_tmp_right_col"),

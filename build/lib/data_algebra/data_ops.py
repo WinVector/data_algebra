@@ -41,7 +41,7 @@ op_list = [
 ]
 
 
-class OperatorPlatform():
+class OperatorPlatform:
     """Abstract class representing ability to apply data_algebra operations."""
 
     def __init__(self):
@@ -414,7 +414,7 @@ class ViewRepresentation(OperatorPlatform):
     def stand_in_for_table(self, ops, table_key):
         """re-write ops replacing any TableDescription with matching id with self"""
         if isinstance(ops, data_algebra.data_ops.TableDescription):
-            if(ops.key == table_key):
+            if ops.key == table_key:
                 return self
             else:
                 return ops
@@ -1211,9 +1211,9 @@ class NaturalJoinNode(ViewRepresentation):
         if len(missing_right) > 0:
             raise KeyError("right table missing join keys: " + str(missing_right))
         self.by = by
-        self.jointype = jointype
+        self.jointype = data_algebra.expr_rep.standardize_join_type(jointype)
         ViewRepresentation.__init__(self, column_names=column_names, sources=sources)
-        self.get_tables() # causes a throw if left and right table descriptions are inconsistent
+        self.get_tables()  # causes a throw if left and right table descriptions are inconsistent
 
     def columns_used_from_sources(self, using=None):
         if using is None:
@@ -1666,7 +1666,7 @@ class NaturalJoin(PipeStep):
         if isinstance(by, str):
             by = [by]
         self._by = by
-        self._jointype = jointype
+        self._jointype = data_algebra.expr_rep.standardize_join_type(jointype)
         self._b = b
 
     def apply(self, other, **kwargs):

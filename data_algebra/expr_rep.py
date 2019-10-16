@@ -885,3 +885,17 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
             "columns both produced and used in same expression set: " + str(intersect)
         )
     return newops
+
+
+def standardize_join_type(join_str):
+    if not isinstance(join_str, str):
+        raise TypeError("Expected join_str to be a string")
+    join_str = join_str.upper()
+    re_map = {
+        'OUTER': 'FULL'
+    }
+    try:
+        return re_map[join_str]
+    except KeyError:
+        pass
+    return join_str
