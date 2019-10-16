@@ -150,7 +150,9 @@ class DataOpArrow(Arrow):
         raise TypeError("unexpected type: " + str(type(obj)))
 
     def __repr__(self):
-        return "DataOpArrow(" + self.pipeline.__repr__() + ")"
+        return "DataOpArrow(\n " + self.pipeline.__repr__() + \
+               ",\n free_table_key=" + self.free_table_key.__repr__() + ")"
+
 
     def __str__(self):
         align_right = 70
@@ -171,4 +173,6 @@ class DataOpArrow(Arrow):
                                                    align_right=align_right, sep_width=sep_width)
         out_rep = [', '.join(line) for line in out_rep]
         out_rep = ' [ ' + ',\n    '.join(out_rep) + ' ]'
-        return "[\n " + in_rep + "\n   ->\n " + out_rep + "\n]\n"
+        return "[\n " + \
+                self.free_table_key.__repr__() + ":\n " + \
+                in_rep + "\n   ->\n " + out_rep + "\n]\n"
