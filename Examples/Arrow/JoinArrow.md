@@ -96,7 +96,7 @@ ops =  table_1_description.\
     natural_join(
         b=table_2_description, 
         by=['key'],
-        jointype='OUTER')
+        jointype='FULL')
 ```
 
 
