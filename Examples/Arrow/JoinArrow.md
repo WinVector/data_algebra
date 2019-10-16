@@ -179,3 +179,8 @@ arrow_1.pipeline.eval_pandas({
 </div>
 
 
+
+More on the categorical arrow treatment of data transformations can be found [here](https://github.com/WinVector/data_algebra/blob/master/Examples/Arrow/Arrow.md).
+
+(Examples of advanced inter-operation between the [`R` `rquery` package](https://github.com/WinVector/rquery/) and the [`Python` `data_algebra` package](https://github.com/WinVector/data_algebra) and `SQL` can be found [here](https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/ScoringExample.md).)
+
