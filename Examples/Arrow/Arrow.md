@@ -312,7 +312,7 @@ print(a1)
 ```
 
     [
-      [ i, v, g, x ]
+      [ x, g, i, v ]
        ->
       [ g, x, v, i, ngroup ]
     ]
@@ -359,8 +359,8 @@ print(a1)
 ```
 
     [
-      [ i: <class 'numpy.bool_'>, v: <class 'numpy.float64'>, g: <class 'str'>,
-        x: <class 'numpy.int64'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
@@ -375,11 +375,11 @@ print(identity_left)
 ```
 
     [
-      [ i: <class 'numpy.bool_'>, v: <class 'numpy.float64'>, g: <class 'str'>,
-        x: <class 'numpy.int64'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
        ->
-      [ i: <class 'numpy.bool_'>, v: <class 'numpy.float64'>, g: <class 'str'>,
-        x: <class 'numpy.int64'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
     ]
     
 
@@ -570,8 +570,8 @@ print(a1b)
 ```
 
     [
-      [ i: <class 'numpy.bool_'>, v: <class 'numpy.float64'>, g: <class 'str'>,
-        x: <class 'numpy.int64'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
@@ -676,9 +676,9 @@ print(a2)
 ```
 
     [
-      [ v, g, x, ngroup ]
+      [ x, g, ngroup, v ]
        ->
-      [ v, g, x, ngroup, row_number, shift_v ]
+      [ x, g, ngroup, v, row_number, shift_v ]
     ]
     
 
@@ -709,7 +709,7 @@ print(a2)
 ```
 
     [
-      [ i, g, q, v, x, ngroup ]
+      [ q, ngroup, x, g, i, v ]
        ->
       [ g, x, v, i, ngroup, q, row_number, shift_v ]
     ]
@@ -746,7 +746,7 @@ print(a2)
 ```
 
     [
-      [ i, g, v, x, ngroup ]
+      [ ngroup, x, g, i, v ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -759,8 +759,8 @@ print(a1 >> a2)
 ```
 
     [
-      [ i: <class 'numpy.bool_'>, v: <class 'numpy.float64'>, g: <class 'str'>,
-        x: <class 'numpy.int64'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -784,8 +784,8 @@ print(a2)
 ```
 
     [
-      [ i: <class 'numpy.bool_'>, g: <class 'str'>, v: <class 'numpy.float64'>,
-        x: <class 'str'>, ngroup: <class 'numpy.int64'> ]
+      [ ngroup: <class 'numpy.int64'>, x: <class 'str'>, g: <class 'str'>,
+        i: <class 'numpy.bool_'>, v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'str'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -811,8 +811,8 @@ print(a2.fit(a1.transform(d)))
 ```
 
     [
-      [ i: <class 'numpy.bool_'>, g: <class 'str'>, v: <class 'numpy.float64'>,
-        x: <class 'numpy.int64'>, ngroup: <class 'numpy.int64'> ]
+      [ ngroup: <class 'numpy.int64'>, x: <class 'numpy.int64'>,
+        g: <class 'str'>, i: <class 'numpy.bool_'>, v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -835,7 +835,7 @@ print(a3)
 ```
 
     [
-      [ i, row_number, g, shift_v, v, x, ngroup ]
+      [ ngroup, x, g, shift_v, i, v, row_number ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v, mean_v ]
     ]
@@ -848,10 +848,10 @@ print(a3.fit(a2.transform(a1.transform(d))))
 ```
 
     [
-      [ i: <class 'numpy.bool_'>, row_number: <class 'numpy.int64'>,
+      [ ngroup: <class 'numpy.int64'>, x: <class 'numpy.int64'>,
         g: <class 'str'>, shift_v: <class 'numpy.float64'>,
-        v: <class 'numpy.float64'>, x: <class 'numpy.int64'>,
-        ngroup: <class 'numpy.int64'> ]
+        i: <class 'numpy.bool_'>, v: <class 'numpy.float64'>,
+        row_number: <class 'numpy.int64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -869,8 +869,8 @@ print(a1 >> a2 >> a3)
 ```
 
     [
-      [ i: <class 'numpy.bool_'>, v: <class 'numpy.float64'>, g: <class 'str'>,
-        x: <class 'numpy.int64'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -888,8 +888,8 @@ print((a1 >> a2) >> a3)
 ```
 
     [
-      [ i: <class 'numpy.bool_'>, v: <class 'numpy.float64'>, g: <class 'str'>,
-        x: <class 'numpy.int64'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -905,8 +905,8 @@ print(a1 >> (a2 >> a3))
 ```
 
     [
-      [ i: <class 'numpy.bool_'>, v: <class 'numpy.float64'>, g: <class 'str'>,
-        x: <class 'numpy.int64'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
+        v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -1118,8 +1118,7 @@ The underlying `data_algebra` steps compute and check very similar pre and post 
 
 The data arrows operate over three different value domains:
 
- * their own arrow space (i.e. composition)
- * data frames (transforming data)
  * single table schemas (transforming single table schemas)
+ * their own arrow space (i.e. composition)
+ * data frames (transforming data as an action)
 
-I think we have that if we consider the arrows operating on data and the arrows operating on single table schemas we have a faithful embedding (in the sense of Saunders Mac Lane *Categories for the Working Mathematician, 2nd Edition*, Springer, 1997, page 15) from data to single table schemas.
