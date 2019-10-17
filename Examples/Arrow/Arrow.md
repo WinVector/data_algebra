@@ -1107,7 +1107,7 @@ The data arrows operate over three different value domains:
  * their own arrow space (i.e. composition)
  * data frames (transforming data as an action)
  
-An example of treating a 2-argument data operation (such as a join) can be found [here](https://github.com/WinVector/rquery/blob/master/Examples/Arrow/JoinArrow.md).
+An example of treating a 2-argument data operation (such as a join) as an arrow can be found [here](https://github.com/WinVector/rquery/blob/master/Examples/Arrow/JoinArrow.md).
 
 (Examples of advanced inter-operation between the [`R` `rquery` package](https://github.com/WinVector/rquery/) and the [`Python` `data_algebra` package](https://github.com/WinVector/data_algebra) and `SQL` can be found [here](https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/ScoringExample.md).)
 
