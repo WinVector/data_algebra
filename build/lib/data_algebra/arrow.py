@@ -44,7 +44,7 @@ class DataOpArrow(Arrow):
         if free_table_key is None:
             if len(t_used) != 1:
                 raise ValueError("pipeline must use exactly one table if free_table_key is not specified")
-            free_table_key =  [k for k in t_used.keys()][0]
+            free_table_key = [k for k in t_used.keys()][0]
         else:
             if free_table_key not in t_used.keys():
                 raise ValueError("free_table_key must be a table key used in the pipeline")
@@ -90,6 +90,24 @@ class DataOpArrow(Arrow):
             res.incoming_types = X.incoming_types
             res.outgoing_types = self.outgoing_types
             return res
+        if isinstance(X, list) or isinstance(X, tuple) or isinstance(X, set):
+            # schema type object
+            if set(self.incoming_columns) != set(X):
+                raise ValueError("input did not match arrow dom()")
+            return self.cod()
+        if isinstance(X, dict):
+            # schema type object
+            if set(self.incoming_columns) != set(X.keys()):
+                raise ValueError("input did not match arrow dom()")
+            if self.incoming_types is not None:
+                for c in self.incoming_columns:
+                    st = self.incoming_types[c]
+                    xt = X[c]
+                    if st != xt:
+                        raise ValueError("column " + c +
+                                         " self incoming type is " + str(st) +
+                                         ", while X outgoing type is " + str(xt))
+            return self.cod()
         # assume a pandas.DataFrame compatible object
         cols = set(X.columns)
         missing = set(self.incoming_columns) - cols
@@ -135,24 +153,9 @@ class DataOpArrow(Arrow):
             return self.outgoing_types.copy()
         return self.outgoing_columns.copy()
 
-    def identity_arrow(self, obj):
-        """build identity arrow from object"""
-        if isinstance(obj, data_algebra.data_ops.TableDescription):
-            return DataOpArrow(obj)
-        if isinstance(obj, list) or isinstance(obj, tuple):
-            td = data_algebra.data_ops.TableDescription("obj", obj)
-            return DataOpArrow(td)
-        if isinstance(obj, dict):
-            td = data_algebra.data_ops.TableDescription("obj", obj.keys(), column_types=obj)
-            res = DataOpArrow(td)
-            res.outgoing_types = obj.copy()
-            return res
-        raise TypeError("unexpected type: " + str(type(obj)))
-
     def __repr__(self):
         return "DataOpArrow(\n " + self.pipeline.__repr__() + \
                ",\n free_table_key=" + self.free_table_key.__repr__() + ")"
-
 
     def __str__(self):
         align_right = 70
@@ -174,5 +177,20 @@ class DataOpArrow(Arrow):
         out_rep = [', '.join(line) for line in out_rep]
         out_rep = ' [ ' + ',\n    '.join(out_rep) + ' ]'
         return "[\n " + \
-                self.free_table_key.__repr__() + ":\n " + \
-                in_rep + "\n   ->\n " + out_rep + "\n]\n"
+               self.free_table_key.__repr__() + ":\n " + \
+               in_rep + "\n   ->\n " + out_rep + "\n]\n"
+
+
+def identity_arrow(obj):
+    """build identity arrow from object"""
+    if isinstance(obj, data_algebra.data_ops.TableDescription):
+        return DataOpArrow(obj)
+    if isinstance(obj, list) or isinstance(obj, tuple) or isinstance(obj, set):
+        td = data_algebra.data_ops.TableDescription("obj", [c for c in obj])
+        return DataOpArrow(td)
+    if isinstance(obj, dict):
+        td = data_algebra.data_ops.TableDescription("obj", obj.keys(), column_types=obj)
+        res = DataOpArrow(td)
+        res.outgoing_types = obj.copy()
+        return res
+    raise TypeError("unexpected type: " + str(type(obj)))
