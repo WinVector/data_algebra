@@ -204,6 +204,15 @@ class ViewRepresentation(OperatorPlatform):
         columns_used = {k: v.columns_currently_used.copy() for (k, v) in tables.items()}
         return columns_used
 
+    # execution
+
+    def ex(self):
+        """Execute pipeline against internally stored values"""
+        tables = self.get_tables()
+        data_map = {t.key: t.data for t in tables.values()}
+        res = self.eval(data_map=data_map)
+        return(res)
+
     # collect as simple structures for YAML I/O and other generic tasks
 
     def collect_representation_implementation(self, *, pipeline=None, dialect="Python"):
@@ -538,7 +547,8 @@ class TableDescription(ViewRepresentation):
     def __init__(self, table_name, column_names,
                  *,
                  qualifiers=None,
-                 column_types=None):
+                 column_types=None,
+                 data=None):
         ViewRepresentation.__init__(self, column_names=column_names)
         if (table_name is not None) and (not isinstance(table_name, str)):
             raise TypeError("table_name must be a string")
@@ -547,6 +557,7 @@ class TableDescription(ViewRepresentation):
             column_names = [column_names]
         self.column_names = [c for c in column_names]
         self.column_types = None
+        self.data = data
         if column_types is not None:
             self.column_types = column_types.copy()
         if qualifiers is None:
@@ -598,6 +609,8 @@ class TableDescription(ViewRepresentation):
         )
         if len(self.qualifiers) > 0:
             s = s + "," + spacer + "qualifiers=" + self.qualifiers.__repr__()
+        if self.data is not None:
+            s = s + "," + spacer + "data=DATA"
         s = s + ")"
         return s
 
@@ -659,6 +672,22 @@ def describe_table(d, table_name="data_frame"):
     if data_algebra.data_types.is_datatable_frame(d):
         return TableDescription(table_name, [c for c in d.names])
     raise TypeError("can't describe " + table_name + ": " + str(type(d)))
+
+
+def wrap(d, *, table_name="data_frame"):
+    if isinstance(d, pandas.DataFrame):
+        column_names = [c for c in d.columns]
+        column_types = None
+        if d.shape[0] > 0:
+            column_types = {k: type(d.loc[0, k]) for k in column_names}
+        return TableDescription(table_name, column_names,
+                                column_types=column_types,
+                                data=d)
+    if data_algebra.data_types.is_dask_data_frame(d):
+        return TableDescription(table_name, [c for c in d.columns], data=d)
+    if data_algebra.data_types.is_datatable_frame(d):
+        return TableDescription(table_name, [c for c in d.names], data=d)
+    raise TypeError("can't wrapr " + table_name + ": " + str(type(d)))
 
 
 class ExtendNode(ViewRepresentation):
