@@ -9,10 +9,28 @@ d = pandas.DataFrame({
     'y': [4, 5, 6]
 })
 
-wrap(d). \
-    extend({'z': 'x + y'}). \
-    ex()
+ops = wrap(d). \
+    extend({'z': 'x + y'})
 
+ops
+```
+
+
+
+
+    [TableDescription(
+     table_name='data_frame',
+     column_names=[
+       'x', 'y']) .\
+       extend({
+        'z': 'x + y'})](
+     {'data_frame'})
+
+
+
+
+```python
+ops.ex()
 ```
 
 

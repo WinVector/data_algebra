@@ -685,6 +685,14 @@ class WrappedOperatorPlatform(OperatorPlatform):
         res = self.underlying.eval(data_map=data_map)
         return (res)
 
+    # general functions
+
+    def __repr__(self):
+        return "[" + self.underlying.__repr__() + "](\n " + set(self.data_map.keys()).__repr__() + ")"
+
+    def __str__(self):
+        return "[" + self.underlying.__str__() + "](\n " + set(self.data_map.keys()).__repr__() + ")"
+
     # overrides
 
     def _reach_in(self, other):
