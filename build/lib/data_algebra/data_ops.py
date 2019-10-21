@@ -755,6 +755,8 @@ class WrappedOperatorPlatform(OperatorPlatform):
             data_map=self.data_map)
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
+        if not isinstance(b, WrappedOperatorPlatform):
+            raise TypeError("expected b to be of type WrappedOperatorPlatform")
         data_map, b = self._reach_in(b)
         return WrappedOperatorPlatform(
             underlying=self.underlying.natural_join(b=b,
