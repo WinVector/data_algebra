@@ -13,7 +13,7 @@ import data_algebra.env
 
 class Term:
     """Inherit from this class to capture expressions.
-    Abstract class, should be extended for use.-"""
+    Abstract class, should be extended for use."""
 
     source_string: Union[str, None]
 
