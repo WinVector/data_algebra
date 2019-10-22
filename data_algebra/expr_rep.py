@@ -848,6 +848,11 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
     """
     if ops is None:
         ops = {}
+    if isinstance(ops, tuple) or isinstance(ops, list):
+        opslen = len(ops)
+        ops = {k: v for (k, v) in ops}
+        if opslen != len(ops):
+            raise ValueError("ops keys must be unique")
     if not isinstance(ops, dict):
         raise TypeError("ops should be a dictionary")
     column_defs = view.column_map.__dict__
