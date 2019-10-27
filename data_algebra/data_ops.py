@@ -683,7 +683,7 @@ class WrappedOperatorPlatform(OperatorPlatform):
         data_map = self.data_map
         missing = set(tables.keys()) - set(data_map.keys())
         res = self.underlying.eval(data_map=data_map)
-        return (res)
+        return res
 
     # general functions
 
@@ -700,7 +700,7 @@ class WrappedOperatorPlatform(OperatorPlatform):
         if isinstance(other, WrappedOperatorPlatform):
             data_map.update(other.data_map)
             other = other.underlying
-        return other, data_map
+        return data_map, other
 
     # noinspection PyPep8Naming
     def transform(self, X):

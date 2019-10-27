@@ -163,7 +163,7 @@ class DaskModel(data_algebra.pandas_model.PandasModel):
         for c in common_cols:
             if c not in op.by:
                 is_null = res[c].isnull()
-                res[c][is_null] = res[c + "_tmp_right_col"]
+                res.loc[is_null, c] = res.loc[is_null, c + "_tmp_right_col"]
                 res = res.drop(c + "_tmp_right_col", axis=1)
         res = res.reset_index(drop=True)
         return res
