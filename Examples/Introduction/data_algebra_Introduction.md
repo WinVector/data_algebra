@@ -222,6 +222,69 @@ wrap(d). \
 
 
 
+`rename_columns` is given as name-assignments of the form `'new_name': 'old_name'`:
+
+
+```python
+wrap(d). \
+  rename_columns({
+     'x_new_name': 'x',
+     'y_new_name': 'y'
+    }). \
+  ex()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>x_new_name</th>
+      <th>y_new_name</th>
+      <th>z</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>5</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>4</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>3</td>
+      <td>8</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 ### Simple row operations (selecting and re-ordering rows)
 
 The simple row operations are:
