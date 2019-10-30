@@ -76,9 +76,9 @@ def partitioned_eval(fn, *args, partition_columns):
     """
     Evaluate fn(fn_columns) on level-sets of partition columms.
 
-    :param fn: function with arity length(fn_columns) then returns lists/vectors of length of its arguements.
-    :param *args: non-empty list of lists of all length n
-    :param partition_columns: non-empty list of lists of hashables/comparables of all length n
+    :param fn: function with arity length(fn_columns) then returns lists/vectors of the common length of its arguments.
+    :param *args: non-empty lists of length n
+    :param partition_columns: possibly empty list of lists of hashables/comparables of all length n
     :return: list of length n of fn(fn_columns) evaluted on level-sets of partition_columns
     """
     if (partition_columns is None) or (len(partition_columns) <= 0):

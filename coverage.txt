@@ -2,34 +2,34 @@
 platform darwin -- Python 3.6.9, pytest-5.0.1, py-1.8.0, pluggy-0.12.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.7.1
-collected 48 items
+collected 49 items
 
 tests/test_R_yaml.py .                                                   [  2%]
 tests/test_apply.py .                                                    [  4%]
 tests/test_arrow1.py .                                                   [  6%]
 tests/test_calc_warnings_errors.py .                                     [  8%]
-tests/test_cc.py ...                                                     [ 14%]
-tests/test_cdata1.py .                                                   [ 16%]
-tests/test_cdata_example.py ....                                         [ 25%]
-tests/test_cols_used.py .                                                [ 27%]
-tests/test_dask.py ..                                                    [ 31%]
-tests/test_datatable.py .                                                [ 33%]
-tests/test_drop_columns.py .                                             [ 35%]
-tests/test_example_data_ops.py .                                         [ 37%]
-tests/test_exp.py .                                                      [ 39%]
-tests/test_export_neg.py .                                               [ 41%]
-tests/test_flow_text.py .                                                [ 43%]
-tests/test_free_expr.py .                                                [ 45%]
-tests/test_ghost_col_issue.py .                                          [ 47%]
-tests/test_if_else.py .                                                  [ 50%]
-tests/test_join_check.py .                                               [ 52%]
-tests/test_join_effects.py ..                                            [ 56%]
-tests/test_math.py .                                                     [ 58%]
-tests/test_natural_join.py .                                             [ 60%]
-tests/test_neg.py .                                                      [ 62%]
-tests/test_null_bad.py .                                                 [ 64%]
-tests/test_parse.py .                                                    [ 66%]
-tests/test_project.py ...                                                [ 72%]
+tests/test_cc.py ...F                                                    [ 16%]
+tests/test_cdata1.py .                                                   [ 18%]
+tests/test_cdata_example.py ....                                         [ 26%]
+tests/test_cols_used.py .                                                [ 28%]
+tests/test_dask.py ..                                                    [ 32%]
+tests/test_datatable.py .                                                [ 34%]
+tests/test_drop_columns.py .                                             [ 36%]
+tests/test_example_data_ops.py .                                         [ 38%]
+tests/test_exp.py .                                                      [ 40%]
+tests/test_export_neg.py .                                               [ 42%]
+tests/test_flow_text.py .                                                [ 44%]
+tests/test_free_expr.py .                                                [ 46%]
+tests/test_ghost_col_issue.py .                                          [ 48%]
+tests/test_if_else.py .                                                  [ 51%]
+tests/test_join_check.py .                                               [ 53%]
+tests/test_join_effects.py ..                                            [ 57%]
+tests/test_math.py .                                                     [ 59%]
+tests/test_natural_join.py .                                             [ 61%]
+tests/test_neg.py .                                                      [ 63%]
+tests/test_null_bad.py .                                                 [ 65%]
+tests/test_parse.py .                                                    [ 67%]
+tests/test_project.py ...                                                [ 73%]
 tests/test_scatter_example.py .                                          [ 75%]
 tests/test_scoring_example.py .                                          [ 77%]
 tests/test_select_stacking.py .                                          [ 79%]
@@ -39,6 +39,56 @@ tests/test_strat_example.py .                                            [ 93%]
 tests/test_table_is_key_by_columns.py .                                  [ 95%]
 tests/test_window2.py .                                                  [ 97%]
 tests/test_window_fns.py .                                               [100%]
+
+=================================== FAILURES ===================================
+___________________________ test_cc_partitioned_ops ____________________________
+
+    def test_cc_partitioned_ops():
+        d = pandas.DataFrame({
+            'f': [1, 4, 6, 2, 1],
+            'g': [2, 5, 7, 3, 7],
+            'p': [1, 2, 1, 2, 1],
+        })
+    
+        ops = describe_table(d). \
+>           extend({'c': '_partitioned_eval(connected_components(f, g, partition_columns=[p])'})
+
+tests/test_cc.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+data_algebra/data_ops.py:489: in extend
+    parse_env=parse_env,
+data_algebra/data_ops.py:845: in __init__
+    ops, source, parse_env=parse_env
+data_algebra/expr_rep.py:886: in parse_assignments_in_context
+    v = _parse_by_eval(source_str=v, data_def=mp, outter_environemnt=parse_env)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source_str = '_partitioned_eval(connected_components(f, g, partition_columns=[p])'
+
+    def _parse_by_eval(source_str, *, data_def, outter_environemnt=None):
+        if not isinstance(source_str, str):
+            source_str = str(source_str)
+        if outter_environemnt is None:
+            outter_environemnt = {}
+        else:
+            outter_environemnt = {
+                k: v for (k, v) in outter_environemnt.items() if not k.startswith("_")
+            }
+        # don't have to completely kill this environment, as the code is something
+        # the user intends to run (and may have even typed in).
+        # But let's cut down the builtins anyway.
+        outter_environemnt["__builtins__"] = {
+            k: v for (k, v) in outter_environemnt.items() if isinstance(v, Exception)
+        }
+        v = eval(
+>           source_str, outter_environemnt, data_def
+        )  # eval is eval(source, globals, locals)- so mp is first
+E         File "<string>", line 1
+E           _partitioned_eval(connected_components(f, g, partition_columns=[p])
+E                                                                             ^
+E       SyntaxError: unexpected EOF while parsing
+
+data_algebra/expr_rep.py:837: SyntaxError
 
 ---------- coverage: platform darwin, python 3.6.9-final-0 -----------
 Name                                   Stmts   Miss  Cover
@@ -68,5 +118,4 @@ data_algebra/yaml.py                     121     15    88%
 ----------------------------------------------------------
 TOTAL                                   3496    941    73%
 
-
-========================== 48 passed in 10.06 seconds ==========================
+===================== 1 failed, 48 passed in 9.67 seconds ======================

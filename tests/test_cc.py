@@ -14,15 +14,6 @@ def test_cc():
     assert res == expect
 
 
-def test_cc_partitioned():
-    f = [1, 4, 6, 2, 1]
-    g = [2, 5, 7, 3, 7]
-    p = [1, 2, 1, 2, 1]
-    res = partitioned_eval(connected_components, f, g, partition_columns=[p])
-    expect = [1, 4, 1, 2, 1]
-    assert res == expect
-
-
 def test_cc2():
     d = pandas.DataFrame({
         'f': [1, 4, 6, 2, 1],
@@ -38,5 +29,35 @@ def test_cc2():
         'g': [2, 5, 7, 3, 7],
         'c': [1, 4, 1, 1, 1],
         })
+
+    assert data_algebra.util.equivalent_frames(res, expect)
+
+
+def test_cc_partitioned():
+    f = [1, 4, 6, 2, 1]
+    g = [2, 5, 7, 3, 7]
+    p = [1, 2, 1, 2, 1]
+    res = partitioned_eval(connected_components, f, g, partition_columns=[p])
+    expect = [1, 4, 1, 2, 1]
+    assert res == expect
+
+
+def test_cc_partitioned_ops():
+    d = pandas.DataFrame({
+        'f': [1, 4, 6, 2, 1],
+        'g': [2, 5, 7, 3, 7],
+        'p': [1, 2, 1, 2, 1],
+    })
+
+    ops = describe_table(d). \
+        extend({'c': '_partitioned_eval(connected_components(f, g, partition_columns=[p])'})
+    res = ops.transform(d)
+
+    expect = pandas.DataFrame({
+        'f': [1, 4, 6, 2, 1],
+        'g': [2, 5, 7, 3, 7],
+        'p': [1, 2, 1, 2, 1],
+        'c': [1, 4, 1, 2, 1],
+    })
 
     assert data_algebra.util.equivalent_frames(res, expect)
