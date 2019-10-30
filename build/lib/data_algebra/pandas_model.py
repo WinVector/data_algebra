@@ -9,6 +9,10 @@ import data_algebra.data_ops
 import data_algebra.connected_components
 
 
+def connected_components(f, g):
+    return data_algebra.connected_components.connected_components(f, g)
+
+
 # alter here, expr_rep pd_formatters, expr_rep @-defs, and env populate_specidls in parallel to extend functionality
 pandas_eval_env = {
     "is_null": lambda x: pandas.isnull(x),
@@ -17,8 +21,9 @@ pandas_eval_env = {
     "co_equalizer": lambda f, g: data_algebra.connected_components.connected_components(
         f, g
     ),
-    "connected_components": lambda f, g: data_algebra.connected_components.connected_components(
-        f, g
+    "connected_components": connected_components,
+    "partitioned_eval": lambda fn, arg_columns, partition_columns:
+        data_algebra.connected_components.partitioned_eval(fn, arg_columns, partition_columns
     ),
 }
 

@@ -72,6 +72,13 @@ class SimpleNamespaceDict(types.SimpleNamespace):
         raise RuntimeError("__setattr__ not allowed")
 
 
+# define with def so function has usable __name__
+def connected_components(f, g):
+    return  data_algebra.expr_rep.Expression(
+        op="connected_components", args=[f, g]
+    )
+
+
 def populate_specials(*, column_defs, destination, user_values=None):
     """populate a dictionary with special values
        column_defs is a dictionary,
@@ -103,6 +110,7 @@ def populate_specials(*, column_defs, destination, user_values=None):
         op="ngroup", args=[]
     )
     destination["_size"] = lambda: data_algebra.expr_rep.Expression(op="size", args=[])
-    destination["connected_components"] = lambda f, g: data_algebra.expr_rep.Expression(
-        op="connected_components", args=[f, g]
+    destination["connected_components"] = connected_components
+    destination["partitioned_eval"] = lambda fn, args, partition: data_algebra.expr_rep.Expression(
+        op="partitioned_eval", args=[fn, args, partition]
     )

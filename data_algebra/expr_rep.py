@@ -724,6 +724,15 @@ py_formatters = {
 
 # Make fns available to Pandas
 # # Alter here, expr_rep @-defs, and env populate_specials in parallel to add functionality
+
+def connected_components(expr):
+    return ("@connected_components("
+        + expr.args[0].to_pandas()
+        + ", "
+        + expr.args[1].to_pandas()
+        + ")")
+
+
 pd_formatters = {
     "is_bad": lambda expr: "@is_bad(" + expr.args[0].to_pandas() + ")",
     "is_null": lambda expr: "@is_null(" + expr.args[0].to_pandas() + ")",
@@ -744,17 +753,46 @@ pd_formatters = {
         + expr.args[1].to_pandas()
         + ")"
     ),
-    "connected_components": lambda expr: (
-        "@connected_components("
-        + expr.args[0].to_pandas()
-        + ", "
-        + expr.args[1].to_pandas()
-        + ")"
+    "connected_components": connected_components,
+    "partitioned_eval": lambda expr: (
+            "@partitioned_eval("
+            # expr.args[0] is a function
+            + '@' + expr.args[0].__name__
+            + ", "
+            # expr.args[1] is a list of args
+            + '[' + ', '.join([ei.to_pandas() for ei in expr.args[1]]) + ']'
+            + ", "
+            # expr.args[2] is a list of args
+            + '[' + ', '.join([ei.to_pandas() for ei in expr.args[2]]) + ']'
+            + ")"
     ),
+
 }
 
 
 r_formatters = {"neg": lambda expr: "-" + expr.args[0].to_R(want_inline_parens=True)}
+
+
+# obj may not be of type Expression
+def _get_column_names(obj, columns_seen):
+    if isinstance(obj, Term):
+        # back to object methods path
+        obj.get_column_names(columns_seen)
+        return
+    if isinstance(obj, list):
+        for b in obj:
+            _get_column_names(b, columns_seen)
+        return
+
+
+# obj may not be of type Expression
+def _to_python(obj, *, want_inline_parens=False):
+    if callable(obj):
+        return obj.__name__
+    if isinstance(obj, Term):
+        # back to object methods path
+        return obj.to_python(want_inline_parens=want_inline_parens)
+    return str(obj)
 
 
 class Expression(Term):
@@ -775,12 +813,12 @@ class Expression(Term):
 
     def get_column_names(self, columns_seen):
         for a in self.args:
-            a.get_column_names(columns_seen)
+            _get_column_names(a, columns_seen)
 
     def to_python(self, *, want_inline_parens=False):
         if self.op in py_formatters.keys():
             return py_formatters[self.op](self)
-        subs = [ai.to_python(want_inline_parens=True) for ai in self.args]
+        subs = [_to_python(ai, want_inline_parens=True) for ai in self.args]
         if len(subs) <= 0:
             return "_" + self.op + "()"
         if len(subs) == 1:

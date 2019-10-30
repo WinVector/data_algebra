@@ -56,7 +56,7 @@ def test_cc_partitioned():
     f = [1, 4, 6, 2, 1]
     g = [2, 5, 7, 3, 7]
     p = [1, 2, 1, 2, 1]
-    res = partitioned_eval(connected_components, f, g, partition_columns=[p])
+    res = partitioned_eval(connected_components, [f, g], partition_columns=[p])
     expect = [1, 4, 1, 2, 1]
     assert res == expect
 
@@ -69,7 +69,7 @@ def test_cc_partitioned_ops():
     })
 
     ops = describe_table(d). \
-        extend({'c': 'partitioned_eval(connected_components, f, g, partition_columns=[p])'})
+        extend({'c': 'partitioned_eval(connected_components, [f, g], [p])'})
     res = ops.transform(d)
 
     expect = pandas.DataFrame({

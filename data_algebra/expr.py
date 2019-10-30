@@ -2,8 +2,6 @@
 
 
 import data_algebra.expr_rep
-import data_algebra.connected_components
-
 
 def _row_number():
     return data_algebra.expr_rep.Expression(op="row_number", args=[])

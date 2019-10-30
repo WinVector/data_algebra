@@ -1,3 +1,4 @@
+
 import numpy
 import pandas
 
@@ -30,7 +31,7 @@ def test_exp():
     with data_algebra.env.Env(locals()) as env:
         ops = TableDescription(
             "d", ["subjectID", "surveyCategory", "assessmentTotal"]
-        ).extend({"v": "assessmentTotal.exp()"})
+        ).extend({"v": "assessmentTotal.exp()+1"})
 
     res_local = ops.transform(d_local)
 
@@ -47,6 +48,7 @@ def test_exp():
             "v": numpy.exp([5, 2, 3, 4]),
         }
     )
+    expect.v = expect.v + 1
 
     assert data_algebra.util.equivalent_frames(res_local, expect, float_tol=1e-3)
 

@@ -8,7 +8,7 @@ tests/test_R_yaml.py .                                                   [  2%]
 tests/test_apply.py .                                                    [  4%]
 tests/test_arrow1.py .                                                   [  6%]
 tests/test_calc_warnings_errors.py .                                     [  8%]
-tests/test_cc.py ....F                                                   [ 18%]
+tests/test_cc.py .....                                                   [ 18%]
 tests/test_cdata1.py .                                                   [ 20%]
 tests/test_cdata_example.py ....                                         [ 28%]
 tests/test_cols_used.py .                                                [ 30%]
@@ -40,36 +40,6 @@ tests/test_table_is_key_by_columns.py .                                  [ 96%]
 tests/test_window2.py .                                                  [ 98%]
 tests/test_window_fns.py .                                               [100%]
 
-=================================== FAILURES ===================================
-___________________________ test_cc_partitioned_ops ____________________________
-
-    def test_cc_partitioned_ops():
-        d = pandas.DataFrame({
-            'f': [1, 4, 6, 2, 1],
-            'g': [2, 5, 7, 3, 7],
-            'p': [1, 2, 1, 2, 1],
-        })
-    
-        ops = describe_table(d). \
->           extend({'c': 'partitioned_eval(connected_components, f, g, partition_columns=[p])'})
-
-tests/test_cc.py:72: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-data_algebra/data_ops.py:495: in extend
-    parse_env=parse_env,
-data_algebra/data_ops.py:880: in __init__
-    ops, source, parse_env=parse_env
-data_algebra/expr_rep.py:899: in parse_assignments_in_context
-    v = _parse_by_eval(source_str=v, data_def=mp, outter_environemnt=parse_env)
-data_algebra/expr_rep.py:850: in _parse_by_eval
-    source_str, outter_environemnt, data_def
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
->   ???
-E   NameError: name 'partitioned_eval' is not defined
-
-<string>:1: NameError
-
 ---------- coverage: platform darwin, python 3.6.9-final-0 -----------
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
@@ -88,14 +58,15 @@ data_algebra/data_types.py                43     19    56%
 data_algebra/datatable_model.py          131     81    38%
 data_algebra/db_model.py                 359     80    78%
 data_algebra/diagram.py                   56     44    21%
-data_algebra/env.py                       49      7    86%
-data_algebra/expr.py                      21      4    81%
-data_algebra/expr_rep.py                 573    201    65%
+data_algebra/env.py                       52      7    87%
+data_algebra/expr.py                      20      4    80%
+data_algebra/expr_rep.py                 589    203    66%
 data_algebra/flow_text.py                 17      0   100%
-data_algebra/pandas_model.py             163     25    85%
+data_algebra/pandas_model.py             165     25    85%
 data_algebra/util.py                      96     11    89%
 data_algebra/yaml.py                     121     15    88%
 ----------------------------------------------------------
-TOTAL                                   3498    941    73%
+TOTAL                                   3518    943    73%
 
-===================== 1 failed, 49 passed in 10.68 seconds =====================
+
+========================== 50 passed in 10.06 seconds ==========================
