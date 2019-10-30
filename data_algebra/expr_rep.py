@@ -1,3 +1,4 @@
+
 from typing import Union
 import collections
 
@@ -722,22 +723,29 @@ py_formatters = {
 }
 
 
+# Make fns available to Pandas
+# # Alter here, expr_rep @-defs, and env populate_specials in parallel to add functionality
 pd_formatters = {
     "is_bad": lambda expr: "@is_bad(" + expr.args[0].to_pandas() + ")",
     "is_null": lambda expr: "@is_null(" + expr.args[0].to_pandas() + ")",
     "if_else": lambda expr: ("@if_else("
-        + expr.args[0].to_pandas()
-        + ", "
-        + expr.args[1].to_pandas()
-        + ", "
-        + expr.args[2].to_pandas()
-        + ")"),
+                             + expr.args[0].to_pandas()
+                             + ", "
+                             + expr.args[1].to_pandas()
+                             + ", "
+                             + expr.args[2].to_pandas()
+                             + ")"),
     "neg": lambda expr: "-" + expr.args[0].to_pandas(want_inline_parens=True),
     "co_equalizer": lambda expr: ("@co_equalizer("
                                   + expr.args[0].to_pandas()
                                   + ", "
                                   + expr.args[1].to_pandas()
                                   + ")"),
+    "connected_components": lambda expr: ("@connected_components("
+                                           + expr.args[0].to_pandas()
+                                           + ", "
+                                           + expr.args[1].to_pandas()
+                                           + ")"),
 }
 
 

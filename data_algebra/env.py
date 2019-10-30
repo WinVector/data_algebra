@@ -90,8 +90,11 @@ def populate_specials(*, column_defs, destination, user_values=None):
         raise TypeError("user_values should be a dictionary")
     nd = column_defs.copy()
     ns = SimpleNamespaceDict(**nd)
+    # makes these symbols available for parsing step
+    # alter here, expr_rep pd_formatters, expr_rep @-defs, and pandas_model pandas_eval_env in parallel to extend functionality
     destination["_"] = ns
     destination["_get"] = lambda key: user_values[key]
+    # TODO: check on parsing of underbar forms with non-under par op (are they rendered as or regular
     destination["_row_number"] = lambda: data_algebra.expr_rep.Expression(
         op="row_number", args=[]
     )
@@ -99,3 +102,5 @@ def populate_specials(*, column_defs, destination, user_values=None):
         op="ngroup", args=[]
     )
     destination["_size"] = lambda: data_algebra.expr_rep.Expression(op="size", args=[])
+    destination["connected_components"] = lambda f, g: data_algebra.expr_rep.Expression(op="connected_components",
+                                                                                         args=[f, g])

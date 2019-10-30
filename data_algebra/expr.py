@@ -2,6 +2,7 @@
 
 
 import data_algebra.expr_rep
+import data_algebra.connected_components
 
 
 def _row_number():
@@ -12,6 +13,7 @@ def row_number():
     return data_algebra.expr_rep.Expression(op="row_number", args=[])
 
 
+# used in R gateway, but not used by package directly
 def r_parse_env():
     return {
         "exp": lambda x: x.exp(),

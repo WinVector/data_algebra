@@ -14,7 +14,7 @@ def test_cc():
     assert res == expect
 
 
-def test_cc2():
+def test_cc_ops():
     d = pandas.DataFrame({
         'f': [1, 4, 6, 2, 1],
         'g': [2, 5, 7, 3, 7],
@@ -22,6 +22,25 @@ def test_cc2():
 
     ops = describe_table(d). \
         extend({'c': 'f.co_equalizer(g)'})
+    res = ops.transform(d)
+
+    expect = pandas.DataFrame({
+        'f': [1, 4, 6, 2, 1],
+        'g': [2, 5, 7, 3, 7],
+        'c': [1, 4, 1, 1, 1],
+        })
+
+    assert data_algebra.util.equivalent_frames(res, expect)
+
+
+def test_cc_ops_f():
+    d = pandas.DataFrame({
+        'f': [1, 4, 6, 2, 1],
+        'g': [2, 5, 7, 3, 7],
+    })
+
+    ops = describe_table(d). \
+        extend({'c': 'connected_components(f, g)'})
     res = ops.transform(d)
 
     expect = pandas.DataFrame({
@@ -50,7 +69,7 @@ def test_cc_partitioned_ops():
     })
 
     ops = describe_table(d). \
-        extend({'c': '_partitioned_eval(connected_components(f, g, partition_columns=[p])'})
+        extend({'c': 'partitioned_eval(connected_components, f, g, partition_columns=[p])'})
     res = ops.transform(d)
 
     expect = pandas.DataFrame({

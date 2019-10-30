@@ -10,11 +10,13 @@ import data_algebra.data_ops
 import data_algebra.connected_components
 
 
+# alter here, expr_rep pd_formatters, expr_rep @-defs, and env populate_specidls in parallel to extend functionality
 pandas_eval_env = {
     "is_null": lambda x: pandas.isnull(x),
     "is_bad": data_algebra.util.is_bad,
     "if_else": lambda c, x, y: numpy.where(c, x, y),
     "co_equalizer": lambda f, g: data_algebra.connected_components.connected_components(f, g),
+    "connected_components": lambda f, g: data_algebra.connected_components.connected_components(f, g),
 }
 
 
