@@ -18,6 +18,8 @@ def connected_components(f, g):
     component, we return the assignment by labeling the edges by components
     (instead of the vertices).
 
+    Not as fast as union/find but fast.
+
     f = [1, 4, 6, 2, 1]
     g = [2, 5, 7, 3, 7]
     res = connected_components(f, g)
@@ -46,3 +48,66 @@ def connected_components(f, g):
                 components[k] = merged
     assignments = [components[k].id for k in f]
     return assignments
+
+
+def get_index_lists(partition_columns):
+    """
+    Find lists of indices for partition_ids level-sets
+
+    :param partition_ids: non-empty list of lists of list of hashables/comparables
+    :return: dictionary of index lists for each level-set of the keys
+    """
+    index_lists = {}
+    for i in range(len(partition_columns[0])):
+        pi = []
+        for j in range(len(partition_columns)):
+            pi.append(partition_columns[j][i])
+        pi = tuple(pi)
+        try:
+            lst = index_lists[pi]
+        except KeyError:
+            lst = []
+            index_lists[pi] = lst
+        lst.append(i)
+    return index_lists
+
+
+def partitioned_eval(fn, fn_columns, partition_columns):
+    """
+    Evaluate fn(fn_columns) on level-sets of partition columms.
+
+    :param fn: function with arity length(fn_columns) then returns lists/vectors of length of its arguements.
+    :param fn_columns: non-empty list of lists of all length n
+    :param partition_columns: non-empty list of lists of hashables/comparables of all length n
+    :return: list of length n of fn(fn_columns) evaluted on level-sets of partition_columns
+    """
+    arity = len(fn_columns)
+    res = [None] * len(fn_columns[0])
+    index_lists = get_index_lists(partition_columns)
+    for indexs in index_lists.values():
+        # slice out a level set
+        ni = len(indexs)
+        fn_cols_i = [[fn_columns[j][indexs[i]] for i in range(ni)] for j in range(arity)]
+        # call function on slice
+        hi = fn(fn_cols_i)
+        # copy back result
+        for i in range(ni):
+            res[indexs[i]] = hi[i]
+    return res
+
+
+def partitioned_connected_components(f, g, partition_ids):
+    """
+    Call connected_components(fi, gi) for each
+
+    :param f:
+    :param g:
+    :param partition_ids:
+    :return:
+    """
+
+    def fn(fn_columns):
+        return connected_components(fn_columns[0], fn_columns[1])
+
+    res = partitioned_eval(fn, [f, g], [partition_ids])
+    return res
