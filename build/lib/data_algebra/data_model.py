@@ -23,14 +23,14 @@ class DataModel:
             for (k, opk) in op.ops.items():
                 if len(opk.args) > 1:
                     raise ValueError(
-                        "non-trivial windows expression: " + str(k) + ": " + str(opk)
+                        "non-trivial window expression: " + str(k) + ": " + str(opk)
                     )
                 if len(opk.args) == 1:
                     if not isinstance(
                         opk.args[0], data_algebra.expr_rep.ColumnReference
                     ):
                         raise ValueError(
-                            "windows expression argument must be a column: "
+                            "window expression argument must be a column: "
                             + str(k)
                             + ": "
                             + str(opk)

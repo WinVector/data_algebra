@@ -32,3 +32,23 @@ def test_cc2():
 
     assert data_algebra.util.equivalent_frames(res, expect)
 
+
+# def test_cc3():
+#     d = pandas.DataFrame({
+#         'f': [1, 4, 6, 2, 1],
+#         'g': [2, 5, 7, 3, 7],
+#         'x': [1, 1, 1, 1, 2],
+#     })
+#
+#     ops = describe_table(d). \
+#         extend({'c': 'f.co_equalizer(g)'},
+#                partition_by=['x'])
+#     res = ops.transform(d)
+#
+#     expect = pandas.DataFrame({
+#         'f': [1, 4, 6, 2, 1],
+#         'g': [2, 5, 7, 3, 7],
+#         'c': [1, 4, 1, 1, 1],
+#         })
+#
+#     assert data_algebra.util.equivalent_frames(res, expect)
