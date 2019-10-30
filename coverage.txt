@@ -55,13 +55,13 @@ ___________________________ test_cc_partitioned_ops ____________________________
 
 tests/test_cc.py:72: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-data_algebra/data_ops.py:489: in extend
+data_algebra/data_ops.py:495: in extend
     parse_env=parse_env,
-data_algebra/data_ops.py:845: in __init__
+data_algebra/data_ops.py:880: in __init__
     ops, source, parse_env=parse_env
-data_algebra/expr_rep.py:894: in parse_assignments_in_context
+data_algebra/expr_rep.py:899: in parse_assignments_in_context
     v = _parse_by_eval(source_str=v, data_def=mp, outter_environemnt=parse_env)
-data_algebra/expr_rep.py:845: in _parse_by_eval
+data_algebra/expr_rep.py:850: in _parse_by_eval
     source_str, outter_environemnt, data_def
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
@@ -98,4 +98,4 @@ data_algebra/yaml.py                     121     15    88%
 ----------------------------------------------------------
 TOTAL                                   3498    941    73%
 
-===================== 1 failed, 49 passed in 12.26 seconds =====================
+===================== 1 failed, 49 passed in 10.68 seconds =====================

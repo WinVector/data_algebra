@@ -1,4 +1,3 @@
-
 from typing import Union
 import collections
 
@@ -728,24 +727,30 @@ py_formatters = {
 pd_formatters = {
     "is_bad": lambda expr: "@is_bad(" + expr.args[0].to_pandas() + ")",
     "is_null": lambda expr: "@is_null(" + expr.args[0].to_pandas() + ")",
-    "if_else": lambda expr: ("@if_else("
-                             + expr.args[0].to_pandas()
-                             + ", "
-                             + expr.args[1].to_pandas()
-                             + ", "
-                             + expr.args[2].to_pandas()
-                             + ")"),
+    "if_else": lambda expr: (
+        "@if_else("
+        + expr.args[0].to_pandas()
+        + ", "
+        + expr.args[1].to_pandas()
+        + ", "
+        + expr.args[2].to_pandas()
+        + ")"
+    ),
     "neg": lambda expr: "-" + expr.args[0].to_pandas(want_inline_parens=True),
-    "co_equalizer": lambda expr: ("@co_equalizer("
-                                  + expr.args[0].to_pandas()
-                                  + ", "
-                                  + expr.args[1].to_pandas()
-                                  + ")"),
-    "connected_components": lambda expr: ("@connected_components("
-                                           + expr.args[0].to_pandas()
-                                           + ", "
-                                           + expr.args[1].to_pandas()
-                                           + ")"),
+    "co_equalizer": lambda expr: (
+        "@co_equalizer("
+        + expr.args[0].to_pandas()
+        + ", "
+        + expr.args[1].to_pandas()
+        + ")"
+    ),
+    "connected_components": lambda expr: (
+        "@connected_components("
+        + expr.args[0].to_pandas()
+        + ", "
+        + expr.args[1].to_pandas()
+        + ")"
+    ),
 }
 
 
@@ -912,9 +917,7 @@ def standardize_join_type(join_str):
     if not isinstance(join_str, str):
         raise TypeError("Expected join_str to be a string")
     join_str = join_str.upper()
-    re_map = {
-        'OUTER': 'FULL'
-    }
+    re_map = {"OUTER": "FULL"}
     try:
         return re_map[join_str]
     except KeyError:

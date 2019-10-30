@@ -1,5 +1,3 @@
-
-
 class Component:
     def __init__(self, item):
         self.id = item
@@ -30,7 +28,7 @@ def connected_components(f, g):
     :return: list of assignments of length n (map both f and g to same values.
     """
     keys = set([k for k in f]).union((k for k in g))
-    components = {k:Component(k) for k in keys}
+    components = {k: Component(k) for k in keys}
     for fi, gi in zip(f, g):
         # print({k: components[k].id for k in keys})
         component_f = components[fi]
@@ -54,7 +52,7 @@ def get_index_lists(partition_columns):
     """
     Find lists of indices for partition_ids level-sets
 
-    :param partition_ids: non-empty list of lists of list of hashables/comparables
+    :param partition_columns: non-empty list of lists of list of hashables/comparables
     :return: dictionary of index lists for each level-set of the keys
     """
     index_lists = {}
@@ -77,7 +75,7 @@ def partitioned_eval(fn, *args, partition_columns):
     Evaluate fn(fn_columns) on level-sets of partition columms.
 
     :param fn: function with arity length(fn_columns) then returns lists/vectors of the common length of its arguments.
-    :param *args: non-empty lists of length n
+    :param args: non-empty lists of length n
     :param partition_columns: possibly empty list of lists of hashables/comparables of all length n
     :return: list of length n of fn(fn_columns) evaluted on level-sets of partition_columns
     """

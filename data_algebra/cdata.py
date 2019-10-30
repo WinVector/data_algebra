@@ -234,7 +234,7 @@ class RecordMap:
             if check_blocks_in_keying:
                 # table should be keyed by record_keys + control_table_keys
                 if not data_algebra.util.table_is_keyed_by_columns(
-                        X, self.blocks_in.record_keys + self.blocks_in.control_table_keys
+                    X, self.blocks_in.record_keys + self.blocks_in.control_table_keys
                 ):
                     raise ValueError(
                         "table is not keyed by blocks_in.record_keys + blocks_in.control_table_keys"
@@ -256,7 +256,7 @@ class RecordMap:
             if check_blocks_out_keying:
                 # table should be keyed by record_keys
                 if not data_algebra.util.table_is_keyed_by_columns(
-                        X, self.blocks_out.record_keys
+                    X, self.blocks_out.record_keys
                 ):
                     raise ValueError("table is not keyed by blocks_out.record_keys")
             # convert to block records

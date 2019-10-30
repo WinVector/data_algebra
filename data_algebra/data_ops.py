@@ -79,7 +79,7 @@ class OperatorPlatform:
     # define builders for all non-initial node types on base class
 
     def extend(
-            self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
+        self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
     ):
         raise NotImplementedError("base class called")
 
@@ -276,7 +276,9 @@ class ViewRepresentation(OperatorPlatform):
         )
         if pretty and have_sqlparse:
             try:
-                sql_str = sqlparse.format(sql_str, encoding=encoding, **sqlparse_options)
+                sql_str = sqlparse.format(
+                    sql_str, encoding=encoding, **sqlparse_options
+                )
             except Exception:
                 pass
         return sql_str
@@ -428,7 +430,9 @@ class ViewRepresentation(OperatorPlatform):
             else:
                 return ops
         node = copy.copy(ops)
-        node.sources = [self.stand_in_for_table(ops=s, table_key=table_key) for s in node.sources]
+        node.sources = [
+            self.stand_in_for_table(ops=s, table_key=table_key) for s in node.sources
+        ]
         return node
 
     # noinspection PyPep8Naming
@@ -457,7 +461,9 @@ class ViewRepresentation(OperatorPlatform):
                 X = X.select_columns([c for c in incoming_columns])
             # check categorical arrow composition conditions
             if set(incoming_columns) != set(X.column_names):
-                raise ValueError("arrow composition conditions not met (incoming column set doesn't match outgoing)")
+                raise ValueError(
+                    "arrow composition conditions not met (incoming column set doesn't match outgoing)"
+                )
             res = X.stand_in_for_table(ops=self, table_key=k)
             return res
         data_map = {k: X}
@@ -478,7 +484,7 @@ class ViewRepresentation(OperatorPlatform):
     # nodes
 
     def extend(
-            self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
+        self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
     ):
         return ExtendNode(
             source=self,
@@ -544,10 +550,7 @@ class TableDescription(ViewRepresentation):
     qualifiers: Dict[str, str]
     key: str
 
-    def __init__(self, table_name, column_names,
-                 *,
-                 qualifiers=None,
-                 column_types=None):
+    def __init__(self, table_name, column_names, *, qualifiers=None, column_types=None):
         ViewRepresentation.__init__(self, column_names=column_names)
         if (table_name is not None) and (not isinstance(table_name, str)):
             raise TypeError("table_name must be a string")
@@ -586,24 +589,32 @@ class TableDescription(ViewRepresentation):
         return pipeline
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
-        spacer = '\n ' + ' ' * indent
+        spacer = "\n " + " " * indent
         column_limit = 20
         truncated = (not strict) and (column_limit < len(self.column_names))
         if truncated:
-            cols_to_print = [self.column_names[i].__repr__() for i in range(column_limit)] + \
-                            ['+ ' + str(len(self.column_names)) + ' more']
+            cols_to_print = [
+                self.column_names[i].__repr__() for i in range(column_limit)
+            ] + ["+ " + str(len(self.column_names)) + " more"]
         else:
             cols_to_print = [c.__repr__() for c in self.column_names]
-        col_text = data_algebra.flow_text.flow_text(cols_to_print,
-                                                    align_right=70 - indent,
-                                                    sep_width=2)
-        col_text = [', '.join(line) for line in col_text]
-        col_text = (',  ' + spacer).join(col_text)
+        col_text = data_algebra.flow_text.flow_text(
+            cols_to_print, align_right=70 - indent, sep_width=2
+        )
+        col_text = [", ".join(line) for line in col_text]
+        col_text = (",  " + spacer).join(col_text)
         s = (
-                "TableDescription("
-                + spacer + "table_name=" + self.table_name.__repr__() + ","
-                + spacer + "column_names=["
-                + spacer + '  ' + col_text + "]"
+            "TableDescription("
+            + spacer
+            + "table_name="
+            + self.table_name.__repr__()
+            + ","
+            + spacer
+            + "column_names=["
+            + spacer
+            + "  "
+            + col_text
+            + "]"
         )
         if len(self.qualifiers) > 0:
             s = s + "," + spacer + "qualifiers=" + self.qualifiers.__repr__()
@@ -636,7 +647,7 @@ class TableDescription(ViewRepresentation):
         return sql_str
 
     def to_sql_implementation(
-            self, db_model, *, using, temp_id_source, force_sql=False
+        self, db_model, *, using, temp_id_source, force_sql=False
     ):
         return db_model.table_def_to_sql(self, using=using, force_sql=force_sql)
 
@@ -661,8 +672,7 @@ def describe_table(d, table_name="data_frame"):
         column_types = None
         if d.shape[0] > 0:
             column_types = {k: type(d.loc[0, k]) for k in column_names}
-        return TableDescription(table_name, column_names,
-                                column_types=column_types)
+        return TableDescription(table_name, column_names, column_types=column_types)
     if data_algebra.data_types.is_dask_data_frame(d):
         return TableDescription(table_name, [c for c in d.columns])
     if data_algebra.data_types.is_datatable_frame(d):
@@ -697,10 +707,22 @@ class WrappedOperatorPlatform(OperatorPlatform):
     # general functions
 
     def __repr__(self):
-        return "[" + self.underlying.__repr__() + "](\n " + set(self.data_map.keys()).__repr__() + ")"
+        return (
+            "["
+            + self.underlying.__repr__()
+            + "](\n "
+            + set(self.data_map.keys()).__repr__()
+            + ")"
+        )
 
     def __str__(self):
-        return "[" + self.underlying.__str__() + "](\n " + set(self.data_map.keys()).__repr__() + ")"
+        return (
+            "["
+            + self.underlying.__str__()
+            + "](\n "
+            + set(self.data_map.keys()).__repr__()
+            + ")"
+        )
 
     # overrides
 
@@ -715,8 +737,7 @@ class WrappedOperatorPlatform(OperatorPlatform):
     def transform(self, X):
         data_map, X = self._reach_in(X)
         return WrappedOperatorPlatform(
-            underlying=self.underlying.transform(X),
-            data_map=data_map
+            underlying=self.underlying.transform(X), data_map=data_map
         )
 
     def __rrshift__(self, other):  # override other >> self
@@ -727,12 +748,12 @@ class WrappedOperatorPlatform(OperatorPlatform):
         data_map, other = self._reach_in(other)
         if isinstance(other, OperatorPlatform):
             return WrappedOperatorPlatform(
-                underlying=other.transform(self.underlying),
-                data_map=data_map)
+                underlying=other.transform(self.underlying), data_map=data_map
+            )
         if isinstance(other, PipeStep):
             return WrappedOperatorPlatform(
-                underlying=other.apply(self.underlying),
-                data_map=data_map)
+                underlying=other.apply(self.underlying), data_map=data_map
+            )
         raise TypeError("unexpected type: " + str(type(other)))
 
     # composition
@@ -740,73 +761,84 @@ class WrappedOperatorPlatform(OperatorPlatform):
         """interface to what we used to call PipeStep nodes"""
         data_map, other = self._reach_in(other)
         return WrappedOperatorPlatform(
-            underlying=other.apply(self.underlying),
-            data_map=data_map)
+            underlying=other.apply(self.underlying), data_map=data_map
+        )
 
     # define builders for all non-initial node types on base class
 
     def extend(
-            self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
+        self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
     ):
         return WrappedOperatorPlatform(
-            underlying=self.underlying.extend(ops=ops,
-                                   partition_by=partition_by,
-                                   order_by=order_by,
-                                   reverse=reverse,
-                                   parse_env=parse_env),
-            data_map=self.data_map)
+            underlying=self.underlying.extend(
+                ops=ops,
+                partition_by=partition_by,
+                order_by=order_by,
+                reverse=reverse,
+                parse_env=parse_env,
+            ),
+            data_map=self.data_map,
+        )
 
     def project(self, ops=None, *, group_by=None, parse_env=None):
         return WrappedOperatorPlatform(
-            underlying=self.underlying.project(ops=ops,
-                                    group_by=group_by,
-                                    parse_env=parse_env),
-            data_map=self.data_map)
+            underlying=self.underlying.project(
+                ops=ops, group_by=group_by, parse_env=parse_env
+            ),
+            data_map=self.data_map,
+        )
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
         if not isinstance(b, WrappedOperatorPlatform):
             raise TypeError("expected b to be of type WrappedOperatorPlatform")
         data_map, b = self._reach_in(b)
         return WrappedOperatorPlatform(
-            underlying=self.underlying.natural_join(b=b,
-                                         by=by,
-                                         jointype=jointype),
-            data_map=data_map)
+            underlying=self.underlying.natural_join(b=b, by=by, jointype=jointype),
+            data_map=data_map,
+        )
 
     def select_rows(self, expr, parse_env=None):
         return WrappedOperatorPlatform(
-            underlying=self.underlying.select_rows(expr=expr,
-                                        parse_env=parse_env),
-            data_map=self.data_map)
+            underlying=self.underlying.select_rows(expr=expr, parse_env=parse_env),
+            data_map=self.data_map,
+        )
 
     def drop_columns(self, column_deletions):
         return WrappedOperatorPlatform(
             underlying=self.underlying.drop_columns(column_deletions=column_deletions),
-            data_map=self.data_map)
+            data_map=self.data_map,
+        )
 
     def select_columns(self, columns):
         return WrappedOperatorPlatform(
             underlying=self.underlying.select_columns(columns=columns),
-            data_map=self.data_map)
+            data_map=self.data_map,
+        )
 
     def rename_columns(self, column_remapping):
         return WrappedOperatorPlatform(
-            underlying=self.underlying.rename_columns(column_remapping=column_remapping),
-            data_map=self.data_map)
+            underlying=self.underlying.rename_columns(
+                column_remapping=column_remapping
+            ),
+            data_map=self.data_map,
+        )
 
     def order_rows(self, columns, *, reverse=None, limit=None):
         return WrappedOperatorPlatform(
-            underlying=self.underlying.order_rows(columns=columns,
-                                       reverse=reverse,
-                                       limit=limit),
-            data_map=self.data_map)
+            underlying=self.underlying.order_rows(
+                columns=columns, reverse=reverse, limit=limit
+            ),
+            data_map=self.data_map,
+        )
 
     def convert_records(self, record_map, *, blocks_out_table=None):
         data_map, blocks_out_table = self._reach_in(blocks_out_table)
         return WrappedOperatorPlatform(
-            underlying=self.underlying.convert_records(record_map=record_map,
-                                            blocks_out_table=blocks_out_table),
-            data_map=data_map)
+            underlying=self.underlying.convert_records(
+                record_map=record_map, blocks_out_table=blocks_out_table
+            ),
+            data_map=data_map,
+        )
 
 
 def wrap(d, *, table_name="data_frame"):
@@ -816,30 +848,33 @@ def wrap(d, *, table_name="data_frame"):
         if d.shape[0] > 0:
             column_types = {k: type(d.loc[0, k]) for k in column_names}
         return WrappedOperatorPlatform(
-            underlying=TableDescription(table_name, column_names,
-                                        column_types=column_types),
-            data_map={table_name: d})
+            underlying=TableDescription(
+                table_name, column_names, column_types=column_types
+            ),
+            data_map={table_name: d},
+        )
     if data_algebra.data_types.is_dask_data_frame(d):
         return WrappedOperatorPlatform(
             TableDescription(table_name, [c for c in d.columns]),
-            data_map={table_name: d})
+            data_map={table_name: d},
+        )
     if data_algebra.data_types.is_datatable_frame(d):
         return WrappedOperatorPlatform(
-            TableDescription(table_name, [c for c in d.names]),
-            data_map={table_name: d})
+            TableDescription(table_name, [c for c in d.names]), data_map={table_name: d}
+        )
     raise TypeError("can't wrap " + table_name + ": " + str(type(d)))
 
 
 class ExtendNode(ViewRepresentation):
     def __init__(
-            self,
-            source,
-            ops,
-            *,
-            partition_by=None,
-            order_by=None,
-            reverse=None,
-            parse_env=None
+        self,
+        source,
+        ops,
+        *,
+        partition_by=None,
+        order_by=None,
+        reverse=None,
+        parse_env=None
     ):
         ops = data_algebra.expr_rep.parse_assignments_in_context(
             ops, source, parse_env=parse_env
@@ -923,21 +958,20 @@ class ExtendNode(ViewRepresentation):
         )
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
-        spacer = '\n   ' + ' ' * indent
+        spacer = "\n   " + " " * indent
         s = ""
         if print_sources:
             s = (
-                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                    + " .\\"
-                    + spacer
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\"
+                + spacer
             )
-        ops = [k.__repr__() + ": " + opi.to_python().__repr__() for (k, opi) in self.ops.items()]
-        flowed = (',' + spacer + ' ').join(ops)
-        s = s + (
-                "extend({"
-                + spacer + ' ' + flowed
-                + "}"
-        )
+        ops = [
+            k.__repr__() + ": " + opi.to_python().__repr__()
+            for (k, opi) in self.ops.items()
+        ]
+        flowed = ("," + spacer + " ").join(ops)
+        s = s + ("extend({" + spacer + " " + flowed + "}")
         if len(self.partition_by) > 0:
             s = s + "," + spacer + "partition_by=" + self.partition_by.__repr__()
         if len(self.order_by) > 0:
@@ -1010,23 +1044,25 @@ class ProjectNode(ViewRepresentation):
         )
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
-        spacer = '\n   ' + ' ' * indent
+        spacer = "\n   " + " " * indent
         s = ""
         if print_sources:
             s = (
-                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                    + " .\\\n"
-                    + " " * (indent + 3)
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
             )
         s = s + (
-                "project({" + spacer + ' '
-                + ("," + spacer + ' ').join(
-            [
-                k.__repr__() + ": " + opi.to_python().__repr__()
-                for (k, opi) in self.ops.items()
-            ]
-        )
-                + "}"
+            "project({"
+            + spacer
+            + " "
+            + ("," + spacer + " ").join(
+                [
+                    k.__repr__() + ": " + opi.to_python().__repr__()
+                    for (k, opi) in self.ops.items()
+                ]
+            )
+            + "}"
         )
         if len(self.group_by) > 0:
             s = s + "," + spacer + "group_by=" + self.group_by.__repr__()
@@ -1080,9 +1116,9 @@ class SelectRowsNode(ViewRepresentation):
         s = ""
         if print_sources:
             s = (
-                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                    + " .\\\n"
-                    + " " * (indent + 3)
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
             )
         s = s + ("select_rows(" + self.expr.to_python().__repr__() + ")")
         return s
@@ -1136,9 +1172,9 @@ class SelectColumnsNode(ViewRepresentation):
         s = ""
         if print_sources:
             s = (
-                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                    + " .\\\n"
-                    + " " * (indent + 3)
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
             )
         s = s + ("select_columns(" + self.column_selection.__repr__() + ")")
         return s
@@ -1192,9 +1228,9 @@ class DropColumnsNode(ViewRepresentation):
         s = ""
         if print_sources:
             s = (
-                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                    + " .\\\n"
-                    + " " * (indent + 3)
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
             )
         s = s + ("drop_columns(" + self.column_deletions.__repr__() + ")")
         return s
@@ -1259,9 +1295,9 @@ class OrderRowsNode(ViewRepresentation):
         s = ""
         if print_sources:
             s = (
-                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                    + " .\\\n"
-                    + " " * (indent + 3)
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
             )
         s = s + ("order_rows(" + self.order_columns.__repr__())
         if len(self.reverse) > 0:
@@ -1295,7 +1331,7 @@ class RenameColumnsNode(ViewRepresentation):
         if len(unknown) > 0:
             raise ValueError("Tried to rename unknown columns: " + str(unknown))
         collisions = (
-                set(source.column_names) - set(new_cols).intersection(orig_cols)
+            set(source.column_names) - set(new_cols).intersection(orig_cols)
         ).intersection(new_cols)
         if len(collisions) > 0:
             raise ValueError(
@@ -1334,9 +1370,9 @@ class RenameColumnsNode(ViewRepresentation):
         s = ""
         if print_sources:
             s = (
-                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                    + " .\\\n"
-                    + " " * (indent + 3)
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
             )
         s = s + ("rename_columns(" + self.column_remapping.__repr__() + ")")
         return s
@@ -1407,23 +1443,23 @@ class NaturalJoinNode(ViewRepresentation):
         s = "_0."
         if print_sources:
             s = (
-                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                    + " .\\\n"
-                    + " " * (indent + 3)
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
             )
         s = s + ("natural_join(b=\n" + " " * (indent + 6))
         if print_sources:
             s = s + (
-                    self.sources[1].to_python_implementation(
-                        indent=indent + 6, strict=strict
-                    )
-                    + ",\n"
-                    + " " * (indent + 6)
+                self.sources[1].to_python_implementation(
+                    indent=indent + 6, strict=strict
+                )
+                + ",\n"
+                + " " * (indent + 6)
             )
         else:
             s = s + " _1, "
         s = s + (
-                "by=" + self.by.__repr__() + ", jointype=" + self.jointype.__repr__() + ")"
+            "by=" + self.by.__repr__() + ", jointype=" + self.jointype.__repr__() + ")"
         )
         return s
 
@@ -1515,19 +1551,19 @@ class ConvertRecordsNode(ViewRepresentation):
         s = ""
         if print_sources:
             s = (
-                    self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                    + " .\\\n"
-                    + " " * (indent + 3)
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
             )
         rm_str = self.record_map.__repr__()
         rm_str = re.sub("\n", "\n   ", rm_str)
         s = s + "convert_record(" + rm_str
         if len(self.sources) > 1:
             s = s + (
-                    "\n,   blocks_out_table="
-                    + self.sources[1].to_python_implementation(
-                indent=indent + 3, strict=strict
-            )
+                "\n,   blocks_out_table="
+                + self.sources[1].to_python_implementation(
+                    indent=indent + 3, strict=strict
+                )
             )
         s = s + ")"
         return s
@@ -1621,15 +1657,15 @@ class Extend(PipeStep):
 
     def __repr__(self):
         return (
-                "Extend("
-                + self._ops.__repr__()
-                + ", partition_by="
-                + self.partition_by.__repr__()
-                + ", order_by="
-                + self.order_by.__repr__()
-                + ", reverse="
-                + self.reverse.__repr__()
-                + ")"
+            "Extend("
+            + self._ops.__repr__()
+            + ", partition_by="
+            + self.partition_by.__repr__()
+            + ", order_by="
+            + self.order_by.__repr__()
+            + ", reverse="
+            + self.reverse.__repr__()
+            + ")"
         )
 
     def __str__(self):
@@ -1660,11 +1696,11 @@ class Project(PipeStep):
 
     def __repr__(self):
         return (
-                "Project("
-                + self._ops.__repr__()
-                + ", group_by="
-                + self.group_by.__repr__()
-                + ")"
+            "Project("
+            + self._ops.__repr__()
+            + ", group_by="
+            + self.group_by.__repr__()
+            + ")"
         )
 
     def __str__(self):
@@ -1788,11 +1824,11 @@ class OrderRows(PipeStep):
 
     def __repr__(self):
         return (
-                "OrderRows("
-                + self.order_columns.__repr__()
-                + ", reverse="
-                + self.reverse.__repr__()
-                + ")"
+            "OrderRows("
+            + self.order_columns.__repr__()
+            + ", reverse="
+            + self.reverse.__repr__()
+            + ")"
         )
 
     def __str__(self):
@@ -1847,14 +1883,14 @@ class NaturalJoin(PipeStep):
 
     def __repr__(self):
         return (
-                "NaturalJoin("
-                + "b="
-                + self._b.__repr__()
-                + ", by="
-                + self._by.__repr__()
-                + ", jointype="
-                + self._jointype.__repr__()
-                + ")"
+            "NaturalJoin("
+            + "b="
+            + self._b.__repr__()
+            + ", by="
+            + self._by.__repr__()
+            + ", jointype="
+            + self._jointype.__repr__()
+            + ")"
         )
 
     def __str__(self):
@@ -1878,13 +1914,13 @@ class ConvertRecords(PipeStep):
 
     def __repr__(self):
         return (
-                "ConvertRecords("
-                + self.record_map.__repr__()
-                + ", record_map="
-                + self.record_map.__repr__()
-                + ", blocks_out_table="
-                + self.blocks_out_table.__repr__()
-                + ")"
+            "ConvertRecords("
+            + self.record_map.__repr__()
+            + ", record_map="
+            + self.record_map.__repr__()
+            + ", blocks_out_table="
+            + self.blocks_out_table.__repr__()
+            + ")"
         )
 
     def __str__(self):

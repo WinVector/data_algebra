@@ -1,5 +1,3 @@
-
-
 def flow_text(tokens, *, align_right=70, sep_width=1):
     """
 
@@ -14,15 +12,15 @@ def flow_text(tokens, *, align_right=70, sep_width=1):
     working = []
     for i in range(len(tokens)):
         li = len(tokens[i])
-        if (len(working)>0) and ((length + sep_width + li)>align_right):
+        if (len(working) > 0) and ((length + sep_width + li) > align_right):
             flowed.append(working)
             length = 0
             working = []
-        if len(working)>0:
+        if len(working) > 0:
             length = length + sep_width
         length = length + li
         working.append(tokens[i])
-    if len(working)>0:
+    if len(working) > 0:
         flowed.append(working)
 
     return flowed

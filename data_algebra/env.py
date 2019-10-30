@@ -91,7 +91,8 @@ def populate_specials(*, column_defs, destination, user_values=None):
     nd = column_defs.copy()
     ns = SimpleNamespaceDict(**nd)
     # makes these symbols available for parsing step
-    # alter here, expr_rep pd_formatters, expr_rep @-defs, and pandas_model pandas_eval_env in parallel to extend functionality
+    # alter env populate_specials, expr_rep pd_formatters, expr_rep @-defs,
+    # and pandas_model pandas_eval_env in parallel to extend functionality
     destination["_"] = ns
     destination["_get"] = lambda key: user_values[key]
     # TODO: check on parsing of underbar forms with non-under par op (are they rendered as or regular
@@ -102,5 +103,6 @@ def populate_specials(*, column_defs, destination, user_values=None):
         op="ngroup", args=[]
     )
     destination["_size"] = lambda: data_algebra.expr_rep.Expression(op="size", args=[])
-    destination["connected_components"] = lambda f, g: data_algebra.expr_rep.Expression(op="connected_components",
-                                                                                         args=[f, g])
+    destination["connected_components"] = lambda f, g: data_algebra.expr_rep.Expression(
+        op="connected_components", args=[f, g]
+    )

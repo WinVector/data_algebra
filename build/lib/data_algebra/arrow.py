@@ -1,4 +1,3 @@
-
 import data_algebra.data_ops
 import data_algebra.flow_text
 
@@ -43,11 +42,15 @@ class DataOpArrow(Arrow):
         t_used = pipeline.get_tables()
         if free_table_key is None:
             if len(t_used) != 1:
-                raise ValueError("pipeline must use exactly one table if free_table_key is not specified")
+                raise ValueError(
+                    "pipeline must use exactly one table if free_table_key is not specified"
+                )
             free_table_key = [k for k in t_used.keys()][0]
         else:
             if free_table_key not in t_used.keys():
-                raise ValueError("free_table_key must be a table key used in the pipeline")
+                raise ValueError(
+                    "free_table_key must be a table key used in the pipeline"
+                )
         c_used = pipeline.columns_used()
         self.free_table_key = free_table_key
         self.incoming_columns = c_used[free_table_key]
@@ -72,21 +75,36 @@ class DataOpArrow(Arrow):
                 # extra columns, in a strict categorical formulation we would
                 # reject this. instead insert a select columns node to get the match
                 x_outgoing_types = X.outgoing_types
-                X = DataOpArrow(X.pipeline.select_columns([c for c in self.incoming_columns]))
+                X = DataOpArrow(
+                    X.pipeline.select_columns([c for c in self.incoming_columns])
+                )
                 if x_outgoing_types is not None:
-                    X.outgoing_types = {k: x_outgoing_types[k] for k in X.outgoing_columns}
+                    X.outgoing_types = {
+                        k: x_outgoing_types[k] for k in X.outgoing_columns
+                    }
             # check categorical arrow composition conditions
             if set(self.incoming_columns) != set(X.outgoing_columns):
-                raise ValueError("arrow composition conditions not met (incoming column set doesn't match outgoing)")
+                raise ValueError(
+                    "arrow composition conditions not met (incoming column set doesn't match outgoing)"
+                )
             if (self.incoming_types is not None) and (X.outgoing_types is not None):
                 for c in self.incoming_columns:
                     st = self.incoming_types[c]
                     xt = X.outgoing_types[c]
                     if st != xt:
-                        raise ValueError("column " + c +
-                                         " self incoming type is " + str(st) +
-                                         ", while X outgoing type is " + str(xt))
-            res = DataOpArrow(X.pipeline.stand_in_for_table(ops=self.pipeline, table_key=self.free_table_key))
+                        raise ValueError(
+                            "column "
+                            + c
+                            + " self incoming type is "
+                            + str(st)
+                            + ", while X outgoing type is "
+                            + str(xt)
+                        )
+            res = DataOpArrow(
+                X.pipeline.stand_in_for_table(
+                    ops=self.pipeline, table_key=self.free_table_key
+                )
+            )
             res.incoming_types = X.incoming_types
             res.outgoing_types = self.outgoing_types
             return res
@@ -104,9 +122,14 @@ class DataOpArrow(Arrow):
                     st = self.incoming_types[c]
                     xt = X[c]
                     if st != xt:
-                        raise ValueError("column " + c +
-                                         " self incoming type is " + str(st) +
-                                         ", while X outgoing type is " + str(xt))
+                        raise ValueError(
+                            "column "
+                            + c
+                            + " self incoming type is "
+                            + str(st)
+                            + ", while X outgoing type is "
+                            + str(xt)
+                        )
             return self.cod()
         # assume a pandas.DataFrame compatible object
         cols = set(X.columns)
@@ -154,31 +177,44 @@ class DataOpArrow(Arrow):
         return self.outgoing_columns.copy()
 
     def __repr__(self):
-        return "DataOpArrow(\n " + self.pipeline.__repr__() + \
-               ",\n free_table_key=" + self.free_table_key.__repr__() + ")"
+        return (
+            "DataOpArrow(\n "
+            + self.pipeline.__repr__()
+            + ",\n free_table_key="
+            + self.free_table_key.__repr__()
+            + ")"
+        )
 
     def __str__(self):
         align_right = 70
         sep_width = 2
         if self.incoming_types is not None:
-            in_rep = [str(k) + ': ' + str(v) for (k, v) in self.incoming_types.items()]
+            in_rep = [str(k) + ": " + str(v) for (k, v) in self.incoming_types.items()]
         else:
             in_rep = [str(c) for c in self.incoming_columns]
-        in_rep = data_algebra.flow_text.flow_text(in_rep,
-                                                  align_right=align_right, sep_width=sep_width)
-        in_rep = [', '.join(line) for line in in_rep]
-        in_rep = ' [ ' + ',\n    '.join(in_rep) + ' ]'
+        in_rep = data_algebra.flow_text.flow_text(
+            in_rep, align_right=align_right, sep_width=sep_width
+        )
+        in_rep = [", ".join(line) for line in in_rep]
+        in_rep = " [ " + ",\n    ".join(in_rep) + " ]"
         if self.outgoing_types is not None:
-            out_rep = [str(k) + ': ' + str(v) for (k, v) in self.outgoing_types.items()]
+            out_rep = [str(k) + ": " + str(v) for (k, v) in self.outgoing_types.items()]
         else:
             out_rep = [str(c) for c in self.outgoing_columns]
-        out_rep = data_algebra.flow_text.flow_text(out_rep,
-                                                   align_right=align_right, sep_width=sep_width)
-        out_rep = [', '.join(line) for line in out_rep]
-        out_rep = ' [ ' + ',\n    '.join(out_rep) + ' ]'
-        return "[\n " + \
-               self.free_table_key.__repr__() + ":\n " + \
-               in_rep + "\n   ->\n " + out_rep + "\n]\n"
+        out_rep = data_algebra.flow_text.flow_text(
+            out_rep, align_right=align_right, sep_width=sep_width
+        )
+        out_rep = [", ".join(line) for line in out_rep]
+        out_rep = " [ " + ",\n    ".join(out_rep) + " ]"
+        return (
+            "[\n "
+            + self.free_table_key.__repr__()
+            + ":\n "
+            + in_rep
+            + "\n   ->\n "
+            + out_rep
+            + "\n]\n"
+        )
 
 
 def identity_arrow(obj):

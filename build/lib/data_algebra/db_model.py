@@ -7,7 +7,8 @@ import pandas
 import data_algebra.expr_rep
 import data_algebra.data_ops
 import data_algebra.util
-#import data_algebra.cdata
+
+# import data_algebra.cdata
 
 
 # map from op-name to special SQL formatting code
@@ -74,10 +75,8 @@ db_expr_formatters = {
     "if_else": _db_if_else_expr,
 }
 
-db_default_op_replacements = {
-    "==": "=",
-    "cumsum": "sum"
-}
+db_default_op_replacements = {"==": "=", "cumsum": "sum"}
+
 
 class DBModel:
     """A model of how SQL should be generated for a given database.

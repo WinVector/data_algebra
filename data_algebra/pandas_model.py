@@ -1,4 +1,3 @@
-
 import numpy
 import pandas
 
@@ -15,8 +14,12 @@ pandas_eval_env = {
     "is_null": lambda x: pandas.isnull(x),
     "is_bad": data_algebra.util.is_bad,
     "if_else": lambda c, x, y: numpy.where(c, x, y),
-    "co_equalizer": lambda f, g: data_algebra.connected_components.connected_components(f, g),
-    "connected_components": lambda f, g: data_algebra.connected_components.connected_components(f, g),
+    "co_equalizer": lambda f, g: data_algebra.connected_components.connected_components(
+        f, g
+    ),
+    "connected_components": lambda f, g: data_algebra.connected_components.connected_components(
+        f, g
+    ),
 }
 
 
@@ -61,7 +64,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self
         )
-        standin_name = '_data_algebra_temp_g'  # name of an arbitrary input variable
+        standin_name = "_data_algebra_temp_g"  # name of an arbitrary input variable
         if not window_situation:
             for (k, opk) in op.ops.items():
                 op_src = opk.to_pandas()
@@ -146,16 +149,20 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self
         )
-        res['_data_table_temp_col'] = 1
+        res["_data_table_temp_col"] = 1
         if len(op.group_by) > 0:
             res = res.groupby(op.group_by)
         if len(op.ops) > 0:
-            cols = {k: (res[str(opk.args[0])].agg(opk.op) if
-                        len(opk.args) > 0 else
-                        res['_data_table_temp_col'].agg(opk.op))
-                    for (k, opk) in op.ops.items()}
+            cols = {
+                k: (
+                    res[str(opk.args[0])].agg(opk.op)
+                    if len(opk.args) > 0
+                    else res["_data_table_temp_col"].agg(opk.op)
+                )
+                for (k, opk) in op.ops.items()
+            }
         else:
-            cols = {'_data_table_temp_col': res['_data_table_temp_col'].agg('sum')}
+            cols = {"_data_table_temp_col": res["_data_table_temp_col"].agg("sum")}
 
         # agg can return scalars, which then can't be made into a pandas.DataFrame
         def promote_scalar(v):
@@ -170,8 +177,8 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = self.columns_to_frame(cols).reset_index(
             drop=len(op.group_by) < 1
         )  # grouping variables in the index
-        if '_data_table_temp_col' in res.columns:
-            res = res.drop('_data_table_temp_col', 1)
+        if "_data_table_temp_col" in res.columns:
+            res = res.drop("_data_table_temp_col", 1)
         return res
 
     def select_rows_step(self, op, *, data_map, eval_env):
@@ -217,7 +224,9 @@ class PandasModel(data_algebra.data_model.DataModel):
         ascending = [
             False if ci in set(op.reverse) else True for ci in op.order_columns
         ]
-        res = res.sort_values(by=op.order_columns, ascending=ascending).reset_index(drop=True)
+        res = res.sort_values(by=op.order_columns, ascending=ascending).reset_index(
+            drop=True
+        )
         return res
 
     def rename_columns_step(self, op, *, data_map, eval_env):
@@ -235,9 +244,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         if not isinstance(jointype, str):
             raise TypeError("expected jointype to be a string")
         jointype = jointype.lower()
-        mp = {
-            'full': 'outer'
-        }
+        mp = {"full": "outer"}
         try:
             return mp[jointype]
         except KeyError:

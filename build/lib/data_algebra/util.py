@@ -119,7 +119,6 @@ def equivalent_frames(
     return True
 
 
-
 def table_is_keyed_by_columns(table, column_names):
     # check for ill-condition
     if isinstance(column_names, str):
