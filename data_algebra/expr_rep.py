@@ -22,13 +22,13 @@ class Term:
 
     # builders
 
-    def __op_expr__(self, op, other):
+    def __op_expr__(self, op, other, *, inline=True):
         """binary expression"""
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
         if not isinstance(other, Term):
             other = Value(other)
-        return Expression(op, (self, other), inline=True)
+        return Expression(op, (self, other), inline=inline)
 
     def __rop_expr__(self, op, other):
         """reversed binary expression"""
@@ -671,6 +671,9 @@ class Term:
     def if_else(self, x, y):
         return self.__triop_expr__("if_else", x, y)
 
+    def co_equalizer(self, x):
+        return self.__op_expr__("co_equalizer", x, inline=False)
+
 
 class Value(Term):
     def __init__(self, value):
@@ -722,14 +725,19 @@ py_formatters = {
 pd_formatters = {
     "is_bad": lambda expr: "@is_bad(" + expr.args[0].to_pandas() + ")",
     "is_null": lambda expr: "@is_null(" + expr.args[0].to_pandas() + ")",
-    "if_else": lambda expr: "@if_else("
-    + expr.args[0].to_pandas()
-    + ", "
-    + expr.args[1].to_pandas()
-    + ", "
-    + expr.args[2].to_pandas()
-    + ")",
+    "if_else": lambda expr: ("@if_else("
+        + expr.args[0].to_pandas()
+        + ", "
+        + expr.args[1].to_pandas()
+        + ", "
+        + expr.args[2].to_pandas()
+        + ")"),
     "neg": lambda expr: "-" + expr.args[0].to_pandas(want_inline_parens=True),
+    "co_equalizer": lambda expr: ("@co_equalizer("
+                                  + expr.args[0].to_pandas()
+                                  + ", "
+                                  + expr.args[1].to_pandas()
+                                  + ")"),
 }
 
 

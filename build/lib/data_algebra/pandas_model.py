@@ -1,3 +1,4 @@
+
 import numpy
 import pandas
 
@@ -6,12 +7,14 @@ import data_algebra.util
 import data_algebra.data_model
 import data_algebra.expr_rep
 import data_algebra.data_ops
+import data_algebra.connected_components
 
 
 pandas_eval_env = {
     "is_null": lambda x: pandas.isnull(x),
     "is_bad": data_algebra.util.is_bad,
     "if_else": lambda c, x, y: numpy.where(c, x, y),
+    "co_equalizer": lambda f, g: data_algebra.connected_components.connected_components(f, g),
 }
 
 
@@ -226,7 +229,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         return res.rename(columns=op.reverse_mapping)
 
     # noinspection PyMethodMayBeStatic
-    def standarardize_join_code(self, jointype):
+    def standardize_join_code(self, jointype):
         if not isinstance(jointype, str):
             raise TypeError("expected jointype to be a string")
         jointype = jointype.lower()
@@ -256,7 +259,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = pandas.merge(
             left=left,
             right=right,
-            how=self.standarardize_join_code(op.jointype),
+            how=self.standardize_join_code(op.jointype),
             on=op.by,
             sort=False,
             suffixes=("", "_tmp_right_col"),
