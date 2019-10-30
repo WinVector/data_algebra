@@ -89,7 +89,7 @@ def partitioned_eval(fn, fn_columns, partition_columns):
         ni = len(indexs)
         fn_cols_i = [[fn_columns[j][indexs[i]] for i in range(ni)] for j in range(arity)]
         # call function on slice
-        hi = fn(fn_cols_i)
+        hi = fn(*fn_cols_i)
         # copy back result
         for i in range(ni):
             res[indexs[i]] = hi[i]
@@ -106,8 +106,5 @@ def partitioned_connected_components(f, g, partition_ids):
     :return:
     """
 
-    def fn(fn_columns):
-        return connected_components(fn_columns[0], fn_columns[1])
-
-    res = partitioned_eval(fn, [f, g], [partition_ids])
+    res = partitioned_eval(connected_components, [f, g], [partition_ids])
     return res

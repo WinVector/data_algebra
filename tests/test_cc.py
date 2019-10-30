@@ -13,6 +13,7 @@ def test_cc():
     expect = [1, 4, 1, 1, 1]
     assert res == expect
 
+
 def test_cc_partitioned():
     f = [1, 4, 6, 2, 1]
     g = [2, 5, 7, 3, 7]
