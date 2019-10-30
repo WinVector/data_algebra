@@ -52,7 +52,7 @@ data_algebra/cdata.py                    231     77    67%
 data_algebra/cdata_impl.py                14      1    93%
 data_algebra/connected_components.py      22      2    91%
 data_algebra/dask_model.py               123     23    81%
-data_algebra/data_model.py                41     15    63%
+data_algebra/data_model.py                42     15    64%
 data_algebra/data_ops.py                1133    263    77%
 data_algebra/data_types.py                43     19    56%
 data_algebra/datatable_model.py          131     81    38%
@@ -66,7 +66,7 @@ data_algebra/pandas_model.py             163     25    85%
 data_algebra/util.py                      96     11    89%
 data_algebra/yaml.py                     121     15    88%
 ----------------------------------------------------------
-TOTAL                                   3468    940    73%
+TOTAL                                   3469    940    73%
 
 
-========================== 47 passed in 9.54 seconds ===========================
+========================== 47 passed in 12.36 seconds ==========================

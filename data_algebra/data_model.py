@@ -21,20 +21,19 @@ class DataModel:
         if window_situation:
             # check these are forms we are prepared to work with
             for (k, opk) in op.ops.items():
-                if len(opk.args) > 1:
-                    raise ValueError(
-                        "non-trivial window expression: " + str(k) + ": " + str(opk)
-                    )
-                if len(opk.args) == 1:
-                    if not isinstance(
-                        opk.args[0], data_algebra.expr_rep.ColumnReference
-                    ):
-                        raise ValueError(
-                            "window expression argument must be a column: "
-                            + str(k)
-                            + ": "
-                            + str(opk)
-                        )
+                if len(opk.args) > 0:
+                    if len(opk.args) > 1:
+                        raise ValueError("window function with more than one argument")
+                    for i in range(len(opk.args)):
+                        if not isinstance(
+                            opk.args[0], data_algebra.expr_rep.ColumnReference
+                        ):
+                            raise ValueError(
+                                "window expression argument must be a column: "
+                                + str(k)
+                                + ": "
+                                + str(opk)
+                            )
 
     def extend_step(self, op, *, data_map, eval_env):
         raise NotImplementedError("base method called")
