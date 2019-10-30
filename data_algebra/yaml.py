@@ -5,9 +5,12 @@ import data_algebra
 import data_algebra.data_ops
 import data_algebra.cdata_impl
 
+have_yaml = False
 try:
     # noinspection PyUnresolvedReferences
     import yaml  # supplied by PyYAML
+
+    have_yaml = True
 except ImportError:
     pass
 
@@ -20,7 +23,7 @@ except ImportError:
 def fix_ordered_dict_yaml_rep():
     """Writer OrderedDict as simple structure"""
     # derived from: https://stackoverflow.com/a/16782282/6901725
-    if not data_algebra.have_yaml:
+    if not have_yaml:
         raise RuntimeError("yaml/PyYAML not installed")
 
     def represent_ordereddict(dumper, data):
@@ -173,7 +176,7 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
 def check_op_round_trip(o):
     if not isinstance(o, data_algebra.data_ops.ViewRepresentation):
         raise TypeError("expect o to be a data_algebra.data_ops.ViewRepresentation")
-    if not data_algebra.have_yaml:
+    if not have_yaml:
         raise RuntimeError("yaml/PyYAML not installed")
     strr = o.to_python(strict=True, pretty=False)
     strp = o.to_python(strict=True, pretty=True)

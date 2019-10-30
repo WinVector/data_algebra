@@ -1,3 +1,5 @@
+
+
 have_graphviz = False
 try:
     # noinspection PyUnresolvedReferences
@@ -6,6 +8,7 @@ try:
     have_graphviz = True
 except ImportError:
     have_graphviz = False
+
 
 have_black = False
 try:
@@ -23,6 +26,7 @@ import data_algebra.data_ops
 def _get_op_str(op):
     op_str = op.to_python_implementation(print_sources=False)
     if have_black:
+        # noinspection PyBroadException
         try:
             black_mode = black.FileMode(line_length=60)
             op_str = black.format_str(op_str, mode=black_mode)

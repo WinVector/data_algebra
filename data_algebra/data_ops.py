@@ -16,17 +16,26 @@ import data_algebra.datatable_model
 import data_algebra.expr_rep
 import data_algebra.env
 
+
+have_black = False
 try:
     # noinspection PyUnresolvedReferences
     import black
+
+    have_black = True
 except ImportError:
     pass
 
+
+have_sqlparse = False
 try:
     # noinspection PyUnresolvedReferences
     import sqlparse
+
+    have_sqlparse = True
 except ImportError:
     pass
+
 
 op_list = [
     "extend",
@@ -232,7 +241,7 @@ class ViewRepresentation(OperatorPlatform):
             indent=indent, strict=strict, print_sources=True
         )
         if pretty:
-            if data_algebra.have_black:
+            if have_black:
                 try:
                     if black_mode is None:
                         black_mode = black.FileMode()
@@ -265,7 +274,7 @@ class ViewRepresentation(OperatorPlatform):
         sql_str = self.to_sql_implementation(
             db_model=db_model, using=None, temp_id_source=temp_id_source
         )
-        if pretty and data_algebra.have_sqlparse:
+        if pretty and have_sqlparse:
             try:
                 sql_str = sqlparse.format(sql_str, encoding=encoding, **sqlparse_options)
             except Exception:
@@ -622,7 +631,7 @@ class TableDescription(ViewRepresentation):
         sql_str = self.to_sql_implementation(
             db_model=db_model, using=None, temp_id_source=temp_id_source, force_sql=True
         )
-        if pretty and data_algebra.have_sqlparse:
+        if pretty and have_sqlparse:
             sql_str = sqlparse.format(sql_str, encoding=encoding, **sqlparse_options)
         return sql_str
 

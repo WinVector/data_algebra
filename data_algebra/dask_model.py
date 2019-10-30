@@ -3,12 +3,15 @@ import data_algebra.data_ops
 import data_algebra.pandas_model
 
 
+have_dask = False
 try:
     # noinspection PyUnresolvedReferences
     import dask
 
     # noinspection PyUnresolvedReferences
     import dask.dataframe
+
+    have_dask = True
 except ImportError:
     pass
 
