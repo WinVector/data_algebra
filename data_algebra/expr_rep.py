@@ -805,6 +805,7 @@ class Expression(Term):
             if len(args) != 2:
                 raise ValueError("must have two arguments if inline is True")
         self.op = op
+        # TODO: deal with lists, functions and values here (test through test_cc.py)
         self.args = args
         self.params = params
         self.inline = inline
