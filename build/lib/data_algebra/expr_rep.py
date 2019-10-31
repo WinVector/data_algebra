@@ -1,9 +1,9 @@
-
 from typing import Union
 import collections
 
 import data_algebra.util
 import data_algebra.env
+
 
 # for some ideas in capturing expressions in Python see:
 #  scipy
@@ -18,7 +18,7 @@ class Term:
 
     source_string: Union[str, None]
 
-    def __init__(self,):
+    def __init__(self, ):
         self.source_string = None
 
     # builders
@@ -687,7 +687,7 @@ class Value(Term):
     def replace_view(self, view):
         return self
 
-    def to_python(self, want_inline_parens=False):
+    def to_python(self, *, want_inline_parens=False):
         return self.value.__repr__()
 
 
@@ -701,7 +701,7 @@ class FnTerm(Term):
     def replace_view(self, view):
         return self
 
-    def to_python(self, want_inline_parens=False):
+    def to_python(self, *, want_inline_parens=False):
         return self.value.__name__
 
 
@@ -713,10 +713,18 @@ class ListTerm(Term):
         Term.__init__(self)
 
     def replace_view(self, view):
-        return self
+        new_list = [ai.replace_view(view) for ai in self.value]
+        return ListTerm(new_list)
 
-    def to_python(self, want_inline_parens=False):
-        return self.value.__name__
+    def to_python(self, *, want_inline_parens=False):
+        return ('['
+                + ', '.join([ai.to_python(want_inline_parens=want_inline_parens) for ai in self.value])
+                + ']')
+
+    def to_pandas(self, *, want_inline_parens=False):
+        return ('['
+                + ', '.join([ai.to_pandas(want_inline_parens=want_inline_parens) for ai in self.value])
+                + ']')
 
     def get_column_names(self, columns_seen):
         for ti in self.value:
@@ -780,21 +788,21 @@ pd_formatters = {
     "is_bad": lambda expr: "@is_bad(" + expr.args[0].to_pandas() + ")",
     "is_null": lambda expr: "@is_null(" + expr.args[0].to_pandas() + ")",
     "if_else": lambda expr: (
-        "@if_else("
-        + expr.args[0].to_pandas()
-        + ", "
-        + expr.args[1].to_pandas()
-        + ", "
-        + expr.args[2].to_pandas()
-        + ")"
+            "@if_else("
+            + expr.args[0].to_pandas()
+            + ", "
+            + expr.args[1].to_pandas()
+            + ", "
+            + expr.args[2].to_pandas()
+            + ")"
     ),
     "neg": lambda expr: "-" + expr.args[0].to_pandas(want_inline_parens=True),
     "co_equalizer": lambda expr: (
-        "@co_equalizer("
-        + expr.args[0].to_pandas()
-        + ", "
-        + expr.args[1].to_pandas()
-        + ")"
+            "@co_equalizer("
+            + expr.args[0].to_pandas()
+            + ", "
+            + expr.args[1].to_pandas()
+            + ")"
     ),
     "connected_components": connected_components,
     "partitioned_eval": lambda expr: (
@@ -810,7 +818,6 @@ pd_formatters = {
             + ")"
     ),
 }
-
 
 r_formatters = {"neg": lambda expr: "-" + expr.args[0].to_R(want_inline_parens=True)}
 
@@ -865,7 +872,7 @@ class Expression(Term):
             return "_" + self.op + "()"
         if len(self.args) == 1:
             return (
-                self.op + "(" + self.args[0].to_pandas(want_inline_parens=False) + ")"
+                    self.op + "(" + self.args[0].to_pandas(want_inline_parens=False) + ")"
             )
         subs = [ai.to_pandas(want_inline_parens=True) for ai in self.args]
         if len(subs) == 2 and self.inline:
@@ -882,7 +889,7 @@ class Expression(Term):
             return self.op + "()"
         if len(self.args) == 1:
             return (
-                self.op + "(" + self.args[0].to_pandas(want_inline_parens=False) + ")"
+                    self.op + "(" + self.args[0].to_pandas(want_inline_parens=False) + ")"
             )
         subs = [ai.to_pandas(want_inline_parens=True) for ai in self.args]
         if len(subs) == 2 and self.inline:
