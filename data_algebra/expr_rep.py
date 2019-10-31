@@ -1,3 +1,4 @@
+
 from typing import Union
 import collections
 
@@ -27,7 +28,7 @@ class Term:
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
         if not isinstance(other, Term):
-            other = Value(other)
+            other = _enc_value(other)
         return Expression(op, (self, other), inline=inline, method=method)
 
     def __rop_expr__(self, op, other):
@@ -35,7 +36,7 @@ class Term:
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
         if not isinstance(other, Term):
-            other = Value(other)
+            other = _enc_value(other)
         return Expression(op, (other, self), inline=True)
 
     def __uop_expr__(self, op, *, params=None):
@@ -49,9 +50,9 @@ class Term:
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
         if not isinstance(x, Term):
-            x = Value(x)
+            x = _enc_value(x)
         if not isinstance(y, Term):
-            y = Value(y)
+            y = _enc_value(y)
         return Expression(op, (self, x, y), inline=inline, method=method)
 
     # tree re-write
@@ -690,6 +691,48 @@ class Value(Term):
         return self.value.__repr__()
 
 
+class FnTerm(Term):
+    def __init__(self, value):
+        if not callable(value):
+            raise TypeError("value type must be callable")
+        self.value = value
+        Term.__init__(self)
+
+    def replace_view(self, view):
+        return self
+
+    def to_python(self, want_inline_parens=False):
+        return self.value.__name__
+
+
+class ListTerm(Term):
+    def __init__(self, value):
+        if not isinstance(value, list):
+            raise TypeError("value type must be a list")
+        self.value = value
+        Term.__init__(self)
+
+    def replace_view(self, view):
+        return self
+
+    def to_python(self, want_inline_parens=False):
+        return self.value.__name__
+
+    def get_column_names(self, columns_seen):
+        for ti in self.value:
+            ti.get_column_names(ti)
+
+
+def _enc_value(value):
+    if isinstance(value, Term):
+        return value
+    if callable(value):
+        return FnTerm(value)
+    if isinstance(value, list):
+        return ListTerm(value)
+    return Value(value)
+
+
 class ColumnReference(Term):
     """class to represent referring to a column"""
 
@@ -727,10 +770,10 @@ py_formatters = {
 
 def connected_components(expr):
     return ("@connected_components("
-        + expr.args[0].to_pandas()
-        + ", "
-        + expr.args[1].to_pandas()
-        + ")")
+            + expr.args[0].to_pandas()
+            + ", "
+            + expr.args[1].to_pandas()
+            + ")")
 
 
 pd_formatters = {
@@ -756,43 +799,20 @@ pd_formatters = {
     "connected_components": connected_components,
     "partitioned_eval": lambda expr: (
             "@partitioned_eval("
-            # expr.args[0] is a function
-            + '@' + expr.args[0].__name__
+            # expr.args[0] is a FnTerm
+            + '@' + expr.args[0].to_pandas()
             + ", "
-            # expr.args[1] is a list of args
-            + '[' + ', '.join([ei.to_pandas() for ei in expr.args[1]]) + ']'
+            # expr.args[1] is a ListTerm
+            + '[' + ', '.join([ei.to_pandas() for ei in expr.args[1].value]) + ']'
             + ", "
-            # expr.args[2] is a list of args
-            + '[' + ', '.join([ei.to_pandas() for ei in expr.args[2]]) + ']'
+            # expr.args[2] is a ListTerm
+            + '[' + ', '.join([ei.to_pandas() for ei in expr.args[2].value]) + ']'
             + ")"
     ),
-
 }
 
 
 r_formatters = {"neg": lambda expr: "-" + expr.args[0].to_R(want_inline_parens=True)}
-
-
-# obj may not be of type Expression
-def _get_column_names(obj, columns_seen):
-    if isinstance(obj, Term):
-        # back to object methods path
-        obj.get_column_names(columns_seen)
-        return
-    if isinstance(obj, list):
-        for b in obj:
-            _get_column_names(b, columns_seen)
-        return
-
-
-# obj may not be of type Expression
-def _to_python(obj, *, want_inline_parens=False):
-    if callable(obj):
-        return obj.__name__
-    if isinstance(obj, Term):
-        # back to object methods path
-        return obj.to_python(want_inline_parens=want_inline_parens)
-    return str(obj)
 
 
 class Expression(Term):
@@ -805,8 +825,7 @@ class Expression(Term):
             if len(args) != 2:
                 raise ValueError("must have two arguments if inline is True")
         self.op = op
-        # TODO: deal with lists, functions and values here (test through test_cc.py)
-        self.args = args
+        self.args = [_enc_value(ai) for ai in args]
         self.params = params
         self.inline = inline
         self.method = method
@@ -820,12 +839,12 @@ class Expression(Term):
 
     def get_column_names(self, columns_seen):
         for a in self.args:
-            _get_column_names(a, columns_seen)
+            a.get_column_names(columns_seen)
 
     def to_python(self, *, want_inline_parens=False):
         if self.op in py_formatters.keys():
             return py_formatters[self.op](self)
-        subs = [_to_python(ai, want_inline_parens=True) for ai in self.args]
+        subs = [ai.to_python(want_inline_parens=True) for ai in self.args]
         if len(subs) <= 0:
             return "_" + self.op + "()"
         if len(subs) == 1:
@@ -897,7 +916,7 @@ def _parse_by_eval(source_str, *, data_def, outter_environemnt=None):
         source_str, outter_environemnt, data_def
     )  # eval is eval(source, globals, locals)- so mp is first
     if not isinstance(v, Term):
-        v = Value(v)
+        v = _enc_value(v)
     v.source_string = source_str
     return v
 

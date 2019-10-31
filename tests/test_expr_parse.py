@@ -4,6 +4,7 @@ from data_algebra.data_ops import *
 from data_algebra.test_util import formats_to_self
 import data_algebra.util
 
+
 def test_expr_parse():
     # check some differences in back to Python versus sending to Pandas
     d = pandas.DataFrame({

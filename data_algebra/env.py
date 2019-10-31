@@ -102,7 +102,8 @@ def populate_specials(*, column_defs, destination, user_values=None):
     # and pandas_model pandas_eval_env in parallel to extend functionality
     destination["_"] = ns
     destination["_get"] = lambda key: user_values[key]
-    # TODO: check on parsing of underbar forms with non-under par op (are they rendered as or regular
+    # Note: a lot of the re-emitters add back the underbar, allow the non
+    # underbar names we see here.  See expr_rep.py Expression to_python and to_pandas.
     destination["_row_number"] = lambda: data_algebra.expr_rep.Expression(
         op="row_number", args=[]
     )
