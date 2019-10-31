@@ -22,13 +22,13 @@ class Term:
 
     # builders
 
-    def __op_expr__(self, op, other, *, inline=True):
+    def __op_expr__(self, op, other, *, inline=True, method=False):
         """binary expression"""
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
         if not isinstance(other, Term):
             other = Value(other)
-        return Expression(op, (self, other), inline=inline)
+        return Expression(op, (self, other), inline=inline, method=method)
 
     def __rop_expr__(self, op, other):
         """reversed binary expression"""
@@ -672,7 +672,7 @@ class Term:
         return self.__triop_expr__("if_else", x, y, method=True)
 
     def co_equalizer(self, x):
-        return self.__op_expr__("co_equalizer", x, inline=False)
+        return self.__op_expr__("co_equalizer", x, inline=False, method=True)
 
 
 class Value(Term):
