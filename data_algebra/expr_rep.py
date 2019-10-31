@@ -44,7 +44,7 @@ class Term:
             raise TypeError("op is supposed to be a string")
         return Expression(op, (self,), params=params)
 
-    def __triop_expr__(self, op, x, y):
+    def __triop_expr__(self, op, x, y, inline=False, method=False):
         """three argument expression"""
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
@@ -52,7 +52,7 @@ class Term:
             x = Value(x)
         if not isinstance(y, Term):
             y = Value(y)
-        return Expression(op, (self, x, y), inline=False)
+        return Expression(op, (self, x, y), inline=inline, method=method)
 
     # tree re-write
 
@@ -542,10 +542,10 @@ class Term:
         return self.__op_expr__("minimum", other)
 
     def fmax(self, other):
-        return self.__op_expr__("fmax", other)
+        return self.__op_expr__("fmax", other, inline=False)
 
     def fmin(self, other):
-        return self.__op_expr__("fmin", other)
+        return self.__op_expr__("fmin", other, inline=False)
 
     def nan_to_num(self):
         return self.__uop_expr__("nan_to_num")
@@ -669,7 +669,7 @@ class Term:
         return self.__uop_expr__("is_bad")
 
     def if_else(self, x, y):
-        return self.__triop_expr__("if_else", x, y)
+        return self.__triop_expr__("if_else", x, y, method=True)
 
     def co_equalizer(self, x):
         return self.__op_expr__("co_equalizer", x, inline=False)
@@ -796,13 +796,19 @@ def _to_python(obj, *, want_inline_parens=False):
 
 
 class Expression(Term):
-    def __init__(self, op, args, *, params=None, inline=False):
+    def __init__(self, op, args, *, params=None, inline=False, method=False):
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
+        if inline:
+            if method:
+                raise ValueError("can't set both inline and method")
+            if len(args) != 2:
+                raise ValueError("must have two arguments if inline is True")
         self.op = op
         self.args = args
         self.params = params
         self.inline = inline
+        self.method = method
         Term.__init__(self)
 
     def replace_view(self, view):
@@ -828,6 +834,8 @@ class Expression(Term):
                 return "(" + subs[0] + " " + self.op + " " + subs[1] + ")"
             else:
                 return subs[0] + " " + self.op + " " + subs[1]
+        if self.method:
+            return subs[0] + "." + self.op + "(" + ", ".join(subs[1:]) + ")"
         return self.op + "(" + ", ".join(subs) + ")"
 
     def to_pandas(self, *, want_inline_parens=False):

@@ -2,24 +2,25 @@
 platform darwin -- Python 3.6.9, pytest-5.0.1, py-1.8.0, pluggy-0.12.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.7.1
-collected 50 items
+collected 51 items
 
-tests/test_R_yaml.py .                                                   [  2%]
-tests/test_apply.py .                                                    [  4%]
-tests/test_arrow1.py .                                                   [  6%]
-tests/test_calc_warnings_errors.py .                                     [  8%]
-tests/test_cc.py .....                                                   [ 18%]
-tests/test_cdata1.py .                                                   [ 20%]
-tests/test_cdata_example.py ....                                         [ 28%]
-tests/test_cols_used.py .                                                [ 30%]
-tests/test_dask.py ..                                                    [ 34%]
-tests/test_datatable.py .                                                [ 36%]
-tests/test_drop_columns.py .                                             [ 38%]
-tests/test_example_data_ops.py .                                         [ 40%]
-tests/test_exp.py .                                                      [ 42%]
-tests/test_export_neg.py .                                               [ 44%]
-tests/test_flow_text.py .                                                [ 46%]
-tests/test_free_expr.py .                                                [ 48%]
+tests/test_R_yaml.py .                                                   [  1%]
+tests/test_apply.py .                                                    [  3%]
+tests/test_arrow1.py .                                                   [  5%]
+tests/test_calc_warnings_errors.py .                                     [  7%]
+tests/test_cc.py .....                                                   [ 17%]
+tests/test_cdata1.py .                                                   [ 19%]
+tests/test_cdata_example.py ....                                         [ 27%]
+tests/test_cols_used.py .                                                [ 29%]
+tests/test_dask.py ..                                                    [ 33%]
+tests/test_datatable.py .                                                [ 35%]
+tests/test_drop_columns.py .                                             [ 37%]
+tests/test_example_data_ops.py .                                         [ 39%]
+tests/test_exp.py .                                                      [ 41%]
+tests/test_export_neg.py .                                               [ 43%]
+tests/test_expr_parse.py .                                               [ 45%]
+tests/test_flow_text.py .                                                [ 47%]
+tests/test_free_expr.py .                                                [ 49%]
 tests/test_ghost_col_issue.py .                                          [ 50%]
 tests/test_if_else.py .                                                  [ 52%]
 tests/test_join_check.py .                                               [ 54%]
@@ -60,13 +61,14 @@ data_algebra/db_model.py                 359     80    78%
 data_algebra/diagram.py                   56     44    21%
 data_algebra/env.py                       52      7    87%
 data_algebra/expr.py                      20      4    80%
-data_algebra/expr_rep.py                 589    203    66%
+data_algebra/expr_rep.py                 597    204    66%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/pandas_model.py             165     25    85%
+data_algebra/test_util.py                  6      0   100%
 data_algebra/util.py                      96     11    89%
 data_algebra/yaml.py                     121     15    88%
 ----------------------------------------------------------
-TOTAL                                   3518    943    73%
+TOTAL                                   3532    944    73%
 
 
-========================== 50 passed in 10.06 seconds ==========================
+========================== 51 passed in 10.55 seconds ==========================
