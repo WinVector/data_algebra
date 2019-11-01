@@ -5,7 +5,9 @@ from data_algebra.data_ops import *
 import data_algebra.PostgreSQL
 from data_algebra.util import od
 import data_algebra.yaml
+from data_algebra.test_util import formats_to_self
 
+import pytest
 
 
 def test_R_yaml():
@@ -42,13 +44,40 @@ def test_project0():
         group_by=["c", "g"]
     )
 
-    res = ops.transform(d)
+    assert formats_to_self(ops)
 
+    res = ops.transform(d)
     expect = pandas.DataFrame(
         {"c": [1, 1], "g": ["a", "b"]}
     )
-
     assert data_algebra.util.equivalent_frames(expect, res)
+
+
+def test_project_z():
+    d = pandas.DataFrame(
+        {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
+    )
+
+    ops = describe_table(d, "d").project(
+        {'c': 'c.max()'}
+    )
+
+    assert formats_to_self(ops)
+
+    res = ops.transform(d)
+    expect = pandas.DataFrame(
+        {"c": [1]}
+    )
+    assert data_algebra.util.equivalent_frames(expect, res)
+
+
+def test_project_zz():
+    d = pandas.DataFrame(
+        {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
+    )
+
+    with pytest.raises(ValueError):
+        describe_table(d, "d").project()
 
 
 def test_project():

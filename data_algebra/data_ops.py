@@ -486,6 +486,8 @@ class ViewRepresentation(OperatorPlatform):
     def extend(
         self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
     ):
+        if (ops is None) or (len(ops) < 1):
+            return self
         return ExtendNode(
             source=self,
             ops=ops,
@@ -685,7 +687,7 @@ class WrappedOperatorPlatform(OperatorPlatform):
 
     def __init__(self, *, underlying, data_map):
         OperatorPlatform.__init__(self)
-        if not isinstance(underlying, OperatorPlatform):
+        if not isinstance(underlying, ViewRepresentation):
             raise TypeError("Expected underlying to be of class OperatorPlatform")
         if isinstance(underlying, WrappedOperatorPlatform):
             raise TypeError("underlying should not be a WrappedOperatorPlatform")
@@ -701,6 +703,8 @@ class WrappedOperatorPlatform(OperatorPlatform):
         tables = self.underlying.get_tables()
         data_map = self.data_map
         missing = set(tables.keys()) - set(data_map.keys())
+        if len(missing) > 0:
+            raise ValueError("missing required tables: " + str(missing))
         res = self.underlying.eval(data_map=data_map)
         return res
 
@@ -769,6 +773,8 @@ class WrappedOperatorPlatform(OperatorPlatform):
     def extend(
         self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
     ):
+        if (ops is None) or (len(ops) < 1):
+            return self
         return WrappedOperatorPlatform(
             underlying=self.underlying.extend(
                 ops=ops,
@@ -851,16 +857,17 @@ def wrap(d, *, table_name="data_frame"):
             underlying=TableDescription(
                 table_name, column_names, column_types=column_types
             ),
-            data_map={table_name: d},
+            data_map={table_name: d}
         )
     if data_algebra.data_types.is_dask_data_frame(d):
         return WrappedOperatorPlatform(
-            TableDescription(table_name, [c for c in d.columns]),
-            data_map={table_name: d},
+            underlying=TableDescription(table_name, [c for c in d.columns]),
+            data_map={table_name: d}
         )
     if data_algebra.data_types.is_datatable_frame(d):
         return WrappedOperatorPlatform(
-            TableDescription(table_name, [c for c in d.names]), data_map={table_name: d}
+            underlying=TableDescription(table_name, [c for c in d.names]),
+            data_map={table_name: d}
         )
     raise TypeError("can't wrap " + table_name + ": " + str(type(d)))
 
@@ -876,6 +883,8 @@ class ExtendNode(ViewRepresentation):
         reverse=None,
         parse_env=None
     ):
+        if ops is None:
+            ops = {}
         ops = data_algebra.expr_rep.parse_assignments_in_context(
             ops, source, parse_env=parse_env
         )
@@ -1018,7 +1027,7 @@ class ProjectNode(ViewRepresentation):
             raise ValueError("Duplicate name in group_by")
         unknown = set(group_by) - known_cols
         if len(unknown) > 0:
-            raise ValueError("unknown partition_by columns: " + str(unknown))
+            raise ValueError("unknown group_by columns: " + str(unknown))
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
 
     def columns_used_from_sources(self, using=None):

@@ -817,6 +817,16 @@ pd_formatters = {
             + '[' + ', '.join([ei.to_pandas() for ei in expr.args[2].value]) + ']'
             + ")"
     ),
+    "max": lambda expr: (
+        "@max("
+        + expr.args[0].to_pandas()
+        + ")"
+    ),
+    "min": lambda expr: (
+            "@min("
+            + expr.args[0].to_pandas()
+            + ")"
+    ),
 }
 
 r_formatters = {"neg": lambda expr: "-" + expr.args[0].to_R(want_inline_parens=True)}

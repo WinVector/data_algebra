@@ -25,6 +25,8 @@ pandas_eval_env = {
     "partitioned_eval": lambda fn, arg_columns, partition_columns:
         data_algebra.connected_components.partitioned_eval(fn, arg_columns, partition_columns
     ),
+    "max": lambda x: [numpy.max(x)] * len(x),
+    "min": lambda x: [numpy.min(x)] * len(x),
 }
 
 
