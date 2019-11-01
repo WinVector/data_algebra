@@ -121,6 +121,11 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
                 jointype=obj["jointype"],
                 b=to_pipeline(obj["b"], known_tables=known_tables, parse_env=parse_env),
             )
+        elif op == "ConcatRows":
+            return data_algebra.data_ops.ConcatRows(
+                id_column=obj["id_column"],
+                b=to_pipeline(obj["b"], known_tables=known_tables, parse_env=parse_env),
+            )
         elif op == "SelectRows":
             expr = get_char_scalar(obj, "expr")
             expr = re.sub("=+", "==", expr)

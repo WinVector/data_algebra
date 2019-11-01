@@ -22,9 +22,8 @@ pandas_eval_env = {
         f, g
     ),
     "connected_components": connected_components,
-    "partitioned_eval": lambda fn, arg_columns, partition_columns:
-        data_algebra.connected_components.partitioned_eval(fn, arg_columns, partition_columns
-    ),
+    "partitioned_eval": lambda fn, arg_columns, partition_columns: (
+        data_algebra.connected_components.partitioned_eval(fn, arg_columns, partition_columns)),
     "max": lambda x: [numpy.max(x)] * len(x),
     "min": lambda x: [numpy.min(x)] * len(x),
 }
@@ -286,6 +285,21 @@ class PandasModel(data_algebra.data_model.DataModel):
                 is_null = res[c].isnull()
                 res.loc[is_null, c] = res.loc[is_null, c + "_tmp_right_col"]
                 res = res.drop(c + "_tmp_right_col", axis=1)
+        res = res.reset_index(drop=True)
+        return res
+
+    def concat_rows_step(self, op, *, data_map, eval_env):
+        if not isinstance(op, data_algebra.data_ops.ConcatRowsNode):
+            raise TypeError(
+                "op was supposed to be a data_algebra.data_ops.ConcatRowsNode"
+            )
+        left = op.sources[0].eval_implementation(
+            data_map=data_map, eval_env=eval_env, data_model=self
+        )
+        right = op.sources[1].eval_implementation(
+            data_map=data_map, eval_env=eval_env, data_model=self
+        )
+        res = pandas.concat([left, right], axis = 0, ignore_index=True)
         res = res.reset_index(drop=True)
         return res
 

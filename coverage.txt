@@ -2,36 +2,37 @@
 platform darwin -- Python 3.6.9, pytest-5.0.1, py-1.8.0, pluggy-0.12.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.7.1
-collected 56 items
+collected 57 items
 
 tests/test_R_yaml.py .                                                   [  1%]
 tests/test_apply.py .                                                    [  3%]
 tests/test_arrow1.py .                                                   [  5%]
 tests/test_calc_warnings_errors.py .                                     [  7%]
-tests/test_cc.py .....                                                   [ 16%]
+tests/test_cc.py .....                                                   [ 15%]
 tests/test_cdata1.py .                                                   [ 17%]
-tests/test_cdata_example.py ....                                         [ 25%]
+tests/test_cdata_example.py ....                                         [ 24%]
 tests/test_cols_used.py .                                                [ 26%]
-tests/test_dask.py ..                                                    [ 30%]
-tests/test_datatable.py .                                                [ 32%]
-tests/test_drop_columns.py .                                             [ 33%]
-tests/test_example_data_ops.py .                                         [ 35%]
-tests/test_exp.py .                                                      [ 37%]
-tests/test_export_neg.py .                                               [ 39%]
-tests/test_expr_parse.py .                                               [ 41%]
-tests/test_extend.py ...                                                 [ 46%]
-tests/test_flow_text.py .                                                [ 48%]
+tests/test_concat_rows.py F                                              [ 28%]
+tests/test_dask.py ..                                                    [ 31%]
+tests/test_datatable.py .                                                [ 33%]
+tests/test_drop_columns.py .                                             [ 35%]
+tests/test_example_data_ops.py .                                         [ 36%]
+tests/test_exp.py .                                                      [ 38%]
+tests/test_export_neg.py .                                               [ 40%]
+tests/test_expr_parse.py .                                               [ 42%]
+tests/test_extend.py ...                                                 [ 47%]
+tests/test_flow_text.py .                                                [ 49%]
 tests/test_free_expr.py .                                                [ 50%]
-tests/test_ghost_col_issue.py .                                          [ 51%]
-tests/test_if_else.py .                                                  [ 53%]
-tests/test_join_check.py .                                               [ 55%]
-tests/test_join_effects.py ..                                            [ 58%]
-tests/test_math.py .                                                     [ 60%]
-tests/test_natural_join.py .                                             [ 62%]
+tests/test_ghost_col_issue.py .                                          [ 52%]
+tests/test_if_else.py .                                                  [ 54%]
+tests/test_join_check.py .                                               [ 56%]
+tests/test_join_effects.py ..                                            [ 59%]
+tests/test_math.py .                                                     [ 61%]
+tests/test_natural_join.py .                                             [ 63%]
 tests/test_neg.py .                                                      [ 64%]
 tests/test_null_bad.py .                                                 [ 66%]
-tests/test_parse.py .                                                    [ 67%]
-tests/test_project.py .....                                              [ 76%]
+tests/test_parse.py .                                                    [ 68%]
+tests/test_project.py .....                                              [ 77%]
 tests/test_scatter_example.py .                                          [ 78%]
 tests/test_scoring_example.py .                                          [ 80%]
 tests/test_select_stacking.py .                                          [ 82%]
@@ -41,6 +42,61 @@ tests/test_strat_example.py .                                            [ 94%]
 tests/test_table_is_key_by_columns.py .                                  [ 96%]
 tests/test_window2.py .                                                  [ 98%]
 tests/test_window_fns.py .                                               [100%]
+
+=================================== FAILURES ===================================
+_______________________________ test_concat_rows _______________________________
+
+    def test_concat_rows():
+        data_algebra.yaml.fix_ordered_dict_yaml_rep()
+        db_model = data_algebra.SQLite.SQLiteModel()
+    
+        d1 = pandas.DataFrame({"x": [-1, 0, 1, numpy.nan], "y": [1, 2, numpy.nan, 3]})
+    
+        d2 = pandas.DataFrame({"x": [0, 4, None], "y": [2, 7, None]})
+    
+        ops4 = describe_table(d1, "d1").concat_rows(
+            b=describe_table(d2, "d2")
+        )
+    
+        assert data_algebra.test_util.formats_to_self(ops4)
+        data_algebra.yaml.check_op_round_trip(ops4)
+    
+        res_pandas = ops4.eval_pandas(data_map={"d1": d1, "d2": d2}, eval_env=locals())
+    
+        expect = pandas.DataFrame({
+            'x': [-1.0, 0.0, 1.0, None, 0.0, 4.0, None],
+            'y': [1.0, 2.0, None, 3.0, 2.0, 7.0, None],
+            })
+    
+        assert data_algebra.util.equivalent_frames(expect, res_pandas)
+    
+>       sql = ops4.to_sql(db_model, pretty=True)
+
+tests/test_concat_rows.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+data_algebra/data_ops.py:279: in to_sql
+    db_model=db_model, using=None, temp_id_source=temp_id_source
+data_algebra/data_ops.py:1577: in to_sql_implementation
+    self, using=using, temp_id_source=temp_id_source
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <data_algebra.SQLite.SQLiteModel object at 0x321df9ba8>
+join_node = TableDescription(
+ table_name='d1',
+ column_names=[
+   'x', 'y']) .\
+   concat_rows(b=
+      TableDescription(
+       table_name='d2',
+       column_names=[
+         'x', 'y']),
+      id_column='table_name')
+
+    def concat_rows_to_sql(self, join_node, *, using=None, temp_id_source=None):
+>       raise NotImplementedError("not implemented yet")  # TODO: implement
+E       NotImplementedError: not implemented yet
+
+data_algebra/db_model.py:555: NotImplementedError
 
 ---------- coverage: platform darwin, python 3.6.9-final-0 -----------
 Name                                   Stmts   Miss  Cover
@@ -54,22 +110,21 @@ data_algebra/cdata.py                    231     77    67%
 data_algebra/cdata_impl.py                14      1    93%
 data_algebra/connected_components.py      49      3    94%
 data_algebra/dask_model.py               123     23    81%
-data_algebra/data_model.py                42     15    64%
-data_algebra/data_ops.py                1141    266    77%
+data_algebra/data_model.py                44     16    64%
+data_algebra/data_ops.py                1216    282    77%
 data_algebra/data_types.py                43     19    56%
 data_algebra/datatable_model.py          131     81    38%
-data_algebra/db_model.py                 359     80    78%
+data_algebra/db_model.py                 361     80    78%
 data_algebra/diagram.py                   56     44    21%
 data_algebra/env.py                       52      7    87%
 data_algebra/expr.py                      20      4    80%
 data_algebra/expr_rep.py                 617    206    67%
 data_algebra/flow_text.py                 17      0   100%
-data_algebra/pandas_model.py             165     25    85%
+data_algebra/pandas_model.py             173     26    85%
 data_algebra/test_util.py                  6      0   100%
 data_algebra/util.py                      96     11    89%
-data_algebra/yaml.py                     121     15    88%
+data_algebra/yaml.py                     123     15    88%
 ----------------------------------------------------------
-TOTAL                                   3560    949    73%
+TOTAL                                   3649    967    73%
 
-
-========================== 56 passed in 11.84 seconds ==========================
+===================== 1 failed, 56 passed in 10.33 seconds =====================

@@ -551,6 +551,9 @@ class DBModel:
         )
         return sql_str
 
+    def concat_rows_to_sql(self, join_node, *, using=None, temp_id_source=None):
+        raise NotImplementedError("not implemented yet")  # TODO: implement
+
     # database helpers
 
     # noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection

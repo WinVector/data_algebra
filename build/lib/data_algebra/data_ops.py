@@ -41,6 +41,7 @@ op_list = [
     "extend",
     "project",
     "natural_join",
+    "concat_rows",
     "select_rows",
     "drop_columns",
     "select_columns",
@@ -87,6 +88,9 @@ class OperatorPlatform:
         raise NotImplementedError("base class called")
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
+        raise NotImplementedError("base class called")
+
+    def concat_rows(self, b, *, id_column='table_name'):
         raise NotImplementedError("base class called")
 
     def select_rows(self, expr, parse_env=None):
@@ -507,6 +511,13 @@ class ViewRepresentation(OperatorPlatform):
             )
         return NaturalJoinNode(a=self, b=b, by=by, jointype=jointype)
 
+    def concat_rows(self, b, *, id_column='table_name'):
+        if not isinstance(b, ViewRepresentation):
+            raise TypeError(
+                "expected b to be a data_algebra.dat_ops.ViewRepresentation"
+            )
+        return ConcatRowsNode(a=self, b=b, id_column=id_column)
+
     def select_rows(self, expr, parse_env=None):
         return SelectRowsNode(source=self, expr=expr, parse_env=parse_env)
 
@@ -800,6 +811,15 @@ class WrappedOperatorPlatform(OperatorPlatform):
         data_map, b = self._reach_in(b)
         return WrappedOperatorPlatform(
             underlying=self.underlying.natural_join(b=b, by=by, jointype=jointype),
+            data_map=data_map,
+        )
+
+    def concat_rows(self, b, *, id_column='table_name'):
+        if not isinstance(b, WrappedOperatorPlatform):
+            raise TypeError("expected b to be of type WrappedOperatorPlatform")
+        data_map, b = self._reach_in(b)
+        return WrappedOperatorPlatform(
+            underlying=self.underlying.concat_rows(b=b, id_column=id_column),
             data_map=data_map,
         )
 
@@ -1400,6 +1420,7 @@ class NaturalJoinNode(ViewRepresentation):
     jointype: str
 
     def __init__(self, a, b, *, by=None, jointype="INNER"):
+        # check set of tables is consistent in both sub-dags
         a_tables = a.get_tables()
         b_tables = b.get_tables(replacements=a_tables)
         common_keys = set(a_tables.keys()).intersection(b_tables.keys())
@@ -1409,6 +1430,7 @@ class NaturalJoinNode(ViewRepresentation):
                     "Different definition of table object on a/b for: " + k
                 )
         sources = [a, b]
+        # check columns
         column_names = sources[0].column_names.copy()
         for ci in sources[1].column_names:
             if ci not in sources[0].column_set:
@@ -1424,9 +1446,9 @@ class NaturalJoinNode(ViewRepresentation):
         missing_right = by_set - b.column_set
         if len(missing_right) > 0:
             raise KeyError("right table missing join keys: " + str(missing_right))
+        ViewRepresentation.__init__(self, column_names=column_names, sources=sources)
         self.by = by
         self.jointype = data_algebra.expr_rep.standardize_join_type(jointype)
-        ViewRepresentation.__init__(self, column_names=column_names, sources=sources)
         self.get_tables()  # causes a throw if left and right table descriptions are inconsistent
 
     def columns_used_from_sources(self, using=None):
@@ -1479,6 +1501,84 @@ class NaturalJoinNode(ViewRepresentation):
 
     def eval_implementation(self, *, data_map, eval_env, data_model):
         return data_model.natural_join_step(
+            op=self, data_map=data_map, eval_env=eval_env
+        )
+
+
+class ConcatRowsNode(ViewRepresentation):
+    id_column: str
+
+    def __init__(self, a, b, *, id_column='table_name'):
+        # check set of tables is consistent in both sub-dags
+        a_tables = a.get_tables()
+        b_tables = b.get_tables(replacements=a_tables)
+        common_keys = set(a_tables.keys()).intersection(b_tables.keys())
+        for k in common_keys:
+            if a_tables[k] is not b_tables[k]:
+                raise ValueError(
+                    "Different definition of table object on a/b for: " + k
+                )
+        sources = [a, b]
+        # check columns
+        if not set(sources[0].column_names) == set(sources[1].column_names):
+            raise ValueError("a and b should have same set of column names")
+        if id_column is not None and id_column in sources[0].column_names:
+            raise ValueError("id_column should not be an input table column name")
+        column_names = sources[0].column_names.copy()
+        if id_column is not None:
+            column_names.append(id_column)
+        ViewRepresentation.__init__(self, column_names=column_names, sources=sources)
+        self.id_column = id_column
+        self.get_tables()  # causes a throw if left and right table descriptions are inconsistent
+
+    def columns_used_from_sources(self, using=None):
+        if using is None:
+            return [self.sources[i].column_set.copy() for i in range(2)]
+        return [self.sources[i].column_set.intersection(using) for i in range(2)]
+
+    def collect_representation_implementation(self, *, pipeline=None, dialect="Python"):
+        if pipeline is None:
+            pipeline = []
+        od = collections.OrderedDict()
+        od["op"] = "ConcatRows"
+        od["id_column"] = self.id_column
+        od["b"] = self.sources[1].collect_representation_implementation(dialect=dialect)
+        pipeline.insert(0, od)
+        return self.sources[0].collect_representation_implementation(
+            pipeline=pipeline, dialect=dialect
+        )
+
+    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+        s = "_0."
+        if print_sources:
+            s = (
+                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                + " .\\\n"
+                + " " * (indent + 3)
+            )
+        s = s + ("concat_rows(b=\n" + " " * (indent + 6))
+        if print_sources:
+            s = s + (
+                self.sources[1].to_python_implementation(
+                    indent=indent + 6, strict=strict
+                )
+                + ",\n"
+                + " " * (indent + 6)
+            )
+        else:
+            s = s + " _1, "
+        s = s + (
+            "id_column=" + self.id_column.__repr__() + ")"
+        )
+        return s
+
+    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+        return db_model.concat_rows_to_sql(
+            self, using=using, temp_id_source=temp_id_source
+        )
+
+    def eval_implementation(self, *, data_map, eval_env, data_model):
+        return data_model.concat_rows_step(
             op=self, data_map=data_map, eval_env=eval_env
         )
 
@@ -1899,6 +1999,38 @@ class NaturalJoin(PipeStep):
             + self._by.__repr__()
             + ", jointype="
             + self._jointype.__repr__()
+            + ")"
+        )
+
+    def __str__(self):
+        return self.__repr__()
+
+
+class ConcatRows(PipeStep):
+    _id_column: str
+    _b: OperatorPlatform
+
+    def __init__(self, *, b=None, id_column="table_name"):
+        PipeStep.__init__(self)
+        if not isinstance(b, ViewRepresentation):
+            raise TypeError("b must be a data_algebra.data_ops.ViewRepresentation")
+        self._id_column = id_column
+        self._b = b
+
+    def apply(self, other, **kwargs):
+        if not isinstance(other, OperatorPlatform):
+            raise TypeError(
+                "expected other to be a data_algebra.data_ops.OperatorPlatform"
+            )
+        return other.concat_rows(b=self._b, id_column=self._id_column)
+
+    def __repr__(self):
+        return (
+            "ConcatRows("
+            + "b="
+            + self._b.__repr__()
+            + ", id_column="
+            + self._id_column.__repr__()
             + ")"
         )
 

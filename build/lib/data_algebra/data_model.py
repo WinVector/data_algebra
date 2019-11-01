@@ -67,5 +67,8 @@ class DataModel:
     def natural_join_step(self, op, *, data_map, eval_env):
         raise NotImplementedError("base method called")
 
+    def concat_rows_step(self, op, *, data_map, eval_env):
+        raise NotImplementedError("base method called")
+
     def convert_records_step(self, op, *, data_map, eval_env):
         raise NotImplementedError("base class called")
