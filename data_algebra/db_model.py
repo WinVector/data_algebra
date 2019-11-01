@@ -551,8 +551,56 @@ class DBModel:
         )
         return sql_str
 
-    def concat_rows_to_sql(self, join_node, *, using=None, temp_id_source=None):
-        raise NotImplementedError("not implemented yet")  # TODO: implement
+    def concat_rows_to_sql(self, concat_node, *, using=None, temp_id_source=None):
+        if not isinstance(concat_node, data_algebra.data_ops.ConcatRowsNode):
+            raise TypeError(
+                "Expected join_node to be a data_algebra.data_ops.ConcatRowsNode)"
+            )
+        if temp_id_source is None:
+            temp_id_source = [0]
+        if using is None:
+            using = concat_node.column_set
+        if len(using) < 1:
+            raise ValueError("must select at least one column")
+        missing = using - concat_node.column_set
+        if len(missing) > 0:
+            raise KeyError("referred to unknown columns: " + str(missing))
+        subusing = concat_node.columns_used_from_sources(using=using)
+        using_left = subusing[0]
+        using_right = subusing[1]
+        if set(using_left) != set(using_right):
+            raise ValueError("left/right usings did not match")
+        sql_left = concat_node.sources[0].to_sql_implementation(
+            db_model=self, using=using_left, temp_id_source=temp_id_source
+        )
+        sql_right = concat_node.sources[1].to_sql_implementation(
+            db_model=self, using=using_left, temp_id_source=temp_id_source
+        )
+        sub_view_name_left = "LC_" + str(temp_id_source[0])
+        temp_id_source[0] = temp_id_source[0] + 1
+        sub_view_name_right = "RC_" + str(temp_id_source[0])
+        temp_id_source[0] = temp_id_source[0] + 1
+        left_cols_exprs = [self.quote_identifier(ci) for ci in using_left]
+        right_cols_exprs = left_cols_exprs.copy()
+        if concat_node.id_column is not None:
+            left_cols_exprs.append(self.quote_string('a') + " AS " + self.quote_identifier(concat_node.id_column))
+            right_cols_exprs.append(self.quote_string('b') + " AS " + self.quote_identifier(concat_node.id_column))
+        sql_str = (
+                "SELECT "
+                + ', '.join(left_cols_exprs)
+                + " FROM ( "
+                + sql_left
+                + " ) "
+                + self.quote_identifier(sub_view_name_left)
+                + " UNION ALL "
+                + "SELECT "
+                + ', '.join(right_cols_exprs)
+                + " FROM ( "
+                + sql_right
+                + " ) "
+                + self.quote_identifier(sub_view_name_right)
+        )
+        return sql_str
 
     # database helpers
 

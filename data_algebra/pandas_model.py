@@ -299,6 +299,9 @@ class PandasModel(data_algebra.data_model.DataModel):
         right = op.sources[1].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self
         )
+        if op.id_column is not None:
+            left[op.id_column] = 'a'
+            right[op.id_column] = 'b'
         res = pandas.concat([left, right], axis = 0, ignore_index=True)
         res = res.reset_index(drop=True)
         return res

@@ -12,7 +12,7 @@ tests/test_cc.py .....                                                   [ 15%]
 tests/test_cdata1.py .                                                   [ 17%]
 tests/test_cdata_example.py ....                                         [ 24%]
 tests/test_cols_used.py .                                                [ 26%]
-tests/test_concat_rows.py F                                              [ 28%]
+tests/test_concat_rows.py .                                              [ 28%]
 tests/test_dask.py ..                                                    [ 31%]
 tests/test_datatable.py .                                                [ 33%]
 tests/test_drop_columns.py .                                             [ 35%]
@@ -43,61 +43,6 @@ tests/test_table_is_key_by_columns.py .                                  [ 96%]
 tests/test_window2.py .                                                  [ 98%]
 tests/test_window_fns.py .                                               [100%]
 
-=================================== FAILURES ===================================
-_______________________________ test_concat_rows _______________________________
-
-    def test_concat_rows():
-        data_algebra.yaml.fix_ordered_dict_yaml_rep()
-        db_model = data_algebra.SQLite.SQLiteModel()
-    
-        d1 = pandas.DataFrame({"x": [-1, 0, 1, numpy.nan], "y": [1, 2, numpy.nan, 3]})
-    
-        d2 = pandas.DataFrame({"x": [0, 4, None], "y": [2, 7, None]})
-    
-        ops4 = describe_table(d1, "d1").concat_rows(
-            b=describe_table(d2, "d2")
-        )
-    
-        assert data_algebra.test_util.formats_to_self(ops4)
-        data_algebra.yaml.check_op_round_trip(ops4)
-    
-        res_pandas = ops4.eval_pandas(data_map={"d1": d1, "d2": d2}, eval_env=locals())
-    
-        expect = pandas.DataFrame({
-            'x': [-1.0, 0.0, 1.0, None, 0.0, 4.0, None],
-            'y': [1.0, 2.0, None, 3.0, 2.0, 7.0, None],
-            })
-    
-        assert data_algebra.util.equivalent_frames(expect, res_pandas)
-    
->       sql = ops4.to_sql(db_model, pretty=True)
-
-tests/test_concat_rows.py:37: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-data_algebra/data_ops.py:279: in to_sql
-    db_model=db_model, using=None, temp_id_source=temp_id_source
-data_algebra/data_ops.py:1577: in to_sql_implementation
-    self, using=using, temp_id_source=temp_id_source
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-self = <data_algebra.SQLite.SQLiteModel object at 0x321df9ba8>
-join_node = TableDescription(
- table_name='d1',
- column_names=[
-   'x', 'y']) .\
-   concat_rows(b=
-      TableDescription(
-       table_name='d2',
-       column_names=[
-         'x', 'y']),
-      id_column='table_name')
-
-    def concat_rows_to_sql(self, join_node, *, using=None, temp_id_source=None):
->       raise NotImplementedError("not implemented yet")  # TODO: implement
-E       NotImplementedError: not implemented yet
-
-data_algebra/db_model.py:555: NotImplementedError
-
 ---------- coverage: platform darwin, python 3.6.9-final-0 -----------
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
@@ -114,17 +59,18 @@ data_algebra/data_model.py                44     16    64%
 data_algebra/data_ops.py                1216    282    77%
 data_algebra/data_types.py                43     19    56%
 data_algebra/datatable_model.py          131     81    38%
-data_algebra/db_model.py                 361     80    78%
+data_algebra/db_model.py                 389     85    78%
 data_algebra/diagram.py                   56     44    21%
 data_algebra/env.py                       52      7    87%
 data_algebra/expr.py                      20      4    80%
 data_algebra/expr_rep.py                 617    206    67%
 data_algebra/flow_text.py                 17      0   100%
-data_algebra/pandas_model.py             173     26    85%
+data_algebra/pandas_model.py             176     26    85%
 data_algebra/test_util.py                  6      0   100%
 data_algebra/util.py                      96     11    89%
 data_algebra/yaml.py                     123     15    88%
 ----------------------------------------------------------
-TOTAL                                   3649    967    73%
+TOTAL                                   3680    972    74%
 
-===================== 1 failed, 56 passed in 10.33 seconds =====================
+
+========================== 57 passed in 9.76 seconds ===========================
