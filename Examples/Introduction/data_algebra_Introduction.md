@@ -17,6 +17,7 @@ In `data_algebra`'s case the primary set of data operators is as follows:
  * `extend`
  * `project`
  * `natural_join`
+ * `concat_rows`
  * `convert_records`.
 
 These operations break into a small number of themes:
@@ -565,7 +566,14 @@ wrap(d). \
 
 ### Combining results between two `DataFrame`s
 
-To combine multiple tables in `data_algebra` one uses what we call the `natural_join` operator.  In the `data_algebra` `natural_join`, rows are matched by column keys and any two columns with the same name are *coalesced* (meaning the first table with a non-missing values supplies the answer).  This is easiest to demonstrate with an example.
+To combine multiple tables in `data_algebra` one uses one of:
+  
+  * `natural_join` 
+  * `concat_rows`
+
+#### `natural_join`
+
+In the `data_algebra` `natural_join`, rows are matched by column keys and any two columns with the same name are *coalesced* (meaning the first table with a non-missing values supplies the answer).  This is easiest to demonstrate with an example.
 
 Let's set up new example tables.
 
@@ -717,8 +725,417 @@ ops.eval({'d_left': d_left, 'd_right': d_right})
 
 In a left-join (as above) if the right-table has unique keys then we get a table with the same structure as the left-table- but with more information per row.  This is a very useful type of join in data science projects.  Notice columns with matching names are coalesced into each other, which we interpret as "take the value from the left table, unless it is missing."
 
+#### 
+
+Another way to combine compatible tables it to concatinate rows.
+
+
+```python
+d_a = pandas.DataFrame({
+  'k': ['a', 'a', 'b'],
+  'x': [1, None, 3],
+  'y': [1, None, None],
+})
+
+d_a
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>k</th>
+      <th>x</th>
+      <th>y</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>a</td>
+      <td>1.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>a</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>b</td>
+      <td>3.0</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+d_b = pandas.DataFrame({
+  'k': [None, 'a', 'b'],
+  'x': [None, 9, 3],
+  'y': [None, 2, None],
+})
+
+d_b
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>k</th>
+      <th>x</th>
+      <th>y</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>a</td>
+      <td>9.0</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>b</td>
+      <td>3.0</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+ops = describe_table(d_a, table_name = 'd_a'). \
+  concat_rows(b = describe_table(d_b, table_name = 'd_b'))
+
+ops.eval({'d_a': d_a, 'd_b': d_b})
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>k</th>
+      <th>x</th>
+      <th>y</th>
+      <th>source_name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>a</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>a</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>a</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>a</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>b</td>
+      <td>3.0</td>
+      <td>NaN</td>
+      <td>a</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>b</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>a</td>
+      <td>9.0</td>
+      <td>2.0</td>
+      <td>b</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>b</td>
+      <td>3.0</td>
+      <td>NaN</td>
+      <td>b</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 ### General conversion of record layouts
+
+Record transformation is re-shaping one (possibly multi-row) record layout to another (possibly multi-row) record layout.
+
+
+```python
+iris_small = pandas.DataFrame({
+    'Sepal.Length': [5.1, 4.9, 4.7],
+    'Sepal.Width': [3.5, 3.0, 3.2],
+    'Petal.Length': [1.4, 1.4, 1.3],
+    'Petal.Width': [0.2, 0.2, 0.2],
+    'Species': ['setosa', 'setosa', 'setosa'],
+    'id': [0, 1, 2],
+    })
+
+iris_small
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Sepal.Length</th>
+      <th>Sepal.Width</th>
+      <th>Petal.Length</th>
+      <th>Petal.Width</th>
+      <th>Species</th>
+      <th>id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>5.1</td>
+      <td>3.5</td>
+      <td>1.4</td>
+      <td>0.2</td>
+      <td>setosa</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>4.9</td>
+      <td>3.0</td>
+      <td>1.4</td>
+      <td>0.2</td>
+      <td>setosa</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>4.7</td>
+      <td>3.2</td>
+      <td>1.3</td>
+      <td>0.2</td>
+      <td>setosa</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+from data_algebra.cdata import *
+
+control_table = pandas.DataFrame(
+    {
+        "Part": ["Sepal", "Sepal", "Petal", "Petal"],
+        "Measure": ["Length", "Width", "Length", "Width"],
+        "Value": ["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"],
+    }
+)
+
+record_spec = data_algebra.cdata.RecordSpecification(
+    control_table,
+    control_table_keys = ['Part', 'Measure'],
+    record_keys = ['id', 'Species']
+    )
+
+map = RecordMap(blocks_out=record_spec)
+
+print(str(map))
+```
+
+    Transform row records of the form:
+      record_keys: ['id', 'Species']
+     ['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width']
+    to block records of structure:
+    RecordSpecification
+       record_keys: ['id', 'Species']
+       control_table_keys: ['Part', 'Measure']
+       control_table:
+           Part Measure         Value
+       0  Sepal  Length  Sepal.Length
+       1  Sepal   Width   Sepal.Width
+       2  Petal  Length  Petal.Length
+       3  Petal   Width   Petal.Width
+    
+
+
+
+```python
+ops = describe_table(iris_small, 'iris_small'). \
+    convert_records(record_map=map)
+
+ops.eval({'iris_small': iris_small, 
+          'cdata_temp_record': ops.record_map.blocks_out.control_table})
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>Species</th>
+      <th>Part</th>
+      <th>Measure</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>setosa</td>
+      <td>Petal</td>
+      <td>Length</td>
+      <td>1.4</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>setosa</td>
+      <td>Petal</td>
+      <td>Width</td>
+      <td>0.2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>setosa</td>
+      <td>Sepal</td>
+      <td>Length</td>
+      <td>5.1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>setosa</td>
+      <td>Sepal</td>
+      <td>Width</td>
+      <td>3.5</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>setosa</td>
+      <td>Petal</td>
+      <td>Length</td>
+      <td>1.4</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1</td>
+      <td>setosa</td>
+      <td>Petal</td>
+      <td>Width</td>
+      <td>0.2</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1</td>
+      <td>setosa</td>
+      <td>Sepal</td>
+      <td>Length</td>
+      <td>4.9</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1</td>
+      <td>setosa</td>
+      <td>Sepal</td>
+      <td>Width</td>
+      <td>3.0</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>2</td>
+      <td>setosa</td>
+      <td>Petal</td>
+      <td>Length</td>
+      <td>1.3</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>2</td>
+      <td>setosa</td>
+      <td>Petal</td>
+      <td>Width</td>
+      <td>0.2</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>2</td>
+      <td>setosa</td>
+      <td>Sepal</td>
+      <td>Length</td>
+      <td>4.7</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>2</td>
+      <td>setosa</td>
+      <td>Sepal</td>
+      <td>Width</td>
+      <td>3.2</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 
 Record transformation is "simple once you get it".  However, we suggest reading up on that as a separate topic [here](https://github.com/WinVector/data_algebra/blob/master/Examples/cdata/cdata.md).
 
