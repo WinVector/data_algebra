@@ -30,7 +30,7 @@ def test_concat_rows():
     expect = pandas.DataFrame({
         'x': [-1.0, 0.0, 1.0, None, 0.0, 4.0, None],
         'y': [1.0, 2.0, None, 3.0, 2.0, 7.0, None],
-        'table_name': ['a', 'a', 'a', 'a', 'b', 'b', 'b'],
+        'source_name': ['a', 'a', 'a', 'a', 'b', 'b', 'b'],
         })
 
     assert data_algebra.util.equivalent_frames(expect, res_pandas)
