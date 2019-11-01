@@ -725,9 +725,9 @@ ops.eval({'d_left': d_left, 'd_right': d_right})
 
 In a left-join (as above) if the right-table has unique keys then we get a table with the same structure as the left-table- but with more information per row.  This is a very useful type of join in data science projects.  Notice columns with matching names are coalesced into each other, which we interpret as "take the value from the left table, unless it is missing."
 
-#### 
+#### `concat_rows`
 
-Another way to combine compatible tables it to concatinate rows.
+Another way to combine compatible tables is to concatinate rows.
 
 
 ```python
