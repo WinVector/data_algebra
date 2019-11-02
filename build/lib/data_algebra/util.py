@@ -2,8 +2,6 @@ import collections
 import numpy
 import pandas
 
-import data_algebra.data_types
-
 
 def od(**kwargs):
     """Capture arguments in order."""
@@ -57,8 +55,6 @@ def equivalent_frames(
 ):
     """return False if the frames are equivalent (up to column re-ordering and possible row-reordering).
     Ignores indexing."""
-    a = data_algebra.data_types.convert_to_pandas_dataframe(a, "a")
-    b = data_algebra.data_types.convert_to_pandas_dataframe(b, "b")
     # leave in extra checks as this is usually used by test code
     if not isinstance(a, pandas.DataFrame):
         raise TypeError("Expect a to be pandas.DataFrame")

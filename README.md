@@ -28,9 +28,7 @@ The project intent is to realize a method chained data processing language based
 
   * [`SQL`](https://en.wikipedia.org/wiki/SQL) databases accessed from [`Python`](https://www.python.org), useful working at scale with `PostgreSQL` or Apache `Spark` (`Spark` example [here](https://github.com/WinVector/data_algebra/blob/master/Examples/Spark/pyspark_example.ipynb)).
   * [`Pandas`](https://pandas.pydata.org) `DataFrame` objects in `Python`.
-  * [`dask`](https://dask.org) distributed `Pandas` structures.
   * `SQL` databases access from [`R`](https://www.r-project.org) (implementation is [here](https://github.com/WinVector/rquery), and is mature and ready for production use).
-  * [`data.table`](http://r-datatable.com) objects in `R` (implementation is [here](https://github.com/WinVector/rqdatatable), and is mature and ready for production use).
   
 The intent is the notation should look idiomatic in each language.  Working in `Python` should feel like working in `Python`, and working in `R` should feel like working in `R`.  The data semantics, however, are designed to be close to the `SQL` realizations (given the close connection of `SQL` to the relational algebra; in particular row numbering starts at `1` and row and column order is not preserved except at row-order steps or select-columns steps respectively). The intent is: it should be very easy to use the system in either `Python` or `R` (a boon to multi-language data science projects) and it is easy to port either code or experience from one system to another (a boon for porting projects, or for data scientists working with more than one code base or computer language).
 
@@ -277,7 +275,7 @@ with data_algebra.env.Env(locals()) as env:
         rename_columns({'diagnosis': 'surveyCategory'})
 ```
 
-We are deliberately writing a longer pipeline of simple steps, so we can use the same pipeline locally with Pandas, at (potentially) scale with `dask`, and (potentially) great scale with `PostgreSQL` or Apache `Spark`.  A more concise variation of this pipeline can be found in the R example [here](https://github.com/WinVector/rquery).
+We are deliberately writing a longer pipeline of simple steps, so we can use the same pipeline locally with Pandas, and (potentially) great scale with `PostgreSQL` or Apache `Spark`.  A more concise variation of this pipeline can be found in the R example [here](https://github.com/WinVector/rquery).
 
 The intent is: the user can build up very sophisticated processing pipelines using a small number of primitive steps.  The pipelines tend to be long, but can still be very efficient- as they are well suited for use with `Pandas` and with `SQL` query optimizers.  Most of the heavy lifting is performed by the  very powerful "window functions" (triggered by use of `partition_by` and `order_by`) available on the `extend()` step.  Multiple statements can be combined into extend steps, but only when they have the same window-structure, and don't create and use the same value name in the same statement (except for replacement, which is shown in this example).  Many conditions are checked and enforced during pipeline construction, making debugging very easy.
 
@@ -517,107 +515,6 @@ ops.transform(d_local)
 
 `eval_pandas` takes a dictionary of `Pandas` `DataFrame`s (names matching names specified in the pipeline) and returns the result of applying the pipeline to the data using `Pandas` commands.  Currently our `Pandas` implementation only allows very simple window functions.  This is why we didn't write `probability = probability/sum(probability)`, but instead broken the calculation into multiple steps by introducing the `total` column (the `SQL` realization does in fact support more complex window functions).  This is a small issue with the grammar: but our feeling encourage simple steps is in fact a good thing (improves debuggability), and in `SQL` the query optimizers likely optimize the different query styles into very similar realizations anyway.
 
-### `dask`
-
-We can also apply our transforms to `dask` objects, meaning we can work at a large range of data sizes (`Pandas`, `dask`, `SQL` `PostgreSQL`, and `Apache Spark`).
-
-
-```python
-import dask.dataframe
-
-d_dask = dask.dataframe.from_pandas(d_local, npartitions=2)
-
-res_dask = ops.transform(d_dask)
- 
-res_dask
-```
-
-
-
-
-<div><strong>Dask DataFrame Structure:</strong></div>
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>subjectID</th>
-      <th>diagnosis</th>
-      <th>probability</th>
-    </tr>
-    <tr>
-      <th>npartitions=2</th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th></th>
-      <td>int64</td>
-      <td>object</td>
-      <td>float64</td>
-    </tr>
-    <tr>
-      <th></th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th></th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-<div>Dask Name: rename, 166 tasks</div>
-
-
-
-
-```python
-res_dask.compute()
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>subjectID</th>
-      <th>diagnosis</th>
-      <th>probability</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>withdrawal behavior</td>
-      <td>0.670622</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>2</td>
-      <td>positive re-framing</td>
-      <td>0.558974</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-Notice the exact same pipeline can be used in all cases, because all three implementations share a large family of commands.
 
 ## Export/Import
 

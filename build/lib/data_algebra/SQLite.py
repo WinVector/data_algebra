@@ -2,7 +2,6 @@ import math
 import numpy
 import numbers
 
-import data_algebra.data_types
 import data_algebra.util
 import data_algebra.db_model
 
@@ -139,7 +138,6 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         :return:
         """
 
-        d = data_algebra.data_types.convert_to_pandas_dataframe(d, "d")
         cur = conn.cursor()
         cur.execute("DROP TABLE IF EXISTS " + table_name)
         d.to_sql(name=table_name, con=conn)

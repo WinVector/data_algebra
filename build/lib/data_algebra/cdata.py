@@ -6,7 +6,6 @@ import sqlite3
 import pandas
 
 import data_algebra.util
-import data_algebra.data_types
 import data_algebra.SQLite
 import data_algebra.data_ops
 
@@ -15,9 +14,6 @@ class RecordSpecification:
     def __init__(
         self, control_table, *, record_keys=None, control_table_keys=None, strict=False
     ):
-        control_table = data_algebra.data_types.convert_to_pandas_dataframe(
-            control_table, "control_table"
-        )
         control_table = control_table.reset_index(inplace=False, drop=True)
         if control_table.shape[0] < 1:
             raise ValueError("control table should have at least 1 row")
@@ -216,7 +212,6 @@ class RecordMap:
     def transform(
         self, X, *, check_blocks_in_keying=True, check_blocks_out_keying=False
     ):
-        X = data_algebra.data_types.convert_to_pandas_dataframe(X, "X")
         unknown = set(self.columns_needed) - set(X.columns)
         if len(unknown) > 0:
             raise ValueError("missing required columns: " + str(unknown))

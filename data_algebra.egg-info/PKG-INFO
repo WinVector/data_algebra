@@ -11,14 +11,13 @@ Description:
         based on Codd's relational algebra and experience working with dplyr at scale, and a general 
         data record transform engine.  The primary purpose of the package is to support an easy to 
         compose and maintain grammar of data processing steps that in turn can be used to generate
-        database specific SQL. The package also implements the same transforms for Pandas DataFrames 
-        and Dask.
+        database specific SQL. The package also implements the same transforms for Pandas DataFrames.
         
         [R](https://www.r-project.org) versions of the system are available as 
         the [rquery](https://github.com/WinVector/rquery) and 
         [rqdatatable](https://github.com/WinVector/rqdatatable) packages.
         
-        Recommended packages include: PyYAML (supplies yaml), sqlparse, black, and dask. 
+        Recommended packages include: PyYAML (supplies yaml), sqlparse, and black.
         
 Platform: any
 Classifier: Intended Audience :: Science/Research

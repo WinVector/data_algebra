@@ -9,11 +9,8 @@ import pandas
 import data_algebra
 import data_algebra.flow_text
 import data_algebra.data_model
-import data_algebra.data_types
 import data_algebra.db_model
 import data_algebra.pandas_model
-import data_algebra.dask_model
-import data_algebra.datatable_model
 import data_algebra.expr_rep
 import data_algebra.env
 
@@ -298,7 +295,7 @@ class ViewRepresentation(OperatorPlatform):
         Evaluate operators with respect to Pandas data frames.
         :param data_map: map from table names to data frames
         :param eval_env: environment to evaluate in
-        :param data_model: adaptor to Pandas dialect (possibly dask)
+        :param data_model: adaptor to Pandas dialect
         :return:
         """
 
@@ -329,78 +326,6 @@ class ViewRepresentation(OperatorPlatform):
             data_map=data_map, eval_env=eval_env, data_model=data_model
         )
 
-    def eval_dask(self, data_map, *, eval_env=None, data_model=None):
-        """
-        Evaluate operators with respect to dask data frames.
-        :param data_map: map from table names to data frames
-        :param eval_env: environment to evaluate in
-        :param data_model: adaptor to Pandas dialect (possibly dask)
-        :return:
-        """
-
-        if not isinstance(data_map, Dict):
-            raise TypeError("data_map should be a dictionary")
-        if len(data_map) < 1:
-            raise ValueError("data_map should not be empty")
-        if eval_env is None:
-            eval_env = data_algebra.env.outer_namespace()
-        if eval_env is None:
-            eval_env = globals()
-        if data_model is None:
-            data_model = data_algebra.dask_model.DaskModel()
-        if not isinstance(data_model, data_algebra.dask_model.DaskModel):
-            raise TypeError(
-                "Expected data_model to derive from data_algebra.dask_model.DaskModel"
-            )
-        self.columns_used()  # for table consistency check/raise
-        tables = self.get_tables()
-        for k in tables.keys():
-            if k not in data_map.keys():
-                raise ValueError("Required table " + k + " not in data_map")
-            else:
-                data_model.assert_is_appropriate_data_instance(
-                    data_map[k], "data_map[" + k + "]"
-                )
-        return self.eval_implementation(
-            data_map=data_map, eval_env=eval_env, data_model=data_model
-        )
-
-    def eval_datatable(self, data_map, *, eval_env=None, data_model=None):
-        """
-        Evaluate operators with respect to Python datatable data frames.
-        :param data_map: map from table names to data frames
-        :param eval_env: environment to evaluate in
-        :param data_model: adaptor to Pandas dialect (possibly dask)
-        :return:
-        """
-
-        if not isinstance(data_map, Dict):
-            raise TypeError("data_map should be a dictionary")
-        if len(data_map) < 1:
-            raise ValueError("data_map should not be empty")
-        if eval_env is None:
-            eval_env = data_algebra.env.outer_namespace()
-        if eval_env is None:
-            eval_env = globals()
-        if data_model is None:
-            data_model = data_algebra.datatable_model.DataTableModel()
-        if not isinstance(data_model, data_algebra.datatable_model.DataTableModel):
-            raise TypeError(
-                "Expected data_model to derive from data_algebra.datatable_model.DataTableModel"
-            )
-        self.columns_used()  # for table consistency check/raise
-        tables = self.get_tables()
-        for k in tables.keys():
-            if k not in data_map.keys():
-                raise ValueError("Required table " + k + " not in data_map")
-            else:
-                data_model.assert_is_appropriate_data_instance(
-                    data_map[k], "data_map[" + k + "]"
-                )
-        return self.eval_implementation(
-            data_map=data_map, eval_env=eval_env, data_model=data_model
-        )
-
     def eval(self, data_map, *, eval_env=None, data_model=None):
         if len(data_map) < 1:
             raise ValueError("Expected data_map to be non-empty")
@@ -413,14 +338,6 @@ class ViewRepresentation(OperatorPlatform):
         x = data_map[k]
         if isinstance(x, pandas.DataFrame):
             return self.eval_pandas(
-                data_map=data_map, eval_env=eval_env, data_model=data_model
-            )
-        if data_algebra.data_types.is_dask_data_frame(x):
-            return self.eval_dask(
-                data_map=data_map, eval_env=eval_env, data_model=data_model
-            )
-        if data_algebra.data_types.is_datatable_frame(x):
-            return self.eval_datatable(
                 data_map=data_map, eval_env=eval_env, data_model=data_model
             )
         raise TypeError("can not apply eval() to type " + str(type(x)))
@@ -474,14 +391,6 @@ class ViewRepresentation(OperatorPlatform):
         data_map = {k: X}
         if isinstance(X, pandas.DataFrame):
             return self.eval_pandas(
-                data_map=data_map, eval_env=eval_env, data_model=data_model
-            )
-        if data_algebra.data_types.is_dask_data_frame(X):
-            return self.eval_dask(
-                data_map=data_map, eval_env=eval_env, data_model=data_model
-            )
-        if data_algebra.data_types.is_datatable_frame(X):
-            return self.eval_datatable(
                 data_map=data_map, eval_env=eval_env, data_model=data_model
             )
         raise TypeError("can not apply transform() to type " + str(type(X)))
@@ -687,10 +596,6 @@ def describe_table(d, table_name="data_frame"):
         if d.shape[0] > 0:
             column_types = {k: type(d.loc[0, k]) for k in column_names}
         return TableDescription(table_name, column_names, column_types=column_types)
-    if data_algebra.data_types.is_dask_data_frame(d):
-        return TableDescription(table_name, [c for c in d.columns])
-    if data_algebra.data_types.is_datatable_frame(d):
-        return TableDescription(table_name, [c for c in d.names])
     raise TypeError("can't describe " + table_name + ": " + str(type(d)))
 
 
@@ -878,16 +783,6 @@ def wrap(d, *, table_name="data_frame"):
             underlying=TableDescription(
                 table_name, column_names, column_types=column_types
             ),
-            data_map={table_name: d}
-        )
-    if data_algebra.data_types.is_dask_data_frame(d):
-        return WrappedOperatorPlatform(
-            underlying=TableDescription(table_name, [c for c in d.columns]),
-            data_map={table_name: d}
-        )
-    if data_algebra.data_types.is_datatable_frame(d):
-        return WrappedOperatorPlatform(
-            underlying=TableDescription(table_name, [c for c in d.names]),
             data_map={table_name: d}
         )
     raise TypeError("can't wrap " + table_name + ": " + str(type(d)))

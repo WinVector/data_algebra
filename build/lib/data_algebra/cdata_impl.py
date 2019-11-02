@@ -3,7 +3,6 @@ import collections
 
 import pandas
 
-import data_algebra.data_types
 import data_algebra.data_ops
 import data_algebra.cdata
 
