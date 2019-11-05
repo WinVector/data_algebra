@@ -107,7 +107,7 @@ def equivalent_frames(
             cb = numpy.asarray(cb, dtype=float)
             dif = ca - cb
             dif = numpy.asarray([abs(d) for d in dif if not pandas.isnull(d)])
-            if dif.max() > float_tol:
+            if numpy.max(dif) > float_tol:
                 return False
         else:
             if not all([ca[i] == cb[i] for i in range(a.shape[0])]):
@@ -116,6 +116,12 @@ def equivalent_frames(
 
 
 def table_is_keyed_by_columns(table, column_names):
+    """
+
+    :param table: pandas DataFrame
+    :param column_names: list of column names
+    :return: True if rows are uniquely keyed by values in named columns
+    """
     # check for ill-condition
     if isinstance(column_names, str):
         column_names = [column_names]
@@ -128,4 +134,4 @@ def table_is_keyed_by_columns(table, column_names):
     if len(column_names) < 1:
         return False
     counts = table.groupby(column_names).size()
-    return counts.max() <= 1
+    return max(counts) <= 1
