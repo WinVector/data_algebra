@@ -188,6 +188,9 @@ class PandasModel(data_algebra.data_model.DataModel):
         )  # grouping variables in the index
         if "_data_table_temp_col" in res.columns:
             res = res.drop("_data_table_temp_col", 1)
+        # double check shape is what we expect
+        if not data_algebra.util.table_is_keyed_by_columns(res, op.group_by):
+            raise ValueError("result wasn't keyed by group_by columns")
         return res
 
     def select_rows_step(self, op, *, data_map, eval_env):
