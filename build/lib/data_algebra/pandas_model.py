@@ -67,7 +67,7 @@ class PandasModel(data_algebra.data_model.DataModel):
     def extend_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.ExtendNode):
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
-        window_situation = (len(op.partition_by) > 0) or (len(op.order_by) > 0)
+        window_situation = op.partitioned or (len(op.partition_by) > 0) or (len(op.order_by) > 0)
         if window_situation:
             self.check_extend_window_fns(op)
         res = op.sources[0].eval_implementation(

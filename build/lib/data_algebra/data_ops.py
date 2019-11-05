@@ -1,4 +1,5 @@
 from typing import Set, Dict, List, Union
+import numbers
 import collections
 import re
 import copy
@@ -812,8 +813,15 @@ class ExtendNode(ViewRepresentation):
         self.ops = ops
         if partition_by is None:
             partition_by = []
+        partitioned = False
+        if isinstance(partition_by, numbers.Number):
+            partition_by = []
+            partitioned = True
         if isinstance(partition_by, str):
             partition_by = [partition_by]
+        if len(partition_by) > 0:
+            partitioned = True
+        self.partitioned = partitioned
         self.partition_by = partition_by
         if order_by is None:
             order_by = []
@@ -837,11 +845,11 @@ class ExtendNode(ViewRepresentation):
             if ci not in known_cols:
                 column_names.append(ci)
         if len(partition_by) != len(set(partition_by)):
-            raise ValueError("Duplicate name in partition_by")
+            raise ValueError("Duplicate name(s) in partition_by")
         if len(order_by) != len(set(order_by)):
-            raise ValueError("Duplicate name in order_by")
+            raise ValueError("Duplicate name(s) in order_by")
         if len(reverse) != len(set(reverse)):
-            raise ValueError("Duplicate name in reverse")
+            raise ValueError("Duplicate name(s) in reverse")
         unknown = set(partition_by) - known_cols
         if len(unknown) > 0:
             raise ValueError("unknown partition_by columns: " + str(unknown))
@@ -900,8 +908,11 @@ class ExtendNode(ViewRepresentation):
         ]
         flowed = ("," + spacer + " ").join(ops)
         s = s + ("extend({" + spacer + " " + flowed + "}")
-        if len(self.partition_by) > 0:
-            s = s + "," + spacer + "partition_by=" + self.partition_by.__repr__()
+        if self.partitioned:
+            if len(self.partition_by) > 0:
+                s = s + "," + spacer + "partition_by=" + self.partition_by.__repr__()
+            else:
+                s = s + "," + spacer + "partition_by=1"
         if len(self.order_by) > 0:
             s = s + "," + spacer + "order_by=" + self.order_by.__repr__()
         if len(self.reverse) > 0:
