@@ -1,4 +1,4 @@
-from typing import Set, Any, Dict, List
+from typing import Set, Dict, List, Union
 import collections
 import re
 import copy
@@ -34,18 +34,18 @@ except ImportError:
     pass
 
 
-op_list = [
-    "extend",
-    "project",
-    "natural_join",
-    "concat_rows",
-    "select_rows",
-    "drop_columns",
-    "select_columns",
-    "rename_columns",
-    "order_rows",
-    "convert_records",
-]
+# op_list = [
+#     "extend",
+#     "project",
+#     "natural_join",
+#     "concat_rows",
+#     "select_rows",
+#     "drop_columns",
+#     "select_columns",
+#     "rename_columns",
+#     "order_rows",
+#     "convert_records",
+# ]
 
 
 class OperatorPlatform:
@@ -116,7 +116,7 @@ class ViewRepresentation(OperatorPlatform):
     column_names: List[str]
     column_set: Set[str]
     column_map: data_algebra.env.SimpleNamespaceDict
-    sources: List[Any]  # actually ViewRepresentation
+    sources: List['ViewRepresentation']  # https://www.python.org/dev/peps/pep-0484/#forward-references
     columns_currently_used: Set[str]  # transient field, operations can update this
 
     def __init__(self, column_names, *, sources=None):
@@ -1423,7 +1423,7 @@ class NaturalJoinNode(ViewRepresentation):
 
 
 class ConcatRowsNode(ViewRepresentation):
-    id_column: str
+    id_column: Union[str, None]
 
     def __init__(self, a, b, *, id_column="table_name", a_name="a", b_name="b"):
         # check set of tables is consistent in both sub-dags
