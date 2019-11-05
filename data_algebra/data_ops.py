@@ -966,6 +966,7 @@ class ProjectNode(ViewRepresentation):
                         + str(opk)
                     )
             # TODO: check op is in list of aggregators
+            # Note: non-aggregators making through will be caught by table shape check
 
     def columns_used_from_sources(self, using=None):
         if using is None:
