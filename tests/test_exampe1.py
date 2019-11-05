@@ -1,19 +1,33 @@
 
+import sqlite3
+
 import pandas
 
 from data_algebra.data_ops import *
 import data_algebra.util
+import data_algebra.SQLite
 import data_algebra.test_util
 
 def test_example1_1():
+
+    conn = sqlite3.connect(":memory:")
+    db_model = data_algebra.SQLite.SQLiteModel()
+
     d = pandas.DataFrame({
         'c': [1, 1, 1, 1, 1, 1],
         'x_s': ['s_03', 's_04', 's_02', 's_01', 's_03', 's_01'],
         'x_n': ['n_13', 'n_48', 'n_77', 'n_29', 'n_91', 'n_93'],
         'y': [1.0312223, -1.3374379, -1.9347144, 1.2772708, -0.1238039, 0.3058670]
     })
+    table_desc = db_model.insert_table(conn, d, 'd')
 
-    ops1 = describe_table(d). \
+    ops1 = table_desc. \
+        extend({
+        'y_mean': 'y.mean()'
+         },
+        partition_by=['c'])
+
+    ops1 = table_desc. \
         extend({
             'y_mean': 'y.mean()'
             },
@@ -35,7 +49,11 @@ def test_example1_1():
         })
     assert data_algebra.util.equivalent_frames(res1, expect1)
 
-    ops2 = describe_table(d). \
+    sql1 = ops1.to_sql(db_model, pretty=True)
+    res1db = db_model.read_query(conn, sql1)
+    assert data_algebra.util.equivalent_frames(res1db, expect1)
+
+    ops2 = table_desc. \
         extend({
             'y_mean': 'y.mean()'
             },
@@ -57,3 +75,10 @@ def test_example1_1():
                   -1.8044483833333334, 0.006462116666666684, 0.4361330166666667],
         })
     assert data_algebra.util.equivalent_frames(res2, expect2)
+
+    sql2 = ops2.to_sql(db_model, pretty=True)
+    res2db = db_model.read_query(conn, sql2)
+    assert data_algebra.util.equivalent_frames(res2db, expect2)
+
+    # clean up
+    conn.close()
