@@ -15,10 +15,10 @@ def test_degenerate_project():
     assert data_algebra.util.equivalent_frames(res, expect)
 
     with pytest.raises(ValueError):
-        ops_complex = describe_table(d).project({"x2": "x.max() + x.max()"})
+        describe_table(d).project({"x2": "x.max() + x.max()"})
 
     with pytest.raises(ValueError):
-        ops_bad = describe_table(d).project({"x2": "x"})
+        describe_table(d).project({"x2": "x"})
 
     with pytest.raises(ValueError):
-        ops_const = describe_table(d).project({"x2": "1"})
+        describe_table(d).project({"x2": "1"})

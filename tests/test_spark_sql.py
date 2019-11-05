@@ -9,8 +9,8 @@ def test_spark_sql():
         "stocks", ["date", "trans", "symbol", "qty", "price"]
     ).extend({"cost": "qty * price"})
 
-    pp = ops.to_python(pretty=True)
+    ops.to_python(pretty=True)
 
     db_model = data_algebra.SparkSQL.SparkSQLModel()
 
-    sql = ops.to_sql(db_model, pretty=True)
+    ops.to_sql(db_model, pretty=True)

@@ -47,7 +47,7 @@ tests/test_window_fns.py .                                               [100%]
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
 data_algebra/PostgreSQL.py                21      4    81%
-data_algebra/SQLite.py                    88     12    86%
+data_algebra/SQLite.py                    89     12    87%
 data_algebra/SparkSQL.py                  21      4    81%
 data_algebra/__init__.py                   5      0   100%
 data_algebra/arrow.py                    140     42    70%
@@ -67,7 +67,7 @@ data_algebra/test_util.py                  6      0   100%
 data_algebra/util.py                      93     14    85%
 data_algebra/yaml.py                     123     15    88%
 ----------------------------------------------------------
-TOTAL                                   3327    830    75%
+TOTAL                                   3328    830    75%
 
 
-============================== 57 passed in 5.97s ==============================
+============================== 57 passed in 6.26s ==============================

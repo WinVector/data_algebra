@@ -4,6 +4,7 @@ import numbers
 
 import data_algebra.util
 import data_algebra.db_model
+import data_algebra.data_ops
 
 
 # map from op-name to special SQL formatting code
