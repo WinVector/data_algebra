@@ -945,6 +945,24 @@ class ProjectNode(ViewRepresentation):
         if len(unknown) > 0:
             raise ValueError("unknown group_by columns: " + str(unknown))
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
+        for (k, opk) in self.ops.items():
+            if not isinstance(opk, data_algebra.expr_rep.Expression):
+                raise ValueError(
+                    "non-aggregated expression in project: " + str(k) + ": " + str(opk)
+                )
+            if len(opk.args) > 1:
+                raise ValueError(
+                    "non-trivial aggregation expression: " + str(k) + ": " + str(opk)
+                )
+            if len(opk.args) > 0:
+                if not isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
+                    raise ValueError(
+                        "windows expression argument must be a column: "
+                        + str(k)
+                        + ": "
+                        + str(opk)
+                    )
+            # TODO: check op is in list of aggregators
 
     def columns_used_from_sources(self, using=None):
         if using is None:

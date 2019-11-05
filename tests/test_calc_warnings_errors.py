@@ -34,22 +34,26 @@ def test_calc_warnings_errors():
     with pytest.raises(ValueError):
         describe_table(d). \
             project({
-            'x': 'x+1',
-            'y': 'x+2'})
+            'x': 'x.max()',
+            'y': 'x.max()'})
 
     with pytest.raises(NameError):
         describe_table(d). \
             project({
-            'x': 'z+1'})
+            'x': 'z.max()'})
 
     with pytest.raises(ValueError):
         describe_table(d). \
             project([
-            ('x', 1),
-            ('x', 2)])
+            ('x', 'x.max()'),
+            ('x', 'x.min()')])
+
+    with pytest.raises(ValueError):
+        describe_table(d). \
+            project([
+            ('x', 1)])
 
     describe_table(d). \
         project({
-        'x': 'x+1',
-        'y': '2'})
-
+        'x2': 'x.max()',
+        'y': 'x.min()'})
