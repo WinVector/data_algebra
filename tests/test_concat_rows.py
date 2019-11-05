@@ -1,4 +1,3 @@
-
 import pandas
 import numpy
 import sqlite3
@@ -18,20 +17,20 @@ def test_concat_rows():
 
     d2 = pandas.DataFrame({"x": [0, 4, None], "y": [2, 7, None]})
 
-    ops4 = describe_table(d1, "d1").concat_rows(
-        b=describe_table(d2, "d2")
-    )
+    ops4 = describe_table(d1, "d1").concat_rows(b=describe_table(d2, "d2"))
 
     assert data_algebra.test_util.formats_to_self(ops4)
     data_algebra.yaml.check_op_round_trip(ops4)
 
     res_pandas = ops4.eval_pandas(data_map={"d1": d1, "d2": d2}, eval_env=locals())
 
-    expect = pandas.DataFrame({
-        'x': [-1.0, 0.0, 1.0, None, 0.0, 4.0, None],
-        'y': [1.0, 2.0, None, 3.0, 2.0, 7.0, None],
-        'source_name': ['a', 'a', 'a', 'a', 'b', 'b', 'b'],
-        })
+    expect = pandas.DataFrame(
+        {
+            "x": [-1.0, 0.0, 1.0, None, 0.0, 4.0, None],
+            "y": [1.0, 2.0, None, 3.0, 2.0, 7.0, None],
+            "source_name": ["a", "a", "a", "a", "b", "b", "b"],
+        }
+    )
 
     assert data_algebra.util.equivalent_frames(expect, res_pandas)
 

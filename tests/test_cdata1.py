@@ -150,9 +150,7 @@ def test_cdata1():
 
     # %%
 
-    mp_to_and_back = RecordMap(
-        blocks_in=record_spec, blocks_out=record_spec
-    )
+    mp_to_and_back = RecordMap(blocks_in=record_spec, blocks_out=record_spec)
     waste_str = str(mp_to_and_back)
     arranged_self = mp_to_and_back.transform(iris_blocks)
     assert data_algebra.util.equivalent_frames(arranged_self, iris_blocks_orig)

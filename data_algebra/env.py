@@ -74,9 +74,7 @@ class SimpleNamespaceDict(types.SimpleNamespace):
 
 # define with def so function has usable __name__
 def connected_components(f, g):
-    return  data_algebra.expr_rep.Expression(
-        op="connected_components", args=[f, g]
-    )
+    return data_algebra.expr_rep.Expression(op="connected_components", args=[f, g])
 
 
 def populate_specials(*, column_defs, destination, user_values=None):
@@ -112,6 +110,8 @@ def populate_specials(*, column_defs, destination, user_values=None):
     )
     destination["_size"] = lambda: data_algebra.expr_rep.Expression(op="size", args=[])
     destination["connected_components"] = connected_components
-    destination["partitioned_eval"] = lambda fn, args, partition: data_algebra.expr_rep.Expression(
+    destination[
+        "partitioned_eval"
+    ] = lambda fn, args, partition: data_algebra.expr_rep.Expression(
         op="partitioned_eval", args=[fn, args, partition]
     )

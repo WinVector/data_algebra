@@ -1,4 +1,3 @@
-
 from typing import Set, Any, Dict, List
 import collections
 import re
@@ -88,7 +87,7 @@ class OperatorPlatform:
     def natural_join(self, b, *, by=None, jointype="INNER"):
         raise NotImplementedError("base class called")
 
-    def concat_rows(self, b, *, id_column='source_name', a_name='a', b_name='b'):
+    def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):
         raise NotImplementedError("base class called")
 
     def select_rows(self, expr, parse_env=None):
@@ -421,12 +420,14 @@ class ViewRepresentation(OperatorPlatform):
             )
         return NaturalJoinNode(a=self, b=b, by=by, jointype=jointype)
 
-    def concat_rows(self, b, *, id_column='source_name', a_name='a', b_name='b'):
+    def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):
         if not isinstance(b, ViewRepresentation):
             raise TypeError(
                 "expected b to be a data_algebra.dat_ops.ViewRepresentation"
             )
-        return ConcatRowsNode(a=self, b=b, id_column=id_column, a_name=a_name, b_name=b_name)
+        return ConcatRowsNode(
+            a=self, b=b, id_column=id_column, a_name=a_name, b_name=b_name
+        )
 
     def select_rows(self, expr, parse_env=None):
         return SelectRowsNode(source=self, expr=expr, parse_env=parse_env)
@@ -720,12 +721,14 @@ class WrappedOperatorPlatform(OperatorPlatform):
             data_map=data_map,
         )
 
-    def concat_rows(self, b, *, id_column='source_name', a_name='a', b_name='b'):
+    def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):
         if not isinstance(b, WrappedOperatorPlatform):
             raise TypeError("expected b to be of type WrappedOperatorPlatform")
         data_map, b = self._reach_in(b)
         return WrappedOperatorPlatform(
-            underlying=self.underlying.concat_rows(b=b, id_column=id_column, a_name=a_name, b_name=b_name),
+            underlying=self.underlying.concat_rows(
+                b=b, id_column=id_column, a_name=a_name, b_name=b_name
+            ),
             data_map=data_map,
         )
 
@@ -783,7 +786,7 @@ def wrap(d, *, table_name="data_frame"):
             underlying=TableDescription(
                 table_name, column_names, column_types=column_types
             ),
-            data_map={table_name: d}
+            data_map={table_name: d},
         )
     raise TypeError("can't wrap " + table_name + ": " + str(type(d)))
 
@@ -1422,7 +1425,7 @@ class NaturalJoinNode(ViewRepresentation):
 class ConcatRowsNode(ViewRepresentation):
     id_column: str
 
-    def __init__(self, a, b, *, id_column='table_name', a_name='a', b_name='b'):
+    def __init__(self, a, b, *, id_column="table_name", a_name="a", b_name="b"):
         # check set of tables is consistent in both sub-dags
         a_tables = a.get_tables()
         b_tables = b.get_tables(replacements=a_tables)
@@ -1484,10 +1487,13 @@ class ConcatRowsNode(ViewRepresentation):
         else:
             s = s + " _1, "
         s = s + (
-            "id_column=" + self.id_column.__repr__() +
-            ", a_name=" + self.a_name.__repr__() +
-            ", b_name=" + self.b_name.__repr__() +
-            ")"
+            "id_column="
+            + self.id_column.__repr__()
+            + ", a_name="
+            + self.a_name.__repr__()
+            + ", b_name="
+            + self.b_name.__repr__()
+            + ")"
         )
         return s
 
@@ -1929,7 +1935,7 @@ class ConcatRows(PipeStep):
     _id_column: str
     _b: OperatorPlatform
 
-    def __init__(self, *, b=None, id_column="table_name", a_name='a', b_name='b'):
+    def __init__(self, *, b=None, id_column="table_name", a_name="a", b_name="b"):
         PipeStep.__init__(self)
         if not isinstance(b, ViewRepresentation):
             raise TypeError("b must be a data_algebra.data_ops.ViewRepresentation")
@@ -1943,7 +1949,9 @@ class ConcatRows(PipeStep):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
-        return other.concat_rows(b=self._b, id_column=self._id_column, a_name=self.a_name, b_name=self.b_name)
+        return other.concat_rows(
+            b=self._b, id_column=self._id_column, a_name=self.a_name, b_name=self.b_name
+        )
 
     def __repr__(self):
         return (

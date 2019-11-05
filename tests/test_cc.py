@@ -1,4 +1,3 @@
-
 import pandas
 
 import data_algebra.util
@@ -29,40 +28,28 @@ def test_cc():
 
 
 def test_cc_ops():
-    d = pandas.DataFrame({
-        'f': [1, 4, 6, 2, 1],
-        'g': [2, 5, 7, 3, 7],
-    })
+    d = pandas.DataFrame({"f": [1, 4, 6, 2, 1], "g": [2, 5, 7, 3, 7],})
 
-    ops = describe_table(d). \
-        extend({'c': 'f.co_equalizer(g)'})
+    ops = describe_table(d).extend({"c": "f.co_equalizer(g)"})
     assert formats_to_self(ops)
 
     res = ops.transform(d)
-    expect = pandas.DataFrame({
-        'f': [1, 4, 6, 2, 1],
-        'g': [2, 5, 7, 3, 7],
-        'c': [1, 4, 1, 1, 1],
-        })
+    expect = pandas.DataFrame(
+        {"f": [1, 4, 6, 2, 1], "g": [2, 5, 7, 3, 7], "c": [1, 4, 1, 1, 1],}
+    )
     assert data_algebra.util.equivalent_frames(res, expect)
 
 
 def test_cc_ops_f():
-    d = pandas.DataFrame({
-        'f': [1, 4, 6, 2, 1],
-        'g': [2, 5, 7, 3, 7],
-    })
+    d = pandas.DataFrame({"f": [1, 4, 6, 2, 1], "g": [2, 5, 7, 3, 7],})
 
-    ops = describe_table(d). \
-        extend({'c': 'connected_components(f, g)'})
+    ops = describe_table(d).extend({"c": "connected_components(f, g)"})
     assert formats_to_self(ops)
 
     res = ops.transform(d)
-    expect = pandas.DataFrame({
-        'f': [1, 4, 6, 2, 1],
-        'g': [2, 5, 7, 3, 7],
-        'c': [1, 4, 1, 1, 1],
-        })
+    expect = pandas.DataFrame(
+        {"f": [1, 4, 6, 2, 1], "g": [2, 5, 7, 3, 7], "c": [1, 4, 1, 1, 1],}
+    )
     assert data_algebra.util.equivalent_frames(res, expect)
 
 
@@ -76,21 +63,22 @@ def test_cc_partitioned():
 
 
 def test_cc_partitioned_ops():
-    d = pandas.DataFrame({
-        'f': [1, 4, 6, 2, 1],
-        'g': [2, 5, 7, 3, 7],
-        'p': [1, 2, 1, 2, 1],
-    })
+    d = pandas.DataFrame(
+        {"f": [1, 4, 6, 2, 1], "g": [2, 5, 7, 3, 7], "p": [1, 2, 1, 2, 1],}
+    )
 
-    ops = describe_table(d). \
-        extend({'c': 'partitioned_eval(connected_components, [f, g], [p])'})
+    ops = describe_table(d).extend(
+        {"c": "partitioned_eval(connected_components, [f, g], [p])"}
+    )
     assert formats_to_self(ops)
 
     res = ops.transform(d)
-    expect = pandas.DataFrame({
-        'f': [1, 4, 6, 2, 1],
-        'g': [2, 5, 7, 3, 7],
-        'p': [1, 2, 1, 2, 1],
-        'c': [1, 4, 1, 2, 1],
-    })
+    expect = pandas.DataFrame(
+        {
+            "f": [1, 4, 6, 2, 1],
+            "g": [2, 5, 7, 3, 7],
+            "p": [1, 2, 1, 2, 1],
+            "c": [1, 4, 1, 2, 1],
+        }
+    )
     assert data_algebra.util.equivalent_frames(res, expect)

@@ -1,4 +1,3 @@
-
 import numpy
 import pandas
 
@@ -24,7 +23,10 @@ pandas_eval_env = {
     ),
     "connected_components": connected_components,
     "partitioned_eval": lambda fn, arg_columns, partition_columns: (
-        data_algebra.connected_components.partitioned_eval(fn, arg_columns, partition_columns)),
+        data_algebra.connected_components.partitioned_eval(
+            fn, arg_columns, partition_columns
+        )
+    ),
     "max": lambda x: [numpy.max(x)] * len(x),
     "min": lambda x: [numpy.min(x)] * len(x),
 }
@@ -303,7 +305,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         if op.id_column is not None:
             left[op.id_column] = op.a_name
             right[op.id_column] = op.b_name
-        res = pandas.concat([left, right], axis = 0, ignore_index=True)
+        res = pandas.concat([left, right], axis=0, ignore_index=True)
         res = res.reset_index(drop=True)
         return res
 

@@ -30,9 +30,11 @@ def test_apply():
 
     assert data_algebra.util.equivalent_frames(expect_1, res_0_2)
 
-    ops1b = TableDescription("t1", ["x", "y"]). \
-        add(Extend({"z": "x / y"})). \
-        add(SelectRows("z >= 0"))
+    ops1b = (
+        TableDescription("t1", ["x", "y"])
+        .add(Extend({"z": "x / y"}))
+        .add(SelectRows("z >= 0"))
+    )
 
     res_1b = ops1b.transform(d)
 

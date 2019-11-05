@@ -87,7 +87,9 @@ def partitioned_eval(fn, arg_columns, partition_columns):
     for indexs in index_lists.values():
         # slice out a level set
         ni = len(indexs)
-        fn_cols_i = [[arg_columns[j][indexs[i]] for i in range(ni)] for j in range(arity)]
+        fn_cols_i = [
+            [arg_columns[j][indexs[i]] for i in range(ni)] for j in range(arity)
+        ]
         # call function on slice
         hi = fn(*fn_cols_i)
         # copy back result

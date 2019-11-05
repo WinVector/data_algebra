@@ -1,5 +1,3 @@
-
-
 import data_algebra.util
 import pandas
 from data_algebra.data_ops import *
@@ -16,10 +14,7 @@ def test_extend_0():
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
 
-    ops = describe_table(d, "d").extend(
-        {},
-        partition_by=["c", "g"]
-    )
+    ops = describe_table(d, "d").extend({}, partition_by=["c", "g"])
 
     assert isinstance(ops, TableDescription)
     assert formats_to_self(ops)
@@ -33,19 +28,14 @@ def test_extend_p():
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
 
-    ops = describe_table(d, "d").extend(
-        {'c': 'y.max()'},
-        partition_by=["g"]
-    )
+    ops = describe_table(d, "d").extend({"c": "y.max()"}, partition_by=["g"])
 
     assert formats_to_self(ops)
 
     res = ops.transform(d)
-    expect = pandas.DataFrame({
-        'g': ['a', 'b', 'a', 'b'],
-        'y': [1, 2, 3, 4],
-        'c': [3, 4, 3, 4],
-        })
+    expect = pandas.DataFrame(
+        {"g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4], "c": [3, 4, 3, 4],}
+    )
     assert data_algebra.util.equivalent_frames(expect, res)
 
 
@@ -54,16 +44,12 @@ def test_extend_p0():
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
 
-    ops = describe_table(d, "d").extend(
-        {'c': 'y.max()'}
-    )
+    ops = describe_table(d, "d").extend({"c": "y.max()"})
 
     assert formats_to_self(ops)
 
     res = ops.transform(d)
-    expect = pandas.DataFrame({
-        'g': ['a', 'b', 'a', 'b'],
-        'y': [1, 2, 3, 4],
-        'c': [4, 4, 4, 4],
-        })
+    expect = pandas.DataFrame(
+        {"g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4], "c": [4, 4, 4, 4],}
+    )
     assert data_algebra.util.equivalent_frames(expect, res)

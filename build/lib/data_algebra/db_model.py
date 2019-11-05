@@ -1,4 +1,3 @@
-
 import math
 import re
 import io
@@ -584,24 +583,30 @@ class DBModel:
         left_cols_exprs = [self.quote_identifier(ci) for ci in using_left]
         right_cols_exprs = left_cols_exprs.copy()
         if concat_node.id_column is not None:
-            left_cols_exprs.append(self.quote_string(concat_node.a_name) + " AS " + \
-                                   self.quote_identifier(concat_node.id_column))
-            right_cols_exprs.append(self.quote_string(concat_node.b_name) + " AS " + \
-                                    self.quote_identifier(concat_node.id_column))
+            left_cols_exprs.append(
+                self.quote_string(concat_node.a_name)
+                + " AS "
+                + self.quote_identifier(concat_node.id_column)
+            )
+            right_cols_exprs.append(
+                self.quote_string(concat_node.b_name)
+                + " AS "
+                + self.quote_identifier(concat_node.id_column)
+            )
         sql_str = (
-                "SELECT "
-                + ', '.join(left_cols_exprs)
-                + " FROM ( "
-                + sql_left
-                + " ) "
-                + self.quote_identifier(sub_view_name_left)
-                + " UNION ALL "
-                + "SELECT "
-                + ', '.join(right_cols_exprs)
-                + " FROM ( "
-                + sql_right
-                + " ) "
-                + self.quote_identifier(sub_view_name_right)
+            "SELECT "
+            + ", ".join(left_cols_exprs)
+            + " FROM ( "
+            + sql_left
+            + " ) "
+            + self.quote_identifier(sub_view_name_left)
+            + " UNION ALL "
+            + "SELECT "
+            + ", ".join(right_cols_exprs)
+            + " FROM ( "
+            + sql_right
+            + " ) "
+            + self.quote_identifier(sub_view_name_right)
         )
         return sql_str
 

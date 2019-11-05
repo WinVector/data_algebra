@@ -1,7 +1,7 @@
-
 # needed for the eval
 # noinspection PyUnresolvedReferences
 from data_algebra.data_ops import *
+
 
 def formats_to_self(ops):
     str1 = str(ops)
