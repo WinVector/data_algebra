@@ -5,8 +5,10 @@ import numpy
 import pandas
 import yaml
 
+import sqlite3
+
 # noinspection PyUnresolvedReferences
-import data_algebra
+import data_algebra.SQLite
 from data_algebra.data_ops import *
 from data_algebra.util import can_convert_v_to_numeric
 from data_algebra.yaml import have_yaml, to_pipeline
@@ -38,15 +40,6 @@ def check_op_round_trip(o):
     assert strr == strr_back
     strp_back = back.to_python(strict=True, pretty=True)
     assert strp == strp_back
-    dmp = yaml.dump(obj)
-    ld = yaml.safe_load(dmp)
-    back = to_pipeline(ld)
-    if isinstance(o, ExtendNode):
-        if len(o.ops) == 1:
-            strr_back = back.to_python(strict=True, pretty=False)
-            assert strr == strr_back
-            strp_back = back.to_python(strict=True, pretty=True)
-            assert strp == strp_back
 
 
 def equivalent_frames(
@@ -118,3 +111,72 @@ def equivalent_frames(
             if not all([ca[i] == cb[i] for i in range(a.shape[0])]):
                 return False
     return True
+
+
+def check_transform(ops, data, expect,
+                   *,
+                   float_tol=1e-8,
+                   check_column_order=False,
+                   cols_case_sensitive=False,
+                   check_row_order=False
+                   ):
+    """
+    Test an operator dag produces the expected result, and parses correctly.
+
+    :param ops: data_algebra.data_ops.ViewRepresentation
+    :param data: pandas.DataFrame or map of strings to pandas.DataFrame
+    :param expect: pandas.DataFrame
+    :param float_tol passed to equivalent_frames()
+    :param check_column_order passed to equivalent_frames()
+    :param cols_case_sensitive passed to equivalent_frames()
+    :param check_row_order passed to equivalent_frames()
+    :return: None, assert if there is an issue
+    """
+
+    if not isinstance(ops, ViewRepresentation):
+        raise TypeError("expected ops to be a data_algebra.data_ops.ViewRepresentation")
+    if not isinstance(expect, pandas.DataFrame):
+        raise TypeError("exepcted expect to be a pandas.DataFrame")
+    cols_used = ops.columns_used()
+    if len(cols_used) < 1:
+        raise ValueError("no tables used")
+    if not formats_to_self(ops):
+        raise ValueError("ops did not round-trip format")
+    check_op_round_trip(ops)
+    if isinstance(data, pandas.DataFrame):
+        if len(cols_used) != 1:
+            raise ValueError("more than one table used, but only one table supplied")
+        res = ops.transform(data)
+    else:
+        if not isinstance(data, Dict):
+            raise TypeError("expected data to be a pandas.DataFrame or a dictionary of such")
+        res = ops.eval_pandas(data_map=data)
+    # try pandas path
+    if not isinstance(res, pandas.DataFrame):
+        raise ValueError("expected res to be pandas.DataFrame, got: " + str(type(res)))
+    if not equivalent_frames(res, expect,
+                             float_tol=float_tol,
+                             check_column_order=check_column_order,
+                             cols_case_sensitive=cols_case_sensitive,
+                             check_row_order=check_row_order):
+        raise ValueError("Pandas result did not match expect")
+    # try Sqlite path
+    conn = sqlite3.connect(":memory:")
+    db_model = data_algebra.SQLite.SQLiteModel()
+    if isinstance(data, pandas.DataFrame):
+        table_name = [k for k in cols_used.keys()][0]
+        db_model.insert_table(conn, data, table_name=table_name)
+    else:
+        res = ops.eval_pandas(data_map=data)
+        for (k, v) in cols_used.items():
+            db_model.insert_table(conn, v, table_name=k)
+    sql = ops.to_sql(db_model, pretty=True)
+    res_db = db_model.read_query(conn, sql)
+    # clean up
+    conn.close()
+    if not equivalent_frames(res_db, expect,
+                             float_tol=float_tol,
+                             check_column_order=check_column_order,
+                             cols_case_sensitive=cols_case_sensitive,
+                             check_row_order=check_row_order):
+        raise ValueError("SQLite result did not match expect")
