@@ -95,6 +95,7 @@ def test_example1_1_early_error():
             },
             partition_by=1)
 
+
 def test_example1_1_detect_agg():
     d = pandas.DataFrame({
         'x_s': ['s_03', 's_04', 's_02', 's_01', 's_03', 's_01'],
@@ -114,3 +115,25 @@ def test_example1_1_detect_agg():
         'y_mean': 'y+1'
         })
     assert not ops2.windowed_situation
+
+
+def test_example1_add_const():
+    d = pandas.DataFrame({
+        'x_s': ['s_03', 's_04', 's_02', 's_01', 's_03', 's_01'],
+        'x_n': ['n_13', 'n_48', 'n_77', 'n_29', 'n_91', 'n_93'],
+        'y': [1.0312223, -1.3374379, -1.9347144, 1.2772708, -0.1238039, 0.3058670],
+    })
+    table_desc = describe_table(d, table_name='d')
+
+    ops = table_desc. \
+        extend({
+        'one': '1'
+        })
+    res = ops.transform(d)
+    expect = pandas.DataFrame({
+        'x_s': ['s_03', 's_04', 's_02', 's_01', 's_03', 's_01'],
+        'x_n': ['n_13', 'n_48', 'n_77', 'n_29', 'n_91', 'n_93'],
+        'y': [1.0312223, -1.3374379, -1.9347144, 1.2772708, -0.1238039, 0.305867],
+        'one': [1, 1, 1, 1, 1, 1],
+        })
+    assert data_algebra.util.equivalent_frames(res, expect)
