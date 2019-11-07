@@ -867,7 +867,7 @@ class ExtendNode(ViewRepresentation):
         reverse=None,
         parse_env=None
     ):
-        partitioned = False
+        windowed_situation = False
         if ops is None:
             ops = {}
         ops = data_algebra.expr_rep.parse_assignments_in_context(
@@ -878,25 +878,25 @@ class ExtendNode(ViewRepresentation):
         for (k, opk) in ops.items():  # look for aggregation functions
             if isinstance(opk, data_algebra.expr_rep.Expression):
                 if opk.op in data_algebra.expr_rep.fn_names_that_imply_windowed_situation:
-                    partitioned = True
+                    windowed_situation = True
         self.ops = ops
         if partition_by is None:
             partition_by = []
         if isinstance(partition_by, numbers.Number):
             partition_by = []
-            partitioned = True
+            windowed_situation = True
         if isinstance(partition_by, str):
             partition_by = [partition_by]
         if len(partition_by) > 0:
-            partitioned = True
+            windowed_situation = True
         self.partition_by = partition_by
         if order_by is None:
             order_by = []
         if isinstance(order_by, str):
             order_by = [order_by]
         if len(order_by) > 0:
-            partitioned = True
-        self.partitioned = partitioned
+            windowed_situation = True
+        self.windowed_situation = windowed_situation
         self.order_by = order_by
         if reverse is None:
             reverse = []
@@ -935,7 +935,7 @@ class ExtendNode(ViewRepresentation):
         if len(bad_overwrite) > 0:
             raise ValueError("tried to change: " + str(bad_overwrite))
         # check op arguments are very simple: all arguments are column names
-        if partitioned:
+        if windowed_situation:
             for (k, opk) in ops.items():
                 if not isinstance(opk, data_algebra.expr_rep.Expression):
                     raise ValueError(
@@ -943,12 +943,12 @@ class ExtendNode(ViewRepresentation):
                         "'" + k + "': '" + opk.to_pandas() + "'"
                     )
                 if len(opk.args) > 1:
-                    raise ValueError("in windowed/partitioned situations only simple operators are allowed, " +
+                    raise ValueError("in windowed situations only simple operators are allowed, " +
                                      "'" + k + "': '" + opk.to_pandas() + "' term is too complex an expression")
                 if len(opk.args) > 0:
                     value_name = opk.args[0].to_pandas()
                     if value_name not in source.column_set:
-                        raise ValueError("in windowed/partitioned situations only simple operators are allowed, " +
+                        raise ValueError("in windowed situations only simple operators are allowed, " +
                                          "'" + k + "': '" + opk.to_pandas() + "' term is too complex an expression")
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
 
@@ -994,7 +994,7 @@ class ExtendNode(ViewRepresentation):
         ]
         flowed = ("," + spacer + " ").join(ops)
         s = s + ("extend({" + spacer + " " + flowed + "}")
-        if self.partitioned:
+        if self.windowed_situation:
             if len(self.partition_by) > 0:
                 s = s + "," + spacer + "partition_by=" + self.partition_by.__repr__()
             else:

@@ -107,10 +107,10 @@ def test_example1_1_detect_agg():
         extend({
         'y_mean': 'y.mean()'
         })
-    assert ops.partitioned
+    assert ops.windowed_situation
 
     ops2 = table_desc. \
         extend({
         'y_mean': 'y+1'
         })
-    assert not ops2.partitioned
+    assert not ops2.windowed_situation

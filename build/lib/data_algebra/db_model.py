@@ -243,7 +243,7 @@ class DBModel:
         sub_view_name = "SQ_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         window_term = ""
-        if extend_node.partitioned or (len(extend_node.partition_by) > 0) or (len(extend_node.order_by) > 0):
+        if extend_node.windowed_situation or (len(extend_node.partition_by) > 0) or (len(extend_node.order_by) > 0):
             window_term = " OVER ( "
             if len(extend_node.partition_by) > 0:
                 pt = [self.quote_identifier(ci) for ci in extend_node.partition_by]
