@@ -5,7 +5,7 @@ import numpy
 import pandas
 
 __docformat__ = "restructuredtext"
-__version__ = "0.3.3"
+__version__ = "0.3.4"
 
 __doc__ = """
 `data_algebra`<https://github.com/WinVector/data_algebra> is a piped data wrangling system

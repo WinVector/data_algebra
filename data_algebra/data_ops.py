@@ -91,7 +91,7 @@ class OperatorPlatform:
     def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):
         raise NotImplementedError("base class called")
 
-    def select_rows(self, expr, parse_env=None):
+    def select_rows(self, expr, *, parse_env=None):
         raise NotImplementedError("base class called")
 
     def drop_columns(self, column_deletions):
@@ -395,6 +395,11 @@ class ViewRepresentation(OperatorPlatform):
             )
         raise TypeError("can not apply transform() to type " + str(type(X)))
 
+    # composition (used to eliminate intermediate order nodes)
+
+    def is_trivial_when_intermediate(self):
+        return False
+
     # nodes
 
     def extend(
@@ -402,6 +407,12 @@ class ViewRepresentation(OperatorPlatform):
     ):
         if (ops is None) or (len(ops) < 1):
             return self
+        if self.is_trivial_when_intermediate():
+            return self.sources[0].extend(ops,
+                                          partition_by=partition_by,
+                                          order_by=order_by,
+                                          reverse=reverse,
+                                          parse_env=parse_env)
         return ExtendNode(
             source=self,
             ops=ops,
@@ -412,6 +423,12 @@ class ViewRepresentation(OperatorPlatform):
         )
 
     def project(self, ops=None, *, group_by=None, parse_env=None):
+        if ((ops is None) or (len(ops) < 1)) and ((group_by is None) or (len(group_by) < 1)):
+            raise ValueError("must have ops or group_by")
+        if self.is_trivial_when_intermediate():
+            return self.sources[0].project(ops,
+                                           group_by=group_by,
+                                           parse_env=parse_env)
         return ProjectNode(source=self, ops=ops, group_by=group_by, parse_env=parse_env)
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
@@ -419,33 +436,76 @@ class ViewRepresentation(OperatorPlatform):
             raise TypeError(
                 "expected b to be a data_algebra.dat_ops.ViewRepresentation"
             )
+        if self.is_trivial_when_intermediate():
+            return self.sources[0].natural_join(b,
+                                                by=by,
+                                                jointype=jointype)
         return NaturalJoinNode(a=self, b=b, by=by, jointype=jointype)
 
     def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):
+        if b is None:
+            return self
         if not isinstance(b, ViewRepresentation):
             raise TypeError(
                 "expected b to be a data_algebra.dat_ops.ViewRepresentation"
             )
+        if self.is_trivial_when_intermediate():
+            return self.sources[0].concat_rows(b,
+                                               id_column=id_column,
+                                               a_name=a_name,
+                                               b_name=b_name)
         return ConcatRowsNode(
             a=self, b=b, id_column=id_column, a_name=a_name, b_name=b_name
         )
 
-    def select_rows(self, expr, parse_env=None):
+    def select_rows(self, expr, *, parse_env=None):
+        if expr is None:
+            return self
+        if self.is_trivial_when_intermediate():
+            return self.sources[0].select_rows(expr,
+                                               parse_env=parse_env)
         return SelectRowsNode(source=self, expr=expr, parse_env=parse_env)
 
     def drop_columns(self, column_deletions):
+        if (column_deletions is None) or (len(column_deletions) < 1):
+            return self
+        if self.is_trivial_when_intermediate():
+            return self.sources[0].drop_columns(column_deletions)
         return DropColumnsNode(source=self, column_deletions=column_deletions)
 
     def select_columns(self, columns):
+        if (columns is None) or (len(columns) < 1):
+            raise ValueError("must select at least one column")
+        if columns == self.column_names:
+            return self
+        if self.is_trivial_when_intermediate():
+            return self.sources[0].select_columns(columns)
+        if isinstance(self, SelectColumnsNode):
+            return self.sources[0].select_columns(columns)
         return SelectColumnsNode(source=self, columns=columns)
 
     def rename_columns(self, column_remapping):
+        if (column_remapping is None) or (len(column_remapping) < 1):
+            return self
+        if self.is_trivial_when_intermediate():
+            return self.sources[0].rename_columns(column_remapping)
         return RenameColumnsNode(source=self, column_remapping=column_remapping)
 
     def order_rows(self, columns, *, reverse=None, limit=None):
+        if ((columns is None) or (len(columns) < 1)) and (limit is None):
+            return self
+        if self.is_trivial_when_intermediate():
+            return self.sources[0].order_rows(columns,
+                                              reverse=reverse,
+                                              limit=limit)
         return OrderRowsNode(source=self, columns=columns, reverse=reverse, limit=limit)
 
     def convert_records(self, record_map, *, blocks_out_table=None):
+        if record_map is None:
+            return self
+        if self.is_trivial_when_intermediate():
+            return self.sources[0].convert_records(record_map,
+                                                   blocks_out_table=blocks_out_table)
         return ConvertRecordsNode(
             source=self, record_map=record_map, blocks_out_table=blocks_out_table
         )
@@ -692,8 +752,6 @@ class WrappedOperatorPlatform(OperatorPlatform):
     def extend(
         self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
     ):
-        if (ops is None) or (len(ops) < 1):
-            return self
         return WrappedOperatorPlatform(
             underlying=self.underlying.extend(
                 ops=ops,
@@ -723,6 +781,8 @@ class WrappedOperatorPlatform(OperatorPlatform):
         )
 
     def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):
+        if b is None:
+            return self
         if not isinstance(b, WrappedOperatorPlatform):
             raise TypeError("expected b to be of type WrappedOperatorPlatform")
         data_map, b = self._reach_in(b)
@@ -733,7 +793,7 @@ class WrappedOperatorPlatform(OperatorPlatform):
             data_map=data_map,
         )
 
-    def select_rows(self, expr, parse_env=None):
+    def select_rows(self, expr, *, parse_env=None):
         return WrappedOperatorPlatform(
             underlying=self.underlying.select_rows(expr=expr, parse_env=parse_env),
             data_map=self.data_map,
@@ -768,6 +828,8 @@ class WrappedOperatorPlatform(OperatorPlatform):
         )
 
     def convert_records(self, record_map, *, blocks_out_table=None):
+        if record_map is None:
+            return self
         data_map, blocks_out_table = self._reach_in(blocks_out_table)
         return WrappedOperatorPlatform(
             underlying=self.underlying.convert_records(
@@ -803,6 +865,7 @@ class ExtendNode(ViewRepresentation):
         reverse=None,
         parse_env=None
     ):
+        partitioned = False
         if ops is None:
             ops = {}
         ops = data_algebra.expr_rep.parse_assignments_in_context(
@@ -813,7 +876,6 @@ class ExtendNode(ViewRepresentation):
         self.ops = ops
         if partition_by is None:
             partition_by = []
-        partitioned = False
         if isinstance(partition_by, numbers.Number):
             partition_by = []
             partitioned = True
@@ -821,12 +883,14 @@ class ExtendNode(ViewRepresentation):
             partition_by = [partition_by]
         if len(partition_by) > 0:
             partitioned = True
-        self.partitioned = partitioned
         self.partition_by = partition_by
         if order_by is None:
             order_by = []
         if isinstance(order_by, str):
             order_by = [order_by]
+        if len(order_by) > 0:
+            partitioned = True
+        self.partitioned = partitioned
         self.order_by = order_by
         if reverse is None:
             reverse = []
@@ -1270,6 +1334,11 @@ class OrderRowsNode(ViewRepresentation):
 
     def eval_implementation(self, *, data_map, eval_env, data_model):
         return data_model.order_rows_step(op=self, data_map=data_map, eval_env=eval_env)
+
+    # short-cut main interface
+
+    def is_trivial_when_intermediate(self):
+        return self.limit is None
 
 
 class RenameColumnsNode(ViewRepresentation):
