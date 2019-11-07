@@ -1,3 +1,4 @@
+import data_algebra.test_util
 from data_algebra.data_ops import *
 from data_algebra.test_util import formats_to_self
 import data_algebra.util
@@ -15,7 +16,7 @@ def test_expr_parse():
     expect0 = pandas.DataFrame(
         {"a": [True, False], "b": [1, 2], "c": [3, 4], "d": [2, 1],}
     )
-    assert data_algebra.util.equivalent_frames(res0, expect0)
+    assert data_algebra.test_util.equivalent_frames(res0, expect0)
 
     ops1 = TableDescription("d", ["a", "b", "c"]).extend({"d": "a.if_else(1, c)"})
 
@@ -25,7 +26,7 @@ def test_expr_parse():
     expect1 = pandas.DataFrame(
         {"a": [True, False], "b": [1, 2], "c": [3, 4], "d": [1, 4],}
     )
-    assert data_algebra.util.equivalent_frames(res1, expect1)
+    assert data_algebra.test_util.equivalent_frames(res1, expect1)
 
     # # TODO: implement and test
     # ops2 = TableDescription('d', ['a', 'b', 'c']). \

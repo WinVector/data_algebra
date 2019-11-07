@@ -2,6 +2,7 @@ import pandas
 
 import data_algebra
 import data_algebra.env
+import data_algebra.test_util
 import data_algebra.util
 import data_algebra.yaml
 from data_algebra.data_ops import *
@@ -47,6 +48,6 @@ def test_neg():
         }
     )
 
-    assert data_algebra.util.equivalent_frames(res_local, expect, float_tol=1e-3)
+    assert data_algebra.test_util.equivalent_frames(res_local, expect, float_tol=1e-3)
 
-    data_algebra.yaml.check_op_round_trip(ops)
+    data_algebra.test_util.check_op_round_trip(ops)

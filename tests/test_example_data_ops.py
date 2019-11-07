@@ -1,3 +1,4 @@
+import data_algebra.test_util
 from data_algebra.data_ops import *
 from data_algebra.util import od
 import data_algebra.env
@@ -34,4 +35,4 @@ def test_example_data_ops_extend():
         ]
 
     for o in ops:
-        data_algebra.yaml.check_op_round_trip(o)
+        data_algebra.test_util.check_op_round_trip(o)

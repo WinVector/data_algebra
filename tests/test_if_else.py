@@ -2,6 +2,7 @@ import sqlite3
 
 import pandas
 
+import data_algebra.test_util
 from data_algebra.data_ops import *
 from data_algebra.SQLite import SQLiteModel
 import data_algebra.util
@@ -18,7 +19,7 @@ def test_if_else():
 
     res_pandas = ops.transform(d)
 
-    assert data_algebra.util.equivalent_frames(res_pandas, expect)
+    assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
 
     db_model = SQLiteModel()
 
@@ -33,4 +34,4 @@ def test_if_else():
 
     conn.close()
 
-    assert data_algebra.util.equivalent_frames(res_db, expect)
+    assert data_algebra.test_util.equivalent_frames(res_db, expect)

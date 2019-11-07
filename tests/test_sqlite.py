@@ -1,5 +1,7 @@
 import sqlite3
 import pandas
+
+import data_algebra.test_util
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 import data_algebra.SQLite
 import data_algebra.util
@@ -52,7 +54,7 @@ def test_sqlite():
         }
     )
 
-    assert data_algebra.util.equivalent_frames(res, expect)
+    assert data_algebra.test_util.equivalent_frames(res, expect)
 
     d2 = pandas.DataFrame(
         {
@@ -66,4 +68,4 @@ def test_sqlite():
 
     res2 = ops.eval_pandas(data_map={"stocks": d2}, eval_env=locals())
 
-    assert data_algebra.util.equivalent_frames(res2, expect)
+    assert data_algebra.test_util.equivalent_frames(res2, expect)

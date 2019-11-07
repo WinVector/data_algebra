@@ -1,3 +1,4 @@
+import data_algebra.test_util
 import data_algebra.util
 import pandas
 from data_algebra.data_ops import *
@@ -20,7 +21,7 @@ def test_extend_0():
     assert formats_to_self(ops)
 
     res = ops.transform(d)
-    assert data_algebra.util.equivalent_frames(d, res)
+    assert data_algebra.test_util.equivalent_frames(d, res)
 
 
 def test_extend_p():
@@ -36,7 +37,7 @@ def test_extend_p():
     expect = pandas.DataFrame(
         {"g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4], "c": [3, 4, 3, 4],}
     )
-    assert data_algebra.util.equivalent_frames(expect, res)
+    assert data_algebra.test_util.equivalent_frames(expect, res)
 
 
 def test_extend_p0():
@@ -52,4 +53,4 @@ def test_extend_p0():
     expect = pandas.DataFrame(
         {"g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4], "c": [4, 4, 4, 4],}
     )
-    assert data_algebra.util.equivalent_frames(expect, res)
+    assert data_algebra.test_util.equivalent_frames(expect, res)

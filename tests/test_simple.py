@@ -1,5 +1,7 @@
 import numpy
 import pandas
+
+import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
 from data_algebra.util import od
@@ -41,22 +43,22 @@ def test_equiv():
     d3 = pandas.DataFrame({"x": [1, 2], "y": ["a", "b"]})
     d4 = pandas.DataFrame({"x": [1, 2]})
     d5 = pandas.DataFrame({"x": [1, 2, 0], "y": [3, numpy.nan, 0]})
-    assert data_algebra.util.equivalent_frames(d1, d1)
-    assert data_algebra.util.equivalent_frames(d2, d2)
-    assert data_algebra.util.equivalent_frames(d1, d1[["y", "x"]])
-    assert not data_algebra.util.equivalent_frames(
+    assert data_algebra.test_util.equivalent_frames(d1, d1)
+    assert data_algebra.test_util.equivalent_frames(d2, d2)
+    assert data_algebra.test_util.equivalent_frames(d1, d1[["y", "x"]])
+    assert not data_algebra.test_util.equivalent_frames(
         d1, d1[["y", "x"]], check_column_order=True
     )
-    assert not data_algebra.util.equivalent_frames(d1, d2)
-    assert data_algebra.util.equivalent_frames(d1, d1b)
-    assert not data_algebra.util.equivalent_frames(d1, d1b, check_row_order=True)
-    assert not data_algebra.util.equivalent_frames(d1, d1c, float_tol=1e-3)
-    assert not data_algebra.util.equivalent_frames(d1, d1c, float_tol=1e-8)
-    assert data_algebra.util.equivalent_frames(d1, d1d, float_tol=1e-3)
-    assert not data_algebra.util.equivalent_frames(d1, d1d, float_tol=1e-8)
-    assert not data_algebra.util.equivalent_frames(d1, d3)
-    assert not data_algebra.util.equivalent_frames(d1, d4)
-    assert not data_algebra.util.equivalent_frames(d1, d5)
+    assert not data_algebra.test_util.equivalent_frames(d1, d2)
+    assert data_algebra.test_util.equivalent_frames(d1, d1b)
+    assert not data_algebra.test_util.equivalent_frames(d1, d1b, check_row_order=True)
+    assert not data_algebra.test_util.equivalent_frames(d1, d1c, float_tol=1e-3)
+    assert not data_algebra.test_util.equivalent_frames(d1, d1c, float_tol=1e-8)
+    assert data_algebra.test_util.equivalent_frames(d1, d1d, float_tol=1e-3)
+    assert not data_algebra.test_util.equivalent_frames(d1, d1d, float_tol=1e-8)
+    assert not data_algebra.test_util.equivalent_frames(d1, d3)
+    assert not data_algebra.test_util.equivalent_frames(d1, d4)
+    assert not data_algebra.test_util.equivalent_frames(d1, d5)
 
 
 def test_simple():
@@ -70,7 +72,7 @@ def test_simple():
     d_local = pandas.DataFrame({"x": [1, 2], "y": [3, 4]})
     res = ops.eval_pandas(data_map={"d": d_local}, eval_env=locals())
     expect = pandas.DataFrame({"x": [1, 2], "y": [3, 4], "z": [1.25, 2.25]})
-    assert data_algebra.util.equivalent_frames(res, expect)
+    assert data_algebra.test_util.equivalent_frames(res, expect)
 
 
 def test_pandas_to_example():
@@ -92,4 +94,4 @@ def test_pandas_to_example():
     )
     d_str = data_algebra.util.pandas_to_example_str(d)
     d_back = eval(d_str)
-    assert data_algebra.util.equivalent_frames(d, d_back)
+    assert data_algebra.test_util.equivalent_frames(d, d_back)

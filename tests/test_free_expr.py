@@ -1,6 +1,6 @@
 from data_algebra.data_ops import *
 from data_algebra.expr import frame, row_number
-
+import data_algebra.test_util
 
 def test_free_expr():
     scale = 0.237
@@ -21,7 +21,7 @@ def test_free_expr():
         .rename_columns({"diagnosis": "surveyCategory"})
     )
 
-    data_algebra.yaml.check_op_round_trip(ops1)
+    data_algebra.test_util.check_op_round_trip(ops1)
 
     with data_algebra.env.Env(locals()) as env:
         ops2 = (
@@ -40,7 +40,7 @@ def test_free_expr():
             .rename_columns({"diagnosis": "surveyCategory"})
         )
 
-    data_algebra.yaml.check_op_round_trip(ops2)
+    data_algebra.test_util.check_op_round_trip(ops2)
 
     assert str(ops1) == str(ops2)
 
@@ -62,7 +62,7 @@ def test_free_expr():
         .rename_columns({"diagnosis": "surveyCategory"})
     )
 
-    data_algebra.yaml.check_op_round_trip(ops3)
+    data_algebra.test_util.check_op_round_trip(ops3)
 
     assert str(ops1) == str(ops3)
 
@@ -84,6 +84,6 @@ def test_free_expr():
         .rename_columns({"diagnosis": "surveyCategory"})
     )
 
-    data_algebra.yaml.check_op_round_trip(ops4)
+    data_algebra.test_util.check_op_round_trip(ops4)
 
     assert str(ops1) == str(ops4)

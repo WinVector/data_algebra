@@ -1,5 +1,6 @@
 import pandas
 
+import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
 from data_algebra.connected_components import connected_components, partitioned_eval
@@ -37,7 +38,7 @@ def test_cc_ops():
     expect = pandas.DataFrame(
         {"f": [1, 4, 6, 2, 1], "g": [2, 5, 7, 3, 7], "c": [1, 4, 1, 1, 1],}
     )
-    assert data_algebra.util.equivalent_frames(res, expect)
+    assert data_algebra.test_util.equivalent_frames(res, expect)
 
 
 def test_cc_ops_f():
@@ -50,7 +51,7 @@ def test_cc_ops_f():
     expect = pandas.DataFrame(
         {"f": [1, 4, 6, 2, 1], "g": [2, 5, 7, 3, 7], "c": [1, 4, 1, 1, 1],}
     )
-    assert data_algebra.util.equivalent_frames(res, expect)
+    assert data_algebra.test_util.equivalent_frames(res, expect)
 
 
 def test_cc_partitioned():
@@ -81,4 +82,4 @@ def test_cc_partitioned_ops():
             "c": [1, 4, 1, 2, 1],
         }
     )
-    assert data_algebra.util.equivalent_frames(res, expect)
+    assert data_algebra.test_util.equivalent_frames(res, expect)

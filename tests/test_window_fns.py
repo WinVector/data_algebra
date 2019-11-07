@@ -1,6 +1,7 @@
 import sqlite3
 import pandas
 
+import data_algebra.test_util
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 import data_algebra.util
 import data_algebra.SQLite
@@ -58,7 +59,7 @@ def test_window_fns():
         }
     )
 
-    assert data_algebra.util.equivalent_frames(res1, expect1)
+    assert data_algebra.test_util.equivalent_frames(res1, expect1)
 
     conn = sqlite3.connect(":memory:")
     db_model = data_algebra.SQLite.SQLiteModel()
@@ -103,7 +104,7 @@ def test_window_fns():
         ]
     ]
 
-    assert data_algebra.util.equivalent_frames(res1_db, expect2)
+    assert data_algebra.test_util.equivalent_frames(res1_db, expect2)
 
     # clean up
     conn.close()

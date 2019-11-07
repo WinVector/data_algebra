@@ -4,6 +4,7 @@ import numpy
 
 import pandas
 
+import data_algebra.test_util
 from data_algebra.data_ops import *
 from data_algebra.cdata import *
 import data_algebra.yaml
@@ -85,7 +86,7 @@ def test_keras_example():
             "validation": [0.8722, -0.3770, 0.8895, -0.2997],
         }
     )
-    assert data_algebra.util.equivalent_frames(res, expect)
+    assert data_algebra.test_util.equivalent_frames(res, expect)
 
 
 def test_cdata_block():
@@ -134,7 +135,7 @@ def test_cdata_block():
 
     back = inv.transform(res)
 
-    assert data_algebra.util.equivalent_frames(data, back)
+    assert data_algebra.test_util.equivalent_frames(data, back)
 
 
 def test_cdata_missing():
@@ -196,4 +197,4 @@ def test_cdata_missing():
         }
     )
 
-    assert data_algebra.util.equivalent_frames(res, expect)
+    assert data_algebra.test_util.equivalent_frames(res, expect)

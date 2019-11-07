@@ -1,5 +1,6 @@
 import pandas
 
+import data_algebra.test_util
 from data_algebra.data_ops import *
 import data_algebra.util
 
@@ -45,4 +46,4 @@ def test_ghost_col_issue():
             "size_v": [1, 2, 2, 3, 3, 3],
         }
     )
-    assert data_algebra.util.equivalent_frames(res, expect)
+    assert data_algebra.test_util.equivalent_frames(res, expect)

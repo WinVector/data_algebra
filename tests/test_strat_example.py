@@ -1,6 +1,8 @@
 # https://github.com/WinVector/pyvtreat/blob/master/Examples/StratifiedCrossPlan/StratifiedCrossPlan.ipynb
 
 import pandas
+
+import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
 
@@ -25,4 +27,4 @@ def test_strat_example():
         }
     )
 
-    assert data_algebra.util.equivalent_frames(res, expect)
+    assert data_algebra.test_util.equivalent_frames(res, expect)

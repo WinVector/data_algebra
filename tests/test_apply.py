@@ -1,5 +1,7 @@
 import pandas
 import numpy
+
+import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
 import data_algebra.PostgreSQL
@@ -24,11 +26,11 @@ def test_apply():
 
     res_0_1 = ops0.transform(d)
 
-    assert data_algebra.util.equivalent_frames(expect_1, res_0_1)
+    assert data_algebra.test_util.equivalent_frames(expect_1, res_0_1)
 
     res_0_2 = d >> ops0
 
-    assert data_algebra.util.equivalent_frames(expect_1, res_0_2)
+    assert data_algebra.test_util.equivalent_frames(expect_1, res_0_2)
 
     ops1b = (
         TableDescription("t1", ["x", "y"])
@@ -38,4 +40,4 @@ def test_apply():
 
     res_1b = ops1b.transform(d)
 
-    assert data_algebra.util.equivalent_frames(expect_1, res_1b)
+    assert data_algebra.test_util.equivalent_frames(expect_1, res_1b)

@@ -1,6 +1,7 @@
 import sqlite3
 import pandas
 
+import data_algebra.test_util
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 import data_algebra.util
 import data_algebra.SQLite
@@ -56,7 +57,7 @@ def test_window2():
         }
     )
 
-    assert data_algebra.util.equivalent_frames(expect1, res1)
+    assert data_algebra.test_util.equivalent_frames(expect1, res1)
 
     conn = sqlite3.connect(":memory:")
     db_model = data_algebra.SQLite.SQLiteModel()
@@ -102,7 +103,7 @@ def test_window2():
         }
     )
 
-    assert data_algebra.util.equivalent_frames(expect1_db, res1_db)
+    assert data_algebra.test_util.equivalent_frames(expect1_db, res1_db)
 
     id_ops_a = table_desciption.project(group_by=["g"]).extend(
         {"ngroup": "_row_number()",}, order_by=["g"]
@@ -126,11 +127,11 @@ def test_window2():
         }
     )
 
-    assert data_algebra.util.equivalent_frames(expect2_db, res2_db)
+    assert data_algebra.test_util.equivalent_frames(expect2_db, res2_db)
 
     # clean up
     conn.close()
 
     res2_pandas = id_ops_b.transform(d)
 
-    assert data_algebra.util.equivalent_frames(expect2_db, res2_pandas)
+    assert data_algebra.test_util.equivalent_frames(expect2_db, res2_pandas)

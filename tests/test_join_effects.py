@@ -1,6 +1,7 @@
 import pandas
 import pytest
 
+import data_algebra.test_util
 from data_algebra.data_ops import *
 import data_algebra.util
 
@@ -25,7 +26,7 @@ def test_join_warn1():
         {"k": ["a", "a", "b"], "x": [1.0, None, 3.0], "y": [1.0, 10.0, 20.0],}
     )
 
-    assert data_algebra.util.equivalent_frames(res, expect)
+    assert data_algebra.test_util.equivalent_frames(res, expect)
 
 
 def test_join_wrap1():
@@ -45,4 +46,4 @@ def test_join_wrap1():
         {"k": ["a", "a", "b"], "x": [1.0, None, 3.0], "y": [1.0, 10.0, 20.0],}
     )
 
-    assert data_algebra.util.equivalent_frames(res, expect)
+    assert data_algebra.test_util.equivalent_frames(res, expect)

@@ -1,3 +1,4 @@
+import data_algebra.test_util
 import data_algebra.util
 import pandas
 from data_algebra.data_ops import *
@@ -15,12 +16,12 @@ def test_R_yaml():
     ops1 = describe_table(d).project({"sum_y": "y.sum()"})
     res1 = ops1.transform(d)
     expect1 = pandas.DataFrame({"sum_y": [10],})
-    assert data_algebra.util.equivalent_frames(res1, expect1)
+    assert data_algebra.test_util.equivalent_frames(res1, expect1)
 
     ops2 = describe_table(d).project({"sum_y": "y.sum()"}, group_by=["x"])
     res2 = ops2.transform(d)
     expect2 = pandas.DataFrame({"x": [1, 2], "sum_y": [3, 7],})
-    assert data_algebra.util.equivalent_frames(res2, expect2)
+    assert data_algebra.test_util.equivalent_frames(res2, expect2)
 
 
 def test_project0():
@@ -34,7 +35,7 @@ def test_project0():
 
     res = ops.transform(d)
     expect = pandas.DataFrame({"c": [1, 1], "g": ["a", "b"]})
-    assert data_algebra.util.equivalent_frames(expect, res)
+    assert data_algebra.test_util.equivalent_frames(expect, res)
 
 
 def test_project_z():
@@ -48,7 +49,7 @@ def test_project_z():
 
     res = ops.transform(d)
     expect = pandas.DataFrame({"c": [1]})
-    assert data_algebra.util.equivalent_frames(expect, res)
+    assert data_algebra.test_util.equivalent_frames(expect, res)
 
 
 def test_project_zz():
@@ -74,7 +75,7 @@ def test_project():
 
     sql = ops.to_sql(db_model)
 
-    data_algebra.yaml.check_op_round_trip(ops)
+    data_algebra.test_util.check_op_round_trip(ops)
 
     res = ops.eval_pandas(data_map=od(d=d), eval_env=locals())
 
@@ -82,4 +83,4 @@ def test_project():
         {"c": [1, 1], "g": ["a", "b"], "ymax": [3, 4], "ymin": [1, 2]}
     )
 
-    assert data_algebra.util.equivalent_frames(expect, res)
+    assert data_algebra.test_util.equivalent_frames(expect, res)

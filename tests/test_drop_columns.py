@@ -1,4 +1,6 @@
 import pandas
+
+import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
 import data_algebra.PostgreSQL
@@ -18,8 +20,8 @@ def test_drop_columns():
 
     res = ops.eval_pandas(data_map=od(d=d), eval_env=locals())
 
-    data_algebra.yaml.check_op_round_trip(ops)
+    data_algebra.test_util.check_op_round_trip(ops)
 
     expect = pandas.DataFrame({"y": [2]})
 
-    assert data_algebra.util.equivalent_frames(expect, res)
+    assert data_algebra.test_util.equivalent_frames(expect, res)

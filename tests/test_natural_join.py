@@ -1,5 +1,7 @@
 import pandas
 import numpy
+
+import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
 import data_algebra.SQLite
@@ -19,7 +21,7 @@ def test_natural_join_columns():
         b=describe_table(d2, "d2"), by=["y"], jointype="LEFT"
     )
 
-    data_algebra.yaml.check_op_round_trip(ops4)
+    data_algebra.test_util.check_op_round_trip(ops4)
 
     res_pandas = ops4.eval_pandas(data_map={"d": d, "d2": d2}, eval_env=locals())
 
@@ -31,7 +33,7 @@ def test_natural_join_columns():
         }
     )
 
-    assert data_algebra.util.equivalent_frames(expect, res_pandas)
+    assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
 
     sql = ops4.to_sql(db_model, pretty=True)
 
@@ -42,4 +44,4 @@ def test_natural_join_columns():
     # neaten up
     conn.close()
 
-    assert data_algebra.util.equivalent_frames(expect, res_sqlite)
+    assert data_algebra.test_util.equivalent_frames(expect, res_sqlite)

@@ -65,11 +65,11 @@ data_algebra/expr.py                      20      4    80%
 data_algebra/expr_rep.py                 618    206    67%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/pandas_model.py             178     22    88%
-data_algebra/test_util.py                  6      0   100%
-data_algebra/util.py                      93     13    86%
-data_algebra/yaml.py                     123     15    88%
+data_algebra/test_util.py                 87      7    92%
+data_algebra/util.py                      40      8    80%
+data_algebra/yaml.py                     101     13    87%
 ----------------------------------------------------------
-TOTAL                                   3404    818    76%
+TOTAL                                   3410    818    76%
 
 
-============================== 62 passed in 6.58s ==============================
+============================== 62 passed in 6.72s ==============================

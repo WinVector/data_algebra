@@ -2,6 +2,8 @@ import math
 import sqlite3
 import pandas  # https://pandas.pydata.org
 import yaml  # https://pyyaml.org
+
+import data_algebra.test_util
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 import data_algebra.env
 import data_algebra.yaml
@@ -52,7 +54,7 @@ def test_scoring_example():
             .rename_columns({"diagnosis": "surveyCategory"})
         )
 
-    data_algebra.yaml.check_op_round_trip(ops)
+    data_algebra.test_util.check_op_round_trip(ops)
 
     py_source = ops.to_python(strict=True, pretty=False)
     py_sourcep = ops.to_python(strict=True, pretty=True)
@@ -66,7 +68,7 @@ def test_scoring_example():
             "probability": [0.670622, 0.558974],
         }
     )
-    assert data_algebra.util.equivalent_frames(expect, res, float_tol=1e-3)
+    assert data_algebra.test_util.equivalent_frames(expect, res, float_tol=1e-3)
 
     # round-trip the operators
     objs_Python = ops.collect_representation()
@@ -93,7 +95,7 @@ def test_scoring_example():
 
     res_sql = db_model_s.read_query(conn, sql_s)
 
-    assert data_algebra.util.equivalent_frames(expect, res_sql, float_tol=1e-3)
+    assert data_algebra.test_util.equivalent_frames(expect, res_sql, float_tol=1e-3)
 
     # test instrumentation
 

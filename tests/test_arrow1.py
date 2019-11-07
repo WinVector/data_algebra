@@ -3,6 +3,7 @@ import pandas
 import pytest
 
 import data_algebra.diagram
+import data_algebra.test_util
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 import data_algebra.util
 import data_algebra.arrow
@@ -47,8 +48,8 @@ def test_arrow1():
     li = data_algebra.arrow.identity_arrow(a1.dom())
     li >> a1
     a1 >> ri
-    assert data_algebra.util.equivalent_frames(d >> a1, d >> li >> a1)
-    assert data_algebra.util.equivalent_frames(d >> a1, d >> a1 >> ri)
+    assert data_algebra.test_util.equivalent_frames(d >> a1, d >> li >> a1)
+    assert data_algebra.test_util.equivalent_frames(d >> a1, d >> a1 >> ri)
     a1.dom() >> a1
     a1.transform(a1.dom())
 
@@ -179,7 +180,7 @@ def test_arrow1():
     # the preferred notation, work in operator space
     r2 = d >> (a1 >> a2 >> a3)
 
-    assert data_algebra.util.equivalent_frames(r1, r2)
+    assert data_algebra.test_util.equivalent_frames(r1, r2)
 
     # check pipelines compose
     p1 = a3.pipeline.transform(a2.pipeline.transform(a1.pipeline)).__repr__()
@@ -192,18 +193,18 @@ def test_arrow1():
 
     r2 = d >> (a1.pipeline >> a2.pipeline >> a3.pipeline)
 
-    assert data_algebra.util.equivalent_frames(r1, r2)
+    assert data_algebra.test_util.equivalent_frames(r1, r2)
 
     r3 = d >> a1.pipeline >> a2.pipeline >> a3.pipeline
 
-    assert data_algebra.util.equivalent_frames(r1, r3)
+    assert data_algebra.test_util.equivalent_frames(r1, r3)
 
     # check identity relns
     ri = data_algebra.arrow.identity_arrow(a1.cod())
     li = data_algebra.arrow.identity_arrow(a1.dom())
     li >> a1
     a1 >> ri
-    assert data_algebra.util.equivalent_frames(d >> a1, d >> li >> a1)
-    assert data_algebra.util.equivalent_frames(d >> a1, d >> a1 >> ri)
+    assert data_algebra.test_util.equivalent_frames(d >> a1, d >> li >> a1)
+    assert data_algebra.test_util.equivalent_frames(d >> a1, d >> a1 >> ri)
     a1.dom() >> a1
     a1.transform(a1.dom())

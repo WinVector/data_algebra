@@ -43,11 +43,11 @@ def test_example1_1():
         'x_s': ['s_01', 's_02', 's_03', 's_04'],
         'meany': [0.9218349166666666, -1.8044483833333334, 0.5839752166666667, -1.2071718833333334],
         })
-    assert data_algebra.util.equivalent_frames(res1, expect1)
+    assert data_algebra.test_util.equivalent_frames(res1, expect1)
 
     sql1 = ops1.to_sql(db_model, pretty=True)
     res1db = db_model.read_query(conn, sql1)
-    assert data_algebra.util.equivalent_frames(res1db, expect1)
+    assert data_algebra.test_util.equivalent_frames(res1db, expect1)
 
     ops2 = table_desc. \
         extend({
@@ -70,11 +70,11 @@ def test_example1_1():
         'meany': [1.1614883166666667, 1.4075368166666666, -1.2071718833333334,
                   -1.8044483833333334, 0.006462116666666684, 0.4361330166666667],
         })
-    assert data_algebra.util.equivalent_frames(res2, expect2)
+    assert data_algebra.test_util.equivalent_frames(res2, expect2)
 
     sql2 = ops2.to_sql(db_model, pretty=True)
     res2db = db_model.read_query(conn, sql2)
-    assert data_algebra.util.equivalent_frames(res2db, expect2)
+    assert data_algebra.test_util.equivalent_frames(res2db, expect2)
 
     # clean up
     conn.close()
@@ -136,4 +136,4 @@ def test_example1_add_const():
         'y': [1.0312223, -1.3374379, -1.9347144, 1.2772708, -0.1238039, 0.305867],
         'one': [1, 1, 1, 1, 1, 1],
         })
-    assert data_algebra.util.equivalent_frames(res, expect)
+    assert data_algebra.test_util.equivalent_frames(res, expect)

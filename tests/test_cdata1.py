@@ -3,6 +3,8 @@ import io
 import sqlite3
 import yaml
 import pandas
+
+import data_algebra.test_util
 from data_algebra.cdata import *
 from data_algebra.cdata_impl import record_map_from_simple_obj
 import data_algebra.SQLite
@@ -103,7 +105,7 @@ def test_cdata1():
     db_model.insert_table(conn, record_spec.control_table, temp_table.table_name)
 
     res_blocks = db_model.read_query(conn, sql)
-    assert data_algebra.util.equivalent_frames(res_blocks, iris_blocks_orig)
+    assert data_algebra.test_util.equivalent_frames(res_blocks, iris_blocks_orig)
     waste_str = str(res_blocks)
 
     # %%
@@ -121,7 +123,7 @@ def test_cdata1():
     # %%
 
     res_rows = db_model.read_query(conn, sql_back)
-    assert data_algebra.util.equivalent_frames(res_rows, iris_orig)
+    assert data_algebra.test_util.equivalent_frames(res_rows, iris_orig)
     waste_str = str(res_rows)
 
     # %%
@@ -137,7 +139,7 @@ def test_cdata1():
     mp_to_blocks = RecordMap(blocks_out=record_spec)
     waste_str = str(mp_to_blocks)
     arranged_blocks = mp_to_blocks.transform(iris)
-    assert data_algebra.util.equivalent_frames(arranged_blocks, iris_blocks_orig)
+    assert data_algebra.test_util.equivalent_frames(arranged_blocks, iris_blocks_orig)
     arranged_blocks
 
     # %%
@@ -145,7 +147,7 @@ def test_cdata1():
     mp_to_rows = RecordMap(blocks_in=record_spec)
     waste_str = str(mp_to_rows)
     arranged_rows = mp_to_rows.transform(arranged_blocks)
-    assert data_algebra.util.equivalent_frames(arranged_rows, iris_orig)
+    assert data_algebra.test_util.equivalent_frames(arranged_rows, iris_orig)
     arranged_rows
 
     # %%
@@ -153,7 +155,7 @@ def test_cdata1():
     mp_to_and_back = RecordMap(blocks_in=record_spec, blocks_out=record_spec)
     waste_str = str(mp_to_and_back)
     arranged_self = mp_to_and_back.transform(iris_blocks)
-    assert data_algebra.util.equivalent_frames(arranged_self, iris_blocks_orig)
+    assert data_algebra.test_util.equivalent_frames(arranged_self, iris_blocks_orig)
     arranged_self
 
     #%%

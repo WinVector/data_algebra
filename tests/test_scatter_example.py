@@ -1,5 +1,6 @@
 import pandas
 
+import data_algebra.test_util
 import data_algebra.util
 from data_algebra.cdata import *
 from data_algebra.cdata_impl import record_map_from_simple_obj
@@ -243,8 +244,8 @@ def test_scatter_example():
             ],
         }
     )
-    assert data_algebra.util.equivalent_frames(res, expect)
+    assert data_algebra.test_util.equivalent_frames(res, expect)
 
     inv = record_map.inverse()
     back = inv.transform(expect)
-    assert data_algebra.util.equivalent_frames(iris_small, back)
+    assert data_algebra.test_util.equivalent_frames(iris_small, back)
