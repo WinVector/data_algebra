@@ -12,6 +12,47 @@ import data_algebra.env
 #  http://tomerfiliba.com/blog/Infix-Operators/
 
 
+# list of window/aggregation functons that must be windowed/aggegated
+# (note some other functions work in more than one mode)
+fn_names_that_imply_windowed_situation = {
+    'all',
+    'any',
+    'bfill',
+    'count',
+    'cumcount',
+    'cummax',
+    'cummin',
+    'cumprod',
+    'cumsum',
+    'ffill',
+    'first',
+    'head',
+    'is_monotonic_decreasing',
+    'is_monotonic_increasing',
+    'last',
+    'max',
+    'mean',
+    'median',
+    'min',
+    'ngroup',
+    'nlargest',
+    'nsmallest',
+    'nth',
+    'nunique',
+    'ohlc',
+    'pct_change',
+    'rank',
+    'sem',
+    'shift',
+    'size',
+    'std',
+    'tail',
+    'unique',
+    'value_counts',
+    'var',
+}
+
+
 class Term:
     """Inherit from this class to capture expressions.
     Abstract class, should be extended for use."""

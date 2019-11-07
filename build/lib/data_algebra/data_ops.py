@@ -15,22 +15,22 @@ import data_algebra.expr_rep
 import data_algebra.env
 
 
-have_black = False
+_have_black = False
 try:
     # noinspection PyUnresolvedReferences
     import black
 
-    have_black = True
+    _have_black = True
 except ImportError:
     pass
 
 
-have_sqlparse = False
+_have_sqlparse = False
 try:
     # noinspection PyUnresolvedReferences
     import sqlparse
 
-    have_sqlparse = True
+    _have_sqlparse = True
 except ImportError:
     pass
 
@@ -243,7 +243,7 @@ class ViewRepresentation(OperatorPlatform):
             indent=indent, strict=strict, print_sources=True
         )
         if pretty:
-            if have_black:
+            if _have_black:
                 try:
                     if black_mode is None:
                         black_mode = black.FileMode()
@@ -276,7 +276,7 @@ class ViewRepresentation(OperatorPlatform):
         sql_str = self.to_sql_implementation(
             db_model=db_model, using=None, temp_id_source=temp_id_source
         )
-        if pretty and have_sqlparse:
+        if pretty and _have_sqlparse:
             try:
                 sql_str = sqlparse.format(
                     sql_str, encoding=encoding, **sqlparse_options
@@ -482,6 +482,8 @@ class ViewRepresentation(OperatorPlatform):
             return self.sources[0].select_columns(columns)
         if isinstance(self, SelectColumnsNode):
             return self.sources[0].select_columns(columns)
+        if isinstance(self, DropColumnsNode):
+            return self.sources[0].select_columns(columns)
         return SelectColumnsNode(source=self, columns=columns)
 
     def rename_columns(self, column_remapping):
@@ -627,7 +629,7 @@ class TableDescription(ViewRepresentation):
         sql_str = self.to_sql_implementation(
             db_model=db_model, using=None, temp_id_source=temp_id_source, force_sql=True
         )
-        if pretty and have_sqlparse:
+        if pretty and _have_sqlparse:
             sql_str = sqlparse.format(sql_str, encoding=encoding, **sqlparse_options)
         return sql_str
 
@@ -873,6 +875,10 @@ class ExtendNode(ViewRepresentation):
         )
         if len(ops) < 1:
             raise ValueError("no ops")
+        for (k, opk) in ops.items():  # look for aggregation functions
+            if isinstance(opk, data_algebra.expr_rep.Expression):
+                if opk.op in data_algebra.expr_rep.fn_names_that_imply_windowed_situation:
+                    partitioned = True
         self.ops = ops
         if partition_by is None:
             partition_by = []
@@ -928,6 +934,22 @@ class ExtendNode(ViewRepresentation):
         )
         if len(bad_overwrite) > 0:
             raise ValueError("tried to change: " + str(bad_overwrite))
+        # check op arguments are very simple: all arguments are column names
+        if partitioned:
+            for (k, opk) in ops.items():
+                if not isinstance(opk, data_algebra.expr_rep.Expression):
+                    raise ValueError(
+                        "non-aggregated expression in windowed/partitoned extend: " +
+                        "'" + k + "': '" + opk.to_pandas() + "'"
+                    )
+                if len(opk.args) > 1:
+                    raise ValueError("in windowed/partitioned situations only simple operators are allowed, " +
+                                     "'" + k + "': '" + opk.to_pandas() + "' term is too complex an expression")
+                if len(opk.args) > 0:
+                    value_name = opk.args[0].to_pandas()
+                    if value_name not in source.column_set:
+                        raise ValueError("in windowed/partitioned situations only simple operators are allowed, " +
+                                         "'" + k + "': '" + opk.to_pandas() + "' term is too complex an expression")
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
 
     def columns_used_from_sources(self, using=None):

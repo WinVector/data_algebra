@@ -3,10 +3,13 @@ import sqlite3
 
 import pandas
 
+import pytest
+
 from data_algebra.data_ops import *
 import data_algebra.util
 import data_algebra.SQLite
 import data_algebra.test_util
+
 
 def test_example1_1():
 
@@ -75,3 +78,39 @@ def test_example1_1():
 
     # clean up
     conn.close()
+
+
+def test_example1_1_early_error():
+    d = pandas.DataFrame({
+        'x_s': ['s_03', 's_04', 's_02', 's_01', 's_03', 's_01'],
+        'x_n': ['n_13', 'n_48', 'n_77', 'n_29', 'n_91', 'n_93'],
+        'y': [1.0312223, -1.3374379, -1.9347144, 1.2772708, -0.1238039, 0.3058670],
+    })
+    table_desc = describe_table(d, table_name='d')
+
+    with pytest.raises(ValueError):
+        table_desc. \
+            extend({
+            'y_mean': 'y.mean() + 1'
+            },
+            partition_by=1)
+
+def test_example1_1_detect_agg():
+    d = pandas.DataFrame({
+        'x_s': ['s_03', 's_04', 's_02', 's_01', 's_03', 's_01'],
+        'x_n': ['n_13', 'n_48', 'n_77', 'n_29', 'n_91', 'n_93'],
+        'y': [1.0312223, -1.3374379, -1.9347144, 1.2772708, -0.1238039, 0.3058670],
+    })
+    table_desc = describe_table(d, table_name='d')
+
+    ops = table_desc. \
+        extend({
+        'y_mean': 'y.mean()'
+        })
+    assert ops.partitioned
+
+    ops2 = table_desc. \
+        extend({
+        'y_mean': 'y+1'
+        })
+    assert not ops2.partitioned

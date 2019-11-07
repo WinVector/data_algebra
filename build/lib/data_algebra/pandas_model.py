@@ -88,6 +88,7 @@ class PandasModel(data_algebra.data_model.DataModel):
                     if c not in col_list:
                         col_list = col_list + [c]
                 value_name = None
+                # assumes all args are column names, enforce this earlier
                 if len(opk.args) > 0:
                     value_name = opk.args[0].to_pandas()
                     if value_name not in set(col_list):
