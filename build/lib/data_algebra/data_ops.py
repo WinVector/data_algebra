@@ -1694,7 +1694,7 @@ class ConvertRecordsNode(ViewRepresentation):
             )
         rm_str = self.record_map.__repr__()
         rm_str = re.sub("\n", "\n   ", rm_str)
-        s = s + "convert_record(" + rm_str
+        s = s + "convert_records(" + rm_str
         if len(self.sources) > 1:
             s = s + (
                 "\n,   blocks_out_table="

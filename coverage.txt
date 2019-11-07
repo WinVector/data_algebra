@@ -42,67 +42,9 @@ tests/test_spark_sql.py .                                                [ 78%]
 tests/test_sqlite.py .                                                   [ 79%]
 tests/test_strat_example.py .                                            [ 80%]
 tests/test_table_is_key_by_columns.py .                                  [ 82%]
-tests/test_transform_examples.py ..........F                             [ 97%]
+tests/test_transform_examples.py ...........                             [ 97%]
 tests/test_window2.py .                                                  [ 98%]
 tests/test_window_fns.py .                                               [100%]
-
-=================================== FAILURES ===================================
-_______________________ test_convert_records_transform_1 _______________________
-
-    def test_convert_records_transform_1():
-        iris_small = pandas.DataFrame({
-            'Sepal.Length': [5.1, 4.9, 4.7],
-            'Sepal.Width': [3.5, 3.0, 3.2],
-            'Petal.Length': [1.4, 1.4, 1.3],
-            'Petal.Width': [0.2, 0.2, 0.2],
-            'Species': ['setosa', 'setosa', 'setosa'],
-            'id': [0, 1, 2],
-        })
-    
-        control_table = pandas.DataFrame(
-            {
-                "Part": ["Sepal", "Sepal", "Petal", "Petal"],
-                "Measure": ["Length", "Width", "Length", "Width"],
-                "Value": ["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"],
-            }
-        )
-    
-        record_spec = data_algebra.cdata.RecordSpecification(
-            control_table,
-            control_table_keys=['Part', 'Measure'],
-            record_keys=['id', 'Species']
-        )
-    
-        map = RecordMap(blocks_out=record_spec)
-    
-        ops = describe_table(iris_small, 'iris_small'). \
-            convert_records(record_map=map)
-    
-        data = {'iris_small': iris_small,
-                'cdata_temp_record': ops.record_map.blocks_out.control_table}
-    
-        expect = pandas.DataFrame({
-            'id': [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2],
-            'Species': ['setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa'],
-            'Part': ['Petal', 'Petal', 'Sepal', 'Sepal', 'Petal', 'Petal', 'Sepal', 'Sepal', 'Petal', 'Petal', 'Sepal', 'Sepal'],
-            'Measure': ['Length', 'Width', 'Length', 'Width', 'Length', 'Width', 'Length', 'Width', 'Length', 'Width', 'Length', 'Width'],
-            'Value': [1.4, 0.2, 5.1, 3.5, 1.4, 0.2, 4.9, 3.0, 1.3, 0.2, 4.7, 3.2],
-            })
-    
->       data_algebra.test_util.check_transform(ops, data, expect)
-
-tests/test_transform_examples.py:198: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-data_algebra/test_util.py:143: in check_transform
-    if not formats_to_self(ops):
-data_algebra/test_util.py:25: in formats_to_self
-    ops2 = eval(str1)
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
->   ???
-E   AttributeError: 'TableDescription' object has no attribute 'convert_record'
-
-<string>:5: AttributeError
 
 ---------- coverage: platform darwin, python 3.6.9-final-0 -----------
 Name                                   Stmts   Miss  Cover
@@ -116,18 +58,19 @@ data_algebra/cdata.py                    228     73    68%
 data_algebra/cdata_impl.py                13      1    92%
 data_algebra/connected_components.py      49      1    98%
 data_algebra/data_model.py                44     16    64%
-data_algebra/data_ops.py                1242    248    80%
+data_algebra/data_ops.py                1242    242    81%
 data_algebra/db_model.py                 389     74    81%
 data_algebra/diagram.py                   56     43    23%
 data_algebra/env.py                       52      7    87%
 data_algebra/expr.py                      20      4    80%
 data_algebra/expr_rep.py                 618    206    67%
 data_algebra/flow_text.py                 17      0   100%
-data_algebra/pandas_model.py             178     22    88%
+data_algebra/pandas_model.py             178     19    89%
 data_algebra/test_util.py                115     16    86%
 data_algebra/util.py                      40      8    80%
 data_algebra/yaml.py                     101     13    87%
 ----------------------------------------------------------
-TOTAL                                   3438    794    77%
+TOTAL                                   3438    785    77%
 
-========================= 1 failed, 72 passed in 6.97s =========================
+
+============================== 73 passed in 6.64s ==============================
