@@ -168,7 +168,8 @@ def check_transform(ops, data, expect,
         db_model.insert_table(conn, data, table_name=table_name)
     else:
         res = ops.eval_pandas(data_map=data)
-        for (k, v) in cols_used.items():
+        for k in cols_used.keys():
+            v = data[k]
             db_model.insert_table(conn, v, table_name=k)
     sql = ops.to_sql(db_model, pretty=True)
     res_db = db_model.read_query(conn, sql)

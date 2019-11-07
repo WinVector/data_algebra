@@ -2,49 +2,107 @@
 platform darwin -- Python 3.6.9, pytest-5.2.2, py-1.8.0, pluggy-0.13.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.8.1
-collected 63 items
+collected 73 items
 
 tests/test_R_yaml.py .                                                   [  1%]
-tests/test_apply.py .                                                    [  3%]
+tests/test_apply.py .                                                    [  2%]
 tests/test_arrow1.py .                                                   [  4%]
-tests/test_calc_warnings_errors.py .                                     [  6%]
-tests/test_cc.py ......                                                  [ 15%]
-tests/test_cdata1.py .                                                   [ 17%]
-tests/test_cdata_example.py ....                                         [ 23%]
-tests/test_cols_used.py .                                                [ 25%]
-tests/test_concat_rows.py .                                              [ 26%]
-tests/test_degenerate_project.py .                                       [ 28%]
-tests/test_drop_columns.py .                                             [ 30%]
-tests/test_exampe1.py ....                                               [ 36%]
-tests/test_example_data_ops.py .                                         [ 38%]
-tests/test_exp.py .                                                      [ 39%]
-tests/test_export_neg.py .                                               [ 41%]
-tests/test_expr_parse.py .                                               [ 42%]
-tests/test_extend.py ...                                                 [ 47%]
-tests/test_flow_text.py .                                                [ 49%]
-tests/test_free_expr.py .                                                [ 50%]
-tests/test_ghost_col_issue.py .                                          [ 52%]
-tests/test_if_else.py .                                                  [ 53%]
-tests/test_join_check.py .                                               [ 55%]
-tests/test_join_effects.py ..                                            [ 58%]
-tests/test_math.py .                                                     [ 60%]
-tests/test_natural_join.py .                                             [ 61%]
-tests/test_neg.py .                                                      [ 63%]
-tests/test_null_bad.py .                                                 [ 65%]
-tests/test_parse.py .                                                    [ 66%]
-tests/test_project.py .....                                              [ 74%]
-tests/test_scatter_example.py .                                          [ 76%]
-tests/test_scoring_example.py .                                          [ 77%]
-tests/test_select_stacking.py .                                          [ 79%]
-tests/test_shorten.py .                                                  [ 80%]
-tests/test_simple.py .....                                               [ 88%]
-tests/test_spark_sql.py .                                                [ 90%]
-tests/test_sqlite.py .                                                   [ 92%]
-tests/test_strat_example.py .                                            [ 93%]
-tests/test_table_is_key_by_columns.py .                                  [ 95%]
-tests/test_transform_examples.py .                                       [ 96%]
+tests/test_calc_warnings_errors.py .                                     [  5%]
+tests/test_cc.py ......                                                  [ 13%]
+tests/test_cdata1.py .                                                   [ 15%]
+tests/test_cdata_example.py ....                                         [ 20%]
+tests/test_cols_used.py .                                                [ 21%]
+tests/test_concat_rows.py .                                              [ 23%]
+tests/test_degenerate_project.py .                                       [ 24%]
+tests/test_drop_columns.py .                                             [ 26%]
+tests/test_exampe1.py ....                                               [ 31%]
+tests/test_example_data_ops.py .                                         [ 32%]
+tests/test_exp.py .                                                      [ 34%]
+tests/test_export_neg.py .                                               [ 35%]
+tests/test_expr_parse.py .                                               [ 36%]
+tests/test_extend.py ...                                                 [ 41%]
+tests/test_flow_text.py .                                                [ 42%]
+tests/test_free_expr.py .                                                [ 43%]
+tests/test_ghost_col_issue.py .                                          [ 45%]
+tests/test_if_else.py .                                                  [ 46%]
+tests/test_join_check.py .                                               [ 47%]
+tests/test_join_effects.py ..                                            [ 50%]
+tests/test_math.py .                                                     [ 52%]
+tests/test_natural_join.py .                                             [ 53%]
+tests/test_neg.py .                                                      [ 54%]
+tests/test_null_bad.py .                                                 [ 56%]
+tests/test_parse.py .                                                    [ 57%]
+tests/test_project.py .....                                              [ 64%]
+tests/test_scatter_example.py .                                          [ 65%]
+tests/test_scoring_example.py .                                          [ 67%]
+tests/test_select_stacking.py .                                          [ 68%]
+tests/test_shorten.py .                                                  [ 69%]
+tests/test_simple.py .....                                               [ 76%]
+tests/test_spark_sql.py .                                                [ 78%]
+tests/test_sqlite.py .                                                   [ 79%]
+tests/test_strat_example.py .                                            [ 80%]
+tests/test_table_is_key_by_columns.py .                                  [ 82%]
+tests/test_transform_examples.py ..........F                             [ 97%]
 tests/test_window2.py .                                                  [ 98%]
 tests/test_window_fns.py .                                               [100%]
+
+=================================== FAILURES ===================================
+_______________________ test_convert_records_transform_1 _______________________
+
+    def test_convert_records_transform_1():
+        iris_small = pandas.DataFrame({
+            'Sepal.Length': [5.1, 4.9, 4.7],
+            'Sepal.Width': [3.5, 3.0, 3.2],
+            'Petal.Length': [1.4, 1.4, 1.3],
+            'Petal.Width': [0.2, 0.2, 0.2],
+            'Species': ['setosa', 'setosa', 'setosa'],
+            'id': [0, 1, 2],
+        })
+    
+        control_table = pandas.DataFrame(
+            {
+                "Part": ["Sepal", "Sepal", "Petal", "Petal"],
+                "Measure": ["Length", "Width", "Length", "Width"],
+                "Value": ["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"],
+            }
+        )
+    
+        record_spec = data_algebra.cdata.RecordSpecification(
+            control_table,
+            control_table_keys=['Part', 'Measure'],
+            record_keys=['id', 'Species']
+        )
+    
+        map = RecordMap(blocks_out=record_spec)
+    
+        ops = describe_table(iris_small, 'iris_small'). \
+            convert_records(record_map=map)
+    
+        data = {'iris_small': iris_small,
+                'cdata_temp_record': ops.record_map.blocks_out.control_table}
+    
+        expect = pandas.DataFrame({
+            'id': [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2],
+            'Species': ['setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa'],
+            'Part': ['Petal', 'Petal', 'Sepal', 'Sepal', 'Petal', 'Petal', 'Sepal', 'Sepal', 'Petal', 'Petal', 'Sepal', 'Sepal'],
+            'Measure': ['Length', 'Width', 'Length', 'Width', 'Length', 'Width', 'Length', 'Width', 'Length', 'Width', 'Length', 'Width'],
+            'Value': [1.4, 0.2, 5.1, 3.5, 1.4, 0.2, 4.9, 3.0, 1.3, 0.2, 4.7, 3.2],
+            })
+    
+>       data_algebra.test_util.check_transform(ops, data, expect)
+
+tests/test_transform_examples.py:198: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+data_algebra/test_util.py:143: in check_transform
+    if not formats_to_self(ops):
+data_algebra/test_util.py:25: in formats_to_self
+    ops2 = eval(str1)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'TableDescription' object has no attribute 'convert_record'
+
+<string>:5: AttributeError
 
 ---------- coverage: platform darwin, python 3.6.9-final-0 -----------
 Name                                   Stmts   Miss  Cover
@@ -54,23 +112,22 @@ data_algebra/SQLite.py                    89     12    87%
 data_algebra/SparkSQL.py                  21      4    81%
 data_algebra/__init__.py                   5      0   100%
 data_algebra/arrow.py                    140     42    70%
-data_algebra/cdata.py                    228     77    66%
+data_algebra/cdata.py                    228     73    68%
 data_algebra/cdata_impl.py                13      1    92%
 data_algebra/connected_components.py      49      1    98%
 data_algebra/data_model.py                44     16    64%
-data_algebra/data_ops.py                1242    275    78%
-data_algebra/db_model.py                 389     76    80%
+data_algebra/data_ops.py                1242    248    80%
+data_algebra/db_model.py                 389     74    81%
 data_algebra/diagram.py                   56     43    23%
 data_algebra/env.py                       52      7    87%
 data_algebra/expr.py                      20      4    80%
 data_algebra/expr_rep.py                 618    206    67%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/pandas_model.py             178     22    88%
-data_algebra/test_util.py                114     21    82%
+data_algebra/test_util.py                115     16    86%
 data_algebra/util.py                      40      8    80%
 data_algebra/yaml.py                     101     13    87%
 ----------------------------------------------------------
-TOTAL                                   3437    832    76%
+TOTAL                                   3438    794    77%
 
-
-============================== 63 passed in 7.48s ==============================
+========================= 1 failed, 72 passed in 6.97s =========================
