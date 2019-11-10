@@ -29,6 +29,12 @@ setuptools.setup(
         "numpy",
         "pandas"
     ],
+    extras_require={
+        'yaml': ['PyYAML'],
+        'pretty_python': ['black'],
+        'pretty_sql': ['sql_parse'],
+        'diagram': ['graphviz'],
+    },
     platforms=['any'],
     license='License :: OSI Approved :: BSD 3-clause License',
     description=DESCRIPTION,
@@ -40,6 +46,7 @@ setuptools.setup(
           'Programming Language :: Python :: 3.5',
           'Programming Language :: Python :: 3.6',
           'Programming Language :: Python :: 3.7',
+          'Programming Language :: Python :: 3.8',
           'License :: OSI Approved :: BSD License',
     ],
     long_description=LONG_DESCRIPTION,

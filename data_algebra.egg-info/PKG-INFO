@@ -26,5 +26,10 @@ Classifier: Programming Language :: Python :: 3
 Classifier: Programming Language :: Python :: 3.5
 Classifier: Programming Language :: Python :: 3.6
 Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
 Classifier: License :: OSI Approved :: BSD License
 Description-Content-Type: text/markdown
+Provides-Extra: yaml
+Provides-Extra: pretty_python
+Provides-Extra: pretty_sql
+Provides-Extra: diagram

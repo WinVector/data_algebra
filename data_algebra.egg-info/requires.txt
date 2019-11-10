@@ -1,2 +1,14 @@
 numpy
 pandas
+
+[diagram]
+graphviz
+
+[pretty_python]
+black
+
+[pretty_sql]
+sql_parse
+
+[yaml]
+PyYAML
