@@ -32,7 +32,7 @@ setuptools.setup(
     extras_require={
         'yaml': ['PyYAML'],
         'pretty_python': ['black'],
-        'pretty_sql': ['sql_parse'],
+        'pretty_sql': ['sqlparse'],
         'diagram': ['graphviz'],
     },
     platforms=['any'],
