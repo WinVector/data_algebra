@@ -1,5 +1,5 @@
+
 import numpy
-import pandas
 
 import data_algebra
 import data_algebra.util
@@ -15,7 +15,7 @@ def connected_components(f, g):
 
 # alter here, expr_rep pd_formatters, expr_rep @-defs, and env populate_specidls in parallel to extend functionality
 pandas_eval_env = {
-    "is_null": lambda x: pandas.isnull(x),
+    "is_null": lambda x: data_algebra.pd.isnull(x),
     "is_bad": data_algebra.util.is_bad,
     "if_else": lambda c, x, y: numpy.where(c, x, y),
     "co_equalizer": lambda f, g: data_algebra.connected_components.connected_components(
@@ -37,8 +37,8 @@ class PandasModel(data_algebra.data_model.DataModel):
         data_algebra.data_model.DataModel.__init__(self)
 
     def assert_is_appropriate_data_instance(self, df, arg_name=""):
-        if not isinstance(df, pandas.DataFrame):
-            raise TypeError(arg_name + " was supposed to be a pandas.DataFrame")
+        if not isinstance(df, data_algebra.pd.DataFrame):
+            raise TypeError(arg_name + " was supposed to be a data_algebra.pd.DataFrame")
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def table_step(self, op, *, data_map, eval_env):
@@ -69,7 +69,7 @@ class PandasModel(data_algebra.data_model.DataModel):
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
         window_situation = op.windowed_situation or (len(op.partition_by) > 0) or (len(op.order_by) > 0)
         if window_situation:
-            self.check_extend_window_fns(op)
+            op.check_extend_window_fns()
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self
         )
@@ -135,7 +135,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         :param cols: dictionary mapping column names to columns
         :return:
         """
-        return pandas.DataFrame(cols)
+        return data_algebra.pd.DataFrame(cols)
 
     def project_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.ProjectNode):
@@ -174,7 +174,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         else:
             cols = {"_data_table_temp_col": res["_data_table_temp_col"].agg("sum")}
 
-        # agg can return scalars, which then can't be made into a pandas.DataFrame
+        # agg can return scalars, which then can't be made into a data_algebra.pd.DataFrame
         def promote_scalar(v):
             # noinspection PyBroadException
             try:
@@ -278,7 +278,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         common_cols = set([c for c in left.columns]).intersection(
             [c for c in right.columns]
         )
-        res = pandas.merge(
+        res = data_algebra.pd.merge(
             left=left,
             right=right,
             how=self.standardize_join_code(op.jointype),
@@ -309,7 +309,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         if op.id_column is not None:
             left[op.id_column] = op.a_name
             right[op.id_column] = op.b_name
-        res = pandas.concat([left, right], axis=0, ignore_index=True)
+        res = data_algebra.pd.concat([left, right], axis=0, ignore_index=True)
         res = res.reset_index(drop=True)
         return res
 

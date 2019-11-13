@@ -1,10 +1,9 @@
+
 from typing import Set, Dict, List, Union
 import numbers
 import collections
 import re
 import copy
-
-import pandas
 
 import data_algebra
 import data_algebra.flow_text
@@ -336,7 +335,7 @@ class ViewRepresentation(OperatorPlatform):
                 )
         k = [k for k in data_map.keys()][0]
         x = data_map[k]
-        if isinstance(x, pandas.DataFrame):
+        if isinstance(x, data_algebra.pd.DataFrame):
             return self.eval_pandas(
                 data_map=data_map, eval_env=eval_env, data_model=data_model
             )
@@ -368,7 +367,7 @@ class ViewRepresentation(OperatorPlatform):
         tables = self.get_tables()
         if len(tables) != 1:
             raise ValueError(
-                "transfrom(pandas.DataFrame) can only be applied to ops-dags with only one table def"
+                "transfrom(data_algebra.pd.DataFrame) can only be applied to ops-dags with only one table def"
             )
         k = [k for k in tables.keys()][0]
         if isinstance(X, ViewRepresentation):
@@ -389,7 +388,7 @@ class ViewRepresentation(OperatorPlatform):
             res = X.stand_in_for_table(ops=self, table_key=k)
             return res
         data_map = {k: X}
-        if isinstance(X, pandas.DataFrame):
+        if isinstance(X, data_algebra.pd.DataFrame):
             return self.eval_pandas(
                 data_map=data_map, eval_env=eval_env, data_model=data_model
             )
@@ -654,7 +653,7 @@ class TableDescription(ViewRepresentation):
 
 
 def describe_table(d, table_name="data_frame"):
-    if isinstance(d, pandas.DataFrame):
+    if isinstance(d, data_algebra.pd.DataFrame):
         column_names = [c for c in d.columns]
         column_types = None
         if d.shape[0] > 0:
@@ -842,7 +841,7 @@ class WrappedOperatorPlatform(OperatorPlatform):
 
 
 def wrap(d, *, table_name="data_frame"):
-    if isinstance(d, pandas.DataFrame):
+    if isinstance(d, data_algebra.pd.DataFrame):
         column_names = [c for c in d.columns]
         column_types = None
         if d.shape[0] > 0:
@@ -951,6 +950,25 @@ class ExtendNode(ViewRepresentation):
                         raise ValueError("in windowed situations only simple operators are allowed, " +
                                          "'" + k + "': '" + opk.to_pandas() + "' term is too complex an expression")
         ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
+
+    def check_extend_window_fns(self):
+        window_situation = (len(self.partition_by) > 0) or (len(self.order_by) > 0)
+        if window_situation:
+            # check these are forms we are prepared to work with
+            for (k, opk) in self.ops.items():
+                if len(opk.args) > 0:
+                    if len(opk.args) > 1:
+                        raise ValueError("window function with more than one argument")
+                    for i in range(len(opk.args)):
+                        if not isinstance(
+                            opk.args[0], data_algebra.expr_rep.ColumnReference
+                        ):
+                            raise ValueError(
+                                "window expression argument must be a column: "
+                                + str(k)
+                                + ": "
+                                + str(opk)
+                            )
 
     def columns_used_from_sources(self, using=None):
         columns_we_take = self.sources[0].column_set.copy()

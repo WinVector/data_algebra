@@ -1,11 +1,9 @@
-# noinspection PyUnresolvedReferences
-import numpy
 
-# noinspection PyUnresolvedReferences
-import pandas
+import importlib
+
 
 __docformat__ = "restructuredtext"
-__version__ = "0.3.5"
+__version__ = "0.3.6"
 
 __doc__ = """
 `data_algebra`<https://github.com/WinVector/data_algebra> is a piped data wrangling system
@@ -22,3 +20,7 @@ the `rquery`<https://github.com/WinVector/rquery> and `rqdatatable`<https://gith
 
 Recommended packages include: Pandas, PyYAML (supplies yaml), sqlparse, and black. 
 """
+
+# TODO: possibly import modin instead
+# pd = importlib.import_module("modin.pandas")
+pd = importlib.import_module("pandas")

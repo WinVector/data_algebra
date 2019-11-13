@@ -1,6 +1,8 @@
+
 import collections
 import numpy
-import pandas
+
+import data_algebra
 
 
 def od(**kwargs):
@@ -25,17 +27,17 @@ def is_bad(x):
     if can_convert_v_to_numeric(x):
         x = numpy.asarray(x + 0, dtype=float)
         return numpy.logical_or(
-            pandas.isnull(x), numpy.logical_or(numpy.isnan(x), numpy.isinf(x))
+            data_algebra.pd.isnull(x), numpy.logical_or(numpy.isnan(x), numpy.isinf(x))
         )
-    return pandas.isnull(x)
+    return data_algebra.pd.isnull(x)
 
 
 def pandas_to_example_str(obj):
-    if not isinstance(obj, pandas.DataFrame):
-        raise TypeError("Expect obj to be pandas.DataFrame")
-    pstr = "pandas.DataFrame({"
+    if not isinstance(obj, data_algebra.pd.DataFrame):
+        raise TypeError("Expect obj to be data_algebra.pd.DataFrame")
+    pstr = "data_algebra.pd.DataFrame({"
     for k in obj.columns:
-        cells = ["None" if pandas.isnull(v) else v.__repr__() for v in obj[k]]
+        cells = ["None" if data_algebra.pd.isnull(v) else v.__repr__() for v in obj[k]]
         pstr = pstr + "\n    " + k.__repr__() + ": [" + ", ".join(cells) + "],"
     pstr = pstr + "\n    })"
     return pstr

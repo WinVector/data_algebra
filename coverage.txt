@@ -55,22 +55,22 @@ data_algebra/SparkSQL.py                  21      4    81%
 data_algebra/__init__.py                   5      0   100%
 data_algebra/arrow.py                    140     42    70%
 data_algebra/cdata.py                    228     73    68%
-data_algebra/cdata_impl.py                13      1    92%
+data_algebra/cdata_impl.py                10      1    90%
 data_algebra/connected_components.py      49      1    98%
-data_algebra/data_model.py                44     16    64%
-data_algebra/data_ops.py                1242    242    81%
+data_algebra/data_model.py                29     13    55%
+data_algebra/data_ops.py                1251    244    80%
 data_algebra/db_model.py                 389     74    81%
 data_algebra/diagram.py                   56     43    23%
 data_algebra/env.py                       52      7    87%
 data_algebra/expr.py                      20      4    80%
 data_algebra/expr_rep.py                 618    206    67%
 data_algebra/flow_text.py                 17      0   100%
-data_algebra/pandas_model.py             178     19    89%
-data_algebra/test_util.py                115     16    86%
+data_algebra/pandas_model.py             177     19    89%
+data_algebra/test_util.py                113     16    86%
 data_algebra/util.py                      40      8    80%
 data_algebra/yaml.py                     101     13    87%
 ----------------------------------------------------------
-TOTAL                                   3438    785    77%
+TOTAL                                   3426    784    77%
 
 
-============================== 73 passed in 7.50s ==============================
+============================== 73 passed in 7.43s ==============================

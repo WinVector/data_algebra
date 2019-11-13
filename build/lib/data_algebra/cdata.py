@@ -3,7 +3,7 @@ import collections
 
 import sqlite3
 
-import pandas
+import data_algebra
 
 import data_algebra.util
 import data_algebra.SQLite
@@ -121,7 +121,7 @@ class RecordSpecification:
 
 
 def record_spec_from_simple_obj(obj):
-    control_table = pandas.DataFrame()
+    control_table = data_algebra.pd.DataFrame()
     for k in obj["control_table"].keys():
         control_table[k] = obj["control_table"][k]
 
@@ -202,7 +202,7 @@ class RecordMap:
                 example[rk] = [rk] * nrow
             return example
         if self.blocks_in is not None:
-            example = pandas.DataFrame()
+            example = data_algebra.pd.DataFrame()
             for k in self.blocks_out.row_columns:
                 example[k] = [k]
             return example

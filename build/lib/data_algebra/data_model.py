@@ -1,39 +1,26 @@
-import data_algebra
-import data_algebra.expr_rep
-import data_algebra.data_ops
 
 
 class DataModel:
     def __init__(self):
         pass
 
+    # helper functions
+
     def assert_is_appropriate_data_instance(self, df, arg_name=""):
         raise NotImplementedError("base method called")
 
-    def table_step(self, op, *, data_map, eval_env):
-        raise NotImplementedError("base method called")
+    # operation implementations
 
-    # noinspection PyMethodMayBeStatic
-    def check_extend_window_fns(self, op):
-        if not isinstance(op, data_algebra.data_ops.ExtendNode):
-            raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
-        window_situation = (len(op.partition_by) > 0) or (len(op.order_by) > 0)
-        if window_situation:
-            # check these are forms we are prepared to work with
-            for (k, opk) in op.ops.items():
-                if len(opk.args) > 0:
-                    if len(opk.args) > 1:
-                        raise ValueError("window function with more than one argument")
-                    for i in range(len(opk.args)):
-                        if not isinstance(
-                            opk.args[0], data_algebra.expr_rep.ColumnReference
-                        ):
-                            raise ValueError(
-                                "window expression argument must be a column: "
-                                + str(k)
-                                + ": "
-                                + str(opk)
-                            )
+    def table_step(self, op, *, data_map, eval_env):
+        """
+        Represets a data input.
+
+        :param op:
+        :param data_map:
+        :param eval_env:
+        :return:
+        """
+        raise NotImplementedError("base method called")
 
     def extend_step(self, op, *, data_map, eval_env):
         raise NotImplementedError("base method called")

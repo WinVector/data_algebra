@@ -2,7 +2,7 @@ import math
 import re
 import io
 
-import pandas
+import data_algebra
 
 import data_algebra.expr_rep
 import data_algebra.data_ops
@@ -657,7 +657,7 @@ class DBModel:
         cur.execute(q)
         r = cur.fetchall()
         colnames = [desc[0] for desc in cur.description]
-        r = pandas.DataFrame(columns=colnames, data=r)
+        r = data_algebra.pd.DataFrame(columns=colnames, data=r)
         r = r.reset_index(drop=True)
         return r
 
