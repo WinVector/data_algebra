@@ -1,9 +1,10 @@
+
 import re
 import io
 import sqlite3
 import yaml
-import pandas
 
+import data_algebra
 import data_algebra.test_util
 from data_algebra.cdata import *
 from data_algebra.cdata_impl import record_map_from_simple_obj
@@ -30,7 +31,7 @@ def test_cdata1():
     """,
         )
     )
-    iris_orig = pandas.read_csv(buf)
+    iris_orig = data_algebra.pd.read_csv(buf)
 
     buf = io.StringIO(
         re.sub(
@@ -53,7 +54,7 @@ def test_cdata1():
     """,
         )
     )
-    iris_blocks_orig = pandas.read_csv(buf)
+    iris_blocks_orig = data_algebra.pd.read_csv(buf)
 
     iris_blocks = iris_blocks_orig.copy()
     iris = iris_orig.copy()
@@ -65,7 +66,7 @@ def test_cdata1():
     # from:
     #   https://github.com/WinVector/cdata/blob/master/vignettes/control_table_keys.Rmd
 
-    control_table = pandas.DataFrame(
+    control_table = data_algebra.pd.DataFrame(
         {
             "Part": ["Sepal", "Sepal", "Petal", "Petal"],
             "Measure": ["Length", "Width", "Length", "Width"],

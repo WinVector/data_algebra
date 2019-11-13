@@ -1,7 +1,7 @@
-import pandas
 
 import pytest
 
+import data_algebra
 import data_algebra.diagram
 import data_algebra.test_util
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
@@ -10,7 +10,7 @@ import data_algebra.arrow
 
 
 def test_arrow1():
-    d = pandas.DataFrame(
+    d = data_algebra.pd.DataFrame(
         {
             "g": ["a", "b", "b", "c", "c", "c"],
             "x": [1, 4, 5, 7, 8, 9],
@@ -111,7 +111,7 @@ def test_arrow1():
 
     # print(a1 >> a2)
 
-    wrong_example = pandas.DataFrame(
+    wrong_example = data_algebra.pd.DataFrame(
         {"g": ["a"], "v": [1.0], "x": ["b"], "i": [True], "ngroup": [1]}
     )
 

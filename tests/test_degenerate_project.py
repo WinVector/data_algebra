@@ -1,18 +1,18 @@
-import pandas
 
 import pytest
 
+import data_algebra
 import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
 
 
 def test_degenerate_project():
-    d = pandas.DataFrame({"x": [1, 2, 3, 4], "y": ["a", "a", "b", "b"]})
+    d = data_algebra.pd.DataFrame({"x": [1, 2, 3, 4], "y": ["a", "a", "b", "b"]})
 
     ops_good = describe_table(d).project({"x2": "x.max()"})
     res = ops_good.transform(d)
-    expect = pandas.DataFrame({"x2": [4],})
+    expect = data_algebra.pd.DataFrame({"x2": [4],})
     assert data_algebra.test_util.equivalent_frames(res, expect)
 
     with pytest.raises(ValueError):

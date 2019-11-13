@@ -1,8 +1,9 @@
+
 import math
 import sqlite3
-import pandas  # https://pandas.pydata.org
 import yaml  # https://pyyaml.org
 
+import data_algebra
 import data_algebra.test_util
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 import data_algebra.env
@@ -20,7 +21,7 @@ def test_scoring_example():
     # ask YAML to write simpler structures
     data_algebra.yaml.fix_ordered_dict_yaml_rep()
 
-    d_local = pandas.DataFrame(
+    d_local = data_algebra.pd.DataFrame(
         {
             "subjectID": [1, 1, 2, 2],
             "surveyCategory": [
@@ -61,7 +62,7 @@ def test_scoring_example():
 
     # Pandas calculate
     res = ops.eval_pandas(data_map={"d": d_local}, eval_env=locals())
-    expect = pandas.DataFrame(
+    expect = data_algebra.pd.DataFrame(
         {
             "subjectID": [1, 2],
             "diagnosis": ["withdrawal behavior", "positive re-framing"],

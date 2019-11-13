@@ -1,12 +1,12 @@
-import pandas
 
+import data_algebra
 import data_algebra.test_util
 from data_algebra.data_ops import *
 import data_algebra.util
 
 
 def test_ghost_col_issue():
-    d2 = pandas.DataFrame(
+    d2 = data_algebra.pd.DataFrame(
         {
             "x": [1, 4, 5, 7, 8, 9],
             "v": [10, 40, 50, 70, 80, 90],
@@ -29,7 +29,7 @@ def test_ghost_col_issue():
         partition_by=["g"],
     )
     res = o2.transform(d2)
-    expect = pandas.DataFrame(
+    expect = data_algebra.pd.DataFrame(
         {
             "x": [1, 4, 5, 7, 8, 9],
             "v": [10, 40, 50, 70, 80, 90],

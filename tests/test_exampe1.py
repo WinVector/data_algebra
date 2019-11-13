@@ -1,10 +1,9 @@
 
 import sqlite3
 
-import pandas
-
 import pytest
 
+import data_algebra
 from data_algebra.data_ops import *
 import data_algebra.util
 import data_algebra.SQLite
@@ -16,7 +15,7 @@ def test_example1_1():
     conn = sqlite3.connect(":memory:")
     db_model = data_algebra.SQLite.SQLiteModel()
 
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         'x_s': ['s_03', 's_04', 's_02', 's_01', 's_03', 's_01'],
         'x_n': ['n_13', 'n_48', 'n_77', 'n_29', 'n_91', 'n_93'],
         'y': [1.0312223, -1.3374379, -1.9347144, 1.2772708, -0.1238039, 0.3058670],
@@ -39,7 +38,7 @@ def test_example1_1():
         order_rows(['x_s'])
     assert data_algebra.test_util.formats_to_self(ops1)
     res1 = ops1.transform(d)
-    expect1 = pandas.DataFrame({
+    expect1 = data_algebra.pd.DataFrame({
         'x_s': ['s_01', 's_02', 's_03', 's_04'],
         'meany': [0.9218349166666666, -1.8044483833333334, 0.5839752166666667, -1.2071718833333334],
         })
@@ -65,7 +64,7 @@ def test_example1_1():
         order_rows(['x_n'])
     assert data_algebra.test_util.formats_to_self(ops2)
     res2 = ops2.transform(d)
-    expect2 = pandas.DataFrame({
+    expect2 = data_algebra.pd.DataFrame({
         'x_n': ['n_13', 'n_29', 'n_48', 'n_77', 'n_91', 'n_93'],
         'meany': [1.1614883166666667, 1.4075368166666666, -1.2071718833333334,
                   -1.8044483833333334, 0.006462116666666684, 0.4361330166666667],
@@ -81,7 +80,7 @@ def test_example1_1():
 
 
 def test_example1_1_early_error():
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         'x_s': ['s_03', 's_04', 's_02', 's_01', 's_03', 's_01'],
         'x_n': ['n_13', 'n_48', 'n_77', 'n_29', 'n_91', 'n_93'],
         'y': [1.0312223, -1.3374379, -1.9347144, 1.2772708, -0.1238039, 0.3058670],
@@ -97,7 +96,7 @@ def test_example1_1_early_error():
 
 
 def test_example1_1_detect_agg():
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         'x_s': ['s_03', 's_04', 's_02', 's_01', 's_03', 's_01'],
         'x_n': ['n_13', 'n_48', 'n_77', 'n_29', 'n_91', 'n_93'],
         'y': [1.0312223, -1.3374379, -1.9347144, 1.2772708, -0.1238039, 0.3058670],
@@ -118,7 +117,7 @@ def test_example1_1_detect_agg():
 
 
 def test_example1_add_const():
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         'x_s': ['s_03', 's_04', 's_02', 's_01', 's_03', 's_01'],
         'x_n': ['n_13', 'n_48', 'n_77', 'n_29', 'n_91', 'n_93'],
         'y': [1.0312223, -1.3374379, -1.9347144, 1.2772708, -0.1238039, 0.3058670],
@@ -130,7 +129,7 @@ def test_example1_add_const():
         'one': '1'
         })
     res = ops.transform(d)
-    expect = pandas.DataFrame({
+    expect = data_algebra.pd.DataFrame({
         'x_s': ['s_03', 's_04', 's_02', 's_01', 's_03', 's_01'],
         'x_n': ['n_13', 'n_48', 'n_77', 'n_29', 'n_91', 'n_93'],
         'y': [1.0312223, -1.3374379, -1.9347144, 1.2772708, -0.1238039, 0.305867],

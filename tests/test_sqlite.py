@@ -1,5 +1,5 @@
+
 import sqlite3
-import pandas
 
 import data_algebra.test_util
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
@@ -43,7 +43,7 @@ def test_sqlite():
     # clean up
     conn.close()
 
-    expect = pandas.DataFrame(
+    expect = data_algebra.pd.DataFrame(
         {
             "symbol": ["RHAT"],
             "date": ["2006-01-05"],
@@ -56,7 +56,7 @@ def test_sqlite():
 
     assert data_algebra.test_util.equivalent_frames(res, expect)
 
-    d2 = pandas.DataFrame(
+    d2 = data_algebra.pd.DataFrame(
         {
             "symbol": ["RHAT"],
             "date": ["2006-01-05"],

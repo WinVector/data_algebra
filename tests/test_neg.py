@@ -1,4 +1,3 @@
-import pandas
 
 import data_algebra
 import data_algebra.env
@@ -12,7 +11,7 @@ def test_neg():
     # ask YAML to write simpler structures
     data_algebra.yaml.fix_ordered_dict_yaml_rep()
 
-    d_local = pandas.DataFrame(
+    d_local = data_algebra.pd.DataFrame(
         {
             "subjectID": [1, 1, 2, 2],
             "surveyCategory": [
@@ -34,7 +33,7 @@ def test_neg():
 
     res_local = ops.transform(d_local)
 
-    expect = pandas.DataFrame(
+    expect = data_algebra.pd.DataFrame(
         {
             "subjectID": [1, 1, 2, 2],
             "surveyCategory": [

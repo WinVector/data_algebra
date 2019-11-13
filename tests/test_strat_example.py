@@ -1,6 +1,6 @@
 # https://github.com/WinVector/pyvtreat/blob/master/Examples/StratifiedCrossPlan/StratifiedCrossPlan.ipynb
 
-import pandas
+import data_algebra
 
 import data_algebra.test_util
 import data_algebra.util
@@ -8,7 +8,7 @@ from data_algebra.data_ops import *
 
 
 def test_strat_example():
-    prepared_stratified = pandas.DataFrame(
+    prepared_stratified = data_algebra.pd.DataFrame(
         {"y": [1, 0, 0, 1, 0, 0], "g": [0, 0, 0, 1, 1, 1], "x": [1, 2, 3, 4, 5, 6]}
     )
 
@@ -18,7 +18,7 @@ def test_strat_example():
 
     res = ops.transform(prepared_stratified)
 
-    expect = pandas.DataFrame(
+    expect = data_algebra.pd.DataFrame(
         {
             "g": [0, 1],
             "sum": [1, 1],

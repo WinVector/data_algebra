@@ -1,7 +1,7 @@
+
 import sqlite3
 
-import pandas
-
+import data_algebra
 import data_algebra.test_util
 from data_algebra.data_ops import *
 from data_algebra.SQLite import SQLiteModel
@@ -9,11 +9,11 @@ import data_algebra.util
 
 
 def test_if_else():
-    d = pandas.DataFrame({"a": [True, False], "b": [1, 2], "c": [3, 4]})
+    d = data_algebra.pd.DataFrame({"a": [True, False], "b": [1, 2], "c": [3, 4]})
 
     ops = TableDescription("d", ["a", "b", "c"]).extend({"d": "a.if_else(b, c)"})
 
-    expect = pandas.DataFrame(
+    expect = data_algebra.pd.DataFrame(
         {"a": [True, False], "b": [1, 2], "c": [3, 4], "d": [1, 4],}
     )
 

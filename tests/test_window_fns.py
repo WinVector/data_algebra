@@ -1,5 +1,5 @@
+
 import sqlite3
-import pandas
 
 import data_algebra.test_util
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
@@ -12,7 +12,7 @@ import data_algebra.SQLite
 
 def test_window_fns():
 
-    d = pandas.DataFrame(
+    d = data_algebra.pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
             "x": [1, 4, 5, 7, 8, 9],
@@ -41,7 +41,7 @@ def test_window_fns():
 
     res1 = ops.transform(d)
 
-    expect1 = pandas.DataFrame(
+    expect1 = data_algebra.pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
             "x": [1, 4, 5, 7, 8, 9],

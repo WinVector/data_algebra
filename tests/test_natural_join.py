@@ -1,6 +1,7 @@
-import pandas
+
 import numpy
 
+import data_algebra
 import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
@@ -13,9 +14,9 @@ def test_natural_join_columns():
     data_algebra.yaml.fix_ordered_dict_yaml_rep()
     db_model = data_algebra.SQLite.SQLiteModel()
 
-    d = pandas.DataFrame({"x": [-1, 0, 1, numpy.nan], "y": [1, 2, numpy.nan, 3]})
+    d = data_algebra.pd.DataFrame({"x": [-1, 0, 1, numpy.nan], "y": [1, 2, numpy.nan, 3]})
 
-    d2 = pandas.DataFrame({"qq": [10, 20, 30], "y": [1.0, 2.0, 3.0], "x": [4, 5, 7]})
+    d2 = data_algebra.pd.DataFrame({"qq": [10, 20, 30], "y": [1.0, 2.0, 3.0], "x": [4, 5, 7]})
 
     ops4 = describe_table(d, "d").natural_join(
         b=describe_table(d2, "d2"), by=["y"], jointype="LEFT"
@@ -25,7 +26,7 @@ def test_natural_join_columns():
 
     res_pandas = ops4.eval_pandas(data_map={"d": d, "d2": d2}, eval_env=locals())
 
-    expect = pandas.DataFrame(
+    expect = data_algebra.pd.DataFrame(
         {
             "x": [-1.0, 0.0, 1.0, 7.0],
             "y": [1.0, 2.0, numpy.nan, 3.0],
