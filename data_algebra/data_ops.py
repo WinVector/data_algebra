@@ -302,10 +302,6 @@ class ViewRepresentation(OperatorPlatform):
             raise TypeError("data_map should be a dictionary")
         if len(data_map) < 1:
             raise ValueError("data_map should not be empty")
-        if eval_env is None:
-            eval_env = data_algebra.env.outer_namespace()
-        if eval_env is None:
-            eval_env = globals()
         if data_model is None:
             data_model = data_algebra.pandas_model.PandasModel()
         if not isinstance(data_model, data_algebra.pandas_model.PandasModel):

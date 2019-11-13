@@ -66,6 +66,6 @@ def test_sqlite():
         }
     )
 
-    res2 = ops.eval_pandas(data_map={"stocks": d2}, eval_env=locals())
+    res2 = ops.eval_pandas(data_map={"stocks": d2})
 
     assert data_algebra.test_util.equivalent_frames(res2, expect)

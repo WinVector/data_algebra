@@ -22,5 +22,7 @@ Recommended packages include: Pandas, PyYAML (supplies yaml), sqlparse, and blac
 """
 
 # TODO: possibly import modin instead
-# pd = importlib.import_module("modin.pandas")
-pd = importlib.import_module("pandas")
+# can't do that now
+# https://github.com/modin-project/modin/issues/865
+# pd = importlib.import_module("modin.pandas")  # https://github.com/modin-project/modin
+pd = importlib.import_module("pandas")  # https://pandas.pydata.org

@@ -202,7 +202,8 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self
         )
-        res = res.query(op.expr.to_pandas()).reset_index(drop=True)
+        q = op.expr.to_pandas()
+        res = res.query(q).reset_index(drop=True)
         return res
 
     def select_columns_step(self, op, *, data_map, eval_env):

@@ -61,7 +61,7 @@ def test_scoring_example():
     py_sourcep = ops.to_python(strict=True, pretty=True)
 
     # Pandas calculate
-    res = ops.eval_pandas(data_map={"d": d_local}, eval_env=locals())
+    res = ops.eval_pandas(data_map={"d": d_local})
     expect = data_algebra.pd.DataFrame(
         {
             "subjectID": [1, 2],

@@ -23,7 +23,7 @@ def test_concat_rows():
     assert data_algebra.test_util.formats_to_self(ops4)
     data_algebra.test_util.check_op_round_trip(ops4)
 
-    res_pandas = ops4.eval_pandas(data_map={"d1": d1, "d2": d2}, eval_env=locals())
+    res_pandas = ops4.eval_pandas(data_map={"d1": d1, "d2": d2})
 
     expect = data_algebra.pd.DataFrame(
         {

@@ -1,3 +1,4 @@
+
 import numpy
 
 import data_algebra
@@ -22,7 +23,9 @@ def test_apply():
         TableDescription("t1", ["x", "y"]).extend({"z": "x / y"}).select_rows("z >= 0")
     )
 
-    ops0.eval_pandas(data_map={"t1": d}, eval_env=locals())
+    res_0_0 = ops0.eval_pandas(data_map={"t1": d})
+
+    assert data_algebra.test_util.equivalent_frames(expect_1, res_0_0)
 
     res_0_1 = ops0.transform(d)
 

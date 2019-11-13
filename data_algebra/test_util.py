@@ -85,6 +85,8 @@ def equivalent_frames(
                 b.iloc[:, j]
         ):
             return False
+    if a.shape[0] < 1:
+        return True
     if not check_row_order:
         a = a.sort_values(by=acols)
         a = a.reset_index(drop=True)
