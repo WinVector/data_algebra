@@ -21,8 +21,9 @@ the `rquery`<https://github.com/WinVector/rquery> and `rqdatatable`<https://gith
 Recommended packages include: Pandas, PyYAML (supplies yaml), sqlparse, and black. 
 """
 
+pd = importlib.import_module("pandas")  # https://pandas.pydata.org
+
 # TODO: possibly import modin instead
 # can't do that now
 # https://github.com/modin-project/modin/issues/865
 # pd = importlib.import_module("modin.pandas")  # https://github.com/modin-project/modin
-pd = importlib.import_module("pandas")  # https://pandas.pydata.org

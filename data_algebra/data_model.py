@@ -13,7 +13,7 @@ class DataModel:
 
     def table_step(self, op, *, data_map, eval_env):
         """
-        Represets a data input.
+        Represents a data input.
 
         :param op:
         :param data_map:

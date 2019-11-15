@@ -1,4 +1,6 @@
 
+import types
+
 import numpy
 
 import data_algebra
@@ -9,36 +11,38 @@ import data_algebra.data_ops
 import data_algebra.connected_components
 
 
-def connected_components(f, g):
-    return data_algebra.connected_components.connected_components(f, g)
-
-
-# alter here, expr_rep pd_formatters, expr_rep @-defs, and env populate_specidls in parallel to extend functionality
-pandas_eval_env = {
-    "is_null": lambda x: data_algebra.pd.isnull(x),
-    "is_bad": data_algebra.util.is_bad,
-    "if_else": lambda c, x, y: numpy.where(c, x, y),
-    "co_equalizer": lambda f, g: data_algebra.connected_components.connected_components(
-        f, g
-    ),
-    "connected_components": connected_components,
-    "partitioned_eval": lambda fn, arg_columns, partition_columns: (
-        data_algebra.connected_components.partitioned_eval(
-            fn, arg_columns, partition_columns
-        )
-    ),
-    "max": lambda x: [numpy.max(x)] * len(x),
-    "min": lambda x: [numpy.min(x)] * len(x),
-}
-
-
 class PandasModel(data_algebra.data_model.DataModel):
-    def __init__(self):
+
+    def __init__(self, *, pd=None):
         data_algebra.data_model.DataModel.__init__(self)
+        if pd is None:
+            pd = data_algebra.pd
+        if not isinstance(pd, types.ModuleType):
+            raise TypeError("Expected pd to be a module")
+        self.pd = pd
+        # alter here, expr_rep pd_formatters, expr_rep @-defs, and env populate_specidls in parallel
+        # to extend functionality
+        self.pandas_eval_env = {
+            "is_null": lambda x: self.pd.isnull(x),
+            "is_bad": lambda x: data_algebra.util.is_bad(x, pd=self.pd),
+            "if_else": lambda c, x, y: numpy.where(c, x, y),
+            "co_equalizer": lambda f, g: data_algebra.connected_components.connected_components(
+                f, g
+            ),
+            "connected_components": lambda f, g: data_algebra.connected_components.connected_components(f, g),
+            "partitioned_eval": lambda fn, arg_columns, partition_columns: (
+                data_algebra.connected_components.partitioned_eval(
+                    fn, arg_columns, partition_columns
+                )
+            ),
+            "max": lambda x: [numpy.max(x)] * len(x),
+            "min": lambda x: [numpy.min(x)] * len(x),
+        }
 
     def assert_is_appropriate_data_instance(self, df, arg_name=""):
-        if not isinstance(df, data_algebra.pd.DataFrame):
-            raise TypeError(arg_name + " was supposed to be a data_algebra.pd.DataFrame")
+        # noinspection PyUnresolvedReferences
+        if not isinstance(df, self.pd.DataFrame):
+            raise TypeError(arg_name + " was supposed to be a self.pd.DataFrame")
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def table_step(self, op, *, data_map, eval_env):
@@ -78,7 +82,7 @@ class PandasModel(data_algebra.data_model.DataModel):
             for (k, opk) in op.ops.items():
                 op_src = opk.to_pandas()
                 res[k] = res.eval(
-                    op_src, local_dict=pandas_eval_env, global_dict=eval_env
+                    op_src, local_dict=self.pandas_eval_env, global_dict=eval_env
                 )
         else:
             for (k, opk) in op.ops.items():
@@ -135,7 +139,8 @@ class PandasModel(data_algebra.data_model.DataModel):
         :param cols: dictionary mapping column names to columns
         :return:
         """
-        return data_algebra.pd.DataFrame(cols)
+        # noinspection PyUnresolvedReferences
+        return self.pd.DataFrame(cols)
 
     def project_step(self, op, *, data_map, eval_env):
         if not isinstance(op, data_algebra.data_ops.ProjectNode):
@@ -174,7 +179,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         else:
             cols = {"_data_table_temp_col": res["_data_table_temp_col"].agg("sum")}
 
-        # agg can return scalars, which then can't be made into a data_algebra.pd.DataFrame
+        # agg can return scalars, which then can't be made into a self.pd.DataFrame
         def promote_scalar(v):
             # noinspection PyBroadException
             try:
@@ -279,7 +284,8 @@ class PandasModel(data_algebra.data_model.DataModel):
         common_cols = set([c for c in left.columns]).intersection(
             [c for c in right.columns]
         )
-        res = data_algebra.pd.merge(
+        # noinspection PyUnresolvedReferences
+        res = self.pd.merge(
             left=left,
             right=right,
             how=self.standardize_join_code(op.jointype),
@@ -310,7 +316,8 @@ class PandasModel(data_algebra.data_model.DataModel):
         if op.id_column is not None:
             left[op.id_column] = op.a_name
             right[op.id_column] = op.b_name
-        res = data_algebra.pd.concat([left, right], axis=0, ignore_index=True)
+        # noinspection PyUnresolvedReferences
+        res = self.pd.concat([left, right], axis=0, ignore_index=True)
         res = res.reset_index(drop=True)
         return res
 

@@ -22,22 +22,26 @@ def can_convert_v_to_numeric(x):
         return False
 
 
-def is_bad(x):
+def is_bad(x, *, pd=None):
     """ for numeric vector x, return logical vector of positions that are null, NaN, infinite"""
+    if pd is None:
+        pd = data_algebra.pd
     if can_convert_v_to_numeric(x):
         x = numpy.asarray(x + 0, dtype=float)
         return numpy.logical_or(
-            data_algebra.pd.isnull(x), numpy.logical_or(numpy.isnan(x), numpy.isinf(x))
+            pd.isnull(x), numpy.logical_or(numpy.isnan(x), numpy.isinf(x))
         )
-    return data_algebra.pd.isnull(x)
+    return pd.isnull(x)
 
 
-def pandas_to_example_str(obj):
-    if not isinstance(obj, data_algebra.pd.DataFrame):
-        raise TypeError("Expect obj to be data_algebra.pd.DataFrame")
-    pstr = "data_algebra.pd.DataFrame({"
+def pandas_to_example_str(obj, *, pd=None, pd_module_name='data_algebra.pd'):
+    if pd is None:
+        pd = data_algebra.pd
+    if not isinstance(obj, pd.DataFrame):
+        raise TypeError("Expect obj to be pd.DataFrame")
+    pstr = pd_module_name + ".DataFrame({"
     for k in obj.columns:
-        cells = ["None" if data_algebra.pd.isnull(v) else v.__repr__() for v in obj[k]]
+        cells = ["None" if pd.isnull(v) else v.__repr__() for v in obj[k]]
         pstr = pstr + "\n    " + k.__repr__() + ": [" + ", ".join(cells) + "],"
     pstr = pstr + "\n    })"
     return pstr

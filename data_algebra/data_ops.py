@@ -304,9 +304,9 @@ class ViewRepresentation(OperatorPlatform):
             raise ValueError("data_map should not be empty")
         if data_model is None:
             data_model = data_algebra.pandas_model.PandasModel()
-        if not isinstance(data_model, data_algebra.pandas_model.PandasModel):
+        if not isinstance(data_model, data_algebra.data_model.DataModel):
             raise TypeError(
-                "Expected data_model to derive from data_algebra.pandas_model.PandasModel"
+                "Expected data_model to derive from data_algebra.data_model.DataModel"
             )
         self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
@@ -324,14 +324,15 @@ class ViewRepresentation(OperatorPlatform):
     def eval(self, data_map, *, eval_env=None, data_model=None):
         if len(data_map) < 1:
             raise ValueError("Expected data_map to be non-empty")
-        if data_model is not None:
-            if not isinstance(data_model, data_algebra.data_model.DataModel):
-                raise TypeError(
-                    "Expected data_model to be derived from data_algebra.data_model.DataModel"
-                )
+        if data_model is None:
+            data_model = data_algebra.pandas_model.PandasModel()
+        if not isinstance(data_model, data_algebra.data_model.DataModel):
+            raise TypeError(
+                "Expected data_model to be derived from data_algebra.data_model.DataModel"
+            )
         k = [k for k in data_map.keys()][0]
         x = data_map[k]
-        if isinstance(x, data_algebra.pd.DataFrame):
+        if isinstance(x, data_model.pd.DataFrame):
             return self.eval_pandas(
                 data_map=data_map, eval_env=eval_env, data_model=data_model
             )
@@ -354,16 +355,17 @@ class ViewRepresentation(OperatorPlatform):
 
     # noinspection PyPep8Naming
     def transform(self, X, *, eval_env=None, data_model=None):
-        if data_model is not None:
-            if not isinstance(data_model, data_algebra.data_model.DataModel):
-                raise TypeError(
-                    "Expected data_model to be derived from data_algebra.data_model.DataModel"
-                )
+        if data_model is None:
+            data_model = data_algebra.pandas_model.PandasModel()
+        if not isinstance(data_model, data_algebra.data_model.DataModel):
+            raise TypeError(
+                "Expected data_model to be derived from data_algebra.data_model.DataModel"
+            )
         cols_used = self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
         if len(tables) != 1:
             raise ValueError(
-                "transfrom(data_algebra.pd.DataFrame) can only be applied to ops-dags with only one table def"
+                "transfrom(DataFrame) can only be applied to ops-dags with only one table def"
             )
         k = [k for k in tables.keys()][0]
         if isinstance(X, ViewRepresentation):
@@ -384,7 +386,7 @@ class ViewRepresentation(OperatorPlatform):
             res = X.stand_in_for_table(ops=self, table_key=k)
             return res
         data_map = {k: X}
-        if isinstance(X, data_algebra.pd.DataFrame):
+        if isinstance(X, data_model.pd.DataFrame):
             return self.eval_pandas(
                 data_map=data_map, eval_env=eval_env, data_model=data_model
             )
@@ -611,6 +613,8 @@ class TableDescription(ViewRepresentation):
         return {self.key: self}
 
     def eval_implementation(self, *, data_map, eval_env, data_model):
+        if data_model is None:
+            data_model = data_algebra.pandas_model.PandasModel()
         return data_model.table_step(op=self, data_map=data_map, eval_env=eval_env)
 
     def columns_used_from_sources(self, using=None):
@@ -649,13 +653,12 @@ class TableDescription(ViewRepresentation):
 
 
 def describe_table(d, table_name="data_frame"):
-    if isinstance(d, data_algebra.pd.DataFrame):
-        column_names = [c for c in d.columns]
-        column_types = None
-        if d.shape[0] > 0:
-            column_types = {k: type(d.loc[0, k]) for k in column_names}
-        return TableDescription(table_name, column_names, column_types=column_types)
-    raise TypeError("can't describe " + table_name + ": " + str(type(d)))
+    # Expect a pandas.DataFrame style object
+    column_names = [c for c in d.columns]
+    column_types = None
+    if d.shape[0] > 0:
+        column_types = {k: type(d.loc[0, k]) for k in column_names}
+    return TableDescription(table_name, column_names, column_types=column_types)
 
 
 class WrappedOperatorPlatform(OperatorPlatform):
@@ -837,18 +840,17 @@ class WrappedOperatorPlatform(OperatorPlatform):
 
 
 def wrap(d, *, table_name="data_frame"):
-    if isinstance(d, data_algebra.pd.DataFrame):
-        column_names = [c for c in d.columns]
-        column_types = None
-        if d.shape[0] > 0:
-            column_types = {k: type(d.loc[0, k]) for k in column_names}
-        return WrappedOperatorPlatform(
-            underlying=TableDescription(
-                table_name, column_names, column_types=column_types
-            ),
-            data_map={table_name: d},
-        )
-    raise TypeError("can't wrap " + table_name + ": " + str(type(d)))
+    # Expect a pandas.DataFrame style object
+    column_names = [c for c in d.columns]
+    column_types = None
+    if d.shape[0] > 0:
+        column_types = {k: type(d.loc[0, k]) for k in column_names}
+    return WrappedOperatorPlatform(
+        underlying=TableDescription(
+            table_name, column_names, column_types=column_types
+        ),
+        data_map={table_name: d},
+    )
 
 
 class ExtendNode(ViewRepresentation):
@@ -1024,6 +1026,8 @@ class ExtendNode(ViewRepresentation):
         return db_model.extend_to_sql(self, using=using, temp_id_source=temp_id_source)
 
     def eval_implementation(self, *, data_map, eval_env, data_model):
+        if data_model is None:
+            data_model = data_algebra.pandas_model.PandasModel()
         return data_model.extend_step(op=self, data_map=data_map, eval_env=eval_env)
 
 
@@ -1131,6 +1135,8 @@ class ProjectNode(ViewRepresentation):
         return db_model.project_to_sql(self, using=using, temp_id_source=temp_id_source)
 
     def eval_implementation(self, *, data_map, eval_env, data_model):
+        if data_model is None:
+            data_model = data_algebra.pandas_model.PandasModel()
         return data_model.project_step(op=self, data_map=data_map, eval_env=eval_env)
 
 
@@ -1187,6 +1193,8 @@ class SelectRowsNode(ViewRepresentation):
         )
 
     def eval_implementation(self, *, data_map, eval_env, data_model):
+        if data_model is None:
+            data_model = data_algebra.pandas_model.PandasModel()
         return data_model.select_rows_step(
             op=self, data_map=data_map, eval_env=eval_env
         )
@@ -1243,6 +1251,8 @@ class SelectColumnsNode(ViewRepresentation):
         )
 
     def eval_implementation(self, *, data_map, eval_env, data_model):
+        if data_model is None:
+            data_model = data_algebra.pandas_model.PandasModel()
         return data_model.select_columns_step(
             op=self, data_map=data_map, eval_env=eval_env
         )
@@ -1299,6 +1309,8 @@ class DropColumnsNode(ViewRepresentation):
         )
 
     def eval_implementation(self, *, data_map, eval_env, data_model):
+        if data_model is None:
+            data_model = data_algebra.pandas_model.PandasModel()
         return data_model.drop_columns_step(
             op=self, data_map=data_map, eval_env=eval_env
         )
@@ -1369,6 +1381,8 @@ class OrderRowsNode(ViewRepresentation):
         return db_model.order_to_sql(self, using=using, temp_id_source=temp_id_source)
 
     def eval_implementation(self, *, data_map, eval_env, data_model):
+        if data_model is None:
+            data_model = data_algebra.pandas_model.PandasModel()
         return data_model.order_rows_step(op=self, data_map=data_map, eval_env=eval_env)
 
     # short-cut main interface
@@ -1444,6 +1458,8 @@ class RenameColumnsNode(ViewRepresentation):
         return db_model.rename_to_sql(self, using=using, temp_id_source=temp_id_source)
 
     def eval_implementation(self, *, data_map, eval_env, data_model):
+        if data_model is None:
+            data_model = data_algebra.pandas_model.PandasModel()
         return data_model.rename_columns_step(
             op=self, data_map=data_map, eval_env=eval_env
         )
@@ -1534,6 +1550,8 @@ class NaturalJoinNode(ViewRepresentation):
         )
 
     def eval_implementation(self, *, data_map, eval_env, data_model):
+        if data_model is None:
+            data_model = data_algebra.pandas_model.PandasModel()
         return data_model.natural_join_step(
             op=self, data_map=data_map, eval_env=eval_env
         )
@@ -1620,6 +1638,8 @@ class ConcatRowsNode(ViewRepresentation):
         )
 
     def eval_implementation(self, *, data_map, eval_env, data_model):
+        if data_model is None:
+            data_model = data_algebra.pandas_model.PandasModel()
         return data_model.concat_rows_step(
             op=self, data_map=data_map, eval_env=eval_env
         )
@@ -1734,6 +1754,8 @@ class ConvertRecordsNode(ViewRepresentation):
         return res
 
     def eval_implementation(self, *, data_map, eval_env, data_model):
+        if data_model is None:
+            data_model = data_algebra.pandas_model.PandasModel()
         return data_model.convert_records_step(
             op=self, data_map=data_map, eval_env=eval_env
         )

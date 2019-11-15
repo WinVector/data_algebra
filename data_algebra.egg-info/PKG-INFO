@@ -33,3 +33,5 @@ Provides-Extra: yaml
 Provides-Extra: pretty_python
 Provides-Extra: pretty_sql
 Provides-Extra: diagram
+Provides-Extra: modin
+Provides-Extra: all

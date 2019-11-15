@@ -34,6 +34,8 @@ setuptools.setup(
         'pretty_python': ['black'],
         'pretty_sql': ['sqlparse'],
         'diagram': ['graphviz'],
+        'modin': ['modin'],
+        'all': ['PyYAML', 'black', 'sqlparse', 'graphviz', 'modin'],
     },
     platforms=['any'],
     license='License :: OSI Approved :: BSD 3-clause License',

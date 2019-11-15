@@ -1,8 +1,18 @@
 numpy
 pandas
 
+[all]
+PyYAML
+black
+sqlparse
+graphviz
+modin
+
 [diagram]
 graphviz
+
+[modin]
+modin
 
 [pretty_python]
 black

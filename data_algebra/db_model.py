@@ -1,3 +1,4 @@
+
 import math
 import re
 import io
@@ -91,8 +92,12 @@ class DBModel:
         identifier_quote='"',
         string_quote="'",
         sql_formatters=None,
-        op_replacements=None
+        op_replacements=None,
+        pd=None
     ):
+        if pd is None:
+            pd = data_algebra.pd
+        self.pd = pd
         if sql_formatters is None:
             sql_formatters = {}
         self.identifier_quote = identifier_quote
@@ -645,7 +650,6 @@ class DBModel:
             table_name=table_name, column_names=[c for c in d.columns]
         )
 
-    # noinspection PyMethodMayBeStatic
     def read_query(self, conn, q):
         """
 
@@ -657,7 +661,7 @@ class DBModel:
         cur.execute(q)
         r = cur.fetchall()
         colnames = [desc[0] for desc in cur.description]
-        r = data_algebra.pd.DataFrame(columns=colnames, data=r)
+        r = self.pd.DataFrame(columns=colnames, data=r)
         r = r.reset_index(drop=True)
         return r
 

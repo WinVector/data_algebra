@@ -49,15 +49,18 @@ def equivalent_frames(
         float_tol=1e-8,
         check_column_order=False,
         cols_case_sensitive=False,
-        check_row_order=False
+        check_row_order=False,
+        pd=None,
 ):
     """return False if the frames are equivalent (up to column re-ordering and possible row-reordering).
     Ignores indexing."""
     # leave in extra checks as this is usually used by test code
-    if not isinstance(a, data_algebra.pd.DataFrame):
-        raise TypeError("Expect a to be data_algebra.pd.DataFrame")
-    if not isinstance(b, data_algebra.pd.DataFrame):
-        raise TypeError("Expect b to be data_algebra.pd.DataFrame")
+    if pd is None:
+        pd = data_algebra.pd
+    if not isinstance(a, pd.DataFrame):
+        raise TypeError("Expect a to be pd.DataFrame")
+    if not isinstance(b, pd.DataFrame):
+        raise TypeError("Expect b to be pd.DataFrame")
     if a.shape != b.shape:
         return False
     if a.shape[1] < 1:
@@ -106,7 +109,7 @@ def equivalent_frames(
             ca = numpy.asarray(ca, dtype=float)
             cb = numpy.asarray(cb, dtype=float)
             dif = ca - cb
-            dif = numpy.asarray([abs(d) for d in dif if not data_algebra.pd.isnull(d)])
+            dif = numpy.asarray([abs(d) for d in dif if not pd.isnull(d)])
             if numpy.max(dif) > float_tol:
                 return False
         else:
@@ -120,42 +123,46 @@ def check_transform(ops, data, expect,
                     float_tol=1e-8,
                     check_column_order=False,
                     cols_case_sensitive=False,
-                    check_row_order=False
+                    check_row_order=False,
+                    pd=None
                     ):
     """
     Test an operator dag produces the expected result, and parses correctly.
 
     :param ops: data_algebra.data_ops.ViewRepresentation
-    :param data: data_algebra.pd.DataFrame or map of strings to data_algebra.pd.DataFrame
-    :param expect: data_algebra.pd.DataFrame
+    :param data: pd.DataFrame or map of strings to pd.DataFrame
+    :param expect: pd.DataFrame
     :param float_tol passed to equivalent_frames()
     :param check_column_order passed to equivalent_frames()
     :param cols_case_sensitive passed to equivalent_frames()
     :param check_row_order passed to equivalent_frames()
+    :param pd pandas module (defaults to data_algebra.pd if None)
     :return: None, assert if there is an issue
     """
 
+    if pd is None:
+        pd = data_algebra.pd
     if not isinstance(ops, ViewRepresentation):
         raise TypeError("expected ops to be a data_algebra.data_ops.ViewRepresentation")
-    if not isinstance(expect, data_algebra.pd.DataFrame):
-        raise TypeError("exepcted expect to be a data_algebra.pd.DataFrame")
+    if not isinstance(expect, pd.DataFrame):
+        raise TypeError("exepcted expect to be a pd.DataFrame")
     cols_used = ops.columns_used()
     if len(cols_used) < 1:
         raise ValueError("no tables used")
     if not formats_to_self(ops):
         raise ValueError("ops did not round-trip format")
     check_op_round_trip(ops)
-    if isinstance(data, data_algebra.pd.DataFrame):
+    if isinstance(data, pd.DataFrame):
         if len(cols_used) != 1:
             raise ValueError("more than one table used, but only one table supplied")
         res = ops.transform(data)
     else:
         if not isinstance(data, Dict):
-            raise TypeError("expected data to be a data_algebra.pd.DataFrame or a dictionary of such")
+            raise TypeError("expected data to be a pd.DataFrame or a dictionary of such")
         res = ops.eval_pandas(data_map=data)
     # try pandas path
-    if not isinstance(res, data_algebra.pd.DataFrame):
-        raise ValueError("expected res to be data_algebra.pd.DataFrame, got: " + str(type(res)))
+    if not isinstance(res, pd.DataFrame):
+        raise ValueError("expected res to be pd.DataFrame, got: " + str(type(res)))
     if not equivalent_frames(res, expect,
                              float_tol=float_tol,
                              check_column_order=check_column_order,
@@ -165,7 +172,7 @@ def check_transform(ops, data, expect,
     # try Sqlite path
     conn = sqlite3.connect(":memory:")
     db_model = data_algebra.SQLite.SQLiteModel()
-    if isinstance(data, data_algebra.pd.DataFrame):
+    if isinstance(data, pd.DataFrame):
         table_name = [k for k in cols_used.keys()][0]
         db_model.insert_table(conn, data, table_name=table_name)
     else:

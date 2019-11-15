@@ -120,8 +120,10 @@ class RecordSpecification:
         return obj
 
 
-def record_spec_from_simple_obj(obj):
-    control_table = data_algebra.pd.DataFrame()
+def record_spec_from_simple_obj(obj, *, pd=None):
+    if pd is None:
+        pd = data_algebra.pd
+    control_table = pd.DataFrame()
     for k in obj["control_table"].keys():
         control_table[k] = obj["control_table"][k]
 
@@ -194,7 +196,9 @@ class RecordMap:
             return self.blocks_out.record_keys.copy()
         return None
 
-    def example_input(self):
+    def example_input(self, *, pd=None):
+        if pd is None:
+            pd = data_algebra.pd
         if self.blocks_in is not None:
             example = self.blocks_in.control_table.copy()
             nrow = example.shape[0]
@@ -202,7 +206,7 @@ class RecordMap:
                 example[rk] = [rk] * nrow
             return example
         if self.blocks_in is not None:
-            example = data_algebra.pd.DataFrame()
+            example = pd.DataFrame()
             for k in self.blocks_out.row_columns:
                 example[k] = [k]
             return example
