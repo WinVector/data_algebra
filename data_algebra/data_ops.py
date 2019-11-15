@@ -12,6 +12,7 @@ import data_algebra.db_model
 import data_algebra.pandas_model
 import data_algebra.expr_rep
 import data_algebra.env
+from data_algebra.data_ops_types import *
 
 
 _have_black = False
@@ -34,81 +35,6 @@ except ImportError:
     pass
 
 
-# op_list = [
-#     "extend",
-#     "project",
-#     "natural_join",
-#     "concat_rows",
-#     "select_rows",
-#     "drop_columns",
-#     "select_columns",
-#     "rename_columns",
-#     "order_rows",
-#     "convert_records",
-# ]
-
-
-class OperatorPlatform:
-    """Abstract class representing ability to apply data_algebra operations."""
-
-    def __init__(self):
-        pass
-
-    # noinspection PyPep8Naming
-    def transform(self, X):
-        raise NotImplementedError("base class called")
-
-    def __rrshift__(self, other):  # override other >> self
-        return self.transform(other)
-
-    def __rshift__(self, other):  # override self >> other
-        # can't use type >> type if only __rrshift__ is defined (must have __rshift__ in this case)
-        if isinstance(other, OperatorPlatform):
-            return other.transform(self)
-        if isinstance(other, PipeStep):
-            other.apply(self)
-        raise TypeError("unexpected type: " + str(type(other)))
-
-    # composition
-    def add(self, other):
-        """interface to what we used to call PipeStep nodes"""
-        return other.apply(self)
-
-    # define builders for all non-initial node types on base class
-
-    def extend(
-        self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
-    ):
-        raise NotImplementedError("base class called")
-
-    def project(self, ops=None, *, group_by=None, parse_env=None):
-        raise NotImplementedError("base class called")
-
-    def natural_join(self, b, *, by=None, jointype="INNER"):
-        raise NotImplementedError("base class called")
-
-    def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):
-        raise NotImplementedError("base class called")
-
-    def select_rows(self, expr, *, parse_env=None):
-        raise NotImplementedError("base class called")
-
-    def drop_columns(self, column_deletions):
-        raise NotImplementedError("base class called")
-
-    def select_columns(self, columns):
-        raise NotImplementedError("base class called")
-
-    def rename_columns(self, column_remapping):
-        raise NotImplementedError("base class called")
-
-    def order_rows(self, columns, *, reverse=None, limit=None):
-        raise NotImplementedError("base class called")
-
-    def convert_records(self, record_map, *, blocks_out_table=None):
-        raise NotImplementedError("base class called")
-
-
 class ViewRepresentation(OperatorPlatform):
     """Structure to represent the columns of a query or a table.
        Abstract base class."""
@@ -119,7 +45,7 @@ class ViewRepresentation(OperatorPlatform):
     sources: List['ViewRepresentation']  # https://www.python.org/dev/peps/pep-0484/#forward-references
     columns_currently_used: Set[str]  # transient field, operations can update this
 
-    def __init__(self, column_names, *, sources=None):
+    def __init__(self, column_names, *, sources=None, node_name):
         if isinstance(column_names, str):
             column_names = [column_names]
         self.column_names = [c for c in column_names]
@@ -143,7 +69,7 @@ class ViewRepresentation(OperatorPlatform):
                 raise ValueError("all sources must be of class ViewRepresentation")
         self.sources = [si for si in sources]
         self.columns_currently_used = set()
-        OperatorPlatform.__init__(self)
+        OperatorPlatform.__init__(self, node_name=node_name)
 
     # adaptors
 
@@ -537,7 +463,7 @@ class TableDescription(ViewRepresentation):
     key: str
 
     def __init__(self, table_name, column_names, *, qualifiers=None, column_types=None):
-        ViewRepresentation.__init__(self, column_names=column_names)
+        ViewRepresentation.__init__(self, column_names=column_names, node_name='TableDescription')
         if (table_name is not None) and (not isinstance(table_name, str)):
             raise TypeError("table_name must be a string")
         self.table_name = table_name
@@ -654,26 +580,26 @@ class TableDescription(ViewRepresentation):
         return self.key.__hash__()
 
 
-def describe_table(d, table_name="data_frame"):
+def describe_table(d, table_name="data_frame", *, qualifiers=None, column_types=None):
     # Expect a pandas.DataFrame style object
     column_names = [c for c in d.columns]
-    column_types = None
-    if d.shape[0] > 0:
-        column_types = {k: type(d.loc[0, k]) for k in column_names}
-    return TableDescription(table_name, column_names, column_types=column_types)
+    if column_types is None:
+        if d.shape[0] > 0:
+            column_types = {k: type(d.loc[0, k]) for k in column_names}
+    return TableDescription(table_name, column_names, column_types=column_types, qualifiers=qualifiers)
 
 
 class WrappedOperatorPlatform(OperatorPlatform):
     """Decorator class for OperatorPlatform."""
 
     def __init__(self, *, underlying, data_map):
-        OperatorPlatform.__init__(self)
         if not isinstance(underlying, ViewRepresentation):
             raise TypeError("Expected underlying to be of class OperatorPlatform")
         if isinstance(underlying, WrappedOperatorPlatform):
             raise TypeError("underlying should not be a WrappedOperatorPlatform")
         if not isinstance(data_map, dict):
             raise TypeError("Expected data_map to be a key to table dictionary")
+        OperatorPlatform.__init__(self, node_name=underlying.node_name)
         self.data_map = data_map.copy()
         self.underlying = underlying
 
@@ -742,12 +668,18 @@ class WrappedOperatorPlatform(OperatorPlatform):
         raise TypeError("unexpected type: " + str(type(other)))
 
     # composition
+
     def add(self, other):
         """interface to what we used to call PipeStep nodes"""
         data_map, other = self._reach_in(other)
         return WrappedOperatorPlatform(
             underlying=other.apply(self.underlying), data_map=data_map
         )
+
+    # sql
+
+    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+        return self.underlying.to_sql_implementation(db_model=db_model, using=using, temp_id_source=temp_id_source)
 
     # define builders for all non-initial node types on base class
 
@@ -949,7 +881,7 @@ class ExtendNode(ViewRepresentation):
                     if value_name not in source.column_set:
                         raise ValueError("in windowed situations only simple operators are allowed, " +
                                          "'" + k + "': '" + opk.to_pandas() + "' term is too complex an expression")
-        ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
+        ViewRepresentation.__init__(self, column_names=column_names, sources=[source], node_name='ExtendNode')
 
     def check_extend_window_fns(self):
         window_situation = (len(self.partition_by) > 0) or (len(self.order_by) > 0)
@@ -1064,7 +996,7 @@ class ProjectNode(ViewRepresentation):
         unknown = set(group_by) - known_cols
         if len(unknown) > 0:
             raise ValueError("unknown group_by columns: " + str(unknown))
-        ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
+        ViewRepresentation.__init__(self, column_names=column_names, sources=[source], node_name='ProjectNode')
         for (k, opk) in self.ops.items():
             if not isinstance(opk, data_algebra.expr_rep.Expression):
                 raise ValueError(
@@ -1156,7 +1088,7 @@ class SelectRowsNode(ViewRepresentation):
         self.decision_columns = set()
         self.expr.get_column_names(self.decision_columns)
         ViewRepresentation.__init__(
-            self, column_names=source.column_names, sources=[source]
+            self, column_names=source.column_names, sources=[source], node_name='SelectRowsNode'
         )
 
     def columns_used_from_sources(self, using=None):
@@ -1216,7 +1148,7 @@ class SelectColumnsNode(ViewRepresentation):
         if isinstance(source, SelectColumnsNode):
             source = source.sources[0]
         ViewRepresentation.__init__(
-            self, column_names=column_selection, sources=[source]
+            self, column_names=column_selection, sources=[source], node_name='SelectColumnsNode'
         )
 
     def columns_used_from_sources(self, using=None):
@@ -1275,7 +1207,7 @@ class DropColumnsNode(ViewRepresentation):
         if len(unknown) > 0:
             raise ValueError("dropping unknown columns " + str(unknown))
         ViewRepresentation.__init__(
-            self, column_names=remaining_columns, sources=[source]
+            self, column_names=remaining_columns, sources=[source], node_name='DropColumnsNode'
         )
 
     def columns_used_from_sources(self, using=None):
@@ -1340,7 +1272,7 @@ class OrderRowsNode(ViewRepresentation):
         if len(not_order) > 0:
             raise ValueError("columns declared reverse, but not order: " + str(unknown))
         ViewRepresentation.__init__(
-            self, column_names=source.column_names, sources=[source]
+            self, column_names=source.column_names, sources=[source], node_name='OrderRowsNode'
         )
 
     def columns_used_from_sources(self, using=None):
@@ -1423,7 +1355,7 @@ class RenameColumnsNode(ViewRepresentation):
             (k if k not in self.reverse_mapping.keys() else self.reverse_mapping[k])
             for k in source.column_names
         ]
-        ViewRepresentation.__init__(self, column_names=column_names, sources=[source])
+        ViewRepresentation.__init__(self, column_names=column_names, sources=[source], node_name='RenameColumnsNode')
 
     def columns_used_from_sources(self, using=None):
         if using is None:
@@ -1498,7 +1430,7 @@ class NaturalJoinNode(ViewRepresentation):
         missing_right = by_set - b.column_set
         if len(missing_right) > 0:
             raise KeyError("right table missing join keys: " + str(missing_right))
-        ViewRepresentation.__init__(self, column_names=column_names, sources=sources)
+        ViewRepresentation.__init__(self, column_names=column_names, sources=sources, node_name='NaturalJoinNode')
         self.by = by
         self.jointype = data_algebra.expr_rep.standardize_join_type(jointype)
         self.get_tables()  # causes a throw if left and right table descriptions are inconsistent
@@ -1581,7 +1513,7 @@ class ConcatRowsNode(ViewRepresentation):
         column_names = sources[0].column_names.copy()
         if id_column is not None:
             column_names.append(id_column)
-        ViewRepresentation.__init__(self, column_names=column_names, sources=sources)
+        ViewRepresentation.__init__(self, column_names=column_names, sources=sources, node_name='ConcatRowsNode')
         self.id_column = id_column
         self.a_name = a_name
         self.b_name = b_name
@@ -1691,7 +1623,7 @@ class ConvertRecordsNode(ViewRepresentation):
         if len(unknown) > 0:
             raise ValueError("missing required columns: " + str(unknown))
         ViewRepresentation.__init__(
-            self, column_names=record_map.columns_produced, sources=sources
+            self, column_names=record_map.columns_produced, sources=sources, node_name='ConvertRecordsNode'
         )
 
     def columns_used_from_sources(self, using=None):
@@ -1761,14 +1693,6 @@ class ConvertRecordsNode(ViewRepresentation):
         return data_model.convert_records_step(
             op=self, data_map=data_map, eval_env=eval_env
         )
-
-
-class PipeStep:
-    def __init__(self):
-        pass
-
-    def apply(self, other, **kwargs):
-        raise NotImplementedError("base class called")
 
 
 class Extend(PipeStep):

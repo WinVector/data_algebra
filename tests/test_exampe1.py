@@ -20,7 +20,8 @@ def test_example1_1():
         'x_n': ['n_13', 'n_48', 'n_77', 'n_29', 'n_91', 'n_93'],
         'y': [1.0312223, -1.3374379, -1.9347144, 1.2772708, -0.1238039, 0.3058670],
     })
-    table_desc = db_model.insert_table(conn, d, 'd')
+    table_desc = describe_table(d, 'd')
+    db_model.insert_table(conn, d, 'd')
 
     ops1 = table_desc. \
         extend({

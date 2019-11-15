@@ -1,3 +1,4 @@
+
 import math
 import numpy
 import numbers
@@ -130,18 +131,18 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         return qt
 
     # noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection
-    def insert_table(self, conn, d, table_name):
+    def insert_table(self, conn, d, table_name, *, qualifiers=None):
         """
 
         :param conn: a database connection
         :param d: a Pandas table
         :param table_name: name to give write to
+        :param qualifiers: schema and such
         :return:
         """
 
+        if qualifiers is not None:
+            raise ValueError("non-empty qualifiers not yet supported on inser")
         cur = conn.cursor()
         cur.execute("DROP TABLE IF EXISTS " + table_name)
         d.to_sql(name=table_name, con=conn)
-        return data_algebra.data_ops.TableDescription(
-            table_name=table_name, column_names=[c for c in d.columns]
-        )
