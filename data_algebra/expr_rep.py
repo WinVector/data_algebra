@@ -994,6 +994,51 @@ def _parse_by_eval(source_str, *, data_def, outter_environemnt=None):
     return v
 
 
+# define with def so function has usable __name__
+def connected_components(f, g):
+    return data_algebra.expr_rep.Expression(op="connected_components", args=[f, g])
+
+
+def populate_specials(*, column_defs, destination, user_values=None):
+    """populate a dictionary with special values
+       column_defs is a dictionary,
+         usually formed from a ViewRepresentation.column_map.__dict__
+       destination is a dictionary,
+         usually formed from a ViewRepresentation.column_map.__dict__.copy()
+    """
+
+    if not isinstance(column_defs, dict):
+        raise TypeError("column_defs should be a dictionary")
+    if not isinstance(destination, dict):
+        raise TypeError("destination should be a dictionary")
+    if user_values is None:
+        user_values = {}
+    if not isinstance(user_values, dict):
+        raise TypeError("user_values should be a dictionary")
+    nd = column_defs.copy()
+    ns = data_algebra.env.SimpleNamespaceDict(**nd)
+    # makes these symbols available for parsing step
+    # alter env populate_specials, expr_rep pd_formatters, expr_rep @-defs,
+    # and pandas_model pandas_eval_env in parallel to extend functionality
+    destination["_"] = ns
+    destination["_get"] = lambda key: user_values[key]
+    # Note: a lot of the re-emitters add back the underbar, allow the non
+    # underbar names we see here.  See expr_rep.py Expression to_python and to_pandas.
+    destination["_row_number"] = lambda: data_algebra.expr_rep.Expression(
+        op="row_number", args=[]
+    )
+    destination["_ngroup"] = lambda: data_algebra.expr_rep.Expression(
+        op="ngroup", args=[]
+    )
+    destination["_size"] = lambda: data_algebra.expr_rep.Expression(op="size", args=[])
+    destination["connected_components"] = connected_components
+    destination[
+        "partitioned_eval"
+    ] = lambda fn, args, partition: data_algebra.expr_rep.Expression(
+        op="partitioned_eval", args=[fn, args, partition]
+    )
+
+
 def parse_assignments_in_context(ops, view, *, parse_env=None):
     """
     Convert all entries of ops map to Term-expressions
@@ -1026,7 +1071,7 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
     columns_used = set()
     newops = collections.OrderedDict()
     mp = column_defs.copy()
-    data_algebra.env.populate_specials(
+    populate_specials(
         column_defs=column_defs, destination=mp, user_values=parse_env
     )
     for k in ops.keys():
