@@ -332,6 +332,7 @@ class ViewRepresentation(OperatorPlatform):
             )
         k = [k for k in data_map.keys()][0]
         x = data_map[k]
+        # noinspection PyUnresolvedReferences
         if isinstance(x, data_model.pd.DataFrame):
             return self.eval_pandas(
                 data_map=data_map, eval_env=eval_env, data_model=data_model
@@ -386,6 +387,7 @@ class ViewRepresentation(OperatorPlatform):
             res = X.stand_in_for_table(ops=self, table_key=k)
             return res
         data_map = {k: X}
+        # noinspection PyUnresolvedReferences
         if isinstance(X, data_model.pd.DataFrame):
             return self.eval_pandas(
                 data_map=data_map, eval_env=eval_env, data_model=data_model

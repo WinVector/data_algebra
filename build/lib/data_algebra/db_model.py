@@ -6,7 +6,6 @@ import io
 import data_algebra
 
 import data_algebra.expr_rep
-import data_algebra.data_ops
 import data_algebra.util
 
 # import data_algebra.cdata
