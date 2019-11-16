@@ -331,16 +331,16 @@ class ViewRepresentation(OperatorPlatform):
     ):
         if (ops is None) or (len(ops) < 1):
             return self
-        parsed_ops = data_algebra.expr_rep.parse_assignments_in_context(
-            ops, self, parse_env=parse_env
-        )
-        new_cols_used_in_calc = set(data_algebra.expr_rep.get_columns_used(parsed_ops))
         if partition_by is None:
             partition_by = []
         if order_by is None:
             order_by = []
         if reverse is None:
             reverse = []
+        parsed_ops = data_algebra.expr_rep.parse_assignments_in_context(
+            ops, self, parse_env=parse_env
+        )
+        new_cols_used_in_calc = set(data_algebra.expr_rep.get_columns_used(parsed_ops))
         new_cols_produced_in_calc = set([k for k in parsed_ops.keys()])
         if (partition_by != 1) and (len(partition_by) > 0):
             if len(new_cols_produced_in_calc.intersection(partition_by)) > 0:
@@ -357,6 +357,7 @@ class ViewRepresentation(OperatorPlatform):
                 reverse=reverse,
                 parse_env=parse_env,
             )
+        # see if we can combine nodes
         if isinstance(self, ExtendNode):
             compatible_partition = (partition_by == self.partition_by) or (
                 ((partition_by == 1) or (len(partition_by) <= 0))
@@ -398,6 +399,7 @@ class ViewRepresentation(OperatorPlatform):
                     order_by=order_by,
                     reverse=reverse,
                 )
+        # new node
         return ExtendNode(
             source=self,
             parsed_ops=parsed_ops,
@@ -407,15 +409,19 @@ class ViewRepresentation(OperatorPlatform):
         )
 
     def project(self, ops=None, *, group_by=None, parse_env=None):
-        if ((ops is None) or (len(ops) < 1)) and (
-            (group_by is None) or (len(group_by) < 1)
-        ):
+        if group_by is None:
+            group_by = []
+        if ((ops is None) or (len(ops) < 1)) and (len(group_by) < 1):
             raise ValueError("must have ops or group_by")
-        if self.is_trivial_when_intermediate():
-            return self.sources[0].project(ops, group_by=group_by, parse_env=parse_env)
         parsed_ops = data_algebra.expr_rep.parse_assignments_in_context(
             ops, self, parse_env=parse_env
         )
+        new_cols_used_in_calc = set(data_algebra.expr_rep.get_columns_used(parsed_ops))
+        new_cols_produced_in_calc = set([k for k in parsed_ops.keys()])
+        if len(new_cols_used_in_calc.intersection(group_by)):
+            raise ValueError("can not alter grouping columns")
+        if self.is_trivial_when_intermediate():
+            return self.sources[0].project(ops, group_by=group_by, parse_env=parse_env)
         return ProjectNode(source=self, parsed_ops=parsed_ops, group_by=group_by)
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
