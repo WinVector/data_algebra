@@ -4,7 +4,6 @@ import collections
 import data_algebra.util
 import data_algebra.env
 
-
 # for some ideas in capturing expressions in Python see:
 #  scipy
 # pipe-like idea
@@ -1104,3 +1103,26 @@ def standardize_join_type(join_str):
     except KeyError:
         pass
     return join_str
+
+
+def get_columns_used(parsed_exprs):
+    if not isinstance(parsed_exprs, dict):
+        raise TypeError(
+            "expected parsed_exprs to be a dictionary of data_algebra.expr_rep.Term(s)"
+        )
+    columns_seen = set()
+    for node in parsed_exprs.values():
+        node.get_column_names(columns_seen)
+    return columns_seen
+
+
+def implies_windowed(parsed_exprs):
+    if not isinstance(parsed_exprs, dict):
+        raise TypeError(
+            "expected parsed_exprs to be a dictionary of data_algebra.expr_rep.Term(s)"
+        )
+    for opk in parsed_exprs.values():  # look for aggregation functions
+        if isinstance(opk, data_algebra.expr_rep.Expression):
+            if opk.op in data_algebra.expr_rep.fn_names_that_imply_windowed_situation:
+                return True
+    return False

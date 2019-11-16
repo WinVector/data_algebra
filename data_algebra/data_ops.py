@@ -13,7 +13,6 @@ import data_algebra.expr_rep
 import data_algebra.env
 from data_algebra.data_ops_types import *
 
-
 _have_black = False
 try:
     # noinspection PyUnresolvedReferences
@@ -22,7 +21,6 @@ try:
     _have_black = True
 except ImportError:
     pass
-
 
 _have_sqlparse = False
 try:
@@ -333,6 +331,24 @@ class ViewRepresentation(OperatorPlatform):
     ):
         if (ops is None) or (len(ops) < 1):
             return self
+        parsed_ops = data_algebra.expr_rep.parse_assignments_in_context(
+            ops, self, parse_env=parse_env
+        )
+        new_cols_used_in_calc = set(data_algebra.expr_rep.get_columns_used(parsed_ops))
+        if partition_by is None:
+            partition_by = []
+        if order_by is None:
+            order_by = []
+        if reverse is None:
+            reverse = []
+        new_cols_produced_in_calc = set([k for k in parsed_ops.keys()])
+        if (partition_by != 1) and (len(partition_by) > 0):
+            if len(new_cols_produced_in_calc.intersection(partition_by)) > 0:
+                raise ValueError("must not change partition_by columns")
+        if len(new_cols_produced_in_calc.intersection(order_by)) > 0:
+            raise ValueError("must not change partition_by columns")
+        if len(set(reverse).difference(order_by)) > 0:
+            raise ValueError("all columns in reverse must be in order_by")
         if self.is_trivial_when_intermediate():
             return self.sources[0].extend(
                 ops,
@@ -341,13 +357,53 @@ class ViewRepresentation(OperatorPlatform):
                 reverse=reverse,
                 parse_env=parse_env,
             )
+        if isinstance(self, ExtendNode):
+            compatible_partition = (partition_by == self.partition_by) or (
+                ((partition_by == 1) or (len(partition_by) <= 0))
+                and ((self.partition_by == 1) or (len(self.partition_by) <= 0))
+            )
+            same_windowing = (
+                data_algebra.expr_rep.implies_windowed(parsed_ops)
+                == self.windowed_situation
+            )
+            if (
+                compatible_partition
+                and same_windowing
+                and (order_by == self.order_by)
+                and (reverse == self.reverse)
+                and (
+                    len(new_cols_used_in_calc.intersection(self.cols_produced_in_calc))
+                    == 0
+                )
+                and (
+                    len(
+                        new_cols_produced_in_calc.intersection(
+                            self.cols_produced_in_calc
+                        )
+                    )
+                    == 0
+                )
+                and (
+                    len(new_cols_produced_in_calc.intersection(self.cols_used_in_calc))
+                    == 0
+                )
+            ):
+                # merge the extends
+                new_ops = self.ops.copy()
+                new_ops.update(parsed_ops)
+                return ExtendNode(
+                    source=self.sources[0],
+                    parsed_ops=new_ops,
+                    partition_by=partition_by,
+                    order_by=order_by,
+                    reverse=reverse,
+                )
         return ExtendNode(
             source=self,
-            ops=ops,
+            parsed_ops=parsed_ops,
             partition_by=partition_by,
             order_by=order_by,
             reverse=reverse,
-            parse_env=parse_env,
         )
 
     def project(self, ops=None, *, group_by=None, parse_env=None):
@@ -357,7 +413,10 @@ class ViewRepresentation(OperatorPlatform):
             raise ValueError("must have ops or group_by")
         if self.is_trivial_when_intermediate():
             return self.sources[0].project(ops, group_by=group_by, parse_env=parse_env)
-        return ProjectNode(source=self, ops=ops, group_by=group_by, parse_env=parse_env)
+        parsed_ops = data_algebra.expr_rep.parse_assignments_in_context(
+            ops, self, parse_env=parse_env
+        )
+        return ProjectNode(source=self, parsed_ops=parsed_ops, group_by=group_by)
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
         if not isinstance(b, ViewRepresentation):
@@ -793,31 +852,12 @@ def wrap(d, *, table_name="data_frame"):
 
 class ExtendNode(ViewRepresentation):
     def __init__(
-        self,
-        source,
-        ops,
-        *,
-        partition_by=None,
-        order_by=None,
-        reverse=None,
-        parse_env=None
+        self, *, source, parsed_ops, partition_by=None, order_by=None, reverse=None,
     ):
-        windowed_situation = False
-        if ops is None:
-            ops = {}
-        ops = data_algebra.expr_rep.parse_assignments_in_context(
-            ops, source, parse_env=parse_env
-        )
-        if len(ops) < 1:
-            raise ValueError("no ops")
-        for (k, opk) in ops.items():  # look for aggregation functions
-            if isinstance(opk, data_algebra.expr_rep.Expression):
-                if (
-                    opk.op
-                    in data_algebra.expr_rep.fn_names_that_imply_windowed_situation
-                ):
-                    windowed_situation = True
-        self.ops = ops
+        windowed_situation = data_algebra.expr_rep.implies_windowed(parsed_ops)
+        self.ops = parsed_ops
+        self.cols_used_in_calc = data_algebra.expr_rep.get_columns_used(parsed_ops)
+        self.cols_produced_in_calc = [k for k in parsed_ops.keys()]
         if partition_by is None:
             partition_by = []
         if isinstance(partition_by, numbers.Number):
@@ -843,13 +883,13 @@ class ExtendNode(ViewRepresentation):
         self.reverse = reverse
         column_names = source.column_names.copy()
         consumed_cols = set()
-        for (k, o) in ops.items():
+        for (k, o) in parsed_ops.items():
             o.get_column_names(consumed_cols)
         unknown_cols = consumed_cols - source.column_set
         if len(unknown_cols) > 0:
             raise KeyError("referred to unknown columns: " + str(unknown_cols))
         known_cols = set(column_names)
-        for ci in ops.keys():
+        for ci in parsed_ops.keys():
             if ci not in known_cols:
                 column_names.append(ci)
         if len(partition_by) != len(set(partition_by)):
@@ -867,14 +907,14 @@ class ExtendNode(ViewRepresentation):
         unknown = set(reverse) - set(order_by)
         if len(unknown) > 0:
             raise ValueError("reverse columns not in order_by: " + str(unknown))
-        bad_overwrite = set(ops.keys()).intersection(
+        bad_overwrite = set(parsed_ops.keys()).intersection(
             set(partition_by).union(order_by, reverse)
         )
         if len(bad_overwrite) > 0:
             raise ValueError("tried to change: " + str(bad_overwrite))
         # check op arguments are very simple: all arguments are column names
         if windowed_situation:
-            for (k, opk) in ops.items():
+            for (k, opk) in parsed_ops.items():
                 if not isinstance(opk, data_algebra.expr_rep.Expression):
                     raise ValueError(
                         "non-aggregated expression in windowed/partitoned extend: "
@@ -991,13 +1031,8 @@ class ExtendNode(ViewRepresentation):
 
 
 class ProjectNode(ViewRepresentation):
-    def __init__(self, source, ops=None, *, group_by=None, parse_env=None):
-        if ops is None:
-            ops = {}
-        ops = data_algebra.expr_rep.parse_assignments_in_context(
-            ops, source, parse_env=parse_env
-        )
-        self.ops = ops
+    def __init__(self, *, source, parsed_ops, group_by=None):
+        self.ops = parsed_ops
         if group_by is None:
             group_by = []
         if isinstance(group_by, str):
@@ -1007,13 +1042,13 @@ class ProjectNode(ViewRepresentation):
         consumed_cols = set()
         for c in group_by:
             consumed_cols.add(c)
-        for (k, o) in ops.items():
+        for (k, o) in parsed_ops.items():
             o.get_column_names(consumed_cols)
         unknown_cols = consumed_cols - source.column_set
         if len(unknown_cols) > 0:
             raise KeyError("referred to unknown columns: " + str(unknown_cols))
         known_cols = set(column_names)
-        for ci in ops.keys():
+        for ci in parsed_ops.keys():
             if ci not in known_cols:
                 column_names.append(ci)
         if len(group_by) != len(set(group_by)):
