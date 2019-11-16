@@ -16,10 +16,6 @@ class Arrow:
         """return co-domain, object at head of arrow"""
         raise NotImplementedError("base class called")
 
-    def identity_arrow(self, obj):
-        """convert object to an identity arrow """
-        raise NotImplementedError("base class called")
-
     # noinspection PyPep8Naming
     def transform(self, X, *, strict=True):
         """ transform X, compose arrows (right to left) """
@@ -132,6 +128,7 @@ class DataOpArrow(Arrow):
                         )
             return self.cod()
         # assume a pandas.DataFrame compatible object
+        # noinspection PyUnresolvedReferences
         cols = set(X.columns)
         missing = set(self.incoming_columns) - cols
         if len(missing) > 0:
@@ -140,6 +137,7 @@ class DataOpArrow(Arrow):
         if len(excess):
             if strict:
                 raise ValueError("extra incoming columns: " + str(excess))
+            # noinspection PyUnresolvedReferences
             X = X[self.incoming_columns]
         return self.pipeline.transform(X)
 

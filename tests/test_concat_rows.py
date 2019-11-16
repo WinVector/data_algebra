@@ -1,4 +1,3 @@
-
 import numpy
 import sqlite3
 
@@ -14,7 +13,9 @@ def test_concat_rows():
     data_algebra.yaml.fix_ordered_dict_yaml_rep()
     db_model = data_algebra.SQLite.SQLiteModel()
 
-    d1 = data_algebra.pd.DataFrame({"x": [-1, 0, 1, numpy.nan], "y": [1, 2, numpy.nan, 3]})
+    d1 = data_algebra.pd.DataFrame(
+        {"x": [-1, 0, 1, numpy.nan], "y": [1, 2, numpy.nan, 3]}
+    )
 
     d2 = data_algebra.pd.DataFrame({"x": [0, 4, None], "y": [2, 7, None]})
 

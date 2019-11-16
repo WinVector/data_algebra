@@ -1,4 +1,3 @@
-
 import numpy
 
 import data_algebra.test_util

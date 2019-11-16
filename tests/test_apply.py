@@ -1,4 +1,3 @@
-
 import numpy
 
 import data_algebra
@@ -14,10 +13,14 @@ def test_apply():
     data_algebra.yaml.fix_ordered_dict_yaml_rep()
     data_algebra.env.push_onto_namespace_stack(locals())
 
-    d = data_algebra.pd.DataFrame({"x": [-1, 0, 1, numpy.nan], "y": [1, 2, numpy.nan, 3]})
+    d = data_algebra.pd.DataFrame(
+        {"x": [-1, 0, 1, numpy.nan], "y": [1, 2, numpy.nan, 3]}
+    )
 
     expect_1 = data_algebra.pd.DataFrame({"x": [0.0], "y": [2.0], "z": [0.0]})
-    expect_2 = data_algebra.pd.DataFrame({"x": [0.0], "y": [2.0], "z": [0.0], "q": [2.0]})
+    expect_2 = data_algebra.pd.DataFrame(
+        {"x": [0.0], "y": [2.0], "z": [0.0], "q": [2.0]}
+    )
 
     ops0 = (
         TableDescription("t1", ["x", "y"]).extend({"z": "x / y"}).select_rows("z >= 0")

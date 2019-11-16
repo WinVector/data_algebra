@@ -1,4 +1,3 @@
-
 import numpy
 
 import data_algebra
@@ -14,9 +13,13 @@ def test_natural_join_columns():
     data_algebra.yaml.fix_ordered_dict_yaml_rep()
     db_model = data_algebra.SQLite.SQLiteModel()
 
-    d = data_algebra.pd.DataFrame({"x": [-1, 0, 1, numpy.nan], "y": [1, 2, numpy.nan, 3]})
+    d = data_algebra.pd.DataFrame(
+        {"x": [-1, 0, 1, numpy.nan], "y": [1, 2, numpy.nan, 3]}
+    )
 
-    d2 = data_algebra.pd.DataFrame({"qq": [10, 20, 30], "y": [1.0, 2.0, 3.0], "x": [4, 5, 7]})
+    d2 = data_algebra.pd.DataFrame(
+        {"qq": [10, 20, 30], "y": [1.0, 2.0, 3.0], "x": [4, 5, 7]}
+    )
 
     ops4 = describe_table(d, "d").natural_join(
         b=describe_table(d2, "d2"), by=["y"], jointype="LEFT"

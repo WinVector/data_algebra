@@ -1,7 +1,7 @@
-
 # needed for the eval
 # noinspection PyUnresolvedReferences
 import numpy
+
 # noinspection PyUnresolvedReferences
 import data_algebra
 
@@ -43,14 +43,14 @@ def check_op_round_trip(o):
 
 
 def equivalent_frames(
-        a,
-        b,
-        *,
-        float_tol=1e-8,
-        check_column_order=False,
-        cols_case_sensitive=False,
-        check_row_order=False,
-        pd=None,
+    a,
+    b,
+    *,
+    float_tol=1e-8,
+    check_column_order=False,
+    cols_case_sensitive=False,
+    check_row_order=False,
+    pd=None,
 ):
     """return False if the frames are equivalent (up to column re-ordering and possible row-reordering).
     Ignores indexing."""
@@ -85,7 +85,7 @@ def equivalent_frames(
         b = b.reset_index(drop=True)
     for j in range(a.shape[1]):
         if can_convert_v_to_numeric(a.iloc[:, j]) != can_convert_v_to_numeric(
-                b.iloc[:, j]
+            b.iloc[:, j]
         ):
             return False
     if a.shape[0] < 1:
@@ -118,14 +118,17 @@ def equivalent_frames(
     return True
 
 
-def check_transform(ops, data, expect,
-                    *,
-                    float_tol=1e-8,
-                    check_column_order=False,
-                    cols_case_sensitive=False,
-                    check_row_order=False,
-                    pd=None
-                    ):
+def check_transform(
+    ops,
+    data,
+    expect,
+    *,
+    float_tol=1e-8,
+    check_column_order=False,
+    cols_case_sensitive=False,
+    check_row_order=False,
+    pd=None,
+):
     """
     Test an operator dag produces the expected result, and parses correctly.
 
@@ -158,16 +161,21 @@ def check_transform(ops, data, expect,
         res = ops.transform(data)
     else:
         if not isinstance(data, Dict):
-            raise TypeError("expected data to be a pd.DataFrame or a dictionary of such")
+            raise TypeError(
+                "expected data to be a pd.DataFrame or a dictionary of such"
+            )
         res = ops.eval_pandas(data_map=data)
     # try pandas path
     if not isinstance(res, pd.DataFrame):
         raise ValueError("expected res to be pd.DataFrame, got: " + str(type(res)))
-    if not equivalent_frames(res, expect,
-                             float_tol=float_tol,
-                             check_column_order=check_column_order,
-                             cols_case_sensitive=cols_case_sensitive,
-                             check_row_order=check_row_order):
+    if not equivalent_frames(
+        res,
+        expect,
+        float_tol=float_tol,
+        check_column_order=check_column_order,
+        cols_case_sensitive=cols_case_sensitive,
+        check_row_order=check_row_order,
+    ):
         raise ValueError("Pandas result did not match expect")
     # try Sqlite path
     conn = sqlite3.connect(":memory:")
@@ -183,9 +191,12 @@ def check_transform(ops, data, expect,
     res_db = db_model.read_query(conn, sql)
     # clean up
     conn.close()
-    if not equivalent_frames(res_db, expect,
-                             float_tol=float_tol,
-                             check_column_order=check_column_order,
-                             cols_case_sensitive=cols_case_sensitive,
-                             check_row_order=check_row_order):
+    if not equivalent_frames(
+        res_db,
+        expect,
+        float_tol=float_tol,
+        check_column_order=check_column_order,
+        cols_case_sensitive=cols_case_sensitive,
+        check_row_order=check_row_order,
+    ):
         raise ValueError("SQLite result did not match expect")

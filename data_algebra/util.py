@@ -1,4 +1,3 @@
-
 import collections
 import numpy
 
@@ -34,7 +33,7 @@ def is_bad(x, *, pd=None):
     return pd.isnull(x)
 
 
-def pandas_to_example_str(obj, *, pd=None, pd_module_name='data_algebra.pd'):
+def pandas_to_example_str(obj, *, pd=None, pd_module_name="data_algebra.pd"):
     if pd is None:
         pd = data_algebra.pd
     if not isinstance(obj, pd.DataFrame):

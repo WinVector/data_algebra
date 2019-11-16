@@ -1,4 +1,3 @@
-
 import math
 import re
 import io
@@ -131,7 +130,7 @@ class DBModel:
         return qt
 
     def quote_table_name(self, table_description):
-        if table_description.node_name != 'TableDescription':
+        if table_description.node_name != "TableDescription":
             raise TypeError(
                 "Expected table_description to be a data_algebra.data_ops.TableDescription)"
             )
@@ -194,7 +193,7 @@ class DBModel:
         raise TypeError("unexpected type: " + str(type(expression)))
 
     def table_def_to_sql(self, table_def, *, using=None, force_sql=False):
-        if table_def.node_name != 'TableDescription':
+        if table_def.node_name != "TableDescription":
             raise TypeError(
                 "Expected table_def to be a data_algebra.data_ops.TableDescription)"
             )
@@ -218,7 +217,7 @@ class DBModel:
         return self.quote_table_name(table_def)
 
     def extend_to_sql(self, extend_node, *, using=None, temp_id_source=None):
-        if extend_node.node_name != 'ExtendNode':
+        if extend_node.node_name != "ExtendNode":
             raise TypeError(
                 "Expected extend_node to be a data_algebra.data_ops.ExtendNode)"
             )
@@ -248,7 +247,11 @@ class DBModel:
         sub_view_name = "SQ_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         window_term = ""
-        if extend_node.windowed_situation or (len(extend_node.partition_by) > 0) or (len(extend_node.order_by) > 0):
+        if (
+            extend_node.windowed_situation
+            or (len(extend_node.partition_by) > 0)
+            or (len(extend_node.order_by) > 0)
+        ):
             window_term = " OVER ( "
             if len(extend_node.partition_by) > 0:
                 pt = [self.quote_identifier(ci) for ci in extend_node.partition_by]
@@ -280,7 +283,7 @@ class DBModel:
         return sql_str
 
     def project_to_sql(self, project_node, *, using=None, temp_id_source=None):
-        if project_node.node_name != 'ProjectNode':
+        if project_node.node_name != "ProjectNode":
             raise TypeError(
                 "Expected project_node to be a data_algebra.data_ops.ProjectNode)"
             )
@@ -316,7 +319,7 @@ class DBModel:
         return sql_str
 
     def select_rows_to_sql(self, select_rows_node, *, using=None, temp_id_source=None):
-        if select_rows_node.node_name != 'SelectRowsNode':
+        if select_rows_node.node_name != "SelectRowsNode":
             raise TypeError(
                 "Expected select_rows_node to be a data_algebra.data_ops.SelectRowsNode)"
             )
@@ -345,7 +348,7 @@ class DBModel:
     def select_columns_to_sql(
         self, select_columns_node, *, using=None, temp_id_source=None
     ):
-        if select_columns_node.node_name != 'SelectColumnsNode':
+        if select_columns_node.node_name != "SelectColumnsNode":
             raise TypeError(
                 "Expected select_columns_to_sql to be a data_algebra.data_ops.SelectColumnsNode)"
             )
@@ -374,7 +377,7 @@ class DBModel:
     def drop_columns_to_sql(
         self, drop_columns_node, *, using=None, temp_id_source=None
     ):
-        if drop_columns_node.node_name != 'DropColumnsNode':
+        if drop_columns_node.node_name != "DropColumnsNode":
             raise TypeError(
                 "Expected drop_columns_node to be a data_algebra.data_ops.DropColumnsNode)"
             )
@@ -401,7 +404,7 @@ class DBModel:
         return sql_str
 
     def order_to_sql(self, order_node, *, using=None, temp_id_source=None):
-        if order_node.node_name != 'OrderRowsNode':
+        if order_node.node_name != "OrderRowsNode":
             raise TypeError(
                 "Expected order_node to be a data_algebra.data_ops.OrderRowsNode)"
             )
@@ -442,7 +445,7 @@ class DBModel:
         return sql_str
 
     def rename_to_sql(self, rename_node, *, using=None, temp_id_source=None):
-        if rename_node.node_name != 'RenameColumnsNode':
+        if rename_node.node_name != "RenameColumnsNode":
             raise TypeError(
                 "Expected rename_node to be a data_algebra.data_ops.RenameColumnsNode)"
             )
@@ -475,7 +478,7 @@ class DBModel:
         return sql_str
 
     def natural_join_to_sql(self, join_node, *, using=None, temp_id_source=None):
-        if join_node.node_name != 'NaturalJoinNode':
+        if join_node.node_name != "NaturalJoinNode":
             raise TypeError(
                 "Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)"
             )
@@ -557,7 +560,7 @@ class DBModel:
         return sql_str
 
     def concat_rows_to_sql(self, concat_node, *, using=None, temp_id_source=None):
-        if concat_node.node_name != 'ConcatRowsNode':
+        if concat_node.node_name != "ConcatRowsNode":
             raise TypeError(
                 "Expected join_node to be a data_algebra.data_ops.ConcatRowsNode)"
             )
@@ -679,7 +682,7 @@ class DBModel:
         return self.read_query(conn, sql)
 
     def read(self, conn, table):
-        if table.node_name != 'TableDescription':
+        if table.node_name != "TableDescription":
             raise TypeError(
                 "Expect table to be a data_algebra.data_ops.TableDescription"
             )

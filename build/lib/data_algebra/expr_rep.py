@@ -1,4 +1,3 @@
-
 from typing import Union
 import collections
 
@@ -16,41 +15,41 @@ import data_algebra.env
 # list of window/aggregation functons that must be windowed/aggegated
 # (note some other functions work in more than one mode)
 fn_names_that_imply_windowed_situation = {
-    'all',
-    'any',
-    'bfill',
-    'count',
-    'cumcount',
-    'cummax',
-    'cummin',
-    'cumprod',
-    'cumsum',
-    'ffill',
-    'first',
-    'head',
-    'is_monotonic_decreasing',
-    'is_monotonic_increasing',
-    'last',
-    'max',
-    'mean',
-    'median',
-    'min',
-    'ngroup',
-    'nlargest',
-    'nsmallest',
-    'nth',
-    'nunique',
-    'ohlc',
-    'pct_change',
-    'rank',
-    'sem',
-    'shift',
-    'size',
-    'std',
-    'tail',
-    'unique',
-    'value_counts',
-    'var',
+    "all",
+    "any",
+    "bfill",
+    "count",
+    "cumcount",
+    "cummax",
+    "cummin",
+    "cumprod",
+    "cumsum",
+    "ffill",
+    "first",
+    "head",
+    "is_monotonic_decreasing",
+    "is_monotonic_increasing",
+    "last",
+    "max",
+    "mean",
+    "median",
+    "min",
+    "ngroup",
+    "nlargest",
+    "nsmallest",
+    "nth",
+    "nunique",
+    "ohlc",
+    "pct_change",
+    "rank",
+    "sem",
+    "shift",
+    "size",
+    "std",
+    "tail",
+    "unique",
+    "value_counts",
+    "var",
 }
 
 
@@ -1071,9 +1070,7 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
     columns_used = set()
     newops = collections.OrderedDict()
     mp = column_defs.copy()
-    populate_specials(
-        column_defs=column_defs, destination=mp, user_values=parse_env
-    )
+    populate_specials(column_defs=column_defs, destination=mp, user_values=parse_env)
     for k in ops.keys():
         if not isinstance(k, str):
             raise TypeError("ops keys should be strings")

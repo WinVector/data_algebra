@@ -53,7 +53,7 @@ data_algebra/PostgreSQL.py                21      4    81%
 data_algebra/SQLite.py                    90     13    86%
 data_algebra/SparkSQL.py                  21      4    81%
 data_algebra/__init__.py                   5      0   100%
-data_algebra/arrow.py                    140     42    70%
+data_algebra/arrow.py                    138     41    70%
 data_algebra/cdata.py                    232     75    68%
 data_algebra/cdata_impl.py                10      1    90%
 data_algebra/connected_components.py      49      1    98%
@@ -71,7 +71,7 @@ data_algebra/test_util.py                119     17    86%
 data_algebra/util.py                      44     10    77%
 data_algebra/yaml.py                     101     13    87%
 ----------------------------------------------------------
-TOTAL                                   3466    796    77%
+TOTAL                                   3464    795    77%
 
 
-============================== 73 passed in 7.27s ==============================
+============================== 73 passed in 7.55s ==============================

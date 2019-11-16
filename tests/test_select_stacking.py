@@ -1,5 +1,5 @@
-
 from data_algebra.data_ops import *
+
 
 def test_select_stacking():
     ops1 = (

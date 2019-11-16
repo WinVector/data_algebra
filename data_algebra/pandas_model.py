@@ -1,4 +1,3 @@
-
 import types
 
 import numpy
@@ -12,7 +11,6 @@ import data_algebra.connected_components
 
 
 class PandasModel(data_algebra.data_model.DataModel):
-
     def __init__(self, *, pd=None):
         data_algebra.data_model.DataModel.__init__(self)
         if pd is None:
@@ -29,7 +27,9 @@ class PandasModel(data_algebra.data_model.DataModel):
             "co_equalizer": lambda f, g: data_algebra.connected_components.connected_components(
                 f, g
             ),
-            "connected_components": lambda f, g: data_algebra.connected_components.connected_components(f, g),
+            "connected_components": lambda f, g: data_algebra.connected_components.connected_components(
+                f, g
+            ),
             "partitioned_eval": lambda fn, arg_columns, partition_columns: (
                 data_algebra.connected_components.partitioned_eval(
                     fn, arg_columns, partition_columns
@@ -46,7 +46,7 @@ class PandasModel(data_algebra.data_model.DataModel):
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def table_step(self, op, *, data_map, eval_env):
-        if op.node_name != 'TableDescription':
+        if op.node_name != "TableDescription":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.TableDescription"
             )
@@ -69,9 +69,13 @@ class PandasModel(data_algebra.data_model.DataModel):
         return res
 
     def extend_step(self, op, *, data_map, eval_env):
-        if op.node_name != 'ExtendNode':
+        if op.node_name != "ExtendNode":
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
-        window_situation = op.windowed_situation or (len(op.partition_by) > 0) or (len(op.order_by) > 0)
+        window_situation = (
+            op.windowed_situation
+            or (len(op.partition_by) > 0)
+            or (len(op.order_by) > 0)
+        )
         if window_situation:
             op.check_extend_window_fns()
         res = op.sources[0].eval_implementation(
@@ -143,7 +147,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         return self.pd.DataFrame(cols)
 
     def project_step(self, op, *, data_map, eval_env):
-        if op.node_name != 'ProjectNode':
+        if op.node_name != "ProjectNode":
             raise TypeError("op was supposed to be a data_algebra.data_ops.ProjectNode")
         # check these are forms we are prepared to work with, and build an aggregation dictionary
         # build an agg list: https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
@@ -200,7 +204,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         return res
 
     def select_rows_step(self, op, *, data_map, eval_env):
-        if op.node_name != 'SelectRowsNode':
+        if op.node_name != "SelectRowsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.SelectRowsNode"
             )
@@ -212,7 +216,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         return res
 
     def select_columns_step(self, op, *, data_map, eval_env):
-        if op.node_name != 'SelectColumnsNode':
+        if op.node_name != "SelectColumnsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.SelectColumnsNode"
             )
@@ -222,7 +226,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         return res[op.column_selection]
 
     def drop_columns_step(self, op, *, data_map, eval_env):
-        if op.node_name != 'DropColumnsNode':
+        if op.node_name != "DropColumnsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.DropColumnsNode"
             )
@@ -233,7 +237,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         return res[column_selection]
 
     def order_rows_step(self, op, *, data_map, eval_env):
-        if op.node_name != 'OrderRowsNode':
+        if op.node_name != "OrderRowsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.OrderRowsNode"
             )
@@ -249,7 +253,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         return res
 
     def rename_columns_step(self, op, *, data_map, eval_env):
-        if op.node_name != 'RenameColumnsNode':
+        if op.node_name != "RenameColumnsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.RenameColumnsNode"
             )
@@ -271,7 +275,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         return jointype
 
     def natural_join_step(self, op, *, data_map, eval_env):
-        if op.node_name != 'NaturalJoinNode':
+        if op.node_name != "NaturalJoinNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.NaturalJoinNode"
             )
@@ -303,7 +307,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         return res
 
     def concat_rows_step(self, op, *, data_map, eval_env):
-        if op.node_name != 'ConcatRowsNode':
+        if op.node_name != "ConcatRowsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.ConcatRowsNode"
             )
@@ -322,7 +326,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         return res
 
     def convert_records_step(self, op, *, data_map, eval_env):
-        if op.node_name != 'ConvertRecordsNode':
+        if op.node_name != "ConvertRecordsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.ConvertRecordsNode"
             )

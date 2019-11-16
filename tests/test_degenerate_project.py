@@ -1,4 +1,3 @@
-
 import pytest
 
 import data_algebra
@@ -18,21 +17,17 @@ def test_degenerate_project():
     ops2 = describe_table(d).extend({"x2": "x.max()"})
     assert ops2.windowed_situation
     res2 = ops2.transform(d)
-    expect2 = data_algebra.pd.DataFrame({
-        'x': [1, 2, 3, 4],
-        'y': ['a', 'a', 'b', 'b'],
-        'x2': [4, 4, 4, 4],
-        })
+    expect2 = data_algebra.pd.DataFrame(
+        {"x": [1, 2, 3, 4], "y": ["a", "a", "b", "b"], "x2": [4, 4, 4, 4],}
+    )
     assert data_algebra.test_util.equivalent_frames(res2, expect2)
 
     ops3 = describe_table(d).extend({"x2": "2*x"})
     assert not ops3.windowed_situation
     res3 = ops3.transform(d)
-    expect3 = data_algebra.pd.DataFrame({
-        'x': [1, 2, 3, 4],
-        'y': ['a', 'a', 'b', 'b'],
-        'x2': [2, 4, 6, 8],
-        })
+    expect3 = data_algebra.pd.DataFrame(
+        {"x": [1, 2, 3, 4], "y": ["a", "a", "b", "b"], "x2": [2, 4, 6, 8],}
+    )
     assert data_algebra.test_util.equivalent_frames(res3, expect3)
 
     with pytest.raises(ValueError):

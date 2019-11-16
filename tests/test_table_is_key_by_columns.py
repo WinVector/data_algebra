@@ -1,4 +1,3 @@
-
 import data_algebra
 import data_algebra.util
 

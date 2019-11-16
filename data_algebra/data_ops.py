@@ -1,4 +1,3 @@
-
 from typing import Set, Dict, List, Union
 import numbers
 import collections
@@ -42,7 +41,9 @@ class ViewRepresentation(OperatorPlatform):
     column_names: List[str]
     column_set: Set[str]
     column_map: data_algebra.env.SimpleNamespaceDict
-    sources: List['ViewRepresentation']  # https://www.python.org/dev/peps/pep-0484/#forward-references
+    sources: List[
+        "ViewRepresentation"
+    ]  # https://www.python.org/dev/peps/pep-0484/#forward-references
     columns_currently_used: Set[str]  # transient field, operations can update this
 
     def __init__(self, column_names, *, sources=None, node_name):
@@ -333,11 +334,13 @@ class ViewRepresentation(OperatorPlatform):
         if (ops is None) or (len(ops) < 1):
             return self
         if self.is_trivial_when_intermediate():
-            return self.sources[0].extend(ops,
-                                          partition_by=partition_by,
-                                          order_by=order_by,
-                                          reverse=reverse,
-                                          parse_env=parse_env)
+            return self.sources[0].extend(
+                ops,
+                partition_by=partition_by,
+                order_by=order_by,
+                reverse=reverse,
+                parse_env=parse_env,
+            )
         return ExtendNode(
             source=self,
             ops=ops,
@@ -348,12 +351,12 @@ class ViewRepresentation(OperatorPlatform):
         )
 
     def project(self, ops=None, *, group_by=None, parse_env=None):
-        if ((ops is None) or (len(ops) < 1)) and ((group_by is None) or (len(group_by) < 1)):
+        if ((ops is None) or (len(ops) < 1)) and (
+            (group_by is None) or (len(group_by) < 1)
+        ):
             raise ValueError("must have ops or group_by")
         if self.is_trivial_when_intermediate():
-            return self.sources[0].project(ops,
-                                           group_by=group_by,
-                                           parse_env=parse_env)
+            return self.sources[0].project(ops, group_by=group_by, parse_env=parse_env)
         return ProjectNode(source=self, ops=ops, group_by=group_by, parse_env=parse_env)
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
@@ -362,9 +365,7 @@ class ViewRepresentation(OperatorPlatform):
                 "expected b to be a data_algebra.dat_ops.ViewRepresentation"
             )
         if self.is_trivial_when_intermediate():
-            return self.sources[0].natural_join(b,
-                                                by=by,
-                                                jointype=jointype)
+            return self.sources[0].natural_join(b, by=by, jointype=jointype)
         return NaturalJoinNode(a=self, b=b, by=by, jointype=jointype)
 
     def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):
@@ -375,10 +376,9 @@ class ViewRepresentation(OperatorPlatform):
                 "expected b to be a data_algebra.dat_ops.ViewRepresentation"
             )
         if self.is_trivial_when_intermediate():
-            return self.sources[0].concat_rows(b,
-                                               id_column=id_column,
-                                               a_name=a_name,
-                                               b_name=b_name)
+            return self.sources[0].concat_rows(
+                b, id_column=id_column, a_name=a_name, b_name=b_name
+            )
         return ConcatRowsNode(
             a=self, b=b, id_column=id_column, a_name=a_name, b_name=b_name
         )
@@ -387,8 +387,7 @@ class ViewRepresentation(OperatorPlatform):
         if expr is None:
             return self
         if self.is_trivial_when_intermediate():
-            return self.sources[0].select_rows(expr,
-                                               parse_env=parse_env)
+            return self.sources[0].select_rows(expr, parse_env=parse_env)
         return SelectRowsNode(source=self, expr=expr, parse_env=parse_env)
 
     def drop_columns(self, column_deletions):
@@ -422,17 +421,16 @@ class ViewRepresentation(OperatorPlatform):
         if ((columns is None) or (len(columns) < 1)) and (limit is None):
             return self
         if self.is_trivial_when_intermediate():
-            return self.sources[0].order_rows(columns,
-                                              reverse=reverse,
-                                              limit=limit)
+            return self.sources[0].order_rows(columns, reverse=reverse, limit=limit)
         return OrderRowsNode(source=self, columns=columns, reverse=reverse, limit=limit)
 
     def convert_records(self, record_map, *, blocks_out_table=None):
         if record_map is None:
             return self
         if self.is_trivial_when_intermediate():
-            return self.sources[0].convert_records(record_map,
-                                                   blocks_out_table=blocks_out_table)
+            return self.sources[0].convert_records(
+                record_map, blocks_out_table=blocks_out_table
+            )
         return ConvertRecordsNode(
             source=self, record_map=record_map, blocks_out_table=blocks_out_table
         )
@@ -463,7 +461,9 @@ class TableDescription(ViewRepresentation):
     key: str
 
     def __init__(self, table_name, column_names, *, qualifiers=None, column_types=None):
-        ViewRepresentation.__init__(self, column_names=column_names, node_name='TableDescription')
+        ViewRepresentation.__init__(
+            self, column_names=column_names, node_name="TableDescription"
+        )
         if (table_name is not None) and (not isinstance(table_name, str)):
             raise TypeError("table_name must be a string")
         self.table_name = table_name
@@ -586,7 +586,9 @@ def describe_table(d, table_name="data_frame", *, qualifiers=None, column_types=
     if column_types is None:
         if d.shape[0] > 0:
             column_types = {k: type(d.loc[0, k]) for k in column_names}
-    return TableDescription(table_name, column_names, column_types=column_types, qualifiers=qualifiers)
+    return TableDescription(
+        table_name, column_names, column_types=column_types, qualifiers=qualifiers
+    )
 
 
 class WrappedOperatorPlatform(OperatorPlatform):
@@ -679,7 +681,9 @@ class WrappedOperatorPlatform(OperatorPlatform):
     # sql
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
-        return self.underlying.to_sql_implementation(db_model=db_model, using=using, temp_id_source=temp_id_source)
+        return self.underlying.to_sql_implementation(
+            db_model=db_model, using=using, temp_id_source=temp_id_source
+        )
 
     # define builders for all non-initial node types on base class
 
@@ -808,7 +812,10 @@ class ExtendNode(ViewRepresentation):
             raise ValueError("no ops")
         for (k, opk) in ops.items():  # look for aggregation functions
             if isinstance(opk, data_algebra.expr_rep.Expression):
-                if opk.op in data_algebra.expr_rep.fn_names_that_imply_windowed_situation:
+                if (
+                    opk.op
+                    in data_algebra.expr_rep.fn_names_that_imply_windowed_situation
+                ):
                     windowed_situation = True
         self.ops = ops
         if partition_by is None:
@@ -870,18 +877,36 @@ class ExtendNode(ViewRepresentation):
             for (k, opk) in ops.items():
                 if not isinstance(opk, data_algebra.expr_rep.Expression):
                     raise ValueError(
-                        "non-aggregated expression in windowed/partitoned extend: " +
-                        "'" + k + "': '" + opk.to_pandas() + "'"
+                        "non-aggregated expression in windowed/partitoned extend: "
+                        + "'"
+                        + k
+                        + "': '"
+                        + opk.to_pandas()
+                        + "'"
                     )
                 if len(opk.args) > 1:
-                    raise ValueError("in windowed situations only simple operators are allowed, " +
-                                     "'" + k + "': '" + opk.to_pandas() + "' term is too complex an expression")
+                    raise ValueError(
+                        "in windowed situations only simple operators are allowed, "
+                        + "'"
+                        + k
+                        + "': '"
+                        + opk.to_pandas()
+                        + "' term is too complex an expression"
+                    )
                 if len(opk.args) > 0:
                     value_name = opk.args[0].to_pandas()
                     if value_name not in source.column_set:
-                        raise ValueError("in windowed situations only simple operators are allowed, " +
-                                         "'" + k + "': '" + opk.to_pandas() + "' term is too complex an expression")
-        ViewRepresentation.__init__(self, column_names=column_names, sources=[source], node_name='ExtendNode')
+                        raise ValueError(
+                            "in windowed situations only simple operators are allowed, "
+                            + "'"
+                            + k
+                            + "': '"
+                            + opk.to_pandas()
+                            + "' term is too complex an expression"
+                        )
+        ViewRepresentation.__init__(
+            self, column_names=column_names, sources=[source], node_name="ExtendNode"
+        )
 
     def check_extend_window_fns(self):
         window_situation = (len(self.partition_by) > 0) or (len(self.order_by) > 0)
@@ -996,7 +1021,9 @@ class ProjectNode(ViewRepresentation):
         unknown = set(group_by) - known_cols
         if len(unknown) > 0:
             raise ValueError("unknown group_by columns: " + str(unknown))
-        ViewRepresentation.__init__(self, column_names=column_names, sources=[source], node_name='ProjectNode')
+        ViewRepresentation.__init__(
+            self, column_names=column_names, sources=[source], node_name="ProjectNode"
+        )
         for (k, opk) in self.ops.items():
             if not isinstance(opk, data_algebra.expr_rep.Expression):
                 raise ValueError(
@@ -1088,7 +1115,10 @@ class SelectRowsNode(ViewRepresentation):
         self.decision_columns = set()
         self.expr.get_column_names(self.decision_columns)
         ViewRepresentation.__init__(
-            self, column_names=source.column_names, sources=[source], node_name='SelectRowsNode'
+            self,
+            column_names=source.column_names,
+            sources=[source],
+            node_name="SelectRowsNode",
         )
 
     def columns_used_from_sources(self, using=None):
@@ -1148,7 +1178,10 @@ class SelectColumnsNode(ViewRepresentation):
         if isinstance(source, SelectColumnsNode):
             source = source.sources[0]
         ViewRepresentation.__init__(
-            self, column_names=column_selection, sources=[source], node_name='SelectColumnsNode'
+            self,
+            column_names=column_selection,
+            sources=[source],
+            node_name="SelectColumnsNode",
         )
 
     def columns_used_from_sources(self, using=None):
@@ -1207,7 +1240,10 @@ class DropColumnsNode(ViewRepresentation):
         if len(unknown) > 0:
             raise ValueError("dropping unknown columns " + str(unknown))
         ViewRepresentation.__init__(
-            self, column_names=remaining_columns, sources=[source], node_name='DropColumnsNode'
+            self,
+            column_names=remaining_columns,
+            sources=[source],
+            node_name="DropColumnsNode",
         )
 
     def columns_used_from_sources(self, using=None):
@@ -1272,7 +1308,10 @@ class OrderRowsNode(ViewRepresentation):
         if len(not_order) > 0:
             raise ValueError("columns declared reverse, but not order: " + str(unknown))
         ViewRepresentation.__init__(
-            self, column_names=source.column_names, sources=[source], node_name='OrderRowsNode'
+            self,
+            column_names=source.column_names,
+            sources=[source],
+            node_name="OrderRowsNode",
         )
 
     def columns_used_from_sources(self, using=None):
@@ -1355,7 +1394,12 @@ class RenameColumnsNode(ViewRepresentation):
             (k if k not in self.reverse_mapping.keys() else self.reverse_mapping[k])
             for k in source.column_names
         ]
-        ViewRepresentation.__init__(self, column_names=column_names, sources=[source], node_name='RenameColumnsNode')
+        ViewRepresentation.__init__(
+            self,
+            column_names=column_names,
+            sources=[source],
+            node_name="RenameColumnsNode",
+        )
 
     def columns_used_from_sources(self, using=None):
         if using is None:
@@ -1430,7 +1474,12 @@ class NaturalJoinNode(ViewRepresentation):
         missing_right = by_set - b.column_set
         if len(missing_right) > 0:
             raise KeyError("right table missing join keys: " + str(missing_right))
-        ViewRepresentation.__init__(self, column_names=column_names, sources=sources, node_name='NaturalJoinNode')
+        ViewRepresentation.__init__(
+            self,
+            column_names=column_names,
+            sources=sources,
+            node_name="NaturalJoinNode",
+        )
         self.by = by
         self.jointype = data_algebra.expr_rep.standardize_join_type(jointype)
         self.get_tables()  # causes a throw if left and right table descriptions are inconsistent
@@ -1513,7 +1562,9 @@ class ConcatRowsNode(ViewRepresentation):
         column_names = sources[0].column_names.copy()
         if id_column is not None:
             column_names.append(id_column)
-        ViewRepresentation.__init__(self, column_names=column_names, sources=sources, node_name='ConcatRowsNode')
+        ViewRepresentation.__init__(
+            self, column_names=column_names, sources=sources, node_name="ConcatRowsNode"
+        )
         self.id_column = id_column
         self.a_name = a_name
         self.b_name = b_name
@@ -1623,7 +1674,10 @@ class ConvertRecordsNode(ViewRepresentation):
         if len(unknown) > 0:
             raise ValueError("missing required columns: " + str(unknown))
         ViewRepresentation.__init__(
-            self, column_names=record_map.columns_produced, sources=sources, node_name='ConvertRecordsNode'
+            self,
+            column_names=record_map.columns_produced,
+            sources=sources,
+            node_name="ConvertRecordsNode",
         )
 
     def columns_used_from_sources(self, using=None):

@@ -2,6 +2,7 @@ from data_algebra.data_ops import *
 from data_algebra.expr import frame, row_number
 import data_algebra.test_util
 
+
 def test_free_expr():
     scale = 0.237
 
