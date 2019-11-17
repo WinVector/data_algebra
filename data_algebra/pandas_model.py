@@ -152,6 +152,8 @@ class PandasModel(data_algebra.data_model.DataModel):
         # check these are forms we are prepared to work with, and build an aggregation dictionary
         # build an agg list: https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
         # https://stackoverflow.com/questions/44635626/rename-result-columns-from-pandas-aggregation-futurewarning-using-a-dict-with
+        # try the following tutorial:
+        # https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
         for (k, opk) in op.ops.items():
             if len(opk.args) > 1:
                 raise ValueError(
