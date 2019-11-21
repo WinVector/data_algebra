@@ -12,6 +12,7 @@ import data_algebra.pandas_model
 import data_algebra.expr_rep
 import data_algebra.env
 from data_algebra.data_ops_types import *
+import data_algebra.data_ops_utils
 
 _have_black = False
 try:
@@ -340,7 +341,6 @@ class ViewRepresentation(OperatorPlatform):
         parsed_ops = data_algebra.expr_rep.parse_assignments_in_context(
             ops, self, parse_env=parse_env
         )
-        new_cols_used_in_calc = set(data_algebra.expr_rep.get_columns_used(parsed_ops))
         new_cols_produced_in_calc = set([k for k in parsed_ops.keys()])
         if (partition_by != 1) and (len(partition_by) > 0):
             if len(new_cols_produced_in_calc.intersection(partition_by)) > 0:
@@ -373,35 +373,8 @@ class ViewRepresentation(OperatorPlatform):
                 and (order_by == self.order_by)
                 and (reverse == self.reverse)
             ):
-                if (
-                    (
-                        len(
-                            new_cols_used_in_calc.intersection(
-                                self.cols_produced_in_calc
-                            )
-                        )
-                        == 0
-                    )
-                    and (
-                        len(
-                            new_cols_produced_in_calc.intersection(
-                                self.cols_produced_in_calc
-                            )
-                        )
-                        == 0
-                    )
-                    and (
-                        len(
-                            new_cols_produced_in_calc.intersection(
-                                self.cols_used_in_calc
-                            )
-                        )
-                        == 0
-                    )
-                ):
-                    # merge the extends
-                    new_ops = self.ops.copy()
-                    new_ops.update(parsed_ops)
+                new_ops = data_algebra.data_ops_utils.try_to_merge_ops(self.ops, parsed_ops)
+                if new_ops is not None:
                     return ExtendNode(
                         source=self.sources[0],
                         parsed_ops=new_ops,
