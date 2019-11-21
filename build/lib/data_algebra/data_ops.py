@@ -372,33 +372,43 @@ class ViewRepresentation(OperatorPlatform):
                 and same_windowing
                 and (order_by == self.order_by)
                 and (reverse == self.reverse)
-                and (
-                    len(new_cols_used_in_calc.intersection(self.cols_produced_in_calc))
-                    == 0
-                )
-                and (
-                    len(
-                        new_cols_produced_in_calc.intersection(
-                            self.cols_produced_in_calc
-                        )
-                    )
-                    == 0
-                )
-                and (
-                    len(new_cols_produced_in_calc.intersection(self.cols_used_in_calc))
-                    == 0
-                )
             ):
-                # merge the extends
-                new_ops = self.ops.copy()
-                new_ops.update(parsed_ops)
-                return ExtendNode(
-                    source=self.sources[0],
-                    parsed_ops=new_ops,
-                    partition_by=partition_by,
-                    order_by=order_by,
-                    reverse=reverse,
-                )
+                if (
+                    (
+                        len(
+                            new_cols_used_in_calc.intersection(
+                                self.cols_produced_in_calc
+                            )
+                        )
+                        == 0
+                    )
+                    and (
+                        len(
+                            new_cols_produced_in_calc.intersection(
+                                self.cols_produced_in_calc
+                            )
+                        )
+                        == 0
+                    )
+                    and (
+                        len(
+                            new_cols_produced_in_calc.intersection(
+                                self.cols_used_in_calc
+                            )
+                        )
+                        == 0
+                    )
+                ):
+                    # merge the extends
+                    new_ops = self.ops.copy()
+                    new_ops.update(parsed_ops)
+                    return ExtendNode(
+                        source=self.sources[0],
+                        parsed_ops=new_ops,
+                        partition_by=partition_by,
+                        order_by=order_by,
+                        reverse=reverse,
+                    )
         # new node
         return ExtendNode(
             source=self,
@@ -416,9 +426,8 @@ class ViewRepresentation(OperatorPlatform):
         parsed_ops = data_algebra.expr_rep.parse_assignments_in_context(
             ops, self, parse_env=parse_env
         )
-        new_cols_used_in_calc = set(data_algebra.expr_rep.get_columns_used(parsed_ops))
         new_cols_produced_in_calc = set([k for k in parsed_ops.keys()])
-        if len(new_cols_used_in_calc.intersection(group_by)):
+        if len(new_cols_produced_in_calc.intersection(group_by)):
             raise ValueError("can not alter grouping columns")
         if self.is_trivial_when_intermediate():
             return self.sources[0].project(ops, group_by=group_by, parse_env=parse_env)
