@@ -88,7 +88,7 @@ def test_extend_shrink_1():
         extend({"c": "1"}). \
         extend({"c": "2"})
 
-    assert isinstance(ops2c.sources[0], ExtendNode)
+    assert isinstance(ops2c.sources[0], TableDescription)
 
 
     ops3 = describe_table(d, "d"). \
