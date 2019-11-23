@@ -1,3 +1,5 @@
+
+import data_algebra
 import data_algebra.data_ops
 import data_algebra.flow_text
 
@@ -53,6 +55,8 @@ class DataOpArrow(Arrow):
         self.incoming_types = t_used[free_table_key].column_types
         self.outgoing_columns = pipeline.column_names
         self.outgoing_types = None
+        if isinstance(pipeline, data_algebra.data_ops.TableDescription):
+            self.outgoing_types = self.incoming_types
         Arrow.__init__(self)
 
     # noinspection PyPep8Naming
@@ -142,10 +146,10 @@ class DataOpArrow(Arrow):
         return self.pipeline.transform(X)
 
     def learn_types(self, data_in, data_out):
-        if data_in.shape[0] > 0:
+        if (data_in is not None) and (data_in.shape[0] > 0):
             types_in = {k: type(data_in.loc[0, k]) for k in self.incoming_columns}
             self.incoming_types = types_in
-        if data_out.shape[0] > 0:
+        if (data_out is not None) and (data_out.shape[0] > 0):
             types_out = {k: type(data_out.loc[0, k]) for k in self.outgoing_columns}
             self.outgoing_types = types_out
 
@@ -217,6 +221,9 @@ class DataOpArrow(Arrow):
 
 def identity_arrow(obj):
     """build identity arrow from object"""
+    if isinstance(obj, data_algebra.pd.DataFrame):
+        td = data_algebra.data_ops.describe_table(obj)
+        return DataOpArrow(td)
     if isinstance(obj, data_algebra.data_ops.TableDescription):
         return DataOpArrow(obj)
     if isinstance(obj, list) or isinstance(obj, tuple) or isinstance(obj, set):
