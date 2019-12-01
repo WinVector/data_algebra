@@ -31,7 +31,7 @@ class Arrow:
 
 
 class DataOpArrow(Arrow):
-    """ Represent a section of operators as a categorical arrow."""
+    """ Represent a dag of operators as a categorical arrow."""
 
     def __init__(self, pipeline, *, free_table_key=None):
         if not isinstance(pipeline, data_algebra.data_ops.ViewRepresentation):
@@ -177,6 +177,12 @@ class DataOpArrow(Arrow):
         if self.incoming_types is not None:
             return self.outgoing_types.copy()
         return self.outgoing_columns.copy()
+
+    def as_table(self, table_name=None, *, qualifiers=None):
+        return DataOpArrow(self.pipeline.as_table(
+            table_name=table_name,
+            qualifiers=qualifiers,
+            column_types=self.outgoing_types))
 
     def __repr__(self):
         return (

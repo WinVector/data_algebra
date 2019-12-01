@@ -325,6 +325,14 @@ class ViewRepresentation(OperatorPlatform):
     def is_trivial_when_intermediate(self):
         return False
 
+    # return table representation of self
+    def as_table(self, table_name=None, *, qualifiers=None, column_types=None):
+        return TableDescription(
+            table_name=table_name,
+            column_names=self.column_names.copy(),
+            qualifiers=qualifiers,
+            column_types=column_types)
+
     # nodes
 
     def extend(
