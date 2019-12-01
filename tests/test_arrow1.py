@@ -43,8 +43,8 @@ def test_arrow1():
     a1 = data_algebra.arrow.DataOpArrow(id_ops_b)
 
     # check identity relns
-    ri = data_algebra.arrow.identity_arrow(a1.cod())
-    li = data_algebra.arrow.identity_arrow(a1.dom())
+    ri = a1.cod()
+    li = a1.dom()
     li >> a1
     a1 >> ri
     assert data_algebra.test_util.equivalent_frames(d >> a1, d >> li >> a1)
@@ -199,8 +199,8 @@ def test_arrow1():
     assert data_algebra.test_util.equivalent_frames(r1, r3)
 
     # check identity relns
-    ri = data_algebra.arrow.identity_arrow(a1.cod())
-    li = data_algebra.arrow.identity_arrow(a1.dom())
+    ri = a1.cod()
+    li = a1.dom()
     li >> a1
     a1 >> ri
     assert data_algebra.test_util.equivalent_frames(d >> a1, d >> li >> a1)

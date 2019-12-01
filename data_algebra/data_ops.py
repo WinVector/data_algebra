@@ -326,7 +326,7 @@ class ViewRepresentation(OperatorPlatform):
         return False
 
     # return table representation of self
-    def as_table(self, table_name=None, *, qualifiers=None, column_types=None):
+    def as_table_description(self, table_name=None, *, qualifiers=None, column_types=None):
         return TableDescription(
             table_name=table_name,
             column_names=self.column_names.copy(),
@@ -519,6 +519,8 @@ class TableDescription(ViewRepresentation):
         ViewRepresentation.__init__(
             self, column_names=column_names, node_name="TableDescription"
         )
+        if table_name is None:
+            table_name = ''
         if (table_name is not None) and (not isinstance(table_name, str)):
             raise TypeError("table_name must be a string")
         self.table_name = table_name
@@ -541,7 +543,9 @@ class TableDescription(ViewRepresentation):
             for k in keys:
                 key = key + "(" + k + ", " + str(self.qualifiers[k]) + ")"
             key = key + "}."
-        self.key = key + self.table_name
+        if self.table_name is not None:
+            key = key + self.table_name
+        self.key = key
 
     def collect_representation_implementation(self, *, pipeline=None, dialect="Python"):
         if pipeline is None:

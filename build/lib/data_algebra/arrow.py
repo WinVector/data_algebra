@@ -169,19 +169,15 @@ class DataOpArrow(Arrow):
         return self.transform(X)
 
     def dom(self):
-        if self.incoming_types is not None:
-            return self.incoming_types.copy()
-        return self.incoming_columns.copy()
+        return DataOpArrow(data_algebra.data_ops.TableDescription(
+            table_name=None,
+            column_names=self.incoming_columns,
+            column_types=self.incoming_types))
 
     def cod(self):
-        if self.incoming_types is not None:
-            return self.outgoing_types.copy()
-        return self.outgoing_columns.copy()
-
-    def as_table(self, table_name=None, *, qualifiers=None):
-        return DataOpArrow(self.pipeline.as_table(
-            table_name=table_name,
-            qualifiers=qualifiers,
+        return DataOpArrow(data_algebra.data_ops.TableDescription(
+            table_name=None,
+            column_names=self.outgoing_columns,
             column_types=self.outgoing_types))
 
     def __repr__(self):
@@ -223,21 +219,3 @@ class DataOpArrow(Arrow):
             + out_rep
             + "\n]\n"
         )
-
-
-def identity_arrow(obj):
-    """build identity arrow from object"""
-    if isinstance(obj, data_algebra.pd.DataFrame):
-        td = data_algebra.data_ops.describe_table(obj)
-        return DataOpArrow(td)
-    if isinstance(obj, data_algebra.data_ops.TableDescription):
-        return DataOpArrow(obj)
-    if isinstance(obj, list) or isinstance(obj, tuple) or isinstance(obj, set):
-        td = data_algebra.data_ops.TableDescription("obj", [c for c in obj])
-        return DataOpArrow(td)
-    if isinstance(obj, dict):
-        td = data_algebra.data_ops.TableDescription("obj", obj.keys(), column_types=obj)
-        res = DataOpArrow(td)
-        res.outgoing_types = obj.copy()
-        return res
-    raise TypeError("unexpected type: " + str(type(obj)))
