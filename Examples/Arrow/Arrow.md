@@ -1,4 +1,3 @@
-
 Example of data transforms as categorical arrows ([`R` version](https://github.com/WinVector/rquery/blob/master/Examples/Arrow/Arrow.md) [`Python` version](https://github.com/WinVector/data_algebra/blob/master/Examples/Arrow/Arrow.md)).
 
 (For ideas on applying category theory to science and data, please see David I Spivak, *Category Theory for the Sciences*, MIT Press, 2014.)
@@ -39,7 +38,19 @@ d
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -124,7 +135,19 @@ id_ops_a.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -174,7 +197,19 @@ id_ops_b.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -288,7 +323,12 @@ a1.dom()
 
 
 
-    {'g', 'i', 'v', 'x'}
+    DataOpArrow(
+     TableDescription(
+     table_name='',
+     column_names=[
+       'x', 'g', 'v', 'i']),
+     free_table_key='')
 
 
 
@@ -300,7 +340,12 @@ a1.cod()
 
 
 
-    ['g', 'x', 'v', 'i', 'ngroup']
+    DataOpArrow(
+     TableDescription(
+     table_name='',
+     column_names=[
+       'g', 'x', 'v', 'i', 'ngroup']),
+     free_table_key='')
 
 
 
@@ -313,7 +358,7 @@ print(a1)
 
     [
      'd':
-      [ v, g, i, x ]
+      [ x, g, v, i ]
        ->
       [ g, x, v, i, ngroup ]
     ]
@@ -342,6 +387,7 @@ print(a1.__repr__())
              group_by=['g']) .\
              extend({
               'ngroup': '_row_number()'},
+             partition_by=1,
              order_by=['g']),
           by=['g'], jointype='LEFT'),
      free_table_key='d')
@@ -363,8 +409,8 @@ print(a1)
 
     [
      'd':
-      [ v: <class 'numpy.float64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
-        x: <class 'numpy.int64'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, v: <class 'numpy.float64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
@@ -383,7 +429,19 @@ a1.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -459,7 +517,19 @@ d >> a1
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -543,8 +613,8 @@ print(a1b)
 
     [
      'd':
-      [ v: <class 'numpy.float64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
-        x: <class 'numpy.int64'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, v: <class 'numpy.float64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
@@ -563,7 +633,19 @@ a1b.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -650,9 +732,9 @@ print(a2)
 
     [
      'd2':
-      [ v, ngroup, g, x ]
+      [ x, ngroup, g, v ]
        ->
-      [ v, ngroup, g, x, row_number, shift_v ]
+      [ x, ngroup, g, v, row_number, shift_v ]
     ]
     
 
@@ -684,7 +766,7 @@ print(a2)
 
     [
      'd2':
-      [ v, g, q, i, x, ngroup ]
+      [ x, g, ngroup, v, i, q ]
        ->
       [ g, x, v, i, ngroup, q, row_number, shift_v ]
     ]
@@ -722,7 +804,7 @@ print(a2)
 
     [
      'd2':
-      [ v, g, i, x, ngroup ]
+      [ x, ngroup, v, i, g ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -736,8 +818,8 @@ print(a1 >> a2)
 
     [
      'd':
-      [ v: <class 'numpy.float64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
-        x: <class 'numpy.int64'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, v: <class 'numpy.float64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v ]
     ]
@@ -762,8 +844,8 @@ print(a2)
 
     [
      'd2':
-      [ v: <class 'numpy.float64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
-        x: <class 'str'>, ngroup: <class 'numpy.int64'> ]
+      [ x: <class 'str'>, ngroup: <class 'numpy.int64'>,
+        v: <class 'numpy.float64'>, i: <class 'numpy.bool_'>, g: <class 'str'> ]
        ->
       [ g: <class 'str'>, x: <class 'str'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -791,8 +873,8 @@ print(a2)
 
     [
      'd2':
-      [ v: <class 'numpy.float64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
-        x: <class 'numpy.int64'>, ngroup: <class 'numpy.int64'> ]
+      [ x: <class 'numpy.int64'>, ngroup: <class 'numpy.int64'>,
+        v: <class 'numpy.float64'>, i: <class 'numpy.bool_'>, g: <class 'str'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -810,13 +892,15 @@ unordered_ops = TableDescription('d3', ordered_ops.column_names). \
         'mean_v': 'v.mean()',
     },
     partition_by=['g'])
+
 a3 = DataOpArrow(unordered_ops)
+
 print(a3)
 ```
 
     [
      'd3':
-      [ v, x, g, row_number, i, shift_v, ngroup ]
+      [ x, ngroup, v, i, row_number, g, shift_v ]
        ->
       [ g, x, v, i, ngroup, row_number, shift_v, mean_v ]
     ]
@@ -831,9 +915,10 @@ print(a3)
 
     [
      'd3':
-      [ v: <class 'numpy.float64'>, x: <class 'numpy.int64'>, g: <class 'str'>,
-        row_number: <class 'numpy.int64'>, i: <class 'numpy.bool_'>,
-        shift_v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'> ]
+      [ x: <class 'numpy.int64'>, ngroup: <class 'numpy.int64'>,
+        v: <class 'numpy.float64'>, i: <class 'numpy.bool_'>,
+        row_number: <class 'numpy.int64'>, g: <class 'str'>,
+        shift_v: <class 'numpy.float64'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -852,8 +937,8 @@ print(a1 >> a2 >> a3)
 
     [
      'd':
-      [ v: <class 'numpy.float64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
-        x: <class 'numpy.int64'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, v: <class 'numpy.float64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -872,8 +957,8 @@ print((a1 >> a2) >> a3)
 
     [
      'd':
-      [ v: <class 'numpy.float64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
-        x: <class 'numpy.int64'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, v: <class 'numpy.float64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -890,8 +975,8 @@ print(a1 >> (a2 >> a3))
 
     [
      'd':
-      [ v: <class 'numpy.float64'>, g: <class 'str'>, i: <class 'numpy.bool_'>,
-        x: <class 'numpy.int64'> ]
+      [ x: <class 'numpy.int64'>, g: <class 'str'>, v: <class 'numpy.float64'>,
+        i: <class 'numpy.bool_'> ]
        ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
@@ -912,7 +997,19 @@ All the compositions are in fact the same arrow, aswe can see by using it on dat
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1009,7 +1106,19 @@ All the compositions are in fact the same arrow, aswe can see by using it on dat
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1106,6 +1215,125 @@ The data arrows operate over three different value domains:
  * single table schemas (transforming single table schemas)
  * their own arrow space (i.e. composition)
  * data frames (transforming data as an action)
+
+We can also demonstrate identity arrows.
+
+
+```python
+id = DataOpArrow(describe_table(d))
+print(id)
+```
+
+    [
+     'data_frame':
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
+        i: <class 'numpy.bool_'> ]
+       ->
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
+        i: <class 'numpy.bool_'> ]
+    ]
+    
+
+
+
+```python
+id >> id
+```
+
+
+
+
+    DataOpArrow(
+     TableDescription(
+     table_name='data_frame',
+     column_names=[
+       'g', 'x', 'v', 'i']),
+     free_table_key='data_frame')
+
+
+
+
+```python
+id.transform(d)
+ 
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>g</th>
+      <th>x</th>
+      <th>v</th>
+      <th>i</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>a</td>
+      <td>1</td>
+      <td>10.0</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>b</td>
+      <td>4</td>
+      <td>40.0</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>b</td>
+      <td>5</td>
+      <td>50.0</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>c</td>
+      <td>7</td>
+      <td>70.0</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>c</td>
+      <td>8</td>
+      <td>80.0</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>c</td>
+      <td>9</td>
+      <td>90.0</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
  
 An example of treating a 2-argument data operation (such as a join) as an arrow can be found [here](https://github.com/WinVector/rquery/blob/master/Examples/Arrow/JoinArrow.md).
 
