@@ -29,18 +29,13 @@
   reverse: []
 - op: Extend
   ops:
-    sort_key: -probability
-  partition_by: []
-  order_by: []
-  reverse: []
-- op: Extend
-  ops:
     row_number: row_number()
   partition_by:
   - subjectID
   order_by:
-  - sort_key
-  reverse: []
+  - probability
+  reverse:
+  - probability
 - op: SelectRows
   expr: row_number == 1
 - op: SelectColumns

@@ -1,4 +1,3 @@
-
 This article introduces the [`data_algebra`](https://github.com/WinVector/data_algebra) project: a data processing tool family available in `R` and `Python`.  These tools are designed to transform data either in-memory or on remote databases.  
 
 In particular we will discuss the `Python` implementation (also called `data_algebra`) and its relation to the mature `R` implementations (`rquery` and `rqdatatable`).
@@ -95,7 +94,19 @@ d_local
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -150,7 +161,7 @@ Let's also copy this data to a [`PostgreSQL`](https://www.postgresql.org) databa
 
 
 ```python
-use_postgresql = True
+use_postgresql = False
 
 if use_postgresql:
     conn = psycopg2.connect(
@@ -181,48 +192,65 @@ db_model.read_table(conn, 'd')
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>subjectid</th>
-      <th>surveycategory</th>
-      <th>assessmenttotal</th>
-      <th>irrelevantcol1</th>
-      <th>irrelevantcol2</th>
+      <th>index</th>
+      <th>subjectID</th>
+      <th>surveyCategory</th>
+      <th>assessmentTotal</th>
+      <th>irrelevantCol1</th>
+      <th>irrelevantCol2</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>1.0</td>
+      <td>0</td>
+      <td>1</td>
       <td>withdrawal behavior</td>
-      <td>5.0</td>
+      <td>5</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>1.0</td>
+      <td>1</td>
+      <td>1</td>
       <td>positive re-framing</td>
-      <td>2.0</td>
+      <td>2</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>2.0</td>
+      <td>2</td>
+      <td>2</td>
       <td>withdrawal behavior</td>
-      <td>3.0</td>
+      <td>3</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>2.0</td>
+      <td>3</td>
+      <td>2</td>
       <td>positive re-framing</td>
-      <td>4.0</td>
+      <td>4</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
@@ -251,10 +279,10 @@ with data_algebra.env.Env(locals()) as env:
         extend({'total': 'probability.sum()'},
                partition_by='subjectID'). \
         extend({'probability': 'probability/total'}). \
-        extend({'sort_key': '-probability'}). \
         extend({'row_number': '_row_number()'},
                partition_by=['subjectID'],
-               order_by=['sort_key']). \
+               order_by=['probability'],
+               reverse=['probability']). \
         select_rows('row_number == 1'). \
         select_columns(['subjectID', 'surveyCategory', 'probability']). \
         rename_columns({'diagnosis': 'surveyCategory'})
@@ -281,16 +309,15 @@ print(py_source)
             "irrelevantCol1",
             "irrelevantCol2",
         ],
-    ).extend(
-        {"probability": "(assessmentTotal * 0.237).exp()"}
-    ).extend(
+    ).extend({"probability": "(assessmentTotal * 0.237).exp()"}).extend(
         {"total": "probability.sum()"}, partition_by=["subjectID"]
     ).extend(
         {"probability": "probability / total"}
     ).extend(
-        {"sort_key": "-probability"}
-    ).extend(
-        {"row_number": "_row_number()"}, partition_by=["subjectID"], order_by=["sort_key"]
+        {"row_number": "_row_number()"},
+        partition_by=["subjectID"],
+        order_by=["probability"],
+        reverse=["probability"],
     ).select_rows(
         "row_number == 1"
     ).select_columns(
@@ -325,48 +352,38 @@ sql = ops.to_sql(db_model, pretty=True)
 print(sql)
 ```
 
-    SELECT "subjectid",
-           "probability",
-           "surveycategory" AS "diagnosis"
+    SELECT "probability",
+           "subjectID",
+           "surveyCategory" AS "diagnosis"
     FROM
-      (SELECT "subjectid",
-              "surveycategory",
-              "probability"
+      (SELECT "probability",
+              "subjectID",
+              "surveyCategory"
        FROM
-         (SELECT "subjectid",
-                 "surveycategory",
-                 "probability"
+         (SELECT "probability",
+                 "subjectID",
+                 "surveyCategory"
           FROM
-            (SELECT "subjectid",
-                    "surveycategory",
+            (SELECT "subjectID",
+                    "surveyCategory",
                     "probability",
-                    "sort_key",
-                    ROW_NUMBER() OVER (PARTITION BY "subjectid"
-                                       ORDER BY "sort_key") AS "row_number"
+                    ROW_NUMBER() OVER (PARTITION BY "subjectID"
+                                       ORDER BY "probability" DESC) AS "row_number"
              FROM
-               (SELECT "subjectid",
-                       "surveycategory",
-                       "probability",
-                       (-"probability") AS "sort_key"
+               (SELECT "subjectID",
+                       "surveyCategory",
+                       "probability" / "total" AS "probability"
                 FROM
-                  (SELECT "subjectid",
-                          "surveycategory",
-                          "probability" / "total" AS "probability"
+                  (SELECT "subjectID",
+                          "surveyCategory",
+                          "probability",
+                          SUM("probability") OVER (PARTITION BY "subjectID") AS "total"
                    FROM
-                     (SELECT "subjectid",
-                             "surveycategory",
-                             "probability",
-                             SUM("probability") OVER (PARTITION BY "subjectid") AS "total"
-                      FROM
-                        (SELECT "subjectid",
-                                "surveycategory",
-                                EXP(("assessmenttotal" * 0.237)) AS "probability"
-                         FROM
-                           (SELECT "subjectid",
-                                   "surveycategory",
-                                   "assessmenttotal"
-                            FROM "d") "sq_0") "sq_1") "sq_2") "sq_3") "sq_4") "sq_5"
-          WHERE "row_number" = 1 ) "sq_6") "sq_7"
+                     (SELECT "subjectID",
+                             "surveyCategory",
+                             EXP(("assessmentTotal" * 0.237)) AS "probability"
+                      FROM ("d") "SQ_0") "SQ_1") "SQ_2") "SQ_3") "SQ_4"
+          WHERE "row_number" = 1 ) "SQ_5") "SQ_6"
 
 
 The `SQL` can be hard to read, as `SQL` expresses composition by inner-nesting (inside `SELECT` statements happen first).  The operator pipeline expresses composition by sequencing or method-chaining, which can be a lot more legible.  However the huge advantage of the `SQL` is: we can send it to the database for execution, as we do now.
@@ -382,27 +399,39 @@ db_model.read_query(conn, sql)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>subjectid</th>
       <th>probability</th>
+      <th>subjectID</th>
       <th>diagnosis</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>1.0</td>
       <td>0.670622</td>
+      <td>1</td>
       <td>withdrawal behavior</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>2.0</td>
       <td>0.558974</td>
+      <td>2</td>
       <td>positive re-framing</td>
     </tr>
   </tbody>
@@ -428,7 +457,19 @@ ops.eval_pandas({'d': d_local})
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -469,7 +510,19 @@ ops.transform(d_local)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -500,107 +553,8 @@ ops.transform(d_local)
 
 `eval_pandas` takes a dictionary of `Pandas` `DataFrame`s (names matching names specified in the pipeline) and returns the result of applying the pipeline to the data using `Pandas` commands.  Currently our `Pandas` implementation only allows very simple window functions.  This is why we didn't write `probability = probability/sum(probability)`, but instead broken the calculation into multiple steps by introducing the `total` column (the `SQL` realization does in fact support more complex window functions).  This is a small issue with the grammar: but our feeling encourage simple steps is in fact a good thing (improves debuggability), and in `SQL` the query optimizers likely optimize the different query styles into very similar realizations anyway.
 
-### `dask`
-
-We can also apply our transforms to `dask` objects, meaning we can work at a large range of data sizes (`Pandas`, `dask`, `SQL` `PostgreSQL`, and `Apache Spark`).
 
 
-```python
-import dask.dataframe
-
-d_dask = dask.dataframe.from_pandas(d_local, npartitions=2)
-
-res_dask = ops.transform(d_dask)
- 
-res_dask
-```
-
-
-
-
-<div><strong>Dask DataFrame Structure:</strong></div>
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>subjectID</th>
-      <th>diagnosis</th>
-      <th>probability</th>
-    </tr>
-    <tr>
-      <th>npartitions=2</th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th></th>
-      <td>int64</td>
-      <td>object</td>
-      <td>float64</td>
-    </tr>
-    <tr>
-      <th></th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th></th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-<div>Dask Name: rename, 166 tasks</div>
-
-
-
-
-```python
-res_dask.compute()
-```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>subjectID</th>
-      <th>diagnosis</th>
-      <th>probability</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>withdrawal behavior</td>
-      <td>0.670622</td>
-    </tr>
-    <tr>
-      <th>0</th>
-      <td>2</td>
-      <td>positive re-framing</td>
-      <td>0.558974</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-Notice the exact same pipeline can be used in all cases, because all three implementations share a large family of commands.
 
 ## Export/Import
 
@@ -621,7 +575,7 @@ dot
 
 
 
-![svg](output_24_0.svg)
+![svg](output_22_0.svg)
 
 
 
@@ -647,176 +601,6 @@ dmp_R = yaml.dump(objs_R)
 with open("pipeline_yaml.txt", "wt") as f:
     print(dmp_R, file=f)
 ```
-
-### `R`
-
-This pipeline can be loaded into `R` and used as follows.
-
-
-```python
-%load_ext rpy2.ipython
-```
-
-
-```r
-%%R 
-
-library(yaml)
-library(wrapr)
-library(rquery)
-library(rqdatatable)
-
-r_yaml <- yaml.load_file("pipeline_yaml.txt")
-r_ops <- convert_yaml_to_pipeline(r_yaml)
-cat(format(r_ops))
-```
-
-    mk_td("d", c(
-      "subjectID",
-      "surveyCategory",
-      "assessmentTotal",
-      "irrelevantCol1",
-      "irrelevantCol2")) %.>%
-     extend(.,
-      probability %:=% exp(assessmentTotal * 0.237)) %.>%
-     extend(.,
-      total %:=% sum(probability),
-      partitionby = c('subjectID'),
-      orderby = c(),
-      reverse = c()) %.>%
-     extend(.,
-      probability %:=% probability / total) %.>%
-     extend(.,
-      sort_key %:=% -(probability)) %.>%
-     extend(.,
-      row_number %:=% row_number(),
-      partitionby = c('subjectID'),
-      orderby = c('sort_key'),
-      reverse = c()) %.>%
-     select_rows(.,
-       row_number == 1) %.>%
-     select_columns(., c(
-       "subjectID", "surveyCategory", "probability")) %.>%
-     rename_columns(.,
-      c('diagnosis' = 'surveyCategory'))
-
-
-The above representation is now the equivalent "`R` code", written using [`wrapr` dot pipe](https://journal.r-project.org/archive/2018/RJ-2018-042/index.html)/[`rquery`](https://github.com/WinVector/rquery) notation. The imported pipeline can be directly executed in `R`.
-
-
-```r
-%%R 
-
-d_local <- build_frame(
-   "subjectID", "surveyCategory"     , "assessmentTotal", "irrelevantCol1", "irrelevantCol2" |
-   1L         , "withdrawal behavior", 5                , "irrel1"        , "irrel2"         |
-   1L         , "positive re-framing", 2                , "irrel1"        , "irrel2"         |
-   2L         , "withdrawal behavior", 3                , "irrel1"        , "irrel2"         |
-   2L         , "positive re-framing", 4                , "irrel1"        , "irrel2"         )
-
-print(d_local)
-```
-
-      subjectID      surveyCategory assessmentTotal irrelevantCol1 irrelevantCol2
-    1         1 withdrawal behavior               5         irrel1         irrel2
-    2         1 positive re-framing               2         irrel1         irrel2
-    3         2 withdrawal behavior               3         irrel1         irrel2
-    4         2 positive re-framing               4         irrel1         irrel2
-
-
-We can execute the `R` pipeline using [`data.table`](http://r-datatable.com) by piping data into the `r_ops` object.
-
-
-```r
-%%R 
-
-d_local %.>% 
-  r_ops %.>% 
-  print(.)
-```
-
-       subjectID           diagnosis probability
-    1:         1 withdrawal behavior   0.6706221
-    2:         2 positive re-framing   0.5589742
-
-
-And the `R` `rquery` package can also perform its own `SQL` translation (and even execution management).
-
-
-```r
-%%R
-
-sql <- to_sql(r_ops, rquery_default_db_info())
-cat(sql)
-```
-
-    SELECT
-     "subjectID" AS "subjectID",
-     "surveyCategory" AS "diagnosis",
-     "probability" AS "probability"
-    FROM (
-     SELECT
-      "subjectID",
-      "surveyCategory",
-      "probability"
-     FROM (
-      SELECT * FROM (
-       SELECT
-        "subjectID",
-        "surveyCategory",
-        "probability",
-        row_number ( ) OVER (  PARTITION BY "subjectID" ORDER BY "sort_key" ) AS "row_number"
-       FROM (
-        SELECT
-         "subjectID",
-         "surveyCategory",
-         "probability",
-         - ( "probability" )  AS "sort_key"
-        FROM (
-         SELECT
-          "subjectID",
-          "surveyCategory",
-          "probability" / "total"  AS "probability"
-         FROM (
-          SELECT
-           "subjectID",
-           "surveyCategory",
-           "probability",
-           sum ( "probability" ) OVER (  PARTITION BY "subjectID" ) AS "total"
-          FROM (
-           SELECT
-            "subjectID",
-            "surveyCategory",
-            exp ( "assessmentTotal" * 0.237 )  AS "probability"
-           FROM (
-            SELECT
-             "subjectID",
-             "surveyCategory",
-             "assessmentTotal"
-            FROM
-             "d"
-            ) tsql_13462271417183976603_0000000000
-           ) tsql_13462271417183976603_0000000001
-          ) tsql_13462271417183976603_0000000002
-         ) tsql_13462271417183976603_0000000003
-        ) tsql_13462271417183976603_0000000004
-      ) tsql_13462271417183976603_0000000005
-      WHERE "row_number" = 1
-     ) tsql_13462271417183976603_0000000006
-    ) tsql_13462271417183976603_0000000007
-
-
-The `R` implementation is mature, and appropriate to use in production.  The [`rquery`](https://github.com/WinVector/rquery) grammar is designed to have minimal state and minimal annotations (no grouping or ordering annotations!).  This makes the grammar, in my opinion, a good design choice. `rquery` has very good performance, often much faster than `dplyr` or base-`R` due to its query generation ideas and use of [`data.table`](https://CRAN.R-project.org/package=data.table) via [`rqdatatable`](https://CRAN.R-project.org/package=rqdatatable).  `rquery` is a mature pure `R` package; [here](https://github.com/WinVector/rquery/blob/master/README.md) is the same example being worked directly in `R`, with no translation from `Python`. 
-
-More of the `R` example (including how another diagram can be produced) can be found [here](https://github.com/WinVector/rquery/blob/master/Examples/yaml/yaml.md).  An example of moving a pipeline from `R` to `Python` can be found [here](https://github.com/WinVector/rquery/blob/master/Examples/data_algebra/interop.md).
-
-## Advantages of `data_algebra`
-
-Multi-language data science is an important trend, so a cross-language query system that supports at least `R` and `Python` is going to be a useful tool or capability going forward. Obviously `SQL` itself is fairly cross-language, but `data_algebra` adds features that can be real advantages.
-
-In addition to the features shown above, a `data_algebra` operator pipeline carries around usable knowledge of the data transform.
-
-For example:
 
 
 ```python
@@ -881,16 +665,15 @@ print(ops_back.to_python(pretty=True))
             "irrelevantCol1",
             "irrelevantCol2",
         ],
-    ).extend(
-        {"probability": "(assessmentTotal * 0.237).exp()"}
-    ).extend(
+    ).extend({"probability": "(assessmentTotal * 0.237).exp()"}).extend(
         {"total": "probability.sum()"}, partition_by=["subjectID"]
     ).extend(
         {"probability": "probability / total"}
     ).extend(
-        {"sort_key": "-probability"}
-    ).extend(
-        {"row_number": "_row_number()"}, partition_by=["subjectID"], order_by=["sort_key"]
+        {"row_number": "_row_number()"},
+        partition_by=["subjectID"],
+        order_by=["probability"],
+        reverse=["probability"],
     ).select_rows(
         "row_number == 1"
     ).select_columns(
