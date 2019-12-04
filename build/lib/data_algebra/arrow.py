@@ -180,6 +180,12 @@ class DataOpArrow(Arrow):
             column_names=self.outgoing_columns,
             column_types=self.outgoing_types))
 
+    def outgoing_table_description(self):
+        return data_algebra.data_ops.TableDescription(
+            table_name=None,
+            column_names=self.outgoing_columns,
+            column_types=self.outgoing_types)
+
     def __repr__(self):
         return (
             "DataOpArrow(\n "
