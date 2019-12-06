@@ -183,6 +183,35 @@ class ViewRepresentation(OperatorPlatform):
     def __str__(self):
         return self.to_python(strict=True)
 
+    # noinspection PyMethodMayBeStatic,PyUnusedLocal
+    def _equiv_nodes(self, other):
+        """Check if immediate node structure is equivalent, assumes non
+        recursive __eq__ checks are TRUE"""
+        return True
+
+    def __eq__(self, other):
+        if not isinstance(other, ViewRepresentation):
+            return False
+        if not type(self) is type(other):
+            return False
+        if self.node_name != other.node_name:
+            return False
+        if self.column_names != other.column_names:
+            return False
+        if self.column_map != other.column_map:
+            return False
+        if len(self.sources) != len(other.sources):
+            return False
+        if not self._equiv_nodes(other):
+            return False
+        for i in range(len(self.sources)):
+            if not self.sources[i].__eq__(other.sources[i]):
+                return False
+        return True
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     # query generation
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
@@ -546,6 +575,17 @@ class TableDescription(ViewRepresentation):
         if self.table_name is not None:
             key = key + self.table_name
         self.key = key
+
+    def _equiv_nodes(self, other):
+        if not self.table_name == other.table_name:
+            return False
+        if not self.column_names == other.column_names:
+            return False
+        if not self.qualifiers == other.qualifiers:
+            return False
+        if not self.key == other.key:
+            return False
+        return True
 
     def collect_representation_implementation(self, *, pipeline=None, dialect="Python"):
         if pipeline is None:
@@ -948,6 +988,19 @@ class ExtendNode(ViewRepresentation):
             self, column_names=column_names, sources=[source], node_name="ExtendNode"
         )
 
+    def _equiv_nodes(self, other):
+        if not self.windowed_situation == other.windowed_situation:
+            return False
+        if not self.partition_by == other.partition_by:
+            return False
+        if not self.order_by == other.order_by:
+            return False
+        if not self.reverse == other.reverse:
+            return False
+        if not self.ops == other.ops:
+            return False
+        return True
+
     def check_extend_window_fns(self):
         window_situation = (len(self.partition_by) > 0) or (len(self.order_by) > 0)
         if window_situation:
@@ -1079,6 +1132,13 @@ class ProjectNode(ViewRepresentation):
             # TODO: check op is in list of aggregators
             # Note: non-aggregators making through will be caught by table shape check
 
+    def _equiv_nodes(self, other):
+        if not self.group_by == other.group_by:
+            return False
+        if not self.ops == other.ops:
+            return False
+        return True
+
     def columns_used_from_sources(self, using=None):
         if using is None:
             subops = self.ops
@@ -1156,6 +1216,13 @@ class SelectRowsNode(ViewRepresentation):
             node_name="SelectRowsNode",
         )
 
+    def _equiv_nodes(self, other):
+        if not self.expr == other.expr:
+            return False
+        if not self.decision_columns == other.decision_columns:
+            return False
+        return True
+
     def columns_used_from_sources(self, using=None):
         columns_we_take = self.sources[0].column_set.copy()
         if using is None:
@@ -1219,6 +1286,11 @@ class SelectColumnsNode(ViewRepresentation):
             node_name="SelectColumnsNode",
         )
 
+    def _equiv_nodes(self, other):
+        if not self.column_selection == other.column_selection:
+            return False
+        return True
+
     def columns_used_from_sources(self, using=None):
         cols = set(self.column_selection.copy())
         if using is None:
@@ -1280,6 +1352,11 @@ class DropColumnsNode(ViewRepresentation):
             sources=[source],
             node_name="DropColumnsNode",
         )
+
+    def _equiv_nodes(self, other):
+        if not self.column_deletions == other.column_deletions:
+            return False
+        return True
 
     def columns_used_from_sources(self, using=None):
         if using is None:
@@ -1348,6 +1425,13 @@ class OrderRowsNode(ViewRepresentation):
             sources=[source],
             node_name="OrderRowsNode",
         )
+
+    def _equiv_nodes(self, other):
+        if not self.order_columns == other.order_columns:
+            return False
+        if not self.reverse == other.reverse:
+            return False
+        return True
 
     def columns_used_from_sources(self, using=None):
         cols = set(self.column_names.copy())
@@ -1436,6 +1520,15 @@ class RenameColumnsNode(ViewRepresentation):
             node_name="RenameColumnsNode",
         )
 
+    def _equiv_nodes(self, other):
+        if not self.column_remapping == other.column_remapping:
+            return False
+        if not self.reverse_mapping == other.reverse_mapping:
+            return False
+        if not self.mapped_columns == other.mapped_columns:
+            return False
+        return True
+
     def columns_used_from_sources(self, using=None):
         if using is None:
             using = self.column_names
@@ -1518,6 +1611,13 @@ class NaturalJoinNode(ViewRepresentation):
         self.by = by
         self.jointype = data_algebra.expr_rep.standardize_join_type(jointype)
         self.get_tables()  # causes a throw if left and right table descriptions are inconsistent
+
+    def _equiv_nodes(self, other):
+        if not self.by == other.by:
+            return False
+        if not self.jointype == other.jointype:
+            return False
+        return True
 
     def columns_used_from_sources(self, using=None):
         if using is None:
@@ -1604,6 +1704,15 @@ class ConcatRowsNode(ViewRepresentation):
         self.a_name = a_name
         self.b_name = b_name
         self.get_tables()  # causes a throw if left and right table descriptions are inconsistent
+
+    def _equiv_nodes(self, other):
+        if not self.id_column == other.id_column:
+            return False
+        if not self.a_name == other.a_name:
+            return False
+        if not self.b_name == other.b_name:
+            return False
+        return True
 
     def columns_used_from_sources(self, using=None):
         if using is None:
@@ -1714,6 +1823,13 @@ class ConvertRecordsNode(ViewRepresentation):
             sources=sources,
             node_name="ConvertRecordsNode",
         )
+
+    def _equiv_nodes(self, other):
+        if not self.blocks_out_table == other.blocks_out_table:
+            return False
+        if not self.record_map == other.record_map:
+            return False
+        return True
 
     def columns_used_from_sources(self, using=None):
         return [

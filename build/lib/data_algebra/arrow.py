@@ -53,7 +53,8 @@ class DataOpArrow(Arrow):
         self.free_table_key = free_table_key
         self.incoming_columns = c_used[free_table_key]
         self.incoming_types = t_used[free_table_key].column_types
-        self.outgoing_columns = pipeline.column_names
+        self.outgoing_columns = pipeline.column_names.copy()
+        self.outgoing_columns.sort()
         self.outgoing_types = None
         if isinstance(pipeline, data_algebra.data_ops.TableDescription):
             self.outgoing_types = self.incoming_types
@@ -174,13 +175,19 @@ class DataOpArrow(Arrow):
             column_names=self.incoming_columns,
             column_types=self.incoming_types))
 
+    def dom_as_table(self):
+        return data_algebra.data_ops.TableDescription(
+            table_name=None,
+            column_names=self.incoming_columns,
+            column_types=self.incoming_types)
+
     def cod(self):
         return DataOpArrow(data_algebra.data_ops.TableDescription(
             table_name=None,
             column_names=self.outgoing_columns,
             column_types=self.outgoing_types))
 
-    def outgoing_table_description(self):
+    def cod_as_table(self):
         return data_algebra.data_ops.TableDescription(
             table_name=None,
             column_names=self.outgoing_columns,
@@ -225,3 +232,21 @@ class DataOpArrow(Arrow):
             + out_rep
             + "\n]\n"
         )
+
+    def __eq__(self, other):
+        if not isinstance(other, DataOpArrow):
+            return False
+        if self.free_table_key != other.free_table_key:
+            return False
+        if self.incoming_columns != other.incoming_columns:
+            return False
+        if self.incoming_types != other.incoming_types:
+            return False
+        if self.outgoing_columns != other.outgoing_columns:
+            return False
+        if self.outgoing_types != other.outgoing_types:
+            return False
+        return self.pipeline == other.pipeline
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
