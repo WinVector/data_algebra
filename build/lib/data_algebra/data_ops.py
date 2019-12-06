@@ -1,8 +1,8 @@
+from abc import ABC
 from typing import Set, Dict, List, Union
 import numbers
 import collections
 import re
-import copy
 
 import data_algebra
 import data_algebra.flow_text
@@ -33,7 +33,7 @@ except ImportError:
     pass
 
 
-class ViewRepresentation(OperatorPlatform):
+class ViewRepresentation(OperatorPlatform, ABC):
     """Structure to represent the columns of a query or a table.
        Abstract base class."""
 
@@ -294,21 +294,6 @@ class ViewRepresentation(OperatorPlatform):
             )
         raise TypeError("can not apply eval() to type " + str(type(x)))
 
-    # implement builders for all non-initial node types on base class
-
-    def stand_in_for_table(self, ops, table_key):
-        """re-write ops replacing any TableDescription with matching id with self"""
-        if isinstance(ops, data_algebra.data_ops.TableDescription):
-            if ops.key == table_key:
-                return self
-            else:
-                return ops
-        node = copy.copy(ops)
-        node.sources = [
-            self.stand_in_for_table(ops=s, table_key=table_key) for s in node.sources
-        ]
-        return node
-
     # noinspection PyPep8Naming
     def transform(self, X, *, eval_env=None, data_model=None):
         if data_model is None:
@@ -317,33 +302,16 @@ class ViewRepresentation(OperatorPlatform):
             raise TypeError(
                 "Expected data_model to be derived from data_algebra.data_model.DataModel"
             )
-        cols_used = self.columns_used()  # for table consistency check/raise
+        self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
         if len(tables) != 1:
             raise ValueError(
                 "transfrom(DataFrame) can only be applied to ops-dags with only one table def"
             )
         k = [k for k in tables.keys()][0]
-        if isinstance(X, ViewRepresentation):
-            # replace self input table with X
-            incoming_columns = cols_used[k]
-            missing = set(incoming_columns) - set(X.column_names)
-            if len(missing) > 0:
-                raise ValueError("missing required columns: " + str(missing))
-            excess = set(X.column_names) - set(incoming_columns)
-            if len(excess):
-                # insert a select columns node to get the match columns
-                X = X.select_columns([c for c in incoming_columns])
-            # check categorical arrow composition conditions
-            if set(incoming_columns) != set(X.column_names):
-                raise ValueError(
-                    "arrow composition conditions not met (incoming column set doesn't match outgoing)"
-                )
-            res = X.stand_in_for_table(ops=self, table_key=k)
-            return res
-        data_map = {k: X}
         # noinspection PyUnresolvedReferences
         if isinstance(X, data_model.pd.DataFrame):
+            data_map = {k: X}
             return self.eval_pandas(
                 data_map=data_map, eval_env=eval_env, data_model=data_model
             )
@@ -362,8 +330,7 @@ class ViewRepresentation(OperatorPlatform):
             qualifiers=qualifiers,
             column_types=column_types)
 
-    # nodes
-
+    # implement builders for all non-initial node types on base class
     def extend(
         self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
     ):
@@ -472,7 +439,10 @@ class ViewRepresentation(OperatorPlatform):
             return self
         if self.is_trivial_when_intermediate():
             return self.sources[0].select_rows(expr, parse_env=parse_env)
-        return SelectRowsNode(source=self, expr=expr, parse_env=parse_env)
+        ops = data_algebra.expr_rep.parse_assignments_in_context(
+            {"expr": expr}, self, parse_env=parse_env
+        )
+        return SelectRowsNode(source=self, ops=ops)
 
     def drop_columns(self, column_deletions):
         if (column_deletions is None) or (len(column_deletions) < 1):
@@ -575,6 +545,17 @@ class TableDescription(ViewRepresentation):
         if self.table_name is not None:
             key = key + self.table_name
         self.key = key
+
+    def apply(self, a, *, target_table_key=None):
+        if (target_table_key is None) or (target_table_key == self.key):
+            # replace table with a
+            return a
+        # copy self
+        r = TableDescription(table_name=self.table_name,
+                             column_names=self.column_names,
+                             qualifiers=self.qualifiers,
+                             column_types=self.column_types)
+        return r
 
     def _equiv_nodes(self, other):
         if not self.table_name == other.table_name:
@@ -690,7 +671,7 @@ def describe_table(d, table_name="data_frame", *, qualifiers=None, column_types=
     )
 
 
-class WrappedOperatorPlatform(OperatorPlatform):
+class WrappedOperatorPlatform(OperatorPlatform, ABC):
     """Decorator class for OperatorPlatform."""
 
     def __init__(self, *, underlying, data_map):
@@ -988,6 +969,14 @@ class ExtendNode(ViewRepresentation):
             self, column_names=column_names, sources=[source], node_name="ExtendNode"
         )
 
+    def apply(self, a, *, target_table_key=None):
+        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+        return ExtendNode(source=new_sources[0],
+                          parsed_ops=self.ops,
+                          partition_by=self.partition_by,
+                          order_by=self.order_by,
+                          reverse=self.reverse)
+
     def _equiv_nodes(self, other):
         if not self.windowed_situation == other.windowed_situation:
             return False
@@ -1132,6 +1121,12 @@ class ProjectNode(ViewRepresentation):
             # TODO: check op is in list of aggregators
             # Note: non-aggregators making through will be caught by table shape check
 
+    def apply(self, a, *, target_table_key=None):
+        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+        return ProjectNode(source=new_sources[0],
+                           parsed_ops=self.ops,
+                           group_by=self.group_by)
+
     def _equiv_nodes(self, other):
         if not self.group_by == other.group_by:
             return False
@@ -1200,12 +1195,10 @@ class SelectRowsNode(ViewRepresentation):
     expr: data_algebra.expr_rep.Expression
     decision_columns: Set[str]
 
-    def __init__(self, source, expr, *, parse_env=None):
-        ops = data_algebra.expr_rep.parse_assignments_in_context(
-            {"expr": expr}, source, parse_env=parse_env
-        )
+    def __init__(self, source, ops):
         if len(ops) < 1:
             raise ValueError("no ops")
+        self.ops = ops
         self.expr = ops["expr"]
         self.decision_columns = set()
         self.expr.get_column_names(self.decision_columns)
@@ -1215,6 +1208,11 @@ class SelectRowsNode(ViewRepresentation):
             sources=[source],
             node_name="SelectRowsNode",
         )
+
+    def apply(self, a, *, target_table_key=None):
+        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+        return SelectRowsNode(source=new_sources[0],
+                              ops=self.ops)
 
     def _equiv_nodes(self, other):
         if not self.expr == other.expr:
@@ -1286,6 +1284,11 @@ class SelectColumnsNode(ViewRepresentation):
             node_name="SelectColumnsNode",
         )
 
+    def apply(self, a, *, target_table_key=None):
+        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+        return SelectColumnsNode(source=new_sources[0],
+                                 columns=self.column_selection)
+
     def _equiv_nodes(self, other):
         if not self.column_selection == other.column_selection:
             return False
@@ -1352,6 +1355,11 @@ class DropColumnsNode(ViewRepresentation):
             sources=[source],
             node_name="DropColumnsNode",
         )
+
+    def apply(self, a, *, target_table_key=None):
+        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+        return DropColumnsNode(source=new_sources[0],
+                               column_deletions=self.column_deletions)
 
     def _equiv_nodes(self, other):
         if not self.column_deletions == other.column_deletions:
@@ -1426,10 +1434,19 @@ class OrderRowsNode(ViewRepresentation):
             node_name="OrderRowsNode",
         )
 
+    def apply(self, a, *, target_table_key=None):
+        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+        return OrderRowsNode(source=new_sources[0],
+                             columns=self.order_columns,
+                             reverse=self.reverse,
+                             limit=self.limit)
+
     def _equiv_nodes(self, other):
         if not self.order_columns == other.order_columns:
             return False
         if not self.reverse == other.reverse:
+            return False
+        if not self.limit == other.limit:
             return False
         return True
 
@@ -1520,12 +1537,13 @@ class RenameColumnsNode(ViewRepresentation):
             node_name="RenameColumnsNode",
         )
 
+    def apply(self, a, *, target_table_key=None):
+        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+        return RenameColumnsNode(source=new_sources[0],
+                                 column_remapping=self.column_remapping)
+
     def _equiv_nodes(self, other):
         if not self.column_remapping == other.column_remapping:
-            return False
-        if not self.reverse_mapping == other.reverse_mapping:
-            return False
-        if not self.mapped_columns == other.mapped_columns:
             return False
         return True
 
@@ -1611,6 +1629,13 @@ class NaturalJoinNode(ViewRepresentation):
         self.by = by
         self.jointype = data_algebra.expr_rep.standardize_join_type(jointype)
         self.get_tables()  # causes a throw if left and right table descriptions are inconsistent
+
+    def apply(self, a, *, target_table_key=None):
+        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+        return NaturalJoinNode(a=new_sources[0],
+                               b=new_sources[1],
+                               by=self.by,
+                               jointype=self.jointype)
 
     def _equiv_nodes(self, other):
         if not self.by == other.by:
@@ -1704,6 +1729,14 @@ class ConcatRowsNode(ViewRepresentation):
         self.a_name = a_name
         self.b_name = b_name
         self.get_tables()  # causes a throw if left and right table descriptions are inconsistent
+
+    def apply(self, a, *, target_table_key=None):
+        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+        return ConcatRowsNode(a=new_sources[0],
+                              b=new_sources[1],
+                              id_column=self.id_column,
+                              a_name=self.a_name,
+                              b_name=self.b_name)
 
     def _equiv_nodes(self, other):
         if not self.id_column == other.id_column:
@@ -1823,6 +1856,12 @@ class ConvertRecordsNode(ViewRepresentation):
             sources=sources,
             node_name="ConvertRecordsNode",
         )
+
+    def apply(self, a, *, target_table_key=None):
+        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+        return ConvertRecordsNode(source=new_sources[0],
+                                  record_map=self.record_map,
+                                  blocks_out_table=self.blocks_out_table)
 
     def _equiv_nodes(self, other):
         if not self.blocks_out_table == other.blocks_out_table:

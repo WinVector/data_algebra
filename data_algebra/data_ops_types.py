@@ -14,22 +14,61 @@ class OperatorPlatform:
 
     # noinspection PyPep8Naming
     def transform(self, X):
+        """
+        apply self to data frame X
+
+        :param X: input data frame
+        :return: transformed dataframe
+        """
+        raise NotImplementedError("base class called")
+
+    def apply(self, a, *, target_table_key=None):
+        """
+        apply self to operator DAG a
+
+        :param a: operators to apply to
+        :param target_table_key: table key to replace with self, None counts as "match all"
+        :return: new operator DAG
+        """
         raise NotImplementedError("base class called")
 
     def __rrshift__(self, other):  # override other >> self
+        """
+        override other >> self
+        self.apply/transform(other)
+
+        :param other:
+        :return:
+        """
+        if isinstance(other, OperatorPlatform):
+            return self.apply(other)
+        if isinstance(other, PipeStep):
+            return other.apply(other)
         return self.transform(other)
 
     def __rshift__(self, other):  # override self >> other
+        """
+        override self >> other
+        other.apply(self)
+
+        :param other:
+        :return:
+        """
         # can't use type >> type if only __rrshift__ is defined (must have __rshift__ in this case)
         if isinstance(other, OperatorPlatform):
-            return other.transform(self)
+            return other.apply(self)
         if isinstance(other, PipeStep):
-            other.apply(self)
+            return other.apply(self)
         raise TypeError("unexpected type: " + str(type(other)))
 
     # composition
     def add(self, other):
-        """interface to what we used to call PipeStep nodes"""
+        """
+        other.apply(self)
+
+        :param other:
+        :return:
+        """
         return other.apply(self)
 
     # query generation

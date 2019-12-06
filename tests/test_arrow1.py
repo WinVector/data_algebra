@@ -176,7 +176,9 @@ def test_arrow1():
 
     # Python default associates left to right so this is:
     # ((d >> a1) >> a2) >> a3
-    r1 = d >> a1 >> a2 >> a3
+    r1b = d >> a1 >> a2 >> a3
+
+    assert data_algebra.test_util.equivalent_frames(r1, r1b)
 
     # the preferred notation, work in operator space
     r2 = d >> (a1 >> a2 >> a3)
@@ -184,7 +186,7 @@ def test_arrow1():
     assert data_algebra.test_util.equivalent_frames(r1, r2)
 
     # check pipelines compose
-    p1 = a3.pipeline.transform(a2.pipeline.transform(a1.pipeline)).__repr__()
+    p1 = a3.pipeline.apply(a2.pipeline.apply(a1.pipeline)).__repr__()
 
     p2 = (a1.pipeline >> a2.pipeline >> a3.pipeline).__repr__()
 

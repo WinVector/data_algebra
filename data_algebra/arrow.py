@@ -70,19 +70,9 @@ class DataOpArrow(Arrow):
             if len(missing) > 0:
                 raise ValueError("missing required columns: " + str(missing))
             excess = set(X.outgoing_columns) - set(self.incoming_columns)
-            if len(excess):
+            if len(excess) > 0:
                 if strict:
                     raise ValueError("extra incoming columns: " + str(excess))
-                # extra columns, in a strict categorical formulation we would
-                # reject this. instead insert a select columns node to get the match
-                x_outgoing_types = X.outgoing_types
-                X = DataOpArrow(
-                    X.pipeline.select_columns([c for c in self.incoming_columns])
-                )
-                if x_outgoing_types is not None:
-                    X.outgoing_types = {
-                        k: x_outgoing_types[k] for k in X.outgoing_columns
-                    }
             # check categorical arrow composition conditions
             if set(self.incoming_columns) != set(X.outgoing_columns):
                 raise ValueError(
@@ -101,11 +91,14 @@ class DataOpArrow(Arrow):
                             + ", while X outgoing type is "
                             + str(xt)
                         )
-            res = DataOpArrow(
-                X.pipeline.stand_in_for_table(
-                    ops=self.pipeline, table_key=self.free_table_key
-                )
-            )
+            new_pipeline = self.pipeline.apply(X.pipeline, target_table_key=self.free_table_key)
+            res = DataOpArrow(pipeline=new_pipeline,
+                              free_table_key=X.free_table_key)
+            # res = DataOpArrow(
+            #     X.pipeline.stand_in_for_table(
+            #         ops=self.pipeline, table_key=self.free_table_key
+            #     )
+            # )
             res.incoming_types = X.incoming_types
             res.outgoing_types = self.outgoing_types
             return res
