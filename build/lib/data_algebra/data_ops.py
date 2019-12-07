@@ -323,18 +323,21 @@ class ViewRepresentation(OperatorPlatform, ABC):
         return False
 
     # return table representation of self
-    def as_table_description(self, table_name=None, *, qualifiers=None, column_types=None):
+    def as_table_description(
+        self, table_name=None, *, qualifiers=None, column_types=None
+    ):
         return TableDescription(
             table_name=table_name,
             column_names=self.column_names.copy(),
             qualifiers=qualifiers,
-            column_types=column_types)
+            column_types=column_types,
+        )
 
     # implement builders for all non-initial node types on base class
-    def extend(
-        self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
+    def extend_parsed(
+        self, parsed_ops, *, partition_by=None, order_by=None, reverse=None
     ):
-        if (ops is None) or (len(ops) < 1):
+        if (parsed_ops is None) or (len(parsed_ops) < 1):
             return self
         if partition_by is None:
             partition_by = []
@@ -342,9 +345,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
             order_by = []
         if reverse is None:
             reverse = []
-        parsed_ops = data_algebra.expr_rep.parse_assignments_in_context(
-            ops, self, parse_env=parse_env
-        )
         new_cols_produced_in_calc = set([k for k in parsed_ops.keys()])
         if (partition_by != 1) and (len(partition_by) > 0):
             if len(new_cols_produced_in_calc.intersection(partition_by)) > 0:
@@ -354,12 +354,11 @@ class ViewRepresentation(OperatorPlatform, ABC):
         if len(set(reverse).difference(order_by)) > 0:
             raise ValueError("all columns in reverse must be in order_by")
         if self.is_trivial_when_intermediate():
-            return self.sources[0].extend(
-                ops,
+            return self.sources[0].extend_parsed(
+                parsed_ops=parsed_ops,
                 partition_by=partition_by,
                 order_by=order_by,
                 reverse=reverse,
-                parse_env=parse_env,
             )
         # see if we can combine nodes
         if isinstance(self, ExtendNode):
@@ -377,7 +376,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
                 and (order_by == self.order_by)
                 and (reverse == self.reverse)
             ):
-                new_ops = data_algebra.data_ops_utils.try_to_merge_ops(self.ops, parsed_ops)
+                new_ops = data_algebra.data_ops_utils.try_to_merge_ops(
+                    self.ops, parsed_ops
+                )
                 if new_ops is not None:
                     return ExtendNode(
                         source=self.sources[0],
@@ -395,6 +396,33 @@ class ViewRepresentation(OperatorPlatform, ABC):
             reverse=reverse,
         )
 
+    def extend(
+        self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
+    ):
+        if (ops is None) or (len(ops) < 1):
+            return self
+        parsed_ops = data_algebra.expr_rep.parse_assignments_in_context(
+            ops, self, parse_env=parse_env
+        )
+        return self.extend_parsed(
+            parsed_ops=parsed_ops,
+            partition_by=partition_by,
+            order_by=order_by,
+            reverse=reverse,
+        )
+
+    def project_parsed(self, parsed_ops=None, *, group_by=None):
+        if group_by is None:
+            group_by = []
+        if ((parsed_ops is None) or (len(parsed_ops) < 1)) and (len(group_by) < 1):
+            raise ValueError("must have ops or group_by")
+        new_cols_produced_in_calc = set([k for k in parsed_ops.keys()])
+        if len(new_cols_produced_in_calc.intersection(group_by)):
+            raise ValueError("can not alter grouping columns")
+        if self.is_trivial_when_intermediate():
+            return self.sources[0].project_parsed(parsed_ops, group_by=group_by)
+        return ProjectNode(source=self, parsed_ops=parsed_ops, group_by=group_by)
+
     def project(self, ops=None, *, group_by=None, parse_env=None):
         if group_by is None:
             group_by = []
@@ -403,12 +431,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         parsed_ops = data_algebra.expr_rep.parse_assignments_in_context(
             ops, self, parse_env=parse_env
         )
-        new_cols_produced_in_calc = set([k for k in parsed_ops.keys()])
-        if len(new_cols_produced_in_calc.intersection(group_by)):
-            raise ValueError("can not alter grouping columns")
-        if self.is_trivial_when_intermediate():
-            return self.sources[0].project(ops, group_by=group_by, parse_env=parse_env)
-        return ProjectNode(source=self, parsed_ops=parsed_ops, group_by=group_by)
+        return self.project_parsed(parsed_ops=parsed_ops, group_by=group_by)
 
     def natural_join(self, b, *, by=None, jointype="INNER"):
         if not isinstance(b, ViewRepresentation):
@@ -434,6 +457,13 @@ class ViewRepresentation(OperatorPlatform, ABC):
             a=self, b=b, id_column=id_column, a_name=a_name, b_name=b_name
         )
 
+    def select_rows_parsed(self, parsed_expr):
+        if parsed_expr is None:
+            return self
+        if self.is_trivial_when_intermediate():
+            return self.sources[0].select_rows_parsed(parsed_expr=parsed_expr)
+        return SelectRowsNode(source=self, ops=parsed_expr)
+
     def select_rows(self, expr, *, parse_env=None):
         if expr is None:
             return self
@@ -442,7 +472,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         ops = data_algebra.expr_rep.parse_assignments_in_context(
             {"expr": expr}, self, parse_env=parse_env
         )
-        return SelectRowsNode(source=self, ops=ops)
+        return self.select_rows_parsed(parsed_expr=ops)
 
     def drop_columns(self, column_deletions):
         if (column_deletions is None) or (len(column_deletions) < 1):
@@ -519,7 +549,7 @@ class TableDescription(ViewRepresentation):
             self, column_names=column_names, node_name="TableDescription"
         )
         if table_name is None:
-            table_name = ''
+            table_name = ""
         if (table_name is not None) and (not isinstance(table_name, str)):
             raise TypeError("table_name must be a string")
         self.table_name = table_name
@@ -551,10 +581,12 @@ class TableDescription(ViewRepresentation):
             # replace table with a
             return a
         # copy self
-        r = TableDescription(table_name=self.table_name,
-                             column_names=self.column_names,
-                             qualifiers=self.qualifiers,
-                             column_types=self.column_types)
+        r = TableDescription(
+            table_name=self.table_name,
+            column_names=self.column_names,
+            qualifiers=self.qualifiers,
+            column_types=self.column_types,
+        )
         return r
 
     def _equiv_nodes(self, other):
@@ -671,7 +703,7 @@ def describe_table(d, table_name="data_frame", *, qualifiers=None, column_types=
     )
 
 
-class WrappedOperatorPlatform(OperatorPlatform, ABC):
+class WrappedOperatorPlatform(OperatorPlatform):
     """Decorator class for OperatorPlatform."""
 
     def __init__(self, *, underlying, data_map):
@@ -726,6 +758,15 @@ class WrappedOperatorPlatform(OperatorPlatform, ABC):
             other = other.underlying
         return data_map, other
 
+    def apply_to(self, a, *, target_table_key=None):
+        if not isinstance(a, WrappedOperatorPlatform):
+            raise TypeError("didn't expect type: " + str(type(a)))
+        # TODO: figure out data_map here
+        return WrappedOperatorPlatform(
+            underlying=self.underlying.apply_to(a.underlying, target_table_key=target_table_key),
+            data_map={}
+        )
+
     # noinspection PyPep8Naming
     def transform(self, X):
         data_map, X = self._reach_in(X)
@@ -767,6 +808,19 @@ class WrappedOperatorPlatform(OperatorPlatform, ABC):
 
     # define builders for all non-initial node types on base class
 
+    def extend_parsed(
+        self, parsed_ops, *, partition_by=None, order_by=None, reverse=None
+    ):
+        return WrappedOperatorPlatform(
+            underlying=self.underlying.extend_parsed(
+                parsed_ops=parsed_ops,
+                partition_by=partition_by,
+                order_by=order_by,
+                reverse=reverse,
+            ),
+            data_map=self.data_map,
+        )
+
     def extend(
         self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
     ):
@@ -777,6 +831,14 @@ class WrappedOperatorPlatform(OperatorPlatform, ABC):
                 order_by=order_by,
                 reverse=reverse,
                 parse_env=parse_env,
+            ),
+            data_map=self.data_map,
+        )
+
+    def project_parsed(self, parsed_ops=None, *, group_by=None):
+        return WrappedOperatorPlatform(
+            underlying=self.underlying.project_parsed(
+                parsed_ops=parsed_ops, group_by=group_by
             ),
             data_map=self.data_map,
         )
@@ -809,6 +871,12 @@ class WrappedOperatorPlatform(OperatorPlatform, ABC):
                 b=b, id_column=id_column, a_name=a_name, b_name=b_name
             ),
             data_map=data_map,
+        )
+
+    def select_rows_parsed(self, parsed_expr):
+        return WrappedOperatorPlatform(
+            underlying=self.underlying.select_rows_parsed(parsed_expr=parsed_expr),
+            data_map=self.data_map,
         )
 
     def select_rows(self, expr, *, parse_env=None):
@@ -873,7 +941,7 @@ def wrap(d, *, table_name="data_frame"):
 
 class ExtendNode(ViewRepresentation):
     def __init__(
-        self, *, source, parsed_ops, partition_by=None, order_by=None, reverse=None,
+        self, *, source, parsed_ops, partition_by=None, order_by=None, reverse=None
     ):
         windowed_situation = data_algebra.expr_rep.implies_windowed(parsed_ops)
         self.ops = parsed_ops
@@ -970,12 +1038,16 @@ class ExtendNode(ViewRepresentation):
         )
 
     def apply_to(self, a, *, target_table_key=None):
-        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
-        return ExtendNode(source=new_sources[0],
-                          parsed_ops=self.ops,
-                          partition_by=self.partition_by,
-                          order_by=self.order_by,
-                          reverse=self.reverse)
+        new_sources = [
+            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+        ]
+        return ExtendNode(
+            source=new_sources[0],
+            parsed_ops=self.ops,
+            partition_by=self.partition_by,
+            order_by=self.order_by,
+            reverse=self.reverse,
+        )
 
     def _equiv_nodes(self, other):
         if not self.windowed_situation == other.windowed_situation:
@@ -1122,10 +1194,12 @@ class ProjectNode(ViewRepresentation):
             # Note: non-aggregators making through will be caught by table shape check
 
     def apply_to(self, a, *, target_table_key=None):
-        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
-        return ProjectNode(source=new_sources[0],
-                           parsed_ops=self.ops,
-                           group_by=self.group_by)
+        new_sources = [
+            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+        ]
+        return ProjectNode(
+            source=new_sources[0], parsed_ops=self.ops, group_by=self.group_by
+        )
 
     def _equiv_nodes(self, other):
         if not self.group_by == other.group_by:
@@ -1210,9 +1284,10 @@ class SelectRowsNode(ViewRepresentation):
         )
 
     def apply_to(self, a, *, target_table_key=None):
-        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
-        return SelectRowsNode(source=new_sources[0],
-                              ops=self.ops)
+        new_sources = [
+            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+        ]
+        return SelectRowsNode(source=new_sources[0], ops=self.ops)
 
     def _equiv_nodes(self, other):
         if not self.expr == other.expr:
@@ -1285,9 +1360,10 @@ class SelectColumnsNode(ViewRepresentation):
         )
 
     def apply_to(self, a, *, target_table_key=None):
-        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
-        return SelectColumnsNode(source=new_sources[0],
-                                 columns=self.column_selection)
+        new_sources = [
+            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+        ]
+        return SelectColumnsNode(source=new_sources[0], columns=self.column_selection)
 
     def _equiv_nodes(self, other):
         if not self.column_selection == other.column_selection:
@@ -1357,9 +1433,12 @@ class DropColumnsNode(ViewRepresentation):
         )
 
     def apply_to(self, a, *, target_table_key=None):
-        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
-        return DropColumnsNode(source=new_sources[0],
-                               column_deletions=self.column_deletions)
+        new_sources = [
+            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+        ]
+        return DropColumnsNode(
+            source=new_sources[0], column_deletions=self.column_deletions
+        )
 
     def _equiv_nodes(self, other):
         if not self.column_deletions == other.column_deletions:
@@ -1435,11 +1514,15 @@ class OrderRowsNode(ViewRepresentation):
         )
 
     def apply_to(self, a, *, target_table_key=None):
-        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
-        return OrderRowsNode(source=new_sources[0],
-                             columns=self.order_columns,
-                             reverse=self.reverse,
-                             limit=self.limit)
+        new_sources = [
+            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+        ]
+        return OrderRowsNode(
+            source=new_sources[0],
+            columns=self.order_columns,
+            reverse=self.reverse,
+            limit=self.limit,
+        )
 
     def _equiv_nodes(self, other):
         if not self.order_columns == other.order_columns:
@@ -1538,9 +1621,12 @@ class RenameColumnsNode(ViewRepresentation):
         )
 
     def apply_to(self, a, *, target_table_key=None):
-        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
-        return RenameColumnsNode(source=new_sources[0],
-                                 column_remapping=self.column_remapping)
+        new_sources = [
+            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+        ]
+        return RenameColumnsNode(
+            source=new_sources[0], column_remapping=self.column_remapping
+        )
 
     def _equiv_nodes(self, other):
         if not self.column_remapping == other.column_remapping:
@@ -1631,11 +1717,12 @@ class NaturalJoinNode(ViewRepresentation):
         self.get_tables()  # causes a throw if left and right table descriptions are inconsistent
 
     def apply_to(self, a, *, target_table_key=None):
-        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
-        return NaturalJoinNode(a=new_sources[0],
-                               b=new_sources[1],
-                               by=self.by,
-                               jointype=self.jointype)
+        new_sources = [
+            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+        ]
+        return NaturalJoinNode(
+            a=new_sources[0], b=new_sources[1], by=self.by, jointype=self.jointype
+        )
 
     def _equiv_nodes(self, other):
         if not self.by == other.by:
@@ -1731,12 +1818,16 @@ class ConcatRowsNode(ViewRepresentation):
         self.get_tables()  # causes a throw if left and right table descriptions are inconsistent
 
     def apply_to(self, a, *, target_table_key=None):
-        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
-        return ConcatRowsNode(a=new_sources[0],
-                              b=new_sources[1],
-                              id_column=self.id_column,
-                              a_name=self.a_name,
-                              b_name=self.b_name)
+        new_sources = [
+            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+        ]
+        return ConcatRowsNode(
+            a=new_sources[0],
+            b=new_sources[1],
+            id_column=self.id_column,
+            a_name=self.a_name,
+            b_name=self.b_name,
+        )
 
     def _equiv_nodes(self, other):
         if not self.id_column == other.id_column:
@@ -1858,10 +1949,14 @@ class ConvertRecordsNode(ViewRepresentation):
         )
 
     def apply_to(self, a, *, target_table_key=None):
-        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
-        return ConvertRecordsNode(source=new_sources[0],
-                                  record_map=self.record_map,
-                                  blocks_out_table=self.blocks_out_table)
+        new_sources = [
+            s.apply_to(a, target_table_key=target_table_key) for s in self.sources
+        ]
+        return ConvertRecordsNode(
+            source=new_sources[0],
+            record_map=self.record_map,
+            blocks_out_table=self.blocks_out_table,
+        )
 
     def _equiv_nodes(self, other):
         if not self.blocks_out_table == other.blocks_out_table:

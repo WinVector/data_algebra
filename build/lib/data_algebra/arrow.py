@@ -1,4 +1,3 @@
-
 import data_algebra
 import data_algebra.data_ops
 import data_algebra.flow_text
@@ -91,9 +90,10 @@ class DataOpArrow(Arrow):
                             + ", while X outgoing type is "
                             + str(xt)
                         )
-            new_pipeline = self.pipeline.apply_to(X.pipeline, target_table_key=self.free_table_key)
-            res = DataOpArrow(pipeline=new_pipeline,
-                              free_table_key=X.free_table_key)
+            new_pipeline = self.pipeline.apply_to(
+                X.pipeline, target_table_key=self.free_table_key
+            )
+            res = DataOpArrow(pipeline=new_pipeline, free_table_key=X.free_table_key)
             # res = DataOpArrow(
             #     X.pipeline.stand_in_for_table(
             #         ops=self.pipeline, table_key=self.free_table_key
@@ -163,28 +163,36 @@ class DataOpArrow(Arrow):
         return self.transform(X)
 
     def dom(self):
-        return DataOpArrow(data_algebra.data_ops.TableDescription(
-            table_name=None,
-            column_names=self.incoming_columns,
-            column_types=self.incoming_types))
+        return DataOpArrow(
+            data_algebra.data_ops.TableDescription(
+                table_name=None,
+                column_names=self.incoming_columns,
+                column_types=self.incoming_types,
+            )
+        )
 
     def dom_as_table(self):
         return data_algebra.data_ops.TableDescription(
             table_name=None,
             column_names=self.incoming_columns,
-            column_types=self.incoming_types)
+            column_types=self.incoming_types,
+        )
 
     def cod(self):
-        return DataOpArrow(data_algebra.data_ops.TableDescription(
-            table_name=None,
-            column_names=self.outgoing_columns,
-            column_types=self.outgoing_types))
+        return DataOpArrow(
+            data_algebra.data_ops.TableDescription(
+                table_name=None,
+                column_names=self.outgoing_columns,
+                column_types=self.outgoing_types,
+            )
+        )
 
     def cod_as_table(self):
         return data_algebra.data_ops.TableDescription(
             table_name=None,
             column_names=self.outgoing_columns,
-            column_types=self.outgoing_types)
+            column_types=self.outgoing_types,
+        )
 
     def __repr__(self):
         return (

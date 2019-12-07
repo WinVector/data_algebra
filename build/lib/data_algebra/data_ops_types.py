@@ -78,9 +78,17 @@ class OperatorPlatform:
 
     # define builders for all non-initial node types on base class
 
+    def extend_parsed(
+        self, parsed_ops, *, partition_by=None, order_by=None, reverse=None
+    ):
+        raise NotImplementedError("base class called")
+
     def extend(
         self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
     ):
+        raise NotImplementedError("base class called")
+
+    def project_parsed(self, parsed_ops=None, *, group_by=None):
         raise NotImplementedError("base class called")
 
     def project(self, ops=None, *, group_by=None, parse_env=None):
@@ -90,6 +98,9 @@ class OperatorPlatform:
         raise NotImplementedError("base class called")
 
     def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):
+        raise NotImplementedError("base class called")
+
+    def select_rows_parsed(self, parsed_expr):
         raise NotImplementedError("base class called")
 
     def select_rows(self, expr, *, parse_env=None):
