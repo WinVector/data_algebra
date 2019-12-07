@@ -91,7 +91,7 @@ class DataOpArrow(Arrow):
                             + ", while X outgoing type is "
                             + str(xt)
                         )
-            new_pipeline = self.pipeline.apply(X.pipeline, target_table_key=self.free_table_key)
+            new_pipeline = self.pipeline.apply_to(X.pipeline, target_table_key=self.free_table_key)
             res = DataOpArrow(pipeline=new_pipeline,
                               free_table_key=X.free_table_key)
             # res = DataOpArrow(

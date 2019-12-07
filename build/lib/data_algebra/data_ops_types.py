@@ -22,7 +22,7 @@ class OperatorPlatform:
         """
         raise NotImplementedError("base class called")
 
-    def apply(self, a, *, target_table_key=None):
+    def apply_to(self, a, *, target_table_key=None):
         """
         apply self to operator DAG a
 
@@ -35,41 +35,41 @@ class OperatorPlatform:
     def __rrshift__(self, other):  # override other >> self
         """
         override other >> self
-        self.apply/transform(other)
+        self.apply_to/transform(other)
 
         :param other:
         :return:
         """
         if isinstance(other, OperatorPlatform):
-            return self.apply(other)
+            return self.apply_to(other)
         if isinstance(other, PipeStep):
-            return other.apply(other)
+            return other.apply_to(other)
         return self.transform(other)
 
     def __rshift__(self, other):  # override self >> other
         """
         override self >> other
-        other.apply(self)
+        other.apply_to(self)
 
         :param other:
         :return:
         """
         # can't use type >> type if only __rrshift__ is defined (must have __rshift__ in this case)
         if isinstance(other, OperatorPlatform):
-            return other.apply(self)
+            return other.apply_to(self)
         if isinstance(other, PipeStep):
-            return other.apply(self)
+            return other.apply_to(self)
         raise TypeError("unexpected type: " + str(type(other)))
 
     # composition
     def add(self, other):
         """
-        other.apply(self)
+        other.apply_to(self)
 
         :param other:
         :return:
         """
-        return other.apply(self)
+        return other.apply_to(self)
 
     # query generation
 

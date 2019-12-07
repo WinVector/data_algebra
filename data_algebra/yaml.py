@@ -170,6 +170,6 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
         for i in range(1, len(obj)):
             nxt = to_pipeline(obj[i], known_tables=known_tables, parse_env=parse_env)
             # res = res >> nxt
-            res = nxt.apply(res, parse_env=parse_env)
+            res = nxt.apply_to(res, parse_env=parse_env)
         return res
     raise TypeError("unexpected type: " + str(obj))

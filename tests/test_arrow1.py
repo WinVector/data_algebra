@@ -186,7 +186,7 @@ def test_arrow1():
     assert data_algebra.test_util.equivalent_frames(r1, r2)
 
     # check pipelines compose
-    p1 = a3.pipeline.apply(a2.pipeline.apply(a1.pipeline)).__repr__()
+    p1 = a3.pipeline.apply_to(a2.pipeline.apply_to(a1.pipeline)).__repr__()
 
     p2 = (a1.pipeline >> a2.pipeline >> a3.pipeline).__repr__()
 

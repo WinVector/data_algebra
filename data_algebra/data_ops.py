@@ -546,7 +546,7 @@ class TableDescription(ViewRepresentation):
             key = key + self.table_name
         self.key = key
 
-    def apply(self, a, *, target_table_key=None):
+    def apply_to(self, a, *, target_table_key=None):
         if (target_table_key is None) or (target_table_key == self.key):
             # replace table with a
             return a
@@ -745,7 +745,7 @@ class WrappedOperatorPlatform(OperatorPlatform, ABC):
             )
         if isinstance(other, PipeStep):
             return WrappedOperatorPlatform(
-                underlying=other.apply(self.underlying), data_map=data_map
+                underlying=other.apply_to(self.underlying), data_map=data_map
             )
         raise TypeError("unexpected type: " + str(type(other)))
 
@@ -755,7 +755,7 @@ class WrappedOperatorPlatform(OperatorPlatform, ABC):
         """interface to what we used to call PipeStep nodes"""
         data_map, other = self._reach_in(other)
         return WrappedOperatorPlatform(
-            underlying=other.apply(self.underlying), data_map=data_map
+            underlying=other.apply_to(self.underlying), data_map=data_map
         )
 
     # sql
@@ -969,8 +969,8 @@ class ExtendNode(ViewRepresentation):
             self, column_names=column_names, sources=[source], node_name="ExtendNode"
         )
 
-    def apply(self, a, *, target_table_key=None):
-        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+    def apply_to(self, a, *, target_table_key=None):
+        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
         return ExtendNode(source=new_sources[0],
                           parsed_ops=self.ops,
                           partition_by=self.partition_by,
@@ -1121,8 +1121,8 @@ class ProjectNode(ViewRepresentation):
             # TODO: check op is in list of aggregators
             # Note: non-aggregators making through will be caught by table shape check
 
-    def apply(self, a, *, target_table_key=None):
-        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+    def apply_to(self, a, *, target_table_key=None):
+        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
         return ProjectNode(source=new_sources[0],
                            parsed_ops=self.ops,
                            group_by=self.group_by)
@@ -1209,8 +1209,8 @@ class SelectRowsNode(ViewRepresentation):
             node_name="SelectRowsNode",
         )
 
-    def apply(self, a, *, target_table_key=None):
-        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+    def apply_to(self, a, *, target_table_key=None):
+        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
         return SelectRowsNode(source=new_sources[0],
                               ops=self.ops)
 
@@ -1284,8 +1284,8 @@ class SelectColumnsNode(ViewRepresentation):
             node_name="SelectColumnsNode",
         )
 
-    def apply(self, a, *, target_table_key=None):
-        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+    def apply_to(self, a, *, target_table_key=None):
+        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
         return SelectColumnsNode(source=new_sources[0],
                                  columns=self.column_selection)
 
@@ -1356,8 +1356,8 @@ class DropColumnsNode(ViewRepresentation):
             node_name="DropColumnsNode",
         )
 
-    def apply(self, a, *, target_table_key=None):
-        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+    def apply_to(self, a, *, target_table_key=None):
+        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
         return DropColumnsNode(source=new_sources[0],
                                column_deletions=self.column_deletions)
 
@@ -1434,8 +1434,8 @@ class OrderRowsNode(ViewRepresentation):
             node_name="OrderRowsNode",
         )
 
-    def apply(self, a, *, target_table_key=None):
-        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+    def apply_to(self, a, *, target_table_key=None):
+        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
         return OrderRowsNode(source=new_sources[0],
                              columns=self.order_columns,
                              reverse=self.reverse,
@@ -1537,8 +1537,8 @@ class RenameColumnsNode(ViewRepresentation):
             node_name="RenameColumnsNode",
         )
 
-    def apply(self, a, *, target_table_key=None):
-        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+    def apply_to(self, a, *, target_table_key=None):
+        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
         return RenameColumnsNode(source=new_sources[0],
                                  column_remapping=self.column_remapping)
 
@@ -1630,8 +1630,8 @@ class NaturalJoinNode(ViewRepresentation):
         self.jointype = data_algebra.expr_rep.standardize_join_type(jointype)
         self.get_tables()  # causes a throw if left and right table descriptions are inconsistent
 
-    def apply(self, a, *, target_table_key=None):
-        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+    def apply_to(self, a, *, target_table_key=None):
+        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
         return NaturalJoinNode(a=new_sources[0],
                                b=new_sources[1],
                                by=self.by,
@@ -1730,8 +1730,8 @@ class ConcatRowsNode(ViewRepresentation):
         self.b_name = b_name
         self.get_tables()  # causes a throw if left and right table descriptions are inconsistent
 
-    def apply(self, a, *, target_table_key=None):
-        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+    def apply_to(self, a, *, target_table_key=None):
+        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
         return ConcatRowsNode(a=new_sources[0],
                               b=new_sources[1],
                               id_column=self.id_column,
@@ -1857,8 +1857,8 @@ class ConvertRecordsNode(ViewRepresentation):
             node_name="ConvertRecordsNode",
         )
 
-    def apply(self, a, *, target_table_key=None):
-        new_sources = [s.apply(a, target_table_key=target_table_key) for s in self.sources]
+    def apply_to(self, a, *, target_table_key=None):
+        new_sources = [s.apply_to(a, target_table_key=target_table_key) for s in self.sources]
         return ConvertRecordsNode(source=new_sources[0],
                                   record_map=self.record_map,
                                   blocks_out_table=self.blocks_out_table)
@@ -1984,7 +1984,7 @@ class Extend(PipeStep):
         self.order_by = order_by
         self.reverse = reverse
 
-    def apply(self, other, **kwargs):
+    def apply_to(self, other, **kwargs):
         if not isinstance(other, OperatorPlatform):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
@@ -2029,7 +2029,7 @@ class Project(PipeStep):
         self._ops = ops
         self.group_by = group_by
 
-    def apply(self, other, **kwargs):
+    def apply_to(self, other, **kwargs):
         if not isinstance(other, OperatorPlatform):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
@@ -2060,7 +2060,7 @@ class SelectRows(PipeStep):
         PipeStep.__init__(self)
         self.expr = expr
 
-    def apply(self, other, **kwargs):
+    def apply_to(self, other, **kwargs):
         if not isinstance(other, OperatorPlatform):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
@@ -2088,7 +2088,7 @@ class SelectColumns(PipeStep):
         column_selection = [c for c in columns]
         self.column_selection = column_selection
 
-    def apply(self, other, **kwargs):
+    def apply_to(self, other, **kwargs):
         if not isinstance(other, OperatorPlatform):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
@@ -2115,7 +2115,7 @@ class DropColumns(PipeStep):
         column_deletions = [c for c in column_deletions]
         self.column_deletions = column_deletions
 
-    def apply(self, other, **kwargs):
+    def apply_to(self, other, **kwargs):
         if not isinstance(other, OperatorPlatform):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
@@ -2156,7 +2156,7 @@ class OrderRows(PipeStep):
         self.reverse = [c for c in reverse]
         self.limit = limit
 
-    def apply(self, other, **kwargs):
+    def apply_to(self, other, **kwargs):
         if not isinstance(other, OperatorPlatform):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
@@ -2188,7 +2188,7 @@ class RenameColumns(PipeStep):
         PipeStep.__init__(self)
         self.column_remapping = column_remapping.copy()
 
-    def apply(self, other, **kwargs):
+    def apply_to(self, other, **kwargs):
         if not isinstance(other, OperatorPlatform):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
@@ -2217,7 +2217,7 @@ class NaturalJoin(PipeStep):
         self._jointype = data_algebra.expr_rep.standardize_join_type(jointype)
         self._b = b
 
-    def apply(self, other, **kwargs):
+    def apply_to(self, other, **kwargs):
         if not isinstance(other, OperatorPlatform):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
@@ -2253,7 +2253,7 @@ class ConcatRows(PipeStep):
         self.b_name = b_name
         self._b = b
 
-    def apply(self, other, **kwargs):
+    def apply_to(self, other, **kwargs):
         if not isinstance(other, OperatorPlatform):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
@@ -2282,7 +2282,7 @@ class ConvertRecords(PipeStep):
         self.record_map = record_map
         self.blocks_out_table = blocks_out_table
 
-    def apply(self, other, **kwargs):
+    def apply_to(self, other, **kwargs):
         if not isinstance(other, OperatorPlatform):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
