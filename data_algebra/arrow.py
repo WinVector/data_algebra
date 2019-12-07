@@ -17,16 +17,22 @@ class Arrow:
         """return co-domain, object at head of arrow"""
         raise NotImplementedError("base class called")
 
+    def apply_to(self, b, *, strict=True):
+        """ apply_to b, compose arrows (right to left) """
+        raise NotImplementedError("base class called")
+
     # noinspection PyPep8Naming
-    def transform(self, X, *, strict=True):
-        """ transform X, compose arrows (right to left) """
+    def transform(self, X):
+        """ transform X, act on X """
         raise NotImplementedError("base class called")
 
     def __rshift__(self, other):  # override self >> other
-        return other.transform(self, strict=True)
+        return other.apply_to(self, strict=True)
 
     def __rrshift__(self, other):  # override other >> self
-        return self.transform(other, strict=True)
+        if isinstance(other, Arrow):
+            return self.apply_to(other, strict=True)
+        return self.transform(other)
 
 
 class DataOpArrow(Arrow):
@@ -60,72 +66,48 @@ class DataOpArrow(Arrow):
             self.outgoing_types = self.incoming_types.copy()
         Arrow.__init__(self)
 
-    # noinspection PyPep8Naming
-    def transform(self, X, *, strict=True):
-        """replace self input table with X"""
-        if isinstance(X, data_algebra.data_ops.ViewRepresentation):
-            X = DataOpArrow(X)
-        if isinstance(X, DataOpArrow):
-            missing = set(self.incoming_columns) - set(X.outgoing_columns)
-            if len(missing) > 0:
-                raise ValueError("missing required columns: " + str(missing))
-            excess = set(X.outgoing_columns) - set(self.incoming_columns)
+    def apply_to(self, b, *, strict=True):
+        """replace self input table with b"""
+        if isinstance(b, data_algebra.data_ops.ViewRepresentation):
+            b = DataOpArrow(b)
+        if not isinstance(b, DataOpArrow):
+            raise TypeError("unexpected type: " + str(type(b)))
+        missing = set(self.incoming_columns) - set(b.outgoing_columns)
+        if len(missing) > 0:
+            raise ValueError("missing required columns: " + str(missing))
+        if strict:
+            excess = set(b.outgoing_columns) - set(self.incoming_columns)
             if len(excess) > 0:
-                if strict:
-                    raise ValueError("extra incoming columns: " + str(excess))
-            # check categorical arrow composition conditions
-            if set(self.incoming_columns) != set(X.outgoing_columns):
-                raise ValueError(
-                    "arrow composition conditions not met (incoming column set doesn't match outgoing)"
-                )
-            if (self.incoming_types is not None) and (X.outgoing_types is not None):
-                for c in self.incoming_columns:
-                    st = self.incoming_types[c]
-                    xt = X.outgoing_types[c]
-                    if st != xt:
-                        raise ValueError(
-                            "column "
-                            + c
-                            + " self incoming type is "
-                            + str(st)
-                            + ", while X outgoing type is "
-                            + str(xt)
-                        )
-            new_pipeline = self.pipeline.apply_to(
-                X.pipeline, target_table_key=self.free_table_key
+                raise ValueError("extra incoming columns: " + str(excess))
+        # check categorical arrow composition conditions
+        if set(self.incoming_columns) != set(b.outgoing_columns):
+            raise ValueError(
+                "arrow composition conditions not met (incoming column set doesn't match outgoing)"
             )
-            res = DataOpArrow(pipeline=new_pipeline, free_table_key=X.free_table_key)
-            # res = DataOpArrow(
-            #     X.pipeline.stand_in_for_table(
-            #         ops=self.pipeline, table_key=self.free_table_key
-            #     )
-            # )
-            res.incoming_types = X.incoming_types
-            res.outgoing_types = self.outgoing_types
-            return res
-        if isinstance(X, list) or isinstance(X, tuple) or isinstance(X, set):
-            # schema type object
-            if set(self.incoming_columns) != set(X):
-                raise ValueError("input did not match arrow dom()")
-            return self.cod()
-        if isinstance(X, dict):
-            # schema type object
-            if set(self.incoming_columns) != set(X.keys()):
-                raise ValueError("input did not match arrow dom()")
-            if self.incoming_types is not None:
-                for c in self.incoming_columns:
-                    st = self.incoming_types[c]
-                    xt = X[c]
-                    if st != xt:
-                        raise ValueError(
-                            "column "
-                            + c
-                            + " self incoming type is "
-                            + str(st)
-                            + ", while X outgoing type is "
-                            + str(xt)
-                        )
-            return self.cod()
+        if (self.incoming_types is not None) and (b.outgoing_types is not None):
+            for c in self.incoming_columns:
+                st = self.incoming_types[c]
+                xt = b.outgoing_types[c]
+                if st != xt:
+                    raise ValueError(
+                        "column "
+                        + c
+                        + " self incoming type is "
+                        + str(st)
+                        + ", while b outgoing type is "
+                        + str(xt)
+                    )
+        new_pipeline = self.pipeline.apply_to(
+            b.pipeline, target_table_key=self.free_table_key
+        )
+        new_pipeline.get_tables()   # check tables are compatible
+        res = DataOpArrow(pipeline=new_pipeline, free_table_key=b.free_table_key)
+        res.incoming_types = b.incoming_types
+        res.outgoing_types = self.outgoing_types
+        return res
+
+    # noinspection PyPep8Naming
+    def transform(self, X):
         # assume a pandas.DataFrame compatible object
         # noinspection PyUnresolvedReferences
         cols = set(X.columns)
@@ -133,10 +115,7 @@ class DataOpArrow(Arrow):
         if len(missing) > 0:
             raise ValueError("missing required columns: " + str(missing))
         excess = cols - set(self.incoming_columns)
-        if len(excess):
-            if strict:
-                raise ValueError("extra incoming columns: " + str(excess))
-            # noinspection PyUnresolvedReferences
+        if len(excess) > 0:
             X = X[self.incoming_columns]
         return self.pipeline.transform(X)
 
