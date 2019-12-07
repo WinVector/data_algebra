@@ -2,7 +2,7 @@ class PipeStep:
     def __init__(self):
         pass
 
-    def apply(self, other, **kwargs):
+    def apply_to(self, other, **kwargs):
         raise NotImplementedError("base class called")
 
 

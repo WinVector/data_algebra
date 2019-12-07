@@ -4,6 +4,7 @@ import data_algebra
 import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
+from data_algebra.data_pipe import *
 import data_algebra.PostgreSQL
 from data_algebra.util import od
 import data_algebra.yaml
