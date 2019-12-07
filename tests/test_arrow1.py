@@ -234,3 +234,14 @@ def test_arrow_cod_dom():
 
     assert a1.cod_as_table() == a2.dom_as_table()
     assert a1.cod() == a2.dom()
+
+def test_arrow_compose_2():
+    b1 = DataOpArrow(TableDescription(column_names=['x', 'y'], table_name=None). \
+        extend({
+        'y': 7
+    }))
+    b2 = DataOpArrow(TableDescription(column_names=['x', 'y'], table_name=None). \
+        extend({
+        'y': 9
+    }))
+    b1 >> b2

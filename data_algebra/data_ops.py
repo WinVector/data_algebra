@@ -43,7 +43,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
     sources: List[
         "ViewRepresentation"
     ]  # https://www.python.org/dev/peps/pep-0484/#forward-references
-    columns_currently_used: Set[str]  # transient field, operations can update this
 
     def __init__(self, column_names, *, sources=None, node_name):
         if isinstance(column_names, str):
@@ -137,7 +136,12 @@ class ViewRepresentation(OperatorPlatform, ABC):
         self._clear_columns_currently_used()
         self._columns_used_implementation(using=using)
         tables = self.get_tables()
-        columns_used = {k: v.columns_currently_used.copy() for (k, v) in tables.items()}
+        # columns_used = {k: v.columns_currently_used.copy() for (k, v) in tables.items()}
+        columns_used = dict()
+        for k in tables.keys():
+            ti = tables[k]
+            vi = ti.columns_currently_used
+            columns_used[k] = vi.copy()
         return columns_used
 
     # collect as simple structures for YAML I/O and other generic tasks

@@ -2,50 +2,103 @@
 platform darwin -- Python 3.7.5, pytest-5.2.4, py-1.8.0, pluggy-0.13.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.8.1
-collected 76 items
+collected 77 items
 
 tests/test_R_yaml.py .                                                   [  1%]
 tests/test_apply.py .                                                    [  2%]
-tests/test_arrow1.py ..                                                  [  5%]
-tests/test_calc_issue.py .                                               [  6%]
-tests/test_calc_warnings_errors.py .                                     [  7%]
-tests/test_cc.py ......                                                  [ 15%]
-tests/test_cdata1.py .                                                   [ 17%]
-tests/test_cdata_example.py ....                                         [ 22%]
-tests/test_cols_used.py .                                                [ 23%]
+tests/test_arrow1.py ..F                                                 [  6%]
+tests/test_calc_issue.py .                                               [  7%]
+tests/test_calc_warnings_errors.py .                                     [  9%]
+tests/test_cc.py ......                                                  [ 16%]
+tests/test_cdata1.py .                                                   [ 18%]
+tests/test_cdata_example.py ....                                         [ 23%]
+tests/test_cols_used.py .                                                [ 24%]
 tests/test_concat_rows.py .                                              [ 25%]
-tests/test_degenerate_project.py .                                       [ 26%]
-tests/test_drop_columns.py .                                             [ 27%]
-tests/test_exampe1.py ....                                               [ 32%]
-tests/test_example_data_ops.py .                                         [ 34%]
-tests/test_exp.py .                                                      [ 35%]
-tests/test_export_neg.py .                                               [ 36%]
+tests/test_degenerate_project.py .                                       [ 27%]
+tests/test_drop_columns.py .                                             [ 28%]
+tests/test_exampe1.py ....                                               [ 33%]
+tests/test_example_data_ops.py .                                         [ 35%]
+tests/test_exp.py .                                                      [ 36%]
+tests/test_export_neg.py .                                               [ 37%]
 tests/test_expr_parse.py .                                               [ 38%]
-tests/test_extend.py ....                                                [ 43%]
-tests/test_flow_text.py .                                                [ 44%]
+tests/test_extend.py ....                                                [ 44%]
+tests/test_flow_text.py .                                                [ 45%]
 tests/test_free_expr.py .                                                [ 46%]
-tests/test_ghost_col_issue.py .                                          [ 47%]
-tests/test_if_else.py .                                                  [ 48%]
+tests/test_ghost_col_issue.py .                                          [ 48%]
+tests/test_if_else.py .                                                  [ 49%]
 tests/test_join_check.py .                                               [ 50%]
-tests/test_join_effects.py ..                                            [ 52%]
-tests/test_math.py .                                                     [ 53%]
+tests/test_join_effects.py ..                                            [ 53%]
+tests/test_math.py .                                                     [ 54%]
 tests/test_natural_join.py .                                             [ 55%]
-tests/test_neg.py .                                                      [ 56%]
-tests/test_null_bad.py .                                                 [ 57%]
+tests/test_neg.py .                                                      [ 57%]
+tests/test_null_bad.py .                                                 [ 58%]
 tests/test_parse.py .                                                    [ 59%]
-tests/test_project.py .....                                              [ 65%]
+tests/test_project.py .....                                              [ 66%]
 tests/test_scatter_example.py .                                          [ 67%]
 tests/test_scoring_example.py .                                          [ 68%]
-tests/test_select_stacking.py .                                          [ 69%]
+tests/test_select_stacking.py .                                          [ 70%]
 tests/test_shorten.py .                                                  [ 71%]
 tests/test_simple.py .....                                               [ 77%]
-tests/test_spark_sql.py .                                                [ 78%]
+tests/test_spark_sql.py .                                                [ 79%]
 tests/test_sqlite.py .                                                   [ 80%]
 tests/test_strat_example.py .                                            [ 81%]
-tests/test_table_is_key_by_columns.py .                                  [ 82%]
+tests/test_table_is_key_by_columns.py .                                  [ 83%]
 tests/test_transform_examples.py ...........                             [ 97%]
 tests/test_window2.py .                                                  [ 98%]
 tests/test_window_fns.py .                                               [100%]
+
+=================================== FAILURES ===================================
+_____________________________ test_arrow_compose_2 _____________________________
+
+    def test_arrow_compose_2():
+        b1 = DataOpArrow(TableDescription(column_names=['x', 'y'], table_name=None). \
+            extend({
+            'y': 7
+        }))
+        b2 = DataOpArrow(TableDescription(column_names=['x', 'y'], table_name=None). \
+            extend({
+            'y': 9
+        }))
+>       b1 >> b2
+
+tests/test_arrow1.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+data_algebra/arrow.py:26: in __rshift__
+    return other.transform(self, strict=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = DataOpArrow(
+ TableDescription(
+ table_name='',
+ column_names=[
+   'x', 'y']) .\
+   extend({
+    'y': '9'}),
+ free_table_key='')
+X = DataOpArrow(
+ TableDescription(
+ table_name='',
+ column_names=[
+   'x', 'y']) .\
+   extend({
+    'y': '7'}),
+ free_table_key='')
+
+    def transform(self, X, *, strict=True):
+        """replace self input table with X"""
+        if isinstance(X, data_algebra.data_ops.ViewRepresentation):
+            X = DataOpArrow(X)
+        if isinstance(X, DataOpArrow):
+            missing = set(self.incoming_columns) - set(X.outgoing_columns)
+            if len(missing) > 0:
+                raise ValueError("missing required columns: " + str(missing))
+            excess = set(X.outgoing_columns) - set(self.incoming_columns)
+            if len(excess) > 0:
+                if strict:
+>                   raise ValueError("extra incoming columns: " + str(excess))
+E                   ValueError: extra incoming columns: {'y'}
+
+data_algebra/arrow.py:74: ValueError
 
 ---------- coverage: platform darwin, python 3.7.5-final-0 -----------
 Name                                   Stmts   Miss  Cover
@@ -54,12 +107,12 @@ data_algebra/PostgreSQL.py                21      4    81%
 data_algebra/SQLite.py                    90     13    86%
 data_algebra/SparkSQL.py                  21      4    81%
 data_algebra/__init__.py                   5      0   100%
-data_algebra/arrow.py                    143     50    65%
+data_algebra/arrow.py                    143     49    66%
 data_algebra/cdata.py                    232     75    68%
 data_algebra/cdata_impl.py                10      1    90%
 data_algebra/connected_components.py      49      1    98%
 data_algebra/data_model.py                29     13    55%
-data_algebra/data_ops.py                1207    298    75%
+data_algebra/data_ops.py                1210    298    75%
 data_algebra/data_ops_types.py            54     22    59%
 data_algebra/data_ops_utils.py            34      6    82%
 data_algebra/data_pipe.py                190     50    74%
@@ -74,7 +127,6 @@ data_algebra/test_util.py                119     17    86%
 data_algebra/util.py                      44     10    77%
 data_algebra/yaml.py                     102     13    87%
 ----------------------------------------------------------
-TOTAL                                   3698    929    75%
+TOTAL                                   3701    928    75%
 
-
-============================== 76 passed in 7.48s ==============================
+========================= 1 failed, 76 passed in 7.04s =========================
