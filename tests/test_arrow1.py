@@ -244,4 +244,5 @@ def test_arrow_compose_2():
         extend({
         'y': 9
     }))
-    b1 >> b2
+    ops = b1 >> b2
+    assert isinstance(ops.pipeline.sources[0], TableDescription)

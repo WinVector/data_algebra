@@ -6,7 +6,7 @@ collected 77 items
 
 tests/test_R_yaml.py .                                                   [  1%]
 tests/test_apply.py .                                                    [  2%]
-tests/test_arrow1.py ..F                                                 [  6%]
+tests/test_arrow1.py ...                                                 [  6%]
 tests/test_calc_issue.py .                                               [  7%]
 tests/test_calc_warnings_errors.py .                                     [  9%]
 tests/test_cc.py ......                                                  [ 16%]
@@ -47,59 +47,6 @@ tests/test_transform_examples.py ...........                             [ 97%]
 tests/test_window2.py .                                                  [ 98%]
 tests/test_window_fns.py .                                               [100%]
 
-=================================== FAILURES ===================================
-_____________________________ test_arrow_compose_2 _____________________________
-
-    def test_arrow_compose_2():
-        b1 = DataOpArrow(TableDescription(column_names=['x', 'y'], table_name=None). \
-            extend({
-            'y': 7
-        }))
-        b2 = DataOpArrow(TableDescription(column_names=['x', 'y'], table_name=None). \
-            extend({
-            'y': 9
-        }))
->       b1 >> b2
-
-tests/test_arrow1.py:247: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-data_algebra/arrow.py:26: in __rshift__
-    return other.transform(self, strict=True)
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-self = DataOpArrow(
- TableDescription(
- table_name='',
- column_names=[
-   'x', 'y']) .\
-   extend({
-    'y': '9'}),
- free_table_key='')
-X = DataOpArrow(
- TableDescription(
- table_name='',
- column_names=[
-   'x', 'y']) .\
-   extend({
-    'y': '7'}),
- free_table_key='')
-
-    def transform(self, X, *, strict=True):
-        """replace self input table with X"""
-        if isinstance(X, data_algebra.data_ops.ViewRepresentation):
-            X = DataOpArrow(X)
-        if isinstance(X, DataOpArrow):
-            missing = set(self.incoming_columns) - set(X.outgoing_columns)
-            if len(missing) > 0:
-                raise ValueError("missing required columns: " + str(missing))
-            excess = set(X.outgoing_columns) - set(self.incoming_columns)
-            if len(excess) > 0:
-                if strict:
->                   raise ValueError("extra incoming columns: " + str(excess))
-E                   ValueError: extra incoming columns: {'y'}
-
-data_algebra/arrow.py:74: ValueError
-
 ---------- coverage: platform darwin, python 3.7.5-final-0 -----------
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
@@ -107,7 +54,7 @@ data_algebra/PostgreSQL.py                21      4    81%
 data_algebra/SQLite.py                    90     13    86%
 data_algebra/SparkSQL.py                  21      4    81%
 data_algebra/__init__.py                   5      0   100%
-data_algebra/arrow.py                    143     49    66%
+data_algebra/arrow.py                    144     50    65%
 data_algebra/cdata.py                    232     75    68%
 data_algebra/cdata_impl.py                10      1    90%
 data_algebra/connected_components.py      49      1    98%
@@ -127,6 +74,7 @@ data_algebra/test_util.py                119     17    86%
 data_algebra/util.py                      44     10    77%
 data_algebra/yaml.py                     102     13    87%
 ----------------------------------------------------------
-TOTAL                                   3701    928    75%
+TOTAL                                   3702    929    75%
 
-========================= 1 failed, 76 passed in 7.04s =========================
+
+============================== 77 passed in 9.63s ==============================
