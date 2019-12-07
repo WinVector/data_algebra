@@ -1041,8 +1041,7 @@ class ExtendNode(ViewRepresentation):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
-        return ExtendNode(
-            source=new_sources[0],
+        return new_sources[0].extend_parsed(
             parsed_ops=self.ops,
             partition_by=self.partition_by,
             order_by=self.order_by,
@@ -1197,9 +1196,7 @@ class ProjectNode(ViewRepresentation):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
-        return ProjectNode(
-            source=new_sources[0], parsed_ops=self.ops, group_by=self.group_by
-        )
+        return new_sources[0].project_parsed(parsed_ops=self.ops, group_by=self.group_by)
 
     def _equiv_nodes(self, other):
         if not self.group_by == other.group_by:
@@ -1287,7 +1284,7 @@ class SelectRowsNode(ViewRepresentation):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
-        return SelectRowsNode(source=new_sources[0], ops=self.ops)
+        return new_sources[0].select_rows_parsed(parsed_ops=self.ops)
 
     def _equiv_nodes(self, other):
         if not self.expr == other.expr:
@@ -1363,7 +1360,7 @@ class SelectColumnsNode(ViewRepresentation):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
-        return SelectColumnsNode(source=new_sources[0], columns=self.column_selection)
+        return new_sources[0].select_columns(columns=self.column_selection)
 
     def _equiv_nodes(self, other):
         if not self.column_selection == other.column_selection:
@@ -1436,9 +1433,7 @@ class DropColumnsNode(ViewRepresentation):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
-        return DropColumnsNode(
-            source=new_sources[0], column_deletions=self.column_deletions
-        )
+        return new_sources[0].drop_columns(column_deletions=self.column_deletions)
 
     def _equiv_nodes(self, other):
         if not self.column_deletions == other.column_deletions:
@@ -1517,8 +1512,7 @@ class OrderRowsNode(ViewRepresentation):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
-        return OrderRowsNode(
-            source=new_sources[0],
+        return new_sources[0].order_rows(
             columns=self.order_columns,
             reverse=self.reverse,
             limit=self.limit,
@@ -1624,9 +1618,7 @@ class RenameColumnsNode(ViewRepresentation):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
-        return RenameColumnsNode(
-            source=new_sources[0], column_remapping=self.column_remapping
-        )
+        return new_sources[0].rename(column_remapping=self.column_remapping)
 
     def _equiv_nodes(self, other):
         if not self.column_remapping == other.column_remapping:
@@ -1720,8 +1712,8 @@ class NaturalJoinNode(ViewRepresentation):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
-        return NaturalJoinNode(
-            a=new_sources[0], b=new_sources[1], by=self.by, jointype=self.jointype
+        return new_sources[0].natural_join(
+            b=new_sources[1], by=self.by, jointype=self.jointype
         )
 
     def _equiv_nodes(self, other):
@@ -1821,8 +1813,7 @@ class ConcatRowsNode(ViewRepresentation):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
-        return ConcatRowsNode(
-            a=new_sources[0],
+        return new_sources[0].concat_rows(
             b=new_sources[1],
             id_column=self.id_column,
             a_name=self.a_name,
@@ -1952,8 +1943,7 @@ class ConvertRecordsNode(ViewRepresentation):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
-        return ConvertRecordsNode(
-            source=new_sources[0],
+        return new_sources[0].convert_records(
             record_map=self.record_map,
             blocks_out_table=self.blocks_out_table,
         )
