@@ -761,10 +761,10 @@ class WrappedOperatorPlatform(OperatorPlatform):
     def apply_to(self, a, *, target_table_key=None):
         if not isinstance(a, WrappedOperatorPlatform):
             raise TypeError("didn't expect type: " + str(type(a)))
-        # TODO: figure out data_map here
+        data_map, a = self._reach_in(a)
         return WrappedOperatorPlatform(
-            underlying=self.underlying.apply_to(a.underlying, target_table_key=target_table_key),
-            data_map={}
+            underlying=self.underlying.apply_to(a, target_table_key=target_table_key),
+            data_map=data_map
         )
 
     # noinspection PyPep8Naming

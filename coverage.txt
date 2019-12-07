@@ -59,7 +59,7 @@ data_algebra/cdata.py                    232     75    68%
 data_algebra/cdata_impl.py                10      1    90%
 data_algebra/connected_components.py      49      1    98%
 data_algebra/data_model.py                29     13    55%
-data_algebra/data_ops.py                1206    297    75%
+data_algebra/data_ops.py                1207    298    75%
 data_algebra/data_ops_types.py            54     22    59%
 data_algebra/data_ops_utils.py            34      6    82%
 data_algebra/data_pipe.py                190     50    74%
@@ -74,7 +74,7 @@ data_algebra/test_util.py                119     17    86%
 data_algebra/util.py                      44     10    77%
 data_algebra/yaml.py                     102     13    87%
 ----------------------------------------------------------
-TOTAL                                   3697    928    75%
+TOTAL                                   3698    929    75%
 
 
-============================== 76 passed in 6.83s ==============================
+============================== 76 passed in 6.86s ==============================
