@@ -327,7 +327,7 @@ a1.dom()
      TableDescription(
      table_name='',
      column_names=[
-       'x', 'g', 'v', 'i']),
+       'g', 'x', 'v', 'i']),
      free_table_key='')
 
 
@@ -344,7 +344,7 @@ a1.cod()
      TableDescription(
      table_name='',
      column_names=[
-       'g', 'x', 'v', 'i', 'ngroup']),
+       'g', 'i', 'ngroup', 'v', 'x']),
      free_table_key='')
 
 
@@ -358,9 +358,9 @@ print(a1)
 
     [
      'd':
-      [ x, g, v, i ]
+      [ g, x, v, i ]
        ->
-      [ g, x, v, i, ngroup ]
+      [ g, i, ngroup, v, x ]
     ]
     
 
@@ -409,11 +409,12 @@ print(a1)
 
     [
      'd':
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, v: <class 'numpy.float64'>,
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'> ]
        ->
-      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
-        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
+      [ g: <class 'str'>, i: <class 'numpy.bool_'>,
+        ngroup: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
+        x: <class 'numpy.int64'> ]
     ]
     
 
@@ -613,11 +614,12 @@ print(a1b)
 
     [
      'd':
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, v: <class 'numpy.float64'>,
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'> ]
        ->
-      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
-        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
+      [ g: <class 'str'>, i: <class 'numpy.bool_'>,
+        ngroup: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
+        x: <class 'numpy.int64'> ]
     ]
     
 
@@ -732,9 +734,9 @@ print(a2)
 
     [
      'd2':
-      [ x, ngroup, g, v ]
+      [ g, x, ngroup, v ]
        ->
-      [ x, ngroup, g, v, row_number, shift_v ]
+      [ g, ngroup, row_number, shift_v, v, x ]
     ]
     
 
@@ -766,9 +768,9 @@ print(a2)
 
     [
      'd2':
-      [ x, g, ngroup, v, i, q ]
+      [ g, x, v, i, ngroup, q ]
        ->
-      [ g, x, v, i, ngroup, q, row_number, shift_v ]
+      [ g, i, ngroup, q, row_number, shift_v, v, x ]
     ]
     
 
@@ -804,9 +806,9 @@ print(a2)
 
     [
      'd2':
-      [ x, ngroup, v, i, g ]
+      [ g, x, v, i, ngroup ]
        ->
-      [ g, x, v, i, ngroup, row_number, shift_v ]
+      [ g, i, ngroup, row_number, shift_v, v, x ]
     ]
     
 
@@ -818,10 +820,10 @@ print(a1 >> a2)
 
     [
      'd':
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, v: <class 'numpy.float64'>,
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'> ]
        ->
-      [ g, x, v, i, ngroup, row_number, shift_v ]
+      [ g, i, ngroup, row_number, shift_v, v, x ]
     ]
     
 
@@ -844,12 +846,13 @@ print(a2)
 
     [
      'd2':
-      [ x: <class 'str'>, ngroup: <class 'numpy.int64'>,
-        v: <class 'numpy.float64'>, i: <class 'numpy.bool_'>, g: <class 'str'> ]
-       ->
       [ g: <class 'str'>, x: <class 'str'>, v: <class 'numpy.float64'>,
-        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
-        row_number: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'> ]
+        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
+       ->
+      [ g: <class 'str'>, i: <class 'numpy.bool_'>,
+        ngroup: <class 'numpy.int64'>, row_number: <class 'numpy.int64'>,
+        shift_v: <class 'numpy.float64'>, v: <class 'numpy.float64'>,
+        x: <class 'str'> ]
     ]
     
 
@@ -862,7 +865,7 @@ except Exception as ex:
     print(str(ex))
 ```
 
-    column x self incoming type is <class 'str'>, while X outgoing type is <class 'numpy.int64'>
+    column x self incoming type is <class 'str'>, while b outgoing type is <class 'numpy.int64'>
 
 
 
@@ -873,12 +876,13 @@ print(a2)
 
     [
      'd2':
-      [ x: <class 'numpy.int64'>, ngroup: <class 'numpy.int64'>,
-        v: <class 'numpy.float64'>, i: <class 'numpy.bool_'>, g: <class 'str'> ]
-       ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
-        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
-        row_number: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'> ]
+        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'> ]
+       ->
+      [ g: <class 'str'>, i: <class 'numpy.bool_'>,
+        ngroup: <class 'numpy.int64'>, row_number: <class 'numpy.int64'>,
+        shift_v: <class 'numpy.float64'>, v: <class 'numpy.float64'>,
+        x: <class 'numpy.int64'> ]
     ]
     
 
@@ -900,9 +904,9 @@ print(a3)
 
     [
      'd3':
-      [ x, ngroup, v, i, row_number, g, shift_v ]
+      [ g, x, v, i, ngroup, row_number, shift_v ]
        ->
-      [ g, x, v, i, ngroup, row_number, shift_v, mean_v ]
+      [ g, i, mean_v, ngroup, row_number, shift_v, v, x ]
     ]
     
 
@@ -915,15 +919,14 @@ print(a3)
 
     [
      'd3':
-      [ x: <class 'numpy.int64'>, ngroup: <class 'numpy.int64'>,
-        v: <class 'numpy.float64'>, i: <class 'numpy.bool_'>,
-        row_number: <class 'numpy.int64'>, g: <class 'str'>,
-        shift_v: <class 'numpy.float64'> ]
-       ->
       [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
+        row_number: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'> ]
+       ->
+      [ g: <class 'str'>, i: <class 'numpy.bool_'>,
+        mean_v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'>,
         row_number: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'>,
-        mean_v: <class 'numpy.float64'> ]
+        v: <class 'numpy.float64'>, x: <class 'numpy.int64'> ]
     ]
     
 
@@ -937,13 +940,13 @@ print(a1 >> a2 >> a3)
 
     [
      'd':
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, v: <class 'numpy.float64'>,
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'> ]
        ->
-      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
-        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
+      [ g: <class 'str'>, i: <class 'numpy.bool_'>,
+        mean_v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'>,
         row_number: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'>,
-        mean_v: <class 'numpy.float64'> ]
+        v: <class 'numpy.float64'>, x: <class 'numpy.int64'> ]
     ]
     
 
@@ -957,13 +960,13 @@ print((a1 >> a2) >> a3)
 
     [
      'd':
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, v: <class 'numpy.float64'>,
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'> ]
        ->
-      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
-        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
+      [ g: <class 'str'>, i: <class 'numpy.bool_'>,
+        mean_v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'>,
         row_number: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'>,
-        mean_v: <class 'numpy.float64'> ]
+        v: <class 'numpy.float64'>, x: <class 'numpy.int64'> ]
     ]
     
 
@@ -975,13 +978,13 @@ print(a1 >> (a2 >> a3))
 
     [
      'd':
-      [ x: <class 'numpy.int64'>, g: <class 'str'>, v: <class 'numpy.float64'>,
+      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
         i: <class 'numpy.bool_'> ]
        ->
-      [ g: <class 'str'>, x: <class 'numpy.int64'>, v: <class 'numpy.float64'>,
-        i: <class 'numpy.bool_'>, ngroup: <class 'numpy.int64'>,
+      [ g: <class 'str'>, i: <class 'numpy.bool_'>,
+        mean_v: <class 'numpy.float64'>, ngroup: <class 'numpy.int64'>,
         row_number: <class 'numpy.int64'>, shift_v: <class 'numpy.float64'>,
-        mean_v: <class 'numpy.float64'> ]
+        v: <class 'numpy.float64'>, x: <class 'numpy.int64'> ]
     ]
     
 
@@ -1334,9 +1337,16 @@ id.transform(d)
 
 
 
- 
+
+An introduction to the <code>data_algebra</code> package can be found [here](https://github.com/WinVector/data_algebra/blob/master/Examples/Introduction/data_algebra_Introduction.md).
+
+Some notes on the category theory influence on the design of the <code>data_algebra</code> package can be found [here](https://github.com/WinVector/data_algebra/blob/master/Examples/Arrow/CDesign.md).
+
 An example of treating a 2-argument data operation (such as a join) as an arrow can be found [here](https://github.com/WinVector/rquery/blob/master/Examples/Arrow/JoinArrow.md).
 
-(Examples of advanced inter-operation between the [`R` `rquery` package](https://github.com/WinVector/rquery/) and the [`Python` `data_algebra` package](https://github.com/WinVector/data_algebra) and `SQL` can be found [here](https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/ScoringExample.md).)
 
 
+
+```python
+
+```
