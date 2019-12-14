@@ -4,6 +4,7 @@ import os
 
 # re-write all .md files in current directory tree to not have <style scoped> blocks.
 
+
 def main():
     targets = [os.path.join(root, file) for root, dirs, files in os.walk(".") for file in files if file.endswith(".md")]
     for ti in targets:
