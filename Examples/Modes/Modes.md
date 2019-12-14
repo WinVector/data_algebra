@@ -22,19 +22,7 @@ d
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -126,19 +114,7 @@ ops.eval({'d': d})
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -223,19 +199,7 @@ ops.transform(d)
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -380,19 +344,7 @@ ops_wrapped.ex()
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -472,4 +424,5 @@ The wrapping of data as a different kind of `data_algebra` pipeline is an exampl
 
 `data_algebra` operator are designed to check pre and post-conditions early.  This can be specialized into [interpreting `data_algebra` pipelines as category theory arrows](https://github.com/WinVector/data_algebra/blob/master/Examples/Arrow/Arrow.md).
 More commonly a less controlled form of operator abstraction/composition based on [lambda-abstraction](https://en.wikipedia.org/wiki/Lambda_calculus), [lazy evaluation](https://en.wikipedia.org/wiki/Lazy_evaluation) is used in `R` packages.
+
 

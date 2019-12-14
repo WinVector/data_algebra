@@ -233,19 +233,7 @@ d
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -314,19 +302,7 @@ a.transform(d)
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -695,3 +671,4 @@ TableDescription(column_names=['x', 'y'], table_name=None). \
 <h2>Conclusion</h2>
 
 And that is an overview of how the <code>data_algebra</code> package leans towards category theory based design. The advantage is it lets us design the package action (how the package works on data) somewhat independently from operator composition.  That is as long as the two operations work correctly together, which turns out to be preseriving associativity.
+

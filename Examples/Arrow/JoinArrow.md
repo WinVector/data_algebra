@@ -19,19 +19,7 @@ d1
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -73,19 +61,7 @@ d2
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -168,19 +144,7 @@ arrow_1.pipeline.eval_pandas({
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -218,4 +182,5 @@ arrow_1.pipeline.eval_pandas({
 More on the categorical arrow treatment of data transformations can be found [here](https://github.com/WinVector/data_algebra/blob/master/Examples/Arrow/Arrow.md).
 
 (Examples of advanced inter-operation between the [`R` `rquery` package](https://github.com/WinVector/rquery/) and the [`Python` `data_algebra` package](https://github.com/WinVector/data_algebra) and `SQL` can be found [here](https://github.com/WinVector/data_algebra/blob/master/Examples/LogisticExample/ScoringExample.md).)
+
 
