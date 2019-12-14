@@ -1,18 +1,18 @@
 <h2>Introduction</h2>
 
-I would like to talk about some of the design principles in the <a href="https://github.com/WinVector/data_algebra"><code>data_algebra</code> package</a> (and also in its sibling <a href="https://github.com/WinVector/rquery"><code>rquery</code> package</a>).
+I would like to talk about some of the design principles underlying the <a href="https://github.com/WinVector/data_algebra"><code>data_algebra</code> package</a> (and also in its sibling <a href="https://github.com/WinVector/rquery"><code>rquery</code> package</a>).
 
-What the <a href="https://github.com/WinVector/data_algebra"><code>data_algebra</code> package</a> is (a query generator that can act on either <a href="https://pandas.pydata.org"><code>Pandas</code></a> data frames or on <a href="https://en.wikipedia.org/wiki/SQL"><code>SQL</code></a> tables) we have already discussed on the <a href="https://github.com/WinVector/data_algebra">project</a> site and the <a href="https://github.com/WinVector/data_algebra/tree/master/Examples">examples directory</a>.  In this note we will set up some technical terminology that will allow us to discuss some of the underlying design decisions.  These are things that when they are done well, the user doesn't have to think much about.
+The <a href="https://github.com/WinVector/data_algebra"><code>data_algebra</code> package</a> is a query generator that can act on either <a href="https://pandas.pydata.org"><code>Pandas</code></a> data frames or on <a href="https://en.wikipedia.org/wiki/SQL"><code>SQL</code></a> tables. This is discussed on the <a href="https://github.com/WinVector/data_algebra">project</a> site and the <a href="https://github.com/WinVector/data_algebra/tree/master/Examples">examples directory</a>.  In this note we will set up some technical terminology that will allow us to discuss some of the underlying design decisions.  These are things that when they are done well, the user doesn't have to think much about. Discussing such design decisions at length can obscure some of their charm, but we would like to point out some features here.
 
 <!--more--><p/>
 
 <h2>Background</h2>
 
+We will introduce a few ideas before trying to synthesize our thesis.
+
 <h3>The <code>data_algebra</code></h3>
     
-An introduction to the <code>data_algebra</code> package can be found [here](https://github.com/WinVector/data_algebra/blob/master/Examples/Introduction/data_algebra_Introduction.md).  In this note we will discuss some of the
-inspirations for the package (Codd's relational algebra, and experience working with [<code>dplyr</code>](https://CRAN.R-project.org/package=dplyr) at scale), and the category theory influences on the design.
-
+An introduction to the <code>data_algebra</code> package can be found [here](https://github.com/WinVector/data_algebra/blob/master/Examples/Introduction/data_algebra_Introduction.md).  In this note we will discuss some of the inspirations for the package: Codd's relational algebra, experience working with [<code>dplyr</code>](https://CRAN.R-project.org/package=dplyr) at scale, sklearn Pipeline, and category theory.
 
 <h3>sklearn Pipeline</h3>
 
@@ -20,24 +20,26 @@ A major influence on the <code>data_algebra</code> design is <a href="https://sc
 
 <code>sklearn.pipeline.Pipeline</code> maintains a list of steps to be applied to data.  What is interesting is the steps are <em>not</em> functions. Steps are instead objects that implement both a <code>.transform()</code> and a <code>.fit()</code> method.
 
-<code>.transform()</code> typically accepts a data-frame type structure and returns a modified version.  Typical operations include adding a new derived column, selected columns, selected rows, and so on.
+<code>.transform()</code> typically accepts a data-frame type structure and returns a modified version.  Typical operations include adding a new derived column, selecting columns, selecting rows, and so on.
 
 From a transform-alone point of view the steps compose like functions.  For list <code>[s, t]</code> <code>transform(x)</code> is defined to as:
 
-<pre><code>   transform([s, t], x) = 
+<pre><code>   transform([s, t], x) := 
       t.transform(s.transform(x))</pre></code>
+      
+(the glyph "<code>:=</code>" denoting "defined as").
 
-The fit-perspective are where things get interesting.  <code>obj.fit(x)</code> changes the internal state of obj based on the value <code>x</code> and returns a reference to <code>obj</code>.  I.e. it learns from the data and stores this result as a side-effect in the object itself.  In <code>sklearn</code> it is common to assume a composite method called <code>.fit_transform()</code> defined as: 
+The fit-perspective is where things get interesting.  <code>obj.fit(x)</code> changes the internal state of obj based on the value <code>x</code> and returns a reference to <code>obj</code>.  I.e. it learns from the data and stores this result as a side-effect in the object itself.  In <code>sklearn</code> it is common to assume a composite method called <code>.fit_transform()</code> often defined as: 
 <code><pre>   obj.fit_transform(x) := obj.fit(x).transform(x)</pre></code>
-(the "<code>:=</code>" denoting "defined as").
+(though for our own <a href="https://github.com/WinVector/pyvtreat"><code>vtreat</code></a> package, this is deliberately not the case).
 
 Using <code>.fit_transform()</code> we can explain that in a <code>sklearn Pipeline</code> <code>.fit()</code> is naturally thought of as:
-<code><pre>   fit([s, t], x]) = 
+<code><pre>   fit([s, t], x]) := 
       t.fit(s.fit_transform(x))</pre></code>
 
-My point is: <code>sklearn.pipeline.Pipeline</code> generalizes function composition (as we see with the <code>.transform()</code> methods) to something more powerful (the ability to both fit and to transform).  This becomes the natural way to store a sequence of parameterized or data-dependent data transform steps (such as centering, scaling, missing value imputation, and much more).
+My point is: <code>sklearn.pipeline.Pipeline</code> generalizes function composition to something more powerful: the ability to both fit and to transform. <code>sklearn.pipeline.Pipeline</code> is a natural way to store a sequence of parameterized or data-dependent data transform steps (such as centering, scaling, missing value imputation, and much more).
 
-A rigid mindset where "function composition is the only form of composition" would not easily allow the above effects. Instead the composition idea is list concatenation or a free group (essentially the graduate school way of saying "list concatenation").
+This gives as a concrete example of where rigid mindset where "function composition is the only form of composition" would not miss design opportunities.
 
 <h3>Fist class citizens</h3>
 
@@ -67,14 +69,27 @@ A lot of the benefit of <a href="https://en.wikipedia.org/wiki/Category_theory">
 
 Category theory routinely studies what are called "arrows."  When treated abstractly an arrow has two associated objects called the "domain" and "co-domain." The names are meant to be evocative of the "domain" (space of inputs) and "co-domains" (space of outputs) from the theory of functions.
 
-Category theory differs from function theory in that category theory is careful to keep separate the following two concepts: what arrows are and how arrows are composed.
-
-When using arrows to model a system we expect to be able to specify, with some degree of freedom:
+Functions are commonly defined as having:
 
 <ul>
-<li>Which arrow(s) are associated with a given domain and co-domain pair.</li>
-<li>How arrows compose.  For arrows <code>a</code> and <code>b</code> with <code>co-domain(b) = domain(a)</code> then: <code>a . b</code> denotes the composition in the category, and is itself a new arrow in the same category.  Composition is not allowed (or defined) when <code>co-domain(b) != domain(a)</code>.</li>
-<li>How arrows <a href="https://ncatlab.org/nlab/show/action">act</a> on items.</li> 
+    <li>A domain, which is a set of values the function can be applied to.</li>
+    <li>A co-domain, which is a set of values the function evaluations are contained in (or range).</li>
+    <li>A <em>fixed</em> composition rule that if <code>domain(g)</code> is contained in <code>co-domain(f)</code> then:
+        <code>g . f</code> is defined as the function such that <code>(g . f)(x) = g(f(x))</code> for all values in 
+        the domain of f. Mathematical functions are usually thought of as a specialization of <a href="https://en.wikipedia.org/wiki/Binary_relation">binary relation</a>, and considered to be uniquely determined by their
+    evaluations (by the <a href="https://en.wikipedia.org/wiki/Axiom_of_extensionality">axiom of extensionality</a>).</li>
+</ul>
+
+Packages that use function composition typically collect functions in lists and define operator composition either through lambda-abstraction or through list concatenation (appealing to 
+
+Category theory differs from function theory in that category theory talks about arrows instead of functions. The theory is careful to keep separate the following two concepts: what arrows are and how arrows are composed.
+
+When using arrows to model a system we expect to be able to specify, with some extra degrees of freedom in specifying:
+
+<ul>
+    <li>How to choose domains and co-domains, for categories these do not have to be sets.</li>
+    <li>How arrows compose.  For arrows <code>a</code> and <code>b</code> with <code>co-domain(b) = domain(a)</code> then: <code>a . b</code> denotes the composition in the category, and is itself a new arrow in the same category.  Composition is not allowed (or defined) when <code>co-domain(b) != domain(a)</code>.</li>
+    <li>How arrows <a href="https://ncatlab.org/nlab/show/action"><em>act</em></a> on items. Arrows can have multiple actions, and arrows can act on items that are not elements of their domains.</li> 
 </ul>
 
 An action is a mapping from arrows and items to items.  I.e. <code>action(arrow, item) = new_item</code>. For categories the items may or may not be related to the domain and co-domain. Not all categories have actions, but when they do have actions the action must be compatible with arrow composition.
@@ -88,7 +103,7 @@ Good general references on category theory, include:
 </ul>
 
 
-Functions have a very ready category theory interpretation as arrows.  We can treat a function <code>f</code> as an arrow with domain equal to the set of values the function is defined for (also called the domain of the function) with co-domain equal to the image of the domain (also called the range of a function), or any set containing the range of the function.  In this formulation we define the arrow composition of <code>f</code> and <code>g</code> as <code>f . g</code> is defined to be the function such that for all <code>x</code> in domain <code>x</code> we have:
+Functions have a very ready category theory interpretation as arrows.  Given a function <code>f</code> with domain <code>A</code> and co-domain <code>B</code>, we can think of any triple <code>(f, A', B')</code> as an arrow in a category of functions if <code>A' contained in A</code> and <code>B contained in B'</code>. In this formulation we define the arrow composition of <code><code>(f, A', B')</code></code> and <code>(g, C', D')</code> as <code>(f . g, D', B')</code> where <code>f . g</code>is defined to be the function such that for all <code>x</code> in domain <code>x</code> we have:
 <code><pre>   (f . g)(x) := f(g(x)) </pre></code>
 
 We will call the application of a function to a value as an example of an "<a href="https://ncatlab.org/nlab/show/action">action</a>." A function <code>f()</code> "acts on its domain" and <code>f(x)</code> is the action of <code>f</code> on <code>x</code>.  For functions we can define the action "<code>apply</code>" as:
@@ -98,8 +113,8 @@ The extra generalization power we get from moving away from functions to arbitra
 
 <ul>
 <li>Arrow composition does <em>not</em> have to be function composition.</li>
-<li>Arrows can <a href="https://ncatlab.org/nlab/show/action">act</a> on items that are <em>not</em> elements of their domain.</li>
-<li>Arrows have a notion of equality, but this notion <em>can differ</em> from having identical actions.  (Functions that have identical actions are usually considered to be identical by the <a href="https://en.wikipedia.org/wiki/Axiom_of_extensionality">axiom of extensionality</a>.)</li>
+<li>Arrows can have multiple actions, and <a href="https://ncatlab.org/nlab/show/action">act</a> on items that are <em>not</em> elements of their domain.</li>
+<li>Arrows have a notion of equality, but this notion <em>can differ</em> from having identical actions.</li>
 </ul>
 
 To be a category a few conditions must be met, including: the composition must be associative and we must have some identity arrows. By "associative composition" we mean, it must be the case that for arrows <code>a</code>,
@@ -113,9 +128,9 @@ Or for contra-variant actions:
 <code><pre>   apply(a . b, x) = apply(b, apply(a, x))</pre></code>
 
 
-The idea is: the arrow <code>a . b</code> must have an action equal to the actions of a and b composed as functions.
+The idea is: the arrow <code>a . b</code> must have an action equal to the actions of a and b composed as functions. That is: arrow composition and actions can differ from function composition and function application, but they must be at least somewhat similar in that they remain <a href="https://en.wikipedia.org/wiki/Associative_property">associative</a>.
 
-Arrow composition and actions can differ from function composition and function application, but they must be at least somewhat similar in that they remain <a href="https://en.wikipedia.org/wiki/Associative_property">associative</a>.
+We now have the background to see that category theory arrows differ from functions in that arrows are more general (we can pick more of their properties) and require a bit more explicit bookkeeping.
 
 <h2>Back to <code>sklearn.pipeline.Pipeline</code></h2>
 
@@ -124,11 +139,11 @@ We now have enough notation to attempt a crude category theory description of <c
 Define our <code>sklearn.pipeline.Pipeline</code> category <code>P</code> as follows:
 
 <ul>
-<li>We have only one object called <code>0</code>. All arrows will have domain and co-domain equal to <code>0</code>, i.e.: we are not doing any interesting pre-condition checking in this category. </li>
+<li>We have only one object called <code>0</code>. All arrows will have domain and co-domain equal to <code>0</code>, i.e.: we are not doing any interesting pre-condition checking in this category. This sort of category is called a "<a href="https://ncatlab.org/nlab/show/monoid#inamonoidalcategory">monoid</a>."</li>
 <li>The arrows of our category are lists of steps.  
 Steps are again <code>Python</code> objects
 that define <code>.transform()</code>, <code>.fit()</code>, and <code>.fit_transform()</code> methods.</li>
-<li>Composition <code>a1 . a2</code> is defined as list concatenation <code>a2 + a1</code>.  "<code>+</code>" being <code>Python</code>'s list concatenate in this case, and the order set to match <code>sklearn.pipeline.Pipeline</code> list order convention.</li>
+<li>Composition <code>a1 . a2</code> is defined as the list concatenation: <code>a2 + a1</code>.  "<code>+</code>" being <code>Python</code>'s list concatenate in this case, and the order set to match <code>sklearn.pipeline.Pipeline</code> list order convention.</li>
 <li>We define an action called "<code>transform_action</code>" defined as:
 
 <code><pre>   transform_action([step1, step2, ..., stepk], x) := 
@@ -142,24 +157,25 @@ We can also try to model the <code>.fit_transform()</code> methods.  We will not
 
 <ul>
 <li>We define an action called "<code>fit_transform</code>" defined as:
-
 <code><pre>   fit_transform_action([step1, step2, ..., stepk], x) := 
       stepk.fit_transform(... step2.fit_transform(step1.fit_transform(x)) )</pre></code>
 </li>
 </ul>
 
-To confirm this is roughly an action, we would want check is if the following equality holds or not:
+To confirm this is an action (ignoring the side-effects), we would want check is if the following equality holds or not:
 <code><pre>  fit_transform_action(a . b, x) =
       fit_transform_action(b, fit_transform_action(a, x))
    </pre></code>
 
 The above should follow by brute pushing notation around (assuming we have defined <code>fit_transform_action</code> correctly, and sufficiently characterized <code>.fit_transform()</code>).
 
-Notice we didn't define a "<code>fit_action</code>" action, as it isn't obvious that has a not obvious that has a nice associative realization. This an example of theory driving the design: <code>fit_transform()</code> may be more fundamental than, and thus preferred over, <code>fit()</code>, due to the easier to argue associativity of <code>fit_transform()</code>.
+Notice we didn't directly define a "<code>fit_action</code>" action, as it isn't obvious that has a not obvious that has a nice associative realization. This an opportunity for theory to drive design; notation considerations hint that <code>fit_transform()</code> may be more fundamental than, and thus preferred over, <code>fit()</code>.
 
-The category theory concepts didn't so-much design <code>sklearn.pipeline.Pipeline</code>, but give us a set of criteria to evaluate <code>sklearn.pipeline.Pipeline</code> design.  We trust the category theory point of view is useful as it emphasizes associativity (which is a great propriety to have), and is routinely found to be a set of choices that work in complicated systems.  The feeling being: the design points category theory seems to suggest, turn out to be the one you want down the round.
+The category theory concepts didn't so-much design <code>sklearn.pipeline.Pipeline</code>, but give us a set of criteria to evaluate <code>sklearn.pipeline.Pipeline</code> design.  We trust the category theory point of view is useful as it emphasizes associativity (which is a great propriety to have), and is routinely found to be a set of choices that work in complicated systems.  The feeling being: the design points category theory seems to suggest, turn out to be the ones you want down the round.
 
 <h2>The <code>data_algebra</code></h2>
+
+Now that we have some terminology, lets get back to the <code>data_algebra</code>
 
 <h3>What is the <code>data_algebra</code>?</h3>
 
@@ -172,10 +188,10 @@ The category theory concepts didn't so-much design <code>sklearn.pipeline.Pipeli
  The operators are essentially those of the Codd relational algebra (select rows/columns, join, union-all, extend, project, and window functions).
 </li>
 <li>
-    Composition is left to right using method chaining.
+    Composition is left to right using <a href="https://en.wikipedia.org/wiki/Method_chaining">method chaining</a>.
 </li>
 <li>
-    Queries can be realized in <code>SQL</code> (targeting <code>PostgeSQL</code> and <code>Spark</code>) or in <code>Pandas</code> (hoping to extend to <code>modin</code>, <code>RAPIDS</code>, and others).
+    Queries can be realized by transforming to <code>SQL</code> (targeting <code>PostgeSQL</code>, <code>Spark</code>, and other implementations), or as acting on <code>Pandas</code> data (we are hoping to extend this to <code>modin</code>, <code>RAPIDS</code>, and others).
     </li>
     <li>The <code>data_algebra</code> has an <a href="https://www.r-project.org"><code>R</code></a> sibling package group
         (<a href="https://github.com/WinVector/rquery"><code>rquery</code></a>/<a href="https://github.com/WinVector/rqdatatable"><code>rqdatatable</code></a>) similar to <a href="https://CRAN.R-project.org/package=dplyr"><code>dplyr</code></a>.</li>
@@ -183,13 +199,13 @@ The category theory concepts didn't so-much design <code>sklearn.pipeline.Pipeli
 
 An introduction to the <code>data_algebra</code> can be found <a href="https://github.com/WinVector/data_algebra">here</a>.
 
-We now have the terminology to concisely state a <code>data_algebra</code> design principle: use general concepts (such as category theory notation) to try and ensure <code>data_algebra</code> steps have a good description and are first class citizens (i.e. we can do a lot with them and to them).
+We now have the terminology to concisely state a <code>data_algebra</code> design principle: use general concepts (such as category theory notation) to try and ensure <code>data_algebra</code> transforms are first class citizens (i.e. we can do a lot with them and to them).
 
 <h3>The naive functional view</h3>
 
-If we were to again take a mere functional view of the <a href="https://github.com/WinVector/data_algebra"><code>data_algebra</code></a> we would say the <code>data_algebra</code> is a set of functions that operate on data.  They translate data frames to new data frames using <a href="https://en.wikipedia.org/wiki/Relational_algebra">Codd]</a>-inspired operations. 
+If we were to again take a mere functional view of the <a href="https://github.com/WinVector/data_algebra"><code>data_algebra</code></a> we would say the <code>data_algebra</code> is a set of functions that operate on data.  They translate data frames to new data frames using <a href="https://en.wikipedia.org/wiki/Relational_algebra">Codd</a>-inspired operations. We could think of the <code>data_algebra</code> as acting on data on the right, and acting on <code>data_algebra</code> operators on the left.
 
-However, this is not correct.  <code>data_algebra</code> methods actually map data transforms to data transforms.  We only apply them to data later.  However even this is a "too functional view" as the <code>data_algebra</code> compose a manner different than mere function composition.
+However, this is not the right abstraction.  <code>data_algebra</code> methods primarily map data transforms to data transforms. However even this is a "too functional view". It makes sense to think of <code>data_algebra</code> operators as arrows, and the whole point of arrows is composition.
 
 <h3>The categorical view</h3>
 
@@ -206,15 +222,16 @@ Good references on the application of category theory to concrete systems (inclu
 Our <code>data_algebra</code> category <code>D</code> is defined as follows.
 
 <ul>
-    <li>The objects of our category are single table <a href="https://en.wikipedia.org/wiki/Database_schema">schemas</a>.</li>
+    <li>The objects of our category are single table <a href="https://en.wikipedia.org/wiki/Database_schema">schemas</a>.  By "single table schema" mean mean only the list of column names (and optionally column types) for a set of named tables.  We are not modeling invariants, or cross-table relations.</li>
     <li>The arrows of our category are <code>data_algebra</code> operator chains.</li>
-    <li>Composition of arrows in our category is query composition.  We will demonstrate query composition in a bit, but as a hint it is not function composition or list concatination.</li>
+    <li>Composition of arrows in our category is a very general query composition.  We will demonstrate query composition in a bit, but as a hint it is not function composition or list concatination.</li>
 </ul>
 
 Some notes on the category theory interpretation of the <code>data_algebra</code> package can be found <a href="https://github.com/WinVector/data_algebra/blob/master/Examples/Arrow/Arrow.md">here</a>.
 
 Let's demonstrate the above with <code>Python</code> code.  The <code>data_algebra</code> allows for the specification of data transforms as first class objects.
 
+First we import some modules and create some example data.
 
 
 ```python
@@ -337,7 +354,7 @@ a.transform(d)
 
 
 
-Or we can compose this transform with more operations to create a composite transform.
+We can compose this transform with more operations to create a composite transform.
 
 
 ```python
@@ -385,7 +402,7 @@ print(
        FROM ("data_frame") "SQ_0") "SQ_1"
 
 
-All of this is the convenient interface we expect users will want.  However, if we asked that all operators specified their expected input schema (or their domain) we have the cateogry <code>D</code>.  We don't expect users to do such, but we have code supporting this style of notation to show that the <code>data_algebra</code> is in fact related to a nice category over schemas.
+All of this is the convenient interface we expect users will want.  However, if we asked that all operators specified their expected input schema (or their domain) we have the category <code>D</code>.  We don't expect users to do such, but we have code supporting this style of notation to show that the <code>data_algebra</code> is in fact related to a nice category over schemas.
 
 Lets re-write the above queries as formal category arrows.
 
@@ -407,7 +424,7 @@ print(str(a1))
     
 
 
-The above is rendering the arrow as just its domain and co-domain. The doman and co-domains are just single-table schemas: lists of column names (possibly with column types).
+The above is rendering the arrow as just its domain and co-domain. The domain and co-domains are just single-table schemas: lists of column names (possibly with column types).
 
 We can get a more detailed representation of the arrow as follows.
 
@@ -427,7 +444,7 @@ print(a1.__repr__())
      free_table_key='data_frame')
 
 
-Or we can examine the domain and co-domain directly.  Here we are using a common category theory trick: associating the object with the identity arrow of the object.  So what we are showing as domain and co-domains are actually identity arrows instead of objets.
+Or we can examine the domain and co-domain directly.  Here we are using a common category theory trick: associating the object with the identity arrow of the object.  So what we are showing as domain and co-domains are actually identity arrows instead of objects.
 
 
 ```python
@@ -490,7 +507,7 @@ a2
 
 We took extra steps, that most users will not want to take, to wrap the second-stage (<code>a2</code>) operations as an arrow.  Being an arrow means that we have a domain and co-domain that can be used to check if operations are composable.
 
-A typical user would not work with arrow, but instead work with the data algebra which itself is a shorthand for the arrows. To add an extra operation a user would work directly with <code>a</code> and just write the following.
+A typical user would not work with arrow, but instead work with the data algebra which itself is a shorthand for the arrows. That is: the users may want the power of a category, but they don't want to be the one handling the extra bookkeeping. To add an extra operation a user would work directly with <code>a</code> and just write the following.
 
 
 ```python
@@ -516,7 +533,7 @@ a.extend({
 
 The above has substantial pre-condition checking and optimizations (as it is merely user facing shorthand for the arrows).
 
-The more cumbersome arrow notation (that requires the specification of pre-conditions) has a payoff: managed arrow composition. That is: we complex operator pipelines can be directly combined.  We are not limitted to extending one operation at a time.
+The more cumbersome arrow notation (that requires the specification of pre-conditions) has a payoff: managed arrow composition. That is: complex operator pipelines can be directly combined.  We are not limited to extending one operation at a time.
 
 If the co-domain of arrow matches the domain of another arrow we can compose them left to right as follows.
 
@@ -556,7 +573,7 @@ composite
 
 
 
-And when this isn't the case, compositio is not allowed.  This is exactly what we want as this means the preconditions (exactly which columns are present) for the second arrow are not supplied by the first arrow.
+And when this isn't the case, composition is not allowed.  This is exactly what we want as this means the preconditions (exactly which columns are present) for the second arrow are not supplied by the first arrow.
 
 
 ```python
@@ -581,7 +598,7 @@ except ValueError as e:
     Caught: extra incoming columns: {'ratio', 'z'}
 
 
-An important point is: for this arrow notation composition is not mere list concatination or function composition.  Here is an example that makes this clear.
+An important point is: for this arrow notation composition is not mere list concatenation or function composition.  Here is an example that makes this clear.
 
 
 ```python
@@ -617,6 +634,8 @@ b2 = DataOpArrow(TableDescription(column_names=['x', 'y'], table_name=None). \
 }))
 ```
 
+Now watch what happens when we use "<code>>></code>" to compose the arrow <code>b1</code> and <code>b2</code>.
+
 
 ```python
 b1 >> b2
@@ -637,7 +656,7 @@ b1 >> b2
 
 
 
-Notice in this special case the composition of <code>b1</code> and <code>b2</code> is a single extend node combining the operations and eliminating the dead-value <code>7</code>.  The idea is: the package has some freedom to define composition as long as it is associative.  In this case we have an optimization at the compose step so the composition is not list concatination or function composition.
+Notice in this special case the composition of <code>b1</code> and <code>b2</code> is a single extend node combining the operations and eliminating the dead-value <code>7</code>.  The idea is: the package has some freedom to define composition as long as it is associative.  In this case we have an optimization at the compose step so the composition is not list concatenation or function composition.
 
 As we have said, a typical user will not take the time to establish pre-conditions on steps.  So they are not so much working with arrows but with operators that can be specialized to arrows.  An actual user might build up the above pipeline as follows.
 
@@ -668,7 +687,12 @@ TableDescription(column_names=['x', 'y'], table_name=None). \
 
 
 
+We <a href="http://www.win-vector.com/blog/2019/12/what-is-new-for-rquery-december-2019/">recently</a> demonstrated this sort of optimization in the <code>R</code> <code>rquery</code> package.
+
+In the above example the user still benefits from the category theory design. As they composed left to right the system was able to add in the pre-conditions for them.  The user only needs to set pre-conditions for non-trivial right-hand side pipelines.
+
 <h2>Conclusion</h2>
 
-And that is an overview of how the <code>data_algebra</code> package leans towards category theory based design. The advantage is it lets us design the package action (how the package works on data) somewhat independently from operator composition.  That is as long as the two operations work correctly together, which turns out to be preseriving associativity.
+The advantage the <code>data_algebra</code> package gets from category theory is: it lets us design the package action (how the package works on data) somewhat independently from operator composition. This gives us a lot more design room and power than a strict function composition or list concatenation theory would give us.
+
 
