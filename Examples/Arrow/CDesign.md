@@ -80,7 +80,7 @@ Functions are commonly defined as having:
     evaluations (by the <a href="https://en.wikipedia.org/wiki/Axiom_of_extensionality">axiom of extensionality</a>).</li>
 </ul>
 
-Packages that use function composition typically collect functions in lists and define operator composition either through lambda-abstraction or through list concatenation (appealing to 
+Packages that use function composition typically collect functions in lists and define operator composition either through lambda-abstraction or through list concatenation.
 
 Category theory differs from function theory in that category theory talks about arrows instead of functions. The theory is careful to keep separate the following two concepts: what arrows are and how arrows are composed.
 
@@ -250,7 +250,19 @@ d
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -319,7 +331,19 @@ a.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -595,7 +619,7 @@ except ValueError as e:
     print("Caught: " + str(e))
 ```
 
-    Caught: extra incoming columns: {'z', 'ratio'}
+    Caught: extra incoming columns: {'ratio', 'z'}
 
 
 An important point is: for this arrow notation composition is not mere list concatenation or function composition.  Here is an example that makes this clear.
@@ -694,5 +718,4 @@ In the above example the user still benefits from the category theory design. As
 <h2>Conclusion</h2>
 
 The advantage the <code>data_algebra</code> package gets from category theory is: it lets us design the package action (how the package works on data) somewhat independently from operator composition. This gives us a lot more design room and power than a strict function composition or list concatenation theory would give us.
-
 
