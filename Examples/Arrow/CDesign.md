@@ -103,7 +103,7 @@ Good general references on category theory, include:
 </ul>
 
 
-Functions have a very ready category theory interpretation as arrows.  Given a function <code>f</code> with domain <code>A</code> and co-domain <code>B</code>, we can think of any triple <code>(f, A', B')</code> as an arrow in a category of functions if <code>A' contained in A</code> and <code>B contained in B'</code>. In this formulation we define the arrow composition of <code><code>(f, A', B')</code></code> and <code>(g, C', D')</code> as <code>(f . g, D', B')</code> where <code>f . g</code>is defined to be the function such that for all <code>x</code> in domain <code>x</code> we have:
+Functions have a very ready category theory interpretation as arrows.  Given a function <code>f</code> with domain <code>A</code> and co-domain <code>B</code>, we can think of any triple <code>(f, A', B')</code> as an arrow in a category of functions if <code>A' contained in A</code> and <code>B contained in B'</code>. In this formulation we define the arrow composition of <code><code>(f, A', B')</code></code> and <code>(g, C', D')</code> as <code>(f . g, C', B')</code> where <code>f . g</code>is defined to be the function such that for all <code>x</code> in domain <code>x</code> we have:
 <code><pre>   (f . g)(x) := f(g(x)) </pre></code>
 
 We will call the application of a function to a value as an example of an "<a href="https://ncatlab.org/nlab/show/action">action</a>." A function <code>f()</code> "acts on its domain" and <code>f(x)</code> is the action of <code>f</code> on <code>x</code>.  For functions we can define the action "<code>apply</code>" as:
@@ -250,7 +250,19 @@ d
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -319,7 +331,19 @@ a.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -595,7 +619,7 @@ except ValueError as e:
     print("Caught: " + str(e))
 ```
 
-    Caught: extra incoming columns: {'ratio', 'z'}
+    Caught: extra incoming columns: {'z', 'ratio'}
 
 
 An important point is: for this arrow notation composition is not mere list concatenation or function composition.  Here is an example that makes this clear.
@@ -694,5 +718,4 @@ In the above example the user still benefits from the category theory design. As
 <h2>Conclusion</h2>
 
 The advantage the <code>data_algebra</code> package gets from category theory is: it lets us design the package action (how the package works on data) somewhat independently from operator composition. This gives us a lot more design room and power than a strict function composition or list concatenation theory would give us.
-
 
