@@ -250,19 +250,7 @@ d
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -331,19 +319,7 @@ a.transform(d)
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -718,4 +694,5 @@ In the above example the user still benefits from the category theory design. As
 <h2>Conclusion</h2>
 
 The advantage the <code>data_algebra</code> package gets from category theory is: it lets us design the package action (how the package works on data) somewhat independently from operator composition. This gives us a lot more design room and power than a strict function composition or list concatenation theory would give us.
+
 
