@@ -662,7 +662,7 @@ print(a2)
 
     [
      'd2':
-      [ g, x, ngroup, v ]
+      [ v, x, ngroup, g ]
        ->
       [ g, ngroup, row_number, shift_v, v, x ]
     ]
@@ -917,7 +917,7 @@ print(a1 >> (a2 >> a3))
     
 
 
-All the compositions are in fact the same arrow, aswe can see by using it on data.
+All the compositions are in fact the same arrow, as we can see by using it on data.
 
 
 ```python

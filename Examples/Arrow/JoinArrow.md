@@ -1,4 +1,4 @@
-Converting a join to a an arrow ([`R` version](https://github.com/WinVector/rquery/blob/master/Examples/Arrow/JoinArrow.md), [`Python` version](https://github.com/WinVector/data_algebra/blob/master/Examples/Arrow/JoinArrow.md)).
+Converting a join to an arrow ([`R` version](https://github.com/WinVector/rquery/blob/master/Examples/Arrow/JoinArrow.md), [`Python` version](https://github.com/WinVector/data_algebra/blob/master/Examples/Arrow/JoinArrow.md)).
 
 
 ```python
