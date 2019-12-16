@@ -17,7 +17,7 @@ class Arrow:
         """return co-domain, object at head of arrow"""
         raise NotImplementedError("base class called")
 
-    def apply_to(self, b, *, strict=True):
+    def apply_to(self, b):
         """ apply_to b, compose arrows (right to left) """
         raise NotImplementedError("base class called")
 
@@ -27,21 +27,25 @@ class Arrow:
         raise NotImplementedError("base class called")
 
     def __rshift__(self, other):  # override self >> other
-        return other.apply_to(self, strict=True)
+        return other.apply_to(self)
 
     def __rrshift__(self, other):  # override other >> self
         if isinstance(other, Arrow):
-            return self.apply_to(other, strict=True)
+            return self.apply_to(other)
         return self.transform(other)
 
 
 class DataOpArrow(Arrow):
-    """ Represent a dag of operators as a categorical arrow."""
+    """
+    Represent a dag of operators as a categorical arrow.
 
-    def __init__(self, pipeline, *, free_table_key=None):
+    """
+
+    def __init__(self, pipeline, *, free_table_key=None, strict=False):
         if not isinstance(pipeline, data_algebra.data_ops.ViewRepresentation):
             raise TypeError("expected pipeline to be data_algebra.data_ops")
         self.pipeline = pipeline
+        self.strict = strict
         t_used = pipeline.get_tables()
         if free_table_key is None:
             if len(t_used) != 1:
@@ -66,7 +70,7 @@ class DataOpArrow(Arrow):
             self.outgoing_types = self.incoming_types.copy()
         Arrow.__init__(self)
 
-    def apply_to(self, b, *, strict=True):
+    def apply_to(self, b):
         """replace self input table with b"""
         if isinstance(b, data_algebra.data_ops.ViewRepresentation):
             b = DataOpArrow(b)
@@ -75,7 +79,7 @@ class DataOpArrow(Arrow):
         missing = set(self.incoming_columns) - set(b.outgoing_columns)
         if len(missing) > 0:
             raise ValueError("missing required columns: " + str(missing))
-        if strict:
+        if self.strict:
             excess = set(b.outgoing_columns) - set(self.incoming_columns)
             if len(excess) > 0:
                 raise ValueError("extra incoming columns: " + str(excess))

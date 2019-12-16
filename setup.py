@@ -20,7 +20,7 @@ Recommended packages include: PyYAML (supplies yaml), sqlparse, and black.
 
 setuptools.setup(
     name='data_algebra',
-    version='0.3.8',
+    version='0.3.9',
     author='John Mount',
     author_email='jmount@win-vector.com',
     url='https://github.com/WinVector/data_algebra',
