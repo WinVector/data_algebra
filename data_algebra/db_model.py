@@ -197,16 +197,16 @@ class DBModel:
             raise TypeError(
                 "Expected table_def to be a data_algebra.data_ops.TableDescription)"
             )
+        if using is None:
+            using = table_def.column_set
+        if len(using) < 1:
+            raise ValueError("must select at least one column")
+        missing = using - table_def.column_set
+        if len(missing) > 0:
+            raise KeyError("referred to unknown columns: " + str(missing))
+        cols_using = [c for c in table_def.column_names if c in using]
+        cols = [self.quote_identifier(ci) for ci in cols_using]
         if force_sql:
-            if using is None:
-                using = table_def.column_set
-            if len(using) < 1:
-                raise ValueError("must select at least one column")
-            missing = using - table_def.column_set
-            if len(missing) > 0:
-                raise KeyError("referred to unknown columns: " + str(missing))
-            cols_using = [c for c in table_def.column_names if c in using]
-            cols = [self.quote_identifier(ci) for ci in cols_using]
             sql_str = (
                 "SELECT "
                 + ", ".join(cols)
