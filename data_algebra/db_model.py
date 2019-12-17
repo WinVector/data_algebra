@@ -458,7 +458,7 @@ class DBModel:
         )
         view_name = "order_rows_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        terms = {ci:None for ci in subusing}
+        terms = {ci: None for ci in subusing}
         suffix = ''
         if len(order_node.order_columns) > 0:
             suffix = (
