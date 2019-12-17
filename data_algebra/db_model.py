@@ -263,15 +263,15 @@ class DBModel:
                 window_term = window_term + "ORDER BY " + ", ".join(rt) + " "
             window_term = window_term + " ) "
         terms = {ci: self.expr_to_sql(oi) + window_term for (ci, oi) in subops.items()}
-        origcols = {k: self.quote_identifier(k) for k in using if k not in subops.keys()}
+        origcols = {k: None for k in using if k not in subops.keys()}
         if len(origcols) > 0:
             terms.update(origcols)
         view_name = "extend_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         near_sql = data_algebra.near_sql.NearSQL(
+            previous_step=subsql,
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
-            sub_is_table=subsql.quoted_table_name is not None,
             sub_sql=subsql.to_sql(columns=subusing, db_model=self)
         )
         return near_sql
@@ -290,27 +290,25 @@ class DBModel:
         if (len(project_node.group_by) + len(subusing)) < 1:
             raise ValueError("must use at least one column")
         grouping = [g for g in project_node.group_by]
-        derived = [
-            self.expr_to_sql(oi) + " AS " + self.quote_identifier(ci)
-            for (ci, oi) in subops.items()
-        ]
+        terms = {ci: self.expr_to_sql(oi) for (ci, oi) in subops.items()}
+        terms.update({g: None for g in project_node.group_by})
         subsql = project_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
-        sub_view_name = "SQ_" + str(temp_id_source[0])
+        view_name = "project_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        sql_str = (
-            "SELECT "
-            + ", ".join(grouping + derived)
-            + " FROM ( "
-            + subsql
-            + " ) "
-            + self.quote_identifier(sub_view_name)
-        )
+        suffix = None
         if len(project_node.group_by) > 0:
             group_terms = [self.quote_identifier(c) for c in project_node.group_by]
-            sql_str = sql_str + " GROUP BY " + ", ".join(group_terms)
-        return sql_str
+            suffix = "GROUP BY " + ", ".join(group_terms)
+        near_sql = data_algebra.near_sql.NearSQL(
+            previous_step=subsql,
+            terms=terms,
+            quoted_query_name=self.quote_identifier(view_name),
+            sub_sql=subsql.to_sql(columns=subusing, db_model=self),
+            suffix=suffix
+        )
+        return near_sql
 
     def select_rows_to_sql(self, select_rows_node, *, using=None, temp_id_source=None):
         if select_rows_node.node_name != "SelectRowsNode":

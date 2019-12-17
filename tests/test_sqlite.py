@@ -1,5 +1,7 @@
 import sqlite3
 
+import pandas
+
 import data_algebra.test_util
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 import data_algebra.SQLite
@@ -68,3 +70,54 @@ def test_sqlite():
     res2 = ops.eval_pandas(data_map={"stocks": d2})
 
     assert data_algebra.test_util.equivalent_frames(res2, expect)
+
+
+def test_sqllite_g2():
+    ops = TableDescription(
+        table_name='d',
+        column_names=['col1', 'col2', 'col3']). \
+        extend({
+        'sum23': 'col2 + col3'
+    }). \
+        extend({
+        'x': 1.0
+    }). \
+        extend({
+        'x': 2.0
+    }). \
+        extend({
+        'x': 3.0
+    }). \
+        extend({
+        'x': 4.0
+    }). \
+        extend({
+        'x': 5.0
+    }). \
+        project({'x': 'x.max()'},
+                group_by=['sum23']). \
+        extend({'ratio': 'x / sum23'}). \
+        select_columns(['ratio', 'sum23'])
+
+    d = pandas.DataFrame({
+        'col1': [1, 2, 2],
+        'col2': [3, 4, 3],
+        'col3': [4, 5, 7]
+    })
+
+    res_pandas = ops.transform(d)
+
+    sql_model = data_algebra.SQLite.SQLiteModel()
+
+    q = ops.to_sql(db_model=sql_model)
+
+    conn = sqlite3.connect(':memory:')
+    sql_model.prepare_connection(conn)
+    sql_model.insert_table(conn, d, table_name='d')
+
+    conn.execute('CREATE TABLE res AS ' + q)
+    res_sql = sql_model.read_table(conn, 'res')
+
+    conn.close()
+
+    assert data_algebra.test_util.equivalent_frames(res_pandas, res_sql)
