@@ -222,7 +222,12 @@ class ViewRepresentation(OperatorPlatform, ABC):
         raise NotImplementedError("base method called")
 
     # noinspection PyBroadException
-    def to_sql(self, db_model, *, pretty=False, encoding=None, sqlparse_options=None):
+    def to_sql(self,
+               db_model,
+               *,
+               pretty=False,
+               encoding=None,
+               sqlparse_options=None):
         if sqlparse_options is None:
             sqlparse_options = {"reindent": True, "keyword_case": "upper"}
         if not isinstance(db_model, data_algebra.db_model.DBModel):
@@ -233,7 +238,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         temp_id_source = [0]
         sql_str = self.to_sql_implementation(
             db_model=db_model, using=None, temp_id_source=temp_id_source
-        )
+            ).to_sql(db_model=db_model, force_sql=True)
         if pretty and _have_sqlparse:
             try:
                 sql_str = sqlparse.format(
@@ -664,22 +669,10 @@ class TableDescription(ViewRepresentation):
     def columns_used_from_sources(self, using=None):
         return []  # no inputs to table description
 
-    def to_sql(self, db_model, *, pretty=False, encoding=None, sqlparse_options=None):
-        if sqlparse_options is None:
-            sqlparse_options = {"reindent": True, "keyword_case": "upper"}
-        self.columns_used()  # for table consistency check/raise
-        temp_id_source = [0]
-        sql_str = self.to_sql_implementation(
-            db_model=db_model, using=None, temp_id_source=temp_id_source, force_sql=True
-        )
-        if pretty and _have_sqlparse:
-            sql_str = sqlparse.format(sql_str, encoding=encoding, **sqlparse_options)
-        return sql_str
-
     def to_sql_implementation(
-        self, db_model, *, using, temp_id_source, force_sql=False
+        self, db_model, *, using, temp_id_source
     ):
-        return db_model.table_def_to_sql(self, using=using, force_sql=force_sql)
+        return db_model.table_def_to_sql(self, using=using, temp_id_source=temp_id_source)
 
     # comparable to other table descriptions
     def __lt__(self, other):

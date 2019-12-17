@@ -4,6 +4,7 @@ import io
 
 import data_algebra
 
+import data_algebra.near_sql
 import data_algebra.expr_rep
 import data_algebra.util
 import data_algebra.data_ops_types
@@ -192,11 +193,13 @@ class DBModel:
             return op.upper() + "(" + ", ".join(subs) + ")"
         raise TypeError("unexpected type: " + str(type(expression)))
 
-    def table_def_to_sql(self, table_def, *, using=None, force_sql=False):
+    def table_def_to_sql(self, table_def, *, using=None, temp_id_source=None):
         if table_def.node_name != "TableDescription":
             raise TypeError(
                 "Expected table_def to be a data_algebra.data_ops.TableDescription)"
             )
+        if temp_id_source is None:
+            temp_id_source = [0]
         if using is None:
             using = table_def.column_set
         if len(using) < 1:
@@ -205,16 +208,13 @@ class DBModel:
         if len(missing) > 0:
             raise KeyError("referred to unknown columns: " + str(missing))
         cols_using = [c for c in table_def.column_names if c in using]
-        cols = [self.quote_identifier(ci) for ci in cols_using]
-        if force_sql:
-            sql_str = (
-                "SELECT "
-                + ", ".join(cols)
-                + " FROM "
-                + self.quote_table_name(table_def)
-            )
-            return sql_str
-        return self.quote_table_name(table_def)
+        view_name = "table_reference_" + str(temp_id_source[0])
+        temp_id_source[0] = temp_id_source[0] + 1
+        near_sql = data_algebra.near_sql.NearSQL(
+            terms={k: self.quote_identifier(k) for k in cols_using},
+            quoted_query_name=self.quote_identifier(view_name),
+            quoted_table_name=self.quote_table_name(table_def))
+        return near_sql
 
     def extend_to_sql(self, extend_node, *, using=None, temp_id_source=None):
         if extend_node.node_name != "ExtendNode":
@@ -244,8 +244,6 @@ class DBModel:
         subsql = extend_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
-        sub_view_name = "SQ_" + str(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
         window_term = ""
         if (
             extend_node.windowed_situation
@@ -264,23 +262,19 @@ class DBModel:
                 ]
                 window_term = window_term + "ORDER BY " + ", ".join(rt) + " "
             window_term = window_term + " ) "
-        derived = [
-            self.expr_to_sql(oi) + window_term + " AS " + self.quote_identifier(ci)
-            for (ci, oi) in subops.items()
-        ]
-        origcols = [k for k in using if k not in subops.keys()]
+        terms = {ci: self.expr_to_sql(oi) + window_term for (ci, oi) in subops.items()}
+        origcols = {k: self.quote_identifier(k) for k in using if k not in subops.keys()}
         if len(origcols) > 0:
-            ordered_orig = [c for c in extend_node.column_names if c in set(origcols)]
-            derived = [self.quote_identifier(ci) for ci in ordered_orig] + derived
-        sql_str = (
-            "SELECT "
-            + ", ".join(derived)
-            + " FROM ( "
-            + subsql
-            + " ) "
-            + self.quote_identifier(sub_view_name)
+            terms.update(origcols)
+        view_name = "extend_" + str(temp_id_source[0])
+        temp_id_source[0] = temp_id_source[0] + 1
+        near_sql = data_algebra.near_sql.NearSQL(
+            terms=terms,
+            quoted_query_name=self.quote_identifier(view_name),
+            sub_is_table=subsql.quoted_table_name is not None,
+            sub_sql=subsql.to_sql(columns=subusing, db_model=self)
         )
-        return sql_str
+        return near_sql
 
     def project_to_sql(self, project_node, *, using=None, temp_id_source=None):
         if project_node.node_name != "ProjectNode":
@@ -360,19 +354,9 @@ class DBModel:
         subsql = select_columns_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
-        # TODO: make sure select rows doesn't force its partition and order columns in, and then
-        #       return the subsql here instead of tacking on an additional query.
-        sub_view_name = "SQ_" + str(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
-        sql_str = (
-            "SELECT "
-            + ", ".join([self.quote_identifier(ci) for ci in subusing])
-            + " FROM ( "
-            + subsql
-            + " ) "
-            + self.quote_identifier(sub_view_name)
-        )
-        return sql_str
+        # see if we can order columns
+        subsql.terms = {k: subsql.terms[k] for k in select_columns_node.column_selection if k in subusing}
+        return subsql
 
     def drop_columns_to_sql(
         self, drop_columns_node, *, using=None, temp_id_source=None
@@ -389,8 +373,6 @@ class DBModel:
         subsql = drop_columns_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
-        # TODO: make sure select rows doesn't force its partition and order columns in, and then
-        #       return the subsql here instead of tacking on an additional query.
         sub_view_name = "SQ_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         sql_str = (
@@ -416,8 +398,6 @@ class DBModel:
         subsql = order_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
-        # TODO: make sure extend doesn't force its partition and order columns in, and then
-        #       return the subsql here instead of tacking on an additional query.
         sub_view_name = "SQ_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         sql_str = (
