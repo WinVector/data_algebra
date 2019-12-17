@@ -97,11 +97,14 @@ def test_sqllite_g2():
         project({'x': 'x.max()'},
                 group_by=['sum23']). \
         extend({'ratio': 'x / sum23',
-                'sum': 'x + sum23'}). \
-        select_columns(['ratio', 'sum23']). \
+                'sum': 'x + sum23',
+                'diff': 'x - sum23'}). \
+        select_columns(['ratio', 'sum23', 'diff']). \
         select_rows('sum23 > 8'). \
         drop_columns(['sum23']). \
-        order_rows(['ratio'])
+        rename_columns({'rat': 'ratio'}). \
+        rename_columns({'rat': 'diff', 'diff': 'rat'}). \
+        order_rows(['rat'])
 
     d = pandas.DataFrame({
         'col1': [1, 2, 2],

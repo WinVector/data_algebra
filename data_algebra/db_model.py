@@ -496,25 +496,20 @@ class DBModel:
         subsql = rename_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
-        sub_view_name = "SQ_" + str(temp_id_source[0])
+        view_name = "rename_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         unchanged_columns = subusing - set(rename_node.column_remapping.values()).union(
             rename_node.column_remapping.keys()
         )
-        copies = [self.quote_identifier(vi) for vi in unchanged_columns]
-        remaps = [
-            self.quote_identifier(vi) + " AS " + self.quote_identifier(ki)
-            for (ki, vi) in rename_node.column_remapping.items()
-        ]
-        sql_str = (
-            "SELECT "
-            + ", ".join(copies + remaps)
-            + " FROM ( "
-            + subsql
-            + " ) "
-            + self.quote_identifier(sub_view_name)
+        terms = {ki: self.quote_identifier(vi) for (ki, vi) in rename_node.column_remapping.items()}
+        terms.update({vi: None for vi in unchanged_columns})
+        near_sql = data_algebra.near_sql.NearSQL(
+            previous_step=subsql,
+            terms=terms,
+            quoted_query_name=self.quote_identifier(view_name),
+            sub_sql=subsql.to_sql(columns=subusing, db_model=self)
         )
-        return sql_str
+        return near_sql
 
     def natural_join_to_sql(self, join_node, *, using=None, temp_id_source=None):
         if join_node.node_name != "NaturalJoinNode":
