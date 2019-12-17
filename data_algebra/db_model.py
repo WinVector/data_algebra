@@ -115,6 +115,78 @@ class DBModel:
     def prepare_connection(self, conn):
         pass
 
+    # database helpers
+
+    # noinspection SqlNoDataSourceInspection
+    def insert_table(self, conn, d, table_name, *, qualifiers=None):
+        """
+
+        :param conn: a database connection
+        :param d: a Pandas table
+        :param table_name: name to give write to
+        :param qualifiers: schema and such
+        :return:
+        """
+
+        cr = [
+            d.columns[i].lower()
+            + " "
+            + (
+                "double precision"
+                if data_algebra.util.can_convert_v_to_numeric(d[d.columns[i]])
+                else "VARCHAR"
+            )
+            for i in range(d.shape[1])
+        ]
+        q_table_name = self.build_qualified_table_name(
+            table_name, qualifiers=qualifiers
+        )
+        create_stmt = "CREATE TABLE " + q_table_name + " ( " + ", ".join(cr) + " )"
+        cur = conn.cursor()
+        cur.execute("DROP TABLE IF EXISTS " + q_table_name)
+        conn.commit()
+        cur.execute(create_stmt)
+        conn.commit()
+        buf = io.StringIO(d.to_csv(index=False, header=False, sep="\t"))
+        cur.copy_from(buf, "d", columns=[c for c in d.columns])
+        conn.commit()
+
+    def read_query(self, conn, q):
+        """
+
+        :param conn: database connection
+        :param q: sql query
+        :return:
+        """
+        cur = conn.cursor()
+        cur.execute(q)
+        r = cur.fetchall()
+        colnames = [desc[0] for desc in cur.description]
+        r = self.pd.DataFrame(columns=colnames, data=r)
+        r = r.reset_index(drop=True)
+        return r
+
+    # noinspection PyMethodMayBeStatic
+    def read_table(self, conn, table_name, *, qualifiers=None, limit=None):
+        if not isinstance(table_name, str):
+            raise TypeError("Expect table_name to be a str")
+        q_table_name = self.build_qualified_table_name(
+            table_name, qualifiers=qualifiers
+        )
+        sql = "SELECT * FROM " + q_table_name
+        if limit is not None:
+            sql = sql + " LIMIT " + limit
+        return self.read_query(conn, sql)
+
+    def read(self, conn, table):
+        if table.node_name != "TableDescription":
+            raise TypeError(
+                "Expect table to be a data_algebra.data_ops.TableDescription"
+            )
+        return self.read_table(
+            conn=conn, table_name=table.table_name, qualifiers=table.qualifiers
+        )
+
     def quote_identifier(self, identifier):
         if not isinstance(identifier, str):
             raise TypeError("expected identifier to be a str")
@@ -289,7 +361,6 @@ class DBModel:
         subusing = project_node.columns_used_from_sources(using=using)[0]
         if (len(project_node.group_by) + len(subusing)) < 1:
             raise ValueError("must use at least one column")
-        grouping = [g for g in project_node.group_by]
         terms = {ci: self.expr_to_sql(oi) for (ci, oi) in subops.items()}
         terms.update({g: None for g in project_node.group_by})
         subsql = project_node.sources[0].to_sql_implementation(
@@ -385,19 +456,13 @@ class DBModel:
         subsql = order_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
-        sub_view_name = "SQ_" + str(temp_id_source[0])
+        view_name = "order_rows_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        sql_str = (
-            "SELECT "
-            + ", ".join([self.quote_identifier(ci) for ci in subusing])
-            + " FROM ( "
-            + subsql
-            + " ) "
-            + self.quote_identifier(sub_view_name)
-        )
+        terms = {ci:None for ci in subusing}
+        suffix = ''
         if len(order_node.order_columns) > 0:
-            sql_str = (
-                sql_str
+            suffix = (
+                suffix
                 + " ORDER BY "
                 + ", ".join(
                     [
@@ -408,8 +473,15 @@ class DBModel:
                 )
             )
         if order_node.limit is not None:
-            sql_str = sql_str + " LIMIT " + order_node.limit.__repr__()
-        return sql_str
+            suffix = suffix + " LIMIT " + order_node.limit.__repr__()
+        near_sql = data_algebra.near_sql.NearSQL(
+            previous_step=subsql,
+            terms=terms,
+            quoted_query_name=self.quote_identifier(view_name),
+            sub_sql=subsql.to_sql(columns=subusing, db_model=self),
+            suffix=suffix
+        )
+        return near_sql
 
     def rename_to_sql(self, rename_node, *, using=None, temp_id_source=None):
         if rename_node.node_name != "RenameColumnsNode":
@@ -584,78 +656,6 @@ class DBModel:
             + self.quote_identifier(sub_view_name_right)
         )
         return sql_str
-
-    # database helpers
-
-    # noinspection SqlNoDataSourceInspection
-    def insert_table(self, conn, d, table_name, *, qualifiers=None):
-        """
-
-        :param conn: a database connection
-        :param d: a Pandas table
-        :param table_name: name to give write to
-        :param qualifiers: schema and such
-        :return:
-        """
-
-        cr = [
-            d.columns[i].lower()
-            + " "
-            + (
-                "double precision"
-                if data_algebra.util.can_convert_v_to_numeric(d[d.columns[i]])
-                else "VARCHAR"
-            )
-            for i in range(d.shape[1])
-        ]
-        q_table_name = self.build_qualified_table_name(
-            table_name, qualifiers=qualifiers
-        )
-        create_stmt = "CREATE TABLE " + q_table_name + " ( " + ", ".join(cr) + " )"
-        cur = conn.cursor()
-        cur.execute("DROP TABLE IF EXISTS " + q_table_name)
-        conn.commit()
-        cur.execute(create_stmt)
-        conn.commit()
-        buf = io.StringIO(d.to_csv(index=False, header=False, sep="\t"))
-        cur.copy_from(buf, "d", columns=[c for c in d.columns])
-        conn.commit()
-
-    def read_query(self, conn, q):
-        """
-
-        :param conn: database connection
-        :param q: sql query
-        :return:
-        """
-        cur = conn.cursor()
-        cur.execute(q)
-        r = cur.fetchall()
-        colnames = [desc[0] for desc in cur.description]
-        r = self.pd.DataFrame(columns=colnames, data=r)
-        r = r.reset_index(drop=True)
-        return r
-
-    # noinspection PyMethodMayBeStatic
-    def read_table(self, conn, table_name, *, qualifiers=None, limit=None):
-        if not isinstance(table_name, str):
-            raise TypeError("Expect table_name to be a str")
-        q_table_name = self.build_qualified_table_name(
-            table_name, qualifiers=qualifiers
-        )
-        sql = "SELECT * FROM " + q_table_name
-        if limit is not None:
-            sql = sql + " LIMIT " + limit
-        return self.read_query(conn, sql)
-
-    def read(self, conn, table):
-        if table.node_name != "TableDescription":
-            raise TypeError(
-                "Expect table to be a data_algebra.data_ops.TableDescription"
-            )
-        return self.read_table(
-            conn=conn, table_name=table.table_name, qualifiers=table.qualifiers
-        )
 
     def row_recs_to_blocks_query(
         self, source_sql, record_spec, record_view, *, using=None, temp_id_source=None

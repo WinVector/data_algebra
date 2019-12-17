@@ -100,7 +100,8 @@ def test_sqllite_g2():
                 'sum': 'x + sum23'}). \
         select_columns(['ratio', 'sum23']). \
         select_rows('sum23 > 8'). \
-        drop_columns(['sum23'])
+        drop_columns(['sum23']). \
+        order_rows(['ratio'])
 
     d = pandas.DataFrame({
         'col1': [1, 2, 2],
@@ -118,9 +119,10 @@ def test_sqllite_g2():
     sql_model.prepare_connection(conn)
     sql_model.insert_table(conn, d, table_name='d')
 
-    conn.execute('CREATE TABLE res AS ' + q)
-    res_sql = sql_model.read_table(conn, 'res')
+    #conn.execute('CREATE TABLE res AS ' + q)
+    #res_sql = sql_model.read_table(conn, 'res')
+    res_sql = sql_model.read_query(conn, q)
 
     conn.close()
 
-    assert data_algebra.test_util.equivalent_frames(res_pandas, res_sql)
+    assert data_algebra.test_util.equivalent_frames(res_pandas, res_sql, check_row_order=True)
