@@ -323,19 +323,18 @@ class DBModel:
         subsql = select_rows_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
-        sub_view_name = "SQ_" + str(temp_id_source[0])
+        view_name = "select_rows_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        sql_str = (
-            "SELECT "
-            + ", ".join([self.quote_identifier(ci) for ci in using])
-            + " FROM ( "
-            + subsql
-            + " ) "
-            + self.quote_identifier(sub_view_name)
-            + " WHERE "
-            + self.expr_to_sql(select_rows_node.expr)
+        terms = {ci: None for ci in using}
+        suffix = " WHERE " + self.expr_to_sql(select_rows_node.expr)
+        near_sql = data_algebra.near_sql.NearSQL(
+            previous_step=subsql,
+            terms=terms,
+            quoted_query_name=self.quote_identifier(view_name),
+            sub_sql=subsql.to_sql(columns=subusing, db_model=self),
+            suffix=suffix
         )
-        return sql_str
+        return near_sql
 
     def select_columns_to_sql(
         self, select_columns_node, *, using=None, temp_id_source=None
@@ -371,17 +370,7 @@ class DBModel:
         subsql = drop_columns_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
-        sub_view_name = "SQ_" + str(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
-        sql_str = (
-            "SELECT "
-            + ", ".join([self.quote_identifier(ci) for ci in subusing])
-            + " FROM ( "
-            + subsql
-            + " ) "
-            + self.quote_identifier(sub_view_name)
-        )
-        return sql_str
+        return subsql
 
     def order_to_sql(self, order_node, *, using=None, temp_id_source=None):
         if order_node.node_name != "OrderRowsNode":
