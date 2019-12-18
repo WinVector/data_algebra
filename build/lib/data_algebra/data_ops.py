@@ -1999,9 +1999,9 @@ class ConvertRecordsNode(ViewRepresentation):
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         sub_query = self.sources[0].to_sql_implementation(
-            db_model=db_model, using=using, temp_id_source=temp_id_source
+            db_model=db_model, using=None, temp_id_source=temp_id_source
         )
-        query = sub_query.to_sql(columns=using, db_model=db_model)
+        query = sub_query.to_sql(columns=None, db_model=db_model)
         if self.record_map.blocks_in is not None:
             query = db_model.blocks_to_row_recs_query(
                 query, record_spec=self.record_map.blocks_in
@@ -2014,10 +2014,16 @@ class ConvertRecordsNode(ViewRepresentation):
             )
         if temp_id_source is None:
             temp_id_source = [0]
-        view_name = "convert_records_" + str(temp_id_source[0])
+        view_name = "convert_records_in_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
+        prev_view_name = "convert_records_out_" + str(temp_id_source[0])
+        temp_id_source[0] = temp_id_source[0] + 1
+        terms = {k: None for k in self.record_map.columns_produced}
         near_sql = data_algebra.near_sql.NearSQLq(
-            quoted_query_name=db_model.quote_identifier(view_name), query=query
+            quoted_query_name=db_model.quote_identifier(view_name),
+            prev_quoted_query_name=db_model.quote_identifier(prev_view_name),
+            query=query,
+            terms=terms
         )
         return near_sql
 

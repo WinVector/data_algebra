@@ -3,7 +3,10 @@ class NearSQL:
     Represent SQL queries in a mostly string-form
     """
 
-    def __init__(self, *, quoted_query_name):
+    def __init__(self, *, terms, quoted_query_name):
+        if (terms is None) or (not isinstance(terms, dict)) or (len(terms) <= 0):
+            raise ValueError("terms is supposed to be a non-empty dictionary")
+        self.terms = terms.copy()
         self.quoted_query_name = quoted_query_name
 
     def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model):
@@ -15,10 +18,7 @@ class NearSQL:
 
 class NearSQLTable(NearSQL):
     def __init__(self, *, terms, quoted_query_name, quoted_table_name):
-        NearSQL.__init__(self, quoted_query_name=quoted_query_name)
-        if (terms is None) or (not isinstance(terms, dict)) or (len(terms) <= 0):
-            raise ValueError("terms is supposed to be a non-empty dictionary")
-        self.terms = terms.copy()
+        NearSQL.__init__(self, terms=terms, quoted_query_name=quoted_query_name)
         self.quoted_table_name = quoted_table_name
 
     def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model):
@@ -43,10 +43,7 @@ class NearSQLUnaryStep(NearSQL):
     def __init__(
         self, *, terms, quoted_query_name, sub_sql, suffix="", previous_step_summary
     ):
-        NearSQL.__init__(self, quoted_query_name=quoted_query_name)
-        if (terms is None) or (not isinstance(terms, dict)) or (len(terms) <= 0):
-            raise ValueError("terms is supposed to be a non-empty dictionary")
-        self.terms = terms.copy()
+        NearSQL.__init__(self, terms=terms, quoted_query_name=quoted_query_name)
         self.sub_sql = sub_sql
         self.suffix = suffix
         if not isinstance(previous_step_summary, dict):
@@ -96,10 +93,7 @@ class NearSQLBinaryStep(NearSQL):
         previous_step_summary2,
         suffix=""
     ):
-        NearSQL.__init__(self, quoted_query_name=quoted_query_name)
-        if (terms is None) or (not isinstance(terms, dict)) or (len(terms) <= 0):
-            raise ValueError("terms is supposed to be a non-empty dictionary")
-        self.terms = terms.copy()
+        NearSQL.__init__(self, terms=terms, quoted_query_name=quoted_query_name)
         self.sub_sql1 = sub_sql1
         if not isinstance(previous_step_summary1, dict):
             raise TypeError("expected previous step to be a dict")
@@ -174,10 +168,7 @@ class NearSQLUStep(NearSQL):
         sub_sql2,
         previous_step_summary2
     ):
-        NearSQL.__init__(self, quoted_query_name=quoted_query_name)
-        if (terms is None) or (not isinstance(terms, dict)) or (len(terms) <= 0):
-            raise ValueError("terms is supposed to be a non-empty dictionary")
-        self.terms = terms.copy()
+        NearSQL.__init__(self, terms=terms, quoted_query_name=quoted_query_name)
         self.sub_sql1 = sub_sql1
         if not isinstance(previous_step_summary1, dict):
             raise TypeError("expected previous step to be a dict")
@@ -239,11 +230,29 @@ class NearSQLUStep(NearSQL):
 
 
 class NearSQLq(NearSQL):
-    def __init__(self, *, quoted_query_name, query):
-        NearSQL.__init__(self, quoted_query_name=quoted_query_name)
+    def __init__(self, *, quoted_query_name, query, terms, prev_quoted_query_name):
+        NearSQL.__init__(self,
+                         terms=terms,
+                         quoted_query_name=quoted_query_name)
         self.query = query
+        self.prev_quoted_query_name = prev_quoted_query_name
 
     def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model):
+        if columns is None:
+            columns = [k for k in self.terms.keys()]
+        terms = self.terms
         if (constants is not None) and (len(constants) > 0):
-            raise ValueError("constants must be empty")
+            terms.update(constants)
+
+        def enc_term(k):
+            v = terms[k]
+            if v is None:
+                return db_model.quote_identifier(k)
+            return v + " AS " + db_model.quote_identifier(k)
+
+        terms_strs = [enc_term(k) for k in columns]
+        return ( "SELECT "
+                 + ', '.join(terms_strs)
+                 + " FROM ( " + self.query + " ) " + self.prev_quoted_query_name
+                 )
         return self.query
