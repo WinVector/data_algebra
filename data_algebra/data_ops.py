@@ -13,6 +13,7 @@ import data_algebra.expr_rep
 import data_algebra.env
 from data_algebra.data_ops_types import *
 import data_algebra.data_ops_utils
+import data_algebra.near_sql
 
 _have_black = False
 try:
@@ -238,7 +239,10 @@ class ViewRepresentation(OperatorPlatform, ABC):
         temp_id_source = [0]
         sql_str = self.to_sql_implementation(
             db_model=db_model, using=None, temp_id_source=temp_id_source
-            ).to_sql(db_model=db_model, force_sql=True)
+            )
+        if isinstance(sql_str, str):
+            print('break')
+        sql_str = sql_str.to_sql(db_model=db_model, force_sql=True)
         if pretty and _have_sqlparse:
             try:
                 sql_str = sqlparse.format(
@@ -2000,18 +2004,27 @@ class ConvertRecordsNode(ViewRepresentation):
         return s
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
-        res = self.sources[0].to_sql_implementation(
+        sub_query = self.sources[0].to_sql_implementation(
             db_model=db_model, using=using, temp_id_source=temp_id_source
         )
+        query = sub_query.to_sql(
+               columns=using,
+               db_model=db_model)
         if self.record_map.blocks_in is not None:
-            res = db_model.blocks_to_row_recs_query(
-                res, record_spec=self.record_map.blocks_in
+            query = db_model.blocks_to_row_recs_query(
+                query, record_spec=self.record_map.blocks_in
             )
         if self.record_map.blocks_out is not None:
-            res = db_model.row_recs_to_blocks_query(
-                res, record_spec=self.record_map.blocks_out, record_view=self.sources[1]
+            query = db_model.row_recs_to_blocks_query(
+                query, record_spec=self.record_map.blocks_out, record_view=self.sources[1]
             )
-        return res
+        if temp_id_source is None:
+            temp_id_source = [0]
+        view_name = "convert_records_" + str(temp_id_source[0])
+        temp_id_source[0] = temp_id_source[0] + 1
+        near_sql = data_algebra.near_sql.NearSQLq(quoted_query_name=db_model.quote_identifier(view_name),
+                                                  query=query)
+        return near_sql
 
     def eval_implementation(self, *, data_map, eval_env, data_model):
         if data_model is None:

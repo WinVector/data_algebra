@@ -610,11 +610,9 @@ class DBModel:
         sql_left = concat_node.sources[0].to_sql_implementation(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
-        sub_view_name_left = sql_left.quoted_query_name
         sql_right = concat_node.sources[1].to_sql_implementation(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
-        sub_view_name_right = sql_right.quoted_query_name
         view_name = "concat_rows_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         terms = {ci: None for ci in using_left}
@@ -704,7 +702,7 @@ class DBModel:
             + "CROSS JOIN (\n  "
             + record_view.to_sql_implementation(
                 self, using=using, temp_id_source=temp_id_source
-            )
+            ).to_sql(db_model=self, columns=using, force_sql=True)
             + " ) b\n"
             + " ORDER BY "
             + ", ".join(control_cols)

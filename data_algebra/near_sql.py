@@ -7,11 +7,7 @@ class NearSQL:
 
     def __init__(self,
                  *,
-                 terms,
                  quoted_query_name):
-        if (terms is None) or (not isinstance(terms, dict)) or (len(terms) <= 0):
-            raise ValueError("terms is supposed to be a non-empty dictionary")
-        self.terms = terms.copy()
         self.quoted_query_name = quoted_query_name
 
     def to_sql(self,
@@ -34,8 +30,10 @@ class NearSQLTable(NearSQL):
                  quoted_query_name,
                  quoted_table_name):
         NearSQL.__init__(self,
-                         terms=terms,
                          quoted_query_name=quoted_query_name)
+        if (terms is None) or (not isinstance(terms, dict)) or (len(terms) <= 0):
+            raise ValueError("terms is supposed to be a non-empty dictionary")
+        self.terms = terms.copy()
         self.quoted_table_name = quoted_table_name
 
     def to_sql(self,
@@ -69,8 +67,10 @@ class NearSQLUnaryStep(NearSQL):
                  suffix='',
                  previous_step_summary):
         NearSQL.__init__(self,
-                         terms=terms,
                          quoted_query_name=quoted_query_name)
+        if (terms is None) or (not isinstance(terms, dict)) or (len(terms) <= 0):
+            raise ValueError("terms is supposed to be a non-empty dictionary")
+        self.terms = terms.copy()
         self.sub_sql = sub_sql
         self.suffix = suffix
         if not isinstance(previous_step_summary, dict):
@@ -119,8 +119,10 @@ class NearSQLBinaryStep(NearSQL):
                  previous_step_summary2,
                  suffix=''):
         NearSQL.__init__(self,
-                         terms=terms,
                          quoted_query_name=quoted_query_name)
+        if (terms is None) or (not isinstance(terms, dict)) or (len(terms) <= 0):
+            raise ValueError("terms is supposed to be a non-empty dictionary")
+        self.terms = terms.copy()
         self.sub_sql1 = sub_sql1
         if not isinstance(previous_step_summary1, dict):
             raise TypeError("expected previous step to be a dict")
@@ -176,8 +178,10 @@ class NearSQLUStep(NearSQL):
                  sub_sql2,
                  previous_step_summary2):
         NearSQL.__init__(self,
-                         terms=terms,
                          quoted_query_name=quoted_query_name)
+        if (terms is None) or (not isinstance(terms, dict)) or (len(terms) <= 0):
+            raise ValueError("terms is supposed to be a non-empty dictionary")
+        self.terms = terms.copy()
         self.sub_sql1 = sub_sql1
         if not isinstance(previous_step_summary1, dict):
             raise TypeError("expected previous step to be a dict")
@@ -218,3 +222,23 @@ class NearSQLUStep(NearSQL):
             sql = sql + ' ( ' + self.sub_sql2 + ' ) ' + self.previous_step_summary2['quoted_query_name']
         sql = sql + " )"
         return sql
+
+
+class NearSQLq(NearSQL):
+    def __init__(self,
+                 *,
+                 quoted_query_name,
+                 query):
+        NearSQL.__init__(self,
+                         quoted_query_name=quoted_query_name)
+        self.query = query
+
+    def to_sql(self,
+               *,
+               columns=None,
+               force_sql=False,
+               constants=None,
+               db_model):
+        if (constants is not None) and (len(constants) > 0):
+            raise ValueError("constants must be empty")
+        return self.query
