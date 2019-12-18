@@ -328,38 +328,34 @@ sql = ops.to_sql(db_model, pretty=True)
 print(sql)
 ```
 
-    SELECT "probability",
+    SELECT "surveyCategory" AS "diagnosis",
            "subjectID",
-           "surveyCategory" AS "diagnosis"
+           "probability"
     FROM
-      (SELECT "probability",
-              "subjectID",
+      (SELECT "subjectID",
+              "probability",
               "surveyCategory"
        FROM
-         (SELECT "probability",
-                 "subjectID",
-                 "surveyCategory"
+         (SELECT "subjectID",
+                 "probability",
+                 "surveyCategory",
+                 ROW_NUMBER() OVER (PARTITION BY "subjectID"
+                                    ORDER BY "probability" DESC) AS "row_number"
           FROM
             (SELECT "subjectID",
-                    "surveyCategory",
-                    "probability",
-                    ROW_NUMBER() OVER (PARTITION BY "subjectID"
-                                       ORDER BY "probability" DESC) AS "row_number"
+                    "probability" / "total" AS "probability",
+                    "surveyCategory"
              FROM
-               (SELECT "subjectID",
-                       "surveyCategory",
-                       "probability" / "total" AS "probability"
+               (SELECT SUM("probability") OVER (PARTITION BY "subjectID") AS "total",
+                                               "subjectID",
+                                               "probability",
+                                               "surveyCategory"
                 FROM
                   (SELECT "subjectID",
-                          "surveyCategory",
-                          "probability",
-                          SUM("probability") OVER (PARTITION BY "subjectID") AS "total"
-                   FROM
-                     (SELECT "subjectID",
-                             "surveyCategory",
-                             EXP(("assessmentTotal" * 0.237)) AS "probability"
-                      FROM ("d") "SQ_0") "SQ_1") "SQ_2") "SQ_3") "SQ_4"
-          WHERE "row_number" = 1 ) "SQ_5") "SQ_6"
+                          EXP(("assessmentTotal" * 0.237)) AS "probability",
+                          "surveyCategory"
+                   FROM "d") "extend_1") "extend_2") "extend_3") "extend_4"
+       WHERE "row_number" = 1 ) "select_rows_5"
 
 
 The `SQL` can be hard to read, as `SQL` expresses composition by inner-nesting (inside `SELECT` statements happen first).  The operator pipeline expresses composition by sequencing or method-chaining, which can be a lot more legible.  However the huge advantage of the `SQL` is: we can send it to the database for execution, as we do now.
@@ -380,23 +376,23 @@ db_model.read_query(conn, sql)
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>probability</th>
-      <th>subjectID</th>
       <th>diagnosis</th>
+      <th>subjectID</th>
+      <th>probability</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.670622</td>
-      <td>1</td>
       <td>withdrawal behavior</td>
+      <td>1</td>
+      <td>0.670622</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>0.558974</td>
-      <td>2</td>
       <td>positive re-framing</td>
+      <td>2</td>
+      <td>0.558974</td>
     </tr>
   </tbody>
 </table>
