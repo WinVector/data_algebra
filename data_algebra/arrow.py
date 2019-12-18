@@ -66,7 +66,10 @@ class DataOpArrow(Arrow):
         self.outgoing_columns = pipeline.column_names.copy()
         self.outgoing_columns.sort()
         self.outgoing_types = None
-        if isinstance(pipeline, data_algebra.data_ops.TableDescription) and self.incoming_types is not None:
+        if (
+            isinstance(pipeline, data_algebra.data_ops.TableDescription)
+            and self.incoming_types is not None
+        ):
             self.outgoing_types = self.incoming_types.copy()
         Arrow.__init__(self)
 
@@ -104,7 +107,7 @@ class DataOpArrow(Arrow):
         new_pipeline = self.pipeline.apply_to(
             b.pipeline, target_table_key=self.free_table_key
         )
-        new_pipeline.get_tables()   # check tables are compatible
+        new_pipeline.get_tables()  # check tables are compatible
         res = DataOpArrow(pipeline=new_pipeline, free_table_key=b.free_table_key)
         res.incoming_types = b.incoming_types
         res.outgoing_types = self.outgoing_types

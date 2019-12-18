@@ -31,8 +31,3 @@ class PostgreSQLModel(data_algebra.db_model.DBModel):
         if "schema" in qualifiers.keys():
             qt = self.quote_identifier(qualifiers["schema"]) + "." + qt
         return qt
-
-    def table_def_to_sql(self, table_def, *, using=None, force_sql=False):
-        return super().table_def_to_sql(
-            table_def=table_def, using=using, force_sql=True
-        )

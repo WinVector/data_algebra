@@ -223,12 +223,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         raise NotImplementedError("base method called")
 
     # noinspection PyBroadException
-    def to_sql(self,
-               db_model,
-               *,
-               pretty=False,
-               encoding=None,
-               sqlparse_options=None):
+    def to_sql(self, db_model, *, pretty=False, encoding=None, sqlparse_options=None):
         if sqlparse_options is None:
             sqlparse_options = {"reindent": True, "keyword_case": "upper"}
         if not isinstance(db_model, data_algebra.db_model.DBModel):
@@ -239,9 +234,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
         temp_id_source = [0]
         sql_str = self.to_sql_implementation(
             db_model=db_model, using=None, temp_id_source=temp_id_source
-            )
+        )
         if isinstance(sql_str, str):
-            print('break')
+            print("break")
         sql_str = sql_str.to_sql(db_model=db_model, force_sql=True)
         if pretty and _have_sqlparse:
             try:
@@ -673,10 +668,10 @@ class TableDescription(ViewRepresentation):
     def columns_used_from_sources(self, using=None):
         return []  # no inputs to table description
 
-    def to_sql_implementation(
-        self, db_model, *, using, temp_id_source
-    ):
-        return db_model.table_def_to_sql(self, using=using, temp_id_source=temp_id_source)
+    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+        return db_model.table_def_to_sql(
+            self, using=using, temp_id_source=temp_id_source
+        )
 
     # comparable to other table descriptions
     def __lt__(self, other):
@@ -765,7 +760,7 @@ class WrappedOperatorPlatform(OperatorPlatform):
         data_map, a = self._reach_in(a)
         return WrappedOperatorPlatform(
             underlying=self.underlying.apply_to(a, target_table_key=target_table_key),
-            data_map=data_map
+            data_map=data_map,
         )
 
     # noinspection PyPep8Naming
@@ -1197,7 +1192,9 @@ class ProjectNode(ViewRepresentation):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
-        return new_sources[0].project_parsed(parsed_ops=self.ops, group_by=self.group_by)
+        return new_sources[0].project_parsed(
+            parsed_ops=self.ops, group_by=self.group_by
+        )
 
     def _equiv_nodes(self, other):
         if not self.group_by == other.group_by:
@@ -1514,9 +1511,7 @@ class OrderRowsNode(ViewRepresentation):
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
         return new_sources[0].order_rows(
-            columns=self.order_columns,
-            reverse=self.reverse,
-            limit=self.limit,
+            columns=self.order_columns, reverse=self.reverse, limit=self.limit
         )
 
     def _equiv_nodes(self, other):
@@ -1945,8 +1940,7 @@ class ConvertRecordsNode(ViewRepresentation):
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
         return new_sources[0].convert_records(
-            record_map=self.record_map,
-            blocks_out_table=self.blocks_out_table,
+            record_map=self.record_map, blocks_out_table=self.blocks_out_table
         )
 
     def _equiv_nodes(self, other):
@@ -2007,23 +2001,24 @@ class ConvertRecordsNode(ViewRepresentation):
         sub_query = self.sources[0].to_sql_implementation(
             db_model=db_model, using=using, temp_id_source=temp_id_source
         )
-        query = sub_query.to_sql(
-               columns=using,
-               db_model=db_model)
+        query = sub_query.to_sql(columns=using, db_model=db_model)
         if self.record_map.blocks_in is not None:
             query = db_model.blocks_to_row_recs_query(
                 query, record_spec=self.record_map.blocks_in
             )
         if self.record_map.blocks_out is not None:
             query = db_model.row_recs_to_blocks_query(
-                query, record_spec=self.record_map.blocks_out, record_view=self.sources[1]
+                query,
+                record_spec=self.record_map.blocks_out,
+                record_view=self.sources[1],
             )
         if temp_id_source is None:
             temp_id_source = [0]
         view_name = "convert_records_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        near_sql = data_algebra.near_sql.NearSQLq(quoted_query_name=db_model.quote_identifier(view_name),
-                                                  query=query)
+        near_sql = data_algebra.near_sql.NearSQLq(
+            quoted_query_name=db_model.quote_identifier(view_name), query=query
+        )
         return near_sql
 
     def eval_implementation(self, *, data_map, eval_env, data_model):

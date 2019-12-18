@@ -4,6 +4,7 @@ import io
 
 import data_algebra
 
+import data_algebra.near_sql
 import data_algebra.expr_rep
 import data_algebra.util
 import data_algebra.data_ops_types
@@ -114,6 +115,78 @@ class DBModel:
     def prepare_connection(self, conn):
         pass
 
+    # database helpers
+
+    # noinspection SqlNoDataSourceInspection
+    def insert_table(self, conn, d, table_name, *, qualifiers=None):
+        """
+
+        :param conn: a database connection
+        :param d: a Pandas table
+        :param table_name: name to give write to
+        :param qualifiers: schema and such
+        :return:
+        """
+
+        cr = [
+            d.columns[i].lower()
+            + " "
+            + (
+                "double precision"
+                if data_algebra.util.can_convert_v_to_numeric(d[d.columns[i]])
+                else "VARCHAR"
+            )
+            for i in range(d.shape[1])
+        ]
+        q_table_name = self.build_qualified_table_name(
+            table_name, qualifiers=qualifiers
+        )
+        create_stmt = "CREATE TABLE " + q_table_name + " ( " + ", ".join(cr) + " )"
+        cur = conn.cursor()
+        cur.execute("DROP TABLE IF EXISTS " + q_table_name)
+        conn.commit()
+        cur.execute(create_stmt)
+        conn.commit()
+        buf = io.StringIO(d.to_csv(index=False, header=False, sep="\t"))
+        cur.copy_from(buf, "d", columns=[c for c in d.columns])
+        conn.commit()
+
+    def read_query(self, conn, q):
+        """
+
+        :param conn: database connection
+        :param q: sql query
+        :return:
+        """
+        cur = conn.cursor()
+        cur.execute(q)
+        r = cur.fetchall()
+        colnames = [desc[0] for desc in cur.description]
+        r = self.pd.DataFrame(columns=colnames, data=r)
+        r = r.reset_index(drop=True)
+        return r
+
+    # noinspection PyMethodMayBeStatic
+    def read_table(self, conn, table_name, *, qualifiers=None, limit=None):
+        if not isinstance(table_name, str):
+            raise TypeError("Expect table_name to be a str")
+        q_table_name = self.build_qualified_table_name(
+            table_name, qualifiers=qualifiers
+        )
+        sql = "SELECT * FROM " + q_table_name
+        if limit is not None:
+            sql = sql + " LIMIT " + limit
+        return self.read_query(conn, sql)
+
+    def read(self, conn, table):
+        if table.node_name != "TableDescription":
+            raise TypeError(
+                "Expect table to be a data_algebra.data_ops.TableDescription"
+            )
+        return self.read_table(
+            conn=conn, table_name=table.table_name, qualifiers=table.qualifiers
+        )
+
     def quote_identifier(self, identifier):
         if not isinstance(identifier, str):
             raise TypeError("expected identifier to be a str")
@@ -192,29 +265,29 @@ class DBModel:
             return op.upper() + "(" + ", ".join(subs) + ")"
         raise TypeError("unexpected type: " + str(type(expression)))
 
-    def table_def_to_sql(self, table_def, *, using=None, force_sql=False):
+    def table_def_to_sql(self, table_def, *, using=None, temp_id_source=None):
         if table_def.node_name != "TableDescription":
             raise TypeError(
                 "Expected table_def to be a data_algebra.data_ops.TableDescription)"
             )
-        if force_sql:
-            if using is None:
-                using = table_def.column_set
-            if len(using) < 1:
-                raise ValueError("must select at least one column")
-            missing = using - table_def.column_set
-            if len(missing) > 0:
-                raise KeyError("referred to unknown columns: " + str(missing))
-            cols_using = [c for c in table_def.column_names if c in using]
-            cols = [self.quote_identifier(ci) for ci in cols_using]
-            sql_str = (
-                "SELECT "
-                + ", ".join(cols)
-                + " FROM "
-                + self.quote_table_name(table_def)
-            )
-            return sql_str
-        return self.quote_table_name(table_def)
+        if temp_id_source is None:
+            temp_id_source = [0]
+        if using is None:
+            using = table_def.column_set
+        if len(using) < 1:
+            raise ValueError("must select at least one column")
+        missing = using - table_def.column_set
+        if len(missing) > 0:
+            raise KeyError("referred to unknown columns: " + str(missing))
+        cols_using = [c for c in table_def.column_names if c in using]
+        view_name = "table_reference_" + str(temp_id_source[0])
+        temp_id_source[0] = temp_id_source[0] + 1
+        near_sql = data_algebra.near_sql.NearSQLTable(
+            terms={k: self.quote_identifier(k) for k in cols_using},
+            quoted_query_name=self.quote_identifier(view_name),
+            quoted_table_name=self.quote_table_name(table_def),
+        )
+        return near_sql
 
     def extend_to_sql(self, extend_node, *, using=None, temp_id_source=None):
         if extend_node.node_name != "ExtendNode":
@@ -244,8 +317,6 @@ class DBModel:
         subsql = extend_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
-        sub_view_name = "SQ_" + str(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
         window_term = ""
         if (
             extend_node.windowed_situation
@@ -264,23 +335,19 @@ class DBModel:
                 ]
                 window_term = window_term + "ORDER BY " + ", ".join(rt) + " "
             window_term = window_term + " ) "
-        derived = [
-            self.expr_to_sql(oi) + window_term + " AS " + self.quote_identifier(ci)
-            for (ci, oi) in subops.items()
-        ]
-        origcols = [k for k in using if k not in subops.keys()]
+        terms = {ci: self.expr_to_sql(oi) + window_term for (ci, oi) in subops.items()}
+        origcols = {k: None for k in using if k not in subops.keys()}
         if len(origcols) > 0:
-            ordered_orig = [c for c in extend_node.column_names if c in set(origcols)]
-            derived = [self.quote_identifier(ci) for ci in ordered_orig] + derived
-        sql_str = (
-            "SELECT "
-            + ", ".join(derived)
-            + " FROM ( "
-            + subsql
-            + " ) "
-            + self.quote_identifier(sub_view_name)
+            terms.update(origcols)
+        view_name = "extend_" + str(temp_id_source[0])
+        temp_id_source[0] = temp_id_source[0] + 1
+        near_sql = data_algebra.near_sql.NearSQLUnaryStep(
+            previous_step_summary=subsql.summary(),
+            terms=terms,
+            quoted_query_name=self.quote_identifier(view_name),
+            sub_sql=subsql.to_sql(columns=subusing, db_model=self),
         )
-        return sql_str
+        return near_sql
 
     def project_to_sql(self, project_node, *, using=None, temp_id_source=None):
         if project_node.node_name != "ProjectNode":
@@ -295,28 +362,25 @@ class DBModel:
         subusing = project_node.columns_used_from_sources(using=using)[0]
         if (len(project_node.group_by) + len(subusing)) < 1:
             raise ValueError("must use at least one column")
-        grouping = [g for g in project_node.group_by]
-        derived = [
-            self.expr_to_sql(oi) + " AS " + self.quote_identifier(ci)
-            for (ci, oi) in subops.items()
-        ]
+        terms = {ci: self.expr_to_sql(oi) for (ci, oi) in subops.items()}
+        terms.update({g: None for g in project_node.group_by})
         subsql = project_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
-        sub_view_name = "SQ_" + str(temp_id_source[0])
+        view_name = "project_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        sql_str = (
-            "SELECT "
-            + ", ".join(grouping + derived)
-            + " FROM ( "
-            + subsql
-            + " ) "
-            + self.quote_identifier(sub_view_name)
-        )
+        suffix = None
         if len(project_node.group_by) > 0:
             group_terms = [self.quote_identifier(c) for c in project_node.group_by]
-            sql_str = sql_str + " GROUP BY " + ", ".join(group_terms)
-        return sql_str
+            suffix = "GROUP BY " + ", ".join(group_terms)
+        near_sql = data_algebra.near_sql.NearSQLUnaryStep(
+            previous_step_summary=subsql.summary(),
+            terms=terms,
+            quoted_query_name=self.quote_identifier(view_name),
+            sub_sql=subsql.to_sql(columns=subusing, db_model=self),
+            suffix=suffix,
+        )
+        return near_sql
 
     def select_rows_to_sql(self, select_rows_node, *, using=None, temp_id_source=None):
         if select_rows_node.node_name != "SelectRowsNode":
@@ -331,19 +395,18 @@ class DBModel:
         subsql = select_rows_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
-        sub_view_name = "SQ_" + str(temp_id_source[0])
+        view_name = "select_rows_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        sql_str = (
-            "SELECT "
-            + ", ".join([self.quote_identifier(ci) for ci in using])
-            + " FROM ( "
-            + subsql
-            + " ) "
-            + self.quote_identifier(sub_view_name)
-            + " WHERE "
-            + self.expr_to_sql(select_rows_node.expr)
+        terms = {ci: None for ci in using}
+        suffix = " WHERE " + self.expr_to_sql(select_rows_node.expr)
+        near_sql = data_algebra.near_sql.NearSQLUnaryStep(
+            previous_step_summary=subsql.summary(),
+            terms=terms,
+            quoted_query_name=self.quote_identifier(view_name),
+            sub_sql=subsql.to_sql(columns=subusing, db_model=self),
+            suffix=suffix,
         )
-        return sql_str
+        return near_sql
 
     def select_columns_to_sql(
         self, select_columns_node, *, using=None, temp_id_source=None
@@ -360,19 +423,13 @@ class DBModel:
         subsql = select_columns_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
-        # TODO: make sure select rows doesn't force its partition and order columns in, and then
-        #       return the subsql here instead of tacking on an additional query.
-        sub_view_name = "SQ_" + str(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
-        sql_str = (
-            "SELECT "
-            + ", ".join([self.quote_identifier(ci) for ci in subusing])
-            + " FROM ( "
-            + subsql
-            + " ) "
-            + self.quote_identifier(sub_view_name)
-        )
-        return sql_str
+        # see if we can order columns
+        subsql.terms = {
+            k: subsql.terms[k]
+            for k in select_columns_node.column_selection
+            if k in subusing
+        }
+        return subsql
 
     def drop_columns_to_sql(
         self, drop_columns_node, *, using=None, temp_id_source=None
@@ -389,19 +446,7 @@ class DBModel:
         subsql = drop_columns_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
-        # TODO: make sure select rows doesn't force its partition and order columns in, and then
-        #       return the subsql here instead of tacking on an additional query.
-        sub_view_name = "SQ_" + str(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
-        sql_str = (
-            "SELECT "
-            + ", ".join([self.quote_identifier(ci) for ci in subusing])
-            + " FROM ( "
-            + subsql
-            + " ) "
-            + self.quote_identifier(sub_view_name)
-        )
-        return sql_str
+        return subsql
 
     def order_to_sql(self, order_node, *, using=None, temp_id_source=None):
         if order_node.node_name != "OrderRowsNode":
@@ -416,21 +461,13 @@ class DBModel:
         subsql = order_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
-        # TODO: make sure extend doesn't force its partition and order columns in, and then
-        #       return the subsql here instead of tacking on an additional query.
-        sub_view_name = "SQ_" + str(temp_id_source[0])
+        view_name = "order_rows_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        sql_str = (
-            "SELECT "
-            + ", ".join([self.quote_identifier(ci) for ci in subusing])
-            + " FROM ( "
-            + subsql
-            + " ) "
-            + self.quote_identifier(sub_view_name)
-        )
+        terms = {ci: None for ci in subusing}
+        suffix = ""
         if len(order_node.order_columns) > 0:
-            sql_str = (
-                sql_str
+            suffix = (
+                suffix
                 + " ORDER BY "
                 + ", ".join(
                     [
@@ -441,8 +478,15 @@ class DBModel:
                 )
             )
         if order_node.limit is not None:
-            sql_str = sql_str + " LIMIT " + order_node.limit.__repr__()
-        return sql_str
+            suffix = suffix + " LIMIT " + order_node.limit.__repr__()
+        near_sql = data_algebra.near_sql.NearSQLUnaryStep(
+            previous_step_summary=subsql.summary(),
+            terms=terms,
+            quoted_query_name=self.quote_identifier(view_name),
+            sub_sql=subsql.to_sql(columns=subusing, db_model=self),
+            suffix=suffix,
+        )
+        return near_sql
 
     def rename_to_sql(self, rename_node, *, using=None, temp_id_source=None):
         if rename_node.node_name != "RenameColumnsNode":
@@ -457,25 +501,23 @@ class DBModel:
         subsql = rename_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
-        sub_view_name = "SQ_" + str(temp_id_source[0])
+        view_name = "rename_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         unchanged_columns = subusing - set(rename_node.column_remapping.values()).union(
             rename_node.column_remapping.keys()
         )
-        copies = [self.quote_identifier(vi) for vi in unchanged_columns]
-        remaps = [
-            self.quote_identifier(vi) + " AS " + self.quote_identifier(ki)
+        terms = {
+            ki: self.quote_identifier(vi)
             for (ki, vi) in rename_node.column_remapping.items()
-        ]
-        sql_str = (
-            "SELECT "
-            + ", ".join(copies + remaps)
-            + " FROM ( "
-            + subsql
-            + " ) "
-            + self.quote_identifier(sub_view_name)
+        }
+        terms.update({vi: None for vi in unchanged_columns})
+        near_sql = data_algebra.near_sql.NearSQLUnaryStep(
+            previous_step_summary=subsql.summary(),
+            terms=terms,
+            quoted_query_name=self.quote_identifier(view_name),
+            sub_sql=subsql.to_sql(columns=subusing, db_model=self),
         )
-        return sql_str
+        return near_sql
 
     def natural_join_to_sql(self, join_node, *, using=None, temp_id_source=None):
         if join_node.node_name != "NaturalJoinNode":
@@ -499,42 +541,39 @@ class DBModel:
         sql_left = join_node.sources[0].to_sql_implementation(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
+        sub_view_name_left = sql_left.quoted_query_name
         sql_right = join_node.sources[1].to_sql_implementation(
             db_model=self, using=using_right, temp_id_source=temp_id_source
         )
-        sub_view_name_left = "LQ_" + str(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
-        sub_view_name_right = "RQ_" + str(temp_id_source[0])
+        sub_view_name_right = sql_right.quoted_query_name
+        view_name = "natural_join_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         common = using_left.intersection(using_right)
-        col_exprs = (
-            [
-                "COALESCE("
-                + self.quote_identifier(sub_view_name_left)
-                + "."
-                + self.quote_identifier(ci)
-                + ", "
-                + self.quote_identifier(sub_view_name_right)
-                + "."
-                + self.quote_identifier(ci)
-                + ") AS "
-                + self.quote_identifier(ci)
-                for ci in common
-            ]
-            + [self.quote_identifier(ci) for ci in using_left - common]
-            + [self.quote_identifier(ci) for ci in using_right - common]
-        )
+        terms = {
+            ci: "COALESCE("
+            + sub_view_name_left
+            + "."
+            + self.quote_identifier(ci)
+            + ", "
+            + sub_view_name_right
+            + "."
+            + self.quote_identifier(ci)
+            + ")"
+            for ci in common
+        }
+        terms.update({ci: None for ci in using_left - common})
+        terms.update({ci: None for ci in using_right - common})
         on_terms = ""
         if len(join_node.by) > 0:
             on_terms = (
                 " ON "
                 + ", ".join(
                     [
-                        self.quote_identifier(sub_view_name_left)
+                        sub_view_name_left
                         + "."
                         + self.quote_identifier(c)
                         + " = "
-                        + self.quote_identifier(sub_view_name_right)
+                        + sub_view_name_right
                         + "."
                         + self.quote_identifier(c)
                         for c in join_node.by
@@ -542,22 +581,17 @@ class DBModel:
                 )
                 + " "
             )
-        sql_str = (
-            "SELECT "
-            + ", ".join(col_exprs)
-            + " FROM ( "
-            + sql_left
-            + " ) "
-            + self.quote_identifier(sub_view_name_left)
-            + " "
-            + join_node.jointype
-            + " JOIN ( "
-            + sql_right
-            + " ) "
-            + self.quote_identifier(sub_view_name_right)
-            + on_terms
+        near_sql = data_algebra.near_sql.NearSQLBinaryStep(
+            terms=terms,
+            quoted_query_name=self.quote_identifier(view_name),
+            sub_sql1=sql_left.to_sql(columns=using_left, db_model=self),
+            previous_step_summary1=sql_left.summary(),
+            joiner=join_node.jointype + " JOIN",
+            sub_sql2=sql_right.to_sql(columns=using_right, db_model=self),
+            previous_step_summary2=sql_right.summary(),
+            suffix=on_terms,
         )
-        return sql_str
+        return near_sql
 
     def concat_rows_to_sql(self, concat_node, *, using=None, temp_id_source=None):
         if concat_node.node_name != "ConcatRowsNode":
@@ -584,111 +618,38 @@ class DBModel:
         sql_right = concat_node.sources[1].to_sql_implementation(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
-        sub_view_name_left = "LC_" + str(temp_id_source[0])
+        view_name = "concat_rows_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        sub_view_name_right = "RC_" + str(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
-        left_cols_exprs = [self.quote_identifier(ci) for ci in using_left]
-        right_cols_exprs = left_cols_exprs.copy()
+        terms = {ci: None for ci in using_left}
+        constants_left = None
+        constants_right = None
         if concat_node.id_column is not None:
-            left_cols_exprs.append(
-                self.quote_string(concat_node.a_name)
-                + " AS "
-                + self.quote_identifier(concat_node.id_column)
-            )
-            right_cols_exprs.append(
-                self.quote_string(concat_node.b_name)
-                + " AS "
-                + self.quote_identifier(concat_node.id_column)
-            )
-        sql_str = (
-            "SELECT "
-            + ", ".join(left_cols_exprs)
-            + " FROM ( "
-            + sql_left
-            + " ) "
-            + self.quote_identifier(sub_view_name_left)
-            + " UNION ALL "
-            + "SELECT "
-            + ", ".join(right_cols_exprs)
-            + " FROM ( "
-            + sql_right
-            + " ) "
-            + self.quote_identifier(sub_view_name_right)
+            constants_left = {
+                concat_node.id_column: self.quote_string(concat_node.a_name)
+            }
+            constants_right = {
+                concat_node.id_column: self.quote_string(concat_node.b_name)
+            }
+            terms.update({concat_node.id_column: None})
+        near_sql = data_algebra.near_sql.NearSQLUStep(
+            terms=terms,
+            quoted_query_name=self.quote_identifier(view_name),
+            sub_sql1=sql_left.to_sql(
+                columns=using_left,
+                db_model=self,
+                force_sql=True,
+                constants=constants_left,
+            ),
+            previous_step_summary1=sql_left.summary(),
+            sub_sql2=sql_right.to_sql(
+                columns=using_right,
+                db_model=self,
+                force_sql=True,
+                constants=constants_right,
+            ),
+            previous_step_summary2=sql_right.summary(),
         )
-        return sql_str
-
-    # database helpers
-
-    # noinspection SqlNoDataSourceInspection
-    def insert_table(self, conn, d, table_name, *, qualifiers=None):
-        """
-
-        :param conn: a database connection
-        :param d: a Pandas table
-        :param table_name: name to give write to
-        :param qualifiers: schema and such
-        :return:
-        """
-
-        cr = [
-            d.columns[i].lower()
-            + " "
-            + (
-                "double precision"
-                if data_algebra.util.can_convert_v_to_numeric(d[d.columns[i]])
-                else "VARCHAR"
-            )
-            for i in range(d.shape[1])
-        ]
-        q_table_name = self.build_qualified_table_name(
-            table_name, qualifiers=qualifiers
-        )
-        create_stmt = "CREATE TABLE " + q_table_name + " ( " + ", ".join(cr) + " )"
-        cur = conn.cursor()
-        cur.execute("DROP TABLE IF EXISTS " + q_table_name)
-        conn.commit()
-        cur.execute(create_stmt)
-        conn.commit()
-        buf = io.StringIO(d.to_csv(index=False, header=False, sep="\t"))
-        cur.copy_from(buf, "d", columns=[c for c in d.columns])
-        conn.commit()
-
-    def read_query(self, conn, q):
-        """
-
-        :param conn: database connection
-        :param q: sql query
-        :return:
-        """
-        cur = conn.cursor()
-        cur.execute(q)
-        r = cur.fetchall()
-        colnames = [desc[0] for desc in cur.description]
-        r = self.pd.DataFrame(columns=colnames, data=r)
-        r = r.reset_index(drop=True)
-        return r
-
-    # noinspection PyMethodMayBeStatic
-    def read_table(self, conn, table_name, *, qualifiers=None, limit=None):
-        if not isinstance(table_name, str):
-            raise TypeError("Expect table_name to be a str")
-        q_table_name = self.build_qualified_table_name(
-            table_name, qualifiers=qualifiers
-        )
-        sql = "SELECT * FROM " + q_table_name
-        if limit is not None:
-            sql = sql + " LIMIT " + limit
-        return self.read_query(conn, sql)
-
-    def read(self, conn, table):
-        if table.node_name != "TableDescription":
-            raise TypeError(
-                "Expect table to be a data_algebra.data_ops.TableDescription"
-            )
-        return self.read_table(
-            conn=conn, table_name=table.table_name, qualifiers=table.qualifiers
-        )
+        return near_sql
 
     def row_recs_to_blocks_query(
         self, source_sql, record_spec, record_view, *, using=None, temp_id_source=None
@@ -759,7 +720,7 @@ class DBModel:
             + "CROSS JOIN (\n  "
             + record_view.to_sql_implementation(
                 self, using=using, temp_id_source=temp_id_source
-            )
+            ).to_sql(db_model=self, columns=using, force_sql=True)
             + " ) b\n"
             + " ORDER BY "
             + ", ".join(control_cols)

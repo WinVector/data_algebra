@@ -285,7 +285,8 @@ class DBModel:
         near_sql = data_algebra.near_sql.NearSQLTable(
             terms={k: self.quote_identifier(k) for k in cols_using},
             quoted_query_name=self.quote_identifier(view_name),
-            quoted_table_name=self.quote_table_name(table_def))
+            quoted_table_name=self.quote_table_name(table_def),
+        )
         return near_sql
 
     def extend_to_sql(self, extend_node, *, using=None, temp_id_source=None):
@@ -344,7 +345,7 @@ class DBModel:
             previous_step_summary=subsql.summary(),
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
-            sub_sql=subsql.to_sql(columns=subusing, db_model=self)
+            sub_sql=subsql.to_sql(columns=subusing, db_model=self),
         )
         return near_sql
 
@@ -377,7 +378,7 @@ class DBModel:
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_sql(columns=subusing, db_model=self),
-            suffix=suffix
+            suffix=suffix,
         )
         return near_sql
 
@@ -403,7 +404,7 @@ class DBModel:
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_sql(columns=subusing, db_model=self),
-            suffix=suffix
+            suffix=suffix,
         )
         return near_sql
 
@@ -423,7 +424,11 @@ class DBModel:
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
         # see if we can order columns
-        subsql.terms = {k: subsql.terms[k] for k in select_columns_node.column_selection if k in subusing}
+        subsql.terms = {
+            k: subsql.terms[k]
+            for k in select_columns_node.column_selection
+            if k in subusing
+        }
         return subsql
 
     def drop_columns_to_sql(
@@ -459,7 +464,7 @@ class DBModel:
         view_name = "order_rows_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         terms = {ci: None for ci in subusing}
-        suffix = ''
+        suffix = ""
         if len(order_node.order_columns) > 0:
             suffix = (
                 suffix
@@ -479,7 +484,7 @@ class DBModel:
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_sql(columns=subusing, db_model=self),
-            suffix=suffix
+            suffix=suffix,
         )
         return near_sql
 
@@ -501,13 +506,16 @@ class DBModel:
         unchanged_columns = subusing - set(rename_node.column_remapping.values()).union(
             rename_node.column_remapping.keys()
         )
-        terms = {ki: self.quote_identifier(vi) for (ki, vi) in rename_node.column_remapping.items()}
+        terms = {
+            ki: self.quote_identifier(vi)
+            for (ki, vi) in rename_node.column_remapping.items()
+        }
         terms.update({vi: None for vi in unchanged_columns})
         near_sql = data_algebra.near_sql.NearSQLUnaryStep(
             previous_step_summary=subsql.summary(),
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
-            sub_sql=subsql.to_sql(columns=subusing, db_model=self)
+            sub_sql=subsql.to_sql(columns=subusing, db_model=self),
         )
         return near_sql
 
@@ -553,12 +561,8 @@ class DBModel:
             + ")"
             for ci in common
         }
-        terms.update({
-            ci: None for ci in using_left - common
-        })
-        terms.update({
-            ci: None for ci in using_right - common
-        })
+        terms.update({ci: None for ci in using_left - common})
+        terms.update({ci: None for ci in using_right - common})
         on_terms = ""
         if len(join_node.by) > 0:
             on_terms = (
@@ -578,14 +582,15 @@ class DBModel:
                 + " "
             )
         near_sql = data_algebra.near_sql.NearSQLBinaryStep(
-                     terms=terms,
-                     quoted_query_name=self.quote_identifier(view_name),
-                     sub_sql1=sql_left.to_sql(columns=using_left, db_model=self),
-                     previous_step_summary1=sql_left.summary(),
-                     joiner=join_node.jointype + " JOIN",
-                     sub_sql2=sql_right.to_sql(columns=using_right, db_model=self),
-                     previous_step_summary2=sql_right.summary(),
-                     suffix=on_terms)
+            terms=terms,
+            quoted_query_name=self.quote_identifier(view_name),
+            sub_sql1=sql_left.to_sql(columns=using_left, db_model=self),
+            previous_step_summary1=sql_left.summary(),
+            joiner=join_node.jointype + " JOIN",
+            sub_sql2=sql_right.to_sql(columns=using_right, db_model=self),
+            previous_step_summary2=sql_right.summary(),
+            suffix=on_terms,
+        )
         return near_sql
 
     def concat_rows_to_sql(self, concat_node, *, using=None, temp_id_source=None):
@@ -619,18 +624,31 @@ class DBModel:
         constants_left = None
         constants_right = None
         if concat_node.id_column is not None:
-            constants_left = {concat_node.id_column: self.quote_string(concat_node.a_name)}
-            constants_right = {concat_node.id_column: self.quote_string(concat_node.b_name)}
+            constants_left = {
+                concat_node.id_column: self.quote_string(concat_node.a_name)
+            }
+            constants_right = {
+                concat_node.id_column: self.quote_string(concat_node.b_name)
+            }
             terms.update({concat_node.id_column: None})
         near_sql = data_algebra.near_sql.NearSQLUStep(
-                     terms=terms,
-                     quoted_query_name=self.quote_identifier(view_name),
-                     sub_sql1=sql_left.to_sql(columns=using_left, db_model=self, force_sql=True,
-                                              constants=constants_left),
-                     previous_step_summary1=sql_left.summary(),
-                     sub_sql2=sql_right.to_sql(columns=using_right, db_model=self, force_sql=True,
-                                               constants=constants_right),
-                     previous_step_summary2=sql_right.summary())
+            terms=terms,
+            quoted_query_name=self.quote_identifier(view_name),
+            sub_sql1=sql_left.to_sql(
+                columns=using_left,
+                db_model=self,
+                force_sql=True,
+                constants=constants_left,
+            ),
+            previous_step_summary1=sql_left.summary(),
+            sub_sql2=sql_right.to_sql(
+                columns=using_right,
+                db_model=self,
+                force_sql=True,
+                constants=constants_right,
+            ),
+            previous_step_summary2=sql_right.summary(),
+        )
         return near_sql
 
     def row_recs_to_blocks_query(
