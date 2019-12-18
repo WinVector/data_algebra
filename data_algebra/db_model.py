@@ -282,7 +282,7 @@ class DBModel:
         cols_using = [c for c in table_def.column_names if c in using]
         view_name = "table_reference_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        near_sql = data_algebra.near_sql.NearSQL(
+        near_sql = data_algebra.near_sql.NearSQLTable(
             terms={k: self.quote_identifier(k) for k in cols_using},
             quoted_query_name=self.quote_identifier(view_name),
             quoted_table_name=self.quote_table_name(table_def))
@@ -340,8 +340,8 @@ class DBModel:
             terms.update(origcols)
         view_name = "extend_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        near_sql = data_algebra.near_sql.NearSQL(
-            previous_step=subsql,
+        near_sql = data_algebra.near_sql.NearSQLUnaryStep(
+            previous_step_summary=subsql.summary(),
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_sql(columns=subusing, db_model=self)
@@ -372,8 +372,8 @@ class DBModel:
         if len(project_node.group_by) > 0:
             group_terms = [self.quote_identifier(c) for c in project_node.group_by]
             suffix = "GROUP BY " + ", ".join(group_terms)
-        near_sql = data_algebra.near_sql.NearSQL(
-            previous_step=subsql,
+        near_sql = data_algebra.near_sql.NearSQLUnaryStep(
+            previous_step_summary=subsql.summary(),
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_sql(columns=subusing, db_model=self),
@@ -398,8 +398,8 @@ class DBModel:
         temp_id_source[0] = temp_id_source[0] + 1
         terms = {ci: None for ci in using}
         suffix = " WHERE " + self.expr_to_sql(select_rows_node.expr)
-        near_sql = data_algebra.near_sql.NearSQL(
-            previous_step=subsql,
+        near_sql = data_algebra.near_sql.NearSQLUnaryStep(
+            previous_step_summary=subsql.summary(),
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_sql(columns=subusing, db_model=self),
@@ -474,8 +474,8 @@ class DBModel:
             )
         if order_node.limit is not None:
             suffix = suffix + " LIMIT " + order_node.limit.__repr__()
-        near_sql = data_algebra.near_sql.NearSQL(
-            previous_step=subsql,
+        near_sql = data_algebra.near_sql.NearSQLUnaryStep(
+            previous_step_summary=subsql.summary(),
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_sql(columns=subusing, db_model=self),
@@ -503,8 +503,8 @@ class DBModel:
         )
         terms = {ki: self.quote_identifier(vi) for (ki, vi) in rename_node.column_remapping.items()}
         terms.update({vi: None for vi in unchanged_columns})
-        near_sql = data_algebra.near_sql.NearSQL(
-            previous_step=subsql,
+        near_sql = data_algebra.near_sql.NearSQLUnaryStep(
+            previous_step_summary=subsql.summary(),
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_sql(columns=subusing, db_model=self)
@@ -533,42 +533,43 @@ class DBModel:
         sql_left = join_node.sources[0].to_sql_implementation(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
+        sub_view_name_left = sql_left.quoted_query_name
         sql_right = join_node.sources[1].to_sql_implementation(
             db_model=self, using=using_right, temp_id_source=temp_id_source
         )
-        sub_view_name_left = "LQ_" + str(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
-        sub_view_name_right = "RQ_" + str(temp_id_source[0])
+        sub_view_name_right = sql_right.quoted_query_name
+        view_name = "natural_join_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         common = using_left.intersection(using_right)
-        col_exprs = (
-            [
-                "COALESCE("
-                + self.quote_identifier(sub_view_name_left)
-                + "."
-                + self.quote_identifier(ci)
-                + ", "
-                + self.quote_identifier(sub_view_name_right)
-                + "."
-                + self.quote_identifier(ci)
-                + ") AS "
-                + self.quote_identifier(ci)
-                for ci in common
-            ]
-            + [self.quote_identifier(ci) for ci in using_left - common]
-            + [self.quote_identifier(ci) for ci in using_right - common]
-        )
+        terms = {
+            ci: "COALESCE("
+            + sub_view_name_left
+            + "."
+            + self.quote_identifier(ci)
+            + ", "
+            + sub_view_name_right
+            + "."
+            + self.quote_identifier(ci)
+            + ")"
+            for ci in common
+        }
+        terms.update({
+            ci: None for ci in using_left - common
+        })
+        terms.update({
+            ci: None for ci in using_right - common
+        })
         on_terms = ""
         if len(join_node.by) > 0:
             on_terms = (
                 " ON "
                 + ", ".join(
                     [
-                        self.quote_identifier(sub_view_name_left)
+                        sub_view_name_left
                         + "."
                         + self.quote_identifier(c)
                         + " = "
-                        + self.quote_identifier(sub_view_name_right)
+                        + sub_view_name_right
                         + "."
                         + self.quote_identifier(c)
                         for c in join_node.by
@@ -576,22 +577,16 @@ class DBModel:
                 )
                 + " "
             )
-        sql_str = (
-            "SELECT "
-            + ", ".join(col_exprs)
-            + " FROM ( "
-            + sql_left
-            + " ) "
-            + self.quote_identifier(sub_view_name_left)
-            + " "
-            + join_node.jointype
-            + " JOIN ( "
-            + sql_right
-            + " ) "
-            + self.quote_identifier(sub_view_name_right)
-            + on_terms
-        )
-        return sql_str
+        near_sql = data_algebra.near_sql.NearSQLBinaryStep(
+                     terms=terms,
+                     quoted_query_name=self.quote_identifier(view_name),
+                     sub_sql1=sql_left.to_sql(columns=using_left, db_model=self),
+                     previous_step_summary1=sql_left.summary(),
+                     joiner=join_node.jointype + " JOIN",
+                     sub_sql2=sql_right.to_sql(columns=using_right, db_model=self),
+                     previous_step_summary2=sql_right.summary(),
+                     suffix=on_terms)
+        return near_sql
 
     def concat_rows_to_sql(self, concat_node, *, using=None, temp_id_source=None):
         if concat_node.node_name != "ConcatRowsNode":
