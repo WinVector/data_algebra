@@ -18,6 +18,7 @@ class NearSQL:
                *,
                columns=None,
                force_sql=False,
+               constants=None,
                db_model):
         raise NotImplemented("base method called")
 
@@ -41,11 +42,15 @@ class NearSQLTable(NearSQL):
                *,
                columns=None,
                force_sql=False,
+               constants=None,
                db_model):
         if columns is None:
             columns = [k for k in self.terms.keys()]
-        if force_sql:
+        have_constants = (constants is not None) and (len(constants) > 0)
+        if force_sql or have_constants:
             terms_strs = [db_model.quote_identifier(k) for k in columns]
+            if have_constants:
+                terms_strs = terms_strs + [v + ' AS ' + db_model.quote_identifier(k) for (k, v) in constants.items()]
             return ('SELECT ' + ', '.join(terms_strs)
                     + ' FROM ' + self.quoted_table_name)
         return self.quoted_table_name
@@ -76,12 +81,16 @@ class NearSQLUnaryStep(NearSQL):
                *,
                columns=None,
                force_sql=False,
+               constants=None,
                db_model):
         if columns is None:
             columns = [k for k in self.terms.keys()]
+        terms = self.terms
+        if (constants is not None) and (len(constants) > 0):
+            terms.update(constants)
 
         def enc_term(k):
-            v = self.terms[k]
+            v = terms[k]
             if v is None:
                 return db_model.quote_identifier(k)
             return v + ' AS ' + db_model.quote_identifier(k)
@@ -127,22 +136,26 @@ class NearSQLBinaryStep(NearSQL):
                *,
                columns=None,
                force_sql=False,
+               constants=None,
                db_model):
         if columns is None:
             columns = [k for k in self.terms.keys()]
+        terms = self.terms
+        if (constants is not None) and (len(constants) > 0):
+            terms.update(constants)
 
         def enc_term(k):
-            v = self.terms[k]
+            v = terms[k]
             if v is None:
                 return db_model.quote_identifier(k)
             return v + ' AS ' + db_model.quote_identifier(k)
 
         terms_strs = [enc_term(k) for k in columns]
-        sql = 'SELECT ' + ', '.join(terms_strs)
+        sql = 'SELECT ' + ', '.join(terms_strs) + ' FROM '
         if self.previous_step_summary1['is_table']:
-            sql = sql + ' FROM ' + self.sub_sql1 + ' ' + self.previous_step_summary1['quoted_query_name']
+            sql = sql + self.sub_sql1 + ' ' + self.previous_step_summary1['quoted_query_name']
         else:
-            sql = sql + ' FROM ( ' + self.sub_sql1 + ' ) ' + self.previous_step_summary1['quoted_query_name']
+            sql = sql + '( ' + self.sub_sql1 + ' ) ' + self.previous_step_summary1['quoted_query_name']
         sql = sql + ' ' + self.joiner + ' '
         if self.previous_step_summary2['is_table']:
             sql = sql + ' ' + self.sub_sql2 + ' ' + self.previous_step_summary2['quoted_query_name']
@@ -150,4 +163,58 @@ class NearSQLBinaryStep(NearSQL):
             sql = sql + ' ( ' + self.sub_sql2 + ' ) ' + self.previous_step_summary2['quoted_query_name']
         if (self.suffix is not None) and (len(self.suffix) > 0):
             sql = sql + ' ' + self.suffix
+        return sql
+
+
+class NearSQLUStep(NearSQL):
+    def __init__(self,
+                 *,
+                 terms,
+                 quoted_query_name,
+                 sub_sql1,
+                 previous_step_summary1,
+                 sub_sql2,
+                 previous_step_summary2):
+        NearSQL.__init__(self,
+                         terms=terms,
+                         quoted_query_name=quoted_query_name)
+        self.sub_sql1 = sub_sql1
+        if not isinstance(previous_step_summary1, dict):
+            raise TypeError("expected previous step to be a dict")
+        self.previous_step_summary1 = previous_step_summary1
+        self.sub_sql2 = sub_sql2
+        if not isinstance(previous_step_summary2, dict):
+            raise TypeError("expected previous step to be a dict")
+        self.previous_step_summary2 = previous_step_summary2
+
+    def to_sql(self,
+               *,
+               columns=None,
+               force_sql=False,
+               constants=None,
+               db_model):
+        if columns is None:
+            columns = [k for k in self.terms.keys()]
+        terms = self.terms
+        if (constants is not None) and (len(constants) > 0):
+            terms.update(constants)
+
+        def enc_term(k):
+            v = terms[k]
+            if v is None:
+                return db_model.quote_identifier(k)
+            return v + ' AS ' + db_model.quote_identifier(k)
+
+        terms_strs = [enc_term(k) for k in columns]
+        sql = 'SELECT ' + ', '.join(terms_strs) + ' FROM ( '
+        if self.previous_step_summary1['is_table']:
+            sql = sql + self.sub_sql1 + ' ' + self.previous_step_summary1['quoted_query_name']
+        else:
+            sql = sql + '( ' + self.sub_sql1 + ' ) ' + self.previous_step_summary1['quoted_query_name']
+        sql = sql + ' UNION ALL '
+        if self.previous_step_summary2['is_table']:
+            sql = sql + ' ' + self.sub_sql2 + ' ' + self.previous_step_summary2['quoted_query_name']
+        else:
+            sql = sql + ' ( ' + self.sub_sql2 + ' ) ' + self.previous_step_summary2['quoted_query_name']
+        sql = sql + " )"
         return sql

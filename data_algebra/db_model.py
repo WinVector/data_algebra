@@ -610,42 +610,30 @@ class DBModel:
         sql_left = concat_node.sources[0].to_sql_implementation(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
+        sub_view_name_left = sql_left.quoted_query_name
         sql_right = concat_node.sources[1].to_sql_implementation(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
-        sub_view_name_left = "LC_" + str(temp_id_source[0])
+        sub_view_name_right = sql_right.quoted_query_name
+        view_name = "concat_rows_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        sub_view_name_right = "RC_" + str(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
-        left_cols_exprs = [self.quote_identifier(ci) for ci in using_left]
-        right_cols_exprs = left_cols_exprs.copy()
+        terms = {ci: None for ci in using_left}
+        constants_left = None
+        constants_right = None
         if concat_node.id_column is not None:
-            left_cols_exprs.append(
-                self.quote_string(concat_node.a_name)
-                + " AS "
-                + self.quote_identifier(concat_node.id_column)
-            )
-            right_cols_exprs.append(
-                self.quote_string(concat_node.b_name)
-                + " AS "
-                + self.quote_identifier(concat_node.id_column)
-            )
-        sql_str = (
-            "SELECT "
-            + ", ".join(left_cols_exprs)
-            + " FROM ( "
-            + sql_left
-            + " ) "
-            + self.quote_identifier(sub_view_name_left)
-            + " UNION ALL "
-            + "SELECT "
-            + ", ".join(right_cols_exprs)
-            + " FROM ( "
-            + sql_right
-            + " ) "
-            + self.quote_identifier(sub_view_name_right)
-        )
-        return sql_str
+            constants_left = {concat_node.id_column: self.quote_string(concat_node.a_name)}
+            constants_right = {concat_node.id_column: self.quote_string(concat_node.b_name)}
+            terms.update({concat_node.id_column: None})
+        near_sql = data_algebra.near_sql.NearSQLUStep(
+                     terms=terms,
+                     quoted_query_name=self.quote_identifier(view_name),
+                     sub_sql1=sql_left.to_sql(columns=using_left, db_model=self, force_sql=True,
+                                              constants=constants_left),
+                     previous_step_summary1=sql_left.summary(),
+                     sub_sql2=sql_right.to_sql(columns=using_right, db_model=self, force_sql=True,
+                                               constants=constants_right),
+                     previous_step_summary2=sql_right.summary())
+        return near_sql
 
     def row_recs_to_blocks_query(
         self, source_sql, record_spec, record_view, *, using=None, temp_id_source=None

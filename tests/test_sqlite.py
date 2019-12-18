@@ -144,10 +144,43 @@ def test_join_g2():
         'col4': [4, 5, 7]
     })
 
-
     ops = describe_table(d1, table_name='d1').natural_join(b=describe_table(d2, table_name='d2'),
                                           by=['col1'],
                                           jointype='LEFT')
+
+    res_pandas = ops.eval({'d1': d1, 'd2': d2})
+
+    sql_model = data_algebra.SQLite.SQLiteModel()
+
+    q = ops.to_sql(db_model=sql_model)
+
+    conn = sqlite3.connect(':memory:')
+    sql_model.prepare_connection(conn)
+    sql_model.insert_table(conn, d1, table_name='d1')
+    sql_model.insert_table(conn, d2, table_name='d2')
+
+    #conn.execute('CREATE TABLE res AS ' + q)
+    #res_sql = sql_model.read_table(conn, 'res')
+    res_sql = sql_model.read_query(conn, q)
+
+    conn.close()
+
+    assert data_algebra.test_util.equivalent_frames(res_pandas, res_sql, check_row_order=True)
+
+
+def test_unionall_g2():
+    d1 = pandas.DataFrame({
+        'col1': [1, 2, 4],
+        'col2': [3, None, 6],
+        'col3': [4, 5, 7]
+    })
+    d2 = pandas.DataFrame({
+        'col1': [1, 2, 3],
+        'col2': [3, 4, None],
+        'col3': [4, 5, 7]
+    })
+
+    ops = describe_table(d1, table_name='d1').concat_rows(b=describe_table(d2, table_name='d2'))
 
     res_pandas = ops.eval({'d1': d1, 'd2': d2})
 
