@@ -1652,8 +1652,7 @@ class RenameColumnsNode(ViewRepresentation):
         # this is where forbidden columns are introduced
         if forbidden is None:
             forbidden = set()
-        new_forbidden = {self.reverse_mapping[k] for k in forbidden if k in self.reverse_mapping.keys()}
-        new_forbidden.update(forbidden - set(self.reverse_mapping.keys()))
+        new_forbidden = set(forbidden) - self.reverse_mapping.keys()
         new_forbidden.update(self.new_columns)
         return self.sources[0].forbidden_columns(forbidden=new_forbidden)
 
