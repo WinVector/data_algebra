@@ -235,8 +235,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
         sql_str = self.to_sql_implementation(
             db_model=db_model, using=None, temp_id_source=temp_id_source
         )
-        if isinstance(sql_str, str):
-            print("break")
         sql_str = sql_str.to_sql(db_model=db_model, force_sql=True)
         if pretty and _have_sqlparse:
             try:
