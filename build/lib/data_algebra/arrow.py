@@ -41,7 +41,7 @@ class DataOpArrow(Arrow):
 
     """
 
-    def __init__(self, pipeline, *, free_table_key=None, strict=False):
+    def __init__(self, pipeline, *, free_table_key=None, strict=True):
         if not isinstance(pipeline, data_algebra.data_ops.ViewRepresentation):
             raise TypeError("expected pipeline to be data_algebra.data_ops")
         self.pipeline = pipeline
