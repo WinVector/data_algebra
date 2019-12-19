@@ -2001,7 +2001,8 @@ class ConvertRecordsNode(ViewRepresentation):
         sub_query = self.sources[0].to_sql_implementation(
             db_model=db_model, using=None, temp_id_source=temp_id_source
         )
-        query = sub_query.to_sql(columns=None, db_model=db_model)
+        # claims to use all columns
+        query = sub_query.to_sql(columns=self.columns_used_from_sources(), db_model=db_model)
         if self.record_map.blocks_in is not None:
             query = db_model.blocks_to_row_recs_query(
                 query, record_spec=self.record_map.blocks_in
