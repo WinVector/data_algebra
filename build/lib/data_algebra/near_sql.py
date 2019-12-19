@@ -1,3 +1,5 @@
+
+# TODO: buld a term object that carries the column use information
 class NearSQL:
     """
     Represent SQL queries in a mostly string-form
@@ -229,6 +231,7 @@ class NearSQLUStep(NearSQL):
         return sql
 
 
+# TODO: get rid of uses of this class and this class
 class NearSQLq(NearSQL):
     def __init__(self, *, quoted_query_name, query, terms, prev_quoted_query_name):
         NearSQL.__init__(self,

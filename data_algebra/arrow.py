@@ -60,6 +60,7 @@ class DataOpArrow(Arrow):
                 )
         self.free_table_key = free_table_key
         self.incoming_columns = t_used[free_table_key].column_names.copy()
+        self.disallowed_columns = pipeline.forbidden_columns()[free_table_key]
         self.incoming_types = None
         if t_used[free_table_key].column_types is not None:
             self.incoming_types = t_used[free_table_key].column_types.copy()
@@ -79,18 +80,17 @@ class DataOpArrow(Arrow):
             b = DataOpArrow(b)
         if not isinstance(b, DataOpArrow):
             raise TypeError("unexpected type: " + str(type(b)))
+        # check categorical arrow composition conditions
         missing = set(self.incoming_columns) - set(b.outgoing_columns)
         if len(missing) > 0:
             raise ValueError("missing required columns: " + str(missing))
-        if self.strict:
-            excess = set(b.outgoing_columns) - set(self.incoming_columns)
-            if len(excess) > 0:
+        excess = set(b.outgoing_columns) - set(self.incoming_columns)
+        if len(excess) > 0:
+            problem_excess = excess.intersection(self.forbidden_columns())
+            if len(problem_excess) > 0:
+                raise ValueError("forbidden incoming columns: " + str(excess))
+            if self.strict:
                 raise ValueError("extra incoming columns: " + str(excess))
-        # check categorical arrow composition conditions
-        if set(self.incoming_columns) != set(b.outgoing_columns):
-            raise ValueError(
-                "arrow composition conditions not met (incoming column set doesn't match outgoing)"
-            )
         if (self.incoming_types is not None) and (b.outgoing_types is not None):
             for c in self.incoming_columns:
                 st = self.incoming_types[c]
@@ -189,6 +189,12 @@ class DataOpArrow(Arrow):
             + self.free_table_key.__repr__()
             + ")"
         )
+
+    def required_columns(self):
+        return self.incoming_columns.copy()
+
+    def forbidden_columns(self):
+        return self.disallowed_columns.copy()
 
     def __str__(self):
         align_right = 70

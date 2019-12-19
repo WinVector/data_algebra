@@ -145,6 +145,22 @@ class ViewRepresentation(OperatorPlatform, ABC):
             columns_used[k] = vi.copy()
         return columns_used
 
+    def forbidden_columns(self, *, forbidden=None):
+        """Determine which columns should not be in source tables"""
+        if forbidden is None:
+            forbidden = set()
+        res = dict()
+        for source in self.sources:
+            forbidden_i = source.forbidden_columns(forbidden=forbidden)
+            for (tk, f) in forbidden_i.items():
+                try:
+                    have = res[tk]
+                except KeyError:
+                    have = set()
+                    res[tk] = have
+                have.update(f)
+        return res
+
     # collect as simple structures for YAML I/O and other generic tasks
 
     def collect_representation_implementation(self, *, pipeline=None, dialect="Python"):
@@ -581,6 +597,11 @@ class TableDescription(ViewRepresentation):
         if self.table_name is not None:
             key = key + self.table_name
         self.key = key
+
+    def forbidden_columns(self, *, forbidden=None):
+        if forbidden is None:
+            forbidden = set()
+        return {self.key: set(forbidden)}
 
     def apply_to(self, a, *, target_table_key=None):
         if (target_table_key is None) or (target_table_key == self.key):
@@ -1186,6 +1207,12 @@ class ProjectNode(ViewRepresentation):
             # TODO: check op is in list of aggregators
             # Note: non-aggregators making through will be caught by table shape check
 
+    def forbidden_columns(self, *, forbidden=None):
+        if forbidden is None:
+            forbidden = set()
+        forbidden = set(forbidden).intersection(self.column_names)
+        return self.sources[0].forbidden_columns(forbidden=forbidden)
+
     def apply_to(self, a, *, target_table_key=None):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
@@ -1352,6 +1379,12 @@ class SelectColumnsNode(ViewRepresentation):
             node_name="SelectColumnsNode",
         )
 
+    def forbidden_columns(self, *, forbidden=None):
+        if forbidden is None:
+            forbidden = set()
+        forbidden = set(forbidden).intersection(self.column_selection)
+        return self.sources[0].forbidden_columns(forbidden=forbidden)
+
     def apply_to(self, a, *, target_table_key=None):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
@@ -1424,6 +1457,12 @@ class DropColumnsNode(ViewRepresentation):
             sources=[source],
             node_name="DropColumnsNode",
         )
+
+    def forbidden_columns(self, *, forbidden=None):
+        if forbidden is None:
+            forbidden = set()
+        forbidden = set(forbidden) - set(self.column_deletions)
+        return self.sources[0].forbidden_columns(forbidden=forbidden)
 
     def apply_to(self, a, *, target_table_key=None):
         new_sources = [
@@ -1601,12 +1640,22 @@ class RenameColumnsNode(ViewRepresentation):
             (k if k not in self.reverse_mapping.keys() else self.reverse_mapping[k])
             for k in source.column_names
         ]
+        self.new_columns = set(new_cols) - set(orig_cols)
         ViewRepresentation.__init__(
             self,
             column_names=column_names,
             sources=[source],
             node_name="RenameColumnsNode",
         )
+
+    def forbidden_columns(self, *, forbidden=None):
+        # this is where forbidden columns are introduced
+        if forbidden is None:
+            forbidden = set()
+        new_forbidden = {self.reverse_mapping[k] for k in forbidden if k in self.reverse_mapping.keys()}
+        new_forbidden.update(forbidden - set(self.reverse_mapping.keys()))
+        new_forbidden.update(self.new_columns)
+        return self.sources[0].forbidden_columns(forbidden=new_forbidden)
 
     def apply_to(self, a, *, target_table_key=None):
         new_sources = [
@@ -1932,6 +1981,9 @@ class ConvertRecordsNode(ViewRepresentation):
             sources=sources,
             node_name="ConvertRecordsNode",
         )
+
+    def forbidden_columns(self, *, forbidden=None):
+        raise NotImplementedError("not implemented yet")
 
     def apply_to(self, a, *, target_table_key=None):
         new_sources = [
