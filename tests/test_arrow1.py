@@ -42,7 +42,7 @@ def test_arrow1():
     # produced
     id_ops_b.column_names
 
-    a1 = data_algebra.arrow.DataOpArrow(id_ops_b)
+    a1 = data_algebra.arrow.DataOpArrow(id_ops_b, strict=True)
 
     # check identity relns
     ri = a1.cod()
@@ -70,7 +70,7 @@ def test_arrow1():
         order_by=["x"],
         partition_by=["g"],
     )
-    a2 = data_algebra.arrow.DataOpArrow(ordered_ops)
+    a2 = data_algebra.arrow.DataOpArrow(ordered_ops, strict=True)
     # print(a2)
 
     # %%

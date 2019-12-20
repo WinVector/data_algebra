@@ -41,12 +41,17 @@ class DataOpArrow(Arrow):
 
     """
 
-    def __init__(self, pipeline, *, free_table_key=None, strict=True):
+    def __init__(self, pipeline, *, free_table_key=None, strict=False, forbidden_to_produce=None):
         if not isinstance(pipeline, data_algebra.data_ops.ViewRepresentation):
             raise TypeError("expected pipeline to be data_algebra.data_ops")
         self.pipeline = pipeline
         self.strict = strict
         t_used = pipeline.get_tables()
+        if forbidden_to_produce is None:
+            forbidden_to_produce = []
+        if isinstance(forbidden_to_produce, str):
+            forbidden_to_produce = [forbidden_to_produce]
+        self.forbidden_to_produce = forbidden_to_produce
         if free_table_key is None:
             if len(t_used) != 1:
                 raise ValueError(
@@ -84,6 +89,10 @@ class DataOpArrow(Arrow):
         missing = set(self.incoming_columns) - set(b.outgoing_columns)
         if len(missing) > 0:
             raise ValueError("missing required columns: " + str(missing))
+        if self.strict:
+            problems = set(self.forbidden_columns()) - set(b.forbidden_to_produce)
+            if len(problems) > 0:
+                raise ValueError("did not document non-produciton of columns: " + str(problems))
         excess = set(b.outgoing_columns) - set(self.incoming_columns)
         if len(excess) > 0:
             problem_excess = excess.intersection(self.forbidden_columns())
@@ -108,7 +117,9 @@ class DataOpArrow(Arrow):
             b.pipeline, target_table_key=self.free_table_key
         )
         new_pipeline.get_tables()  # check tables are compatible
-        res = DataOpArrow(pipeline=new_pipeline, free_table_key=b.free_table_key)
+        res = DataOpArrow(pipeline=new_pipeline,
+                          free_table_key=b.free_table_key,
+                          forbidden_to_produce=self.forbidden_to_produce)
         res.incoming_types = b.incoming_types
         res.outgoing_types = self.outgoing_types
         return res
@@ -196,27 +207,36 @@ class DataOpArrow(Arrow):
     def forbidden_columns(self):
         return self.disallowed_columns.copy()
 
-    def __str__(self):
-        align_right = 70
-        sep_width = 2
-        if self.incoming_types is not None:
-            in_rep = [str(k) + ": " + str(v) for (k, v) in self.incoming_types.items()]
+    # noinspection PyMethodMayBeStatic
+    def format_end_description(self, *,
+                               required_cols, col_types, forbidden_cols,
+                               align_right=70,
+                               sep_width=2):
+        if col_types is not None:
+            in_rep = [str(c) + ": " + str(col_types[c]) for c in required_cols]
         else:
-            in_rep = [str(c) for c in self.incoming_columns]
+            in_rep = [str(c) for c in required_cols]
         in_rep = data_algebra.flow_text.flow_text(
             in_rep, align_right=align_right, sep_width=sep_width
         )
-        in_rep = [", ".join(line) for line in in_rep]
-        in_rep = " [ " + ",\n    ".join(in_rep) + " ]"
-        if self.outgoing_types is not None:
-            out_rep = [str(k) + ": " + str(v) for (k, v) in self.outgoing_types.items()]
-        else:
-            out_rep = [str(c) for c in self.outgoing_columns]
-        out_rep = data_algebra.flow_text.flow_text(
-            out_rep, align_right=align_right, sep_width=sep_width
-        )
-        out_rep = [", ".join(line) for line in out_rep]
-        out_rep = " [ " + ",\n    ".join(out_rep) + " ]"
+        col_rep = [", ".join(line) for line in in_rep]
+        col_rep = " [ " + ",\n    ".join(col_rep) + " ]"
+        if (forbidden_cols is not None) and (len(forbidden_cols) > 0):
+            f_rep = [str(c) for c in forbidden_cols]
+            f_rep = data_algebra.flow_text.flow_text(
+                f_rep, align_right=align_right, sep_width=sep_width
+            )
+            f_rep = [", ".join(line) for line in f_rep]
+            col_rep = col_rep + " - [ " + ",\n    ".join(f_rep) + " ]"
+        return col_rep
+
+    def __str__(self):
+        in_rep = self.format_end_description(required_cols=self.incoming_columns,
+                                             col_types=self.incoming_types,
+                                             forbidden_cols=self.disallowed_columns)
+        out_rep = self.format_end_description(required_cols=self.outgoing_columns,
+                                              col_types=self.outgoing_types,
+                                              forbidden_cols=self.forbidden_to_produce)
         return (
             "[\n "
             + self.free_table_key.__repr__()
