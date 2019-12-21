@@ -87,3 +87,29 @@ def test_calc_interface():
         ops.check_constraints(data_model, strict=True)
 
     ops.check_constraints(data_model, strict=False)
+
+    # the examples we are interested in
+
+    ops_first = td.extend({'x': 1})
+    res_first = ops_first.transform(d_extra)
+    expect_first = data_algebra.pd.DataFrame({
+        'a': [1],
+        'x': [1],
+        })
+    assert data_algebra.test_util.equivalent_frames(res_first, expect_first)
+
+    ops_widened = ops_first.apply_to(td_extra)
+    assert ops_widened == (td_extra >> ops_first)
+    res_widened = ops_widened.transform(d_extra)
+    expect_widened = data_algebra.pd.DataFrame({
+        'a': [1],
+        'b': [2],
+        'x': [1],
+        })
+    assert data_algebra.test_util.equivalent_frames(res_widened, expect_widened)
+
+    ops_strict = td.rename_columns({'b': 'a'})
+
+    with pytest.raises(ValueError):
+        ops_strict.apply_to(td_extra)
+

@@ -1685,7 +1685,7 @@ class RenameColumnsNode(ViewRepresentation):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
-        return new_sources[0].rename(column_remapping=self.column_remapping)
+        return new_sources[0].rename_columns(column_remapping=self.column_remapping)
 
     def _equiv_nodes(self, other):
         if not self.column_remapping == other.column_remapping:
