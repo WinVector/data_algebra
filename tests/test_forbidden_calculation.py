@@ -64,7 +64,7 @@ def test_calc_interface():
     sql = ops.to_sql(db_model, pretty=True)
     # DB doesn't give us an easy path to check stuff
     res_db_bad = db_model.read_query(conn, sql)
-    data_model = {'d': [c for c in db_model.read_table(conn, 'd').columns]}
+    data_model = {'d': [c for c in db_model.read_table(conn, 'd', limit=1).columns]}
     conn.close()
 
     with pytest.raises(ValueError):
