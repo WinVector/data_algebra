@@ -42,30 +42,48 @@ def test_forbidden_calculation():
 
 
 def test_calc_interface():
-    ops = TableDescription(table_name='d', column_names=['a']).rename_columns({'b': 'a'})
+    td = TableDescription(table_name='d', column_names=['a'])
+    ops = td.rename_columns({'b': 'a'})
 
     d_good = pandas.DataFrame({'a': [1]})
-    d_bad = pandas.DataFrame({'a': [1], 'b': [2]})
+    d_extra = pandas.DataFrame({'a': [1], 'b': [2]})
     expect = pandas.DataFrame({'b': [1]})
+
+    # check that table-defs narrow data
+    res0 = td.transform(d_extra)
+    assert data_algebra.test_util.equivalent_frames(res0, d_good)
+    data_algebra.test_util.check_transform(ops=td, data=d_extra, expect=d_good)
+
+    # check that def composition can widen arrows
+    td_extra = describe_table(d_extra, 'd_extra')
+    assert td.apply_to(td_extra) == td_extra
+    assert td_extra.apply_to(td) == td
+    assert (td >> td_extra) == td
+    assert (td_extra >> td) == td_extra
 
     res1 = ops.transform(d_good)
     assert data_algebra.test_util.equivalent_frames(res1, expect)
     data_algebra.test_util.check_transform(ops=ops, data=d_good, expect=expect)
 
-    with pytest.raises(ValueError):
-        ops.transform(d_bad)
+    res2 = ops.transform(d_extra)
+    assert data_algebra.test_util.equivalent_frames(res2, expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d_extra, expect=expect)
 
     conn = sqlite3.connect(":memory:")
     db_model = data_algebra.SQLite.SQLiteModel()
     db_model.prepare_connection(conn)
 
-    db_model.insert_table(conn, d_bad, table_name='d')
+    db_model.insert_table(conn, d_extra, table_name='d')
 
     sql = ops.to_sql(db_model, pretty=True)
-    # DB doesn't give us an easy path to check stuff
+    # Note: extra columns during execution is not an error.
     res_db_bad = db_model.read_query(conn, sql)
     data_model = {'d': [c for c in db_model.read_table(conn, 'd', limit=1).columns]}
     conn.close()
 
+    assert data_algebra.test_util.equivalent_frames(res_db_bad, expect)
+
     with pytest.raises(ValueError):
-        ops.check_constraints(data_model)
+        ops.check_constraints(data_model, strict=True)
+
+    ops.check_constraints(data_model, strict=False)

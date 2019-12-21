@@ -270,6 +270,30 @@ class ViewRepresentation(OperatorPlatform, ABC):
     def eval_implementation(self, *, data_map, eval_env, data_model):
         raise NotImplementedError("base method called")
 
+    def check_constraints(self, data_model, *, strict=False):
+        """
+        Check tables supplied meet data consistency constraints.
+
+        data_model: dictionairy of column name lists.
+        """
+        self.columns_used()  # for table consistency check/raise
+        forbidden = self.forbidden_columns()
+        tables = self.get_tables()
+        missing_tables = set(tables.keys()) - set(data_model.keys())
+        if len(missing_tables) > 0:
+            raise ValueError("missing required tables: " + str(missing_tables))
+        for k in tables.keys():
+            have = set(data_model[k])
+            td = tables[k]
+            missing = set(td.column_names) - have
+            if len(missing) > 0:
+                raise ValueError("Table " + k + " missing required columns: " + str(missing))
+            if strict:
+                cf = set(forbidden[k])
+                excess = cf.intersection(have)
+                if len(excess) > 0:
+                    raise ValueError("Table " + k + " has forbidden columns: " + str(excess))
+
     def eval_pandas(self, data_map, *, eval_env=None, data_model=None):
         """
         Evaluate operators with respect to Pandas data frames.
@@ -291,7 +315,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             )
         self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
-        self.check_constraints({k: x.columns for (k, x) in data_map.items()})
+        self.check_constraints({k: x.columns for (k, x) in data_map.items()}, strict=False)
         for k in tables.keys():
             if k not in data_map.keys():
                 raise ValueError("Required table " + k + " not in data_map")
@@ -320,29 +344,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
                 data_map=data_map, eval_env=eval_env, data_model=data_model
             )
         raise TypeError("can not apply eval() to type " + str(type(x)))
-
-    def check_constraints(self, data_model):
-        """
-        Check tables supplied meet data consistency constraints.
-
-        data_model: dictionairy of column name lists.
-        """
-        self.columns_used()  # for table consistency check/raise
-        forbidden = self.forbidden_columns()
-        tables = self.get_tables()
-        missing_tables = set(tables.keys()) - set(data_model.keys())
-        if len(missing_tables) > 0:
-            raise ValueError("missing required tables: " + str(missing_tables))
-        for k in tables.keys():
-            have = set(data_model[k])
-            td = tables[k]
-            cf = set(forbidden[k])
-            excess = cf.intersection(have)
-            if len(excess) > 0:
-                raise ValueError("Table " + k + " has forbidden columns: " + str(excess))
-            missing = set(td.column_names) - have
-            if len(missing) > 0:
-                raise ValueError("Table " + k + " missing required columns: " + str(missing))
 
     # noinspection PyPep8Naming
     def transform(self, X, *, eval_env=None, data_model=None):
