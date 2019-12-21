@@ -324,6 +324,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             raise TypeError(
                 "Expected data_model to be derived from data_algebra.data_model.DataModel"
             )
+        # noinspection PyUnusedLocal
         cols_used = self.columns_used()  # for table consistency check/raise
         forbidden = self.forbidden_columns()
         tables = self.get_tables()
