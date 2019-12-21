@@ -239,7 +239,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         raise NotImplementedError("base method called")
 
     # noinspection PyBroadException
-    def to_sql(self, db_model, *, pretty=False, encoding=None, sqlparse_options=None):
+    def to_sql(self, db_model, *, pretty=False, encoding=None, sqlparse_options=None, temp_tables=None):
         if sqlparse_options is None:
             sqlparse_options = {"reindent": True, "keyword_case": "upper"}
         if not isinstance(db_model, data_algebra.db_model.DBModel):
@@ -248,10 +248,14 @@ class ViewRepresentation(OperatorPlatform, ABC):
             )
         self.columns_used()  # for table consistency check/raise
         temp_id_source = [0]
-        sql_str = self.to_sql_implementation(
+        sub_sql = self.to_sql_implementation(
             db_model=db_model, using=None, temp_id_source=temp_id_source
         )
-        sql_str = sql_str.to_sql(db_model=db_model, force_sql=True)
+        if (sub_sql.temp_tables is not None) and (len(sub_sql.temp_tables) > 0):
+            if temp_tables is None:
+                raise ValueError("need temp_tables to be a dictionary to copy back found temporary table values")
+            temp_tables.update(sub_sql.temp_tables)
+        sql_str = sub_sql.to_sql(db_model=db_model, force_sql=True)
         if pretty and _have_sqlparse:
             try:
                 sql_str = sqlparse.format(
@@ -299,7 +303,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
             data_map=data_map, eval_env=eval_env, data_model=data_model
         )
 
-    # TODO: see where this method is used and possibly remove?
     def eval(self, data_map, *, eval_env=None, data_model=None):
         if len(data_map) < 1:
             raise ValueError("Expected data_map to be non-empty")
@@ -1952,46 +1955,9 @@ class ConcatRowsNode(ViewRepresentation):
         )
 
 
-# TODO: get control of temp table name back
 class ConvertRecordsNode(ViewRepresentation):
     def __init__(self, source, record_map):
-        blocks_out_table = None
         sources = [source]
-        if blocks_out_table is None and record_map.blocks_out.control_table is not None:
-            blocks_out_table = TableDescription(
-                "cdata_temp_record",
-                [c for c in record_map.blocks_out.record_keys]
-                + [c for c in record_map.blocks_out.control_table.columns],
-            )
-        if blocks_out_table is not None:
-            # check blocks_out_table is a direct table
-            if not isinstance(blocks_out_table, TableDescription):
-                raise TypeError(
-                    "expected blocks_out_table to be a data_algebra.data_ops.TableDescription"
-                )
-            # ensure table is the exact same definition object if already present
-            a_tables = source.get_tables()
-            if blocks_out_table.key in a_tables.keys():
-                a_table = a_tables[blocks_out_table.key]
-                if not a_table.column_set == blocks_out_table.column_set:
-                    raise ValueError(
-                        "blocks_out_table column definition does not match table already in op DAG"
-                    )
-                if blocks_out_table is not a_table:
-                    blocks_out_table = a_table
-            # check blocks_out_table is a direct table
-            if not isinstance(blocks_out_table, TableDescription):
-                raise TypeError(
-                    "expected blocks_out_table to be a data_algebra.data_ops.TableDescription"
-                )
-            # check it has at least the columns we expect
-            expect = [c for c in record_map.blocks_out.record_keys] + [
-                c for c in record_map.blocks_out.control_table.columns
-            ]
-            unknown = set(expect) - set(blocks_out_table.column_names)
-            if len(unknown) > 0:
-                raise ValueError("blocks_out_table missing columns: " + str(unknown))
-        self.blocks_out_table = blocks_out_table
         self.record_map = record_map
         unknown = set(self.record_map.columns_needed) - set(source.column_names)
         if len(unknown) > 0:
@@ -2003,6 +1969,16 @@ class ConvertRecordsNode(ViewRepresentation):
             node_name="ConvertRecordsNode",
         )
 
+    def blocks_out_table(self, *, temp_id_source):
+        view_name = "cdata_temp_record_" + str(temp_id_source[0])
+        temp_id_source[0] = temp_id_source[0] + 1
+        res = TableDescription(
+            view_name,
+            [c for c in self.record_map.blocks_out.record_keys]
+            + [c for c in self.record_map.blocks_out.control_table.columns],
+        )
+        return res
+
     def apply_to(self, a, *, target_table_key=None):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
@@ -2011,8 +1987,6 @@ class ConvertRecordsNode(ViewRepresentation):
             record_map=self.record_map)
 
     def _equiv_nodes(self, other):
-        if not self.blocks_out_table == other.blocks_out_table:
-            return False
         if not self.record_map == other.record_map:
             return False
         return True
@@ -2028,14 +2002,6 @@ class ConvertRecordsNode(ViewRepresentation):
         od = collections.OrderedDict()
         od["op"] = "ConvertRecords"
         od["record_map"] = self.record_map.to_simple_obj()
-        od["blocks_out_table"] = None
-        blocks_out_table = None
-        if len(self.sources) > 1:
-            blocks_out_table = self.blocks_out_table
-        if blocks_out_table is not None:
-            od["blocks_out_table"] = blocks_out_table.collect_representation(
-                dialect=dialect
-            )[0]
         pipeline.insert(0, od)
         return self.sources[0].collect_representation_implementation(
             pipeline=pipeline, dialect=dialect
@@ -2052,44 +2018,44 @@ class ConvertRecordsNode(ViewRepresentation):
         rm_str = self.record_map.__repr__()
         rm_str = re.sub("\n", "\n   ", rm_str)
         s = s + "convert_records(" + rm_str
-        if len(self.sources) > 1:
-            s = s + (
-                "\n,   blocks_out_table="
-                + self.blocks_out_table.to_python_implementation(
-                    indent=indent + 3, strict=strict
-                )
-            )
         s = s + ")"
         return s
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
+        if temp_id_source is None:
+            temp_id_source = [0]
+        # TODO: narrow to what we are using
         sub_query = self.sources[0].to_sql_implementation(
             db_model=db_model, using=None, temp_id_source=temp_id_source
         )
         # claims to use all columns
         query = sub_query.to_sql(columns=self.columns_used_from_sources(), db_model=db_model)
+        blocks_out_table = None
         if self.record_map.blocks_in is not None:
             query = db_model.blocks_to_row_recs_query(
                 query, record_spec=self.record_map.blocks_in
             )
         if self.record_map.blocks_out is not None:
+            blocks_out_table = self.blocks_out_table(temp_id_source=temp_id_source)
             query = db_model.row_recs_to_blocks_query(
                 query,
                 record_spec=self.record_map.blocks_out,
-                record_view=self.blocks_out_table,
+                record_view=blocks_out_table,
             )
-        if temp_id_source is None:
-            temp_id_source = [0]
         view_name = "convert_records_in_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         prev_view_name = "convert_records_out_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         terms = {k: None for k in self.record_map.columns_produced}
+        temp_tables = sub_query.temp_tables.copy()
+        if blocks_out_table is not None:
+            temp_tables[blocks_out_table.key] = self.record_map.blocks_out.control_table
         near_sql = data_algebra.near_sql.NearSQLq(
             quoted_query_name=db_model.quote_identifier(view_name),
             prev_quoted_query_name=db_model.quote_identifier(prev_view_name),
             query=query,
-            terms=terms
+            terms=terms,
+            temp_tables=temp_tables
         )
         return near_sql
 

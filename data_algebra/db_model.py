@@ -346,6 +346,7 @@ class DBModel:
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_sql(columns=subusing, db_model=self),
+            temp_tables=subsql.temp_tables.copy()
         )
         return near_sql
 
@@ -379,6 +380,7 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_sql(columns=subusing, db_model=self),
             suffix=suffix,
+            temp_tables=subsql.temp_tables.copy()
         )
         return near_sql
 
@@ -405,6 +407,7 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_sql(columns=subusing, db_model=self),
             suffix=suffix,
+            temp_tables=subsql.temp_tables.copy()
         )
         return near_sql
 
@@ -485,6 +488,7 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_sql(columns=subusing, db_model=self),
             suffix=suffix,
+            temp_tables=subsql.temp_tables.copy()
         )
         return near_sql
 
@@ -516,6 +520,7 @@ class DBModel:
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_sql(columns=subusing, db_model=self),
+            temp_tables=subsql.temp_tables.copy()
         )
         return near_sql
 
@@ -581,6 +586,8 @@ class DBModel:
                 )
                 + " "
             )
+        temp_tables = sql_left.temp_tables.copy()
+        temp_tables.update(sql_right.temp_tables)
         near_sql = data_algebra.near_sql.NearSQLBinaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
@@ -590,6 +597,7 @@ class DBModel:
             sub_sql2=sql_right.to_sql(columns=using_right, db_model=self),
             previous_step_summary2=sql_right.summary(),
             suffix=on_terms,
+            temp_tables=temp_tables
         )
         return near_sql
 
@@ -631,6 +639,8 @@ class DBModel:
                 concat_node.id_column: self.quote_string(concat_node.b_name)
             }
             terms.update({concat_node.id_column: None})
+        temp_tables = sql_left.temp_tables.copy()
+        temp_tables.update(sql_right.temp_tables)
         near_sql = data_algebra.near_sql.NearSQLUStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
@@ -648,6 +658,7 @@ class DBModel:
                 constants=constants_right,
             ),
             previous_step_summary2=sql_right.summary(),
+            temp_tables=temp_tables
         )
         return near_sql
 

@@ -1,4 +1,7 @@
 
+import pytest
+
+import data_algebra.SQLite
 import data_algebra.test_util
 from data_algebra.data_ops import *
 from data_algebra.cdata import *
@@ -122,7 +125,7 @@ def test_convert_records_transform_1():
 
     data = {
         "iris_small": iris_small,
-        "cdata_temp_record": ops.record_map.blocks_out.control_table,
+        # "cdata_temp_record": ops.record_map.blocks_out.control_table,
     }
 
     expect = data_algebra.pd.DataFrame({
@@ -136,4 +139,18 @@ def test_convert_records_transform_1():
         'Value': [1.4, 0.2, 5.1, 3.5, 1.4, 0.2, 4.9, 3.0, 1.3, 0.2, 4.7, 3.2],
         })
 
+    res_pandas = ops.transform(iris_small)
+    assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
+
+    db_model = data_algebra.SQLite.SQLiteModel()
+    with pytest.raises(ValueError):
+        ops.to_sql(db_model)
+
+    temp_tables = dict()
+    sql = ops.to_sql(db_model, temp_tables=temp_tables)
+    assert len(temp_tables) == 1
+    k = [k for k in temp_tables.keys()][0]
+    assert isinstance(temp_tables[k], data_algebra.pd.DataFrame)
+
     data_algebra.test_util.check_transform(ops, data, expect)
+

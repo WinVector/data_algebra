@@ -187,7 +187,10 @@ def check_transform(
     else:
         for (k, v) in data.items():
             db_model.insert_table(conn, v, table_name=k)
-    sql = ops.to_sql(db_model, pretty=True)
+    temp_tables = dict()
+    sql = ops.to_sql(db_model, pretty=True, temp_tables=temp_tables)
+    for (k, v) in temp_tables.items():
+        db_model.insert_table(conn, v, table_name=k)
     res_db = db_model.read_query(conn, sql)
     # clean up
     conn.close()
