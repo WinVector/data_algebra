@@ -219,14 +219,14 @@ class DataOpArrow(Arrow):
             in_rep, align_right=align_right, sep_width=sep_width
         )
         col_rep = [", ".join(line) for line in in_rep]
-        col_rep = " [ " + ",\n    ".join(col_rep) + " ]"
+        col_rep = " at least [ " + ",\n    ".join(col_rep) + " ]"
         if (forbidden_cols is not None) and (len(forbidden_cols) > 0):
             f_rep = [str(c) for c in forbidden_cols]
             f_rep = data_algebra.flow_text.flow_text(
                 f_rep, align_right=align_right, sep_width=sep_width
             )
             f_rep = [", ".join(line) for line in f_rep]
-            col_rep = col_rep + " - [ " + ",\n    ".join(f_rep) + " ]"
+            col_rep = col_rep + " , and none of [ " + ",\n    ".join(f_rep) + " ]"
         return col_rep
 
     def __str__(self):
@@ -263,3 +263,7 @@ class DataOpArrow(Arrow):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+
+def fmt_as_arrow(ops):
+    return str(DataOpArrow(ops))

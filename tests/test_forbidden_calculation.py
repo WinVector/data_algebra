@@ -7,6 +7,7 @@ import pytest
 
 from data_algebra.data_ops import *
 import data_algebra.test_util
+from data_algebra.arrow import fmt_as_arrow
 
 
 def test_forbidden_calculation():
@@ -113,3 +114,11 @@ def test_calc_interface():
     with pytest.raises(ValueError):
         ops_strict.apply_to(td_extra)
 
+    new_ops = ops_strict.apply_to(td.drop_columns('b'))
+    fmt_as_arrow(ops_strict)
+    fmt_as_arrow(new_ops)
+
+    assert data_algebra.test_util.equivalent_frames(new_ops.transform(d_good), expect)
+    assert data_algebra.test_util.equivalent_frames(new_ops.transform(d_extra), expect)
+    data_algebra.test_util.check_transform(ops=new_ops, data=d_good, expect=expect)
+    data_algebra.test_util.check_transform(ops=new_ops, data=d_extra, expect=expect)

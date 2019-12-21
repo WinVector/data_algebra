@@ -1473,9 +1473,6 @@ class DropColumnsNode(ViewRepresentation):
         remaining_columns = [
             c for c in source.column_names if c not in column_deletions
         ]
-        unknown = set(column_deletions) - set(source.column_names)
-        if len(unknown) > 0:
-            raise ValueError("dropping unknown columns " + str(unknown))
         ViewRepresentation.__init__(
             self,
             column_names=remaining_columns,
