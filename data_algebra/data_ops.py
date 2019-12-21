@@ -316,6 +316,25 @@ class ViewRepresentation(OperatorPlatform, ABC):
             )
         raise TypeError("can not apply eval() to type " + str(type(x)))
 
+    def check_constraints(self, data_model):
+        cols_used = self.columns_used()  # for table consistency check/raise
+        forbidden = self.forbidden_columns()
+        tables = self.get_tables()
+        missing_tables = set(tables.keys()) - set(data_model.keys())
+        if len(missing_tables) > 0:
+            raise ValueError("missing required tables: " + str(missing_tables))
+        for k in tables.keys():
+            have = set(data_model[k])
+            td = tables[k]
+            # cu = set(cols_used[k])
+            cf = set(forbidden[k])
+            excess = cf.intersection(have)
+            if len(excess) > 0:
+                raise ValueError("Table " + k + " has forbidden columns: " + str(excess))
+            missing = set(td.column_names) - have
+            if len(missing) > 0:
+                raise ValueError("Table " + k + " missing required columns: " + str(missing))
+
     # noinspection PyPep8Naming
     def transform(self, X, *, eval_env=None, data_model=None):
         if data_model is None:
@@ -324,28 +343,17 @@ class ViewRepresentation(OperatorPlatform, ABC):
             raise TypeError(
                 "Expected data_model to be derived from data_algebra.data_model.DataModel"
             )
-        # noinspection PyUnusedLocal
-        cols_used = self.columns_used()  # for table consistency check/raise
-        forbidden = self.forbidden_columns()
+        self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
         if len(tables) != 1:
             raise ValueError(
                 "transfrom(DataFrame) can only be applied to ops-dags with only one table def"
             )
         k = [k for k in tables.keys()][0]
-        td = tables[k]
-        # cu = set(cols_used[k])
-        cf = set(forbidden[k])
         # noinspection PyUnresolvedReferences
         if isinstance(X, data_model.pd.DataFrame):
-            have = set(X.columns)
-            excess = cf.intersection(have)
-            if len(excess) > 0:
-                raise ValueError("Table " + k + " has forbidden columns: " + str(excess))
-            missing = set(td.column_names) - have
-            if len(missing) > 0:
-                raise ValueError("Table " + k + " missing required columns: " + str(missing))
             data_map = {k: X}
+            self.check_constraints({k: X.columns})  # TODO: move this into eval_panas, but after we fix record-xform
             return self.eval_pandas(
                 data_map=data_map, eval_env=eval_env, data_model=data_model
             )
@@ -1992,9 +2000,6 @@ class ConvertRecordsNode(ViewRepresentation):
             sources=sources,
             node_name="ConvertRecordsNode",
         )
-
-    def forbidden_columns(self, *, forbidden=None):
-        raise NotImplementedError("not implemented yet")
 
     def apply_to(self, a, *, target_table_key=None):
         new_sources = [

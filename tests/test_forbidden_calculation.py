@@ -62,6 +62,10 @@ def test_calc_interface():
     db_model.insert_table(conn, d_bad, table_name='d')
 
     sql = ops.to_sql(db_model, pretty=True)
+    # DB doesn't give us an easy path to check stuff
     res_db_bad = db_model.read_query(conn, sql)
-
+    data_model = {'d': [c for c in db_model.read_table(conn, 'd').columns]}
     conn.close()
+
+    with pytest.raises(ValueError):
+        ops.check_constraints(data_model)
