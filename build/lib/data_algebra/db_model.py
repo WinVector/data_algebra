@@ -586,6 +586,9 @@ class DBModel:
                 )
                 + " "
             )
+        confused_temps = set(sql_left.temp_tables.keys()).intersection(sql_right.temp_tables.keys())
+        if len(confused_temps) > 0:
+            raise ValueError("name collisions on temp_tables: " + str(confused_temps))
         temp_tables = sql_left.temp_tables.copy()
         temp_tables.update(sql_right.temp_tables)
         near_sql = data_algebra.near_sql.NearSQLBinaryStep(
@@ -639,6 +642,9 @@ class DBModel:
                 concat_node.id_column: self.quote_string(concat_node.b_name)
             }
             terms.update({concat_node.id_column: None})
+        confused_temps = set(sql_left.temp_tables.keys()).intersection(sql_right.temp_tables.keys())
+        if len(confused_temps) > 0:
+            raise ValueError("name collisions on temp_tables: " + str(confused_temps))
         temp_tables = sql_left.temp_tables.copy()
         temp_tables.update(sql_right.temp_tables)
         near_sql = data_algebra.near_sql.NearSQLUStep(
