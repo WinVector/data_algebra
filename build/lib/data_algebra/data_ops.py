@@ -2049,6 +2049,8 @@ class ConvertRecordsNode(ViewRepresentation):
         terms = {k: None for k in self.record_map.columns_produced}
         temp_tables = sub_query.temp_tables.copy()
         if blocks_out_table is not None:
+            if blocks_out_table.key in temp_tables.keys():
+                raise ValueError("key collision in temp_tables construction: " + blocks_out_table.key)
             temp_tables[blocks_out_table.key] = self.record_map.blocks_out.control_table
         near_sql = data_algebra.near_sql.NearSQLq(
             quoted_query_name=db_model.quote_identifier(view_name),
