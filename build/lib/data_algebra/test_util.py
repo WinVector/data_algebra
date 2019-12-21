@@ -185,8 +185,7 @@ def check_transform(
         table_name = [k for k in cols_used.keys()][0]
         db_model.insert_table(conn, data, table_name=table_name)
     else:
-        for k in cols_used.keys():
-            v = data[k]
+        for (k, v) in data.items():
             db_model.insert_table(conn, v, table_name=k)
     sql = ops.to_sql(db_model, pretty=True)
     res_db = db_model.read_query(conn, sql)

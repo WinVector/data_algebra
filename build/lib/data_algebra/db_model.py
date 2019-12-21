@@ -175,7 +175,7 @@ class DBModel:
         )
         sql = "SELECT * FROM " + q_table_name
         if limit is not None:
-            sql = sql + " LIMIT " + limit
+            sql = sql + " LIMIT " + limit.__repr__()
         return self.read_query(conn, sql)
 
     def read(self, conn, table):

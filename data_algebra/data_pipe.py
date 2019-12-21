@@ -340,10 +340,9 @@ class ConcatRows(PipeStep):
 
 
 class ConvertRecords(PipeStep):
-    def __init__(self, record_map, *, blocks_out_table=None):
+    def __init__(self, record_map):
         PipeStep.__init__(self)
         self.record_map = record_map
-        self.blocks_out_table = blocks_out_table
 
     def apply_to(self, other, **kwargs):
         if not isinstance(other, OperatorPlatform):
@@ -351,8 +350,7 @@ class ConvertRecords(PipeStep):
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
         return other.convert_records(
-            record_map=self.record_map, blocks_out_table=self.blocks_out_table
-        )
+            record_map=self.record_map)
 
     def __repr__(self):
         return (
@@ -360,8 +358,6 @@ class ConvertRecords(PipeStep):
             + self.record_map.__repr__()
             + ", record_map="
             + self.record_map.__repr__()
-            + ", blocks_out_table="
-            + self.blocks_out_table.__repr__()
             + ")"
         )
 

@@ -287,6 +287,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             )
         self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
+        self.check_constraints({k: x.columns for (k, x) in data_map.items()})
         for k in tables.keys():
             if k not in data_map.keys():
                 raise ValueError("Required table " + k + " not in data_map")
@@ -298,6 +299,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             data_map=data_map, eval_env=eval_env, data_model=data_model
         )
 
+    # TODO: see where this method is used and possibly remove?
     def eval(self, data_map, *, eval_env=None, data_model=None):
         if len(data_map) < 1:
             raise ValueError("Expected data_map to be non-empty")
@@ -317,7 +319,12 @@ class ViewRepresentation(OperatorPlatform, ABC):
         raise TypeError("can not apply eval() to type " + str(type(x)))
 
     def check_constraints(self, data_model):
-        cols_used = self.columns_used()  # for table consistency check/raise
+        """
+        Check tables supplied meet data consistency constraints.
+
+        data_model: dictionairy of column name lists.
+        """
+        self.columns_used()  # for table consistency check/raise
         forbidden = self.forbidden_columns()
         tables = self.get_tables()
         missing_tables = set(tables.keys()) - set(data_model.keys())
@@ -326,7 +333,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
         for k in tables.keys():
             have = set(data_model[k])
             td = tables[k]
-            # cu = set(cols_used[k])
             cf = set(forbidden[k])
             excess = cf.intersection(have)
             if len(excess) > 0:
@@ -353,7 +359,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
         # noinspection PyUnresolvedReferences
         if isinstance(X, data_model.pd.DataFrame):
             data_map = {k: X}
-            self.check_constraints({k: X.columns})  # TODO: move this into eval_panas, but after we fix record-xform
             return self.eval_pandas(
                 data_map=data_map, eval_env=eval_env, data_model=data_model
             )
@@ -550,16 +555,14 @@ class ViewRepresentation(OperatorPlatform, ABC):
             return self.sources[0].order_rows(columns, reverse=reverse, limit=limit)
         return OrderRowsNode(source=self, columns=columns, reverse=reverse, limit=limit)
 
-    def convert_records(self, record_map, *, blocks_out_table=None):
+    def convert_records(self, record_map):
         if record_map is None:
             return self
         if self.is_trivial_when_intermediate():
             return self.sources[0].convert_records(
-                record_map, blocks_out_table=blocks_out_table
-            )
+                record_map)
         return ConvertRecordsNode(
-            source=self, record_map=record_map, blocks_out_table=blocks_out_table
-        )
+            source=self, record_map=record_map)
 
 
 # Could also have general query as starting node, but don't see a lot of point to
@@ -948,15 +951,13 @@ class WrappedOperatorPlatform(OperatorPlatform):
             data_map=self.data_map,
         )
 
-    def convert_records(self, record_map, *, blocks_out_table=None):
+    def convert_records(self, record_map):
         if record_map is None:
             return self
-        data_map, blocks_out_table = self._reach_in(blocks_out_table)
         return WrappedOperatorPlatform(
             underlying=self.underlying.convert_records(
-                record_map=record_map, blocks_out_table=blocks_out_table
-            ),
-            data_map=data_map,
+                record_map=record_map),
+            data_map=self.data_map,
         )
 
 
@@ -1951,8 +1952,10 @@ class ConcatRowsNode(ViewRepresentation):
         )
 
 
+# TODO: get control of temp table name back
 class ConvertRecordsNode(ViewRepresentation):
-    def __init__(self, source, record_map, *, blocks_out_table=None):
+    def __init__(self, source, record_map):
+        blocks_out_table = None
         sources = [source]
         if blocks_out_table is None and record_map.blocks_out.control_table is not None:
             blocks_out_table = TableDescription(
@@ -1988,7 +1991,6 @@ class ConvertRecordsNode(ViewRepresentation):
             unknown = set(expect) - set(blocks_out_table.column_names)
             if len(unknown) > 0:
                 raise ValueError("blocks_out_table missing columns: " + str(unknown))
-            sources = sources + [blocks_out_table]
         self.blocks_out_table = blocks_out_table
         self.record_map = record_map
         unknown = set(self.record_map.columns_needed) - set(source.column_names)
@@ -2006,8 +2008,7 @@ class ConvertRecordsNode(ViewRepresentation):
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
         return new_sources[0].convert_records(
-            record_map=self.record_map, blocks_out_table=self.blocks_out_table
-        )
+            record_map=self.record_map)
 
     def _equiv_nodes(self, other):
         if not self.blocks_out_table == other.blocks_out_table:
@@ -2018,9 +2019,7 @@ class ConvertRecordsNode(ViewRepresentation):
 
     def columns_used_from_sources(self, using=None):
         return [
-            self.record_map.columns_needed,
-            [c for c in self.record_map.blocks_out.record_keys]
-            + [c for c in self.record_map.blocks_out.control_table.columns],
+            self.record_map.columns_needed
         ]
 
     def collect_representation_implementation(self, *, pipeline=None, dialect="Python"):
@@ -2032,7 +2031,7 @@ class ConvertRecordsNode(ViewRepresentation):
         od["blocks_out_table"] = None
         blocks_out_table = None
         if len(self.sources) > 1:
-            blocks_out_table = self.sources[1]
+            blocks_out_table = self.blocks_out_table
         if blocks_out_table is not None:
             od["blocks_out_table"] = blocks_out_table.collect_representation(
                 dialect=dialect
@@ -2056,7 +2055,7 @@ class ConvertRecordsNode(ViewRepresentation):
         if len(self.sources) > 1:
             s = s + (
                 "\n,   blocks_out_table="
-                + self.sources[1].to_python_implementation(
+                + self.blocks_out_table.to_python_implementation(
                     indent=indent + 3, strict=strict
                 )
             )
@@ -2077,7 +2076,7 @@ class ConvertRecordsNode(ViewRepresentation):
             query = db_model.row_recs_to_blocks_query(
                 query,
                 record_spec=self.record_map.blocks_out,
-                record_view=self.sources[1],
+                record_view=self.blocks_out_table,
             )
         if temp_id_source is None:
             temp_id_source = [0]

@@ -1,4 +1,4 @@
-import data_algebra
+
 import data_algebra.test_util
 from data_algebra.data_ops import *
 from data_algebra.cdata import *
@@ -125,53 +125,15 @@ def test_convert_records_transform_1():
         "cdata_temp_record": ops.record_map.blocks_out.control_table,
     }
 
-    expect = data_algebra.pd.DataFrame(
-        {
-            "id": [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2],
-            "Species": [
-                "setosa",
-                "setosa",
-                "setosa",
-                "setosa",
-                "setosa",
-                "setosa",
-                "setosa",
-                "setosa",
-                "setosa",
-                "setosa",
-                "setosa",
-                "setosa",
-            ],
-            "Part": [
-                "Petal",
-                "Petal",
-                "Sepal",
-                "Sepal",
-                "Petal",
-                "Petal",
-                "Sepal",
-                "Sepal",
-                "Petal",
-                "Petal",
-                "Sepal",
-                "Sepal",
-            ],
-            "Measure": [
-                "Length",
-                "Width",
-                "Length",
-                "Width",
-                "Length",
-                "Width",
-                "Length",
-                "Width",
-                "Length",
-                "Width",
-                "Length",
-                "Width",
-            ],
-            "Value": [1.4, 0.2, 5.1, 3.5, 1.4, 0.2, 4.9, 3.0, 1.3, 0.2, 4.7, 3.2],
-        }
-    )
+    expect = data_algebra.pd.DataFrame({
+        'id': [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2],
+        'Species': ['setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa',
+                    'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa'],
+        'Part': ['Petal', 'Petal', 'Sepal', 'Sepal', 'Petal', 'Petal', 'Sepal',
+                 'Sepal', 'Petal', 'Petal', 'Sepal', 'Sepal'],
+        'Measure': ['Length', 'Width', 'Length', 'Width', 'Length', 'Width',
+                    'Length', 'Width', 'Length', 'Width', 'Length', 'Width'],
+        'Value': [1.4, 0.2, 5.1, 3.5, 1.4, 0.2, 4.9, 3.0, 1.3, 0.2, 4.7, 3.2],
+        })
 
     data_algebra.test_util.check_transform(ops, data, expect)

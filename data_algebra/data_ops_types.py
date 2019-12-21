@@ -118,5 +118,5 @@ class OperatorPlatform:
     def order_rows(self, columns, *, reverse=None, limit=None):
         raise NotImplementedError("base class called")
 
-    def convert_records(self, record_map, *, blocks_out_table=None):
+    def convert_records(self, record_map):
         raise NotImplementedError("base class called")
