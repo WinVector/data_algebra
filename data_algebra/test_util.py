@@ -180,6 +180,7 @@ def check_transform(
     # try Sqlite path
     conn = sqlite3.connect(":memory:")
     db_model = data_algebra.SQLite.SQLiteModel()
+    db_model.prepare_connection(conn)
     if isinstance(data, pd.DataFrame):
         table_name = [k for k in cols_used.keys()][0]
         db_model.insert_table(conn, data, table_name=table_name)

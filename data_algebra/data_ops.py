@@ -324,15 +324,26 @@ class ViewRepresentation(OperatorPlatform, ABC):
             raise TypeError(
                 "Expected data_model to be derived from data_algebra.data_model.DataModel"
             )
-        self.columns_used()  # for table consistency check/raise
+        cols_used = self.columns_used()  # for table consistency check/raise
+        forbidden = self.forbidden_columns()
         tables = self.get_tables()
         if len(tables) != 1:
             raise ValueError(
                 "transfrom(DataFrame) can only be applied to ops-dags with only one table def"
             )
         k = [k for k in tables.keys()][0]
+        td = tables[k]
+        # cu = set(cols_used[k])
+        cf = set(forbidden[k])
         # noinspection PyUnresolvedReferences
         if isinstance(X, data_model.pd.DataFrame):
+            have = set(X.columns)
+            excess = cf.intersection(have)
+            if len(excess) > 0:
+                raise ValueError("Table " + k + " has forbidden columns: " + str(excess))
+            missing = set(td.column_names) - have
+            if len(missing) > 0:
+                raise ValueError("Table " + k + " missing required columns: " + str(missing))
             data_map = {k: X}
             return self.eval_pandas(
                 data_map=data_map, eval_env=eval_env, data_model=data_model
