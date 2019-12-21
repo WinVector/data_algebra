@@ -89,10 +89,9 @@ class DataOpArrow(Arrow):
         missing = set(self.incoming_columns) - set(b.outgoing_columns)
         if len(missing) > 0:
             raise ValueError("missing required columns: " + str(missing))
-        if self.strict:
-            problems = set(self.forbidden_columns()) - set(b.forbidden_to_produce)
-            if len(problems) > 0:
-                raise ValueError("did not document non-produciton of columns: " + str(problems))
+        problem_production = set(self.forbidden_columns()) - set(b.forbidden_to_produce)
+        if len(problem_production) > 0:
+            raise ValueError("did not document non-produciton of columns: " + str(problem_production))
         excess = set(b.outgoing_columns) - set(self.incoming_columns)
         if len(excess) > 0:
             problem_excess = excess.intersection(self.forbidden_columns())
