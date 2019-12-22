@@ -22,9 +22,15 @@ class Arrow:
         raise NotImplementedError("base class called")
 
     # noinspection PyPep8Naming
-    def transform(self, X):
-        """ transform X, act on X """
+    def act_on(self, X):
+        """ act on X, must associate with composition """
         raise NotImplementedError("base class called")
+
+        # noinspection PyPep8Naming
+
+    def transform(self, X):
+        """ transform X, may or may not associate with composition """
+        return self.act_on(X)
 
     def __rshift__(self, other):  # override self >> other
         return other.apply_to(self)
@@ -32,7 +38,7 @@ class Arrow:
     def __rrshift__(self, other):  # override other >> self
         if isinstance(other, Arrow):
             return self.apply_to(other)
-        return self.transform(other)
+        return self.act_on(other)
 
 
 class DataOpArrow(Arrow):
@@ -124,7 +130,7 @@ class DataOpArrow(Arrow):
         return res
 
     # noinspection PyPep8Naming
-    def transform(self, X):
+    def act_on(self, X):
         # assume a pandas.DataFrame compatible object
         # noinspection PyUnresolvedReferences
         cols = set(X.columns)
@@ -134,7 +140,7 @@ class DataOpArrow(Arrow):
         excess = cols - set(self.incoming_columns)
         if len(excess) > 0:
             X = X[self.incoming_columns]
-        return self.pipeline.transform(X)
+        return self.pipeline.act_on(X)
 
     def learn_types(self, data_in, data_out):
         if (data_in is not None) and (data_in.shape[0] > 0):
@@ -148,7 +154,7 @@ class DataOpArrow(Arrow):
     def fit(self, X):
         """Learn input and output types from example, and return self"""
         # assume a pandas.DataFrame compatible object
-        out = self.transform(X)
+        out = self.act_on(X)
         self.learn_types(X, out)
         return self
 

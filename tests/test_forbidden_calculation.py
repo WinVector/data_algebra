@@ -66,9 +66,10 @@ def test_calc_interface():
     assert data_algebra.test_util.equivalent_frames(res1, expect)
     data_algebra.test_util.check_transform(ops=ops, data=d_good, expect=expect)
 
-    res2 = ops.transform(d_extra)
-    assert data_algebra.test_util.equivalent_frames(res2, expect)
-    data_algebra.test_util.check_transform(ops=ops, data=d_extra, expect=expect)
+    with pytest.raises(ValueError):
+        ops.act_on(d_extra)
+
+    ops.transform(d_extra)
 
     conn = sqlite3.connect(":memory:")
     db_model = data_algebra.SQLite.SQLiteModel()

@@ -13,14 +13,24 @@ class OperatorPlatform:
         self.node_name = node_name
 
     # noinspection PyPep8Naming
-    def transform(self, X):
+    def transform(self, X, *, eval_env=None, data_model=None, narrow=True):
         """
-        apply self to data frame X
+        apply self to data frame X, may or may not commute with composition
 
         :param X: input data frame
         :return: transformed dataframe
         """
         raise NotImplementedError("base class called")
+
+    # noinspection PyPep8Naming
+    def act_on(self, X, *, eval_env=None, data_model=None):
+        """
+        apply self to data frame X, must commute with composition
+
+        :param X: input data frame
+        :return: transformed dataframe
+        """
+        return self.transform(X=X, eval_env=eval_env, data_model=data_model, narrow=False)
 
     def apply_to(self, a, *, target_table_key=None):
         """
@@ -35,7 +45,7 @@ class OperatorPlatform:
     def __rrshift__(self, other):  # override other >> self
         """
         override other >> self
-        self.apply_to/transform(other)
+        self.apply_to/act_on(other)
 
         :param other:
         :return:
@@ -44,7 +54,7 @@ class OperatorPlatform:
             return self.apply_to(other)
         if isinstance(other, PipeStep):
             return other.apply_to(other)
-        return self.transform(other)
+        return self.act_on(other)
 
     def __rshift__(self, other):  # override self >> other
         """

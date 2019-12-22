@@ -45,14 +45,14 @@ class PandasModel(data_algebra.data_model.DataModel):
             raise TypeError(arg_name + " was supposed to be a self.pd.DataFrame")
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
-    def table_step(self, op, *, data_map, eval_env):
+    def table_step(self, op, *, data_map, eval_env, narrow):
         if op.node_name != "TableDescription":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.TableDescription"
             )
         if len(op.qualifiers) > 0:
             raise ValueError(
-                "table descriptions used with eval_implementation() must not have qualifiers"
+                "table descriptions used with table_step() must not have qualifiers"
             )
         df = data_map[op.table_name]
         self.assert_is_appropriate_data_instance(df, "data_map[" + op.table_name + "]")
@@ -64,11 +64,13 @@ class PandasModel(data_algebra.data_model.DataModel):
         if len(missing) > 0:
             raise ValueError("missing required columns: " + str(missing))
         # make an index-free copy of the data to isolate side-effects and not deal with indices
+        if not narrow:
+            columns_using = [c for c in df.columns]
         res = df.loc[:, columns_using]
         res = res.reset_index(drop=True)
         return res
 
-    def extend_step(self, op, *, data_map, eval_env):
+    def extend_step(self, op, *, data_map, eval_env, narrow):
         if op.node_name != "ExtendNode":
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
         window_situation = (
@@ -79,7 +81,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         if window_situation:
             op.check_extend_window_fns()
         res = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, data_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
         standin_name = "_data_algebra_temp_g"  # name of an arbitrary input variable
         if not window_situation:
@@ -146,7 +148,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         # noinspection PyUnresolvedReferences
         return self.pd.DataFrame(cols)
 
-    def project_step(self, op, *, data_map, eval_env):
+    def project_step(self, op, *, data_map, eval_env, narrow):
         if op.node_name != "ProjectNode":
             raise TypeError("op was supposed to be a data_algebra.data_ops.ProjectNode")
         # check these are forms we are prepared to work with, and build an aggregation dictionary
@@ -168,7 +170,7 @@ class PandasModel(data_algebra.data_model.DataModel):
                         + str(opk)
                     )
         res = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, data_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
         res["_data_table_temp_col"] = 1
         if len(op.group_by) > 0:
@@ -205,46 +207,46 @@ class PandasModel(data_algebra.data_model.DataModel):
             raise ValueError("result wasn't keyed by group_by columns")
         return res
 
-    def select_rows_step(self, op, *, data_map, eval_env):
+    def select_rows_step(self, op, *, data_map, eval_env, narrow):
         if op.node_name != "SelectRowsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.SelectRowsNode"
             )
         res = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, data_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
         q = op.expr.to_pandas()
         res = res.query(q).reset_index(drop=True)
         return res
 
-    def select_columns_step(self, op, *, data_map, eval_env):
+    def select_columns_step(self, op, *, data_map, eval_env, narrow):
         if op.node_name != "SelectColumnsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.SelectColumnsNode"
             )
         res = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, data_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
         return res[op.column_selection]
 
-    def drop_columns_step(self, op, *, data_map, eval_env):
+    def drop_columns_step(self, op, *, data_map, eval_env, narrow):
         if op.node_name != "DropColumnsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.DropColumnsNode"
             )
         res = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, data_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
         column_selection = [c for c in res.columns if c not in op.column_deletions]
         return res[column_selection]
 
-    def order_rows_step(self, op, *, data_map, eval_env):
+    def order_rows_step(self, op, *, data_map, eval_env, narrow):
         if op.node_name != "OrderRowsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.OrderRowsNode"
             )
         res = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, data_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
         ascending = [
             False if ci in set(op.reverse) else True for ci in op.order_columns
@@ -254,13 +256,13 @@ class PandasModel(data_algebra.data_model.DataModel):
         )
         return res
 
-    def rename_columns_step(self, op, *, data_map, eval_env):
+    def rename_columns_step(self, op, *, data_map, eval_env, narrow):
         if op.node_name != "RenameColumnsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.RenameColumnsNode"
             )
         res = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, data_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
         return res.rename(columns=op.reverse_mapping)
 
@@ -276,16 +278,16 @@ class PandasModel(data_algebra.data_model.DataModel):
             pass
         return jointype
 
-    def natural_join_step(self, op, *, data_map, eval_env):
+    def natural_join_step(self, op, *, data_map, eval_env, narrow):
         if op.node_name != "NaturalJoinNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.NaturalJoinNode"
             )
         left = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, data_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
         right = op.sources[1].eval_implementation(
-            data_map=data_map, eval_env=eval_env, data_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
         common_cols = set([c for c in left.columns]).intersection(
             [c for c in right.columns]
@@ -308,16 +310,16 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = res.reset_index(drop=True)
         return res
 
-    def concat_rows_step(self, op, *, data_map, eval_env):
+    def concat_rows_step(self, op, *, data_map, eval_env, narrow):
         if op.node_name != "ConcatRowsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.ConcatRowsNode"
             )
         left = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, data_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
         right = op.sources[1].eval_implementation(
-            data_map=data_map, eval_env=eval_env, data_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
         if op.id_column is not None:
             left[op.id_column] = op.a_name
@@ -327,12 +329,12 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = res.reset_index(drop=True)
         return res
 
-    def convert_records_step(self, op, *, data_map, eval_env):
+    def convert_records_step(self, op, *, data_map, eval_env, narrow):
         if op.node_name != "ConvertRecordsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.ConvertRecordsNode"
             )
         res = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, data_model=self
+            data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
         return op.record_map.transform(res)

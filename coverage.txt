@@ -57,13 +57,13 @@ data_algebra/PostgreSQL.py                19      4    79%
 data_algebra/SQLite.py                    90      6    93%
 data_algebra/SparkSQL.py                  19      4    79%
 data_algebra/__init__.py                   5      0   100%
-data_algebra/arrow.py                    153     28    82%
+data_algebra/arrow.py                    155     28    82%
 data_algebra/cdata.py                    232     75    68%
 data_algebra/cdata_impl.py                10      1    90%
 data_algebra/connected_components.py      49      1    98%
 data_algebra/data_model.py                29     13    55%
 data_algebra/data_ops.py                1253    269    79%
-data_algebra/data_ops_types.py            54     22    59%
+data_algebra/data_ops_types.py            56     22    61%
 data_algebra/data_ops_utils.py            34      6    82%
 data_algebra/data_pipe.py                189     50    74%
 data_algebra/db_model.py                 402     70    83%
@@ -73,12 +73,12 @@ data_algebra/expr.py                      20      4    80%
 data_algebra/expr_rep.py                 653    209    68%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 140     16    89%
-data_algebra/pandas_model.py             182     20    89%
+data_algebra/pandas_model.py             184     20    89%
 data_algebra/test_util.py                122     17    86%
 data_algebra/util.py                      44      6    86%
 data_algebra/yaml.py                      95     11    88%
 ----------------------------------------------------------
-TOTAL                                   3898    879    77%
+TOTAL                                   3904    879    77%
 
 
-============================== 84 passed in 6.83s ==============================
+============================== 84 passed in 8.38s ==============================
