@@ -160,7 +160,19 @@ d
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -195,7 +207,19 @@ b.act_on(a.act_on(d))
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -233,7 +257,19 @@ ab.act_on(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -292,7 +328,19 @@ ab.transform(excess_frame)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -317,7 +365,7 @@ ab.transform(excess_frame)
 
 Notice in the above that the input `x` did not interfere with the calculation, and `d` was not copied forward.  The idea is behavior during composition is very close to behavior during action/application, so we find more issues during composition.
 
-However, `.transform()` does not associate with composition as we have `b.transform(a.transform(d))` is not equal to `ab.transform(d)`.
+However, `.transform()` does not associate with composition, or is not an action of this category, as we have `b.transform(a.transform(d))` is not equal to `ab.transform(d)`.  `.transform()` does associate with the arrows of the stricter [identical column set category we demonstrated earlier](https://github.com/WinVector/data_algebra/blob/master/Examples/Arrow/CDesign.md), so it is an action of this category.
 
 
 ```python
@@ -328,7 +376,19 @@ b.transform(a.transform(d))
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -405,7 +465,19 @@ table_c
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -446,7 +518,19 @@ c.act_on(table_c)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -478,7 +562,19 @@ c.transform(table_c)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -555,7 +651,19 @@ rab.act_on(excess_frame)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -675,9 +783,9 @@ print(bigger_a.to_sql(db_model=db_model, pretty=True))
 
     SELECT "a" + "b" AS "c",
            "a",
-           "b",
            "x",
            "y",
+           "b",
            "z"
     FROM "bigger"
 
@@ -692,4 +800,3 @@ And that is some of how the `data_algebra` works on our new set-oriented categor
 ```python
 
 ```
-
