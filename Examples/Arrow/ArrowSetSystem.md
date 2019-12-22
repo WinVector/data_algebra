@@ -2,16 +2,18 @@ I've been writing a lot about a [category theory interpretations of data-process
 
 I think I've found an even better category theory re-formulation of the package, which I will describe here.
 
-In the [earlier formalism](http://www.win-vector.com/blog/2019/12/data_algebra-rquery-as-a-category-over-table-descriptions/) our data transform pipelines were arrows over a category of sets of column names (sets of strings).  
+In the [earlier formalism](http://www.win-vector.com/blog/2019/12/data_algebra-rquery-as-a-category-over-table-descriptions/) our data transform pipelines were arrows over a category of sets of column names (sets of strings).  We will call this the "column equality" version of our category.
 
-These pipelines acted on `Pandas` tables or `SQL` tables, with one table marked as special.  Marking one table as special (or using a "pointed set" notation) lets us use a nice compositional notation, without having to appeal to something like operads.  The treating one table as the one of interest is fairly compatible with data science, as in data science often when working with many tables one is the primary model-frame and the rest are used to join in additional information.
+These pipelines acted on `Pandas` tables or `SQL` tables, with one table marked as special.  Marking one table as special (or using a "pointed set" notation) lets us use a nice compositional notation, without having to appeal to something like operads.  Treating one table as the one of interest is fairly compatible with data science, as in data science often when working with many tables one is the primary model-frame and the rest are used to join in additional information.
 
 The above formulation was really working well. But we have found a variation of the `data_algebra` with an even neater formalism.
 
 The `data_algebra` objects have a very nice interpretation as arrows in a category whose objects are set families described by:
 
- * a set of required columns.
- * a set of forbidden columns.
+ * a set of required column names.
+ * a set of forbidden column names.
+
+We will call this the "set ordered" version of our category.
  
 The arrows `a` and `b` compose as `a >> b` as long as:
 
@@ -39,7 +41,9 @@ We define our first arrow which is a transform that creates a new column `x` as 
 
 
 ```python
-a = TableDescription(table_name='table_a', column_names=['a', 'b']). \
+a = TableDescription(
+    table_name='table_a', 
+    column_names=['a', 'b']). \
         extend({'c': 'a + b'})
 
 a
@@ -365,7 +369,7 @@ ab.transform(excess_frame)
 
 Notice in the above that the input `x` did not interfere with the calculation, and `d` was not copied forward.  The idea is behavior during composition is very close to behavior during action/application, so we find more issues during composition.
 
-However, `.transform()` does not associate with composition, or is not an action of this category, as we have `b.transform(a.transform(d))` is not equal to `ab.transform(d)`.  `.transform()` does associate with the arrows of the stricter [identical column set category we demonstrated earlier](https://github.com/WinVector/data_algebra/blob/master/Examples/Arrow/CDesign.md), so it is an action of this category.
+However, `.transform()` does not associate with composition in the set ordered verson of our category, so is not an action of this category. The issue is: we have `b.transform(a.transform(d))` is not equal to `ab.transform(d)` in this category.
 
 
 ```python
@@ -411,11 +415,17 @@ b.transform(a.transform(d))
 
 
 
+`.transform()` does associate with the arrows of the stricter [identical column set category we demonstrated earlier](https://github.com/WinVector/data_algebra/blob/master/Examples/Arrow/CDesign.md), so it is an action of this category.
+
+So we have two categories, `.act_on()` is the category compatible action for one, and `.transform()` for the other.
+
 In both cases we still have result-oriented narrowing.
 
 
 ```python
-c = TableDescription(table_name='table_c', column_names=['a', 'b', 'c']). \
+c = TableDescription(
+    table_name='table_c', 
+    column_names=['a', 'b', 'c']). \
         extend({'x': 'a + b'}). \
         select_columns({'x'})
 
@@ -603,7 +613,8 @@ Another useful operator is `.drop_columns()` which drops columns if they are pre
 
 
 ```python
-tdr = describe_table(excess_frame).drop_columns(['x'])
+tdr = describe_table(excess_frame). \
+        drop_columns(['x'])
 
 tdr
 ```
@@ -722,7 +733,9 @@ a
 
 
 ```python
-bigger = TableDescription(table_name='bigger', column_names=['a', 'b', 'x', 'y', 'z'])
+bigger = TableDescription(
+    table_name='bigger', 
+    column_names=['a', 'b', 'x', 'y', 'z'])
 
 bigger
 ```
@@ -783,14 +796,16 @@ print(bigger_a.to_sql(db_model=db_model, pretty=True))
 
     SELECT "a" + "b" AS "c",
            "a",
+           "b",
            "x",
            "y",
-           "b",
            "z"
     FROM "bigger"
 
 
-The `SQL` translation is similar to `.transform()` in that it only refers to known columns by name.  This means we are safe from extra columns in the source tables. This means if we did derive an action acting on `SQL` or composition over `SQL` it would not associate with the `data_algebra` operator composition (just as `.transform()` did not).
+The `SQL` translation does not use "`*`", so it is similar to `.transform()` in that it only refers to known columns by name.  This means we are safe from extra columns in the source tables. This means if we did derive an action acting on `SQL` or composition over `SQL` it would not associate with the `data_algebra` operator composition (just as `.transform()` did not).
+
+So the column identity is category is a model of our `SQL` translation scheme (needs exact column definitions), and the set ordered category is a model of our in-memory data processing (accepts extra columns). These two systems being slightly different is mitigated by the fact each has an orderly model as a category. So we have tools, in principle, to formally talk about how they relate to each other (again using category theory).
 
 Notice we no longer have to use the arrow-adapter classes (except for formatting), the `data_algebra` itself has been adjusted to a more direct categorical basis.
 
