@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: data-algebra
-Version: 0.4.1
+Version: 0.4.2
 Summary: data_algebra is a data manipulation language that can both generate SQL queries and work on Pandas DataFrames. 
 Home-page: https://github.com/WinVector/data_algebra
 Author: John Mount
