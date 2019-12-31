@@ -222,7 +222,7 @@ class DBModel:
         )
 
     def quote_literal(self, string):
-        return self.quote_string(string)
+        return self.quote_string(str(string))
 
     def value_to_sql(self, v):
         if v is None:
@@ -636,10 +636,10 @@ class DBModel:
         constants_right = None
         if concat_node.id_column is not None:
             constants_left = {
-                concat_node.id_column: self.quote_string(concat_node.a_name)
+                concat_node.id_column: self.quote_literal(concat_node.a_name)
             }
             constants_right = {
-                concat_node.id_column: self.quote_string(concat_node.b_name)
+                concat_node.id_column: self.quote_literal(concat_node.b_name)
             }
             terms.update({concat_node.id_column: None})
         confused_temps = set(sql_left.temp_tables.keys()).intersection(sql_right.temp_tables.keys())
@@ -719,7 +719,7 @@ class DBModel:
                         "  WHEN b."
                         + self.quote_identifier(result_col)
                         + " = "
-                        + self.quote_string(source_col)
+                        + self.quote_literal(source_col)
                         + " THEN a."
                         + self.quote_identifier(source_col)
                         + "\n"
@@ -776,7 +776,7 @@ class DBModel:
                             " ( "
                             + self.quote_identifier(cc)
                             + " = "
-                            + self.quote_string(record_spec.control_table[cc][i])
+                            + self.quote_literal(record_spec.control_table[cc][i])
                             + " ) "
                         )
                     cstmt = (

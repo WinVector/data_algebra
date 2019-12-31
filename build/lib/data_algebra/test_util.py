@@ -110,8 +110,9 @@ def equivalent_frames(
             cb = numpy.asarray(cb, dtype=float)
             dif = ca - cb
             dif = numpy.asarray([abs(d) for d in dif if not pd.isnull(d)])
-            if numpy.max(dif) > float_tol:
-                return False
+            if len(dif) > 0:
+                if numpy.max(dif) > float_tol:
+                    return False
         else:
             if not all([ca[i] == cb[i] for i in range(a.shape[0])]):
                 return False
