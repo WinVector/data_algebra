@@ -16,10 +16,9 @@ def test_ranked_example():
                  '2004-01-09 00:00:00'],
         })
 
-    d['rowid'] = range(d.shape[0])
     ops = describe_table(d, 'd'). \
         extend({'rank': '_row_number()'},
-               partition_by="ID", order_by="rowid")
+               partition_by="ID", order_by="DATE")
     d = ops.transform(d)
 
     diagram = data_algebra.pd.DataFrame({
@@ -39,17 +38,16 @@ def test_ranked_example():
 
     expect = data_algebra.pd.DataFrame({
         'ID': [1, 2, 3, 4, 5, 6],
-        'DATE1': ['2001-01-02 00:00:00', '2000-04-01 00:00:00', '2014-04-07 00:00:00', '2012-12-01 00:00:00',
-                  '2010-10-10 00:00:00', '2004-01-09 00:00:00'],
-        'OP1': ['A', 'A', 'C', 'C', 'A', 'B'],
-        'DATE2': ['2015-04-25 00:00:00', None, None, '2005-06-16 00:00:00', '2003-11-09 00:00:00', None],
-        'OP2': ['B', None, None, 'A', 'B', None],
-        'DATE3': [None, None, None, '2009-01-20 00:00:00', None, None],
-        'OP3': [None, None, None, 'D', None, None],
+        'DATE1': ['2001-01-02 00:00:00', '2000-04-01 00:00:00', '2014-04-07 00:00:00', '2005-06-16 00:00:00', '2003-11-09 00:00:00', '2004-01-09 00:00:00'],
+        'OP1': ['A', 'A', 'C', 'A', 'B', 'B'],
+        'DATE2': ['2015-04-25 00:00:00', None, None, '2009-01-20 00:00:00', '2010-10-10 00:00:00', None],
+        'OP2': ['B', None, None, 'D', 'A', None],
+        'DATE3': [None, None, None, '2012-12-01 00:00:00', None, None],
+        'OP3': [None, None, None, 'C', None, None],
         'DATE4': [None, None, None, None, None, None],
         'OP4': [None, None, None, None, None, None],
         'DATE5': [None, None, None, None, None, None],
         'OP5': [None, None, None, None, None, None],
-    })
+        })
 
     assert data_algebra.test_util.equivalent_frames(res, expect)
