@@ -98,24 +98,27 @@ def equivalent_frames(
     for j in range(a.shape[1]):
         ca = a.iloc[:, j]
         cb = b.iloc[:, j]
-        ca_null = ca.isnull()
-        cb_null = cb.isnull()
-        if (ca_null is None) != (cb_null is None):
+        if (ca is None) != (cb is None):
             return False
         if ca is not None:
-            if not all([ca_null[i] == cb_null[i] for i in range(a.shape[0])]):
+            ca_null = ca.isnull()
+            cb_null = cb.isnull()
+            if (ca_null is None) != (cb_null is None):
                 return False
-        if can_convert_v_to_numeric(ca):
-            ca = numpy.asarray(ca, dtype=float)
-            cb = numpy.asarray(cb, dtype=float)
-            dif = ca - cb
-            dif = numpy.asarray([abs(d) for d in dif if not pd.isnull(d)])
-            if len(dif) > 0:
-                if numpy.max(dif) > float_tol:
-                    return False
-        else:
-            if not all([ca[i] == cb[i] for i in range(a.shape[0])]):
+            if not all(ca_null == cb_null):
                 return False
+            if not all(ca_null):
+                ca = ca[~ ca_null]
+                cb = cb[~ cb_null]
+                if can_convert_v_to_numeric(ca):
+                    ca = numpy.asarray(ca, dtype=float)
+                    cb = numpy.asarray(cb, dtype=float)
+                    dif = abs(ca - cb)
+                    if numpy.max(dif) > float_tol:
+                        return False
+                else:
+                    if not all(ca == cb):
+                        return False
     return True
 
 
