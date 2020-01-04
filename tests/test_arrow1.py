@@ -7,7 +7,6 @@ from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 from data_algebra.arrow import *
 import data_algebra.util
 import data_algebra.arrow
-import pandas
 
 
 def test_arrow1():
@@ -214,7 +213,7 @@ def test_arrow1():
 
 
 def test_arrow_cod_dom():
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         'x': [1, 2, 3],
         'y': [3, 4, 4],
     })

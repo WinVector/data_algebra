@@ -1,8 +1,7 @@
 
 import sqlite3
 
-import pandas
-
+import data_algebra
 import data_algebra.test_util
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 import data_algebra.SQLite
@@ -107,7 +106,7 @@ def test_sqllite_g2():
         rename_columns({'rat': 'diff', 'diff': 'rat'}). \
         order_rows(['rat'])
 
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         'col1': [1, 2, 2],
         'col2': [3, 4, 3],
         'col3': [4, 5, 7]
@@ -133,12 +132,12 @@ def test_sqllite_g2():
 
 
 def test_join_g2():
-    d1 = pandas.DataFrame({
+    d1 = data_algebra.pd.DataFrame({
         'col1': [1, 2, 4],
         'col2': [3, None, 6],
         'col3': [4, 5, 7]
     })
-    d2 = pandas.DataFrame({
+    d2 = data_algebra.pd.DataFrame({
         'col1': [1, 2, 3],
         'col2': [3, 4, None],
         'col4': [4, 5, 7]
@@ -169,12 +168,12 @@ def test_join_g2():
 
 
 def test_unionall_g2():
-    d1 = pandas.DataFrame({
+    d1 = data_algebra.pd.DataFrame({
         'col1': [1, 2, 4],
         'col2': [3, None, 6],
         'col3': [4, 5, 7]
     })
-    d2 = pandas.DataFrame({
+    d2 = data_algebra.pd.DataFrame({
         'col1': [1, 2, 3],
         'col2': [3, 4, None],
         'col3': [4, 5, 7]

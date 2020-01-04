@@ -1,5 +1,6 @@
-import numpy
 
+import data_algebra
+import numpy
 import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
@@ -30,6 +31,9 @@ def test_can_convert_v_to_numeric():
     )
     assert not data_algebra.util.can_convert_v_to_numeric(
         data_algebra.pd.DataFrame({"x": ["a", numpy.nan]})["x"]
+    )
+    assert not data_algebra.util.can_convert_v_to_numeric(
+        data_algebra.pd.DataFrame({"x": [1, "a"]})["x"]
     )
 
 

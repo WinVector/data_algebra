@@ -133,7 +133,7 @@ class DBModel:
             + " "
             + (
                 "double precision"
-                if data_algebra.util.can_convert_v_to_numeric(d[d.columns[i]])
+                if data_algebra.util.can_convert_v_to_numeric(d[d.columns[i]], pd=self.pd)
                 else "VARCHAR"
             )
             for i in range(d.shape[1])

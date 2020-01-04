@@ -1,10 +1,9 @@
 
 import sqlite3
 
-import pandas
-
 import pytest
 
+import data_algebra
 from data_algebra.data_ops import *
 import data_algebra.test_util
 from data_algebra.arrow import fmt_as_arrow
@@ -46,9 +45,9 @@ def test_calc_interface():
     td = TableDescription(table_name='d', column_names=['a'])
     ops = td.rename_columns({'b': 'a'})
 
-    d_good = pandas.DataFrame({'a': [1]})
-    d_extra = pandas.DataFrame({'a': [1], 'b': [2]})
-    expect = pandas.DataFrame({'b': [1]})
+    d_good = data_algebra.pd.DataFrame({'a': [1]})
+    d_extra = data_algebra.pd.DataFrame({'a': [1], 'b': [2]})
+    expect = data_algebra.pd.DataFrame({'b': [1]})
 
     # check that table-defs narrow data
     res0 = td.transform(d_extra)

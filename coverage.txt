@@ -76,10 +76,10 @@ data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 140     16    89%
 data_algebra/pandas_model.py             184     20    89%
 data_algebra/test_util.py                126     18    86%
-data_algebra/util.py                      44      6    86%
+data_algebra/util.py                      45      6    87%
 data_algebra/yaml.py                      95     11    88%
 ----------------------------------------------------------
-TOTAL                                   3908    879    78%
+TOTAL                                   3909    879    78%
 
 
-============================== 85 passed in 9.50s ==============================
+============================== 85 passed in 8.37s ==============================

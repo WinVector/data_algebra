@@ -25,4 +25,6 @@ pd = importlib.import_module("pandas")  # https://pandas.pydata.org
 # TODO: possibly import modin instead
 # can't do that now
 # https://github.com/modin-project/modin/issues/865
+# requires: modin, ray, distributed
+# pip install modin[ray]
 # pd = importlib.import_module("modin.pandas")  # https://github.com/modin-project/modin

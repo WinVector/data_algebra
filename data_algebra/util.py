@@ -1,5 +1,6 @@
 import collections
 import numpy
+import numbers
 
 import data_algebra
 
@@ -12,20 +13,20 @@ def od(**kwargs):
     return r
 
 
-def can_convert_v_to_numeric(x):
+def can_convert_v_to_numeric(x, *, pd=None):
     """check if non-empty vector can convert to numeric"""
-    try:
-        numpy.asarray(x + 0, dtype=float)
+    if pd is None:
+        pd = data_algebra.pd
+    if isinstance(x, numbers.Number):
         return True
-    except TypeError:
-        return False
+    return pd.api.types.is_numeric_dtype(x)
 
 
 def is_bad(x, *, pd=None):
     """ for numeric vector x, return logical vector of positions that are null, NaN, infinite"""
     if pd is None:
         pd = data_algebra.pd
-    if can_convert_v_to_numeric(x):
+    if can_convert_v_to_numeric(x, pd=pd):
         x = numpy.asarray(x + 0, dtype=float)
         return numpy.logical_or(
             pd.isnull(x), numpy.logical_or(numpy.isnan(x), numpy.isinf(x))

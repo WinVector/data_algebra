@@ -84,8 +84,8 @@ def equivalent_frames(
         b = b[acols]
         b = b.reset_index(drop=True)
     for j in range(a.shape[1]):
-        if can_convert_v_to_numeric(a.iloc[:, j]) != can_convert_v_to_numeric(
-            b.iloc[:, j]
+        if can_convert_v_to_numeric(a.iloc[:, j], pd=pd) != can_convert_v_to_numeric(
+            b.iloc[:, j], pd=pd
         ):
             return False
     if a.shape[0] < 1:
@@ -110,7 +110,7 @@ def equivalent_frames(
             if not all(ca_null):
                 ca = ca[~ ca_null]
                 cb = cb[~ cb_null]
-                if can_convert_v_to_numeric(ca):
+                if can_convert_v_to_numeric(ca, pd=pd):
                     ca = numpy.asarray(ca, dtype=float)
                     cb = numpy.asarray(cb, dtype=float)
                     dif = abs(ca - cb)
