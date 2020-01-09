@@ -13,7 +13,7 @@ class NearSQL:
         self.temp_tables = temp_tables
 
     def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model):
-        raise NotImplemented("base method called")
+        raise NotImplementedError("base method called")
 
     def summary(self):
         return {"quoted_query_name": self.quoted_query_name, "is_table": False}
