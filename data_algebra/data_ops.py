@@ -114,6 +114,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
         with the using columns (None means all)."""
         raise NotImplementedError("base method called")
 
+    def columns_produced(self):
+        return self.column_names.copy()
+
     def _clear_columns_currently_used(self):
         self.columns_currently_used = set()
         for si in self.sources:
@@ -300,6 +303,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         :param data_map: map from table names to data frames
         :param eval_env: environment to evaluate in
         :param data_model: adaptor to Pandas dialect
+        :param narrow logical, if True don't copy unexpected columns
         :return:
         """
 
@@ -758,6 +762,9 @@ class WrappedOperatorPlatform(OperatorPlatform):
         OperatorPlatform.__init__(self, node_name=underlying.node_name)
         self.data_map = data_map.copy()
         self.underlying = underlying
+
+    def columns_produced(self):
+        return self.underlying.columns_produced()
 
     # execution
 

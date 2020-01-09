@@ -18,6 +18,9 @@ class OperatorPlatform:
         apply self to data frame X, may or may not commute with composition
 
         :param X: input data frame
+        :param eval_env environment to look for symbols in
+        :param data_model implementation to use
+        :param narrow logical, if True don't copy unexpected columns
         :return: transformed dataframe
         """
         raise NotImplementedError("base class called")
@@ -28,6 +31,8 @@ class OperatorPlatform:
         apply self to data frame X, must commute with composition
 
         :param X: input data frame
+        :param eval_env environment to look for symbols in
+        :param data_model implementation to use
         :return: transformed dataframe
         """
         return self.transform(X=X, eval_env=eval_env, data_model=data_model, narrow=False)
@@ -81,6 +86,11 @@ class OperatorPlatform:
         """
         return other.apply_to(self)
 
+    # info
+
+    def columns_produced(self):
+        raise NotImplementedError("base class called")
+
     # query generation
 
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
@@ -130,3 +140,28 @@ class OperatorPlatform:
 
     def convert_records(self, record_map):
         raise NotImplementedError("base class called")
+
+    # sklearn step style interface
+
+    # noinspection PyPep8Naming, PyUnusedLocal
+    def fit(self, X, y=None):
+        pass
+
+    # noinspection PyPep8Naming, PyUnusedLocal
+    def fit_transform(self, X, y=None):
+        return self.transform(X)
+
+    # noinspection PyUnusedLocal
+    def get_feature_names(self, input_features=None):
+        return self.columns_produced()
+
+    # noinspection PyUnusedLocal,PyMethodMayBeStatic
+    def get_params(self, deep=False):
+        return dict()
+
+    def set_params(self, **params):
+        pass
+
+    # noinspection PyPep8Naming
+    def inverse_transform(self, X):
+        raise TypeError("data_algebra does not support inverse_transform")
