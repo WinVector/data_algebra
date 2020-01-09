@@ -401,3 +401,28 @@ class RecordMap:
         if self.blocks_out is not None:
             obj["blocks_out"] = self.blocks_out.to_simple_obj()
         return obj
+
+    # more of the sklearn step API
+
+    # noinspection PyPep8Naming, PyUnusedLocal
+    def fit(self, X, y=None):
+        pass
+
+    # noinspection PyPep8Naming, PyUnusedLocal
+    def fit_transform(self, X, y=None):
+        return self.transform(X)
+
+    # noinspection PyUnusedLocal
+    def get_feature_names(self, input_features=None):
+        return self.columns_produced.copy()
+
+    # noinspection PyUnusedLocal,PyMethodMayBeStatic
+    def get_params(self, deep=False):
+        return dict()
+
+    def set_params(self, **params):
+        pass
+
+    # noinspection PyPep8Naming
+    def inverse_transform(self, X):
+        raise TypeError("data_algebra does not support inverse_transform")
