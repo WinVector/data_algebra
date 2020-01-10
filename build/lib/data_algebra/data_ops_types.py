@@ -149,11 +149,14 @@ class OperatorPlatform:
 
     # noinspection PyPep8Naming, PyUnusedLocal
     def fit_transform(self, X, y=None):
+        self.fit(X, y=y)
         return self.transform(X)
 
-    # noinspection PyUnusedLocal
     def get_feature_names(self, input_features=None):
-        return self.columns_produced()
+        cp = self.columns_produced()
+        if input_features is not None:
+            cp = cp + [f for f in input_features if f not in cp]
+        return cp
 
     # noinspection PyUnusedLocal,PyMethodMayBeStatic
     def get_params(self, deep=False):

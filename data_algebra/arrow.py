@@ -26,8 +26,7 @@ class Arrow:
         """ act on X, must associate with composition """
         raise NotImplementedError("base class called")
 
-        # noinspection PyPep8Naming
-
+    # noinspection PyPep8Naming
     def transform(self, X):
         """ transform X, may or may not associate with composition """
         return self.act_on(X)
@@ -39,6 +38,32 @@ class Arrow:
         if isinstance(other, Arrow):
             return self.apply_to(other)
         return self.act_on(other)
+
+    # sklearn step style interface
+
+    # noinspection PyPep8Naming, PyUnusedLocal
+    def fit(self, X, y=None):
+        pass
+
+    # noinspection PyPep8Naming, PyUnusedLocal
+    def fit_transform(self, X, y=None):
+        self.fit(X, y=y)
+        return self.transform(X)
+
+    # noinspection PyUnusedLocal
+    def get_feature_names(self, input_features=None):
+        raise NotImplementedError("base class called")
+
+    # noinspection PyUnusedLocal,PyMethodMayBeStatic
+    def get_params(self, deep=False):
+        return dict()
+
+    def set_params(self, **params):
+        pass
+
+    # noinspection PyPep8Naming
+    def inverse_transform(self, X):
+        raise TypeError("data_algebra does not support inverse_transform")
 
 
 class DataOpArrow(Arrow):
@@ -84,6 +109,12 @@ class DataOpArrow(Arrow):
         ):
             self.outgoing_types = self.incoming_types.copy()
         Arrow.__init__(self)
+
+    def get_feature_names(self, input_features=None):
+        cp = self.outgoing_columns.copy()
+        if (not self.strict) and (input_features is not None):
+            cp = cp + [f for f in input_features if f not in cp]
+        return cp
 
     def apply_to(self, b):
         """replace self input table with b"""
@@ -151,7 +182,7 @@ class DataOpArrow(Arrow):
             self.outgoing_types = types_out
 
     # noinspection PyPep8Naming
-    def fit(self, X):
+    def fit(self, X, y=None):
         """Learn input and output types from example, and return self"""
         # assume a pandas.DataFrame compatible object
         out = self.act_on(X)
@@ -159,7 +190,7 @@ class DataOpArrow(Arrow):
         return self
 
     # noinspection PyPep8Naming
-    def fit_transform(self, X):
+    def fit_transform(self, X, y=None):
         """Learn input and output types from example, and return transform."""
         out = self.transform(X)
         self.learn_types(X, out)
