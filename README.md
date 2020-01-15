@@ -38,6 +38,7 @@ Related work includes:
   * [`SQL`](https://en.wikipedia.org/wiki/SQL)
   * [`data.table`](https://CRAN.R-project.org/package=data.table)
   * [`LINQ`](https://en.wikipedia.org/wiki/Language_Integrated_Query)
+  * [`Apache Calcite`](https://calcite.apache.org)
   * [`dplyr`](https://CRAN.R-project.org/package=dplyr)
   * [`dtplyr`](https://CRAN.R-project.org/package=dtplyr)
   * [`table.express`](https://github.com/asardaes/table.express)
