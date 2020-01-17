@@ -716,10 +716,10 @@ class DBModel:
                 if not (isnull[i]):
                     source_col = col[i]
                     col_sql = (
-                        "  WHEN b."
+                        "  WHEN CAST(b."
                         + self.quote_identifier(result_col)
-                        + " = "
-                        + self.quote_literal(source_col)
+                        + " AS VARCHAR) = "
+                        + self.quote_string(str(source_col))
                         + " THEN a."
                         + self.quote_identifier(source_col)
                         + "\n"
@@ -773,10 +773,10 @@ class DBModel:
                     clauses = []
                     for cc in record_spec.control_table_keys:
                         clauses.append(
-                            " ( "
+                            " ( CAST("
                             + self.quote_identifier(cc)
-                            + " = "
-                            + self.quote_literal(record_spec.control_table[cc][i])
+                            + " AS VARCHAR) = "
+                            + self.quote_string(str(record_spec.control_table[cc][i]))
                             + " ) "
                         )
                     cstmt = (
