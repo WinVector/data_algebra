@@ -1,13 +1,12 @@
 import types
 
-import numpy
-
 import data_algebra
 import data_algebra.util
 import data_algebra.data_model
 import data_algebra.expr_rep
 import data_algebra.data_ops_types
 import data_algebra.connected_components
+import data_algebra.custom_functions
 
 
 class PandasModel(data_algebra.data_model.DataModel):
@@ -18,26 +17,8 @@ class PandasModel(data_algebra.data_model.DataModel):
         if not isinstance(pd, types.ModuleType):
             raise TypeError("Expected pd to be a module")
         self.pd = pd
-        # alter here, expr_rep pd_formatters, expr_rep @-defs, and env populate_specidls in parallel
-        # to extend functionality
-        self.pandas_eval_env = {
-            "is_null": lambda x: self.pd.isnull(x),
-            "is_bad": lambda x: data_algebra.util.is_bad(x, pd=self.pd),
-            "if_else": lambda c, x, y: numpy.where(c, x, y),
-            "co_equalizer": lambda f, g: data_algebra.connected_components.connected_components(
-                f, g
-            ),
-            "connected_components": lambda f, g: data_algebra.connected_components.connected_components(
-                f, g
-            ),
-            "partitioned_eval": lambda fn, arg_columns, partition_columns: (
-                data_algebra.connected_components.partitioned_eval(
-                    fn, arg_columns, partition_columns
-                )
-            ),
-            "max": lambda x: [numpy.max(x)] * len(x),
-            "min": lambda x: [numpy.min(x)] * len(x),
-        }
+        self.custom_function_map = data_algebra.custom_functions.make_custom_function_map(self.pd)
+        self.pandas_eval_env = {k: cf.implementation for (k, cf) in self.custom_function_map.items()}
 
     def assert_is_appropriate_data_instance(self, df, arg_name=""):
         # noinspection PyUnresolvedReferences

@@ -8,6 +8,7 @@ data_algebra/arrow.py
 data_algebra/cdata.py
 data_algebra/cdata_impl.py
 data_algebra/connected_components.py
+data_algebra/custom_functions.py
 data_algebra/data_model.py
 data_algebra/data_ops.py
 data_algebra/data_ops_types.py

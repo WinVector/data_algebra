@@ -9,18 +9,19 @@ class DataModel:
 
     # operation implementations
 
-    def table_step(self, op, *, data_map, eval_env):
+    def table_step(self, op, *, data_map, eval_env, narrow):
         """
         Represents a data input.
 
         :param op:
         :param data_map:
         :param eval_env:
+        :param narrow:
         :return:
         """
         raise NotImplementedError("base method called")
 
-    def extend_step(self, op, *, data_map, eval_env):
+    def extend_step(self, op, *, data_map, eval_env, narrow):
         raise NotImplementedError("base method called")
 
     def columns_to_frame(self, cols):
@@ -31,29 +32,29 @@ class DataModel:
         """
         raise NotImplementedError("base method called")
 
-    def project_step(self, op, *, data_map, eval_env):
+    def project_step(self, op, *, data_map, eval_env, narrow):
         raise NotImplementedError("base method called")
 
-    def select_rows_step(self, op, *, data_map, eval_env):
+    def select_rows_step(self, op, *, data_map, eval_env, narrow):
         raise NotImplementedError("base method called")
 
-    def select_columns_step(self, op, *, data_map, eval_env):
+    def select_columns_step(self, op, *, data_map, eval_env, narrow):
         raise NotImplementedError("base method called")
 
-    def drop_columns_step(self, op, *, data_map, eval_env):
+    def drop_columns_step(self, op, *, data_map, eval_env, narrow):
         raise NotImplementedError("base method called")
 
-    def order_rows_step(self, op, *, data_map, eval_env):
+    def order_rows_step(self, op, *, data_map, eval_env, narrow):
         raise NotImplementedError("base method called")
 
-    def rename_columns_step(self, op, *, data_map, eval_env):
+    def rename_columns_step(self, op, *, data_map, eval_env, narrow):
         raise NotImplementedError("base method called")
 
-    def natural_join_step(self, op, *, data_map, eval_env):
+    def natural_join_step(self, op, *, data_map, eval_env, narrow):
         raise NotImplementedError("base method called")
 
-    def concat_rows_step(self, op, *, data_map, eval_env):
+    def concat_rows_step(self, op, *, data_map, eval_env, narrow):
         raise NotImplementedError("base method called")
 
-    def convert_records_step(self, op, *, data_map, eval_env):
+    def convert_records_step(self, op, *, data_map, eval_env, narrow):
         raise NotImplementedError("base class called")

@@ -3,6 +3,7 @@ import collections
 
 import data_algebra.util
 import data_algebra.env
+import data_algebra.custom_functions
 
 # for some ideas in capturing expressions in Python see:
 #  scipy
@@ -827,62 +828,6 @@ py_formatters = {
 }
 
 
-# Make fns available to Pandas
-# # Alter here, expr_rep @-defs, and env populate_specials in parallel to add functionality
-
-
-def connected_components(expr):
-    return (
-        "@connected_components("
-        + expr.args[0].to_pandas()
-        + ", "
-        + expr.args[1].to_pandas()
-        + ")"
-    )
-
-
-pd_formatters = {
-    "is_bad": lambda expr: "@is_bad(" + expr.args[0].to_pandas() + ")",
-    "is_null": lambda expr: "@is_null(" + expr.args[0].to_pandas() + ")",
-    "if_else": lambda expr: (
-        "@if_else("
-        + expr.args[0].to_pandas()
-        + ", "
-        + expr.args[1].to_pandas()
-        + ", "
-        + expr.args[2].to_pandas()
-        + ")"
-    ),
-    "neg": lambda expr: "-" + expr.args[0].to_pandas(want_inline_parens=True),
-    "co_equalizer": lambda expr: (
-        "@co_equalizer("
-        + expr.args[0].to_pandas()
-        + ", "
-        + expr.args[1].to_pandas()
-        + ")"
-    ),
-    "connected_components": connected_components,
-    "partitioned_eval": lambda expr: (
-        "@partitioned_eval("
-        # expr.args[0] is a FnTerm
-        + "@"
-        + expr.args[0].to_pandas()
-        + ", "
-        # expr.args[1] is a ListTerm
-        + "["
-        + ", ".join([ei.to_pandas() for ei in expr.args[1].value])
-        + "]"
-        + ", "
-        # expr.args[2] is a ListTerm
-        + "["
-        + ", ".join([ei.to_pandas() for ei in expr.args[2].value])
-        + "]"
-        + ")"
-    ),
-    "max": lambda expr: ("@max(" + expr.args[0].to_pandas() + ")"),
-    "min": lambda expr: ("@min(" + expr.args[0].to_pandas() + ")"),
-}
-
 r_formatters = {"neg": lambda expr: "-" + expr.args[0].to_R(want_inline_parens=True)}
 
 
@@ -930,8 +875,8 @@ class Expression(Term):
         return self.op + "(" + ", ".join(subs) + ")"
 
     def to_pandas(self, *, want_inline_parens=False):
-        if self.op in pd_formatters.keys():
-            return pd_formatters[self.op](self)
+        if self.op in data_algebra.custom_functions.default_custom_function_map.keys():
+            return data_algebra.custom_functions.default_custom_function_map[self.op].pandas_formatter(self)
         if len(self.args) <= 0:
             return "_" + self.op + "()"
         if len(self.args) == 1:
@@ -1015,6 +960,7 @@ def populate_specials(*, column_defs, destination, user_values=None):
         raise TypeError("user_values should be a dictionary")
     nd = column_defs.copy()
     ns = data_algebra.env.SimpleNamespaceDict(**nd)
+    # TODO: unify with custom_functions
     # makes these symbols available for parsing step
     # alter env populate_specials, expr_rep pd_formatters, expr_rep @-defs,
     # and pandas_model pandas_eval_env in parallel to extend functionality
