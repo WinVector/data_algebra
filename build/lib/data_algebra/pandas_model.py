@@ -138,6 +138,8 @@ class PandasModel(data_algebra.data_model.DataModel):
         # try the following tutorial:
         # https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
         for (k, opk) in op.ops.items():
+            if isinstance(opk, data_algebra.expr_rep.FnTerm):
+                continue
             if len(opk.args) > 1:
                 raise ValueError(
                     "non-trivial aggregation expression: " + str(k) + ": " + str(opk)
@@ -157,14 +159,18 @@ class PandasModel(data_algebra.data_model.DataModel):
         if len(op.group_by) > 0:
             res = res.groupby(op.group_by)
         if len(op.ops) > 0:
-            cols = {
-                k: (
-                    res[str(opk.args[0])].agg(opk.op)
-                    if len(opk.args) > 0
-                    else res["_data_table_temp_col"].agg(opk.op)
-                )
-                for (k, opk) in op.ops.items()
-            }
+            cols = {}
+            for k, opk in op.ops.items():
+                vk = None
+                if isinstance(opk, data_algebra.expr_rep.FnTerm):
+                    fn = opk.value
+                    vk = res[str(k)].agg(fn)
+                else:
+                    if len(opk.args) > 0:
+                        vk = res[str(opk.args[0])].agg(opk.op)
+                    else:
+                        vk = res["_data_table_temp_col"].agg(opk.op)
+                cols[k] = vk
         else:
             cols = {"_data_table_temp_col": res["_data_table_temp_col"].agg("sum")}
 

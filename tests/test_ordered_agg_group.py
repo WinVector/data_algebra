@@ -111,3 +111,20 @@ def test_ordered_agg_group():
         })
 
     assert data_algebra.test_util.equivalent_frames(expect_ag, res_ag)
+
+    # proves we could pass a lambda into agg (need to extend framework to allow this)
+    def sorted_concat(vals):
+        return ', '.join(sorted([str(vi) for vi in set(vals)]))
+
+    ops3 = describe_table(d, table_name='d'). \
+        project({'OP': sorted_concat},
+                group_by=['ID', 'DATE']). \
+        extend({'rank': '_row_number()'},
+               partition_by=['ID'],
+               order_by=['DATE']). \
+        convert_records(record_map). \
+        order_rows(['ID'])
+
+    res_ag3 = ops3.transform(d)
+
+    assert data_algebra.test_util.equivalent_frames(expect_ag, res_ag3)

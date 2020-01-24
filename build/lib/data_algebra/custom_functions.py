@@ -84,6 +84,9 @@ def make_custom_function_map(pd=None):
         CustomFunction(name="min",
                        pandas_formatter=lambda expr: ("@min(" + expr.args[0].to_pandas() + ")"),
                        implementation=lambda x: [numpy.min(x)] * len(x)),
+        CustomFunction(name="fn",  # special case, user defined function
+                       pandas_formatter=lambda expr: "@fn(" + expr.args[0].to_pandas() + ")",
+                       implementation=None),
     ]
     mp = {cf.name: cf for cf in custom_functions}
     return mp

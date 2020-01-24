@@ -733,11 +733,19 @@ class Value(Term):
 
 
 class FnTerm(Term):
-    def __init__(self, value):
+    def __init__(self, value, cols_used=None):
         if not callable(value):
             raise TypeError("value type must be callable")
         self.value = value
+        if cols_used is None:
+            self.cols_used = []
+        else:
+            self.cols_used = cols_used.copy()
         Term.__init__(self)
+
+    def get_column_names(self, columns_seen):
+        for vi in self.cols_used:
+            columns_seen.add(vi)
 
     def replace_view(self, view):
         return self
@@ -783,7 +791,7 @@ class ListTerm(Term):
 
     def get_column_names(self, columns_seen):
         for ti in self.value:
-            ti.get_column_names(ti)
+            ti.get_column_names(columns_seen)
 
 
 def _enc_value(value):
@@ -962,8 +970,7 @@ def populate_specials(*, column_defs, destination, user_values=None):
     ns = data_algebra.env.SimpleNamespaceDict(**nd)
     # TODO: unify with custom_functions
     # makes these symbols available for parsing step
-    # alter env populate_specials, expr_rep pd_formatters, expr_rep @-defs,
-    # and pandas_model pandas_eval_env in parallel to extend functionality
+    # need to enter user functions here or as methods on variables
     destination["_"] = ns
     destination["_get"] = lambda key: user_values[key]
     # Note: a lot of the re-emitters add back the underbar, allow the non
@@ -1022,7 +1029,10 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
         ov = ops[k]
         v = ov
         if not isinstance(v, Term):
-            v = _parse_by_eval(source_str=v, data_def=mp, outter_environemnt=parse_env)
+            if callable(v):
+                v = FnTerm(v, cols_used=[k])
+            else:
+                v  = _parse_by_eval(source_str=v, data_def=mp, outter_environemnt=parse_env)
         else:
             v = v.replace_view(view)
         newops[k] = v

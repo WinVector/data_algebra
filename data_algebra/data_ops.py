@@ -1221,21 +1221,23 @@ class ProjectNode(ViewRepresentation):
             self, column_names=column_names, sources=[source], node_name="ProjectNode"
         )
         for (k, opk) in self.ops.items():
-            if not isinstance(opk, data_algebra.expr_rep.Expression):
-                raise ValueError(
-                    "non-aggregated expression in project: " + str(k) + ": " + str(opk)
-                )
-            if len(opk.args) > 1:
-                raise ValueError(
-                    "non-trivial aggregation expression: " + str(k) + ": " + str(opk)
-                )
-            if len(opk.args) > 0:
-                if not isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
+            if isinstance(opk, data_algebra.expr_rep.Expression):
+                if len(opk.args) > 1:
                     raise ValueError(
-                        "windows expression argument must be a column: "
-                        + str(k)
-                        + ": "
-                        + str(opk)
+                        "non-trivial aggregation expression: " + str(k) + ": " + str(opk)
+                    )
+                if len(opk.args) > 0:
+                    if not isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
+                        raise ValueError(
+                            "windows expression argument must be a column: "
+                            + str(k)
+                            + ": "
+                            + str(opk)
+                    )
+            else:
+                if not isinstance(opk, data_algebra.expr_rep.FnTerm):
+                    raise ValueError(
+                        "non-aggregated expression in project: " + str(k) + ": " + str(opk)
                     )
             # TODO: check op is in list of aggregators
             # Note: non-aggregators making through will be caught by table shape check
