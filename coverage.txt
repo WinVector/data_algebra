@@ -74,7 +74,7 @@ data_algebra/db_model.py                 402     70    83%
 data_algebra/diagram.py                   56     44    21%
 data_algebra/env.py                       31      3    90%
 data_algebra/expr.py                      20      4    80%
-data_algebra/expr_rep.py                 659    209    68%
+data_algebra/expr_rep.py                 659    208    68%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 140     16    89%
 data_algebra/pandas_model.py             196     20    90%
@@ -82,7 +82,7 @@ data_algebra/test_util.py                126     18    86%
 data_algebra/util.py                      45      6    87%
 data_algebra/yaml.py                      95     11    88%
 ----------------------------------------------------------
-TOTAL                                   3998    909    77%
+TOTAL                                   3998    908    77%
 
 
-============================== 89 passed in 7.39s ==============================
+============================== 89 passed in 8.32s ==============================

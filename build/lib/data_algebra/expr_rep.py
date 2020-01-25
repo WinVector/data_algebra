@@ -1032,7 +1032,7 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
             if callable(v):
                 v = FnTerm(v, cols_used=[k])
             else:
-                v  = _parse_by_eval(source_str=v, data_def=mp, outter_environemnt=parse_env)
+                v = _parse_by_eval(source_str=v, data_def=mp, outter_environemnt=parse_env)
         else:
             v = v.replace_view(view)
         newops[k] = v
