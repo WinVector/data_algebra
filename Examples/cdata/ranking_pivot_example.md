@@ -1,3 +1,5 @@
+# Ordered Grouping Example
+
 ## Introduction
 
 I'd like to share an example of data-wrangling/data-reshaping and how to solve it in [`Python`](https://www.python.org)/[`Pandas`](https://pandas.pydata.org) using [`data_algebra`](https://github.com/WinVector/data_algebra) (the `R` version of this example can be found [`here`](https://github.com/WinVector/cdata/blob/master/Examples/OrderedGrouping/OrderedGrouping.md)).
@@ -553,11 +555,11 @@ res_db
       <th></th>
       <th>DATE2</th>
       <th>OP2</th>
-      <th>OP3</th>
-      <th>DATE3</th>
-      <th>ID</th>
       <th>OP1</th>
+      <th>OP3</th>
+      <th>ID</th>
       <th>DATE1</th>
+      <th>DATE3</th>
     </tr>
   </thead>
   <tbody>
@@ -565,61 +567,61 @@ res_db
       <th>0</th>
       <td>2015-04-25 00:00:00</td>
       <td>B</td>
-      <td>None</td>
+      <td>A</td>
       <td>None</td>
       <td>1</td>
-      <td>A</td>
       <td>2001-01-02 00:00:00</td>
+      <td>None</td>
     </tr>
     <tr>
       <th>1</th>
       <td>None</td>
       <td>None</td>
-      <td>None</td>
+      <td>A</td>
       <td>None</td>
       <td>2</td>
-      <td>A</td>
       <td>2000-04-01 00:00:00</td>
+      <td>None</td>
     </tr>
     <tr>
       <th>2</th>
       <td>None</td>
       <td>None</td>
-      <td>None</td>
+      <td>D</td>
       <td>None</td>
       <td>3</td>
-      <td>D</td>
       <td>2014-04-07 00:00:00</td>
+      <td>None</td>
     </tr>
     <tr>
       <th>3</th>
       <td>2009-01-20 00:00:00</td>
       <td>B, D</td>
-      <td>C</td>
-      <td>2012-12-01 00:00:00</td>
-      <td>4</td>
       <td>A</td>
+      <td>C</td>
+      <td>4</td>
       <td>2005-06-16 00:00:00</td>
+      <td>2012-12-01 00:00:00</td>
     </tr>
     <tr>
       <th>4</th>
       <td>2010-10-10 00:00:00</td>
       <td>A</td>
-      <td>None</td>
+      <td>B</td>
       <td>None</td>
       <td>5</td>
-      <td>B</td>
       <td>2003-11-09 00:00:00</td>
+      <td>None</td>
     </tr>
     <tr>
       <th>5</th>
       <td>None</td>
       <td>None</td>
-      <td>None</td>
+      <td>B</td>
       <td>None</td>
       <td>6</td>
-      <td>B</td>
       <td>2004-01-09 00:00:00</td>
+      <td>None</td>
     </tr>
   </tbody>
 </table>
