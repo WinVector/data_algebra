@@ -79,7 +79,6 @@ def test_ordered_agg_group():
     d.to_sql('d', con, if_exists='replace')
 
     res_db = data_algebra.pd.read_sql_query(sql, con)
-    con.close()
 
     # res_db
     assert data_algebra.test_util.equivalent_frames(expect, res_db)
@@ -142,6 +141,23 @@ def test_ordered_agg_group():
 
     assert data_algebra.test_util.equivalent_frames(expect_ag, res_ag4)
 
+    class SortedConcat:
+        def __init__(self):
+            self.accum = set()
+
+        def step(self, value):
+            self.accum.add(str(value))
+
+        def finalize(self):
+            return ', '.join(sorted([v for v in self.accum]))
+
+    # sqlite has group_concat https://pythontic.com/database/sqlite/aggregate%20functions
+    sql4 = ops4.to_sql(db_model)
+    # https://docs.python.org/2/library/sqlite3.html
+    con.create_aggregate("sorted_concat", 1, SortedConcat)
+    res_db4 = data_algebra.pd.read_sql_query(sql4, con)
+    assert data_algebra.test_util.equivalent_frames(expect_ag, res_db4)
+
     ops5 = describe_table(d, table_name='d'). \
         project({'OP': user_fn('lambda vals: ", ".join(sorted([str(vi) for vi in set(vals)]))', 'OP')},
                 group_by=['ID', 'DATE']). \
@@ -155,3 +171,4 @@ def test_ordered_agg_group():
 
     assert data_algebra.test_util.equivalent_frames(expect_ag, res_ag5)
 
+    con.close()
