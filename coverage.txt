@@ -66,7 +66,7 @@ data_algebra/cdata_impl.py                10      1    90%
 data_algebra/connected_components.py      49      1    98%
 data_algebra/custom_functions.py          18      1    94%
 data_algebra/data_model.py                29     13    55%
-data_algebra/data_ops.py                1258    269    79%
+data_algebra/data_ops.py                1264    271    79%
 data_algebra/data_ops_types.py            74     33    55%
 data_algebra/data_ops_utils.py            34      6    82%
 data_algebra/data_pipe.py                189     50    74%
@@ -74,15 +74,15 @@ data_algebra/db_model.py                 402     70    83%
 data_algebra/diagram.py                   56     44    21%
 data_algebra/env.py                       31      3    90%
 data_algebra/expr.py                      20      4    80%
-data_algebra/expr_rep.py                 659    208    68%
+data_algebra/expr_rep.py                 662    209    68%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 140     16    89%
-data_algebra/pandas_model.py             196     20    90%
+data_algebra/pandas_model.py             194     20    90%
 data_algebra/test_util.py                126     18    86%
 data_algebra/util.py                      45      6    87%
 data_algebra/yaml.py                      95     11    88%
 ----------------------------------------------------------
-TOTAL                                   3998    908    77%
+TOTAL                                   4005    911    77%
 
 
-============================== 89 passed in 8.32s ==============================
+============================== 89 passed in 8.31s ==============================

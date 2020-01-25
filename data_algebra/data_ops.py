@@ -34,6 +34,16 @@ except ImportError:
     pass
 
 
+# wrap a single argument function as a user callable function in pipeling
+# used for custom aggregators
+def user_fn(fn, var):
+    if not callable(fn):
+        raise TypeError("expected fn to be callable")
+    if not isinstance(var, str):
+        raise TypeError("expected var to be str")
+    return data_algebra.expr_rep.FnTerm(fn, fn_arg=data_algebra.expr_rep.ColumnReference(view=None, column_name=var))
+
+
 class ViewRepresentation(OperatorPlatform, ABC):
     """Structure to represent the columns of a query or a table.
        Abstract base class."""
@@ -1232,8 +1242,7 @@ class ProjectNode(ViewRepresentation):
                             "windows expression argument must be a column: "
                             + str(k)
                             + ": "
-                            + str(opk)
-                    )
+                            + str(opk))
             else:
                 if not isinstance(opk, data_algebra.expr_rep.FnTerm):
                     raise ValueError(

@@ -733,21 +733,24 @@ class Value(Term):
 
 
 class FnTerm(Term):
-    def __init__(self, value, cols_used=None):
+    def __init__(self, value, fn_arg=None):
         if not callable(value):
             raise TypeError("value type must be callable")
         self.value = value
-        if cols_used is None:
-            self.cols_used = []
+        if fn_arg is None:
+            self.args = []
         else:
-            self.cols_used = cols_used.copy()
+            if not isinstance(fn_arg, ColumnReference):
+                raise TypeError("Expected fn_arg to be None or a ColumnReference")
+            self.args = [fn_arg]
         Term.__init__(self)
 
     def get_column_names(self, columns_seen):
-        for vi in self.cols_used:
-            columns_seen.add(vi)
+        for vi in self.args:
+            columns_seen.add(str(vi))
 
     def replace_view(self, view):
+        self.args = [ai.replace_view(view) for ai in self.args]
         return self
 
     def to_python(self, *, want_inline_parens=False):
@@ -1030,7 +1033,8 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
         v = ov
         if not isinstance(v, Term):
             if callable(v):
-                v = FnTerm(v, cols_used=[k])
+                # k = f(k) implicit form
+                v = FnTerm(v, fn_arg=ColumnReference(view=view, column_name=k))
             else:
                 v = _parse_by_eval(source_str=v, data_def=mp, outter_environemnt=parse_env)
         else:

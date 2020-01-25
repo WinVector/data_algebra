@@ -6,7 +6,6 @@ import data_algebra.test_util
 from data_algebra.cdata import *
 from data_algebra.data_ops import *
 import data_algebra.SQLite
-from data_algebra.expr_rep import FnTerm
 
 
 def test_ordered_agg_group():
@@ -130,9 +129,8 @@ def test_ordered_agg_group():
 
     assert data_algebra.test_util.equivalent_frames(expect_ag, res_ag3)
 
-
     ops4 = describe_table(d, table_name='d'). \
-        project({'OP': FnTerm(sorted_concat, cols_used=['OP'])},
+        project({'OP': user_fn(sorted_concat, 'OP')},
                 group_by=['ID', 'DATE']). \
         extend({'rank': '_row_number()'},
                partition_by=['ID'],
