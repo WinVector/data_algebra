@@ -60,6 +60,7 @@ first add those.
 
 ```python
 # bring in all of our modues/packages
+import io
 import sqlite3
 
 import pandas
@@ -309,11 +310,12 @@ the interesting record is the following.
 
 
 ```python
-diagram = pandas.DataFrame({
-    'rank': ['1', '2', '3'],
-    'DATE': ['DATE1', 'DATE2', 'DATE3'],
-    'OP': ['OP1', 'OP2', 'OP3']
-})
+diagram = pandas.read_table(sep='\\s*,\\s*', engine='python', filepath_or_buffer=io.StringIO("""
+rank,	DATE,	OP
+1,	DATE1,	OP1
+2,	DATE2,	OP2
+3,	DATE3,	OP3
+"""))
 
 diagram
 ```
@@ -382,10 +384,10 @@ print(str(record_map))
        record_keys: ['ID']
        control_table_keys: ['rank']
        control_table:
-         rank   DATE   OP
-       0    1  DATE1  OP1
-       1    2  DATE2  OP2
-       2    3  DATE3  OP3
+          rank   DATE   OP
+       0     1  DATE1  OP1
+       1     2  DATE2  OP2
+       2     3  DATE3  OP3
     to row records of the form:
       record_keys: ['ID']
      ['DATE1', 'DATE2', 'DATE3', 'OP1', 'OP2', 'OP3']
@@ -553,75 +555,75 @@ res_db
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>DATE2</th>
       <th>OP2</th>
-      <th>OP1</th>
+      <th>DATE2</th>
       <th>OP3</th>
       <th>ID</th>
       <th>DATE1</th>
       <th>DATE3</th>
+      <th>OP1</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>2015-04-25 00:00:00</td>
       <td>B</td>
-      <td>A</td>
+      <td>2015-04-25 00:00:00</td>
       <td>None</td>
       <td>1</td>
       <td>2001-01-02 00:00:00</td>
       <td>None</td>
+      <td>A</td>
     </tr>
     <tr>
       <th>1</th>
       <td>None</td>
       <td>None</td>
-      <td>A</td>
       <td>None</td>
       <td>2</td>
       <td>2000-04-01 00:00:00</td>
       <td>None</td>
+      <td>A</td>
     </tr>
     <tr>
       <th>2</th>
       <td>None</td>
       <td>None</td>
-      <td>D</td>
       <td>None</td>
       <td>3</td>
       <td>2014-04-07 00:00:00</td>
       <td>None</td>
+      <td>D</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>2009-01-20 00:00:00</td>
       <td>B, D</td>
-      <td>A</td>
+      <td>2009-01-20 00:00:00</td>
       <td>C</td>
       <td>4</td>
       <td>2005-06-16 00:00:00</td>
       <td>2012-12-01 00:00:00</td>
+      <td>A</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>2010-10-10 00:00:00</td>
       <td>A</td>
-      <td>B</td>
+      <td>2010-10-10 00:00:00</td>
       <td>None</td>
       <td>5</td>
       <td>2003-11-09 00:00:00</td>
       <td>None</td>
+      <td>B</td>
     </tr>
     <tr>
       <th>5</th>
       <td>None</td>
       <td>None</td>
-      <td>B</td>
       <td>None</td>
       <td>6</td>
       <td>2004-01-09 00:00:00</td>
       <td>None</td>
+      <td>B</td>
     </tr>
   </tbody>
 </table>
