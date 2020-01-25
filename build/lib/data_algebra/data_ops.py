@@ -36,12 +36,18 @@ except ImportError:
 
 # wrap a single argument function as a user callable function in pipeling
 # used for custom aggregators
-def user_fn(fn, var):
+def user_fn(fn, var, display_form=None):
+    if isinstance(fn, str):
+        if display_form is None:
+            display_form = fn
+        fn = eval(fn)
     if not callable(fn):
         raise TypeError("expected fn to be callable")
     if not isinstance(var, str):
         raise TypeError("expected var to be str")
-    return data_algebra.expr_rep.FnTerm(fn, fn_arg=data_algebra.expr_rep.ColumnReference(view=None, column_name=var))
+    return data_algebra.expr_rep.FnTerm(fn,
+                                        fn_arg=data_algebra.expr_rep.ColumnReference(view=None, column_name=var),
+                                        display_form=display_form)
 
 
 class ViewRepresentation(OperatorPlatform, ABC):

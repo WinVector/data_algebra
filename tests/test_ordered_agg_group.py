@@ -141,3 +141,17 @@ def test_ordered_agg_group():
     res_ag4 = ops4.transform(d)
 
     assert data_algebra.test_util.equivalent_frames(expect_ag, res_ag4)
+
+    ops5 = describe_table(d, table_name='d'). \
+        project({'OP': user_fn('lambda vals: ", ".join(sorted([str(vi) for vi in set(vals)]))', 'OP')},
+                group_by=['ID', 'DATE']). \
+        extend({'rank': '_row_number()'},
+               partition_by=['ID'],
+               order_by=['DATE']). \
+        convert_records(record_map). \
+        order_rows(['ID'])
+
+    res_ag5 = ops5.transform(d)
+
+    assert data_algebra.test_util.equivalent_frames(expect_ag, res_ag5)
+

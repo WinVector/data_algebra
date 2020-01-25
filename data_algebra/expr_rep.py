@@ -733,10 +733,11 @@ class Value(Term):
 
 
 class FnTerm(Term):
-    def __init__(self, value, fn_arg=None):
+    def __init__(self, value, fn_arg=None, display_form=None):
         if not callable(value):
             raise TypeError("value type must be callable")
         self.value = value
+        self.display_form = display_form
         if fn_arg is None:
             self.args = []
         else:
