@@ -43,6 +43,8 @@ def user_fn(fn, var, display_form=None):
         fn = eval(fn)
     if not callable(fn):
         raise TypeError("expected fn to be callable")
+    if display_form is None:
+        display_form = fn.__name__
     if not isinstance(var, str):
         raise TypeError("expected var to be str")
     return data_algebra.expr_rep.FnTerm(fn,
