@@ -732,12 +732,28 @@ class Value(Term):
         return self.value.__repr__()
 
 
+class Name(str):
+    def __init__(self, v):
+        self.v = v
+
+    def str(self):
+        return self.v
+
+    def __repr__(self):
+        return self.v
+
+
 class FnTerm(Term):
-    def __init__(self, value, fn_arg=None, display_form=None):
+    def __init__(self, value, fn_arg=None, display_form=None, op=None):
         if not callable(value):
             raise TypeError("value type must be callable")
         self.value = value
+        if display_form is None:
+            display_form = value.__name__
+        if op is None:
+            op = value.__name__
         self.display_form = display_form
+        self.op = op
         if fn_arg is None:
             self.args = []
         else:
@@ -755,7 +771,7 @@ class FnTerm(Term):
         return self
 
     def to_python(self, *, want_inline_parens=False):
-        return self.value.__name__
+        return Name(self.display_form)
 
 
 class ListTerm(Term):
