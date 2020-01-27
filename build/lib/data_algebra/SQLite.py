@@ -2,6 +2,8 @@ import math
 import numpy
 import numbers
 
+import sqlite3
+
 import data_algebra.util
 import data_algebra.db_model
 import data_algebra.data_ops
@@ -145,3 +147,14 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         cur = conn.cursor()
         cur.execute("DROP TABLE IF EXISTS " + table_name)
         d.to_sql(name=table_name, con=conn)
+
+
+def eval_sqlite(ops, data_map):
+    db_model = SQLiteModel()
+    with sqlite3.connect(':memory:') as conn:
+        db_model.prepare_connection(conn)
+        for k, d in data_map.items():
+            db_model.insert_table(conn, d, table_name=k)
+        query = ops.to_sql(db_model)
+        res = db_model.read_query(conn, query)
+    return res

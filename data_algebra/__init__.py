@@ -2,7 +2,7 @@ import importlib
 
 
 __docformat__ = "restructuredtext"
-__version__ = "0.4.5"
+__version__ = "0.4.6"
 
 __doc__ = """
 `data_algebra`<https://github.com/WinVector/data_algebra> is a piped data wrangling system
