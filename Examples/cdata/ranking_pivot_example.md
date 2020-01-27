@@ -61,6 +61,7 @@ first add those.
 ```python
 # bring in all of our modues/packages
 import io
+import re
 import sqlite3
 
 import pandas
@@ -305,22 +306,24 @@ this:
 
 The `data_algebra` data shaping rule is: draw a picture of any non-trivial
 (more than one row) data records in their full generality. In our case
-the interesting record is the following.
+the interesting record is the following (with the record `ID` columns suppressed for conciseness).
 
 
 
 ```python
 def diagram_to_pandas(s):
-    return pandas.read_table(sep='\\s*,\\s*', engine='python', filepath_or_buffer=io.StringIO(s.strip()))
+    s = s.strip()
+    s = re.sub(r'"', '', s)
+    return pandas.read_table(sep='\\s*,\\s*', engine='python', filepath_or_buffer=io.StringIO(s))
 
 
 diagram = diagram_to_pandas("""
 
 
-    rank,	DATE,	OP
-    1,	DATE1,	OP1
-    2,	DATE2,	OP2
-    3,	DATE3,	OP3
+    "rank",    "DATE",    "OP"
+    "1",       DATE1,     OP1
+    "2",       DATE2,     OP2
+    "3",       DATE3,     OP3
 
 
 """)
@@ -368,6 +371,55 @@ diagram
 
 
 The column names `rank`, `DATE`, and `OP` are all column names of the table we are starting with.  The values `1`, `2`, and `3` are all values we expect to see in the `rank` column of the working data frame.  And the symbols `DATE1`, `DATE2`, `DATE3`, `OP1`, `OP2`, and `OP3` are all stand-in names for values we see in our data.  These symbols will be the column names of our new row-records.
+
+We have tutorials on how to build these diagrams [here](https://winvector.github.io/cdata/articles/design.html) and [here](https://winvector.github.io/cdata/articles/blocksrecs.html).  Essentially we draw one record of the input and output and match column names to stand-in interior values of the other.  The output record is a single row, so we don't have to explicitly pass it in.  However it looks like the following.
+
+
+```python
+row_record = diagram_to_pandas("""
+
+  "DATE1", "OP1", "DATE2", "OP2", "DATE3", "OP3"
+   DATE1 ,  OP1 ,  DATE2 ,  OP2 ,  DATE3 ,  OP3
+
+""")
+
+row_record
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>DATE1</th>
+      <th>OP1</th>
+      <th>DATE2</th>
+      <th>OP2</th>
+      <th>DATE3</th>
+      <th>OP3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>DATE1</td>
+      <td>OP1</td>
+      <td>DATE2</td>
+      <td>OP2</td>
+      <td>DATE3</td>
+      <td>OP3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+Notice the interior-data portions (the parts we wrote in the inputs as unquoted) of each table input are the cells that are matched from one record to the other.  These are in fact just the earlier sample inputs and outputs with the values replaced with the placeholders `DATE1`, `DATE2`, `DATE3`, `OP1`, `OP2`, and `OP3`.
 
 With this diagram in hand we can specify the data reshaping step.
 
@@ -563,74 +615,74 @@ res_db
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>DATE2</th>
+      <th>DATE1</th>
+      <th>OP2</th>
+      <th>DATE3</th>
       <th>ID</th>
       <th>OP3</th>
-      <th>DATE1</th>
       <th>OP1</th>
-      <th>DATE3</th>
-      <th>OP2</th>
+      <th>DATE2</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>2015-04-25 00:00:00</td>
+      <td>2001-01-02 00:00:00</td>
+      <td>B</td>
+      <td>None</td>
       <td>1</td>
       <td>None</td>
-      <td>2001-01-02 00:00:00</td>
       <td>A</td>
-      <td>None</td>
-      <td>B</td>
+      <td>2015-04-25 00:00:00</td>
     </tr>
     <tr>
       <th>1</th>
+      <td>2000-04-01 00:00:00</td>
+      <td>None</td>
       <td>None</td>
       <td>2</td>
       <td>None</td>
-      <td>2000-04-01 00:00:00</td>
       <td>A</td>
-      <td>None</td>
       <td>None</td>
     </tr>
     <tr>
       <th>2</th>
+      <td>2014-04-07 00:00:00</td>
+      <td>None</td>
       <td>None</td>
       <td>3</td>
       <td>None</td>
-      <td>2014-04-07 00:00:00</td>
       <td>D</td>
-      <td>None</td>
       <td>None</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>2009-01-20 00:00:00</td>
+      <td>2005-06-16 00:00:00</td>
+      <td>B, D</td>
+      <td>2012-12-01 00:00:00</td>
       <td>4</td>
       <td>C</td>
-      <td>2005-06-16 00:00:00</td>
       <td>A</td>
-      <td>2012-12-01 00:00:00</td>
-      <td>B, D</td>
+      <td>2009-01-20 00:00:00</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>2010-10-10 00:00:00</td>
+      <td>2003-11-09 00:00:00</td>
+      <td>A</td>
+      <td>None</td>
       <td>5</td>
       <td>None</td>
-      <td>2003-11-09 00:00:00</td>
       <td>B</td>
-      <td>None</td>
-      <td>A</td>
+      <td>2010-10-10 00:00:00</td>
     </tr>
     <tr>
       <th>5</th>
+      <td>2004-01-09 00:00:00</td>
+      <td>None</td>
       <td>None</td>
       <td>6</td>
       <td>None</td>
-      <td>2004-01-09 00:00:00</td>
       <td>B</td>
-      <td>None</td>
       <td>None</td>
     </tr>
   </tbody>
