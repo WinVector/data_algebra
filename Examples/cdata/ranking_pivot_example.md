@@ -428,8 +428,6 @@ Notice the interior-data portions (the parts we wrote in the inputs as unquoted)
 
 We have a one minute video of how to work out the placeholder labels and build the diagram [here](https://youtu.be/JzaZBjsLpUQ).
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/JzaZBjsLpUQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
 With the diagram in hand we can specify the data reshaping step. Since we are moving the data from blocks to row records, we use the class `RecordMap` with a `blocks_in` argument to create the reshaping transform.
 
 
