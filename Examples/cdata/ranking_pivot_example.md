@@ -426,7 +426,7 @@ row_record
 
 Notice the interior-data portions (the parts we wrote in the inputs as unquoted) of each table input are the cells that are matched from one record to the other.  These are in fact just the earlier sample inputs and outputs with the values replaced with the placeholders `DATE1`, `DATE2`, `DATE3`, `OP1`, `OP2`, and `OP3`.
 
-We have a one minute video of how to work out the placeholder labels and build the diagram [here](https://youtu.be/JzaZBjsLpUQ):
+We have a one minute video of how to work out the placeholder labels and build the diagram [here](https://youtu.be/JzaZBjsLpUQ).
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/JzaZBjsLpUQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
