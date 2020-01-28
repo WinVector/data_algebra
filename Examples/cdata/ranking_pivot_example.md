@@ -1,23 +1,15 @@
-# Ordered Grouping Example
+John Mount and Nina Zumel
 
 ## Introduction
 
-I'd like to share an example of data-wrangling/data-reshaping and how to solve it in [`Python`](https://www.python.org)/[`Pandas`](https://pandas.pydata.org) using [`data_algebra`](https://github.com/WinVector/data_algebra) (the `R` version of this example can be found [`here`](https://github.com/WinVector/cdata/blob/master/Examples/OrderedGrouping/OrderedGrouping.md)).
+This is an example of an interesting data-wrangling/data-reshaping problem and how to solve it in [`Python`](https://www.python.org)/[`Pandas`](https://pandas.pydata.org) using [`data_algebra`](https://github.com/WinVector/data_algebra). The `R` version of this example can be found [here](https://github.com/WinVector/cdata/blob/master/Examples/OrderedGrouping/OrderedGrouping.md)).
 
-In an RStudio Community note, user <code>hklovs</code> asked [how to re-organize some data](https://community.rstudio.com/t/tidying-data-reorganizing-tibble/48292).
-
-The solution is: 
-
-  * Get a good definition of what is wanted
-  * Re-process the data so any advisory column you wished you had is actually there
-  * And finish the problem.
-  
 ## The problem
 
-In this example the ask was equivalent to:
+In an RStudio Community note, user <code>hklovs</code> asked [how to re-organize some data](https://community.rstudio.com/t/tidying-data-reorganizing-tibble/48292). The ask was essentially to
 
 <blockquote>
-How do I transform data from this format:
+transform data from this format: 
 
 | ID | OP | DATE                |
 | -: | :- | :------------------ |
@@ -37,25 +29,29 @@ Into this format:
 
 | ID | DATE1               | OP1 | DATE2               | OP2         | DATE3               | OP3 |
 | -: | :------------------ | :-- | :------------------ | :---------- | :------------------ | :-- |
-|  1 | 2001-01-02 00:00:00 | A   | 2015-04-25 00:00:00 | B           | NA                  | NA  |
-|  2 | 2000-04-01 00:00:00 | A   | NA                  | NA          | NA                  | NA  |
-|  3 | 2014-04-07 00:00:00 | D   | NA                  | NA          | NA                  | NA  |
-|  4 | 2005-06-16 00:00:00 | A   | 2009-01-20 00:00:00 | c(“B”, “D”) | 2012-12-01 00:00:00 | C   |
-|  5 | 2003-11-09 00:00:00 | B   | 2010-10-10 00:00:00 | A           | NA                  | NA  |
-|  6 | 2004-01-09 00:00:00 | B   | NA                  | NA          | NA                  | NA  |
+|  1 | 2001-01-02 00:00:00 | A   | 2015-04-25 00:00:00 | B           | None                  | None  |
+|  2 | 2000-04-01 00:00:00 | A   | None                  | None          | None                  | None  |
+|  3 | 2014-04-07 00:00:00 | D   | None                  | None          | None                  | None  |
+|  4 | 2005-06-16 00:00:00 | A   | 2009-01-20 00:00:00 | B, D        | 2012-12-01 00:00:00 | C   |
+|  5 | 2003-11-09 00:00:00 | B   | 2010-10-10 00:00:00 | A           | None                  | None  |
+|  6 | 2004-01-09 00:00:00 | B   | None                  | None          | None                  | None  |
 </blockquote>
+
+That is: for each `ID` pick the first three operations ordered by date, merging operations with the same timestamp.  Then write these results into a single row for each `ID`.
 
 ## The solution
 
-What the ask translates to is: per `ID` pick the first three operations
-ordered by date, merging operations with the same timestamp. Then write
-these results into a single row for each `ID`.
+A good way to solve any data-wrangling problem is to:
 
-The first step isn’t to worry about the data format, it is an
-inessential or solvable difficulty. Instead make any extra descriptions
-or controls you need explicit. In this case we need ranks. So let’s
-first add those.
+  * Get a good definition of what is wanted
+  * Re-process the data so any advisory column you wished you had is actually there
+  * And finish the problem.
 
+Let's apply this process to our example problem.
+
+### Adding an advisory rank column
+
+The first step isn't to worry about the data format, as it is an inessential or solvable difficulty. Instead make any extra descriptions or controls you need explicit.  In this case we need to date-rank and to merge the operations (per `ID`). So let's do that first.
 
 
 ```python
@@ -91,7 +87,19 @@ d
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -177,14 +185,16 @@ d
 
 ```python
 # define a user aggregation function
+# a function to paste a vector of strings together
 def sorted_concat(vals):
     return ', '.join(sorted([str(vi) for vi in set(vals)]))
 
-# specify the first few data processing steps
+# merge the operations to get one row per ID and DATE
+# then rank the rows for each ID by DATE
 ops = describe_table(d, table_name='d'). \
-        project({'OP': user_fn(sorted_concat, 'OP')},
+        project({'OP': user_fn(sorted_concat, 'OP')},  # fuse all the ops on same date/id into one string
                 group_by=['ID', 'DATE']). \
-        extend({'rank': '_row_number()'},
+        extend({'rank': '_row_number()'},  # rank each ID group in order of date
                partition_by=['ID'],
                order_by=['DATE'])
 
@@ -198,7 +208,19 @@ d2
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -286,9 +308,11 @@ d2
 
 
 
-In the above code we used the `sorted_concat()` operator to combine rows with duplicates combined into vectors such as `c("B", "D")`.  Then we added a rank column.  This gets us much closer to a complete solution.   All we have to do now is re-arrange the data.
+In the above code we used the `project()` operator to merge rows with duplicate `ID` and `DATE` into a single string listing all the operations that occurred, for example "B, D".  Then we added a rank column.  This gives us all the information we need for a complete solution to the original problem.   Now all we have to do is re-arrange the data.
 
-First data re-arrangement we strongly encourage drawing out what one wants it terms of one input record and one output record.  With `data_algebra` doing so essentially solves the problem.
+### Reshaping the data
+
+To reshape the data, we strongly encourage drawing out what one wants it terms of one input record and one output record.  With `data_algebra` doing so essentially solves the problem.
 
 So let's look at what happens only to the rows with `ID == 1`.  In this case we expect input rows that look like this:
 
@@ -297,17 +321,19 @@ So let's look at what happens only to the rows with `ID == 1`.  In this case we 
 |  1 | 2001-01-02 00:00:00 | A  |    1 |
 |  1 | 2015-04-25 00:00:00 | B  |    2 |
 
-And we want this record transformed into
-this:
+And we want this record transformed into this:
 
 | ID | DATE1               | OP1 | DATE2               | OP2 | DATE3 | OP3 |
 | -: | :------------------ | :-- | :------------------ | :-- | :---- | :-- |
-|  1 | 2001-01-02 00:00:00 | A   | 2015-04-25 00:00:00 | B   | NA    | NA  |
+|  1 | 2001-01-02 00:00:00 | A   | 2015-04-25 00:00:00 | B   | None  | None  |
 
-The `data_algebra` data shaping rule is: draw a picture of any non-trivial
-(more than one row) data records in their full generality. In our case
-the interesting record is the following (with the record `ID` columns suppressed for conciseness).
 
+We call the above record form a *row record*, because all the data for a given `ID` is in a single row. When the data for a given `ID` is not in a single row, we say it is in a *block*. In addition to having a per-record key (`ID` in our example), each row of a block is uniquely identified by an in-record structure key (in this case, `rank`).
+
+`data_algebra` moves records from row shaped to block shaped, and vice-versa (It can also move data from one block shape to another, by going through a row).
+
+To use `data_algebra`, draw a picture of any block record in its full generality. 
+In our case the interesting record is the input shape, which looks like the following (with the record `ID` columns suppressed for conciseness).
 
 
 ```python
@@ -316,7 +342,7 @@ def diagram_to_pandas(s):
     s = re.sub(r'"', '', s)
     return pandas.read_table(sep='\\s*,\\s*', engine='python', filepath_or_buffer=io.StringIO(s))
 
-
+# draw a picture of the record format
 diagram = diagram_to_pandas("""
 
 
@@ -335,7 +361,19 @@ diagram
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -372,6 +410,8 @@ diagram
 
 The column names `rank`, `DATE`, and `OP` are all column names of the table we are starting with.  The values `1`, `2`, and `3` are all values we expect to see in the `rank` column of the working data frame.  And the symbols `DATE1`, `DATE2`, `DATE3`, `OP1`, `OP2`, and `OP3` are all stand-in names for values we see in our data.  These symbols will be the column names of our new row-records.
 
+By default, the first column of a diagram is the in-record key (that is why we put `rank` first).  However, any set of columns can be specified as the in-record keys through the package interfaces. 
+
 We have tutorials on how to build these diagrams [here](https://winvector.github.io/cdata/articles/design.html) and [here](https://winvector.github.io/cdata/articles/blocksrecs.html).  Essentially we draw one record of the input and output and match column names to stand-in interior values of the other.  The output record is a single row, so we don't have to explicitly pass it in.  However it looks like the following.
 
 
@@ -390,7 +430,19 @@ row_record
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -421,7 +473,7 @@ row_record
 
 Notice the interior-data portions (the parts we wrote in the inputs as unquoted) of each table input are the cells that are matched from one record to the other.  These are in fact just the earlier sample inputs and outputs with the values replaced with the placeholders `DATE1`, `DATE2`, `DATE3`, `OP1`, `OP2`, and `OP3`.
 
-With this diagram in hand we can specify the data reshaping step.
+With the diagram in hand we can specify the data reshaping step. Since we are moving the data from blocks to row records, we use the class `RecordMap` with a `blocks_in` argument to create the reshaping transform.
 
 
 ```python
@@ -432,7 +484,7 @@ record_map = RecordMap(
     ))
 ```
 
-The transform specifies that records are found in the format shown in diagram, and are to be converted to rows.  We can confirm the intent by printing the transform.
+The transform specifies that records are found in the format shown in `diagram`, and are to be converted to rows.  We can confirm the intent by printing the transform.
 
 
 ```python
@@ -454,22 +506,17 @@ print(str(record_map))
     
 
 
-We are now ready to put all of our operations together into one composite pipeline
+If we apply this transform to the intermediate table `d2`, we have the data in the format we need (except possibly for the order of `ID`).
 
 
 ```python
 # specify the first few data processing steps
-ops = describe_table(d, table_name='d'). \
-        project({'OP': user_fn(sorted_concat, 'OP')},
-                group_by=['ID', 'DATE']). \
-        extend({'rank': '_row_number()'},
-               partition_by=['ID'],
-               order_by=['DATE']). \
+ops2 = describe_table(d2, table_name='d2'). \
         convert_records(record_map). \
-        order_rows(['ID'])
+        order_rows(['ID'])  # ensure presentation is ordered by ID
 
 # apply the operations to the dat
-res = ops.transform(d)
+res = ops2.transform(d2)
 
 res
 ```
@@ -478,7 +525,139 @@ res
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ID</th>
+      <th>DATE1</th>
+      <th>OP1</th>
+      <th>DATE2</th>
+      <th>OP2</th>
+      <th>DATE3</th>
+      <th>OP3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>2001-01-02 00:00:00</td>
+      <td>A</td>
+      <td>2015-04-25 00:00:00</td>
+      <td>B</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>2000-04-01 00:00:00</td>
+      <td>A</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>2014-04-07 00:00:00</td>
+      <td>D</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>2005-06-16 00:00:00</td>
+      <td>A</td>
+      <td>2009-01-20 00:00:00</td>
+      <td>B, D</td>
+      <td>2012-12-01 00:00:00</td>
+      <td>C</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>2003-11-09 00:00:00</td>
+      <td>B</td>
+      <td>2010-10-10 00:00:00</td>
+      <td>A</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>6</td>
+      <td>2004-01-09 00:00:00</td>
+      <td>B</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+### The full transformation
+
+We are now ready to put all of our operations together into one composite pipeline, starting from a specification of the original data `d`.
+
+
+```python
+# specify the first few data processing steps
+ops = describe_table(d, table_name='d'). \
+        project({'OP': user_fn(sorted_concat, 'OP')},  # fuse all the ops on same date/id into one string
+                group_by=['ID', 'DATE']). \
+        extend({'rank': '_row_number()'},  # rank each ID group in order of date
+               partition_by=['ID'],
+               order_by=['DATE']). \
+        convert_records(record_map). \
+        order_rows(['ID'])   # ensure presentation is ordered by ID
+
+# apply the operations to the data
+res = ops.transform(d)
+
+# present the results
+res
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -561,10 +740,9 @@ res
 
 And we are done.
 
-## `SQL`
+## SQL
 
-All of the steps are easy to translate into `SQL` for running in databases, which we will show here.
-
+All of the steps are easy to translate into SQL for running in databases, which we will show here.
 
 
 ```python
@@ -575,10 +753,7 @@ db_model.prepare_connection(con)
 
 # copy our data to the database
 d.to_sql('d', con, if_exists='replace')
-```
 
-
-```python
 # define the aggregator
 # Note: this will move data between the database and SQL
 # in general we would use a stored procedure
@@ -592,7 +767,6 @@ class SortedConcat:
 
     def finalize(self):
         return ', '.join(sorted([v for v in self.accum]))
-
 
 # registoer our aggregator with SQLite
 con.create_aggregate("sorted_concat", 1, SortedConcat)
@@ -610,79 +784,91 @@ res_db
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>DATE1</th>
-      <th>OP2</th>
-      <th>DATE3</th>
-      <th>ID</th>
-      <th>OP3</th>
       <th>OP1</th>
       <th>DATE2</th>
+      <th>ID</th>
+      <th>DATE1</th>
+      <th>DATE3</th>
+      <th>OP3</th>
+      <th>OP2</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>2001-01-02 00:00:00</td>
-      <td>B</td>
-      <td>None</td>
-      <td>1</td>
-      <td>None</td>
       <td>A</td>
       <td>2015-04-25 00:00:00</td>
+      <td>1</td>
+      <td>2001-01-02 00:00:00</td>
+      <td>None</td>
+      <td>None</td>
+      <td>B</td>
     </tr>
     <tr>
       <th>1</th>
+      <td>A</td>
+      <td>None</td>
+      <td>2</td>
       <td>2000-04-01 00:00:00</td>
       <td>None</td>
       <td>None</td>
-      <td>2</td>
-      <td>None</td>
-      <td>A</td>
       <td>None</td>
     </tr>
     <tr>
       <th>2</th>
+      <td>D</td>
+      <td>None</td>
+      <td>3</td>
       <td>2014-04-07 00:00:00</td>
       <td>None</td>
       <td>None</td>
-      <td>3</td>
-      <td>None</td>
-      <td>D</td>
       <td>None</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>2005-06-16 00:00:00</td>
-      <td>B, D</td>
-      <td>2012-12-01 00:00:00</td>
-      <td>4</td>
-      <td>C</td>
       <td>A</td>
       <td>2009-01-20 00:00:00</td>
+      <td>4</td>
+      <td>2005-06-16 00:00:00</td>
+      <td>2012-12-01 00:00:00</td>
+      <td>C</td>
+      <td>B, D</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>2003-11-09 00:00:00</td>
-      <td>A</td>
-      <td>None</td>
-      <td>5</td>
-      <td>None</td>
       <td>B</td>
       <td>2010-10-10 00:00:00</td>
+      <td>5</td>
+      <td>2003-11-09 00:00:00</td>
+      <td>None</td>
+      <td>None</td>
+      <td>A</td>
     </tr>
     <tr>
       <th>5</th>
+      <td>B</td>
+      <td>None</td>
+      <td>6</td>
       <td>2004-01-09 00:00:00</td>
       <td>None</td>
       <td>None</td>
-      <td>6</td>
-      <td>None</td>
-      <td>B</td>
       <td>None</td>
     </tr>
   </tbody>
@@ -691,31 +877,30 @@ res_db
 
 
 
-Note: column order is not considered essential in `data_algebra` pipelines (though the `select_columns()` can specify it).
-
-## A variation
-
-If the ask had not wanted same-timestamp `OP`s merged into a list the solution would have looked like this:
+Note: column order is not considered essential in `data_algebra` pipelines (though it is easy to fix once you are in `Python`).
 
 
 ```python
-ops2 = describe_table(d, table_name='d'). \
-    extend({'rank': '_row_number()'},
-           partition_by=['ID'],
-           order_by=['DATE', 'OP']). \
-    convert_records(record_map). \
-    order_rows(['ID'])
-
-res2 = ops2.transform(d)
-
-res2
+res_db[['ID', 'DATE1', 'OP1', 'DATE2', 'OP2', 'DATE3', 'OP3']]
 ```
 
 
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -766,9 +951,9 @@ res2
       <td>2005-06-16 00:00:00</td>
       <td>A</td>
       <td>2009-01-20 00:00:00</td>
-      <td>B</td>
-      <td>2009-01-20 00:00:00</td>
-      <td>D</td>
+      <td>B, D</td>
+      <td>2012-12-01 00:00:00</td>
+      <td>C</td>
     </tr>
     <tr>
       <th>4</th>
@@ -806,4 +991,3 @@ con.close()
 ```python
 
 ```
-
