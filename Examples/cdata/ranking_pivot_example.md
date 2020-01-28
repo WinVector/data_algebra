@@ -464,7 +464,8 @@ If we apply this transform to the intermediate table `d2`, we have the data in t
 ```python
 # specify the first few data processing steps
 ops2 = describe_table(d2, table_name='d2'). \
-        convert_records(record_map). \
+        convert_records(  # transform the record shape
+                        record_map). \
         order_rows(['ID'])  # ensure presentation is ordered by ID
 
 # apply the operations to the dat
@@ -571,7 +572,8 @@ ops = describe_table(d, table_name='d'). \
         extend({'rank': '_row_number()'},  # rank each ID group in order of date
                partition_by=['ID'],
                order_by=['DATE']). \
-        convert_records(record_map). \
+        convert_records(  # transform the record shape
+                        record_map). \
         order_rows(['ID'])   # ensure presentation is ordered by ID
 
 # apply the operations to the data
@@ -717,73 +719,73 @@ res_db
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>OP1</th>
-      <th>DATE2</th>
       <th>ID</th>
       <th>DATE1</th>
+      <th>DATE2</th>
       <th>DATE3</th>
-      <th>OP3</th>
+      <th>OP1</th>
       <th>OP2</th>
+      <th>OP3</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>A</td>
-      <td>2015-04-25 00:00:00</td>
       <td>1</td>
       <td>2001-01-02 00:00:00</td>
+      <td>2015-04-25 00:00:00</td>
       <td>None</td>
-      <td>None</td>
+      <td>A</td>
       <td>B</td>
+      <td>None</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>A</td>
-      <td>None</td>
       <td>2</td>
       <td>2000-04-01 00:00:00</td>
       <td>None</td>
+      <td>None</td>
+      <td>A</td>
       <td>None</td>
       <td>None</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>D</td>
-      <td>None</td>
       <td>3</td>
       <td>2014-04-07 00:00:00</td>
       <td>None</td>
+      <td>None</td>
+      <td>D</td>
       <td>None</td>
       <td>None</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>A</td>
-      <td>2009-01-20 00:00:00</td>
       <td>4</td>
       <td>2005-06-16 00:00:00</td>
+      <td>2009-01-20 00:00:00</td>
       <td>2012-12-01 00:00:00</td>
-      <td>C</td>
+      <td>A</td>
       <td>B, D</td>
+      <td>C</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>B</td>
-      <td>2010-10-10 00:00:00</td>
       <td>5</td>
       <td>2003-11-09 00:00:00</td>
+      <td>2010-10-10 00:00:00</td>
       <td>None</td>
-      <td>None</td>
+      <td>B</td>
       <td>A</td>
+      <td>None</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>B</td>
-      <td>None</td>
       <td>6</td>
       <td>2004-01-09 00:00:00</td>
       <td>None</td>
+      <td>None</td>
+      <td>B</td>
       <td>None</td>
       <td>None</td>
     </tr>
@@ -858,6 +860,217 @@ res_db[['ID', 'DATE1', 'OP1', 'DATE2', 'OP2', 'DATE3', 'OP3']]
       <td>B, D</td>
       <td>2012-12-01 00:00:00</td>
       <td>C</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>2003-11-09 00:00:00</td>
+      <td>B</td>
+      <td>2010-10-10 00:00:00</td>
+      <td>A</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>6</td>
+      <td>2004-01-09 00:00:00</td>
+      <td>B</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+## A variation
+
+If we had not wanted to merge ties, the solution would look like this:
+
+
+
+```python
+# specify the first few data processing steps
+ops = describe_table(d, table_name='d'). \
+        extend({'rank': '_row_number()'},  # now we have to order by Date AND op
+               partition_by=['ID'],
+               order_by=['DATE', 'OP']). \
+        convert_records(  # transform the record shape
+                        record_map). \
+        select_columns(   # order the columns
+                       ['ID', 'DATE1', 'OP1', 'DATE2', 'OP2', 'DATE3', 'OP3']). \
+        order_rows(   # ensure presentation is ordered by ID
+                   ['ID'])
+
+# apply the operations to the data
+res = ops.transform(d)
+
+# present the results
+res
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ID</th>
+      <th>DATE1</th>
+      <th>OP1</th>
+      <th>DATE2</th>
+      <th>OP2</th>
+      <th>DATE3</th>
+      <th>OP3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>2001-01-02 00:00:00</td>
+      <td>A</td>
+      <td>2015-04-25 00:00:00</td>
+      <td>B</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>2000-04-01 00:00:00</td>
+      <td>A</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>2014-04-07 00:00:00</td>
+      <td>D</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>2005-06-16 00:00:00</td>
+      <td>A</td>
+      <td>2009-01-20 00:00:00</td>
+      <td>B</td>
+      <td>2009-01-20 00:00:00</td>
+      <td>D</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>2003-11-09 00:00:00</td>
+      <td>B</td>
+      <td>2010-10-10 00:00:00</td>
+      <td>A</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>6</td>
+      <td>2004-01-09 00:00:00</td>
+      <td>B</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+This time we included re-ordering the columns as part of the reusable pipeline.
+
+And this is again, easy to run in a database.
+
+
+```python
+# convert ops to SQL
+sql_code = ops.to_sql(db_model)
+
+# run the query, and bring the results back
+res_db = data_algebra.pd.read_sql_query(sql_code, con)
+
+res_db
+```
+
+
+
+
+<div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ID</th>
+      <th>DATE1</th>
+      <th>OP1</th>
+      <th>DATE2</th>
+      <th>OP2</th>
+      <th>DATE3</th>
+      <th>OP3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>2001-01-02 00:00:00</td>
+      <td>A</td>
+      <td>2015-04-25 00:00:00</td>
+      <td>B</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>2000-04-01 00:00:00</td>
+      <td>A</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>2014-04-07 00:00:00</td>
+      <td>D</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>2005-06-16 00:00:00</td>
+      <td>A</td>
+      <td>2009-01-20 00:00:00</td>
+      <td>B</td>
+      <td>2009-01-20 00:00:00</td>
+      <td>D</td>
     </tr>
     <tr>
       <th>4</th>
