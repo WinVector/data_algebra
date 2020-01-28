@@ -58,6 +58,7 @@ def test_ordered_agg_group():
                partition_by=['ID'],
                order_by=['DATE', 'OP']). \
         convert_records(record_map). \
+        select_columns(['ID', 'DATE1', 'OP1', 'DATE2', 'OP2', 'DATE3', 'OP3']). \
         order_rows(['ID'])
 
     res1 = ops.transform(d)
@@ -94,6 +95,7 @@ def test_ordered_agg_group():
                partition_by=['ID'],
                order_by=['DATE']). \
         convert_records(record_map). \
+        select_columns(['ID', 'DATE1', 'OP1', 'DATE2', 'OP2', 'DATE3', 'OP3']). \
         order_rows(['ID'])
 
     res_ag = ops2.transform(r)
@@ -122,6 +124,7 @@ def test_ordered_agg_group():
                partition_by=['ID'],
                order_by=['DATE']). \
         convert_records(record_map). \
+        select_columns(['ID', 'DATE1', 'OP1', 'DATE2', 'OP2', 'DATE3', 'OP3']). \
         order_rows(['ID'])
 
     res_ag3 = ops3.transform(d)
@@ -135,6 +138,7 @@ def test_ordered_agg_group():
                partition_by=['ID'],
                order_by=['DATE']). \
         convert_records(record_map). \
+        select_columns(['ID', 'DATE1', 'OP1', 'DATE2', 'OP2', 'DATE3', 'OP3']). \
         order_rows(['ID'])
 
     res_ag4 = ops4.transform(d)
@@ -156,7 +160,8 @@ def test_ordered_agg_group():
     # https://docs.python.org/2/library/sqlite3.html
     con.create_aggregate("sorted_concat", 1, SortedConcat)
     res_db4 = data_algebra.pd.read_sql_query(sql4, con)
-    assert data_algebra.test_util.equivalent_frames(expect_ag, res_db4)
+    assert data_algebra.test_util.equivalent_frames(expect_ag, res_db4,
+                                                    check_column_order=True, check_row_order=True)
 
     ops5 = describe_table(d, table_name='d'). \
         project({'OP': user_fn('lambda vals: ", ".join(sorted([str(vi) for vi in set(vals)]))', 'OP')},
@@ -165,6 +170,7 @@ def test_ordered_agg_group():
                partition_by=['ID'],
                order_by=['DATE']). \
         convert_records(record_map). \
+        select_columns(['ID', 'DATE1', 'OP1', 'DATE2', 'OP2', 'DATE3', 'OP3']). \
         order_rows(['ID'])
 
     res_ag5 = ops5.transform(d)
