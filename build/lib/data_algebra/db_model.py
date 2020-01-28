@@ -272,12 +272,6 @@ class DBModel:
             subs = [
                 self.expr_to_sql(ai, want_inline_parens=True) for ai in expression.args
             ]
-            if len(subs) == 2 and expression.inline:
-                if want_inline_parens:
-                    return "(" + subs[0] + " " + op.upper() + " " + subs[1] + ")"
-                else:
-                    # SQL window functions don't like parens
-                    return subs[0] + " " + op.upper() + " " + subs[1]
             return op.upper() + "(" + ", ".join(subs) + ")"
         raise TypeError("unexpected type: " + str(type(expression)))
 
@@ -439,8 +433,9 @@ class DBModel:
         if using is None:
             using = select_columns_node.column_set
         subusing = select_columns_node.columns_used_from_sources(using=using)[0]
+        subusing = [c for c in select_columns_node.column_selection if c in subusing]  # fix order
         subsql = select_columns_node.sources[0].to_sql_implementation(
-            db_model=self, using=subusing, temp_id_source=temp_id_source
+            db_model=self, using=set(subusing), temp_id_source=temp_id_source
         )
         # see if we can order columns
         subsql.terms = {
@@ -477,8 +472,9 @@ class DBModel:
         if using is None:
             using = order_node.column_set
         subusing = order_node.columns_used_from_sources(using=using)[0]
+        subusing = [c for c in order_node.column_names if c in subusing]  # fix order
         subsql = order_node.sources[0].to_sql_implementation(
-            db_model=self, using=subusing, temp_id_source=temp_id_source
+            db_model=self, using=set(subusing), temp_id_source=temp_id_source
         )
         view_name = "order_rows_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
