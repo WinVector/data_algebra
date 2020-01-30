@@ -157,7 +157,6 @@ class PandasModel(data_algebra.data_model.DataModel):
         if len(op.ops) > 0:
             cols = {}
             for k, opk in op.ops.items():
-                vk = None
                 if isinstance(opk, data_algebra.expr_rep.FnTerm):
                     fn = opk.value
                     vk = res[str(opk.args[0])].agg(fn)
@@ -321,3 +320,12 @@ class PandasModel(data_algebra.data_model.DataModel):
             data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
         return op.record_map.transform(res)
+
+    # EvalModel interface
+
+    def eval(self, ops, data_map, *, eval_env=None, narrow=True):
+        return ops.eval(data_map, eval_env=eval_env, data_model=self, narrow=narrow)
+
+    # noinspection PyPep8Naming
+    def transform(self, ops, X, *, eval_env=None, narrow=True):
+        return ops.transform(X, eval_env=eval_env, data_model=self, narrow=narrow)

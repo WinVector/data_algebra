@@ -7,6 +7,7 @@ import sqlite3
 import data_algebra.util
 import data_algebra.db_model
 import data_algebra.data_ops
+import data_algebra.eval_model
 
 
 # map from op-name to special SQL formatting code
@@ -55,7 +56,7 @@ def _check_scalar_bad(x):
     return 0
 
 
-class SQLiteModel(data_algebra.db_model.DBModel):
+class SQLiteModel(data_algebra.db_model.DBModel, data_algebra.eval_model.EvalModel):
     """A model of how SQL should be generated for SQLite"""
 
     def __init__(self):
@@ -65,6 +66,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             string_quote="'",
             sql_formatters=SQLite_formatters,
         )
+        data_algebra.eval_model.EvalModel.__init__(self)
 
     def prepare_connection(self, conn):
         # https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.create_function
@@ -148,13 +150,11 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         cur.execute("DROP TABLE IF EXISTS " + table_name)
         d.to_sql(name=table_name, con=conn)
 
-
-def eval_sqlite(ops, data_map):
-    db_model = SQLiteModel()
-    with sqlite3.connect(':memory:') as conn:
-        db_model.prepare_connection(conn)
-        for k, d in data_map.items():
-            db_model.insert_table(conn, d, table_name=k)
-        query = ops.to_sql(db_model)
-        res = db_model.read_query(conn, query)
-    return res
+    def eval(self, ops, data_map, *, eval_env=None, data_model=None, narrow=True):
+        with sqlite3.connect(':memory:') as conn:
+            self.prepare_connection(conn)
+            for k, d in data_map.items():
+                self.insert_table(conn, d, table_name=k)
+            query = ops.to_sql(self)
+            res = self.read_query(conn, query)
+        return res

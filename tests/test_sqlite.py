@@ -200,5 +200,5 @@ def test_unionall_g2():
 
     assert data_algebra.test_util.equivalent_frames(res_pandas, res_sql, check_row_order=True)
 
-    res_db2 = data_algebra.SQLite.eval_sqlite(ops, {'d1': d1, 'd2': d2})
+    res_db2 = sql_model.eval(ops, {'d1': d1, 'd2': d2})
     assert data_algebra.test_util.equivalent_frames(res_pandas, res_db2, check_row_order=True)

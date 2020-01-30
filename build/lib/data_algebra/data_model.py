@@ -1,6 +1,12 @@
-class DataModel:
+
+from abc import ABC
+
+import data_algebra.eval_model
+
+
+class DataModel(data_algebra.eval_model.EvalModel, ABC):
     def __init__(self):
-        pass
+        data_algebra.eval_model.EvalModel.__init__(self)
 
     # helper functions
 
