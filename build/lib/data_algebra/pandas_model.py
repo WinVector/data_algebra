@@ -325,7 +325,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
-        return op.record_map.transform(res)
+        return op.record_map.transform(res, pd=self.pd)
 
     # EvalModel interface
 

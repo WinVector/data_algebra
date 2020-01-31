@@ -146,9 +146,11 @@ def record_spec_from_simple_obj(obj, *, pd=None):
     )
 
 
-def blocks_to_rowrecs(data, *, blocks_in):
+def blocks_to_rowrecs(data, *, blocks_in, pd=None):
     if not isinstance(blocks_in, data_algebra.cdata.RecordSpecification):
         raise TypeError("blocks_in should be a data_algebra.cdata.RecordSpecification")
+    if pd is None:
+        pd = data_algebra.pd
     data = data.reset_index(drop=True)
     x1_descr = data_algebra.data_ops.describe_table(data, table_name="x_blocks_in")
     missing_cols = set(blocks_in.control_table_keys).union(blocks_in.record_keys) - set(
@@ -293,22 +295,26 @@ class RecordMap:
 
     # noinspection PyPep8Naming
     def transform(
-        self, X, *, check_blocks_out_keying=False
+        self, X, *, check_blocks_out_keying=False, pd=None
     ):
         unknown = set(self.columns_needed) - set(X.columns)
         if len(unknown) > 0:
             raise ValueError("missing required columns: " + str(unknown))
+        if pd is None:
+            pd = data_algebra.pd
         X = X.reset_index(drop=True)
         if self.blocks_in is not None:
             X = blocks_to_rowrecs(
                 X,
                 blocks_in=self.blocks_in,
+                pd=pd
             )
         if self.blocks_out is not None:
             X = rowrecs_to_blocks(
                 X,
                 blocks_out=self.blocks_out,
                 check_blocks_out_keying=check_blocks_out_keying,
+                pd=pd
             )
         return X
 
