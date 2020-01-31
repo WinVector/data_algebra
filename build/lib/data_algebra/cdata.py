@@ -208,7 +208,7 @@ def blocks_to_rowrecs(data, *, blocks_in, pd=None):
     colset = set(res.columns)
     for c in blocks_in.row_version():
         if c not in colset:
-            res[c] = numpy.NaN
+            res[c] = None
     return res
 
 
@@ -250,7 +250,7 @@ def rowrecs_to_blocks(data, *, blocks_out, check_blocks_out_keying=False, pd=Non
     value_keys = [k for k in ctemp.columns if k not in set(ckeys)]
     donor_cols = set(dtemp.columns)
     for vk in value_keys:
-        res[vk] = numpy.NaN
+        res[vk] = None
     # we now have parallel structures to copy between
     for i in range(ctemp.shape[0]):
         want = numpy.ones((res.shape[0],), dtype=bool)
