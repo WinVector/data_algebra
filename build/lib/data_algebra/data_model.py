@@ -1,4 +1,3 @@
-
 from abc import ABC
 
 import data_algebra.eval_model

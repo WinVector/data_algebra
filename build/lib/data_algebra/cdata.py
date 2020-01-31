@@ -147,20 +147,18 @@ def record_spec_from_simple_obj(obj, *, pd=None):
 
 def rowrecs_to_blocks(data, *, blocks_in, check_blocks_in_keying=True):
     if not isinstance(blocks_in, data_algebra.cdata.RecordSpecification):
-        raise TypeError(
-            "blocks_in should be a data_algebra.cdata.RecordSpecification"
-        )
+        raise TypeError("blocks_in should be a data_algebra.cdata.RecordSpecification")
     data = data.reset_index(drop=True)
     x1_descr = data_algebra.data_ops.describe_table(data, table_name="x_blocks_in")
-    missing_cols = set(blocks_in.control_table_keys).union(
-        blocks_in.record_keys
-    ) - set(x1_descr.column_names)
+    missing_cols = set(blocks_in.control_table_keys).union(blocks_in.record_keys) - set(
+        x1_descr.column_names
+    )
     if len(missing_cols) > 0:
         raise KeyError("missing required columns: " + str(missing_cols))
     if check_blocks_in_keying:
         # table should be keyed by record_keys + control_table_keys
         if not data_algebra.util.table_is_keyed_by_columns(
-                data, blocks_in.record_keys + blocks_in.control_table_keys
+            data, blocks_in.record_keys + blocks_in.control_table_keys
         ):
             raise ValueError(
                 "table is not keyed by blocks_in.record_keys + blocks_in.control_table_keys"
@@ -170,29 +168,23 @@ def rowrecs_to_blocks(data, *, blocks_in, check_blocks_in_keying=True):
     x1_sql = x1_descr.to_sql(db_model)
     with sqlite3.connect(":memory:") as conn:
         db_model.insert_table(conn, data, x1_descr.table_name)
-        to_blocks_sql = db_model.blocks_to_row_recs_query(
-            x1_sql, blocks_in
-        )
+        to_blocks_sql = db_model.blocks_to_row_recs_query(x1_sql, blocks_in)
         data = db_model.read_query(conn, to_blocks_sql)
     return data
 
 
 def blocks_to_rowrecs(data, *, blocks_out, check_blocks_out_keying=False):
     if not isinstance(blocks_out, data_algebra.cdata.RecordSpecification):
-        raise TypeError(
-            "blocks_out should be a data_algebra.cdata.RecordSpecification"
-        )
+        raise TypeError("blocks_out should be a data_algebra.cdata.RecordSpecification")
     data = data.reset_index(drop=True)
-    x2_descr = data_algebra.data_ops.describe_table(
-        data, table_name="x_blocks_out"
-    )
+    x2_descr = data_algebra.data_ops.describe_table(data, table_name="x_blocks_out")
     missing_cols = set(blocks_out.record_keys) - set(x2_descr.column_names)
     if len(missing_cols) > 0:
         raise KeyError("missing required columns: " + str(missing_cols))
     if check_blocks_out_keying:
         # table should be keyed by record_keys
         if not data_algebra.util.table_is_keyed_by_columns(
-                data, blocks_out.record_keys
+            data, blocks_out.record_keys
         ):
             raise ValueError("table is not keyed by blocks_out.record_keys")
     # convert to block records
@@ -203,12 +195,8 @@ def blocks_to_rowrecs(data, *, blocks_out, check_blocks_out_keying=False):
             "blocks_out", blocks_out.control_table.columns
         )
         db_model.insert_table(conn, data, x2_descr.table_name)
-        db_model.insert_table(
-            conn, blocks_out.control_table, temp_table.table_name
-        )
-        to_rows_sql = db_model.row_recs_to_blocks_query(
-            x2_sql, blocks_out, temp_table
-        )
+        db_model.insert_table(conn, blocks_out.control_table, temp_table.table_name)
+        to_rows_sql = db_model.row_recs_to_blocks_query(x2_sql, blocks_out, temp_table)
         data = db_model.read_query(conn, to_rows_sql)
     return data
 
@@ -289,9 +277,17 @@ class RecordMap:
             raise ValueError("missing required columns: " + str(unknown))
         X = X.reset_index(drop=True)
         if self.blocks_in is not None:
-            X = rowrecs_to_blocks(X, blocks_in=self.blocks_in, check_blocks_in_keying=check_blocks_in_keying)
+            X = rowrecs_to_blocks(
+                X,
+                blocks_in=self.blocks_in,
+                check_blocks_in_keying=check_blocks_in_keying,
+            )
         if self.blocks_out is not None:
-            X = blocks_to_rowrecs(X, blocks_out=self.blocks_out, check_blocks_out_keying=check_blocks_out_keying)
+            X = blocks_to_rowrecs(
+                X,
+                blocks_out=self.blocks_out,
+                check_blocks_out_keying=check_blocks_out_keying,
+            )
         return X
 
     def compose(self, other):

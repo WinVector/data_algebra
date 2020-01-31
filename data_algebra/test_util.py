@@ -108,8 +108,8 @@ def equivalent_frames(
             if not all(ca_null == cb_null):
                 return False
             if not all(ca_null):
-                ca = ca[~ ca_null]
-                cb = cb[~ cb_null]
+                ca = ca[~ca_null]
+                cb = cb[~cb_null]
                 if can_convert_v_to_numeric(ca, pd=pd):
                     ca = numpy.asarray(ca, dtype=float)
                     cb = numpy.asarray(cb, dtype=float)

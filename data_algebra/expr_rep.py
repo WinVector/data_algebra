@@ -904,7 +904,9 @@ class Expression(Term):
 
     def to_pandas(self, *, want_inline_parens=False):
         if self.op in data_algebra.custom_functions.default_custom_function_map.keys():
-            return data_algebra.custom_functions.default_custom_function_map[self.op].pandas_formatter(self)
+            return data_algebra.custom_functions.default_custom_function_map[
+                self.op
+            ].pandas_formatter(self)
         if len(self.args) <= 0:
             return "_" + self.op + "()"
         if len(self.args) == 1:
@@ -1053,7 +1055,9 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
                 # k = f(k) implicit form
                 v = FnTerm(v, fn_arg=ColumnReference(view=view, column_name=k))
             else:
-                v = _parse_by_eval(source_str=v, data_def=mp, outter_environemnt=parse_env)
+                v = _parse_by_eval(
+                    source_str=v, data_def=mp, outter_environemnt=parse_env
+                )
         else:
             v = v.replace_view(view)
         newops[k] = v

@@ -151,7 +151,7 @@ class SQLiteModel(data_algebra.db_model.DBModel, data_algebra.eval_model.EvalMod
         d.to_sql(name=table_name, con=conn)
 
     def eval(self, ops, data_map, *, eval_env=None, data_model=None, narrow=True):
-        with sqlite3.connect(':memory:') as conn:
+        with sqlite3.connect(":memory:") as conn:
             self.prepare_connection(conn)
             for k, d in data_map.items():
                 self.insert_table(conn, d, table_name=k)

@@ -47,9 +47,11 @@ def user_fn(fn, var, display_form=None):
         display_form = fn.__name__
     if not isinstance(var, str):
         raise TypeError("expected var to be str")
-    return data_algebra.expr_rep.FnTerm(fn,
-                                        fn_arg=data_algebra.expr_rep.ColumnReference(view=None, column_name=var),
-                                        display_form=display_form)
+    return data_algebra.expr_rep.FnTerm(
+        fn,
+        fn_arg=data_algebra.expr_rep.ColumnReference(view=None, column_name=var),
+        display_form=display_form,
+    )
 
 
 class ViewRepresentation(OperatorPlatform, ABC):
@@ -260,7 +262,15 @@ class ViewRepresentation(OperatorPlatform, ABC):
         raise NotImplementedError("base method called")
 
     # noinspection PyBroadException
-    def to_sql(self, db_model, *, pretty=False, encoding=None, sqlparse_options=None, temp_tables=None):
+    def to_sql(
+        self,
+        db_model,
+        *,
+        pretty=False,
+        encoding=None,
+        sqlparse_options=None,
+        temp_tables=None
+    ):
         if sqlparse_options is None:
             sqlparse_options = {"reindent": True, "keyword_case": "upper"}
         if not isinstance(db_model, data_algebra.db_model.DBModel):
@@ -274,7 +284,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
         )
         if (sub_sql.temp_tables is not None) and (len(sub_sql.temp_tables) > 0):
             if temp_tables is None:
-                raise ValueError("need temp_tables to be a dictionary to copy back found temporary table values")
+                raise ValueError(
+                    "need temp_tables to be a dictionary to copy back found temporary table values"
+                )
             temp_tables.update(sub_sql.temp_tables)
         sql_str = sub_sql.to_sql(db_model=db_model, force_sql=True)
         if pretty and _have_sqlparse:
@@ -308,12 +320,16 @@ class ViewRepresentation(OperatorPlatform, ABC):
             td = tables[k]
             missing = set(td.column_names) - have
             if len(missing) > 0:
-                raise ValueError("Table " + k + " missing required columns: " + str(missing))
+                raise ValueError(
+                    "Table " + k + " missing required columns: " + str(missing)
+                )
             if strict:
                 cf = set(forbidden[k])
                 excess = cf.intersection(have)
                 if len(excess) > 0:
-                    raise ValueError("Table " + k + " has forbidden columns: " + str(excess))
+                    raise ValueError(
+                        "Table " + k + " has forbidden columns: " + str(excess)
+                    )
 
     def eval_pandas(self, data_map, *, eval_env=None, data_model=None, narrow=True):
         """
@@ -337,7 +353,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
             )
         self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
-        self.check_constraints({k: x.columns for (k, x) in data_map.items()}, strict=not narrow)
+        self.check_constraints(
+            {k: x.columns for (k, x) in data_map.items()}, strict=not narrow
+        )
         for k in tables.keys():
             if k not in data_map.keys():
                 raise ValueError("Required table " + k + " not in data_map")
@@ -363,7 +381,10 @@ class ViewRepresentation(OperatorPlatform, ABC):
         # noinspection PyUnresolvedReferences
         if isinstance(x, data_model.pd.DataFrame):
             return self.eval_pandas(
-                data_map=data_map, eval_env=eval_env, data_model=data_model, narrow=narrow
+                data_map=data_map,
+                eval_env=eval_env,
+                data_model=data_model,
+                narrow=narrow,
             )
         raise TypeError("can not apply eval() to type " + str(type(x)))
 
@@ -386,7 +407,10 @@ class ViewRepresentation(OperatorPlatform, ABC):
         if isinstance(X, data_model.pd.DataFrame):
             data_map = {k: X}
             return self.eval_pandas(
-                data_map=data_map, eval_env=eval_env, data_model=data_model, narrow=narrow
+                data_map=data_map,
+                eval_env=eval_env,
+                data_model=data_model,
+                narrow=narrow,
             )
         raise TypeError("can not apply transform() to type " + str(type(X)))
 
@@ -585,10 +609,8 @@ class ViewRepresentation(OperatorPlatform, ABC):
         if record_map is None:
             return self
         if self.is_trivial_when_intermediate():
-            return self.sources[0].convert_records(
-                record_map)
-        return ConvertRecordsNode(
-            source=self, record_map=record_map)
+            return self.sources[0].convert_records(record_map)
+        return ConvertRecordsNode(source=self, record_map=record_map)
 
 
 # Could also have general query as starting node, but don't see a lot of point to
@@ -731,7 +753,9 @@ class TableDescription(ViewRepresentation):
     def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
         if data_model is None:
             data_model = data_algebra.pandas_model.PandasModel()
-        return data_model.table_step(op=self, data_map=data_map, eval_env=eval_env, narrow=narrow)
+        return data_model.table_step(
+            op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
+        )
 
     def columns_used_from_sources(self, using=None):
         return []  # no inputs to table description
@@ -838,8 +862,10 @@ class WrappedOperatorPlatform(OperatorPlatform):
     def transform(self, X, *, eval_env=None, data_model=None, narrow=True):
         data_map, X = self._reach_in(X)
         return WrappedOperatorPlatform(
-            underlying=self.underlying.transform(X, eval_env=eval_env, data_model=data_model, narrow=narrow),
-            data_map=data_map
+            underlying=self.underlying.transform(
+                X, eval_env=eval_env, data_model=data_model, narrow=narrow
+            ),
+            data_map=data_map,
         )
 
     def __rrshift__(self, other):  # override other >> self
@@ -985,8 +1011,7 @@ class WrappedOperatorPlatform(OperatorPlatform):
         if record_map is None:
             return self
         return WrappedOperatorPlatform(
-            underlying=self.underlying.convert_records(
-                record_map=record_map),
+            underlying=self.underlying.convert_records(record_map=record_map),
             data_map=self.data_map,
         )
 
@@ -1206,7 +1231,9 @@ class ExtendNode(ViewRepresentation):
     def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
         if data_model is None:
             data_model = data_algebra.pandas_model.PandasModel()
-        return data_model.extend_step(op=self, data_map=data_map, eval_env=eval_env, narrow=narrow)
+        return data_model.extend_step(
+            op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
+        )
 
 
 class ProjectNode(ViewRepresentation):
@@ -1242,19 +1269,28 @@ class ProjectNode(ViewRepresentation):
             if isinstance(opk, data_algebra.expr_rep.Expression):
                 if len(opk.args) > 1:
                     raise ValueError(
-                        "non-trivial aggregation expression: " + str(k) + ": " + str(opk)
+                        "non-trivial aggregation expression: "
+                        + str(k)
+                        + ": "
+                        + str(opk)
                     )
                 if len(opk.args) > 0:
-                    if not isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
+                    if not isinstance(
+                        opk.args[0], data_algebra.expr_rep.ColumnReference
+                    ):
                         raise ValueError(
                             "windows expression argument must be a column: "
                             + str(k)
                             + ": "
-                            + str(opk))
+                            + str(opk)
+                        )
             else:
                 if not isinstance(opk, data_algebra.expr_rep.FnTerm):
                     raise ValueError(
-                        "non-aggregated expression in project: " + str(k) + ": " + str(opk)
+                        "non-aggregated expression in project: "
+                        + str(k)
+                        + ": "
+                        + str(opk)
                     )
             # TODO: check op is in list of aggregators
             # Note: non-aggregators making through will be caught by table shape check
@@ -1334,7 +1370,9 @@ class ProjectNode(ViewRepresentation):
     def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
         if data_model is None:
             data_model = data_algebra.pandas_model.PandasModel()
-        return data_model.project_step(op=self, data_map=data_map, eval_env=eval_env, narrow=narrow)
+        return data_model.project_step(
+            op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
+        )
 
 
 class SelectRowsNode(ViewRepresentation):
@@ -1651,7 +1689,9 @@ class OrderRowsNode(ViewRepresentation):
     def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
         if data_model is None:
             data_model = data_algebra.pandas_model.PandasModel()
-        return data_model.order_rows_step(op=self, data_map=data_map, eval_env=eval_env, narrow=narrow)
+        return data_model.order_rows_step(
+            op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
+        )
 
     # short-cut main interface
 
@@ -2008,8 +2048,7 @@ class ConvertRecordsNode(ViewRepresentation):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
-        return new_sources[0].convert_records(
-            record_map=self.record_map)
+        return new_sources[0].convert_records(record_map=self.record_map)
 
     def _equiv_nodes(self, other):
         if not self.record_map == other.record_map:
@@ -2017,9 +2056,7 @@ class ConvertRecordsNode(ViewRepresentation):
         return True
 
     def columns_used_from_sources(self, using=None):
-        return [
-            self.record_map.columns_needed
-        ]
+        return [self.record_map.columns_needed]
 
     def collect_representation_implementation(self, *, pipeline=None, dialect="Python"):
         if pipeline is None:
@@ -2054,7 +2091,9 @@ class ConvertRecordsNode(ViewRepresentation):
             db_model=db_model, using=None, temp_id_source=temp_id_source
         )
         # claims to use all columns
-        query = sub_query.to_sql(columns=self.columns_used_from_sources()[0], db_model=db_model)
+        query = sub_query.to_sql(
+            columns=self.columns_used_from_sources()[0], db_model=db_model
+        )
         blocks_out_table = None
         if self.record_map.blocks_in is not None:
             query = db_model.blocks_to_row_recs_query(
@@ -2075,14 +2114,16 @@ class ConvertRecordsNode(ViewRepresentation):
         temp_tables = sub_query.temp_tables.copy()
         if blocks_out_table is not None:
             if blocks_out_table.key in temp_tables.keys():
-                raise ValueError("key collision in temp_tables construction: " + blocks_out_table.key)
+                raise ValueError(
+                    "key collision in temp_tables construction: " + blocks_out_table.key
+                )
             temp_tables[blocks_out_table.key] = self.record_map.blocks_out.control_table
         near_sql = data_algebra.near_sql.NearSQLq(
             quoted_query_name=db_model.quote_identifier(view_name),
             prev_quoted_query_name=db_model.quote_identifier(prev_view_name),
             query=query,
             terms=terms,
-            temp_tables=temp_tables
+            temp_tables=temp_tables,
         )
         return near_sql
 

@@ -72,7 +72,9 @@ class DataOpArrow(Arrow):
 
     """
 
-    def __init__(self, pipeline, *, free_table_key=None, strict=False, forbidden_to_produce=None):
+    def __init__(
+        self, pipeline, *, free_table_key=None, strict=False, forbidden_to_produce=None
+    ):
         if not isinstance(pipeline, data_algebra.data_ops.ViewRepresentation):
             raise TypeError("expected pipeline to be data_algebra.data_ops")
         self.pipeline = pipeline
@@ -128,7 +130,9 @@ class DataOpArrow(Arrow):
             raise ValueError("missing required columns: " + str(missing))
         problem_production = set(self.forbidden_columns()) - set(b.forbidden_to_produce)
         if len(problem_production) > 0:
-            raise ValueError("did not document non-produciton of columns: " + str(problem_production))
+            raise ValueError(
+                "did not document non-produciton of columns: " + str(problem_production)
+            )
         excess = set(b.outgoing_columns) - set(self.incoming_columns)
         if len(excess) > 0:
             problem_excess = excess.intersection(self.forbidden_columns())
@@ -153,9 +157,11 @@ class DataOpArrow(Arrow):
             b.pipeline, target_table_key=self.free_table_key
         )
         new_pipeline.get_tables()  # check tables are compatible
-        res = DataOpArrow(pipeline=new_pipeline,
-                          free_table_key=b.free_table_key,
-                          forbidden_to_produce=self.forbidden_to_produce)
+        res = DataOpArrow(
+            pipeline=new_pipeline,
+            free_table_key=b.free_table_key,
+            forbidden_to_produce=self.forbidden_to_produce,
+        )
         res.incoming_types = b.incoming_types
         res.outgoing_types = self.outgoing_types
         return res
@@ -244,10 +250,9 @@ class DataOpArrow(Arrow):
         return self.disallowed_columns.copy()
 
     # noinspection PyMethodMayBeStatic
-    def format_end_description(self, *,
-                               required_cols, col_types, forbidden_cols,
-                               align_right=70,
-                               sep_width=2):
+    def format_end_description(
+        self, *, required_cols, col_types, forbidden_cols, align_right=70, sep_width=2
+    ):
         if col_types is not None:
             in_rep = [str(c) + ": " + str(col_types[c]) for c in required_cols]
         else:
@@ -267,12 +272,16 @@ class DataOpArrow(Arrow):
         return col_rep
 
     def __str__(self):
-        in_rep = self.format_end_description(required_cols=self.incoming_columns,
-                                             col_types=self.incoming_types,
-                                             forbidden_cols=self.disallowed_columns)
-        out_rep = self.format_end_description(required_cols=self.outgoing_columns,
-                                              col_types=self.outgoing_types,
-                                              forbidden_cols=self.forbidden_to_produce)
+        in_rep = self.format_end_description(
+            required_cols=self.incoming_columns,
+            col_types=self.incoming_types,
+            forbidden_cols=self.disallowed_columns,
+        )
+        out_rep = self.format_end_description(
+            required_cols=self.outgoing_columns,
+            col_types=self.outgoing_types,
+            forbidden_cols=self.forbidden_to_produce,
+        )
         return (
             "[\n "
             + self.free_table_key.__repr__()

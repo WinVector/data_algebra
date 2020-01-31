@@ -133,7 +133,9 @@ class DBModel:
             + " "
             + (
                 "double precision"
-                if data_algebra.util.can_convert_v_to_numeric(d[d.columns[i]], pd=self.pd)
+                if data_algebra.util.can_convert_v_to_numeric(
+                    d[d.columns[i]], pd=self.pd
+                )
                 else "VARCHAR"
             )
             for i in range(d.shape[1])
@@ -356,7 +358,7 @@ class DBModel:
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_sql(columns=subusing, db_model=self),
-            temp_tables=subsql.temp_tables.copy()
+            temp_tables=subsql.temp_tables.copy(),
         )
         return near_sql
 
@@ -390,7 +392,7 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_sql(columns=subusing, db_model=self),
             suffix=suffix,
-            temp_tables=subsql.temp_tables.copy()
+            temp_tables=subsql.temp_tables.copy(),
         )
         return near_sql
 
@@ -417,7 +419,7 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_sql(columns=subusing, db_model=self),
             suffix=suffix,
-            temp_tables=subsql.temp_tables.copy()
+            temp_tables=subsql.temp_tables.copy(),
         )
         return near_sql
 
@@ -433,7 +435,9 @@ class DBModel:
         if using is None:
             using = select_columns_node.column_set
         subusing = select_columns_node.columns_used_from_sources(using=using)[0]
-        subusing = [c for c in select_columns_node.column_selection if c in subusing]  # fix order
+        subusing = [
+            c for c in select_columns_node.column_selection if c in subusing
+        ]  # fix order
         subsql = select_columns_node.sources[0].to_sql_implementation(
             db_model=self, using=set(subusing), temp_id_source=temp_id_source
         )
@@ -500,7 +504,7 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_sql(columns=subusing, db_model=self),
             suffix=suffix,
-            temp_tables=subsql.temp_tables.copy()
+            temp_tables=subsql.temp_tables.copy(),
         )
         return near_sql
 
@@ -532,7 +536,7 @@ class DBModel:
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_sql(columns=subusing, db_model=self),
-            temp_tables=subsql.temp_tables.copy()
+            temp_tables=subsql.temp_tables.copy(),
         )
         return near_sql
 
@@ -598,7 +602,9 @@ class DBModel:
                 )
                 + " "
             )
-        confused_temps = set(sql_left.temp_tables.keys()).intersection(sql_right.temp_tables.keys())
+        confused_temps = set(sql_left.temp_tables.keys()).intersection(
+            sql_right.temp_tables.keys()
+        )
         if len(confused_temps) > 0:
             raise ValueError("name collisions on temp_tables: " + str(confused_temps))
         temp_tables = sql_left.temp_tables.copy()
@@ -612,7 +618,7 @@ class DBModel:
             sub_sql2=sql_right.to_sql(columns=using_right, db_model=self),
             previous_step_summary2=sql_right.summary(),
             suffix=on_terms,
-            temp_tables=temp_tables
+            temp_tables=temp_tables,
         )
         return near_sql
 
@@ -654,7 +660,9 @@ class DBModel:
                 concat_node.id_column: self.quote_literal(concat_node.b_name)
             }
             terms.update({concat_node.id_column: None})
-        confused_temps = set(sql_left.temp_tables.keys()).intersection(sql_right.temp_tables.keys())
+        confused_temps = set(sql_left.temp_tables.keys()).intersection(
+            sql_right.temp_tables.keys()
+        )
         if len(confused_temps) > 0:
             raise ValueError("name collisions on temp_tables: " + str(confused_temps))
         temp_tables = sql_left.temp_tables.copy()
@@ -676,7 +684,7 @@ class DBModel:
                 constants=constants_right,
             ),
             previous_step_summary2=sql_right.summary(),
-            temp_tables=temp_tables
+            temp_tables=temp_tables,
         )
         return near_sql
 

@@ -35,7 +35,9 @@ class OperatorPlatform:
         :param data_model implementation to use
         :return: transformed dataframe
         """
-        return self.transform(X=X, eval_env=eval_env, data_model=data_model, narrow=False)
+        return self.transform(
+            X=X, eval_env=eval_env, data_model=data_model, narrow=False
+        )
 
     def apply_to(self, a, *, target_table_key=None):
         """

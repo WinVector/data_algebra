@@ -19,74 +19,101 @@ def make_custom_function_map(pd=None):
     if pd is None:
         pd = data_algebra.pd
     custom_functions = [
-        CustomFunction(name="is_bad",
-                       pandas_formatter=lambda expr: "@is_bad(" + expr.args[0].to_pandas() + ")",
-                       implementation=lambda x: data_algebra.util.is_bad(x, pd=pd)),
-        CustomFunction(name="is_null",
-                       pandas_formatter=lambda expr: "@is_null(" + expr.args[0].to_pandas() + ")",
-                       implementation=lambda x: pd.isnull(x)),
-        CustomFunction(name="if_else",
-                       pandas_formatter=lambda expr: (
-                               "@if_else("
-                               + expr.args[0].to_pandas()
-                               + ", "
-                               + expr.args[1].to_pandas()
-                               + ", "
-                               + expr.args[2].to_pandas()
-                               + ")"),
-                       implementation=lambda c, x, y: numpy.where(c, x, y)),
-        CustomFunction(name="neg",
-                       pandas_formatter=lambda expr: "-" + expr.args[0].to_pandas(want_inline_parens=True),
-                       implementation=lambda x: numpy.negative(x)),
-        CustomFunction(name="co_equalizer",
-                       pandas_formatter=lambda expr: (
-                               "@co_equalizer("
-                               + expr.args[0].to_pandas()
-                               + ", "
-                               + expr.args[1].to_pandas()
-                               + ")"
-                       ),
-                       implementation=lambda f, g: data_algebra.connected_components.connected_components(f, g)),
-        CustomFunction(name="connected_components",
-                       pandas_formatter=lambda expr: ("@connected_components("
-                                                      + expr.args[0].to_pandas()
-                                                      + ", "
-                                                      + expr.args[1].to_pandas()
-                                                      + ")"
-                                                      ),
-                       implementation=lambda f, g: data_algebra.connected_components.connected_components(f, g)),
-        CustomFunction(name="partitioned_eval",
-                       pandas_formatter=lambda expr: (
-                               "@partitioned_eval("
-                               # expr.args[0] is a FnTerm
-                               + "@"
-                               + expr.args[0].to_pandas()
-                               + ", "
-                               # expr.args[1] is a ListTerm
-                               + "["
-                               + ", ".join([ei.to_pandas() for ei in expr.args[1].value])
-                               + "]"
-                               + ", "
-                               # expr.args[2] is a ListTerm
-                               + "["
-                               + ", ".join([ei.to_pandas() for ei in expr.args[2].value])
-                               + "]"
-                               + ")"
-                       ),
-                       implementation=lambda fn, arg_columns, partition_columns: (
-                           data_algebra.connected_components.partitioned_eval(
-                               fn, arg_columns, partition_columns
-                           )
-                       )),
-        CustomFunction(name="max",
-                       pandas_formatter=lambda expr: ("@max(" + expr.args[0].to_pandas() + ")"),
-                       implementation=lambda x: [numpy.max(x)] * len(x)),
-        CustomFunction(name="min",
-                       pandas_formatter=lambda expr: ("@min(" + expr.args[0].to_pandas() + ")"),
-                       implementation=lambda x: [numpy.min(x)] * len(x)),
-        CustomFunction(name="fn",  # special case, user defined function
-                       pandas_formatter=lambda expr: "@fn(" + expr.args[0].to_pandas() + ")",
-                       implementation=None),
+        CustomFunction(
+            name="is_bad",
+            pandas_formatter=lambda expr: "@is_bad(" + expr.args[0].to_pandas() + ")",
+            implementation=lambda x: data_algebra.util.is_bad(x, pd=pd),
+        ),
+        CustomFunction(
+            name="is_null",
+            pandas_formatter=lambda expr: "@is_null(" + expr.args[0].to_pandas() + ")",
+            implementation=lambda x: pd.isnull(x),
+        ),
+        CustomFunction(
+            name="if_else",
+            pandas_formatter=lambda expr: (
+                "@if_else("
+                + expr.args[0].to_pandas()
+                + ", "
+                + expr.args[1].to_pandas()
+                + ", "
+                + expr.args[2].to_pandas()
+                + ")"
+            ),
+            implementation=lambda c, x, y: numpy.where(c, x, y),
+        ),
+        CustomFunction(
+            name="neg",
+            pandas_formatter=lambda expr: "-"
+            + expr.args[0].to_pandas(want_inline_parens=True),
+            implementation=lambda x: numpy.negative(x),
+        ),
+        CustomFunction(
+            name="co_equalizer",
+            pandas_formatter=lambda expr: (
+                "@co_equalizer("
+                + expr.args[0].to_pandas()
+                + ", "
+                + expr.args[1].to_pandas()
+                + ")"
+            ),
+            implementation=lambda f, g: data_algebra.connected_components.connected_components(
+                f, g
+            ),
+        ),
+        CustomFunction(
+            name="connected_components",
+            pandas_formatter=lambda expr: (
+                "@connected_components("
+                + expr.args[0].to_pandas()
+                + ", "
+                + expr.args[1].to_pandas()
+                + ")"
+            ),
+            implementation=lambda f, g: data_algebra.connected_components.connected_components(
+                f, g
+            ),
+        ),
+        CustomFunction(
+            name="partitioned_eval",
+            pandas_formatter=lambda expr: (
+                "@partitioned_eval("
+                # expr.args[0] is a FnTerm
+                + "@"
+                + expr.args[0].to_pandas()
+                + ", "
+                # expr.args[1] is a ListTerm
+                + "["
+                + ", ".join([ei.to_pandas() for ei in expr.args[1].value])
+                + "]"
+                + ", "
+                # expr.args[2] is a ListTerm
+                + "["
+                + ", ".join([ei.to_pandas() for ei in expr.args[2].value])
+                + "]"
+                + ")"
+            ),
+            implementation=lambda fn, arg_columns, partition_columns: (
+                data_algebra.connected_components.partitioned_eval(
+                    fn, arg_columns, partition_columns
+                )
+            ),
+        ),
+        CustomFunction(
+            name="max",
+            pandas_formatter=lambda expr: ("@max(" + expr.args[0].to_pandas() + ")"),
+            implementation=lambda x: [numpy.max(x)] * len(x),
+        ),
+        CustomFunction(
+            name="min",
+            pandas_formatter=lambda expr: ("@min(" + expr.args[0].to_pandas() + ")"),
+            implementation=lambda x: [numpy.min(x)] * len(x),
+        ),
+        CustomFunction(
+            name="fn",  # special case, user defined function
+            pandas_formatter=lambda expr: "@fn(" + expr.args[0].to_pandas() + ")",
+            implementation=None,
+        ),
     ]
     mp = {cf.name: cf for cf in custom_functions}
     return mp

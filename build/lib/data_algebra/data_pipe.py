@@ -349,8 +349,7 @@ class ConvertRecords(PipeStep):
             raise TypeError(
                 "expected other to be a data_algebra.data_ops.OperatorPlatform"
             )
-        return other.convert_records(
-            record_map=self.record_map)
+        return other.convert_records(record_map=self.record_map)
 
     def __repr__(self):
         return (

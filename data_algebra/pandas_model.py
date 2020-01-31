@@ -17,8 +17,12 @@ class PandasModel(data_algebra.data_model.DataModel):
         if not isinstance(pd, types.ModuleType):
             raise TypeError("Expected pd to be a module")
         self.pd = pd
-        self.custom_function_map = data_algebra.custom_functions.make_custom_function_map(self.pd)
-        self.pandas_eval_env = {k: cf.implementation for (k, cf) in self.custom_function_map.items()}
+        self.custom_function_map = data_algebra.custom_functions.make_custom_function_map(
+            self.pd
+        )
+        self.pandas_eval_env = {
+            k: cf.implementation for (k, cf) in self.custom_function_map.items()
+        }
 
     def assert_is_appropriate_data_instance(self, df, arg_name=""):
         # noinspection PyUnresolvedReferences
@@ -139,7 +143,9 @@ class PandasModel(data_algebra.data_model.DataModel):
         # https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
         for (k, opk) in op.ops.items():
             if len(opk.args) > 1:
-                raise ValueError("non-trivial aggregation expression: " + str(k) + ": " + str(opk))
+                raise ValueError(
+                    "non-trivial aggregation expression: " + str(k) + ": " + str(opk)
+                )
             if len(opk.args) > 0:
                 if not isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
                     raise ValueError(

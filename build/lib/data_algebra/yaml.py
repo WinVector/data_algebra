@@ -151,7 +151,8 @@ def to_pipeline(obj, *, known_tables=None, parse_env=None):
             return data_algebra.data_pipe.ConvertRecords(
                 record_map=data_algebra.cdata_impl.record_map_from_simple_obj(
                     obj["record_map"]
-                ))
+                )
+            )
         else:
             raise TypeError("Unexpected op name: " + op)
     if isinstance(obj, list):
