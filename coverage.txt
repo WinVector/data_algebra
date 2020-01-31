@@ -61,7 +61,7 @@ data_algebra/SQLite.py                   101      6    94%
 data_algebra/SparkSQL.py                  19      4    79%
 data_algebra/__init__.py                   5      0   100%
 data_algebra/arrow.py                    173     39    77%
-data_algebra/cdata.py                    244     81    67%
+data_algebra/cdata.py                    257     83    68%
 data_algebra/cdata_impl.py                10      1    90%
 data_algebra/connected_components.py      49      1    98%
 data_algebra/custom_functions.py          18      1    94%
@@ -83,7 +83,7 @@ data_algebra/test_util.py                126     18    86%
 data_algebra/util.py                      45      6    87%
 data_algebra/yaml.py                      95     11    88%
 ----------------------------------------------------------
-TOTAL                                   4062    923    77%
+TOTAL                                   4075    925    77%
 
 
-============================== 89 passed in 7.67s ==============================
+============================== 89 passed in 7.53s ==============================
