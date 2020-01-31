@@ -9,11 +9,15 @@ import data_algebra.util
 
 class RecordSpecification:
     def __init__(
-        self, control_table, *, record_keys=None, control_table_keys=None, strict=False
+        self, control_table, *, record_keys=None, control_table_keys=None, strict=False, pd=None
     ):
+        if pd is None:
+            pd = data_algebra.pd
         control_table = control_table.reset_index(inplace=False, drop=True)
         if control_table.shape[0] < 1:
             raise ValueError("control table should have at least 1 row")
+        if any(data_algebra.util.is_bad(control_table.columns)):
+            raise ValueError("control table column names can not be NA/NaN/inf/None")
         if len(control_table.columns) != len(set(control_table.columns)):
             raise ValueError("control table columns should be unique")
         self.control_table = control_table.reset_index(drop=True)
@@ -39,6 +43,9 @@ class RecordSpecification:
             raise ValueError(
                 "columns common to record_keys and control_table_keys: " + str(confused)
             )
+        for ck in self.control_table_keys:
+            if any(data_algebra.util.is_bad(control_table[ck], pd=pd)):
+                raise ValueError("NA/NaN/inf/None not allowed as control table keys")
         if strict:
             if not data_algebra.util.table_is_keyed_by_columns(
                 self.control_table, self.control_table_keys
