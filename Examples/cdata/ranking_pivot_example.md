@@ -324,9 +324,9 @@ diagram = diagram_to_pandas("""
 
 
     "rank",    "DATE",    "OP"
-    "1",       DATE1,     OP1
-    "2",       DATE2,     OP2
-    "3",       DATE3,     OP3
+    1,         DATE1,     OP1
+    2,         DATE2,     OP2
+    3,         DATE3,     OP3
 
 
 """)
@@ -503,28 +503,28 @@ res
       <td>A</td>
       <td>2015-04-25 00:00:00</td>
       <td>B</td>
-      <td>None</td>
-      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>1</th>
       <td>2</td>
       <td>2000-04-01 00:00:00</td>
       <td>A</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>2</th>
       <td>3</td>
       <td>2014-04-07 00:00:00</td>
       <td>D</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>3</th>
@@ -543,18 +543,18 @@ res
       <td>B</td>
       <td>2010-10-10 00:00:00</td>
       <td>A</td>
-      <td>None</td>
-      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>5</th>
       <td>6</td>
       <td>2004-01-09 00:00:00</td>
       <td>B</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
     </tr>
   </tbody>
 </table>
@@ -612,28 +612,28 @@ res
       <td>A</td>
       <td>2015-04-25 00:00:00</td>
       <td>B</td>
-      <td>None</td>
-      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>1</th>
       <td>2</td>
       <td>2000-04-01 00:00:00</td>
       <td>A</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>2</th>
       <td>3</td>
       <td>2014-04-07 00:00:00</td>
       <td>D</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>3</th>
@@ -652,18 +652,18 @@ res
       <td>B</td>
       <td>2010-10-10 00:00:00</td>
       <td>A</td>
-      <td>None</td>
-      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>5</th>
       <td>6</td>
       <td>2004-01-09 00:00:00</td>
       <td>B</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
     </tr>
   </tbody>
 </table>
@@ -942,28 +942,28 @@ res
       <td>A</td>
       <td>2015-04-25 00:00:00</td>
       <td>B</td>
-      <td>None</td>
-      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>1</th>
       <td>2</td>
       <td>2000-04-01 00:00:00</td>
       <td>A</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>2</th>
       <td>3</td>
       <td>2014-04-07 00:00:00</td>
       <td>D</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>3</th>
@@ -982,18 +982,18 @@ res
       <td>B</td>
       <td>2010-10-10 00:00:00</td>
       <td>A</td>
-      <td>None</td>
-      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>5</th>
       <td>6</td>
       <td>2004-01-09 00:00:00</td>
       <td>B</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
-      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
     </tr>
   </tbody>
 </table>
