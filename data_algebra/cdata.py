@@ -425,4 +425,4 @@ class RecordMap:
 
     # noinspection PyPep8Naming
     def inverse_transform(self, X):
-        raise TypeError("data_algebra does not support inverse_transform")
+        return self.inverse().transform(X)
