@@ -145,7 +145,7 @@ def record_spec_from_simple_obj(obj, *, pd=None):
     )
 
 
-def blocs_to_rowrecs(data, *, blocks_in, check_blocks_in_keying=True):
+def blocks_to_rowrecs(data, *, blocks_in, check_blocks_in_keying=True):
     if not isinstance(blocks_in, data_algebra.cdata.RecordSpecification):
         raise TypeError("blocks_in should be a data_algebra.cdata.RecordSpecification")
     data = data.reset_index(drop=True)
@@ -277,7 +277,7 @@ class RecordMap:
             raise ValueError("missing required columns: " + str(unknown))
         X = X.reset_index(drop=True)
         if self.blocks_in is not None:
-            X = blocs_to_rowrecs(
+            X = blocks_to_rowrecs(
                 X,
                 blocks_in=self.blocks_in,
                 check_blocks_in_keying=check_blocks_in_keying,
