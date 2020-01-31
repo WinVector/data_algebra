@@ -173,9 +173,26 @@ d
 
 ```python
 # define a user aggregation function
-# a function to paste a vector of strings together
+
+# # a function to paste a vector of strings together
+# def sorted_concat(vals):
+#     return ', '.join(sorted([str(vi) for vi in set(vals)]))
+
+# just a class that doesn't declare an iterable interface
+# so Pandas thinks of these values as scalars.
+class Container:
+    def __init__(self, value):
+        self.value = value
+    
+    def __repr__(self):
+        return self.value.__repr__()
+    
+    def __str__(self):
+        return self.value.__repr__()
+
+
 def sorted_concat(vals):
-    return ', '.join(sorted([str(vi) for vi in set(vals)]))
+    return Container(sorted([str(vi) for vi in set(vals)]))
 
 # merge the operations to get one row per ID and DATE
 # then rank the rows for each ID by DATE
@@ -212,70 +229,70 @@ d2
       <th>0</th>
       <td>1</td>
       <td>2001-01-02 00:00:00</td>
-      <td>A</td>
+      <td>['A']</td>
       <td>1</td>
     </tr>
     <tr>
       <th>1</th>
       <td>1</td>
       <td>2015-04-25 00:00:00</td>
-      <td>B</td>
+      <td>['B']</td>
       <td>2</td>
     </tr>
     <tr>
       <th>2</th>
       <td>2</td>
       <td>2000-04-01 00:00:00</td>
-      <td>A</td>
+      <td>['A']</td>
       <td>1</td>
     </tr>
     <tr>
       <th>3</th>
       <td>3</td>
       <td>2014-04-07 00:00:00</td>
-      <td>D</td>
+      <td>['D']</td>
       <td>1</td>
     </tr>
     <tr>
       <th>4</th>
       <td>4</td>
       <td>2005-06-16 00:00:00</td>
-      <td>A</td>
+      <td>['A']</td>
       <td>1</td>
     </tr>
     <tr>
       <th>5</th>
       <td>4</td>
       <td>2009-01-20 00:00:00</td>
-      <td>B, D</td>
+      <td>['B', 'D']</td>
       <td>2</td>
     </tr>
     <tr>
       <th>6</th>
       <td>4</td>
       <td>2012-12-01 00:00:00</td>
-      <td>C</td>
+      <td>['C']</td>
       <td>3</td>
     </tr>
     <tr>
       <th>7</th>
       <td>5</td>
       <td>2003-11-09 00:00:00</td>
-      <td>B</td>
+      <td>['B']</td>
       <td>1</td>
     </tr>
     <tr>
       <th>8</th>
       <td>5</td>
       <td>2010-10-10 00:00:00</td>
-      <td>A</td>
+      <td>['A']</td>
       <td>2</td>
     </tr>
     <tr>
       <th>9</th>
       <td>6</td>
       <td>2004-01-09 00:00:00</td>
-      <td>B</td>
+      <td>['B']</td>
       <td>1</td>
     </tr>
   </tbody>
@@ -500,9 +517,9 @@ res
       <th>0</th>
       <td>1</td>
       <td>2001-01-02 00:00:00</td>
-      <td>A</td>
+      <td>['A']</td>
       <td>2015-04-25 00:00:00</td>
-      <td>B</td>
+      <td>['B']</td>
       <td>NaN</td>
       <td>NaN</td>
     </tr>
@@ -510,7 +527,7 @@ res
       <th>1</th>
       <td>2</td>
       <td>2000-04-01 00:00:00</td>
-      <td>A</td>
+      <td>['A']</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -520,7 +537,7 @@ res
       <th>2</th>
       <td>3</td>
       <td>2014-04-07 00:00:00</td>
-      <td>D</td>
+      <td>['D']</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -530,19 +547,19 @@ res
       <th>3</th>
       <td>4</td>
       <td>2005-06-16 00:00:00</td>
-      <td>A</td>
+      <td>['A']</td>
       <td>2009-01-20 00:00:00</td>
-      <td>B, D</td>
+      <td>['B', 'D']</td>
       <td>2012-12-01 00:00:00</td>
-      <td>C</td>
+      <td>['C']</td>
     </tr>
     <tr>
       <th>4</th>
       <td>5</td>
       <td>2003-11-09 00:00:00</td>
-      <td>B</td>
+      <td>['B']</td>
       <td>2010-10-10 00:00:00</td>
-      <td>A</td>
+      <td>['A']</td>
       <td>NaN</td>
       <td>NaN</td>
     </tr>
@@ -550,7 +567,7 @@ res
       <th>5</th>
       <td>6</td>
       <td>2004-01-09 00:00:00</td>
-      <td>B</td>
+      <td>['B']</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -609,9 +626,9 @@ res
       <th>0</th>
       <td>1</td>
       <td>2001-01-02 00:00:00</td>
-      <td>A</td>
+      <td>['A']</td>
       <td>2015-04-25 00:00:00</td>
-      <td>B</td>
+      <td>['B']</td>
       <td>NaN</td>
       <td>NaN</td>
     </tr>
@@ -619,7 +636,7 @@ res
       <th>1</th>
       <td>2</td>
       <td>2000-04-01 00:00:00</td>
-      <td>A</td>
+      <td>['A']</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -629,7 +646,7 @@ res
       <th>2</th>
       <td>3</td>
       <td>2014-04-07 00:00:00</td>
-      <td>D</td>
+      <td>['D']</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -639,19 +656,19 @@ res
       <th>3</th>
       <td>4</td>
       <td>2005-06-16 00:00:00</td>
-      <td>A</td>
+      <td>['A']</td>
       <td>2009-01-20 00:00:00</td>
-      <td>B, D</td>
+      <td>['B', 'D']</td>
       <td>2012-12-01 00:00:00</td>
-      <td>C</td>
+      <td>['C']</td>
     </tr>
     <tr>
       <th>4</th>
       <td>5</td>
       <td>2003-11-09 00:00:00</td>
-      <td>B</td>
+      <td>['B']</td>
       <td>2010-10-10 00:00:00</td>
-      <td>A</td>
+      <td>['A']</td>
       <td>NaN</td>
       <td>NaN</td>
     </tr>
@@ -659,7 +676,7 @@ res
       <th>5</th>
       <td>6</td>
       <td>2004-01-09 00:00:00</td>
-      <td>B</td>
+      <td>['B']</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
