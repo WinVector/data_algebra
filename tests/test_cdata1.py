@@ -12,6 +12,77 @@ from data_algebra.data_ops import *
 import data_algebra.util
 
 
+def test_small_cdata_example_debug():
+    buf = io.StringIO(
+        re.sub(
+            "[ \\t]+",
+            "",
+            """
+    Sepal.Length,Sepal.Width,Petal.Length,Petal.Width,Species,id
+    5.1,3.5,1.4,0.2,setosa,0
+    4.9,3.0,1.4,0.2,setosa,1
+    4.7,3.2,1.3,0.2,setosa,2
+    """,
+        )
+    )
+    iris_orig = data_algebra.pd.read_csv(buf)
+
+    buf = io.StringIO(
+        re.sub(
+            "[ \\t]+",
+            "",
+            """
+    id,Species,Part,Measure,Value
+    0,setosa,Petal,Length,1.4
+    0,setosa,Petal,Width,0.2
+    0,setosa,Sepal,Length,5.1
+    0,setosa,Sepal,Width,3.5
+    1,setosa,Petal,Length,1.4
+    1,setosa,Petal,Width,0.2
+    1,setosa,Sepal,Length,4.9
+    1,setosa,Sepal,Width,3.0
+    2,setosa,Petal,Length,1.3
+    2,setosa,Petal,Width,0.2
+    2,setosa,Sepal,Length,4.7
+    2,setosa,Sepal,Width,3.2
+    """,
+        )
+    )
+    iris_blocks_orig = data_algebra.pd.read_csv(buf)
+
+    iris_blocks = iris_blocks_orig.copy()
+    iris = iris_orig.copy()
+
+    control_table = data_algebra.pd.DataFrame(
+        {
+            "Part": ["Sepal", "Sepal", "Petal", "Petal"],
+            "Measure": ["Length", "Width", "Length", "Width"],
+            "Value": ["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"],
+        }
+    )
+    record_spec = data_algebra.cdata.RecordSpecification(
+        control_table,
+        control_table_keys=["Part", "Measure"],
+        record_keys=["id", "Species"],
+    )
+
+    # %%
+
+    mp_to_blocks = RecordMap(blocks_out=record_spec)
+    waste_str = str(mp_to_blocks)
+    arranged_blocks = mp_to_blocks.transform(iris)
+    assert data_algebra.test_util.equivalent_frames(arranged_blocks, iris_blocks_orig)
+    # arranged_blocks
+
+    # %%
+
+    mp_to_rows = RecordMap(blocks_in=record_spec)
+    waste_str = str(mp_to_rows)
+    arranged_rows = mp_to_rows.transform(arranged_blocks)
+    assert data_algebra.test_util.equivalent_frames(arranged_rows, iris_orig)
+    # arranged_rows
+
+
 def test_cdata1():
 
     # From: https://github.com/WinVector/data_algebra/blob/master/Examples/cdata/cdata.ipynb
@@ -140,7 +211,7 @@ def test_cdata1():
     waste_str = str(mp_to_blocks)
     arranged_blocks = mp_to_blocks.transform(iris)
     assert data_algebra.test_util.equivalent_frames(arranged_blocks, iris_blocks_orig)
-    arranged_blocks
+    # arranged_blocks
 
     # %%
 
@@ -148,7 +219,7 @@ def test_cdata1():
     waste_str = str(mp_to_rows)
     arranged_rows = mp_to_rows.transform(arranged_blocks)
     assert data_algebra.test_util.equivalent_frames(arranged_rows, iris_orig)
-    arranged_rows
+    # arranged_rows
 
     # %%
 

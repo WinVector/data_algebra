@@ -1,14 +1,10 @@
 import re
 import collections
 
-import sqlite3
-
 import numpy
 
 import data_algebra
 import data_algebra.util
-import data_algebra.SQLite
-import data_algebra.data_ops
 
 
 class RecordSpecification:
@@ -28,6 +24,8 @@ class RecordSpecification:
         self.record_keys = [k for k in record_keys]
         if control_table_keys is None:
             control_table_keys = [control_table.columns[0]]
+        if len(control_table_keys) <= 0:
+            raise ValueError("must have at least one control table key")
         if isinstance(control_table_keys, str):
             record_keys = [control_table_keys]
         self.control_table_keys = [k for k in control_table_keys]
@@ -157,9 +155,8 @@ def blocks_to_rowrecs(data, *, blocks_in, pd=None):
     if pd is None:
         pd = data_algebra.pd
     data = data.reset_index(drop=True)
-    x1_descr = data_algebra.data_ops.describe_table(data, table_name="x_blocks_in")
     missing_cols = set(blocks_in.control_table_keys).union(blocks_in.record_keys) - set(
-        x1_descr.column_names
+        data.columns
     )
     if len(missing_cols) > 0:
         raise KeyError("missing required columns: " + str(missing_cols))
@@ -171,13 +168,48 @@ def blocks_to_rowrecs(data, *, blocks_in, pd=None):
             "table is not keyed by blocks_in.record_keys + blocks_in.control_table_keys"
         )
     # convert to row-records
-    db_model = data_algebra.SQLite.SQLiteModel()
-    x1_sql = x1_descr.to_sql(db_model)
-    with sqlite3.connect(":memory:") as conn:
-        db_model.insert_table(conn, data, x1_descr.table_name)
-        to_blocks_sql = db_model.blocks_to_row_recs_query(x1_sql, blocks_in)
-        data = db_model.read_query(conn, to_blocks_sql)
-    return data
+    # regularize/complete records
+    dtemp = data.copy()  # TODO: select down columns
+    dtemp['FALSE_AGG_KEY'] = 1
+    if len(blocks_in.record_keys) > 0:
+        ideal = dtemp[blocks_in.record_keys + ['FALSE_AGG_KEY']].copy()
+        res = ideal.groupby(blocks_in.record_keys)['FALSE_AGG_KEY'].agg('sum')
+        ideal = pd.DataFrame(res).reset_index(drop=False)
+        ideal['FALSE_AGG_KEY'] = 1
+        ctemp = blocks_in.control_table[blocks_in.control_table_keys].copy()
+        ctemp['FALSE_AGG_KEY'] = 1
+        ideal = ideal.merge(ctemp, how='outer', on='FALSE_AGG_KEY')
+        ideal = ideal.reset_index(drop=True)
+        dtemp = ideal.merge(right=dtemp,
+                            how='left',
+                            on=blocks_in.record_keys + blocks_in.control_table_keys + ['FALSE_AGG_KEY'])
+    dtemp.sort_values(by=blocks_in.record_keys + blocks_in.control_table_keys, inplace=True)
+    dtemp = dtemp.reset_index(drop=True)
+    # start building up result frame
+    res = dtemp.groupby(blocks_in.record_keys)['FALSE_AGG_KEY'].agg('sum')
+    res = pd.DataFrame(res).reset_index(drop=False)
+    res.sort_values(by=blocks_in.record_keys, inplace=True)
+    res = pd.DataFrame(res).reset_index(drop=True)
+    del res['FALSE_AGG_KEY']
+    # now fill in columns
+    ckeys = blocks_in.control_table_keys
+    value_keys = [k for k in blocks_in.control_table.columns if k not in set(ckeys)]
+    donor_cols = set(dtemp.columns)
+    for i in range(blocks_in.control_table.shape[0]):
+        want = numpy.ones((dtemp.shape[0],), dtype=bool)
+        for ck in ckeys:
+            want = numpy.logical_and(want, dtemp[ck] == blocks_in.control_table[ck][i])
+        if numpy.any(want):
+            for vk in value_keys:
+                if vk in donor_cols:
+                    dcol = blocks_in.control_table[vk][i]
+                    res[dcol] = numpy.asarray(dtemp.loc[want, vk])
+    # fill in any missed columns
+    colset = set(res.columns)
+    for c in blocks_in.row_version():
+        if c not in colset:
+            res[c] = numpy.NaN
+    return res
 
 
 def rowrecs_to_blocks(data, *, blocks_out, check_blocks_out_keying=False, pd=None):
@@ -186,8 +218,7 @@ def rowrecs_to_blocks(data, *, blocks_out, check_blocks_out_keying=False, pd=Non
     if pd is None:
         pd = data_algebra.pd
     data = data.reset_index(drop=True)
-    x2_descr = data_algebra.data_ops.describe_table(data, table_name="x_blocks_out")
-    missing_cols = set(blocks_out.record_keys) - set(x2_descr.column_names)
+    missing_cols = set(blocks_out.record_keys) - set(data.columns)
     if len(missing_cols) > 0:
         raise KeyError("missing required columns: " + str(missing_cols))
     if check_blocks_out_keying:
@@ -196,7 +227,7 @@ def rowrecs_to_blocks(data, *, blocks_out, check_blocks_out_keying=False, pd=Non
             data, blocks_out.record_keys
         ):
             raise ValueError("table is not keyed by blocks_out.record_keys")
-    # convert to block records
+    # convert to block records, first build up parallel structures
     rv = [k for k in blocks_out.row_version(include_record_keys=True) if k is not None]
     if len(rv) != len(set(rv)):
         raise ValueError("duplicate row columns")
@@ -231,7 +262,7 @@ def rowrecs_to_blocks(data, *, blocks_out, check_blocks_out_keying=False, pd=Non
                 if dcol in donor_cols:
                     res.loc[want, vk] = numpy.asarray(dtemp[dcol])
     # see about promoting composite columns to numeric
-    for vk in value_keys:
+    for vk in set(value_keys):
         converted = pd.to_numeric(res[vk], errors='coerce')
         if numpy.all(pd.isnull(converted) == pd.isnull(res[vk])):
             res[vk] = converted

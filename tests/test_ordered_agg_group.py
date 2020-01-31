@@ -34,7 +34,7 @@ def test_ordered_agg_group():
     # %%
 
     diagram = data_algebra.pd.DataFrame({
-        'rank': ['1', '2', '3'],
+        'rank': [1, 2, 3],
         'DATE': ['DATE1', 'DATE2', 'DATE3'],
         'OP': ['OP1', 'OP2', 'OP3']
     })
