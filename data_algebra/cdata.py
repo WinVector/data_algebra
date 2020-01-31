@@ -18,6 +18,8 @@ class RecordSpecification:
         control_table = control_table.reset_index(inplace=False, drop=True)
         if control_table.shape[0] < 1:
             raise ValueError("control table should have at least 1 row")
+        if len(control_table.columns) != len(set(control_table.columns)):
+            raise ValueError("control table columns should be unique")
         self.control_table = control_table.reset_index(drop=True)
         if record_keys is None:
             record_keys = []
@@ -149,6 +151,9 @@ def record_spec_from_simple_obj(obj, *, pd=None):
 def blocks_to_rowrecs(data, *, blocks_in, pd=None):
     if not isinstance(blocks_in, data_algebra.cdata.RecordSpecification):
         raise TypeError("blocks_in should be a data_algebra.cdata.RecordSpecification")
+    ck = [k for k in blocks_in.content_keys if k is not None]
+    if len(ck) != len(set(ck)):
+        raise ValueError("blocks_in can not have duplicate content keys")
     if pd is None:
         pd = data_algebra.pd
     data = data.reset_index(drop=True)
@@ -192,9 +197,15 @@ def rowrecs_to_blocks(data, *, blocks_out, check_blocks_out_keying=False, pd=Non
         ):
             raise ValueError("table is not keyed by blocks_out.record_keys")
     # convert to block records
-    dtemp = data[blocks_out.record_keys + blocks_out.content_keys].copy()
+    rv = [k for k in blocks_out.row_version(include_record_keys=True) if k is not None]
+    if len(rv) != len(set(rv)):
+        raise ValueError("duplicate row columns")
+    dtemp_cols = [k for k in rv if k is not None and k in set(blocks_out.record_keys + blocks_out.content_keys)]
+    dtemp = data[dtemp_cols].copy()
     dtemp.sort_values(by=blocks_out.record_keys, inplace=True)
     dtemp = dtemp.reset_index(drop=True)
+    if len(dtemp.columns) != len(set(dtemp.columns)):
+        raise ValueError("targeted data columns not unique")
     ctemp = blocks_out.control_table.copy()
     dtemp['FALSE_JOIN_KEY'] = 1
     ctemp['FALSE_JOIN_KEY'] = 1
@@ -209,6 +220,7 @@ def rowrecs_to_blocks(data, *, blocks_out, check_blocks_out_keying=False, pd=Non
     donor_cols = set(dtemp.columns)
     for vk in value_keys:
         res[vk] = numpy.NaN
+    # we now have parallel structures to copy between
     for i in range(ctemp.shape[0]):
         want = numpy.ones((res.shape[0],), dtype=bool)
         for ck in ckeys:
@@ -233,6 +245,9 @@ class RecordMap:
                 raise TypeError(
                     "blocks_in should be a data_algebra.cdata.RecordSpecification"
                 )
+            ck = [k for k in blocks_in.content_keys if k is not None]
+            if len(ck) != len(set(ck)):
+                raise ValueError("blocks_in can not have duplicate content keys")
         if blocks_out is not None:
             if not isinstance(blocks_out, data_algebra.cdata.RecordSpecification):
                 raise TypeError(
