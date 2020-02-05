@@ -27,23 +27,3 @@ def test_join_warn1():
     )
 
     assert data_algebra.test_util.equivalent_frames(res, expect)
-
-
-def test_join_wrap1():
-    d_left = data_algebra.pd.DataFrame(
-        {"k": ["a", "a", "b"], "x": [1, None, 3], "y": [1, None, None],}
-    )
-
-    d_right = data_algebra.pd.DataFrame({"k": ["a", "b", "q"], "y": [10, 20, 30],})
-
-    ops = wrap(d_left, table_name="d_left").natural_join(
-        b=wrap(d_right, table_name="d_right"), by="k", jointype="LEFT"
-    )
-
-    res = ops.ex()
-
-    expect = data_algebra.pd.DataFrame(
-        {"k": ["a", "a", "b"], "x": [1.0, None, 3.0], "y": [1.0, 10.0, 20.0],}
-    )
-
-    assert data_algebra.test_util.equivalent_frames(res, expect)
