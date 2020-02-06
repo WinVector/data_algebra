@@ -73,7 +73,7 @@ def test_simple():
         ops = TableDescription("d", ["x", "y"]).extend({"z": "1/q + x"})
 
     d_local = data_algebra.pd.DataFrame({"x": [1, 2], "y": [3, 4]})
-    res = ops.eval_pandas(data_map={"d": d_local})
+    res = ops.eval(data_map={"d": d_local})
     expect = data_algebra.pd.DataFrame({"x": [1, 2], "y": [3, 4], "z": [1.25, 2.25]})
     assert data_algebra.test_util.equivalent_frames(res, expect)
 

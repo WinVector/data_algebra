@@ -1,5 +1,5 @@
 ============================= test session starts ==============================
-platform darwin -- Python 3.7.5, pytest-5.3.1, py-1.8.0, pluggy-0.13.1
+platform darwin -- Python 3.7.5, pytest-5.2.4, py-1.8.0, pluggy-0.13.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.8.1
 collected 90 items
@@ -66,7 +66,7 @@ data_algebra/cdata_impl.py                10      1    90%
 data_algebra/connected_components.py      49      1    98%
 data_algebra/custom_functions.py          18      1    94%
 data_algebra/data_model.py                31     13    58%
-data_algebra/data_ops.py                1175    228    81%
+data_algebra/data_ops.py                1163    225    81%
 data_algebra/data_ops_types.py            74     33    55%
 data_algebra/data_ops_utils.py            34      6    82%
 data_algebra/data_pipe.py                189     50    74%
@@ -83,7 +83,7 @@ data_algebra/test_util.py                126     18    86%
 data_algebra/util.py                      45      4    91%
 data_algebra/yaml.py                      95     11    88%
 ----------------------------------------------------------
-TOTAL                                   4055    890    78%
+TOTAL                                   4043    887    78%
 
 
-============================= 90 passed in 17.40s ==============================
+============================== 90 passed in 9.54s ==============================

@@ -331,25 +331,25 @@ class ViewRepresentation(OperatorPlatform, ABC):
                         "Table " + k + " has forbidden columns: " + str(excess)
                     )
 
-    def eval_pandas(self, data_map, *, eval_env=None, data_model=None, narrow=True):
+    def eval(self, data_map, *, eval_env=None, data_model=None, narrow=True):
         """
-        Evaluate operators with respect to Pandas data frames.
-        :param data_map: map from table names to data frames
-        :param eval_env: environment to evaluate in
-        :param data_model: adaptor to Pandas dialect
-        :param narrow logical, if True don't copy unexpected columns
-        :return:
-        """
+         Evaluate operators with respect to Pandas data frames.
+         :param data_map: map from table names to data frames
+         :param eval_env: environment to evaluate in
+         :param data_model: adaptor to data dialect (Pandas for now)
+         :param narrow logical, if True don't copy unexpected columns
+         :return:
+         """
 
         if not isinstance(data_map, Dict):
             raise TypeError("data_map should be a dictionary")
         if len(data_map) < 1:
-            raise ValueError("data_map should not be empty")
+            raise ValueError("Expected data_map to be non-empty")
         if data_model is None:
             data_model = data_algebra.pandas_model.PandasModel()
         if not isinstance(data_model, data_algebra.data_model.DataModel):
             raise TypeError(
-                "Expected data_model to derive from data_algebra.data_model.DataModel"
+                "Expected data_model to be derived from data_algebra.data_model.DataModel"
             )
         self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
@@ -362,31 +362,10 @@ class ViewRepresentation(OperatorPlatform, ABC):
             else:
                 data_model.assert_is_appropriate_data_instance(
                     data_map[k], "data_map[" + k + "]"
-                )
+                )        # noinspection PyUnresolvedReferences
         return self.eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=data_model, narrow=narrow
         )
-
-    def eval(self, data_map, *, eval_env=None, data_model=None, narrow=True):
-        if len(data_map) < 1:
-            raise ValueError("Expected data_map to be non-empty")
-        if data_model is None:
-            data_model = data_algebra.pandas_model.PandasModel()
-        if not isinstance(data_model, data_algebra.data_model.DataModel):
-            raise TypeError(
-                "Expected data_model to be derived from data_algebra.data_model.DataModel"
-            )
-        k = [k for k in data_map.keys()][0]
-        x = data_map[k]
-        # noinspection PyUnresolvedReferences
-        if isinstance(x, data_model.pd.DataFrame):
-            return self.eval_pandas(
-                data_map=data_map,
-                eval_env=eval_env,
-                data_model=data_model,
-                narrow=narrow,
-            )
-        raise TypeError("can not apply eval() to type " + str(type(x)))
 
     # noinspection PyPep8Naming
     def transform(self, X, *, eval_env=None, data_model=None, narrow=True):
@@ -406,7 +385,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         # noinspection PyUnresolvedReferences
         if isinstance(X, data_model.pd.DataFrame):
             data_map = {k: X}
-            return self.eval_pandas(
+            return self.eval(
                 data_map=data_map,
                 eval_env=eval_env,
                 data_model=data_model,

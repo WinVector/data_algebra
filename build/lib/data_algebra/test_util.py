@@ -168,7 +168,7 @@ def check_transform(
             raise TypeError(
                 "expected data to be a pd.DataFrame or a dictionary of such"
             )
-        res = ops.eval_pandas(data_map=data)
+        res = ops.eval(data_map=data)
     # try pandas path
     if not isinstance(res, pd.DataFrame):
         raise ValueError("expected res to be pd.DataFrame, got: " + str(type(res)))
