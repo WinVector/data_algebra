@@ -11,7 +11,7 @@ import data_algebra.SQLite
 
 def test_window_fns():
 
-    d = data_algebra.pd.DataFrame(
+    d = data_algebra.default_data_model.pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
             "x": [1, 4, 5, 7, 8, 9],
@@ -40,7 +40,7 @@ def test_window_fns():
 
     res1 = ops.transform(d)
 
-    expect1 = data_algebra.pd.DataFrame(
+    expect1 = data_algebra.default_data_model.pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
             "x": [1, 4, 5, 7, 8, 9],

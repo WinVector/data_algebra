@@ -9,7 +9,6 @@ import data_algebra.expr_rep
 import data_algebra.util
 import data_algebra.data_ops_types
 
-# import data_algebra.cdata
 
 
 # map from op-name to special SQL formatting code
@@ -93,11 +92,11 @@ class DBModel:
         string_quote="'",
         sql_formatters=None,
         op_replacements=None,
-        pd=None
+        local_data_model=None
     ):
-        if pd is None:
-            pd = data_algebra.pd
-        self.pd = pd
+        if local_data_model is None:
+            local_data_model = data_algebra.default_data_model
+        self.local_data_model = local_data_model
         if sql_formatters is None:
             sql_formatters = {}
         self.identifier_quote = identifier_quote
@@ -133,9 +132,7 @@ class DBModel:
             + " "
             + (
                 "double precision"
-                if data_algebra.util.can_convert_v_to_numeric(
-                    d[d.columns[i]], pd=self.pd
-                )
+                if self.local_data_model.can_convert_col_to_numeric(d[d.columns[i]])
                 else "VARCHAR"
             )
             for i in range(d.shape[1])
@@ -164,7 +161,7 @@ class DBModel:
         cur.execute(q)
         r = cur.fetchall()
         colnames = [desc[0] for desc in cur.description]
-        r = self.pd.DataFrame(columns=colnames, data=r)
+        r = self.local_data_model.pd.DataFrame(columns=colnames, data=r)
         r = r.reset_index(drop=True)
         return r
 

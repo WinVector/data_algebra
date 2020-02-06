@@ -15,19 +15,19 @@ class CustomFunction:
         return self.pandas_formatter(expr)
 
 
-def make_custom_function_map(pd=None):
-    if pd is None:
-        pd = data_algebra.pd
+def make_custom_function_map(data_model):
+    if data_model is None:
+        data_model = data_algebra.default_data_model
     custom_functions = [
         CustomFunction(
             name="is_bad",
             pandas_formatter=lambda expr: "@is_bad(" + expr.args[0].to_pandas() + ")",
-            implementation=lambda x: data_algebra.util.is_bad(x, pd=pd),
+            implementation=lambda x: data_model.bad_column_positions(x),
         ),
         CustomFunction(
             name="is_null",
             pandas_formatter=lambda expr: "@is_null(" + expr.args[0].to_pandas() + ")",
-            implementation=lambda x: pd.isnull(x),
+            implementation=lambda x: data_model.isnull(x),
         ),
         CustomFunction(
             name="if_else",
@@ -117,8 +117,3 @@ def make_custom_function_map(pd=None):
     ]
     mp = {cf.name: cf for cf in custom_functions}
     return mp
-
-
-# uses data_algebra.pd, mostly use this for printing
-# or other tasks that don't actually depend on pd
-default_custom_function_map = make_custom_function_map()

@@ -45,9 +45,9 @@ def test_calc_interface():
     td = TableDescription(table_name='d', column_names=['a'])
     ops = td.rename_columns({'b': 'a'})
 
-    d_good = data_algebra.pd.DataFrame({'a': [1]})
-    d_extra = data_algebra.pd.DataFrame({'a': [1], 'b': [2]})
-    expect = data_algebra.pd.DataFrame({'b': [1]})
+    d_good = data_algebra.default_data_model.pd.DataFrame({'a': [1]})
+    d_extra = data_algebra.default_data_model.pd.DataFrame({'a': [1], 'b': [2]})
+    expect = data_algebra.default_data_model.pd.DataFrame({'b': [1]})
 
     # check that table-defs narrow data
     res0 = td.transform(d_extra)
@@ -93,7 +93,7 @@ def test_calc_interface():
 
     ops_first = td.extend({'x': 1})
     res_first = ops_first.transform(d_extra)
-    expect_first = data_algebra.pd.DataFrame({
+    expect_first = data_algebra.default_data_model.pd.DataFrame({
         'a': [1],
         'x': [1],
         })
@@ -102,7 +102,7 @@ def test_calc_interface():
     ops_widened = ops_first.apply_to(td_extra)
     assert ops_widened == (td_extra >> ops_first)
     res_widened = ops_widened.transform(d_extra)
-    expect_widened = data_algebra.pd.DataFrame({
+    expect_widened = data_algebra.default_data_model.pd.DataFrame({
         'a': [1],
         'b': [2],
         'x': [1],

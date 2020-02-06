@@ -6,7 +6,6 @@ import data_algebra.util
 from data_algebra.data_ops import *
 from data_algebra.data_pipe import *
 import data_algebra.PostgreSQL
-from data_algebra.util import od
 import data_algebra.yaml
 
 
@@ -14,12 +13,12 @@ def test_apply():
     data_algebra.yaml.fix_ordered_dict_yaml_rep()
     data_algebra.env.push_onto_namespace_stack(locals())
 
-    d = data_algebra.pd.DataFrame(
+    d = data_algebra.default_data_model.pd.DataFrame(
         {"x": [-1, 0, 1, numpy.nan], "y": [1, 2, numpy.nan, 3]}
     )
 
-    expect_1 = data_algebra.pd.DataFrame({"x": [0.0], "y": [2.0], "z": [0.0]})
-    expect_2 = data_algebra.pd.DataFrame(
+    expect_1 = data_algebra.default_data_model.pd.DataFrame({"x": [0.0], "y": [2.0], "z": [0.0]})
+    expect_2 = data_algebra.default_data_model.pd.DataFrame(
         {"x": [0.0], "y": [2.0], "z": [0.0], "q": [2.0]}
     )
 

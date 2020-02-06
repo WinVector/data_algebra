@@ -8,47 +8,47 @@ from data_algebra.cdata import *
 
 
 def test_extend_transform_1():
-    d = data_algebra.pd.DataFrame({"x": [1, 2]})
+    d = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2]})
     ops = describe_table(d, table_name="d").extend({"y": 1})
-    expect = data_algebra.pd.DataFrame({"x": [1, 2], "y": [1, 1],})
+    expect = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2], "y": [1, 1],})
     data_algebra.test_util.check_transform(ops, d, expect)
 
 
 def test_extend_transform_2():
-    d = data_algebra.pd.DataFrame({"x": [1, 2]})
+    d = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2]})
     ops = describe_table(d, table_name="d").extend({"y": "x + x"})
-    expect = data_algebra.pd.DataFrame({"x": [1, 2], "y": [2, 4],})
+    expect = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2], "y": [2, 4],})
     data_algebra.test_util.check_transform(ops, d, expect)
 
 
 def test_project_transform_2():
-    d = data_algebra.pd.DataFrame({"x": [1, 2]})
+    d = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2]})
     ops = describe_table(d, table_name="d").project({"y": "x.max()"})
-    expect = data_algebra.pd.DataFrame({"y": [2],})
+    expect = data_algebra.default_data_model.pd.DataFrame({"y": [2],})
     data_algebra.test_util.check_transform(ops, d, expect)
 
 
 def test_natural_join_transform_1():
-    d1 = data_algebra.pd.DataFrame({"k": ["a", "b"], "x": [1, 2],})
-    d2 = data_algebra.pd.DataFrame({"k": ["b", "c"], "x": [3, 4], "y": [5, 6],})
+    d1 = data_algebra.default_data_model.pd.DataFrame({"k": ["a", "b"], "x": [1, 2],})
+    d2 = data_algebra.default_data_model.pd.DataFrame({"k": ["b", "c"], "x": [3, 4], "y": [5, 6],})
     ops = describe_table(d1, table_name="d1").natural_join(
         b=describe_table(d2, table_name="d2"), by=["k"], jointype="LEFT"
     )
     data = {"d1": d1, "d2": d2}
-    expect = data_algebra.pd.DataFrame(
+    expect = data_algebra.default_data_model.pd.DataFrame(
         {"k": ["a", "b"], "x": [1.0, 2.0], "y": [None, 5.0],}
     )
     data_algebra.test_util.check_transform(ops, data, expect)
 
 
 def test_concat_rows_transform_1():
-    d1 = data_algebra.pd.DataFrame({"k": ["a", "b"], "x": [1, 2],})
-    d2 = data_algebra.pd.DataFrame({"k": ["b", "c"], "x": [3, 4],})
+    d1 = data_algebra.default_data_model.pd.DataFrame({"k": ["a", "b"], "x": [1, 2],})
+    d2 = data_algebra.default_data_model.pd.DataFrame({"k": ["b", "c"], "x": [3, 4],})
     ops = describe_table(d1, table_name="d1").concat_rows(
         b=describe_table(d2, table_name="d2")
     )
     data = {"d1": d1, "d2": d2}
-    expect = data_algebra.pd.DataFrame(
+    expect = data_algebra.default_data_model.pd.DataFrame(
         {
             "k": ["a", "b", "b", "c"],
             "x": [1, 2, 3, 4],
@@ -59,42 +59,42 @@ def test_concat_rows_transform_1():
 
 
 def test_select_rows_transform_1():
-    d = data_algebra.pd.DataFrame({"x": [1, 2], "y": [3, 4]})
+    d = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2], "y": [3, 4]})
     ops = describe_table(d, table_name="d").select_rows("x == 2")
-    expect = data_algebra.pd.DataFrame({"x": [2], "y": [4]})
+    expect = data_algebra.default_data_model.pd.DataFrame({"x": [2], "y": [4]})
     data_algebra.test_util.check_transform(ops, d, expect)
 
 
 def test_drop_columns_transform_1():
-    d = data_algebra.pd.DataFrame({"x": [1, 2], "y": [3, 4]})
+    d = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2], "y": [3, 4]})
     ops = describe_table(d, table_name="d").drop_columns("x")
-    expect = data_algebra.pd.DataFrame({"y": [3, 4]})
+    expect = data_algebra.default_data_model.pd.DataFrame({"y": [3, 4]})
     data_algebra.test_util.check_transform(ops, d, expect)
 
 
 def test_select_columns_transform_1():
-    d = data_algebra.pd.DataFrame({"x": [1, 2], "y": [3, 4]})
+    d = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2], "y": [3, 4]})
     ops = describe_table(d, table_name="d").select_columns("y")
-    expect = data_algebra.pd.DataFrame({"y": [3, 4]})
+    expect = data_algebra.default_data_model.pd.DataFrame({"y": [3, 4]})
     data_algebra.test_util.check_transform(ops, d, expect)
 
 
 def test_rename_columns_transform_1():
-    d = data_algebra.pd.DataFrame({"x": [1, 2], "y": [3, 4]})
+    d = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2], "y": [3, 4]})
     ops = describe_table(d, table_name="d").rename_columns({"x": "y", "y": "x"})
-    expect = data_algebra.pd.DataFrame({"y": [1, 2], "x": [3, 4]})
+    expect = data_algebra.default_data_model.pd.DataFrame({"y": [1, 2], "x": [3, 4]})
     data_algebra.test_util.check_transform(ops, d, expect)
 
 
 def test_order_rows_transform_1():
-    d = data_algebra.pd.DataFrame({"x": [1, 2], "y": [3, 4]})
+    d = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2], "y": [3, 4]})
     ops = describe_table(d, table_name="d").order_rows(["y"], reverse=["y"])
-    expect = data_algebra.pd.DataFrame({"x": [2, 1], "y": [4, 3]})
+    expect = data_algebra.default_data_model.pd.DataFrame({"x": [2, 1], "y": [4, 3]})
     data_algebra.test_util.check_transform(ops, d, expect, check_row_order=True)
 
 
 def test_convert_records_transform_1():
-    iris_small = data_algebra.pd.DataFrame(
+    iris_small = data_algebra.default_data_model.pd.DataFrame(
         {
             "Sepal.Length": [5.1, 4.9, 4.7],
             "Sepal.Width": [3.5, 3.0, 3.2],
@@ -105,7 +105,7 @@ def test_convert_records_transform_1():
         }
     )
 
-    control_table = data_algebra.pd.DataFrame(
+    control_table = data_algebra.default_data_model.pd.DataFrame(
         {
             "Part": ["Sepal", "Sepal", "Petal", "Petal"],
             "Measure": ["Length", "Width", "Length", "Width"],
@@ -128,7 +128,7 @@ def test_convert_records_transform_1():
         # "cdata_temp_record": ops.record_map.blocks_out.control_table,
     }
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'id': [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2],
         'Species': ['setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa',
                     'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa'],
@@ -150,7 +150,7 @@ def test_convert_records_transform_1():
     sql = ops.to_sql(db_model, temp_tables=temp_tables)
     assert len(temp_tables) == 1
     k = [k for k in temp_tables.keys()][0]
-    assert isinstance(temp_tables[k], data_algebra.pd.DataFrame)
+    assert isinstance(temp_tables[k], data_algebra.default_data_model.pd.DataFrame)
 
     data_algebra.test_util.check_transform(ops, data, expect)
 

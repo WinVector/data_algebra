@@ -1,51 +1,47 @@
 
-import data_algebra
 import numpy
+import pandas  # for eval test
+
+import data_algebra
+
 import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
-from data_algebra.util import od
 
-
-def test_od():
-    res = od(y=1, x="b")
-    expect = collections.OrderedDict()
-    expect["y"] = 1
-    expect["x"] = "b"
-    assert res == expect
 
 
 def test_can_convert_v_to_numeric():
-    assert data_algebra.util.can_convert_v_to_numeric(0)
-    assert data_algebra.util.can_convert_v_to_numeric(1.0)
-    assert not data_algebra.util.can_convert_v_to_numeric("hi")
-    assert data_algebra.util.can_convert_v_to_numeric(numpy.asarray([1, 2]))
-    assert data_algebra.util.can_convert_v_to_numeric(
-        data_algebra.pd.DataFrame({"x": [1, 2]})["x"]
+    data_model = data_algebra. default_data_model
+    assert data_model.can_convert_col_to_numeric(0)
+    assert data_model.can_convert_col_to_numeric(1.0)
+    assert not data_model.can_convert_col_to_numeric("hi")
+    assert data_model.can_convert_col_to_numeric(numpy.asarray([1, 2]))
+    assert data_model.can_convert_col_to_numeric(
+        data_algebra.default_data_model.pd.DataFrame({"x": [1, 2]})["x"]
     )
-    assert data_algebra.util.can_convert_v_to_numeric(
-        data_algebra.pd.DataFrame({"x": [1, numpy.nan]})["x"]
+    assert data_model.can_convert_col_to_numeric(
+        data_algebra.default_data_model.pd.DataFrame({"x": [1, numpy.nan]})["x"]
     )
-    assert not data_algebra.util.can_convert_v_to_numeric(
-        data_algebra.pd.DataFrame({"x": ["a", "b"]})["x"]
+    assert not data_model.can_convert_col_to_numeric(
+        data_algebra.default_data_model.pd.DataFrame({"x": ["a", "b"]})["x"]
     )
-    assert not data_algebra.util.can_convert_v_to_numeric(
-        data_algebra.pd.DataFrame({"x": ["a", numpy.nan]})["x"]
+    assert not data_model.can_convert_col_to_numeric(
+        data_algebra.default_data_model.pd.DataFrame({"x": ["a", numpy.nan]})["x"]
     )
-    assert not data_algebra.util.can_convert_v_to_numeric(
-        data_algebra.pd.DataFrame({"x": [1, "a"]})["x"]
+    assert not data_model.can_convert_col_to_numeric(
+        data_algebra.default_data_model.pd.DataFrame({"x": [1, "a"]})["x"]
     )
 
 
 def test_equiv():
-    d1 = data_algebra.pd.DataFrame({"x": [1, 2], "y": [3, numpy.nan]})
-    d1b = data_algebra.pd.DataFrame({"x": [2, 1], "y": [numpy.nan, 3]})
-    d1c = data_algebra.pd.DataFrame({"x": [1, 2], "y": [3, 4.0001]})
-    d1d = data_algebra.pd.DataFrame({"x": [1, 2], "y": [3.0001, numpy.nan]})
-    d2 = data_algebra.pd.DataFrame({"x": [1, 2], "z": ["a", "b"]})
-    d3 = data_algebra.pd.DataFrame({"x": [1, 2], "y": ["a", "b"]})
-    d4 = data_algebra.pd.DataFrame({"x": [1, 2]})
-    d5 = data_algebra.pd.DataFrame({"x": [1, 2, 0], "y": [3, numpy.nan, 0]})
+    d1 = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2], "y": [3, numpy.nan]})
+    d1b = data_algebra.default_data_model.pd.DataFrame({"x": [2, 1], "y": [numpy.nan, 3]})
+    d1c = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2], "y": [3, 4.0001]})
+    d1d = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2], "y": [3.0001, numpy.nan]})
+    d2 = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2], "z": ["a", "b"]})
+    d3 = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2], "y": ["a", "b"]})
+    d4 = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2]})
+    d5 = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2, 0], "y": [3, numpy.nan, 0]})
     assert data_algebra.test_util.equivalent_frames(d1, d1)
     assert data_algebra.test_util.equivalent_frames(d2, d2)
     assert data_algebra.test_util.equivalent_frames(d1, d1[["y", "x"]])
@@ -72,14 +68,14 @@ def test_simple():
     with data_algebra.env.Env(locals()) as env:
         ops = TableDescription("d", ["x", "y"]).extend({"z": "1/q + x"})
 
-    d_local = data_algebra.pd.DataFrame({"x": [1, 2], "y": [3, 4]})
+    d_local = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2], "y": [3, 4]})
     res = ops.eval(data_map={"d": d_local})
-    expect = data_algebra.pd.DataFrame({"x": [1, 2], "y": [3, 4], "z": [1.25, 2.25]})
+    expect = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2], "y": [3, 4], "z": [1.25, 2.25]})
     assert data_algebra.test_util.equivalent_frames(res, expect)
 
 
 def test_pandas_to_example():
-    d = data_algebra.pd.DataFrame(
+    d = data_algebra.default_data_model.pd.DataFrame(
         {
             "record_id": [1, 1, 1, 2, 2, 2],
             "column_label": [

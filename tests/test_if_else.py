@@ -8,11 +8,11 @@ import data_algebra.util
 
 
 def test_if_else():
-    d = data_algebra.pd.DataFrame({"a": [True, False], "b": [1, 2], "c": [3, 4]})
+    d = data_algebra.default_data_model.pd.DataFrame({"a": [True, False], "b": [1, 2], "c": [3, 4]})
 
     ops = TableDescription("d", ["a", "b", "c"]).extend({"d": "a.if_else(b, c)"})
 
-    expect = data_algebra.pd.DataFrame(
+    expect = data_algebra.default_data_model.pd.DataFrame(
         {"a": [True, False], "b": [1, 2], "c": [3, 4], "d": [1, 4],}
     )
 

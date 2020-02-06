@@ -10,13 +10,13 @@ import data_algebra.util
 
 
 def test_rename_character():
-    d = data_algebra.pd.DataFrame({'x': [1], 'y': [2]})
+    d = data_algebra.default_data_model.pd.DataFrame({'x': [1], 'y': [2]})
     td = describe_table(d, table_name='d')
 
     swap = td.rename_columns({'y': 'x', 'x': 'y'})
     res_pandas = swap.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'y': [1],
         'x': [2],
     })

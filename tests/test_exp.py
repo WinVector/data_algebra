@@ -12,7 +12,7 @@ def test_exp():
     # ask YAML to write simpler structures
     data_algebra.yaml.fix_ordered_dict_yaml_rep()
 
-    d_local = data_algebra.pd.DataFrame(
+    d_local = data_algebra.default_data_model.pd.DataFrame(
         {
             "subjectID": [1, 1, 2, 2],
             "surveyCategory": [
@@ -34,7 +34,7 @@ def test_exp():
 
     res_local = ops.transform(d_local)
 
-    expect = data_algebra.pd.DataFrame(
+    expect = data_algebra.default_data_model.pd.DataFrame(
         {
             "subjectID": [1, 1, 2, 2],
             "surveyCategory": [

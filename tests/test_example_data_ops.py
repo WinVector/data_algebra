@@ -1,6 +1,5 @@
 import data_algebra.test_util
 from data_algebra.data_ops import *
-from data_algebra.util import od
 import data_algebra.env
 import data_algebra.yaml
 
@@ -24,7 +23,7 @@ def test_example_data_ops_extend():
 
         ops = ops + [
             TableDescription("d", ["x", "y"]).extend(
-                od(z="1/q + _.x/_[var_name]", f=1, g='"2"', h=True)
+                {'z': "1/q + _.x/_[var_name]", 'f': 1, 'g': '"2"', 'h': True}
             )
         ]
 

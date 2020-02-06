@@ -13,11 +13,11 @@ def test_natural_join_columns():
     data_algebra.yaml.fix_ordered_dict_yaml_rep()
     db_model = data_algebra.SQLite.SQLiteModel()
 
-    d = data_algebra.pd.DataFrame(
+    d = data_algebra.default_data_model.pd.DataFrame(
         {"x": [-1, 0, 1, numpy.nan], "y": [1, 2, numpy.nan, 3]}
     )
 
-    d2 = data_algebra.pd.DataFrame(
+    d2 = data_algebra.default_data_model.pd.DataFrame(
         {"qq": [10, 20, 30], "y": [1.0, 2.0, 3.0], "x": [4, 5, 7]}
     )
 
@@ -29,7 +29,7 @@ def test_natural_join_columns():
 
     res_pandas = ops4.eval(data_map={"d": d, "d2": d2})
 
-    expect = data_algebra.pd.DataFrame(
+    expect = data_algebra.default_data_model.pd.DataFrame(
         {
             "x": [-1.0, 0.0, 1.0, 7.0],
             "y": [1.0, 2.0, numpy.nan, 3.0],

@@ -10,7 +10,7 @@ import data_algebra.arrow
 
 
 def test_arrow1():
-    d = data_algebra.pd.DataFrame(
+    d = data_algebra.default_data_model.pd.DataFrame(
         {
             "g": ["a", "b", "b", "c", "c", "c"],
             "x": [1, 4, 5, 7, 8, 9],
@@ -111,7 +111,7 @@ def test_arrow1():
 
     # print(a1 >> a2)
 
-    wrong_example = data_algebra.pd.DataFrame(
+    wrong_example = data_algebra.default_data_model.pd.DataFrame(
         {"g": ["a"], "v": [1.0], "x": ["b"], "i": [True], "ngroup": [1]}
     )
 
@@ -213,7 +213,7 @@ def test_arrow1():
 
 
 def test_arrow_cod_dom():
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, 3],
         'y': [3, 4, 4],
     })

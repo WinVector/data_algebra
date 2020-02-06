@@ -8,14 +8,14 @@ import data_algebra.util
 
 def test_expr_parse():
     # check some differences in back to Python versus sending to Pandas
-    d = data_algebra.pd.DataFrame({"a": [True, False], "b": [1, 2], "c": [3, 4]})
+    d = data_algebra.default_data_model.pd.DataFrame({"a": [True, False], "b": [1, 2], "c": [3, 4]})
 
     ops0 = TableDescription("d", ["a", "b", "c"]).extend({"d": "a + 1"})
 
     assert formats_to_self(ops0)
 
     res0 = ops0.transform(d)
-    expect0 = data_algebra.pd.DataFrame(
+    expect0 = data_algebra.default_data_model.pd.DataFrame(
         {"a": [True, False], "b": [1, 2], "c": [3, 4], "d": [2, 1],}
     )
     assert data_algebra.test_util.equivalent_frames(res0, expect0)
@@ -25,7 +25,7 @@ def test_expr_parse():
     assert formats_to_self(ops1)
 
     res1 = ops1.transform(d)
-    expect1 = data_algebra.pd.DataFrame(
+    expect1 = data_algebra.default_data_model.pd.DataFrame(
         {"a": [True, False], "b": [1, 2], "c": [3, 4], "d": [1, 4],}
     )
     assert data_algebra.test_util.equivalent_frames(res1, expect1)
@@ -37,7 +37,7 @@ def test_expr_parse():
     # assert formats_to_self(ops2)
     #
     # res2 = ops2.transform(d)
-    # expect2 = data_algebra.pd.DataFrame({
+    # expect2 = data_algebra.default_data_model.pd.DataFrame({
     #     'a': [True, False],
     #     'b': [1, 2],
     #     'c': [3, 4],

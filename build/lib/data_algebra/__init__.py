@@ -1,4 +1,3 @@
-import importlib
 
 
 __docformat__ = "restructuredtext"
@@ -20,11 +19,7 @@ the `rquery`<https://github.com/WinVector/rquery> and `rqdatatable`<https://gith
 Recommended packages include: Pandas, PyYAML (supplies yaml), sqlparse, and black. 
 """
 
-pd = importlib.import_module("pandas")  # https://pandas.pydata.org
+import data_algebra.pandas_model
 
-# TODO: possibly import modin instead
-# can't do that now
-# https://github.com/modin-project/modin/issues/865
-# requires: modin, ray, distributed
-# pip install modin[ray]
-# pd = importlib.import_module("modin.pandas")  # https://github.com/modin-project/modin
+default_data_model = data_algebra.pandas_model.PandasModel()
+

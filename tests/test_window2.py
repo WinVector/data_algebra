@@ -8,7 +8,7 @@ import data_algebra.SQLite
 
 # https://github.com/WinVector/data_algebra/blob/master/Examples/WindowFunctions/WindowFunctions.ipynb
 def test_window2():
-    d = data_algebra.pd.DataFrame(
+    d = data_algebra.default_data_model.pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
             "x": [1, 4, 5, 7, 8, 9],
@@ -38,7 +38,7 @@ def test_window2():
 
     res1 = ops.transform(d)
 
-    expect1 = data_algebra.pd.DataFrame(
+    expect1 = data_algebra.default_data_model.pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
             "x": [1, 4, 5, 7, 8, 9],
@@ -85,7 +85,7 @@ def test_window2():
 
     res1_db = db_model.read_query(conn, sql1)
 
-    expect1_db = data_algebra.pd.DataFrame(
+    expect1_db = data_algebra.default_data_model.pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
             "x": [1, 4, 5, 7, 8, 9],
@@ -117,7 +117,7 @@ def test_window2():
 
     res2_db = db_model.read_table(conn, "remote_result")
 
-    expect2_db = data_algebra.pd.DataFrame(
+    expect2_db = data_algebra.default_data_model.pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
             "v": [10, 40, 50, 70, 80, 90],

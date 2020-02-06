@@ -4,13 +4,12 @@ import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
 import data_algebra.PostgreSQL
-from data_algebra.util import od
 import data_algebra.yaml
 from data_algebra.test_util import formats_to_self
 
 
 def test_extend_0():
-    d = data_algebra.pd.DataFrame(
+    d = data_algebra.default_data_model.pd.DataFrame(
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
 
@@ -24,7 +23,7 @@ def test_extend_0():
 
 
 def test_extend_p():
-    d = data_algebra.pd.DataFrame(
+    d = data_algebra.default_data_model.pd.DataFrame(
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
 
@@ -33,14 +32,14 @@ def test_extend_p():
     assert formats_to_self(ops)
 
     res = ops.transform(d)
-    expect = data_algebra.pd.DataFrame(
+    expect = data_algebra.default_data_model.pd.DataFrame(
         {"g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4], "c": [3, 4, 3, 4],}
     )
     assert data_algebra.test_util.equivalent_frames(expect, res)
 
 
 def test_extend_p0():
-    d = data_algebra.pd.DataFrame(
+    d = data_algebra.default_data_model.pd.DataFrame(
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
 
@@ -49,14 +48,14 @@ def test_extend_p0():
     assert formats_to_self(ops)
 
     res = ops.transform(d)
-    expect = data_algebra.pd.DataFrame(
+    expect = data_algebra.default_data_model.pd.DataFrame(
         {"g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4], "c": [4, 4, 4, 4],}
     )
     assert data_algebra.test_util.equivalent_frames(expect, res)
 
 
 def test_extend_shrink_1():
-    d = data_algebra.pd.DataFrame(
+    d = data_algebra.default_data_model.pd.DataFrame(
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
     )
 
@@ -67,7 +66,7 @@ def test_extend_shrink_1():
     assert formats_to_self(ops)
 
     res = ops.transform(d)
-    expect = data_algebra.pd.DataFrame(
+    expect = data_algebra.default_data_model.pd.DataFrame(
         {"g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4], "c": [4, 4, 4, 4], "d":[1, 1, 1, 1]}
     )
     assert data_algebra.test_util.equivalent_frames(expect, res)

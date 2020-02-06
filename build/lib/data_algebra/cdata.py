@@ -9,15 +9,13 @@ import data_algebra.util
 
 class RecordSpecification:
     def __init__(
-        self, control_table, *, record_keys=None, control_table_keys=None, strict=False, pd=None
+        self, control_table, *, record_keys=None, control_table_keys=None, strict=False, local_data_model=None
     ):
-        if pd is None:
-            pd = data_algebra.pd
+        if local_data_model is None:
+            local_data_model = data_algebra.default_data_model
         control_table = control_table.reset_index(inplace=False, drop=True)
         if control_table.shape[0] < 1:
             raise ValueError("control table should have at least 1 row")
-        if any(data_algebra.util.is_bad(control_table.columns)):
-            raise ValueError("control table column names can not be NA/NaN/inf/None")
         if len(control_table.columns) != len(set(control_table.columns)):
             raise ValueError("control table columns should be unique")
         self.control_table = control_table.reset_index(drop=True)
@@ -44,7 +42,7 @@ class RecordSpecification:
                 "columns common to record_keys and control_table_keys: " + str(confused)
             )
         for ck in self.control_table_keys:
-            if any(data_algebra.util.is_bad(control_table[ck], pd=pd)):
+            if any(local_data_model.bad_column_positions(control_table[ck])):
                 raise ValueError("NA/NaN/inf/None not allowed as control table keys")
         if strict:
             if not data_algebra.util.table_is_keyed_by_columns(
@@ -128,10 +126,10 @@ class RecordSpecification:
         return obj
 
 
-def record_spec_from_simple_obj(obj, *, pd=None):
-    if pd is None:
-        pd = data_algebra.pd
-    control_table = pd.DataFrame()
+def record_spec_from_simple_obj(obj, *, local_data_model=None):
+    if local_data_model is None:
+        local_data_model = data_algebra.default_data_model
+    control_table = local_data_model.data_frame()
     for k in obj["control_table"].keys():
         control_table[k] = obj["control_table"][k]
 
@@ -153,14 +151,14 @@ def record_spec_from_simple_obj(obj, *, pd=None):
     )
 
 
-def blocks_to_rowrecs(data, *, blocks_in, pd=None):
+def blocks_to_rowrecs(data, *, blocks_in, local_data_model=None):
     if not isinstance(blocks_in, data_algebra.cdata.RecordSpecification):
         raise TypeError("blocks_in should be a data_algebra.cdata.RecordSpecification")
     ck = [k for k in blocks_in.content_keys if k is not None]
     if len(ck) != len(set(ck)):
         raise ValueError("blocks_in can not have duplicate content keys")
-    if pd is None:
-        pd = data_algebra.pd
+    if local_data_model is None:
+        local_data_model = data_algebra.default_data_model
     data = data.reset_index(drop=True)
     missing_cols = set(blocks_in.control_table_keys).union(blocks_in.record_keys) - set(
         data.columns
@@ -181,7 +179,7 @@ def blocks_to_rowrecs(data, *, blocks_in, pd=None):
     if len(blocks_in.record_keys) > 0:
         ideal = dtemp[blocks_in.record_keys + ['FALSE_AGG_KEY']].copy()
         res = ideal.groupby(blocks_in.record_keys)['FALSE_AGG_KEY'].agg('sum')
-        ideal = pd.DataFrame(res).reset_index(drop=False)
+        ideal = local_data_model.data_frame(res).reset_index(drop=False)
         ideal['FALSE_AGG_KEY'] = 1
         ctemp = blocks_in.control_table[blocks_in.control_table_keys].copy()
         ctemp['FALSE_AGG_KEY'] = 1
@@ -194,9 +192,9 @@ def blocks_to_rowrecs(data, *, blocks_in, pd=None):
     dtemp = dtemp.reset_index(drop=True)
     # start building up result frame
     res = dtemp.groupby(blocks_in.record_keys)['FALSE_AGG_KEY'].agg('sum')
-    res = pd.DataFrame(res).reset_index(drop=False)
+    res = local_data_model.data_frame(res).reset_index(drop=False)
     res.sort_values(by=blocks_in.record_keys, inplace=True)
-    res = pd.DataFrame(res).reset_index(drop=True)
+    res = local_data_model.data_frame(res).reset_index(drop=True)
     del res['FALSE_AGG_KEY']
     # now fill in columns
     ckeys = blocks_in.control_table_keys
@@ -219,11 +217,11 @@ def blocks_to_rowrecs(data, *, blocks_in, pd=None):
     return res
 
 
-def rowrecs_to_blocks(data, *, blocks_out, check_blocks_out_keying=False, pd=None):
+def rowrecs_to_blocks(data, *, blocks_out, check_blocks_out_keying=False, local_data_model=None):
     if not isinstance(blocks_out, data_algebra.cdata.RecordSpecification):
         raise TypeError("blocks_out should be a data_algebra.cdata.RecordSpecification")
-    if pd is None:
-        pd = data_algebra.pd
+    if local_data_model is None:
+        local_data_model = data_algebra.default_data_model
     data = data.reset_index(drop=True)
     missing_cols = set(blocks_out.record_keys) - set(data.columns)
     if len(missing_cols) > 0:
@@ -270,8 +268,8 @@ def rowrecs_to_blocks(data, *, blocks_out, check_blocks_out_keying=False, pd=Non
                     res.loc[want, vk] = numpy.asarray(dtemp[dcol])
     # see about promoting composite columns to numeric
     for vk in set(value_keys):
-        converted = pd.to_numeric(res[vk], errors='coerce')
-        if numpy.all(pd.isnull(converted) == pd.isnull(res[vk])):
+        converted = local_data_model.to_numeric(res[vk], errors='coerce')
+        if numpy.all(local_data_model.isnull(converted) == local_data_model.isnull(res[vk])):
             res[vk] = converted
     return res
 
@@ -330,9 +328,9 @@ class RecordMap:
             return self.blocks_out.record_keys.copy()
         return None
 
-    def example_input(self, *, pd=None):
-        if pd is None:
-            pd = data_algebra.pd
+    def example_input(self, *, local_data_model=None):
+        if local_data_model is None:
+            local_data_model = data_algebra.default_data_model
         if self.blocks_in is not None:
             example = self.blocks_in.control_table.copy()
             nrow = example.shape[0]
@@ -340,7 +338,7 @@ class RecordMap:
                 example[rk] = [rk] * nrow
             return example
         if self.blocks_in is not None:
-            example = pd.DataFrame()
+            example = local_data_model.data_frame()
             for k in self.blocks_out.row_columns:
                 example[k] = [k]
             return example
@@ -348,26 +346,26 @@ class RecordMap:
 
     # noinspection PyPep8Naming
     def transform(
-        self, X, *, check_blocks_out_keying=False, pd=None
+        self, X, *, check_blocks_out_keying=False, local_data_model=None
     ):
         unknown = set(self.columns_needed) - set(X.columns)
         if len(unknown) > 0:
             raise ValueError("missing required columns: " + str(unknown))
-        if pd is None:
-            pd = data_algebra.pd
+        if local_data_model is None:
+            local_data_model = data_algebra.default_data_model
         X = X.reset_index(drop=True)
         if self.blocks_in is not None:
             X = blocks_to_rowrecs(
                 X,
                 blocks_in=self.blocks_in,
-                pd=pd
+                local_data_model=local_data_model
             )
         if self.blocks_out is not None:
             X = rowrecs_to_blocks(
                 X,
                 blocks_out=self.blocks_out,
                 check_blocks_out_keying=check_blocks_out_keying,
-                pd=pd
+                local_data_model=local_data_model
             )
         return X
 

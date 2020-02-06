@@ -20,7 +20,7 @@ def test_scoring_example():
     # ask YAML to write simpler structures
     data_algebra.yaml.fix_ordered_dict_yaml_rep()
 
-    d_local = data_algebra.pd.DataFrame(
+    d_local = data_algebra.default_data_model.pd.DataFrame(
         {
             "subjectID": [1, 1, 2, 2],
             "surveyCategory": [
@@ -61,7 +61,7 @@ def test_scoring_example():
 
     # Pandas calculate
     res = ops.eval(data_map={"d": d_local})
-    expect = data_algebra.pd.DataFrame(
+    expect = data_algebra.default_data_model.pd.DataFrame(
         {
             "subjectID": [1, 2],
             "diagnosis": ["withdrawal behavior", "positive re-framing"],

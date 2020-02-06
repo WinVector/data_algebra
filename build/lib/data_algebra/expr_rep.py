@@ -735,6 +735,7 @@ class Value(Term):
 class Name(str):
     def __init__(self, v):
         self.v = v
+        str.__init__(v)
 
     def str(self):
         return self.v
@@ -903,8 +904,9 @@ class Expression(Term):
         return self.op + "(" + ", ".join(subs) + ")"
 
     def to_pandas(self, *, want_inline_parens=False):
-        if self.op in data_algebra.custom_functions.default_custom_function_map.keys():
-            return data_algebra.custom_functions.default_custom_function_map[
+        cfmap = data_algebra.custom_functions.make_custom_function_map(data_algebra.default_data_model.pd)
+        if self.op in cfmap.keys():
+            return cfmap[
                 self.op
             ].pandas_formatter(self)
         if len(self.args) <= 0:

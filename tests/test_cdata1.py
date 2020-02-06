@@ -25,7 +25,7 @@ def test_small_cdata_example_debug():
     """,
         )
     )
-    iris_orig = data_algebra.pd.read_csv(buf)
+    iris_orig = data_algebra.default_data_model.pd.read_csv(buf)
 
     buf = io.StringIO(
         re.sub(
@@ -48,12 +48,12 @@ def test_small_cdata_example_debug():
     """,
         )
     )
-    iris_blocks_orig = data_algebra.pd.read_csv(buf)
+    iris_blocks_orig = data_algebra.default_data_model.pd.read_csv(buf)
 
     iris_blocks = iris_blocks_orig.copy()
     iris = iris_orig.copy()
 
-    control_table = data_algebra.pd.DataFrame(
+    control_table = data_algebra.default_data_model.pd.DataFrame(
         {
             "Part": ["Sepal", "Sepal", "Petal", "Petal"],
             "Measure": ["Length", "Width", "Length", "Width"],
@@ -101,7 +101,7 @@ def test_cdata1():
     """,
         )
     )
-    iris_orig = data_algebra.pd.read_csv(buf)
+    iris_orig = data_algebra.default_data_model.pd.read_csv(buf)
 
     buf = io.StringIO(
         re.sub(
@@ -124,7 +124,7 @@ def test_cdata1():
     """,
         )
     )
-    iris_blocks_orig = data_algebra.pd.read_csv(buf)
+    iris_blocks_orig = data_algebra.default_data_model.pd.read_csv(buf)
 
     iris_blocks = iris_blocks_orig.copy()
     iris = iris_orig.copy()
@@ -136,7 +136,7 @@ def test_cdata1():
     # from:
     #   https://github.com/WinVector/cdata/blob/master/vignettes/control_table_keys.Rmd
 
-    control_table = data_algebra.pd.DataFrame(
+    control_table = data_algebra.default_data_model.pd.DataFrame(
         {
             "Part": ["Sepal", "Sepal", "Petal", "Petal"],
             "Measure": ["Length", "Width", "Length", "Width"],
@@ -242,7 +242,7 @@ def test_cdata1():
 
 def test_cdata_explode():
     # from https://github.com/WinVector/cdata/blob/master/README.Rmd
-    control = data_algebra.pd.read_csv(io.StringIO(re.sub("[ \\t]+", "", """
+    control = data_algebra.default_data_model.pd.read_csv(io.StringIO(re.sub("[ \\t]+", "", """
                 v1,v2,value1,value2
                 Sepal.Length,Sepal.Length,Sepal.Length,Sepal.Length
                 Sepal.Width,Sepal.Length,Sepal.Width,Sepal.Length
@@ -261,7 +261,7 @@ def test_cdata_explode():
                 Petal.Length,Petal.Width,Petal.Length,Petal.Width
                 Petal.Width,Petal.Width,Petal.Width,Petal.Width
                 """)))
-    iris = data_algebra.pd.read_csv(io.StringIO(re.sub("[ \\t]+", "", """
+    iris = data_algebra.default_data_model.pd.read_csv(io.StringIO(re.sub("[ \\t]+", "", """
                 Sepal.Length,Sepal.Width,Petal.Length,Petal.Width,Species,iris_id
                 5.1,3.5,1.4,0.2,setosa,1
                 4.9,3,1.4,0.2,setosa,2
@@ -270,7 +270,7 @@ def test_cdata_explode():
                 5,3.6,1.4,0.2,setosa,5
                 5.4,3.9,1.7,0.4,setosa,6
     """)))
-    expect = data_algebra.pd.read_csv(io.StringIO(re.sub("[ \\t]+", "", """
+    expect = data_algebra.default_data_model.pd.read_csv(io.StringIO(re.sub("[ \\t]+", "", """
                 iris_id,Species,v1,v2,value1,value2
                 1,setosa,Sepal.Length,Sepal.Length,5.1,5.1
                 1,setosa,Sepal.Width,Sepal.Length,3.5,5.1

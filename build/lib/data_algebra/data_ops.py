@@ -341,7 +341,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
          :return:
          """
 
-        if not isinstance(data_map, Dict):
+        if not isinstance(data_map, dict):
             raise TypeError("data_map should be a dictionary")
         if len(data_map) < 1:
             raise ValueError("Expected data_map to be non-empty")
@@ -360,9 +360,8 @@ class ViewRepresentation(OperatorPlatform, ABC):
             if k not in data_map.keys():
                 raise ValueError("Required table " + k + " not in data_map")
             else:
-                data_model.assert_is_appropriate_data_instance(
-                    data_map[k], "data_map[" + k + "]"
-                )        # noinspection PyUnresolvedReferences
+                if not data_model.is_appropriate_data_instance(data_map[k]):
+                    raise ValueError("data_map[" + k + "] was not a usable type")
         return self.eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=data_model, narrow=narrow
         )

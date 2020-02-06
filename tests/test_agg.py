@@ -5,7 +5,7 @@ import data_algebra.test_util
 
 
 def test_agg():
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, 3, 4],
         'g': [1, 1, 2, 2],
     })
@@ -16,7 +16,7 @@ def test_agg():
 
     res = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'g': [1, 2],
         'x': [2, 4],
     })
@@ -25,7 +25,7 @@ def test_agg():
 
 
 def test_agg_fn():
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, 3, 4],
         'g': [1, 1, 2, 2],
     })
@@ -41,7 +41,7 @@ def test_agg_fn():
 
     res = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'g': [1, 2],
         'x': ["1, 2", "3, 4"],
     })

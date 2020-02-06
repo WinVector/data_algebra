@@ -6,7 +6,7 @@ from data_algebra.cdata import *
 
 def test_ranked_example():
     # from https://community.rstudio.com/t/tidying-data-reorganizing-tibble/48292
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'ID': [1, 1, 2, 3, 4, 4, 4, 5, 5, 6],
         'OP': ['A', 'B', 'A', 'C', 'C', 'A', 'D', 'A', 'B', 'B'],
         'DATE': ['2001-01-02 00:00:00', '2015-04-25 00:00:00', '2000-04-01 00:00:00',
@@ -20,7 +20,7 @@ def test_ranked_example():
                partition_by="ID", order_by="DATE")
     d = ops.transform(d)
 
-    diagram = data_algebra.pd.DataFrame({
+    diagram = data_algebra.default_data_model.pd.DataFrame({
         'rank':  [1, 2, 3, 4, 5],
         'DATE': ['DATE1', 'DATE2', 'DATE3', 'DATE4', 'DATE5'],
         'OP': ['OP1', 'OP2', 'OP3', 'OP4', 'OP5']
@@ -35,7 +35,7 @@ def test_ranked_example():
 
     res = mapping.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'ID': [1, 2, 3, 4, 5, 6],
         'DATE1': ['2001-01-02 00:00:00', '2000-04-01 00:00:00', '2014-04-07 00:00:00', '2005-06-16 00:00:00', '2003-11-09 00:00:00', '2004-01-09 00:00:00'],
         'OP1': ['A', 'A', 'C', 'A', 'B', 'B'],

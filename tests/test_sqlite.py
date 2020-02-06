@@ -44,7 +44,7 @@ def test_sqlite():
     # clean up
     conn.close()
 
-    expect = data_algebra.pd.DataFrame(
+    expect = data_algebra.default_data_model.pd.DataFrame(
         {
             "symbol": ["RHAT"],
             "date": ["2006-01-05"],
@@ -57,7 +57,7 @@ def test_sqlite():
 
     assert data_algebra.test_util.equivalent_frames(res, expect)
 
-    d2 = data_algebra.pd.DataFrame(
+    d2 = data_algebra.default_data_model.pd.DataFrame(
         {
             "symbol": ["RHAT"],
             "date": ["2006-01-05"],
@@ -106,7 +106,7 @@ def test_sqllite_g2():
         rename_columns({'rat': 'diff', 'diff': 'rat'}). \
         order_rows(['rat'])
 
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'col1': [1, 2, 2],
         'col2': [3, 4, 3],
         'col3': [4, 5, 7]
@@ -132,12 +132,12 @@ def test_sqllite_g2():
 
 
 def test_join_g2():
-    d1 = data_algebra.pd.DataFrame({
+    d1 = data_algebra.default_data_model.pd.DataFrame({
         'col1': [1, 2, 4],
         'col2': [3, None, 6],
         'col3': [4, 5, 7]
     })
-    d2 = data_algebra.pd.DataFrame({
+    d2 = data_algebra.default_data_model.pd.DataFrame({
         'col1': [1, 2, 3],
         'col2': [3, 4, None],
         'col4': [4, 5, 7]
@@ -168,12 +168,12 @@ def test_join_g2():
 
 
 def test_unionall_g2():
-    d1 = data_algebra.pd.DataFrame({
+    d1 = data_algebra.default_data_model.pd.DataFrame({
         'col1': [1, 2, 4],
         'col2': [3, None, 6],
         'col3': [4, 5, 7]
     })
-    d2 = data_algebra.pd.DataFrame({
+    d2 = data_algebra.default_data_model.pd.DataFrame({
         'col1': [1, 2, 3],
         'col2': [3, 4, None],
         'col3': [4, 5, 7]

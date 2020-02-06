@@ -5,7 +5,7 @@ import data_algebra.util
 
 
 def test_ghost_col_issue():
-    d2 = data_algebra.pd.DataFrame(
+    d2 = data_algebra.default_data_model.pd.DataFrame(
         {
             "x": [1, 4, 5, 7, 8, 9],
             "v": [10, 40, 50, 70, 80, 90],
@@ -28,7 +28,7 @@ def test_ghost_col_issue():
         partition_by=["g"],
     )
     res = o2.transform(d2)
-    expect = data_algebra.pd.DataFrame(
+    expect = data_algebra.default_data_model.pd.DataFrame(
         {
             "x": [1, 4, 5, 7, 8, 9],
             "v": [10, 40, 50, 70, 80, 90],

@@ -1,5 +1,6 @@
 # needed for the eval
 # noinspection PyUnresolvedReferences
+import pandas
 import numpy
 
 # noinspection PyUnresolvedReferences
@@ -10,7 +11,6 @@ import sqlite3
 # noinspection PyUnresolvedReferences
 import data_algebra.SQLite
 from data_algebra.data_ops import *
-from data_algebra.util import can_convert_v_to_numeric
 from data_algebra.yaml import have_yaml, to_pipeline
 
 
@@ -50,17 +50,17 @@ def equivalent_frames(
     check_column_order=False,
     cols_case_sensitive=False,
     check_row_order=False,
-    pd=None,
+    local_data_model=None,
 ):
     """return False if the frames are equivalent (up to column re-ordering and possible row-reordering).
     Ignores indexing."""
     # leave in extra checks as this is usually used by test code
-    if pd is None:
-        pd = data_algebra.pd
-    if not isinstance(a, pd.DataFrame):
-        raise TypeError("Expect a to be pd.DataFrame")
-    if not isinstance(b, pd.DataFrame):
-        raise TypeError("Expect b to be pd.DataFrame")
+    if local_data_model is None:
+        local_data_model = data_algebra.default_data_model
+    if not isinstance(a, local_data_model.pd.DataFrame):
+        raise TypeError("Expect a to be local_data_model.pd.DataFrame")
+    if not isinstance(b, local_data_model.pd.DataFrame):
+        raise TypeError("Expect b to be local_data_model.pd.DataFrame")
     if a.shape != b.shape:
         return False
     if a.shape[1] < 1:
@@ -83,10 +83,8 @@ def equivalent_frames(
         # re-order b into a's column order
         b = b[acols]
         b = b.reset_index(drop=True)
-    for j in range(a.shape[1]):
-        if can_convert_v_to_numeric(a.iloc[:, j], pd=pd) != can_convert_v_to_numeric(
-            b.iloc[:, j], pd=pd
-        ):
+    for c in acols:
+        if local_data_model.can_convert_col_to_numeric(a[c]) != local_data_model.can_convert_col_to_numeric(b[c]):
             return False
     if a.shape[0] < 1:
         return True
@@ -95,9 +93,9 @@ def equivalent_frames(
         a = a.reset_index(drop=True)
         b = b.sort_values(by=acols)
         b = b.reset_index(drop=True)
-    for j in range(a.shape[1]):
-        ca = a.iloc[:, j]
-        cb = b.iloc[:, j]
+    for c in acols:
+        ca = a[c]
+        cb = b[c]
         if (ca is None) != (cb is None):
             return False
         if ca is not None:
@@ -110,7 +108,7 @@ def equivalent_frames(
             if not all(ca_null):
                 ca = ca[~ca_null]
                 cb = cb[~cb_null]
-                if can_convert_v_to_numeric(ca, pd=pd):
+                if local_data_model.can_convert_col_to_numeric(a[c]):
                     ca = numpy.asarray(ca, dtype=float)
                     cb = numpy.asarray(cb, dtype=float)
                     dif = abs(ca - cb)
@@ -131,7 +129,7 @@ def check_transform(
     check_column_order=False,
     cols_case_sensitive=False,
     check_row_order=False,
-    pd=None,
+    local_data_model=None,
 ):
     """
     Test an operator dag produces the expected result, and parses correctly.
@@ -143,35 +141,33 @@ def check_transform(
     :param check_column_order passed to equivalent_frames()
     :param cols_case_sensitive passed to equivalent_frames()
     :param check_row_order passed to equivalent_frames()
-    :param pd pandas module (defaults to data_algebra.pd if None)
+    :param pd pandas module (defaults to data_algebra.default_data_model if None)
     :return: None, assert if there is an issue
     """
 
-    if pd is None:
-        pd = data_algebra.pd
+    if local_data_model is None:
+        local_data_model = data_algebra.default_data_model
     if not isinstance(ops, ViewRepresentation):
         raise TypeError("expected ops to be a data_algebra.data_ops.ViewRepresentation")
-    if not isinstance(expect, pd.DataFrame):
-        raise TypeError("exepcted expect to be a pd.DataFrame")
+    if not local_data_model.is_appropriate_data_instance(expect):
+        raise TypeError("exepcted expect to be a local_data_model.pd.DataFrame")
     cols_used = ops.columns_used()
     if len(cols_used) < 1:
         raise ValueError("no tables used")
     if not formats_to_self(ops):
         raise ValueError("ops did not round-trip format")
     check_op_round_trip(ops)
-    if isinstance(data, pd.DataFrame):
+    if isinstance(data, dict):
+        res = ops.eval(data_map=data)
+    else:
         if len(cols_used) != 1:
             raise ValueError("more than one table used, but only one table supplied")
+        if not local_data_model.is_appropriate_data_instance(data):
+            raise TypeError("exepcted expect to be a local_data_model.pd.DataFrame")
         res = ops.transform(data)
-    else:
-        if not isinstance(data, Dict):
-            raise TypeError(
-                "expected data to be a pd.DataFrame or a dictionary of such"
-            )
-        res = ops.eval(data_map=data)
     # try pandas path
-    if not isinstance(res, pd.DataFrame):
-        raise ValueError("expected res to be pd.DataFrame, got: " + str(type(res)))
+    if not local_data_model.is_appropriate_data_instance(res):
+        raise ValueError("expected res to be local_data_model.pd.DataFrame, got: " + str(type(res)))
     if not equivalent_frames(
         res,
         expect,
@@ -185,12 +181,12 @@ def check_transform(
     conn = sqlite3.connect(":memory:")
     db_model = data_algebra.SQLite.SQLiteModel()
     db_model.prepare_connection(conn)
-    if isinstance(data, pd.DataFrame):
-        table_name = [k for k in cols_used.keys()][0]
-        db_model.insert_table(conn, data, table_name=table_name)
-    else:
+    if isinstance(data, dict):
         for (k, v) in data.items():
             db_model.insert_table(conn, v, table_name=k)
+    else:
+        table_name = [k for k in cols_used.keys()][0]
+        db_model.insert_table(conn, data, table_name=table_name)
     temp_tables = dict()
     sql = ops.to_sql(db_model, pretty=True, temp_tables=temp_tables)
     for (k, v) in temp_tables.items():

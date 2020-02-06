@@ -2,7 +2,6 @@ import data_algebra
 import data_algebra.util
 from data_algebra.data_ops import *
 import data_algebra.PostgreSQL
-from data_algebra.util import od
 import data_algebra.yaml
 
 

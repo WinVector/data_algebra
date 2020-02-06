@@ -9,7 +9,7 @@ import data_algebra.SQLite
 
 
 def test_ordered_agg_group():
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'ID': [1, 2, 3, 4, 5, 6],
         'DATE1': ['2001-01-02 00:00:00', '2000-04-01 00:00:00', '2014-04-07 00:00:00', '2005-06-16 00:00:00',
                   '2003-11-09 00:00:00', '2004-01-09 00:00:00'],
@@ -20,7 +20,7 @@ def test_ordered_agg_group():
         'OP3': [None, None, None, 'D', None, None],
     })
 
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
         'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
         'DATE': ['2001-01-02 00:00:00', '2015-04-25 00:00:00', '2000-04-01 00:00:00',
@@ -33,7 +33,7 @@ def test_ordered_agg_group():
 
     # %%
 
-    diagram = data_algebra.pd.DataFrame({
+    diagram = data_algebra.default_data_model.pd.DataFrame({
         'rank': [1, 2, 3],
         'DATE': ['DATE1', 'DATE2', 'DATE3'],
         'OP': ['OP1', 'OP2', 'OP3']
@@ -79,7 +79,7 @@ def test_ordered_agg_group():
     db_model.prepare_connection(con)
     d.to_sql('d', con, if_exists='replace')
 
-    res_db = data_algebra.pd.read_sql_query(sql, con)
+    res_db = data_algebra.default_data_model.pd.read_sql_query(sql, con)
 
     # res_db
     assert data_algebra.test_util.equivalent_frames(expect, res_db)
@@ -100,7 +100,7 @@ def test_ordered_agg_group():
 
     res_ag = ops2.transform(r)
 
-    expect_ag = data_algebra.pd.DataFrame({
+    expect_ag = data_algebra.default_data_model.pd.DataFrame({
         'ID': [1, 2, 3, 4, 5, 6],
         'DATE1': ['2001-01-02 00:00:00', '2000-04-01 00:00:00', '2014-04-07 00:00:00', '2005-06-16 00:00:00',
                   '2003-11-09 00:00:00', '2004-01-09 00:00:00'],
@@ -159,7 +159,7 @@ def test_ordered_agg_group():
     sql4 = ops4.to_sql(db_model)
     # https://docs.python.org/2/library/sqlite3.html
     con.create_aggregate("sorted_concat", 1, SortedConcat)
-    res_db4 = data_algebra.pd.read_sql_query(sql4, con)
+    res_db4 = data_algebra.default_data_model.pd.read_sql_query(sql4, con)
     assert data_algebra.test_util.equivalent_frames(expect_ag, res_db4,
                                                     check_column_order=True, check_row_order=True)
 

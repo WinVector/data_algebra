@@ -1,47 +1,19 @@
-import collections
-import numpy
-import numbers
 
 import data_algebra
 
 
-def od(**kwargs):
-    """Capture arguments in order."""
-    r = collections.OrderedDict()
-    for (k, v) in kwargs.items():
-        r[k] = v
-    return r
-
-
-def can_convert_v_to_numeric(x, *, pd=None):
-    """check if non-empty vector can convert to numeric"""
-    if pd is None:
-        pd = data_algebra.pd
-    if isinstance(x, numbers.Number):
-        return True
-    return pd.api.types.is_numeric_dtype(x)
-
-
-def is_bad(x, *, pd=None):
-    """ for numeric vector x, return logical vector of positions that are null, NaN, infinite"""
-    if pd is None:
-        pd = data_algebra.pd
-    if can_convert_v_to_numeric(x, pd=pd):
-        x = numpy.asarray(x + 0, dtype=float)
-        return numpy.logical_or(
-            pd.isnull(x), numpy.logical_or(numpy.isnan(x), numpy.isinf(x))
-        )
-    return pd.isnull(x)
-
-
-def pandas_to_example_str(obj, *, pd=None, pd_module_name="data_algebra.pd"):
-    if pd is None:
-        pd = data_algebra.pd
-    if not isinstance(obj, pd.DataFrame):
-        raise TypeError("Expect obj to be pd.DataFrame")
+def pandas_to_example_str(obj, *, local_data_model=None):
+    if local_data_model is None:
+        local_data_model = data_algebra.default_data_model
+    pd_module_name = local_data_model.presentation_model_name
+    if not local_data_model.is_appropriate_data_instance(obj):
+        raise TypeError("Expect obj to be local_data_model.pd.DataFrame")
+    nrow = obj.shape[0]
     pstr = pd_module_name + ".DataFrame({"
     for k in obj.columns:
-        cells = ["None" if pd.isnull(v) else v.__repr__() for v in obj[k]]
+        col = obj[k]
+        nulls = local_data_model.bad_column_positions(col)
+        cells = ["None" if nulls[i] else col[i].__repr__() for i in range(nrow)]
         pstr = pstr + "\n    " + k.__repr__() + ": [" + ", ".join(cells) + "],"
     pstr = pstr + "\n    })"
     return pstr

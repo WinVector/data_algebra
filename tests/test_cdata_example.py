@@ -25,11 +25,11 @@ def test_cdata_example():
     """,
         )
     )
-    iris = data_algebra.pd.read_csv(buf)
+    iris = data_algebra.default_data_model.pd.read_csv(buf)
 
     td = describe_table(iris, "iris")
 
-    control_table = data_algebra.pd.DataFrame(
+    control_table = data_algebra.default_data_model.pd.DataFrame(
         {
             "Part": ["Sepal", "Sepal", "Petal", "Petal"],
             "Measure": ["Length", "Width", "Length", "Width"],
@@ -62,7 +62,7 @@ def test_keras_example():
         }
     }
     record_map = record_map_from_simple_obj(obj)
-    data = data_algebra.pd.DataFrame(
+    data = data_algebra.default_data_model.pd.DataFrame(
         {
             "val_loss": [-0.377, -0.2997],
             "val_acc": [0.8722, 0.8895],
@@ -72,7 +72,7 @@ def test_keras_example():
         }
     )
     res = record_map.transform(data)
-    expect = data_algebra.pd.DataFrame(
+    expect = data_algebra.default_data_model.pd.DataFrame(
         {
             "epoch": [1, 1, 2, 2],
             "measure": [
@@ -89,7 +89,7 @@ def test_keras_example():
 
 
 def test_cdata_block():
-    data = data_algebra.pd.DataFrame(
+    data = data_algebra.default_data_model.pd.DataFrame(
         {
             "record_id": [1, 1, 1, 2, 2, 2],
             "row": ["row1", "row2", "row3", "row1", "row2", "row3"],
@@ -101,7 +101,7 @@ def test_cdata_block():
 
     record_keys = ["record_id"]
 
-    incoming_shape = data_algebra.pd.DataFrame(
+    incoming_shape = data_algebra.default_data_model.pd.DataFrame(
         {
             "row": ["row1", "row2", "row3"],
             "col1": ["v11", "v21", "v31"],
@@ -110,7 +110,7 @@ def test_cdata_block():
         }
     )
 
-    outgoing_shape = data_algebra.pd.DataFrame(
+    outgoing_shape = data_algebra.default_data_model.pd.DataFrame(
         {
             "column_label": ["rec_col1", "rec_col2", "rec_col3"],
             "c_row1": ["v11", "v12", "v13"],
@@ -138,7 +138,7 @@ def test_cdata_block():
 
 
 def test_cdata_missing():
-    data = data_algebra.pd.DataFrame(
+    data = data_algebra.default_data_model.pd.DataFrame(
         {
             "record_id": [1, 1, 1, 2, 2, 2],
             "row": ["row1", "row2", "row3", "row1", "row2", "row3"],
@@ -150,7 +150,7 @@ def test_cdata_missing():
 
     record_keys = ["record_id"]
 
-    incoming_shape = data_algebra.pd.DataFrame(
+    incoming_shape = data_algebra.default_data_model.pd.DataFrame(
         {
             "row": ["row1", "row2", "row3"],
             "col1": ["v11", "v21", "v31"],
@@ -159,7 +159,7 @@ def test_cdata_missing():
         }
     )
 
-    outgoing_shape = data_algebra.pd.DataFrame(
+    outgoing_shape = data_algebra.default_data_model.pd.DataFrame(
         {
             "column_label": ["rec_col1", "rec_col2", "rec_col3"],
             "c_row1": ["v11", numpy.nan, "v13"],
@@ -179,7 +179,7 @@ def test_cdata_missing():
 
     res = record_map.transform(data)
 
-    expect = data_algebra.pd.DataFrame(
+    expect = data_algebra.default_data_model.pd.DataFrame(
         {
             "record_id": [1, 1, 1, 2, 2, 2],
             "column_label": [

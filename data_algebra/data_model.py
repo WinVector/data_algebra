@@ -4,12 +4,30 @@ import data_algebra.eval_model
 
 
 class DataModel(data_algebra.eval_model.EvalModel, ABC):
-    def __init__(self):
+    def __init__(self, presentation_model_name):
+        self.presentation_model_name = presentation_model_name
         data_algebra.eval_model.EvalModel.__init__(self)
 
     # helper functions
 
-    def assert_is_appropriate_data_instance(self, df, arg_name=""):
+    def data_frame(self, arg=None):
+        raise NotImplementedError("base method called")
+
+    def is_appropriate_data_instance(self, df):
+        raise NotImplementedError("base method called")
+
+    def can_convert_col_to_numeric(self, x):
+        """check if non-empty vector can convert to numeric"""
+        raise NotImplementedError("base method called")
+
+    def to_numeric(self, x, *, errors='coerce'):
+        raise NotImplementedError("base method called")
+
+    def isnull(self, x):
+        raise NotImplementedError("base method called")
+
+    def bad_column_positions(self, x):
+        """ for numeric vector x, return logical vector of positions that are null, NaN, infinite"""
         raise NotImplementedError("base method called")
 
     # operation implementations

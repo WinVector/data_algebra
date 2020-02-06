@@ -1,6 +1,9 @@
 import types
+import importlib
+import numbers
 
-import data_algebra
+import numpy
+
 import data_algebra.util
 import data_algebra.data_model
 import data_algebra.expr_rep
@@ -9,25 +12,66 @@ import data_algebra.connected_components
 import data_algebra.custom_functions
 
 
+# TODO: possibly import dask, Nvidia Rapids, or modin instead
+# can't do that now
+# https://github.com/modin-project/modin/issues/865
+# requires: modin, ray, distributed
+# pip install modin[ray]
+# pd = importlib.import_module("modin.pandas")  # https://github.com/modin-project/modin
+
+
 class PandasModel(data_algebra.data_model.DataModel):
-    def __init__(self, *, pd=None):
-        data_algebra.data_model.DataModel.__init__(self)
+    def __init__(self, *, pd=None, presentation_model_name=None):
         if pd is None:
-            pd = data_algebra.pd
+            pd = importlib.import_module("pandas")  # https://pandas.pydata.org
+        if presentation_model_name is None:
+            presentation_model_name = "pandas"
+        data_algebra.data_model.DataModel.__init__(self, presentation_model_name=presentation_model_name)
         if not isinstance(pd, types.ModuleType):
             raise TypeError("Expected pd to be a module")
         self.pd = pd
         self.custom_function_map = data_algebra.custom_functions.make_custom_function_map(
-            self.pd
+            self
         )
         self.pandas_eval_env = {
             k: cf.implementation for (k, cf) in self.custom_function_map.items()
         }
 
-    def assert_is_appropriate_data_instance(self, df, arg_name=""):
+    # utils
+
+    def data_frame(self, arg=None):
+        if arg is None:
+            # noinspection PyUnresolvedReferences
+            return self.pd.DataFrame()
         # noinspection PyUnresolvedReferences
-        if not isinstance(df, self.pd.DataFrame):
-            raise TypeError(arg_name + " was supposed to be a self.pd.DataFrame")
+        return self.pd.DataFrame(arg)
+
+    def is_appropriate_data_instance(self, df):
+        # noinspection PyUnresolvedReferences
+        return isinstance(df, self.pd.DataFrame)
+
+    def can_convert_col_to_numeric(self, x):
+        if isinstance(x, numbers.Number):
+            return True
+        # noinspection PyUnresolvedReferences
+        return self.pd.api.types.is_numeric_dtype(x)
+
+    def to_numeric(self, x, *, errors='coerce'):
+        # noinspection PyUnresolvedReferences
+        return self.pd.to_numeric(x, errors='coerce')
+
+    def isnull(self, x):
+        return self.pd.isnull(x)
+
+    def bad_column_positions(self, x):
+        if self.can_convert_col_to_numeric(x):
+            x = numpy.asarray(x + 0, dtype=float)
+            return numpy.logical_or(
+                self.pd.isnull(x), numpy.logical_or(numpy.isnan(x), numpy.isinf(x))
+            )
+        return self.pd.isnull(x)
+
+    # bigger stuff
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def table_step(self, op, *, data_map, eval_env, narrow):
@@ -40,7 +84,8 @@ class PandasModel(data_algebra.data_model.DataModel):
                 "table descriptions used with table_step() must not have qualifiers"
             )
         df = data_map[op.table_name]
-        self.assert_is_appropriate_data_instance(df, "data_map[" + op.table_name + "]")
+        if not self.is_appropriate_data_instance(df):
+            raise ValueError("data_map[" + op.table_name + "] was not the right type")
         # check all columns we expect are present
         columns_using = op.column_names
         if op.columns_currently_used is not None and len(op.columns_currently_used) > 0:
@@ -325,7 +370,7 @@ class PandasModel(data_algebra.data_model.DataModel):
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
-        return op.record_map.transform(res, pd=self.pd)
+        return op.record_map.transform(res, local_data_model=self)
 
     # EvalModel interface
 
