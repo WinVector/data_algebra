@@ -725,7 +725,7 @@ con.create_aggregate("sorted_concat", 1, SortedConcat)
 sql_code = ops.to_sql(db_model)
 
 # run the query, and bring the results back
-res_db = data_algebra.default_data_model.pd.read_sql_query(sql_code, con)
+res_db = pandas.read_sql_query(sql_code, con)
 
 res_db
 ```
@@ -1028,7 +1028,7 @@ And this is again, easy to run in a database.
 sql_code = ops.to_sql(db_model)
 
 # run the query, and bring the results back
-res_db = data_algebra.default_data_model.pd.read_sql_query(sql_code, con)
+res_db = pandas.read_sql_query(sql_code, con)
 
 res_db
 ```
