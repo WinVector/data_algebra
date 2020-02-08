@@ -443,7 +443,7 @@ row_record
 
 Notice the interior-data portions (the parts we wrote in the inputs as unquoted) of each table input are the cells that are matched from one record to the other.  These are in fact just the earlier sample inputs and outputs with the values replaced with the placeholders `DATE1`, `DATE2`, `DATE3`, `OP1`, `OP2`, and `OP3`.
 
-We have a one minute video of how to work out the placeholder labels and build the diagram [here](https://youtu.be/JzaZBjsLpUQ).
+We have a two minute video of how to work out the placeholder labels and build the diagram [here](https://youtu.be/8TVoQdnvfqQ).
 
 With the diagram in hand we can specify the data reshaping step. Since we are moving the data from blocks to row records, we use the class `RecordMap` with a `blocks_in` argument to create the reshaping transform.
 
@@ -725,7 +725,7 @@ con.create_aggregate("sorted_concat", 1, SortedConcat)
 sql_code = ops.to_sql(db_model)
 
 # run the query, and bring the results back
-res_db = data_algebra.pd.read_sql_query(sql_code, con)
+res_db = data_algebra.default_data_model.pd.read_sql_query(sql_code, con)
 
 res_db
 ```
@@ -1028,7 +1028,7 @@ And this is again, easy to run in a database.
 sql_code = ops.to_sql(db_model)
 
 # run the query, and bring the results back
-res_db = data_algebra.pd.read_sql_query(sql_code, con)
+res_db = data_algebra.default_data_model.pd.read_sql_query(sql_code, con)
 
 res_db
 ```
