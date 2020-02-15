@@ -4,9 +4,7 @@
 [Codd style operators](https://en.wikipedia.org/wiki/Relational_algebra) in a [piped](https://en.wikipedia.org/wiki/Pipeline_(Unix)) or [method-chained](https://en.wikipedia.org/wiki/Method_chaining) notation (or [dplyr](https://CRAN.R-project.org/package=dplyr)-esque) data processing in Python
 
 
-[This](https://github.com/WinVector/data_algebra) is to be the [`Python`](https://www.python.org) equivalent of the [`R`](https://www.r-project.org) packages [`rquery`](https://github.com/WinVector/rquery/) and [`rqdatatable`](https://github.com/WinVector/rqdatatable).  This package will supply piped Codd-transform style notation that 
-can perform data engineering in [`Pandas`](https://pandas.pydata.org) and generate [`SQL`](https://en.wikipedia.org/wiki/SQL) queries from the same specification.
-
+[This](https://github.com/WinVector/data_algebra) is to be the [`Python`](https://www.python.org) equivalent of the [`R`](https://www.r-project.org) packages [`rquery`](https://github.com/WinVector/rquery/), [`rqdatatable`](https://github.com/WinVector/rqdatatable), and [`cdata`](https://CRAN.R-project.org/package=cdata).  This package will supply piped Codd-transform style notation that can perform data engineering in [`Pandas`](https://pandas.pydata.org) and generate [`SQL`](https://en.wikipedia.org/wiki/SQL) queries from the same specification.
 
 # Installing
 
@@ -17,8 +15,7 @@ Install `data_algebra` with either of:
 
 # Announcement
 
-
-This article introduces the [`data_algebra`](https://github.com/WinVector/data_algebra) project: a data processing tool family available in `R` and `Python`.  These tools are designed to transform data either in-memory or on remote databases.  
+This article introduces the [`data_algebra`](https://github.com/WinVector/data_algebra) project: a data processing tool family available in `R` and `Python`.  These tools are designed to transform data either in-memory or on remote databases.  For an example (with video) of using `data_algebra` to re-arrange data layout please see [here](https://github.com/WinVector/data_algebra/blob/master/Examples/cdata/ranking_pivot_example.md).
 
 In particular we will discuss the `Python` implementation (also called `data_algebra`) and its relation to the mature `R` implementations (`rquery` and `rqdatatable`).
 
@@ -323,11 +320,11 @@ In either case, the pipeline is read as a sequence of operations (top to bottom,
   * We produce a new table by transforming this table through a sequence of "extend" operations which add new columns.
   
     * The first `extend` computes `probability = exp(scale*assessmentTotal)`, this is similar to the inverse-link step of a logistic regression. We assume when writing this pipeline we were given this math as a requirement.
-    * The next few `extend` steps total the `probabilty` per-subject (this is controlled by the `partition_by` argument) and then rank the normalized probabilities per-subject (grouping again specified by the `partition_by` argument, and order contolled by the `order_by` clause).
+    * The next few `extend` steps total the `probability` per-subject (this is controlled by the `partition_by` argument) and then rank the normalized probabilities per-subject (grouping again specified by the `partition_by` argument, and order controlled by the `order_by` clause).
     
   * We then select the per-subject top-ranked rows by the `select_rows` step.
   
-  * And finally we clean up the results for presentation with the `select_columns`, `rename_columns`, and `order_rows` steps.  The names of these methods are intedned to evoke what they do.
+  * And finally we clean up the results for presentation with the `select_columns`, `rename_columns`, and `order_rows` steps.  The names of these methods are intended to evoke what they do.
   
 The point is: each step is deliberately so trivial one can reason about it. However the many steps in sequence do quite a lot.
 
@@ -427,7 +424,7 @@ db_model.read_query(conn, sql)
 
 
 
-What comes back is: one row per subject, with the highest per-subject diagnosis and the estimated probabilty. Again, the math of this is outside the scope of this note (think of that as something coming from a specification)- the ability to write such a pipeline is our actual topic.
+What comes back is: one row per subject, with the highest per-subject diagnosis and the estimated probability. Again, the math of this is outside the scope of this note (think of that as something coming from a specification)- the ability to write such a pipeline is our actual topic.
 
 The hope is that the `data_algebra` pipeline is easier to read, write, and maintain than the `SQL` query. If we wanted to change the calculation we would just add a stage to the `data_algebra` pipeline and then regenerate the `SQL` query.
 
@@ -521,7 +518,7 @@ ops.transform(d_local)
 
 Because our operator pipeline is a `Python` object with no references to external objects (such as the database connection), it can be saved through standard methods such as "[pickling](https://docs.python.org/3/library/pickle.html)."
 
-We can also diagram the pipleline using graphviz.
+We can also diagram the pipeline using graphviz.
 
 
 ```python
