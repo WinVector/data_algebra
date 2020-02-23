@@ -2,6 +2,7 @@
 import sqlite3
 
 import data_algebra
+import data_algebra.db_model
 import data_algebra.test_util
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 import data_algebra.SQLite
@@ -196,9 +197,11 @@ def test_unionall_g2():
     #res_sql = sql_model.read_table(conn, 'res')
     res_sql = sql_model.read_query(conn, q)
 
-    conn.close()
-
     assert data_algebra.test_util.equivalent_frames(res_pandas, res_sql, check_row_order=True)
 
-    res_db2 = sql_model.eval(ops, {'d1': d1, 'd2': d2})
+    db_handle = data_algebra.db_model.DBHandle(sql_model, conn)
+    res_handle = db_handle.eval(ops)
+    res_db2 = sql_model.read_table(conn, res_handle)
     assert data_algebra.test_util.equivalent_frames(res_pandas, res_db2, check_row_order=True)
+
+    conn.close()

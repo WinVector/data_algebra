@@ -56,7 +56,7 @@ def _check_scalar_bad(x):
     return 0
 
 
-class SQLiteModel(data_algebra.db_model.DBModel, data_algebra.eval_model.EvalModel):
+class SQLiteModel(data_algebra.db_model.DBModel):
     """A model of how SQL should be generated for SQLite"""
 
     def __init__(self):
@@ -124,6 +124,8 @@ class SQLiteModel(data_algebra.db_model.DBModel, data_algebra.eval_model.EvalMod
         return self.identifier_quote + identifier + self.identifier_quote
 
     def quote_table_name(self, table_description):
+        if isinstance(table_description, str):
+            return self.quote_identifier(table_description)
         if not isinstance(table_description, data_algebra.data_ops.TableDescription):
             raise TypeError(
                 "Expected table_description to be a data_algebra.data_ops.TableDescription)"
@@ -147,14 +149,5 @@ class SQLiteModel(data_algebra.db_model.DBModel, data_algebra.eval_model.EvalMod
         if qualifiers is not None:
             raise ValueError("non-empty qualifiers not yet supported on inser")
         cur = conn.cursor()
-        cur.execute("DROP TABLE IF EXISTS " + table_name)
+        cur.execute("DROP TABLE IF EXISTS " + self.quote_table_name(table_name))
         d.to_sql(name=table_name, con=conn)
-
-    def eval(self, ops, data_map, *, eval_env=None, data_model=None, narrow=True):
-        with sqlite3.connect(":memory:") as conn:
-            self.prepare_connection(conn)
-            for k, d in data_map.items():
-                self.insert_table(conn, d, table_name=k)
-            query = ops.to_sql(self)
-            res = self.read_query(conn, query)
-        return res

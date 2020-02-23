@@ -374,7 +374,7 @@ class PandasModel(data_algebra.data_model.DataModel):
 
     # EvalModel interface
 
-    def eval(self, ops, data_map, *, eval_env=None, narrow=True):
+    def eval(self, ops, data_map=None, *, eval_env=None, narrow=True):
         return ops.eval(data_map, eval_env=eval_env, data_model=self, narrow=narrow)
 
     # noinspection PyPep8Naming

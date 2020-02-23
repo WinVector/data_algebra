@@ -8,7 +8,7 @@ import data_algebra.near_sql
 import data_algebra.expr_rep
 import data_algebra.util
 import data_algebra.data_ops_types
-
+import data_algebra.eval_model
 
 
 # map from op-name to special SQL formatting code
@@ -202,6 +202,8 @@ class DBModel:
         return qt
 
     def quote_table_name(self, table_description):
+        if isinstance(table_description, str):
+            return self.quote_identifier(table_description)
         if table_description.node_name != "TableDescription":
             raise TypeError(
                 "Expected table_description to be a data_algebra.data_ops.TableDescription)"
@@ -820,3 +822,26 @@ class DBModel:
             + ", ".join(control_cols)
         )
         return sql
+
+
+class DBHandle(data_algebra.eval_model.EvalModel):
+    def __init__(self, db_model, conn):
+        if not isinstance(db_model, DBModel):
+            raise TypeError("expected db_model to be of class data_algebra.db_model.DBHandle")
+        data_algebra.eval_model.EvalModel.__init__(self)
+        self.db_model = db_model
+        self.conn = conn
+        self.temp_id = 0
+
+    def mk_tmp_name(self):
+        new_id = self.temp_id
+        self.temp_id = new_id + 1
+        return 'TMP_' + str(id).zfill(7) + '_T'
+
+    def eval(self, ops, data_map=None, *, eval_env=None, data_model=None, narrow=True):
+        query = ops.to_sql(self.db_model)
+        new_table_name = self.mk_tmp_name()
+        create_query = 'CREATE TABLE ' + self.db_model.quote_table_name(new_table_name) + " AS " + query
+        cur = self.conn.cursor()
+        cur.execute(create_query)
+        return new_table_name
