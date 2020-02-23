@@ -20,7 +20,7 @@ class DataModel(data_algebra.eval_model.EvalModel, ABC):
         """check if non-empty vector can convert to numeric"""
         raise NotImplementedError("base method called")
 
-    def to_numeric(self, x, *, errors='coerce'):
+    def to_numeric(self, x, *, errors="coerce"):
         raise NotImplementedError("base method called")
 
     def isnull(self, x):

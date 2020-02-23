@@ -84,7 +84,9 @@ def equivalent_frames(
         b = b[acols]
         b = b.reset_index(drop=True)
     for c in acols:
-        if local_data_model.can_convert_col_to_numeric(a[c]) != local_data_model.can_convert_col_to_numeric(b[c]):
+        if local_data_model.can_convert_col_to_numeric(
+            a[c]
+        ) != local_data_model.can_convert_col_to_numeric(b[c]):
             return False
     if a.shape[0] < 1:
         return True
@@ -167,7 +169,9 @@ def check_transform(
         res = ops.transform(data)
     # try pandas path
     if not local_data_model.is_appropriate_data_instance(res):
-        raise ValueError("expected res to be local_data_model.pd.DataFrame, got: " + str(type(res)))
+        raise ValueError(
+            "expected res to be local_data_model.pd.DataFrame, got: " + str(type(res))
+        )
     if not equivalent_frames(
         res,
         expect,

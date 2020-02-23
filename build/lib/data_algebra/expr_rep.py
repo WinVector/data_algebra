@@ -904,11 +904,11 @@ class Expression(Term):
         return self.op + "(" + ", ".join(subs) + ")"
 
     def to_pandas(self, *, want_inline_parens=False):
-        cfmap = data_algebra.custom_functions.make_custom_function_map(data_algebra.default_data_model.pd)
+        cfmap = data_algebra.custom_functions.make_custom_function_map(
+            data_algebra.default_data_model.pd
+        )
         if self.op in cfmap.keys():
-            return cfmap[
-                self.op
-            ].pandas_formatter(self)
+            return cfmap[self.op].pandas_formatter(self)
         if len(self.args) <= 0:
             return "_" + self.op + "()"
         if len(self.args) == 1:

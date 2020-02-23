@@ -1,5 +1,3 @@
-
-
 __docformat__ = "restructuredtext"
 __version__ = "0.5.1"
 
@@ -22,4 +20,3 @@ Recommended packages include: Pandas, PyYAML (supplies yaml), sqlparse, and blac
 import data_algebra.pandas_model
 
 default_data_model = data_algebra.pandas_model.PandasModel()
-

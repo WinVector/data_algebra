@@ -9,7 +9,13 @@ import data_algebra.util
 
 class RecordSpecification:
     def __init__(
-        self, control_table, *, record_keys=None, control_table_keys=None, strict=False, local_data_model=None
+        self,
+        control_table,
+        *,
+        record_keys=None,
+        control_table_keys=None,
+        strict=False,
+        local_data_model=None
     ):
         if local_data_model is None:
             local_data_model = data_algebra.default_data_model
@@ -175,27 +181,31 @@ def blocks_to_rowrecs(data, *, blocks_in, local_data_model=None):
     # convert to row-records
     # regularize/complete records
     dtemp = data.copy()  # TODO: select down columns
-    dtemp['FALSE_AGG_KEY'] = 1
+    dtemp["FALSE_AGG_KEY"] = 1
     if len(blocks_in.record_keys) > 0:
-        ideal = dtemp[blocks_in.record_keys + ['FALSE_AGG_KEY']].copy()
-        res = ideal.groupby(blocks_in.record_keys)['FALSE_AGG_KEY'].agg('sum')
+        ideal = dtemp[blocks_in.record_keys + ["FALSE_AGG_KEY"]].copy()
+        res = ideal.groupby(blocks_in.record_keys)["FALSE_AGG_KEY"].agg("sum")
         ideal = local_data_model.data_frame(res).reset_index(drop=False)
-        ideal['FALSE_AGG_KEY'] = 1
+        ideal["FALSE_AGG_KEY"] = 1
         ctemp = blocks_in.control_table[blocks_in.control_table_keys].copy()
-        ctemp['FALSE_AGG_KEY'] = 1
-        ideal = ideal.merge(ctemp, how='outer', on='FALSE_AGG_KEY')
+        ctemp["FALSE_AGG_KEY"] = 1
+        ideal = ideal.merge(ctemp, how="outer", on="FALSE_AGG_KEY")
         ideal = ideal.reset_index(drop=True)
-        dtemp = ideal.merge(right=dtemp,
-                            how='left',
-                            on=blocks_in.record_keys + blocks_in.control_table_keys + ['FALSE_AGG_KEY'])
-    dtemp.sort_values(by=blocks_in.record_keys + blocks_in.control_table_keys, inplace=True)
+        dtemp = ideal.merge(
+            right=dtemp,
+            how="left",
+            on=blocks_in.record_keys + blocks_in.control_table_keys + ["FALSE_AGG_KEY"],
+        )
+    dtemp.sort_values(
+        by=blocks_in.record_keys + blocks_in.control_table_keys, inplace=True
+    )
     dtemp = dtemp.reset_index(drop=True)
     # start building up result frame
-    res = dtemp.groupby(blocks_in.record_keys)['FALSE_AGG_KEY'].agg('sum')
+    res = dtemp.groupby(blocks_in.record_keys)["FALSE_AGG_KEY"].agg("sum")
     res = local_data_model.data_frame(res).reset_index(drop=False)
     res.sort_values(by=blocks_in.record_keys, inplace=True)
     res = local_data_model.data_frame(res).reset_index(drop=True)
-    del res['FALSE_AGG_KEY']
+    del res["FALSE_AGG_KEY"]
     # now fill in columns
     ckeys = blocks_in.control_table_keys
     value_keys = [k for k in blocks_in.control_table.columns if k not in set(ckeys)]
@@ -217,7 +227,9 @@ def blocks_to_rowrecs(data, *, blocks_in, local_data_model=None):
     return res
 
 
-def rowrecs_to_blocks(data, *, blocks_out, check_blocks_out_keying=False, local_data_model=None):
+def rowrecs_to_blocks(
+    data, *, blocks_out, check_blocks_out_keying=False, local_data_model=None
+):
     if not isinstance(blocks_out, data_algebra.cdata.RecordSpecification):
         raise TypeError("blocks_out should be a data_algebra.cdata.RecordSpecification")
     if local_data_model is None:
@@ -236,22 +248,28 @@ def rowrecs_to_blocks(data, *, blocks_out, check_blocks_out_keying=False, local_
     rv = [k for k in blocks_out.row_version(include_record_keys=True) if k is not None]
     if len(rv) != len(set(rv)):
         raise ValueError("duplicate row columns")
-    dtemp_cols = [k for k in rv if k is not None and k in set(blocks_out.record_keys + blocks_out.content_keys)]
+    dtemp_cols = [
+        k
+        for k in rv
+        if k is not None and k in set(blocks_out.record_keys + blocks_out.content_keys)
+    ]
     dtemp = data[dtemp_cols].copy()
     dtemp.sort_values(by=blocks_out.record_keys, inplace=True)
     dtemp = dtemp.reset_index(drop=True)
     if len(dtemp.columns) != len(set(dtemp.columns)):
         raise ValueError("targeted data columns not unique")
     ctemp = blocks_out.control_table.copy()
-    dtemp['FALSE_JOIN_KEY'] = 1
-    ctemp['FALSE_JOIN_KEY'] = 1
-    res = dtemp[blocks_out.record_keys + ['FALSE_JOIN_KEY']].merge(ctemp, how='outer', on=['FALSE_JOIN_KEY'])
-    del res['FALSE_JOIN_KEY']
+    dtemp["FALSE_JOIN_KEY"] = 1
+    ctemp["FALSE_JOIN_KEY"] = 1
+    res = dtemp[blocks_out.record_keys + ["FALSE_JOIN_KEY"]].merge(
+        ctemp, how="outer", on=["FALSE_JOIN_KEY"]
+    )
+    del res["FALSE_JOIN_KEY"]
     ckeys = blocks_out.control_table_keys
     res.sort_values(by=blocks_out.record_keys + ckeys, inplace=True)
     res = res.reset_index(drop=True)
-    del ctemp['FALSE_JOIN_KEY']
-    del dtemp['FALSE_JOIN_KEY']
+    del ctemp["FALSE_JOIN_KEY"]
+    del dtemp["FALSE_JOIN_KEY"]
     value_keys = [k for k in ctemp.columns if k not in set(ckeys)]
     donor_cols = set(dtemp.columns)
     for vk in value_keys:
@@ -268,8 +286,10 @@ def rowrecs_to_blocks(data, *, blocks_out, check_blocks_out_keying=False, local_
                     res.loc[want, vk] = numpy.asarray(dtemp[dcol])
     # see about promoting composite columns to numeric
     for vk in set(value_keys):
-        converted = local_data_model.to_numeric(res[vk], errors='coerce')
-        if numpy.all(local_data_model.isnull(converted) == local_data_model.isnull(res[vk])):
+        converted = local_data_model.to_numeric(res[vk], errors="coerce")
+        if numpy.all(
+            local_data_model.isnull(converted) == local_data_model.isnull(res[vk])
+        ):
             res[vk] = converted
     return res
 
@@ -345,9 +365,7 @@ class RecordMap:
         return None
 
     # noinspection PyPep8Naming
-    def transform(
-        self, X, *, check_blocks_out_keying=False, local_data_model=None
-    ):
+    def transform(self, X, *, check_blocks_out_keying=False, local_data_model=None):
         unknown = set(self.columns_needed) - set(X.columns)
         if len(unknown) > 0:
             raise ValueError("missing required columns: " + str(unknown))
@@ -356,16 +374,14 @@ class RecordMap:
         X = X.reset_index(drop=True)
         if self.blocks_in is not None:
             X = blocks_to_rowrecs(
-                X,
-                blocks_in=self.blocks_in,
-                local_data_model=local_data_model
+                X, blocks_in=self.blocks_in, local_data_model=local_data_model
             )
         if self.blocks_out is not None:
             X = rowrecs_to_blocks(
                 X,
                 blocks_out=self.blocks_out,
                 check_blocks_out_keying=check_blocks_out_keying,
-                local_data_model=local_data_model
+                local_data_model=local_data_model,
             )
         return X
 

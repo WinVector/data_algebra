@@ -26,7 +26,9 @@ class PandasModel(data_algebra.data_model.DataModel):
             pd = importlib.import_module("pandas")  # https://pandas.pydata.org
         if presentation_model_name is None:
             presentation_model_name = "pandas"
-        data_algebra.data_model.DataModel.__init__(self, presentation_model_name=presentation_model_name)
+        data_algebra.data_model.DataModel.__init__(
+            self, presentation_model_name=presentation_model_name
+        )
         if not isinstance(pd, types.ModuleType):
             raise TypeError("Expected pd to be a module")
         self.pd = pd
@@ -56,9 +58,9 @@ class PandasModel(data_algebra.data_model.DataModel):
         # noinspection PyUnresolvedReferences
         return self.pd.api.types.is_numeric_dtype(x)
 
-    def to_numeric(self, x, *, errors='coerce'):
+    def to_numeric(self, x, *, errors="coerce"):
         # noinspection PyUnresolvedReferences
-        return self.pd.to_numeric(x, errors='coerce')
+        return self.pd.to_numeric(x, errors="coerce")
 
     def isnull(self, x):
         return self.pd.isnull(x)
