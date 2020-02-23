@@ -70,20 +70,20 @@ data_algebra/data_ops.py                1164    226    81%
 data_algebra/data_ops_types.py            74     33    55%
 data_algebra/data_ops_utils.py            34      6    82%
 data_algebra/data_pipe.py                189     50    74%
-data_algebra/db_model.py                 447     84    81%
+data_algebra/db_model.py                 454     81    82%
 data_algebra/diagram.py                   56     44    21%
 data_algebra/env.py                       31      3    90%
-data_algebra/eval_model.py                14      7    50%
+data_algebra/eval_model.py                 8      2    75%
 data_algebra/expr.py                      20      4    80%
 data_algebra/expr_rep.py                 677    211    69%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 140     16    89%
-data_algebra/pandas_model.py             222     26    88%
+data_algebra/pandas_model.py             233     37    84%
 data_algebra/test_util.py                126     18    86%
 data_algebra/util.py                      28      4    86%
 data_algebra/yaml.py                      95     11    88%
 ----------------------------------------------------------
-TOTAL                                   4091    910    78%
+TOTAL                                   4103    913    78%
 
 
-============================== 89 passed in 8.65s ==============================
+============================== 89 passed in 9.19s ==============================

@@ -833,30 +833,36 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         self.conn = conn
         self.temp_id = 0
 
-    def to_pandas(self, handle):
-        return self.db_model.read_table(self.conn, handle)
-
     def mk_tmp_name(self):
         new_id = self.temp_id
         self.temp_id = new_id + 1
-        return 'TMP_' + str(id).zfill(7) + '_T'
+        return 'TMP_' + str(new_id).zfill(7) + '_T'
 
-    def eval(self, ops, *, data_map=None, eval_env=None, data_model=None, narrow=True):
-        query = ops.to_sql(self.db_model)
+    def to_pandas(self, handle, *, data_map=None):
         if data_map is not None:
-            tables_needed = [k for k in ops.get_tables().keys()]
+            if not handle in data_map:
+                return ValueError("Expected handle to be a data_map key " + handle)
+            if data_map[handle] != handle:
+                raise ValueError("data_map[" + handle + "] == " + str(data_map[handle]) + ", not " + handle)
+        return self.db_model.read_table(self.conn, handle)
+
+    def eval(self, ops, *, data_map=None, result_name=None, eval_env=None, narrow=True):
+        query = ops.to_sql(self.db_model)
+        if result_name is None:
+            result_name = self.mk_tmp_name()
+        tables_needed = [k for k in ops.get_tables().keys()]
+        if data_map is not None:
             missing_tables = set(tables_needed) - set(data_map.keys())
             if len(missing_tables) > 0:
                 raise ValueError("missing required tables: " + str(missing_tables))
             for k in tables_needed:
-                v = data_map[k]
-                if isinstance(v, str):
-                    if v != k:
-                        raise ValueError("string values must match keys: " + k + ": " + v)
-                else:
-                    self.db_model.insert_table(self.conn, d=v, table_name=k)
-        new_table_name = self.mk_tmp_name()
-        create_query = 'CREATE TABLE ' + self.db_model.quote_table_name(new_table_name) + " AS " + query
+                if data_map[k] != k:
+                    raise ValueError("data_map[" + k + "] == " + str(data_map[k]) + ", not " + k)
+        if result_name in tables_needed:
+            raise ValueError("Can not write over an input table")
+        create_query = 'CREATE TABLE ' + self.db_model.quote_table_name(result_name) + " AS " + query
         cur = self.conn.cursor()
         cur.execute(create_query)
-        return new_table_name
+        if data_map is not None:
+            data_map[result_name] = result_name
+        return result_name
