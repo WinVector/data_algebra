@@ -824,6 +824,23 @@ class DBModel:
         return sql
 
 
+class TableHandle:
+    def __init__(self, table_name, head, *, limit_was=None):
+        self.table_name = table_name
+        self.head = head
+        self.limit_was = limit_was
+
+    def __str__(self):
+        res = "\t" + self.table_name + "\n" + str(self.head)
+        if (self.limit_was is not None) and (self.head.shape[0] >= self.limit_was):
+            res = res + "\n..."
+        res = res + "\n"
+        return res
+
+    def __repr__(self):
+        return self.__str__()
+
+
 class DBHandle(data_algebra.eval_model.EvalModel):
     def __init__(self, db_model, conn):
         if not isinstance(db_model, DBModel):
@@ -833,17 +850,36 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         self.conn = conn
         self.temp_id = 0
 
+    def build_rep(self, table_name, *, row_limit=7):
+        head = self.db_model.read_query(
+            conn=self.conn,
+            q="SELECT * FROM "
+              + self.db_model.quote_table_name(table_name)
+              + " LIMIT " + str(row_limit))
+        return TableHandle(table_name=table_name, head=head, limit_was=row_limit)
+
     def mk_tmp_name(self):
         new_id = self.temp_id
         self.temp_id = new_id + 1
         return 'TMP_' + str(new_id).zfill(7) + '_T'
 
     def to_pandas(self, handle, *, data_map=None):
+        if isinstance(handle, TableHandle):
+            handle = handle.table_name
+        if not isinstance(handle, str):
+            raise TypeError("Expect handle to a data_algebra.db_model.TableHandle or str")
         if data_map is not None:
             if not handle in data_map:
                 return ValueError("Expected handle to be a data_map key " + handle)
-            if data_map[handle] != handle:
-                raise ValueError("data_map[" + handle + "] == " + str(data_map[handle]) + ", not " + handle)
+            if not isinstance(data_map[handle], TableHandle):
+                raise ValueError("Expect data_map[" + handle + "] to be class data_algebra.db_model.TableHandle")
+            if data_map[handle].table_name != handle:
+                raise ValueError("data_map["
+                                 + handle
+                                 + "].table_name == "
+                                 + data_map[handle].table_name
+                                 + ", not "
+                                 + handle)
         return self.db_model.read_table(self.conn, handle)
 
     def eval(self, ops, *, data_map=None, result_name=None, eval_env=None, narrow=True):
@@ -856,13 +892,21 @@ class DBHandle(data_algebra.eval_model.EvalModel):
             if len(missing_tables) > 0:
                 raise ValueError("missing required tables: " + str(missing_tables))
             for k in tables_needed:
-                if data_map[k] != k:
-                    raise ValueError("data_map[" + k + "] == " + str(data_map[k]) + ", not " + k)
+                if not isinstance(data_map[k], TableHandle):
+                    raise ValueError("Expect data_map[" + k + "] to be class data_algebra.db_model.TableHandle")
+                if data_map[k].table_name != k:
+                    raise ValueError("data_map["
+                                     + k
+                                     + "].table_name == "
+                                     + data_map[k].table_name
+                                     + ", not "
+                                     + k)
         if result_name in tables_needed:
             raise ValueError("Can not write over an input table")
         create_query = 'CREATE TABLE ' + self.db_model.quote_table_name(result_name) + " AS " + query
         cur = self.conn.cursor()
         cur.execute(create_query)
+        res = self.build_rep(result_name)
         if data_map is not None:
-            data_map[result_name] = result_name
-        return result_name
+            data_map[result_name] = res
+        return res
