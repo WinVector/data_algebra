@@ -2,8 +2,6 @@ import math
 import numpy
 import numbers
 
-import sqlite3
-
 import data_algebra.util
 import data_algebra.db_model
 import data_algebra.data_ops
@@ -66,7 +64,6 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             string_quote="'",
             sql_formatters=SQLite_formatters,
         )
-        data_algebra.eval_model.EvalModel.__init__(self)
 
     def prepare_connection(self, conn):
         # https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.create_function

@@ -5,7 +5,10 @@ class EvalModel(ABC):
     def __init__(self):
         pass
 
-    def eval(self, ops, data_map=None, *, eval_env=None, narrow=True):
+    def to_pandas(self, handle):
+        return handle
+
+    def eval(self, ops, *, data_map=None, eval_env=None, narrow=True):
         """
         apply ops to data frames in data_map
 
@@ -32,4 +35,4 @@ class EvalModel(ABC):
         if len(tabs) is not 1:
             raise ValueError("ops must use exaclty one table")
         tname = [k for k in tabs.keys()][0]
-        return self.eval(ops, {tname: X}, eval_env=eval_env, narrow=narrow)
+        return self.eval(ops, data_map={tname: X}, eval_env=eval_env, narrow=narrow)

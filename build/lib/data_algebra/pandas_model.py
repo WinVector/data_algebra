@@ -374,7 +374,11 @@ class PandasModel(data_algebra.data_model.DataModel):
 
     # EvalModel interface
 
-    def eval(self, ops, data_map=None, *, eval_env=None, narrow=True):
+    def eval(self, ops, *, data_map=None, eval_env=None, narrow=True):
+        tables_needed = [k for k in ops.get_tables().keys()]
+        missing_tables = set(tables_needed) - set(data_map.keys())
+        if len(missing_tables) > 0:
+            raise ValueError("missing required tables: " + str(missing_tables))
         return ops.eval(data_map, eval_env=eval_env, data_model=self, narrow=narrow)
 
     # noinspection PyPep8Naming

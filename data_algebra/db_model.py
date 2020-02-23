@@ -833,13 +833,28 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         self.conn = conn
         self.temp_id = 0
 
+    def to_pandas(self, handle):
+        return self.db_model.read_table(self.conn, handle)
+
     def mk_tmp_name(self):
         new_id = self.temp_id
         self.temp_id = new_id + 1
         return 'TMP_' + str(id).zfill(7) + '_T'
 
-    def eval(self, ops, data_map=None, *, eval_env=None, data_model=None, narrow=True):
+    def eval(self, ops, *, data_map=None, eval_env=None, data_model=None, narrow=True):
         query = ops.to_sql(self.db_model)
+        if data_map is not None:
+            tables_needed = [k for k in ops.get_tables().keys()]
+            missing_tables = set(tables_needed) - set(data_map.keys())
+            if len(missing_tables) > 0:
+                raise ValueError("missing required tables: " + str(missing_tables))
+            for k in tables_needed:
+                v = data_map[k]
+                if isinstance(v, str):
+                    if v != k:
+                        raise ValueError("string values must match keys: " + k + ": " + v)
+                else:
+                    self.db_model.insert_table(self.conn, d=v, table_name=k)
         new_table_name = self.mk_tmp_name()
         create_query = 'CREATE TABLE ' + self.db_model.quote_table_name(new_table_name) + " AS " + query
         cur = self.conn.cursor()
