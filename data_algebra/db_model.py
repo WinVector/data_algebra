@@ -16,32 +16,32 @@ import data_algebra.eval_model
 
 def _db_is_null_expr(dbmodel, expression):
     return (
-        "("
-        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-        + " IS NULL)"
+            "("
+            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+            + " IS NULL)"
     )
 
 
 def _db_is_bad_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     return (
-        "("
-        + subexpr
-        + " IS NULL OR "
-        + subexpr
-        + " >= "
-        + dbmodel.quote_literal("+infinity")
-        + " OR "
-        + subexpr
-        + " <= "
-        + dbmodel.quote_literal("-infinity")
-        + " OR ("
-        + subexpr
-        + " != 0 AND "
-        + subexpr
-        + " = -"
-        + subexpr
-        + "))"
+            "("
+            + subexpr
+            + " IS NULL OR "
+            + subexpr
+            + " >= "
+            + dbmodel.quote_literal("+infinity")
+            + " OR "
+            + subexpr
+            + " <= "
+            + dbmodel.quote_literal("-infinity")
+            + " OR ("
+            + subexpr
+            + " != 0 AND "
+            + subexpr
+            + " = -"
+            + subexpr
+            + "))"
     )
 
 
@@ -50,16 +50,16 @@ def _db_if_else_expr(dbmodel, expression):
     x_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
     y_expr = dbmodel.expr_to_sql(expression.args[2], want_inline_parens=True)
     return (
-        "CASE"
-        + " WHEN "
-        + if_expr
-        + " THEN "
-        + x_expr
-        + " WHEN NOT "
-        + if_expr
-        + " THEN "
-        + y_expr
-        + " ELSE NULL END"
+            "CASE"
+            + " WHEN "
+            + if_expr
+            + " THEN "
+            + x_expr
+            + " WHEN NOT "
+            + if_expr
+            + " THEN "
+            + y_expr
+            + " ELSE NULL END"
     )
 
 
@@ -86,13 +86,13 @@ class DBModel:
     string_quote: str
 
     def __init__(
-        self,
-        *,
-        identifier_quote='"',
-        string_quote="'",
-        sql_formatters=None,
-        op_replacements=None,
-        local_data_model=None
+            self,
+            *,
+            identifier_quote='"',
+            string_quote="'",
+            sql_formatters=None,
+            op_replacements=None,
+            local_data_model=None
     ):
         if local_data_model is None:
             local_data_model = data_algebra.default_data_model
@@ -217,9 +217,9 @@ class DBModel:
             raise TypeError("expected string to be a str")
         # replace all single-quotes with doubled single quotes and return surrounded by single quotes
         return (
-            self.string_quote
-            + re.sub(self.string_quote, self.string_quote + self.string_quote, string)
-            + self.string_quote
+                self.string_quote
+                + re.sub(self.string_quote, self.string_quote + self.string_quote, string)
+                + self.string_quote
         )
 
     def quote_literal(self, string):
@@ -330,9 +330,9 @@ class DBModel:
         )
         window_term = ""
         if (
-            extend_node.windowed_situation
-            or (len(extend_node.partition_by) > 0)
-            or (len(extend_node.order_by) > 0)
+                extend_node.windowed_situation
+                or (len(extend_node.partition_by) > 0)
+                or (len(extend_node.order_by) > 0)
         ):
             window_term = " OVER ( "
             if len(extend_node.partition_by) > 0:
@@ -423,7 +423,7 @@ class DBModel:
         return near_sql
 
     def select_columns_to_sql(
-        self, select_columns_node, *, using=None, temp_id_source=None
+            self, select_columns_node, *, using=None, temp_id_source=None
     ):
         if select_columns_node.node_name != "SelectColumnsNode":
             raise TypeError(
@@ -449,7 +449,7 @@ class DBModel:
         return subsql
 
     def drop_columns_to_sql(
-        self, drop_columns_node, *, using=None, temp_id_source=None
+            self, drop_columns_node, *, using=None, temp_id_source=None
     ):
         if drop_columns_node.node_name != "DropColumnsNode":
             raise TypeError(
@@ -485,15 +485,15 @@ class DBModel:
         suffix = ""
         if len(order_node.order_columns) > 0:
             suffix = (
-                suffix
-                + " ORDER BY "
-                + ", ".join(
-                    [
-                        self.quote_identifier(ci)
-                        + (" DESC" if ci in set(order_node.reverse) else "")
-                        for ci in order_node.order_columns
-                    ]
-                )
+                    suffix
+                    + " ORDER BY "
+                    + ", ".join(
+                [
+                    self.quote_identifier(ci)
+                    + (" DESC" if ci in set(order_node.reverse) else "")
+                    for ci in order_node.order_columns
+                ]
+            )
             )
         if order_node.limit is not None:
             suffix = suffix + " LIMIT " + order_node.limit.__repr__()
@@ -571,14 +571,14 @@ class DBModel:
         common = using_left.intersection(using_right)
         terms = {
             ci: "COALESCE("
-            + sub_view_name_left
-            + "."
-            + self.quote_identifier(ci)
-            + ", "
-            + sub_view_name_right
-            + "."
-            + self.quote_identifier(ci)
-            + ")"
+                + sub_view_name_left
+                + "."
+                + self.quote_identifier(ci)
+                + ", "
+                + sub_view_name_right
+                + "."
+                + self.quote_identifier(ci)
+                + ")"
             for ci in common
         }
         terms.update({ci: None for ci in using_left - common})
@@ -586,20 +586,20 @@ class DBModel:
         on_terms = ""
         if len(join_node.by) > 0:
             on_terms = (
-                " ON "
-                + ", ".join(
-                    [
-                        sub_view_name_left
-                        + "."
-                        + self.quote_identifier(c)
-                        + " = "
-                        + sub_view_name_right
-                        + "."
-                        + self.quote_identifier(c)
-                        for c in join_node.by
-                    ]
-                )
-                + " "
+                    " ON "
+                    + ", ".join(
+                [
+                    sub_view_name_left
+                    + "."
+                    + self.quote_identifier(c)
+                    + " = "
+                    + sub_view_name_right
+                    + "."
+                    + self.quote_identifier(c)
+                    for c in join_node.by
+                ]
+            )
+                    + " "
             )
         confused_temps = set(sql_left.temp_tables.keys()).intersection(
             sql_right.temp_tables.keys()
@@ -688,7 +688,7 @@ class DBModel:
         return near_sql
 
     def row_recs_to_blocks_query(
-        self, source_sql, record_spec, record_view, *, using=None, temp_id_source=None
+            self, source_sql, record_spec, record_view, *, using=None, temp_id_source=None
     ):
         if temp_id_source is None:
             temp_id_source = [0]
@@ -706,11 +706,11 @@ class DBModel:
             if c not in record_spec.control_table_keys
         ]
         control_cols = [
-            "a." + self.quote_identifier(c) for c in record_spec.record_keys
-        ] + [
-            "b." + self.quote_identifier(key_col)
-            for key_col in record_spec.control_table_keys
-        ]
+                           "a." + self.quote_identifier(c) for c in record_spec.record_keys
+                       ] + [
+                           "b." + self.quote_identifier(key_col)
+                           for key_col in record_spec.control_table_keys
+                       ]
         col_stmts = []
         for c in record_spec.record_keys:
             col_stmts.append(
@@ -735,37 +735,37 @@ class DBModel:
                 if not (isnull[i]):
                     source_col = col[i]
                     col_sql = (
-                        "  WHEN CAST(b."
-                        + self.quote_identifier(result_col)
-                        + " AS VARCHAR) = "
-                        + self.quote_string(str(source_col))
-                        + " THEN a."
-                        + self.quote_identifier(source_col)
-                        + "\n"
+                            "  WHEN CAST(b."
+                            + self.quote_identifier(result_col)
+                            + " AS VARCHAR) = "
+                            + self.quote_string(str(source_col))
+                            + " THEN a."
+                            + self.quote_identifier(source_col)
+                            + "\n"
                     )
                     cstmt = cstmt + col_sql
             cstmt = cstmt + "  ELSE NULL END AS " + self.quote_identifier(result_col)
             col_stmts.append(cstmt)
         sql = (
-            "SELECT\n"
-            + ",\n".join(col_stmts)
-            + "\n"
-            + "FROM (\n  "
-            + source_sql
-            + " ) a\n"
-            + "CROSS JOIN (\n  "
-            + record_view.to_sql_implementation(
-                self, using=using, temp_id_source=temp_id_source
-            ).to_sql(db_model=self, columns=using, force_sql=True)
-            + " ) b\n"
-            + " ORDER BY "
-            + ", ".join(control_cols)
+                "SELECT\n"
+                + ",\n".join(col_stmts)
+                + "\n"
+                + "FROM (\n  "
+                + source_sql
+                + " ) a\n"
+                + "CROSS JOIN (\n  "
+                + record_view.to_sql_implementation(
+            self, using=using, temp_id_source=temp_id_source
+        ).to_sql(db_model=self, columns=using, force_sql=True)
+                + " ) b\n"
+                + " ORDER BY "
+                + ", ".join(control_cols)
         )
         return sql
 
     # noinspection PyUnusedLocal
     def blocks_to_row_recs_query(
-        self, source_sql, record_spec, *, using=None, temp_id_source=None
+            self, source_sql, record_spec, *, using=None, temp_id_source=None
     ):
         # if not isinstance(record_spec, data_algebra.cdata.RecordSpecification):
         #     raise TypeError(
@@ -799,41 +799,46 @@ class DBModel:
                             + " ) "
                         )
                     cstmt = (
-                        " MAX(CASE WHEN "
-                        + " AND ".join(clauses)
-                        + " THEN "
-                        + self.quote_identifier(vc)
-                        + " ELSE NULL END) AS "
-                        + self.quote_identifier(col[i])
+                            " MAX(CASE WHEN "
+                            + " AND ".join(clauses)
+                            + " THEN "
+                            + self.quote_identifier(vc)
+                            + " ELSE NULL END) AS "
+                            + self.quote_identifier(col[i])
                     )
                     col_stmts.append(cstmt)
         sql = (
-            "SELECT\n"
-            + ",\n".join(col_stmts)
-            + "\n"
-            + "FROM (\n  "
-            + source_sql
-            + "\n"
-            + " ) a\n"
-            + " GROUP BY "
-            + ", ".join(control_cols)
-            + "\n"
-            + " ORDER BY "
-            + ", ".join(control_cols)
+                "SELECT\n"
+                + ",\n".join(col_stmts)
+                + "\n"
+                + "FROM (\n  "
+                + source_sql
+                + "\n"
+                + " ) a\n"
+                + " GROUP BY "
+                + ", ".join(control_cols)
+                + "\n"
+                + " ORDER BY "
+                + ", ".join(control_cols)
         )
         return sql
 
 
 class TableHandle:
-    def __init__(self, table_name, head, *, limit_was=None):
+    def __init__(self, table_name,
+                 *,
+                 head=None,
+                 limit_was=None):
         self.table_name = table_name
         self.head = head
         self.limit_was = limit_was
 
     def __str__(self):
-        res = "\t" + self.table_name + "\n" + str(self.head)
-        if (self.limit_was is not None) and (self.head.shape[0] >= self.limit_was):
-            res = res + "\n..."
+        res = "\t" + self.table_name
+        if self.head is not None:
+            res = res + "\n" + str(self.head)
+            if (self.limit_was is not None) and (self.head.shape[0] >= self.limit_was):
+                res = res + "\n..."
         res = res + "\n"
         return res
 
@@ -882,6 +887,10 @@ class DBHandle(data_algebra.eval_model.EvalModel):
                                  + handle)
         return self.db_model.read_table(self.conn, handle)
 
+    def insert_table(self, d, *, table_name):
+        self.db_model.insert_table(conn=self.conn, d=d, table_name=table_name)
+        return self.build_rep(table_name)
+
     def eval(self, ops, *, data_map=None, result_name=None, eval_env=None, narrow=True):
         query = ops.to_sql(self.db_model)
         if result_name is None:
@@ -910,3 +919,13 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         if data_map is not None:
             data_map[result_name] = res
         return res
+
+    def __str__(self):
+        return (
+                'data_algebra.db_model.DBHandle('
+                + 'db_model=' + str(self.db_model)
+                + ', conn=' + str(self.conn)
+                + ')')
+
+    def __repr__(self):
+        return self.__str__()

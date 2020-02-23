@@ -190,17 +190,15 @@ def test_unionall_g2():
 
     conn = sqlite3.connect(':memory:')
     sql_model.prepare_connection(conn)
-    sql_model.insert_table(conn, d1, table_name='d1')
-    sql_model.insert_table(conn, d2, table_name='d2')
+    db_handle = data_algebra.db_model.DBHandle(sql_model, conn)
 
-    #conn.execute('CREATE TABLE res AS ' + q)
-    #res_sql = sql_model.read_table(conn, 'res')
+    tbl_map = {'d1': db_handle.insert_table(d1, table_name='d1'),
+               'd2': db_handle.insert_table(d2, table_name='d2')}
+
     res_sql = sql_model.read_query(conn, q)
 
     assert data_algebra.test_util.equivalent_frames(res_pandas, res_sql, check_row_order=False)
 
-    db_handle = data_algebra.db_model.DBHandle(sql_model, conn)
-    tbl_map = {'d1': db_handle.build_rep('d1'), 'd2': db_handle.build_rep('d2')}
     res_handle = db_handle.eval(ops, data_map=tbl_map)
     res_db2 = db_handle.to_pandas(res_handle)
     assert data_algebra.test_util.equivalent_frames(res_pandas, res_db2, check_row_order=False)
