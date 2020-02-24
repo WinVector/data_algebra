@@ -14,7 +14,7 @@ class EvalModel(ABC):
 
         :param ops OperatorPlatform, operation to apply OperatorPlatform
         :param data_map map from data frame names to data frame representations, altered by eval.
-        :parap result_name Name for result.
+        :param result_name Name for result.
         :param eval_env environment to look for symbols in
         :param narrow logical, if True don't copy unexpected columns
         :return: result data frame representation
