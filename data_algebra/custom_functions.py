@@ -17,7 +17,7 @@ class CustomFunction:
 
 def make_custom_function_map(data_model):
     if data_model is None:
-        data_model = data_algebra.default_data_model
+        raise ValueError("Expect data_model to not be None")
     custom_functions = [
         CustomFunction(
             name="is_bad",

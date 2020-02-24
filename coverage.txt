@@ -77,6 +77,7 @@ data_algebra/eval_model.py                 8      2    75%
 data_algebra/expr.py                      20      4    80%
 data_algebra/expr_rep.py                 677    211    69%
 data_algebra/flow_text.py                 17      0   100%
+data_algebra/modin_model.py               36     36     0%
 data_algebra/near_sql.py                 140     16    89%
 data_algebra/pandas_base.py              229     37    84%
 data_algebra/pandas_model.py               4      0   100%
@@ -84,7 +85,7 @@ data_algebra/test_util.py                126     18    86%
 data_algebra/util.py                      28      4    86%
 data_algebra/yaml.py                      95     11    88%
 ----------------------------------------------------------
-TOTAL                                   4138    927    78%
+TOTAL                                   4174    963    77%
 
 
-============================== 89 passed in 9.66s ==============================
+============================= 89 passed in 13.55s ==============================

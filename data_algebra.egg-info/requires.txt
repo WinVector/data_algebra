@@ -6,19 +6,26 @@ PyYAML
 black
 sqlparse
 graphviz
-modin
+dask
+modin[ray]
+
+[dask]
+dask
 
 [diagram]
 graphviz
 
-[modin]
-modin
+[modin_ray]
+modin[ray]
 
 [pretty_python]
 black
 
 [pretty_sql]
 sqlparse
+
+[ray]
+ray
 
 [yaml]
 PyYAML
