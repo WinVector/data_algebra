@@ -22,6 +22,7 @@ data_algebra/expr.py
 data_algebra/expr_rep.py
 data_algebra/flow_text.py
 data_algebra/near_sql.py
+data_algebra/pandas_base.py
 data_algebra/pandas_model.py
 data_algebra/test_util.py
 data_algebra/util.py

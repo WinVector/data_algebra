@@ -59,7 +59,7 @@ Name                                   Stmts   Miss  Cover
 data_algebra/PostgreSQL.py                19      4    79%
 data_algebra/SQLite.py                    93      6    94%
 data_algebra/SparkSQL.py                  19      4    79%
-data_algebra/__init__.py                   5      0   100%
+data_algebra/__init__.py                   6      0   100%
 data_algebra/arrow.py                    173     39    77%
 data_algebra/cdata.py                    330     92    72%
 data_algebra/cdata_impl.py                10      1    90%
@@ -78,12 +78,13 @@ data_algebra/expr.py                      20      4    80%
 data_algebra/expr_rep.py                 677    211    69%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 140     16    89%
-data_algebra/pandas_model.py             233     37    84%
+data_algebra/pandas_base.py              229     37    84%
+data_algebra/pandas_model.py               4      0   100%
 data_algebra/test_util.py                126     18    86%
 data_algebra/util.py                      28      4    86%
 data_algebra/yaml.py                      95     11    88%
 ----------------------------------------------------------
-TOTAL                                   4137    927    78%
+TOTAL                                   4138    927    78%
 
 
-============================= 89 passed in 11.11s ==============================
+============================== 89 passed in 9.66s ==============================

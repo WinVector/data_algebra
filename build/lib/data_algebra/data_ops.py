@@ -346,7 +346,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         if len(data_map) < 1:
             raise ValueError("Expected data_map to be non-empty")
         if data_model is None:
-            data_model = data_algebra.pandas_model.PandasModel()
+            data_model = data_algebra.default_data_model
         if not isinstance(data_model, data_algebra.data_model.DataModel):
             raise TypeError(
                 "Expected data_model to be derived from data_algebra.data_model.DataModel"
@@ -369,7 +369,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
     # noinspection PyPep8Naming
     def transform(self, X, *, eval_env=None, data_model=None, narrow=True):
         if data_model is None:
-            data_model = data_algebra.pandas_model.PandasModel()
+            data_model = data_algebra.default_data_model
         if not isinstance(data_model, data_algebra.data_model.DataModel):
             raise TypeError(
                 "Expected data_model to be derived from data_algebra.data_model.DataModel"
@@ -730,7 +730,7 @@ class TableDescription(ViewRepresentation):
 
     def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
         if data_model is None:
-            data_model = data_algebra.pandas_model.PandasModel()
+            data_model = data_algebra.default_data_model
         return data_model.table_step(
             op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
         )
@@ -969,7 +969,7 @@ class ExtendNode(ViewRepresentation):
 
     def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
         if data_model is None:
-            data_model = data_algebra.pandas_model.PandasModel()
+            data_model = data_algebra.default_data_model
         return data_model.extend_step(
             op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
         )
@@ -1108,7 +1108,7 @@ class ProjectNode(ViewRepresentation):
 
     def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
         if data_model is None:
-            data_model = data_algebra.pandas_model.PandasModel()
+            data_model = data_algebra.default_data_model
         return data_model.project_step(
             op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
         )
@@ -1182,7 +1182,7 @@ class SelectRowsNode(ViewRepresentation):
 
     def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
         if data_model is None:
-            data_model = data_algebra.pandas_model.PandasModel()
+            data_model = data_algebra.default_data_model
         return data_model.select_rows_step(
             op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
         )
@@ -1260,7 +1260,7 @@ class SelectColumnsNode(ViewRepresentation):
 
     def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
         if data_model is None:
-            data_model = data_algebra.pandas_model.PandasModel()
+            data_model = data_algebra.default_data_model
         return data_model.select_columns_step(
             op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
         )
@@ -1335,7 +1335,7 @@ class DropColumnsNode(ViewRepresentation):
 
     def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
         if data_model is None:
-            data_model = data_algebra.pandas_model.PandasModel()
+            data_model = data_algebra.default_data_model
         return data_model.drop_columns_step(
             op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
         )
@@ -1427,7 +1427,7 @@ class OrderRowsNode(ViewRepresentation):
 
     def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
         if data_model is None:
-            data_model = data_algebra.pandas_model.PandasModel()
+            data_model = data_algebra.default_data_model
         return data_model.order_rows_step(
             op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
         )
@@ -1531,7 +1531,7 @@ class RenameColumnsNode(ViewRepresentation):
 
     def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
         if data_model is None:
-            data_model = data_algebra.pandas_model.PandasModel()
+            data_model = data_algebra.default_data_model
         return data_model.rename_columns_step(
             op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
         )
@@ -1643,7 +1643,7 @@ class NaturalJoinNode(ViewRepresentation):
 
     def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
         if data_model is None:
-            data_model = data_algebra.pandas_model.PandasModel()
+            data_model = data_algebra.default_data_model
         return data_model.natural_join_step(
             op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
         )
@@ -1753,7 +1753,7 @@ class ConcatRowsNode(ViewRepresentation):
 
     def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
         if data_model is None:
-            data_model = data_algebra.pandas_model.PandasModel()
+            data_model = data_algebra.default_data_model
         return data_model.concat_rows_step(
             op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
         )
@@ -1868,7 +1868,7 @@ class ConvertRecordsNode(ViewRepresentation):
 
     def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
         if data_model is None:
-            data_model = data_algebra.pandas_model.PandasModel()
+            data_model = data_algebra.default_data_model
         return data_model.convert_records_step(
             op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
         )
