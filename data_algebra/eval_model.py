@@ -28,6 +28,6 @@ class EvalModel(ABC):
         :param result_name Name for result.
         :param eval_env environment to look for symbols in
         :param narrow logical, if True don't copy unexpected columns
-        :return: tuple: (key, result data frame representation)
+        :return: result name
         """
         raise NotImplementedError("base class called")

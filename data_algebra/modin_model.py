@@ -54,4 +54,4 @@ class ModinModel(data_algebra.eval_model.EvalModel):
             raise ValueError("Can not write over an input table")
         res = ops.eval(data_map, eval_env=eval_env, data_model=self.impl, narrow=narrow)
         data_map[result_name] = res
-        return (result_name, res)
+        return result_name

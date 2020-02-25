@@ -932,7 +932,7 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         res = self.build_rep(result_name)
         if data_map is not None:
             data_map[result_name] = res
-        return (result_name, res)
+        return result_name
 
     def __str__(self):
         return (
