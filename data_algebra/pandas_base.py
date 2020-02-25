@@ -119,6 +119,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                     op_src, local_dict=self.pandas_eval_env, global_dict=eval_env
                 )
         else:
+            # TODO: share grouping outside for-loop
             for (k, opk) in op.ops.items():
                 # work on a slice of the data frame
                 col_list = [c for c in set(op.partition_by)]

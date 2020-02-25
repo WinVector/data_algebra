@@ -201,7 +201,10 @@ def blocks_to_rowrecs(data, *, blocks_in, local_data_model=None):
     )
     dtemp = dtemp.reset_index(drop=True)
     # start building up result frame
-    res = dtemp.groupby(blocks_in.record_keys)["FALSE_AGG_KEY"].agg("sum")
+    if len(blocks_in.record_keys) > 0:
+        res = dtemp.groupby(blocks_in.record_keys)["FALSE_AGG_KEY"].agg("sum")
+    else:
+        res = dtemp.groupby("FALSE_AGG_KEY")["FALSE_AGG_KEY"].agg("sum")
     res = local_data_model.data_frame(res).reset_index(drop=False)
     res.sort_values(by=blocks_in.record_keys, inplace=True)
     res = local_data_model.data_frame(res).reset_index(drop=True)
