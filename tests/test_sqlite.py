@@ -199,8 +199,8 @@ def test_unionall_g2():
 
     assert data_algebra.test_util.equivalent_frames(res_pandas, res_sql, check_row_order=False)
 
-    res_handle = db_handle.eval(ops, data_map=tbl_map)
-    res_db2 = db_handle.to_pandas(res_handle)
+    (res_name, res_handle) = db_handle.eval(ops, data_map=tbl_map)
+    res_db2 = db_handle.to_pandas(res_handle, data_map=tbl_map)
     assert data_algebra.test_util.equivalent_frames(res_pandas, res_db2, check_row_order=False)
 
     conn.close()

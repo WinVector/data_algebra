@@ -1,12 +1,9 @@
 from abc import ABC
 
-import data_algebra.eval_model
 
-
-class DataModel(data_algebra.eval_model.EvalModel, ABC):
+class DataModel(ABC):
     def __init__(self, presentation_model_name):
         self.presentation_model_name = presentation_model_name
-        data_algebra.eval_model.EvalModel.__init__(self)
 
     # helper functions
 

@@ -48,10 +48,10 @@ class ModinModel(data_algebra.eval_model.EvalModel):
         missing_tables = set(tables_needed) - set(data_map.keys())
         if len(missing_tables) > 0:
             raise ValueError("missing required tables: " + str(missing_tables))
-        if result_name is not None:
-            if result_name in tables_needed:
-                raise ValueError("Can not write over an input table")
+        if result_name is None:
+            result_name = self.mk_tmp_name(data_map)
+        if result_name in tables_needed:
+            raise ValueError("Can not write over an input table")
         res = ops.eval(data_map, eval_env=eval_env, data_model=self.impl, narrow=narrow)
-        if result_name is not None:
-            data_map[result_name] = res
-        return res
+        data_map[result_name] = res
+        return (result_name, res)

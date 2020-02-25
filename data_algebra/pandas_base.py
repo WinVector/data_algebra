@@ -369,28 +369,3 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
         return op.record_map.transform(res, local_data_model=self)
-
-    # EvalModel interface
-
-    def to_pandas(self, handle, *, data_map=None):
-        if isinstance(data_map, str):
-            res = data_map[handle]
-        else:
-            res = handle
-        # noinspection PyUnresolvedReferences
-        if not isinstance(res, self.pd.DataFrame):
-            raise TypeError("expected handle to be of type self.pd.DataFrame")
-        return res
-
-    def eval(self, ops, *, data_map=None, result_name=None, eval_env=None, narrow=True):
-        tables_needed = [k for k in ops.get_tables().keys()]
-        missing_tables = set(tables_needed) - set(data_map.keys())
-        if len(missing_tables) > 0:
-            raise ValueError("missing required tables: " + str(missing_tables))
-        if result_name is not None:
-            if result_name in tables_needed:
-                raise ValueError("Can not write over an input table")
-        res = ops.eval(data_map, eval_env=eval_env, data_model=self, narrow=narrow)
-        if result_name is not None:
-            data_map[result_name] = res
-        return res

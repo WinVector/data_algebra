@@ -26,11 +26,11 @@ def test_modin():
 
         data_map = {'d': d}
 
-        res = data_model.eval(ops, data_map=data_map)
+        (res_name, res) = data_model.eval(ops, data_map=data_map)
 
         assert isinstance(res, modin_pandas.DataFrame)
 
-        res_p = data_model.to_pandas(res)
+        res_p = data_model.to_pandas(res, data_map=data_map)
 
         assert isinstance(res_p, data_algebra.default_data_model.pd.DataFrame)
 

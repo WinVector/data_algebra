@@ -852,7 +852,6 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         data_algebra.eval_model.EvalModel.__init__(self)
         self.db_model = db_model
         self.conn = conn
-        self.temp_id = 0
 
     def build_rep(self, table_name, *, row_limit=7):
         head = self.db_model.read_query(
@@ -863,11 +862,6 @@ class DBHandle(data_algebra.eval_model.EvalModel):
             + str(row_limit),
         )
         return TableHandle(table_name=table_name, head=head, limit_was=row_limit)
-
-    def mk_tmp_name(self):
-        new_id = self.temp_id
-        self.temp_id = new_id + 1
-        return "TMP_" + str(new_id).zfill(7) + "_T"
 
     def to_pandas(self, handle, *, data_map=None):
         if isinstance(handle, TableHandle):
@@ -903,7 +897,7 @@ class DBHandle(data_algebra.eval_model.EvalModel):
     def eval(self, ops, *, data_map=None, result_name=None, eval_env=None, narrow=True):
         query = ops.to_sql(self.db_model)
         if result_name is None:
-            result_name = self.mk_tmp_name()
+            result_name = self.mk_tmp_name(data_map)
         tables_needed = [k for k in ops.get_tables().keys()]
         if data_map is not None:
             missing_tables = set(tables_needed) - set(data_map.keys())
@@ -938,7 +932,7 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         res = self.build_rep(result_name)
         if data_map is not None:
             data_map[result_name] = res
-        return res
+        return (result_name, res)
 
     def __str__(self):
         return (

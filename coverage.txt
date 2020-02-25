@@ -66,27 +66,27 @@ data_algebra/cdata.py                    330     92    72%
 data_algebra/cdata_impl.py                10      1    90%
 data_algebra/connected_components.py      49      1    98%
 data_algebra/custom_functions.py          17      2    88%
-data_algebra/data_model.py                42     18    57%
+data_algebra/data_model.py                40     18    55%
 data_algebra/data_ops.py                1164    226    81%
 data_algebra/data_ops_types.py            74     33    55%
 data_algebra/data_ops_utils.py            34      6    82%
 data_algebra/data_pipe.py                189     50    74%
-data_algebra/db_model.py                 488     95    81%
+data_algebra/db_model.py                 483     92    81%
 data_algebra/diagram.py                   56     44    21%
 data_algebra/env.py                       31      3    90%
-data_algebra/eval_model.py                 8      2    75%
+data_algebra/eval_model.py                18      2    89%
 data_algebra/expr.py                      20      4    80%
 data_algebra/expr_rep.py                 677    211    69%
 data_algebra/flow_text.py                 17      0   100%
-data_algebra/modin_model.py               36      8    78%
+data_algebra/modin_model.py               36      6    83%
 data_algebra/near_sql.py                 140     16    89%
-data_algebra/pandas_base.py              229     37    84%
-data_algebra/pandas_model.py               4      0   100%
+data_algebra/pandas_base.py              210     20    90%
+data_algebra/pandas_model.py              25     17    32%
 data_algebra/test_util.py                126     18    86%
 data_algebra/util.py                      28      4    86%
 data_algebra/yaml.py                      95     11    88%
 ----------------------------------------------------------
-TOTAL                                   4174    935    78%
+TOTAL                                   4179    930    78%
 
 
-============================= 90 passed in 21.84s ==============================
+============================= 90 passed in 23.93s ==============================
