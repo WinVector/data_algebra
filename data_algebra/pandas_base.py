@@ -119,32 +119,44 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                     op_src, local_dict=self.pandas_eval_env, global_dict=eval_env
                 )
         else:
-            # TODO: share grouping outside for-loop
+            # build up a sub-frame to work on
+            col_list = [c for c in set(op.partition_by)]
+            col_set = set(col_list)
+            for c in op.order_by:
+                if c not in col_set:
+                    col_list = col_list + [c]
+                    col_set.add(c)
+            order_cols = [c for c in col_list]  # must be partion by followed by order
+            for (k, opk) in op.ops.items():
+                # assumes all args are column names, enforce this earlier
+                if len(opk.args) > 0:
+                    value_name = opk.args[0].to_pandas()
+                    if value_name not in col_set:
+                        col_list = col_list + [value_name]
+                        col_set.add(value_name)
+            ascending = [c not in set(op.reverse) for c in col_list]
+            subframe = res[col_list].reset_index(drop=True)
+            subframe["_data_algebra_orig_index"] = subframe.index
+            if len(order_cols) > 0:
+                subframe = subframe.sort_values(
+                    by=col_list, ascending=ascending
+                ).reset_index(drop=True)
+            subframe[standin_name] = 1
+            if len(op.partition_by) > 0:
+                opframe = subframe.groupby(op.partition_by)
+                #  Groupby preserves the order of rows within each group.
+                # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.groupby.html
+            else:
+                opframe = subframe.groupby([standin_name])
+            # perform calculations
             for (k, opk) in op.ops.items():
                 # work on a slice of the data frame
-                col_list = [c for c in set(op.partition_by)]
-                for c in op.order_by:
-                    if c not in col_list:
-                        col_list = col_list + [c]
                 value_name = None
                 # assumes all args are column names, enforce this earlier
                 if len(opk.args) > 0:
                     value_name = opk.args[0].to_pandas()
                     if value_name not in set(col_list):
                         col_list = col_list + [value_name]
-                ascending = [c not in set(op.reverse) for c in col_list]
-                subframe = res[col_list].reset_index(drop=True)
-                subframe["_data_algebra_orig_index"] = subframe.index
-                subframe = subframe.sort_values(
-                    by=col_list, ascending=ascending
-                ).reset_index(drop=True)
-                subframe[standin_name] = 1
-                if len(op.partition_by) > 0:
-                    opframe = subframe.groupby(op.partition_by)
-                    #  Groupby preserves the order of rows within each group.
-                    # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.groupby.html
-                else:
-                    opframe = subframe.groupby([standin_name])
                 # TODO: document exactly which of these are available
                 if len(opk.args) == 0:
                     if opk.op == "row_number":
@@ -162,9 +174,11 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                     subframe[k] = opframe[value_name].transform(
                         opk.op
                     )  # Pandas transform, not data_algegra
-                subframe = subframe.reset_index(drop=True)
-                subframe = subframe.sort_values(by=["_data_algebra_orig_index"])
-                subframe = subframe.reset_index(drop=True)
+            # copy out results
+            subframe = subframe.reset_index(drop=True)
+            subframe = subframe.sort_values(by=["_data_algebra_orig_index"])
+            subframe = subframe.reset_index(drop=True)
+            for (k, opk) in op.ops.items():
                 res[k] = subframe[k]
         return res
 
