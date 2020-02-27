@@ -9,6 +9,7 @@ import data_algebra.expr_rep
 import data_algebra.util
 import data_algebra.data_ops_types
 import data_algebra.eval_model
+import data_algebra.data_ops
 
 
 # map from op-name to special SQL formatting code
@@ -117,14 +118,14 @@ class DBModel:
     # database helpers
 
     # noinspection SqlNoDataSourceInspection
-    def insert_table(self, conn, d, table_name, *, qualifiers=None):
+    def insert_table(self, conn, d, table_name, *, qualifiers=None, allow_overwrite=False):
         """
 
         :param conn: a database connection
         :param d: a Pandas table
         :param table_name: name to give write to
         :param qualifiers: schema and such
-        :return:
+        :param allow_overwrite logical, if True drop previous table
         """
 
         cr = [
@@ -140,22 +141,43 @@ class DBModel:
         q_table_name = self.build_qualified_table_name(
             table_name, qualifiers=qualifiers
         )
-        create_stmt = "CREATE TABLE " + q_table_name + " ( " + ", ".join(cr) + " )"
         cur = conn.cursor()
-        cur.execute("DROP TABLE IF EXISTS " + q_table_name)
-        conn.commit()
+        # check for table
+        table_exists = True
+        # noinspection PyBroadException
+        try:
+            self.read_query(conn, "SELECT * FROM " + q_table_name + " LIMIT 1")
+        except:
+            table_exists = False
+        if table_exists:
+            if not allow_overwrite:
+                raise ValueError("table " + q_table_name + " already exists")
+            else:
+                cur.execute("DROP TABLE " + q_table_name)
+                conn.commit()
+        create_stmt = "CREATE TABLE " + q_table_name + " ( " + ", ".join(cr) + " )"
         cur.execute(create_stmt)
         conn.commit()
         buf = io.StringIO(d.to_csv(index=False, header=False, sep="\t"))
         cur.copy_from(buf, "d", columns=[c for c in d.columns])
         conn.commit()
 
+    # noinspection PyMethodMayBeStatic
+    def execute(self, conn, q):
+        """
+
+        :param conn: database connection
+        :param q: sql query
+        """
+        cur = conn.cursor()
+        cur.execute(q)
+
     def read_query(self, conn, q):
         """
 
         :param conn: database connection
         :param q: sql query
-        :return:
+        :return: query results as table
         """
         cur = conn.cursor()
         cur.execute(q)
@@ -829,6 +851,9 @@ class TableHandle:
         self.table_name = table_name
         self.head = head
         self.limit_was = limit_was
+        self.op = None
+        if head is not None:
+            self.op = data_algebra.data_ops.describe_table(head, table_name=table_name)
 
     def __str__(self):
         res = "\t" + self.table_name
@@ -871,7 +896,7 @@ class DBHandle(data_algebra.eval_model.EvalModel):
                 "Expect handle to a data_algebra.db_model.TableHandle or str"
             )
         if data_map is not None:
-            if not handle in data_map:
+            if handle not in data_map:
                 return ValueError("Expected handle to be a data_map key " + handle)
             if not isinstance(data_map[handle], TableHandle):
                 raise ValueError(
@@ -890,8 +915,8 @@ class DBHandle(data_algebra.eval_model.EvalModel):
                 )
         return self.db_model.read_table(self.conn, handle)
 
-    def insert_table(self, d, *, table_name):
-        self.db_model.insert_table(conn=self.conn, d=d, table_name=table_name)
+    def insert_table(self, d, *, table_name, allow_overwrite=False):
+        self.db_model.insert_table(conn=self.conn, d=d, table_name=table_name, allow_overwrite=allow_overwrite)
         return self.build_rep(table_name)
 
     def eval(self, ops, *, data_map=None, result_name=None, eval_env=None, narrow=True):

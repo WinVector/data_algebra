@@ -35,7 +35,7 @@ class ModinModel(data_algebra.eval_model.EvalModel):
                                     presentation_model_name='modin')
 
     def to_pandas(self, handle, *, data_map=None):
-        if isinstance(data_map, str):
+        if isinstance(handle, str):
             res = data_map[handle]
         else:
             res = handle
