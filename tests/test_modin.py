@@ -43,6 +43,14 @@ def test_modin():
             })
         assert data_algebra.test_util.equivalent_frames(res_p, expect)
 
+        # check original frame is unchanged
+        start_modin = data_map['d']
+        start_p = data_model.to_pandas(start_modin, data_map=data_map)
+        expect_start = data_algebra.default_data_model.pd.DataFrame({
+            'x': [1, 2],
+            })
+        assert data_algebra.test_util.equivalent_frames(start_p, expect_start)
+
 
 @pytest.mark.filterwarnings("ignore:")
 def test_modin_gcalc():
@@ -74,3 +82,11 @@ def test_modin_gcalc():
             'x_mean': [1.5, 1.5, 4.0, 4.0],
             })
         assert data_algebra.test_util.equivalent_frames(res_p, expect)
+
+        # check original frame is unchanged
+        start_modin = data_map['d']
+        start_p = data_model.to_pandas(start_modin, data_map=data_map)
+        expect_start = data_algebra.default_data_model.pd.DataFrame({
+            'x': [1, 2, 3, 5],
+            'g': ['a', 'a', 'b', 'b']})
+        assert data_algebra.test_util.equivalent_frames(start_p, expect_start)

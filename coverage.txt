@@ -1,5 +1,5 @@
 ============================= test session starts ==============================
-platform darwin -- Python 3.7.6, pytest-5.3.5, py-1.8.1, pluggy-0.13.1
+platform darwin -- Python 3.7.5, pytest-5.2.4, py-1.8.0, pluggy-0.13.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.8.1
 collected 91 items
@@ -54,11 +54,11 @@ tests/test_transform_examples.py ...........                             [ 97%]
 tests/test_window2.py .                                                  [ 98%]
 tests/test_window_fns.py .                                               [100%]
 
----------- coverage: platform darwin, python 3.7.6-final-0 -----------
+---------- coverage: platform darwin, python 3.7.5-final-0 -----------
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
 data_algebra/PostgreSQL.py                19      4    79%
-data_algebra/SQLite.py                    93     13    86%
+data_algebra/SQLite.py                    93      6    94%
 data_algebra/SparkSQL.py                  19      4    79%
 data_algebra/__init__.py                   6      0   100%
 data_algebra/arrow.py                    173     39    77%
@@ -71,8 +71,8 @@ data_algebra/data_ops.py                1164    226    81%
 data_algebra/data_ops_types.py            74     33    55%
 data_algebra/data_ops_utils.py            34      6    82%
 data_algebra/data_pipe.py                189     50    74%
-data_algebra/db_model.py                 483     96    80%
-data_algebra/diagram.py                   56     43    23%
+data_algebra/db_model.py                 483     93    81%
+data_algebra/diagram.py                   56     44    21%
 data_algebra/env.py                       31      3    90%
 data_algebra/eval_model.py                18      2    89%
 data_algebra/expr.py                      20      4    80%
@@ -86,7 +86,7 @@ data_algebra/test_util.py                126     18    86%
 data_algebra/util.py                      28      4    86%
 data_algebra/yaml.py                      95     11    88%
 ----------------------------------------------------------
-TOTAL                                   4192    941    78%
+TOTAL                                   4192    932    78%
 
 
-============================= 91 passed in 14.18s ==============================
+============================= 91 passed in 14.73s ==============================
