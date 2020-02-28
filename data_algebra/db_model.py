@@ -147,7 +147,7 @@ class DBModel:
         # noinspection PyBroadException
         try:
             self.read_query(conn, "SELECT * FROM " + q_table_name + " LIMIT 1")
-        except:
+        except Exception:
             table_exists = False
         if table_exists:
             if not allow_overwrite:
@@ -846,28 +846,6 @@ class DBModel:
         return sql
 
 
-class TableHandle:
-    def __init__(self, table_name, *, head=None, limit_was=None):
-        self.table_name = table_name
-        self.head = head
-        self.limit_was = limit_was
-        self.op = None
-        if head is not None:
-            self.op = data_algebra.data_ops.describe_table(head, table_name=table_name)
-
-    def __str__(self):
-        res = "\t" + self.table_name
-        if self.head is not None:
-            res = res + "\n" + str(self.head)
-            if (self.limit_was is not None) and (self.head.shape[0] >= self.limit_was):
-                res = res + "\n..."
-        res = res + "\n"
-        return res
-
-    def __repr__(self):
-        return self.__str__()
-
-
 class DBHandle(data_algebra.eval_model.EvalModel):
     def __init__(self, db_model, conn):
         if not isinstance(db_model, DBModel):
@@ -886,23 +864,27 @@ class DBHandle(data_algebra.eval_model.EvalModel):
             + " LIMIT "
             + str(row_limit),
         )
-        return TableHandle(table_name=table_name, head=head, limit_was=row_limit)
+        return data_algebra.data_ops.TableDescription(
+            column_names=head.columns,
+            table_name=table_name,
+            head=head,
+            limit_was=row_limit)
 
     def to_pandas(self, handle, *, data_map=None):
-        if isinstance(handle, TableHandle):
+        if isinstance(handle, data_algebra.data_ops.TableDescription):
             handle = handle.table_name
         if not isinstance(handle, str):
             raise TypeError(
-                "Expect handle to a data_algebra.db_model.TableHandle or str"
+                "Expect handle to be a data_algebra.data_ops.TableDescription or str"
             )
         if data_map is not None:
             if handle not in data_map:
                 return ValueError("Expected handle to be a data_map key " + handle)
-            if not isinstance(data_map[handle], TableHandle):
+            if not isinstance(data_map[handle], data_algebra.data_ops.TableDescription):
                 raise ValueError(
                     "Expect data_map["
                     + handle
-                    + "] to be class data_algebra.db_model.TableHandle"
+                    + "] to be class data_algebra.data_ops.TableDescription"
                 )
             if data_map[handle].table_name != handle:
                 raise ValueError(
@@ -929,11 +911,11 @@ class DBHandle(data_algebra.eval_model.EvalModel):
             if len(missing_tables) > 0:
                 raise ValueError("missing required tables: " + str(missing_tables))
             for k in tables_needed:
-                if not isinstance(data_map[k], TableHandle):
+                if not isinstance(data_map[k], data_algebra.data_ops.TableDescription):
                     raise ValueError(
                         "Expect data_map["
                         + k
-                        + "] to be class data_algebra.db_model.TableHandle"
+                        + "] to be class data_algebra.data_ops.TableDescription"
                     )
                 if data_map[k].table_name != k:
                     raise ValueError(

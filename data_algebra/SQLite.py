@@ -148,10 +148,10 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         cur = conn.cursor()
         # check for table
         table_exists = True
+        # noinspection PyBroadException
         try:
             self.read_query(conn, "SELECT * FROM " + table_name + " LIMIT 1")
-        # noinspection PyBroadException
-        except:
+        except Exception:
             table_exists = False
         if table_exists:
             if not allow_overwrite:

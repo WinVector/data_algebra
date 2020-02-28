@@ -615,7 +615,10 @@ class TableDescription(ViewRepresentation):
     qualifiers: Dict[str, str]
     key: str
 
-    def __init__(self, table_name, column_names, *, qualifiers=None, column_types=None):
+    def __init__(self, table_name, column_names,
+                 *,
+                 qualifiers=None, column_types=None,
+                 head=None, limit_was=None):
         ViewRepresentation.__init__(
             self, column_names=column_names, node_name="TableDescription"
         )
@@ -623,6 +626,11 @@ class TableDescription(ViewRepresentation):
             table_name = ""
         if (table_name is not None) and (not isinstance(table_name, str)):
             raise TypeError("table_name must be a string")
+        if head is not None:
+            if set([c for c in head.columns]) != set(column_names):
+                raise ValueError("head.columns != column_names")
+        self.head = head
+        self.limit_was = limit_was
         self.table_name = table_name
         if isinstance(column_names, str):
             column_names = [column_names]
@@ -743,6 +751,12 @@ class TableDescription(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
+    def __str__(self):
+        rep = ViewRepresentation.__str__(self)
+        if self.head is not None:
+            rep = rep + "\n#\t" + str(self.head).replace("\n", "\n#\t")
+        return rep
+
     # comparable to other table descriptions
     def __lt__(self, other):
         if not isinstance(other, TableDescription):
@@ -764,8 +778,15 @@ def describe_table(d, table_name="data_frame", *, qualifiers=None, column_types=
     if column_types is None:
         if d.shape[0] > 0:
             column_types = {k: type(d.loc[0, k]) for k in column_names}
+    limit_was = 6
+    if d.shape[0] > limit_was:
+        head = d.iloc[range(limit_was), :]
+    else:
+        head = d.copy()
+    head = head.reset_index(drop=True, inplace=False)
     return TableDescription(
-        table_name, column_names, column_types=column_types, qualifiers=qualifiers
+        table_name, column_names, column_types=column_types, qualifiers=qualifiers,
+        head=head, limit_was=limit_was
     )
 
 

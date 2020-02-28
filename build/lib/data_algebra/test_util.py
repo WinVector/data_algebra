@@ -21,9 +21,9 @@ def formats_to_self(ops):
     :param ops: data_algebra.data_ops.ViewRepresentation
     :return: logical, True if formats and evals back to self
     """
-    str1 = str(ops)
+    str1 = repr(ops)
     ops2 = eval(str1)
-    str2 = str(ops2)
+    str2 = repr(ops2)
     return str1 == str2
 
 

@@ -23,7 +23,7 @@ def test_apply():
     )
 
     ops0 = (
-        TableDescription("t1", ["x", "y"]).extend({"z": "x / y"}).select_rows("z >= 0")
+        describe_table(d, table_name='t1').extend({"z": "x / y"}).select_rows("z >= 0")
     )
 
     res_0_0 = ops0.eval(data_map={"t1": d})
