@@ -928,13 +928,20 @@ class DBHandle(data_algebra.eval_model.EvalModel):
                     )
         if result_name in tables_needed:
             raise ValueError("Can not write over an input table")
+        q_table_name = self.db_model.quote_table_name(result_name)
+        drop_query = "DROP TABLE " + q_table_name
         create_query = (
             "CREATE TABLE "
-            + self.db_model.quote_table_name(result_name)
+            + q_table_name
             + " AS "
             + query
         )
         cur = self.conn.cursor()
+        # noinspection PyBroadException
+        try:
+            cur.execute(drop_query)
+        except Exception:
+            pass
         cur.execute(create_query)
         res = self.build_rep(result_name)
         if data_map is not None:
