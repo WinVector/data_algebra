@@ -88,8 +88,10 @@ class ViewRepresentation(OperatorPlatform, ABC):
             if not isinstance(si, ViewRepresentation):
                 raise ValueError("all sources must be of class ViewRepresentation")
         self.sources = [si for si in sources]
-        self.columns_currently_used = set()
         OperatorPlatform.__init__(self, node_name=node_name)
+
+    def merged_rep_id(self):
+        return "node+ " + str(id(self))
 
     # adaptors
 
@@ -103,25 +105,18 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     # characterization
 
-    def get_tables(self, *, replacements=None):
+    def get_tables(self):
         """Get a dictionary of all tables used in an operator DAG,
         raise an exception if the values are not consistent."""
         tables = {}
         for i in range(len(self.sources)):
             s = self.sources[i]
-            if isinstance(s, TableDescription):
-                if replacements is not None and s.key in replacements:
-                    orig_table = replacements[s.key]
-                    if s.column_set != orig_table.column_set:
-                        raise ValueError(
-                            "table " + s.key + " has two incompatible definitions"
-                        )
-                    self.sources[i] = orig_table
-                    s = orig_table
-            ti = s.get_tables(replacements=replacements)
+            ti = s.get_tables()
             for (k, v) in ti.items():
+                if not isinstance(v, TableDescription):
+                    raise TypeError("Expected v to be data_algebra.data_ops.TableDescription")
                 if k in tables.keys():
-                    if not tables[k] is v:
+                    if not v.same_table(tables[k]):
                         raise ValueError(
                             "Table " + k + " has two different representation objects"
                         )
@@ -137,34 +132,36 @@ class ViewRepresentation(OperatorPlatform, ABC):
     def columns_produced(self):
         return self.column_names.copy()
 
-    def _clear_columns_currently_used(self):
-        self.columns_currently_used = set()
-        for si in self.sources:
-            si._clear_columns_currently_used()
-
-    def _columns_used_implementation(self, *, using=None):
+    def _columns_used_implementation(self, *, using, columns_currenty_using_records):
+        self_merged_rep_id = self.merged_rep_id()
+        try:
+            crec = columns_currenty_using_records[self_merged_rep_id]
+        except KeyError:
+            crec = set()
+            columns_currenty_using_records[self_merged_rep_id] = crec
         if using is None:
-            self.columns_currently_used.update(self.column_names)
+            crec.update(self.column_names)
         else:
             unknown = set(using) - set(self.column_names)
             if len(unknown) > 0:
                 raise ValueError("asked for unknown columns: " + str(unknown))
-            self.columns_currently_used.update(using)
-        cu_list = self.columns_used_from_sources(self.columns_currently_used.copy())
+            crec.update(using)
+        cu_list = self.columns_used_from_sources(crec.copy())
         for i in range(len(self.sources)):
-            self.sources[i]._columns_used_implementation(using=cu_list[i])
+            self.sources[i]._columns_used_implementation(using=cu_list[i],
+                                                         columns_currenty_using_records=columns_currenty_using_records)
 
     def columns_used(self, *, using=None):
-        """Determine which columns are used from source tables.
-        Sets nodes' columns_currently_used values as a side-effect."""
-        self._clear_columns_currently_used()
-        self._columns_used_implementation(using=using)
+        """Determine which columns are used from source tables."""
+
         tables = self.get_tables()
-        # columns_used = {k: v.columns_currently_used.copy() for (k, v) in tables.items()}
+        columns_currenty_using_records = {v.merged_rep_id(): set() for v in tables.values()}
+        self._columns_used_implementation(using=using,
+                                          columns_currenty_using_records=columns_currenty_using_records)
         columns_used = dict()
         for k in tables.keys():
             ti = tables[k]
-            vi = ti.columns_currently_used
+            vi = columns_currenty_using_records[ti.merged_rep_id()]
             columns_used[k] = vi.copy()
         return columns_used
 
@@ -655,6 +652,23 @@ class TableDescription(ViewRepresentation):
             key = key + self.table_name
         self.key = key
 
+    def same_table(self, other):
+        if not isinstance(other, data_algebra.data_ops.TableDescription):
+            return False
+        if self.table_name != other.table_name:
+            return False
+        if self.key != other.key:
+            return False
+        if self.column_names != other.column_names:
+            return False
+        if self.qualifiers != other.qualifiers:
+            return False
+        # ignore head and limit_was, as they are just advisory
+        return True
+
+    def merged_rep_id(self):
+        return "table_" + str(self.key)
+
     def forbidden_columns(self, *, forbidden=None):
         if forbidden is None:
             forbidden = set()
@@ -729,11 +743,9 @@ class TableDescription(ViewRepresentation):
         s = s + ")"
         return s
 
-    def get_tables(self, *, replacements=None):
+    def get_tables(self):
         """get a dictionary of all tables used in an operator DAG,
         raise an exception if the values are not consistent"""
-        if replacements is not None and self.key in replacements.keys():
-            return {self.key: replacements[self.key]}
         return {self.key: self}
 
     def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
@@ -1565,10 +1577,10 @@ class NaturalJoinNode(ViewRepresentation):
     def __init__(self, a, b, *, by=None, jointype="INNER"):
         # check set of tables is consistent in both sub-dags
         a_tables = a.get_tables()
-        b_tables = b.get_tables(replacements=a_tables)
+        b_tables = b.get_tables()
         common_keys = set(a_tables.keys()).intersection(b_tables.keys())
         for k in common_keys:
-            if a_tables[k] is not b_tables[k]:
+            if not a_tables[k].same_table(b_tables[k]):
                 raise ValueError(
                     "Different definition of table object on a/b for: " + k
                 )
@@ -1676,10 +1688,10 @@ class ConcatRowsNode(ViewRepresentation):
     def __init__(self, a, b, *, id_column="table_name", a_name="a", b_name="b"):
         # check set of tables is consistent in both sub-dags
         a_tables = a.get_tables()
-        b_tables = b.get_tables(replacements=a_tables)
+        b_tables = b.get_tables()
         common_keys = set(a_tables.keys()).intersection(b_tables.keys())
         for k in common_keys:
-            if a_tables[k] is not b_tables[k]:
+            if not a_tables[k].same_table(b_tables[k]):
                 raise ValueError(
                     "Different definition of table object on a/b for: " + k
                 )
