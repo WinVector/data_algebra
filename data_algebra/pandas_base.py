@@ -112,10 +112,22 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         standin_name = "_data_algebra_temp_g"  # name of an arbitrary input variable
         if not window_situation:
             for (k, opk) in op.ops.items():
-                op_src = opk.to_pandas()
-                res[k] = res.eval(
-                    op_src, local_dict=self.pandas_eval_env, global_dict=eval_env
-                )
+                if isinstance(opk, data_algebra.expr_rep.FnTerm):
+                    # res[k] = opk.value(*[res[nm.column_name] for nm in opk.args])
+                    pe = self.pandas_eval_env.copy()
+                    pe[opk.name] = opk.value
+                    op_src = ('@' + opk.name
+                              + '('
+                              + ', '.join([nm.column_name for nm in opk.args])
+                              + ')')
+                    res[k] = res.eval(
+                        op_src, local_dict=pe, global_dict=eval_env
+                    )
+                else:
+                    op_src = opk.to_pandas()
+                    res[k] = res.eval(
+                        op_src, local_dict=self.pandas_eval_env, global_dict=eval_env
+                    )
         else:
             # build up a sub-frame to work on
             col_list = [c for c in set(op.partition_by)]

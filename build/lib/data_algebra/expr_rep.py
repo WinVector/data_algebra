@@ -690,16 +690,10 @@ class Value(Term):
         return self.value.__repr__()
 
 
-class Name(str):
+class UnQuotedStr(str):
     def __init__(self, v):
         self.v = v
         str.__init__(v)
-
-    def is_equal(self, other):
-        # can't use == as that builds a larger expression
-        if not isinstance(other, Name):
-            return False
-        return self.v == other.v
 
     def str(self):
         return self.v
@@ -709,22 +703,29 @@ class Name(str):
 
 
 class FnTerm(Term):
-    def __init__(self, value, fn_arg=None, display_form=None, op=None):
+    # represent a function of columns
+    def __init__(self, value, fn_args=None, name=None, display_form=None, op=None):
         if not callable(value):
             raise TypeError("value type must be callable")
         self.value = value
+        if name is None:
+            name = value.__name__
+        self.name = name
         if display_form is None:
             display_form = value.__name__
         if op is None:
             op = value.__name__
         self.display_form = display_form
         self.op = op
-        if fn_arg is None:
+        if fn_args is None:
             self.args = []
         else:
-            if not isinstance(fn_arg, ColumnReference):
-                raise TypeError("Expected fn_arg to be None or a ColumnReference")
-            self.args = [fn_arg]
+            if isinstance(fn_args, ColumnReference):
+                fn_args = [fn_args]
+            for v in fn_args:
+                if not isinstance(v, ColumnReference):
+                    raise TypeError("Expected fn_args to be None or all ColumnReference")
+            self.args = fn_args
         Term.__init__(self)
 
     def is_equal(self, other):
@@ -749,7 +750,7 @@ class FnTerm(Term):
         return self
 
     def to_python(self, *, want_inline_parens=False):
-        return Name(self.display_form)
+        return UnQuotedStr(self.display_form)
 
 
 class ListTerm(Term):
@@ -1068,7 +1069,7 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
         if not isinstance(v, Term):
             if callable(v):
                 # k = f(k) implicit form
-                v = FnTerm(v, fn_arg=ColumnReference(view=view, column_name=k))
+                v = FnTerm(v, fn_args=[ColumnReference(view=view, column_name=k)])
             else:
                 v = _parse_by_eval(
                     source_str=v, data_def=mp, outter_environemnt=parse_env

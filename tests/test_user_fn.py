@@ -63,7 +63,6 @@ def test_user_fn_2():
                     -0.8303896031810106, 0.5966033407000854],
     })
 
-
     # https://github.com/WinVector/data_algebra/blob/master/Examples/cdata/ranking_pivot_example.md
     class Container:
         def __init__(self, value):
@@ -84,6 +83,9 @@ def test_user_fn_2():
 
     def sorted_concat(vals):
         return Container(sorted([vi for vi in set(vals)]))
+
+    def combine_containers(lcv, rcv):
+        return [lft.update(rgt) for lft, rgt in zip(lcv, rcv)]
 
     nrow = d_original.shape[0]
     ncol = d_original.shape[1]
@@ -113,12 +115,11 @@ def test_user_fn_2():
             b=describe_table(pairsj, table_name='pairsj'). \
                 rename_columns({'c_right': 'complement'}),
             jointype='left',
-            by=['idx'])
+            by=['idx']). \
+            extend({'complement': user_fn(combine_containers,
+                                          ['complement', 'c_right'])}). \
+            drop_columns('c_right')
         pairs = ops_join.eval({'pairs': pairs, 'pairsj': pairsj})
-        pairs['complement'] = [lft.update(rgt) for lft, rgt in
-                               zip(pairs['complement'],
-                                   pairs['c_right'])]
-        del pairs['c_right']
 
     expect_pairs = data_algebra.default_data_model.pd.DataFrame({
         'idx': range(10),
