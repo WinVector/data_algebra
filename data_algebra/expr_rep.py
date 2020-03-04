@@ -181,12 +181,6 @@ class Term:
     def __rmul__(self, other):
         return self.__rop_expr__("*", other)
 
-    def __matmul__(self, other):
-        return self.__op_expr__("@", other)
-
-    def __rmatmul__(self, other):
-        return self.__rop_expr__("@", other)
-
     def __truediv__(self, other):
         return self.__op_expr__("/", other)
 
@@ -260,7 +254,7 @@ class Term:
         return self.__uop_expr__("invert")
 
     def __round__(self, ndigits=None):
-        return self.__uop_expr__("neg", params={"ndigits": ndigits})
+        return self.__uop_expr__("round", params={"ndigits": ndigits})
 
     def __trunc__(self):
         return self.__uop_expr__("trunc")

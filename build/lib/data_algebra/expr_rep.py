@@ -181,12 +181,6 @@ class Term:
     def __rmul__(self, other):
         return self.__rop_expr__("*", other)
 
-    def __matmul__(self, other):
-        return self.__op_expr__("@", other)
-
-    def __rmatmul__(self, other):
-        return self.__rop_expr__("@", other)
-
     def __truediv__(self, other):
         return self.__op_expr__("/", other)
 
@@ -247,45 +241,6 @@ class Term:
     def __ror__(self, other):
         return self.__rop_expr__("or", other)
 
-    def __iadd__(self, other):
-        raise RuntimeError("unsuppoted method called")
-
-    def __isub__(self, other):
-        raise RuntimeError("unsuppoted method called")
-
-    def __imul__(self, other):
-        raise RuntimeError("unsuppoted method called")
-
-    def __imatmul__(self, other):
-        raise RuntimeError("unsuppoted method called")
-
-    def __itruediv__(self, other):
-        raise RuntimeError("unsuppoted method called")
-
-    def __ifloordiv__(self, other):
-        raise RuntimeError("unsuppoted method called")
-
-    def __imod__(self, other):
-        raise RuntimeError("unsuppoted method called")
-
-    def __ipow__(self, other, modulo=None):
-        raise RuntimeError("unsuppoted method called")
-
-    def __ilshift__(self, other):
-        raise RuntimeError("unsuppoted method called")
-
-    def __irshift__(self, other):
-        raise RuntimeError("unsuppoted method called")
-
-    def __iand__(self, other):
-        raise RuntimeError("unsuppoted method called")
-
-    def __ixor__(self, other):
-        raise RuntimeError("unsuppoted method called")
-
-    def __ior__(self, other):
-        raise RuntimeError("unsuppoted method called")
-
     def __neg__(self):
         return self.__uop_expr__("neg")
 
@@ -298,20 +253,8 @@ class Term:
     def __invert__(self):
         return self.__uop_expr__("invert")
 
-    def __complex__(self):
-        raise RuntimeError("unsuppoted method called")
-
-    def __int__(self):
-        raise RuntimeError("unsuppoted method called")
-
-    def __float__(self):
-        raise RuntimeError("unsuppoted method called")
-
-    def __index__(self):
-        raise RuntimeError("unsuppoted method called")
-
     def __round__(self, ndigits=None):
-        return self.__uop_expr__("neg", params={"ndigits": ndigits})
+        return self.__uop_expr__("round", params={"ndigits": ndigits})
 
     def __trunc__(self):
         return self.__uop_expr__("trunc")
