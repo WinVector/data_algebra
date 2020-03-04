@@ -136,6 +136,17 @@ def test_cdata_block():
 
     assert data_algebra.test_util.equivalent_frames(data, back)
 
+    ex_inp = record_map.example_input()
+    e_f = record_map.transform(ex_inp)
+    ex_inp_inv = inv.example_input()
+    e_r = inv.transform(ex_inp_inv)
+    assert data_algebra.test_util.equivalent_frames(ex_inp_inv, e_f)
+    assert data_algebra.test_util.equivalent_frames(ex_inp, e_r)
+    id_f = record_map.compose(inv).transform(ex_inp_inv)
+    assert data_algebra.test_util.equivalent_frames(id_f, ex_inp_inv)
+    id_r = inv.compose(record_map).transform(ex_inp)
+    assert data_algebra.test_util.equivalent_frames(id_r, ex_inp)
+
 
 def test_cdata_missing():
     data = data_algebra.default_data_model.pd.DataFrame(

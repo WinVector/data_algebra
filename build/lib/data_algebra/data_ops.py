@@ -226,14 +226,15 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def _equiv_nodes(self, other):
-        """Check if immediate node structure is equivalent, assumes non
-        recursive __eq__ checks are TRUE"""
-        return True
+        """Check if immediate node structure is equivalent, does not check child nodes"""
+        raise NotImplementedError("base method called")
 
     def __eq__(self, other):
         if not isinstance(other, ViewRepresentation):
             return False
         if not type(self) is type(other):
+            return False
+        if not type(other) is type(self):
             return False
         if self.node_name != other.node_name:
             return False
@@ -688,6 +689,8 @@ class TableDescription(ViewRepresentation):
         return r
 
     def _equiv_nodes(self, other):
+        if not isinstance(other, TableDescription):
+            return False
         if not self.table_name == other.table_name:
             return False
         if not self.column_names == other.column_names:
@@ -912,6 +915,8 @@ class ExtendNode(ViewRepresentation):
         )
 
     def _equiv_nodes(self, other):
+        if not isinstance(other, ExtendNode):
+            return False
         if not self.windowed_situation == other.windowed_situation:
             return False
         if not self.partition_by == other.partition_by:
@@ -920,8 +925,11 @@ class ExtendNode(ViewRepresentation):
             return False
         if not self.reverse == other.reverse:
             return False
-        if not self.ops == other.ops:
+        if set(self.ops.keys()) != set(other.ops.keys()):
             return False
+        for k in self.ops.keys():
+            if not self.ops[k].is_equal(other.ops[k]):
+                return False
         return True
 
     def check_extend_window_fns(self):
@@ -1009,6 +1017,7 @@ class ExtendNode(ViewRepresentation):
 
 
 class ProjectNode(ViewRepresentation):
+    # TODO: should project to take an optional order for last() style calculations?
     def __init__(self, *, source, parsed_ops, group_by=None):
         self.ops = parsed_ops
         if group_by is None:
@@ -1082,10 +1091,15 @@ class ProjectNode(ViewRepresentation):
         )
 
     def _equiv_nodes(self, other):
+        if not isinstance(other, ProjectNode):
+            return False
         if not self.group_by == other.group_by:
             return False
-        if not self.ops == other.ops:
+        if set(self.ops.keys()) != set(other.ops.keys()):
             return False
+        for k in self.ops.keys():
+            if not self.ops[k].is_equal(other.ops[k]):
+                return False
         return True
 
     def columns_used_from_sources(self, using=None):
@@ -1154,6 +1168,8 @@ class SelectRowsNode(ViewRepresentation):
     def __init__(self, source, ops):
         if len(ops) < 1:
             raise ValueError("no ops")
+        if len(ops) > 1:
+            raise ValueError("too many ops")
         self.ops = ops
         self.expr = ops["expr"]
         self.decision_columns = set()
@@ -1172,9 +1188,11 @@ class SelectRowsNode(ViewRepresentation):
         return new_sources[0].select_rows_parsed(parsed_ops=self.ops)
 
     def _equiv_nodes(self, other):
-        if not self.expr == other.expr:
+        if not isinstance(other, SelectRowsNode):
             return False
-        if not self.decision_columns == other.decision_columns:
+        if not self.expr.is_equal(other.expr):
+            return False
+        if len(self.ops) != len(other.ops):
             return False
         return True
 
@@ -1254,6 +1272,8 @@ class SelectColumnsNode(ViewRepresentation):
         return new_sources[0].select_columns(columns=self.column_selection)
 
     def _equiv_nodes(self, other):
+        if not isinstance(other, SelectColumnsNode):
+            return False
         if not self.column_selection == other.column_selection:
             return False
         return True
@@ -1330,6 +1350,8 @@ class DropColumnsNode(ViewRepresentation):
         return new_sources[0].drop_columns(column_deletions=self.column_deletions)
 
     def _equiv_nodes(self, other):
+        if not isinstance(other, DropColumnsNode):
+            return False
         if not self.column_deletions == other.column_deletions:
             return False
         return True
@@ -1411,6 +1433,8 @@ class OrderRowsNode(ViewRepresentation):
         )
 
     def _equiv_nodes(self, other):
+        if not isinstance(other, OrderRowsNode):
+            return False
         if not self.order_columns == other.order_columns:
             return False
         if not self.reverse == other.reverse:
@@ -1524,6 +1548,8 @@ class RenameColumnsNode(ViewRepresentation):
         return new_sources[0].rename_columns(column_remapping=self.column_remapping)
 
     def _equiv_nodes(self, other):
+        if not isinstance(other, RenameColumnsNode):
+            return False
         if not self.column_remapping == other.column_remapping:
             return False
         return True
@@ -1620,6 +1646,8 @@ class NaturalJoinNode(ViewRepresentation):
         )
 
     def _equiv_nodes(self, other):
+        if not isinstance(other, NaturalJoinNode):
+            return False
         if not self.by == other.by:
             return False
         if not self.jointype == other.jointype:
@@ -1724,6 +1752,8 @@ class ConcatRowsNode(ViewRepresentation):
         )
 
     def _equiv_nodes(self, other):
+        if not isinstance(other, ConcatRowsNode):
+            return False
         if not self.id_column == other.id_column:
             return False
         if not self.a_name == other.a_name:
@@ -1823,6 +1853,8 @@ class ConvertRecordsNode(ViewRepresentation):
         return new_sources[0].convert_records(record_map=self.record_map)
 
     def _equiv_nodes(self, other):
+        if not isinstance(other, ConvertRecordsNode):
+            return False
         if not self.record_map == other.record_map:
             return False
         return True

@@ -62,6 +62,12 @@ class Term:
     def __init__(self,):
         self.source_string = None
 
+    def is_equal(self, other):
+        # can't use == as that builds a larger expression
+        if not isinstance(other, Term):
+            return False
+        return self.source_string == other.source_string
+
     # builders
 
     def __op_expr__(self, op, other, *, inline=True, method=False):
@@ -671,6 +677,12 @@ class Value(Term):
         self.value = value
         Term.__init__(self)
 
+    def is_equal(self, other):
+        # can't use == as that builds a larger expression
+        if not isinstance(other, Value):
+            return False
+        return self.value == other.value
+
     def replace_view(self, view):
         return self
 
@@ -682,6 +694,12 @@ class Name(str):
     def __init__(self, v):
         self.v = v
         str.__init__(v)
+
+    def is_equal(self, other):
+        # can't use == as that builds a larger expression
+        if not isinstance(other, Name):
+            return False
+        return self.v == other.v
 
     def str(self):
         return self.v
@@ -709,6 +727,19 @@ class FnTerm(Term):
             self.args = [fn_arg]
         Term.__init__(self)
 
+    def is_equal(self, other):
+        # can't use == as that builds a larger expression
+        if not isinstance(other, FnTerm):
+            return False
+        if self.display_form != other.display_form:
+            return False
+        if len(self.args) != len(other.args):
+            return False
+        for li, ri in zip(self.args, other.args):
+            if not li.is_equal(ri):
+                return False
+        return True
+
     def get_column_names(self, columns_seen):
         for vi in self.args:
             columns_seen.add(str(vi))
@@ -727,6 +758,12 @@ class ListTerm(Term):
             raise TypeError("value type must be a list")
         self.value = value
         Term.__init__(self)
+
+    def is_equal(self, other):
+        # can't use == as that builds a larger expression
+        if not isinstance(other, ListTerm):
+            return False
+        return self.value == other.value
 
     def replace_view(self, view):
         new_list = [ai.replace_view(view) for ai in self.value]
@@ -787,6 +824,14 @@ class ColumnReference(Term):
                 raise KeyError("column_name must be a column of the given view")
         Term.__init__(self)
 
+    def is_equal(self, other):
+        # can't use == as that builds a larger expression
+        if not isinstance(other, ColumnReference):
+            return False
+        if self.view != other.view:
+            return False
+        return self.column_name == other.column_name
+
     def replace_view(self, view):
         return ColumnReference(view=view, column_name=self.column_name)
 
@@ -821,6 +866,30 @@ class Expression(Term):
         self.inline = inline
         self.method = method
         Term.__init__(self)
+
+    def is_equal(self, other):
+        # can't use == as that builds a larger expression
+        if not isinstance(other, Expression):
+            return False
+        if self.op != other.op:
+            return False
+        if self.inline != other.inline:
+            return False
+        if self.params is None:
+            if not other.params is None:
+                return False
+        else:
+            if set(self.params.keys()) != set(other.params.keys()):
+                return False
+            for k in self.params.keys():
+                if self.params[k] != other.params[k]:
+                    return False
+        if len(self.args) != len(other.args):
+            return False
+        for lft, rgt in zip(self.args, other.args):
+            if not lft.is_equal(rgt):
+                return False
+        return True
 
     def replace_view(self, view):
         new_args = [oi.replace_view(view) for oi in self.args]
