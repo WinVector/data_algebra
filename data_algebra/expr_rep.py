@@ -850,9 +850,7 @@ class Expression(Term):
         return self.op + "(" + ", ".join(subs) + ")"
 
     def to_pandas(self, *, want_inline_parens=False):
-        cfmap = data_algebra.custom_functions.make_custom_function_map(
-            data_algebra.default_data_model.pd
-        )
+        cfmap = data_algebra.default_data_model.custom_function_map
         if self.op in cfmap.keys():
             return cfmap[self.op].pandas_formatter(self)
         if len(self.args) <= 0:

@@ -7,6 +7,9 @@ import data_algebra.test_util
 import data_algebra.db_model
 import data_algebra.SQLite
 
+
+# simple direct tests of basic expressions
+
 def test_ops():
     d = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, 3, 4],
@@ -24,13 +27,16 @@ def test_ops():
     db_handle = data_algebra.db_model.DBHandle(sql_model, conn)
     tbl_map = {'d': db_handle.insert_table(d, table_name='d')}
 
-    def check_ops(ops, expect):
+    def check_ops(ops, expect=None, *, test_sql=True):
         res_pandas = ops.transform(d)
         if expect is not None:
             assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
-        query = ops.to_sql(sql_model)
-        res_db = sql_model.read_query(conn, query)
-        assert data_algebra.test_util.equivalent_frames(res_db, res_pandas)
+        if test_sql:
+            query = ops.to_sql(sql_model)
+            res_db = sql_model.read_query(conn, query)
+            assert data_algebra.test_util.equivalent_frames(res_db, res_pandas)
+            if expect is not None:
+                assert data_algebra.test_util.equivalent_frames(res_db, expect)
         assert data_algebra.test_util.equivalent_frames(d, d_orig)
 
     ops = td. \
