@@ -565,6 +565,9 @@ class Term:
     def square(self):
         return self.__uop_expr__("square")
 
+    def abs(self):
+        return self.__uop_expr__("abs")
+
     def absolute(self):
         return self.__uop_expr__("absolute")
 
