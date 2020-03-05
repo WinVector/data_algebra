@@ -264,8 +264,8 @@ class DBModel:
         return str(v)
 
     def expr_to_sql(self, expression, *, want_inline_parens=False):
-        if not isinstance(expression, data_algebra.expr_rep.Term):
-            raise TypeError("expression should be of class data_algebra.table_rep.Term")
+        if not isinstance(expression, data_algebra.expr_rep.PreTerm):
+            raise TypeError("expression should be of class data_algebra.table_rep.PreTerm")
         if isinstance(expression, data_algebra.expr_rep.Value):
             return self.value_to_sql(expression.value)
         if isinstance(expression, data_algebra.expr_rep.ColumnReference):

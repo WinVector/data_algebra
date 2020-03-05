@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import Union
 import collections
 
@@ -53,54 +54,16 @@ fn_names_that_imply_windowed_situation = {
 }
 
 
-class Term:
-    """Inherit from this class to capture expressions.
-    Abstract class, should be extended for use."""
-
+class PreTerm(ABC):
+    # abstract base class, without combination ability
     source_string: Union[str, None]
 
-    def __init__(self,):
+    def __init__(self):
         self.source_string = None
 
     def is_equal(self, other):
         # can't use == as that builds a larger expression
-        if not isinstance(other, Term):
-            return False
-        return self.source_string == other.source_string
-
-    # builders
-
-    def __op_expr__(self, op, other, *, inline=True, method=False):
-        """binary expression"""
-        if not isinstance(op, str):
-            raise TypeError("op is supposed to be a string")
-        if not isinstance(other, Term):
-            other = _enc_value(other)
-        return Expression(op, (self, other), inline=inline, method=method)
-
-    def __rop_expr__(self, op, other):
-        """reversed binary expression"""
-        if not isinstance(op, str):
-            raise TypeError("op is supposed to be a string")
-        if not isinstance(other, Term):
-            other = _enc_value(other)
-        return Expression(op, (other, self), inline=True)
-
-    def __uop_expr__(self, op, *, params=None):
-        """unary expression"""
-        if not isinstance(op, str):
-            raise TypeError("op is supposed to be a string")
-        return Expression(op, (self,), params=params)
-
-    def __triop_expr__(self, op, x, y, inline=False, method=False):
-        """three argument expression"""
-        if not isinstance(op, str):
-            raise TypeError("op is supposed to be a string")
-        if not isinstance(x, Term):
-            x = _enc_value(x)
-        if not isinstance(y, Term):
-            y = _enc_value(y)
-        return Expression(op, (self, x, y), inline=inline, method=method)
+        raise NotImplementedError("base method called")
 
     # tree re-write
 
@@ -146,6 +109,48 @@ class Term:
 
     def __str__(self):
         return self.to_python(want_inline_parens=False)
+
+
+class Term(PreTerm, ABC):
+    """Inherit from this class to capture expressions.
+    Abstract class, should be extended for use."""
+
+    def __init__(self):
+        PreTerm.__init__(self)
+
+    # builders
+
+    def __op_expr__(self, op, other, *, inline=True, method=False):
+        """binary expression"""
+        if not isinstance(op, str):
+            raise TypeError("op is supposed to be a string")
+        if not isinstance(other, Term):
+            other = _enc_value(other)
+        return Expression(op, (self, other), inline=inline, method=method)
+
+    def __rop_expr__(self, op, other):
+        """reversed binary expression"""
+        if not isinstance(op, str):
+            raise TypeError("op is supposed to be a string")
+        if not isinstance(other, Term):
+            other = _enc_value(other)
+        return Expression(op, (other, self), inline=True)
+
+    def __uop_expr__(self, op, *, params=None):
+        """unary expression"""
+        if not isinstance(op, str):
+            raise TypeError("op is supposed to be a string")
+        return Expression(op, (self,), params=params)
+
+    def __triop_expr__(self, op, x, y, inline=False, method=False):
+        """three argument expression"""
+        if not isinstance(op, str):
+            raise TypeError("op is supposed to be a string")
+        if not isinstance(x, Term):
+            x = _enc_value(x)
+        if not isinstance(y, Term):
+            y = _enc_value(y)
+        return Expression(op, (self, x, y), inline=inline, method=method)
 
     # try to get at == and other comparision operators
 
@@ -702,7 +707,7 @@ class UnQuotedStr(str):
         return self.v
 
 
-class FnTerm(Term):
+class FnTerm(PreTerm):
     # represent a function of columns
     def __init__(self, value, fn_args=None, name=None, display_form=None, op=None):
         if not callable(value):
@@ -711,22 +716,28 @@ class FnTerm(Term):
         if name is None:
             name = value.__name__
         self.name = name
-        if display_form is None:
-            display_form = value.__name__
         if op is None:
             op = value.__name__
+        if fn_args is None:
+            fn_args = []
+        if isinstance(fn_args, ColumnReference):
+            fn_args = [fn_args]
+        for v in fn_args:
+            if not isinstance(v, ColumnReference):
+                raise TypeError("Expected fn_args to be None or all ColumnReference")
+        self.args = fn_args
+        if display_form is None:
+            if len(fn_args)<1:
+                display_form = name
+            else:
+                display_form = (name
+                                + '('
+                                + ', '.join([fi.column_name for fi in fn_args])
+                                + ')'
+                                )
         self.display_form = display_form
         self.op = op
-        if fn_args is None:
-            self.args = []
-        else:
-            if isinstance(fn_args, ColumnReference):
-                fn_args = [fn_args]
-            for v in fn_args:
-                if not isinstance(v, ColumnReference):
-                    raise TypeError("Expected fn_args to be None or all ColumnReference")
-            self.args = fn_args
-        Term.__init__(self)
+        PreTerm.__init__(self)
 
     def is_equal(self, other):
         # can't use == as that builds a larger expression
@@ -877,7 +888,7 @@ class Expression(Term):
         if self.inline != other.inline:
             return False
         if self.params is None:
-            if not other.params is None:
+            if other.params is not None:
                 return False
         else:
             if set(self.params.keys()) != set(other.params.keys()):
@@ -977,7 +988,7 @@ def _parse_by_eval(source_str, *, data_def, outter_environemnt=None):
     v = eval(
         source_str, outter_environemnt, data_def
     )  # eval is eval(source, globals, locals)- so mp is first
-    if not isinstance(v, Term):
+    if not isinstance(v, PreTerm):
         v = _enc_value(v)
     v.source_string = source_str
     return v
@@ -1066,7 +1077,7 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
             raise TypeError("ops keys should be strings")
         ov = ops[k]
         v = ov
-        if not isinstance(v, Term):
+        if not isinstance(v, PreTerm):
             if callable(v):
                 # k = f(k) implicit form
                 v = FnTerm(v, fn_args=[ColumnReference(view=view, column_name=k)])

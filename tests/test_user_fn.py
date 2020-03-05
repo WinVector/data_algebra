@@ -1,21 +1,26 @@
 
 import numpy
 
+import pytest
+
 import data_algebra
 from data_algebra.data_ops import *
 import data_algebra.test_util
+from data_algebra.expr_rep import *
 
+
+def test_term_combine():
+    t1 = ColumnReference(view = None, column_name='x')
+    t1 + 1  # allowed
+    t2 = FnTerm(numpy.sin, [t1])
+    with pytest.raises(TypeError):
+        t2 + 1  # not allowed
 
 def test_user_fn_1():
     d = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, 3, 4],
         'g': [1, 1, 2, 2],
     })
-
-    def normalize(x):
-        x = x - numpy.mean(x)
-        x = x/numpy.std(x)
-        return x
 
     def sumsq(x):
         return numpy.sum(x*x)
@@ -29,6 +34,32 @@ def test_user_fn_1():
         'x': [5, 25],
         })
     assert data_algebra.test_util.equivalent_frames(res_g, expect_g)
+
+
+def test_extend_fn_exception():
+    d = data_algebra.default_data_model.pd.DataFrame({
+        'x': [1, 2, 3, 4],
+        'g': [1, 1, 2, 2],
+    })
+
+    def normalize(x):
+        x = x - numpy.mean(x)
+        x = x / numpy.std(x)
+        return x
+
+    ops = describe_table(d, table_name='d'). \
+        extend({'x': user_fn(normalize, 'x')})
+    res = ops.transform(d)
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        'x': [-1.3416407864998738, -0.4472135954999579, 0.4472135954999579, 1.3416407864998738],
+        'g': [1, 1, 2, 2],
+        })
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+
+    with pytest.raises(ValueError):
+        describe_table(d, table_name='d'). \
+            extend({'x': user_fn(normalize, 'x')},
+                    partition_by=['g'])
 
 
 def test_user_fn_2():

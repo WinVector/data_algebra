@@ -885,7 +885,7 @@ class ExtendNode(ViewRepresentation):
             for (k, opk) in parsed_ops.items():
                 if not isinstance(opk, data_algebra.expr_rep.Expression):
                     raise ValueError(
-                        "non-aggregated expression in windowed/partitoned extend: "
+                        "non-aggregated expression in windowed/partitioned extend: "
                         + "'"
                         + k
                         + "': '"
