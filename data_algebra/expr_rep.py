@@ -246,10 +246,8 @@ class Term(PreTerm, ABC):
     def __ror__(self, other):
         return self.__rop_expr__("|", other)
 
-    ## not isn't applicable to objects
-    ## https://docs.python.org/3/library/operator.html
-    #def __not__(self):
-    #    return self.__uop_expr__("~")
+    # not/~ isn't applicable to objects
+    # https://docs.python.org/3/library/operator.html
 
     def __neg__(self):
         # return self.__uop_expr__("neg")
@@ -709,13 +707,14 @@ class UnQuotedStr(str):
 
 class FnValue(PreTerm):
     # represent a function
-    def __init__(self, value, *, name = None):
+    def __init__(self, value, *, name=None):
         if not callable(value):
             raise TypeError("value must be callable")
         if name is None:
             name = value.__name__
         self.value = value
         self.name = name
+        PreTerm.__init__(self)
 
     def is_equal(self, other):
         # can't use == as that builds a larger expression
@@ -753,10 +752,9 @@ class FnCall(PreTerm):
                 raise TypeError("Expected fn_args to be None or all ColumnReference")
         self.args = fn_args
         self.display_form = (name
-                                + '('
-                                + ', '.join([fi.column_name for fi in fn_args])
-                                + ')'
-                                )
+                             + '('
+                             + ', '.join([fi.column_name for fi in fn_args])
+                             + ')')
         PreTerm.__init__(self)
 
     def is_equal(self, other):
@@ -941,7 +939,7 @@ class Expression(Term):
             return "_" + self.op + "()"
         if len(subs) == 1:
             if self.inline:
-                return self.op + '('+ self.args[0].to_pandas(want_inline_parens=False) + ')'
+                return self.op + '(' + self.args[0].to_pandas(want_inline_parens=False) + ')'
             return subs[0] + "." + self.op + "()"
         if len(subs) == 2 and self.inline:
             if want_inline_parens:
