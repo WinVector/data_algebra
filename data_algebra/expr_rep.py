@@ -784,7 +784,7 @@ class FnCall(PreTerm):
         return UnQuotedStr(self.display_form)
 
 
-class ListTerm(Term):
+class ListTerm(PreTerm):
     def __init__(self, value):
         if not isinstance(value, list):
             raise TypeError("value type must be a list")
