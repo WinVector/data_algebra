@@ -136,11 +136,11 @@ class Term(PreTerm, ABC):
             other = _enc_value(other)
         return Expression(op, (other, self), inline=True)
 
-    def __uop_expr__(self, op, *, params=None):
+    def __uop_expr__(self, op, *, params=None, inline=False):
         """unary expression"""
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
-        return Expression(op, (self,), params=params)
+        return Expression(op, (self,), params=params, inline=inline)
 
     def __triop_expr__(self, op, x, y, inline=False, method=False):
         """three argument expression"""
@@ -210,53 +210,53 @@ class Term(PreTerm, ABC):
     def __rmod__(self, other):
         return self.__rop_expr__("%", other)
 
-    def __divmod__(self, other):
-        return self.__op_expr__("divmod", other)
+    def __pow__(self, other):
+        return self.__op_expr__("**", other)
 
-    def __rdivmod__(self, other):
-        return self.__rop_expr__("divmod", other)
-
-    def __pow__(self, other, modulo=None):
-        return self.__op_expr__("pow", other)
-
-    def __rpow__(self, other):
-        return self.__rop_expr__("pow", other)
+    def __rpow__(self, other, inline=False):
+        return self.__rop_expr__("**", other)
 
     def __lshift__(self, other):
-        return self.__op_expr__("lshift", other)
+        return self.__op_expr__("<<", other)
 
     def __rlshift__(self, other):
-        return self.__rop_expr__("lshift", other)
+        return self.__rop_expr__("<<", other)
 
     def __rshift__(self, other):
-        return self.__op_expr__("rshift", other)
+        return self.__op_expr__(">>", other)
 
     def __rrshift__(self, other):
-        return self.__rop_expr__("rshift", other)
+        return self.__rop_expr__(">>", other)
 
     def __and__(self, other):
-        return self.__op_expr__("and", other)
+        return self.__op_expr__("&", other)
 
     def __rand__(self, other):
-        return self.__rop_expr__("and", other)
+        return self.__rop_expr__("&", other)
 
     def __xor__(self, other):
-        return self.__op_expr__("xor", other)
+        return self.__op_expr__("^", other)
 
     def __rxor__(self, other):
-        return self.__rop_expr__("xor", other)
+        return self.__rop_expr__("^", other)
 
     def __or__(self, other):
-        return self.__op_expr__("or", other)
+        return self.__op_expr__("|", other)
 
     def __ror__(self, other):
-        return self.__rop_expr__("or", other)
+        return self.__rop_expr__("|", other)
+
+    ## not isn't applicable to objects
+    ## https://docs.python.org/3/library/operator.html
+    #def __not__(self):
+    #    return self.__uop_expr__("~")
 
     def __neg__(self):
-        return self.__uop_expr__("neg")
+        # return self.__uop_expr__("neg")
+        return self.__uop_expr__("-", inline=True)
 
     def __pos__(self):
-        return self.__uop_expr__("pos")
+        return self  # Treat as a no-op
 
     def __abs__(self):
         return self.__uop_expr__("abs")
@@ -890,8 +890,8 @@ class Expression(Term):
         if inline:
             if method:
                 raise ValueError("can't set both inline and method")
-            if len(args) != 2:
-                raise ValueError("must have two arguments if inline is True")
+            if len(args) > 2:
+                raise ValueError("must have no more than two arguments if inline is True")
         self.op = op
         self.args = [_enc_value(ai) for ai in args]
         self.params = params
@@ -940,6 +940,8 @@ class Expression(Term):
         if len(subs) <= 0:
             return "_" + self.op + "()"
         if len(subs) == 1:
+            if self.inline:
+                return self.op + '('+ self.args[0].to_pandas(want_inline_parens=False) + ')'
             return subs[0] + "." + self.op + "()"
         if len(subs) == 2 and self.inline:
             if want_inline_parens:
