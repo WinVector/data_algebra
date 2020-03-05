@@ -99,6 +99,11 @@ class RecordSpecification:
         )
         return s
 
+    def __eq__(self, other):
+        if not isinstance(other, RecordSpecification):
+            return False
+        return self.__repr__() == other.__repr__()
+
     def fmt(self):
         s = (
             "RecordSpecification\n"
@@ -343,6 +348,21 @@ class RecordMap:
         else:
             self.columns_produced = self.blocks_in.row_columns
         self.fmt_string = self.fmt()
+
+    def __eq__(self, other):
+        if not isinstance(other, RecordMap):
+            return False
+        if (self.blocks_in is None) != (other.blocks_in is None):
+            return False
+        if (self.blocks_out is None) != (other.blocks_out is None):
+            return False
+        if self.blocks_in is not None:
+            if self.blocks_in != other.blocks_in:
+                return False
+        if self.blocks_in is not None:
+            if self.blocks_out != other.blocks_out:
+                return False
+        return True
 
     def record_keys(self):
         if self.blocks_in is not None:
