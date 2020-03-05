@@ -335,7 +335,7 @@ def test_ops():
         'tanh': numpy.tanh,
     }
     for k, f in fns_to_check.items():
-        print(k)
+        # print(k)
         ops = td. \
             extend({'x3': 'x2.' + k + '()'})
         expect = data_algebra.default_data_model.pd.DataFrame({
@@ -344,7 +344,7 @@ def test_ops():
             'g': [1, 1, 2, 2],
             'x3': [f(xi) for xi in [.1, .2, .3, .4]],
         })
-        check_ops(ops, expect, test_sql=False)  # TODO: test SQL versions
+        check_ops(ops, expect, test_sql=True)
 
     # clean up
     conn.close()
