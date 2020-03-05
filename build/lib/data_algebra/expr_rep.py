@@ -210,39 +210,6 @@ class Term(PreTerm, ABC):
     def __rpow__(self, other, inline=False):
         return self.__rop_expr__("**", other)
 
-    def __lshift__(self, other):
-        return self.__op_expr__("<<", other)
-
-    def __rlshift__(self, other):
-        return self.__rop_expr__("<<", other)
-
-    def __rshift__(self, other):
-        return self.__op_expr__(">>", other)
-
-    def __rrshift__(self, other):
-        return self.__rop_expr__(">>", other)
-
-    def __and__(self, other):
-        return self.__op_expr__("&", other)
-
-    def __rand__(self, other):
-        return self.__rop_expr__("&", other)
-
-    def __xor__(self, other):
-        return self.__op_expr__("^", other)
-
-    def __rxor__(self, other):
-        return self.__rop_expr__("^", other)
-
-    def __or__(self, other):
-        return self.__op_expr__("|", other)
-
-    def __ror__(self, other):
-        return self.__rop_expr__("|", other)
-
-    # not/~ isn't applicable to objects
-    # https://docs.python.org/3/library/operator.html
-
     def __neg__(self):
         # return self.__uop_expr__("neg")
         return self.__uop_expr__("-", inline=True)
@@ -250,26 +217,45 @@ class Term(PreTerm, ABC):
     def __pos__(self):
         return self  # Treat as a no-op
 
-    def __abs__(self):
-        return self.__uop_expr__("abs")
+    # # TODO: need to work out how to send to Pandas
+    # def __lshift__(self, other):
+    #     return self.__op_expr__("<<", other)
+    #
+    # def __rlshift__(self, other):
+    #     return self.__rop_expr__("<<", other)
+    #
+    # def __rshift__(self, other):
+    #     return self.__op_expr__(">>", other)
+    #
+    # def __rrshift__(self, other):
+    #     return self.__rop_expr__(">>", other)
+    #
+    # def __and__(self, other):
+    #     return self.__op_expr__("&", other)
+    #
+    # def __rand__(self, other):
+    #     return self.__rop_expr__("&", other)
+    #
+    # def __xor__(self, other):
+    #     return self.__op_expr__("^", other)
+    #
+    # def __rxor__(self, other):
+    #     return self.__rop_expr__("^", other)
+    #
+    # def __or__(self, other):
+    #     return self.__op_expr__("|", other)
+    #
+    # def __ror__(self, other):
+    #     return self.__rop_expr__("|", other)
 
-    def __invert__(self):
-        return self.__uop_expr__("invert")
-
-    def __round__(self, ndigits=None):
-        return self.__uop_expr__("round", params={"ndigits": ndigits})
-
-    def __trunc__(self):
-        return self.__uop_expr__("trunc")
-
-    def __floor__(self):
-        return self.__uop_expr__("floor")
-
-    def __ceil__(self):
-        return self.__uop_expr__("ceil")
+    # not/~ isn't applicable to objects
+    # https://docs.python.org/3/library/operator.html
 
     # math functions
     # https://docs.scipy.org/doc/numpy-1.13.0/reference/routines.math.html
+
+    # TODO: double check https://docs.python.org/3/library/operator.html
+    # for more ops such as concat() and so on
 
     def sin(self):
         return self.__uop_expr__("sin")
@@ -866,12 +852,6 @@ class ColumnReference(Term):
         columns_seen.add(self.column_name)
 
 
-# map from op-name to special Python formatting code
-py_formatters = {
-    "neg": lambda expr: "-" + expr.args[0].to_python(want_inline_parens=True)
-}
-
-
 class Expression(Term):
     def __init__(self, op, args, *, params=None, inline=False, method=False):
         if not isinstance(op, str):
@@ -923,14 +903,12 @@ class Expression(Term):
             a.get_column_names(columns_seen)
 
     def to_python(self, *, want_inline_parens=False):
-        if self.op in py_formatters.keys():
-            return py_formatters[self.op](self)
         subs = [ai.to_python(want_inline_parens=True) for ai in self.args]
         if len(subs) <= 0:
             return "_" + self.op + "()"
         if len(subs) == 1:
             if self.inline:
-                return self.op + '(' + self.args[0].to_pandas(want_inline_parens=False) + ')'
+                return self.op + self.args[0].to_pandas(want_inline_parens=True)
             return subs[0] + "." + self.op + "()"
         if len(subs) == 2 and self.inline:
             if want_inline_parens:

@@ -64,17 +64,12 @@ def _db_if_else_expr(dbmodel, expression):
     )
 
 
-def _db_neg_expr(dbmodel, expression):
-    subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
-    return "( -" + subexpr + " )"
-
-
 db_expr_formatters = {
     "is_null": _db_is_null_expr,
     "is_bad": _db_is_bad_expr,
-    "neg": _db_neg_expr,
     "if_else": _db_if_else_expr,
 }
+
 
 db_default_op_replacements = {"==": "=", "cumsum": "sum"}
 
@@ -102,8 +97,6 @@ class DBModel:
             sql_formatters = {}
         self.identifier_quote = identifier_quote
         self.string_quote = string_quote
-        if sql_formatters is None:
-            sql_formatters = {}
         self.sql_formatters = sql_formatters.copy()
         for k in db_expr_formatters.keys():
             if k not in self.sql_formatters.keys():

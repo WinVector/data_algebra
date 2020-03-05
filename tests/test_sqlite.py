@@ -99,13 +99,15 @@ def test_sqllite_g2():
                 group_by=['sum23']). \
         extend({'ratio': 'x / sum23',
                 'sum': 'x + sum23',
-                'diff': 'x - sum23'}). \
+                'diff': 'x - sum23',
+                'neg': '-x'}). \
         select_columns(['ratio', 'sum23', 'diff']). \
         select_rows('sum23 > 8'). \
         drop_columns(['sum23']). \
         rename_columns({'rat': 'ratio'}). \
         rename_columns({'rat': 'diff', 'diff': 'rat'}). \
-        order_rows(['rat'])
+        order_rows(['rat']). \
+        extend({'z': '-rat'})
 
     d = data_algebra.default_data_model.pd.DataFrame({
         'col1': [1, 2, 2],

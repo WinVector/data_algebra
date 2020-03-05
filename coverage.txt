@@ -2,19 +2,20 @@
 platform darwin -- Python 3.7.5, pytest-5.2.4, py-1.8.0, pluggy-0.13.0
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.8.1
-collected 100 items
+collected 101 items
 
-tests/test_R_yaml.py .                                                   [  1%]
-tests/test_agg.py ..                                                     [  3%]
-tests/test_apply.py .                                                    [  4%]
-tests/test_arrow1.py ...                                                 [  7%]
-tests/test_calc_issue.py .                                               [  8%]
-tests/test_calc_warnings_errors.py .                                     [  9%]
-tests/test_cc.py ......                                                  [ 15%]
-tests/test_cdata1.py ...                                                 [ 18%]
-tests/test_cdata_example.py ....                                         [ 22%]
-tests/test_cols_used.py .                                                [ 23%]
-tests/test_concat_rows.py .                                              [ 24%]
+tests/test_R_yaml.py .                                                   [  0%]
+tests/test_agg.py ..                                                     [  2%]
+tests/test_apply.py .                                                    [  3%]
+tests/test_arrow1.py ...                                                 [  6%]
+tests/test_calc_issue.py .                                               [  7%]
+tests/test_calc_warnings_errors.py .                                     [  8%]
+tests/test_cc.py ......                                                  [ 14%]
+tests/test_cdata1.py ...                                                 [ 17%]
+tests/test_cdata_example.py ....                                         [ 21%]
+tests/test_cols_used.py .                                                [ 22%]
+tests/test_concat_rows.py .                                              [ 23%]
+tests/test_db_model.py .                                                 [ 24%]
 tests/test_degenerate_project.py .                                       [ 25%]
 tests/test_drop_columns.py .                                             [ 26%]
 tests/test_exampe1.py ....                                               [ 30%]
@@ -75,12 +76,12 @@ data_algebra/data_ops.py                1225    247    80%
 data_algebra/data_ops_types.py            74     33    55%
 data_algebra/data_ops_utils.py            34      6    82%
 data_algebra/data_pipe.py                189     50    74%
-data_algebra/db_model.py                 494    105    79%
+data_algebra/db_model.py                 489     95    81%
 data_algebra/diagram.py                   56     44    21%
 data_algebra/env.py                       31      3    90%
 data_algebra/eval_model.py                18      2    89%
 data_algebra/expr.py                      20      4    80%
-data_algebra/expr_rep.py                 695    207    70%
+data_algebra/expr_rep.py                 660    190    71%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/modin_model.py               36      5    86%
 data_algebra/near_sql.py                 140     16    89%
@@ -90,7 +91,7 @@ data_algebra/test_util.py                126     18    86%
 data_algebra/util.py                      28      4    86%
 data_algebra/yaml.py                      95     11    88%
 ----------------------------------------------------------
-TOTAL                                   4293    942    78%
+TOTAL                                   4253    915    78%
 
 
-============================= 100 passed in 18.24s =============================
+============================= 101 passed in 14.16s =============================
