@@ -308,12 +308,6 @@ class Term(PreTerm, ABC):
     def cumsum(self):
         return self.__uop_expr__("cumsum")
 
-    def diff(self):
-        return self.__uop_expr__("diff")
-
-    def cross(self, other):
-        return self.__op_expr__("cross", other)
-
     def exp(self):
         return self.__uop_expr__("exp")
 
@@ -329,65 +323,11 @@ class Term(PreTerm, ABC):
     def log1p(self):
         return self.__uop_expr__("log1p")
 
-    def logaddexp(self, other):
-        return self.__op_expr__("logaddexp", other)
-
-    def logaddexp2(self, other):
-        return self.__op_expr__("logaddexp2", other)
-
-    def copysign(self, other):
-        return self.__op_expr__("copysign", other)
-
-    def ldexp(self, other):
-        return self.__op_expr__("ldexp", other)
-
-    def nextafter(self, other):
-        return self.__op_expr__("nextafter", other)
-
-    def add(self, other):
-        return self.__op_expr__("add", other)
-
-    def reciprocal(self):
-        return self.__uop_expr__("reciprocal")
-
-    def multiply(self, other):
-        return self.__op_expr__("multiply", other)
-
-    def divide(self, other):
-        return self.__op_expr__("divide", other)
-
-    def power(self, other):
-        return self.__op_expr__("power", other)
-
-    def subtract(self, other):
-        return self.__op_expr__("subtract", other)
-
-    def true_divide(self, other):
-        return self.__op_expr__("true_divide", other)
-
-    def floor_divide(self, other):
-        return self.__op_expr__("floor_divide", other)
-
-    def float_power(self, other):
-        return self.__op_expr__("float_power", other)
-
-    def fmod(self, other):
-        return self.__op_expr__("fmod", other)
-
     def mod(self, other):
         return self.__op_expr__("mod", other)
 
     def remainder(self, other):
         return self.__op_expr__("remainder", other)
-
-    def divmod(self, other):
-        return self.__op_expr__("divmod", other)
-
-    def convolve(self, other):
-        return self.__op_expr__("convolve", other)
-
-    def clip(self, x, y):
-        return self.__triop_expr__("clip", x, y)
 
     def sqrt(self):
         return self.__uop_expr__("sqrt")
