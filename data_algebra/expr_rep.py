@@ -866,12 +866,6 @@ class ColumnReference(Term):
         columns_seen.add(self.column_name)
 
 
-# map from op-name to special Python formatting code
-py_formatters = {
-    "neg": lambda expr: "-" + expr.args[0].to_python(want_inline_parens=True)
-}
-
-
 class Expression(Term):
     def __init__(self, op, args, *, params=None, inline=False, method=False):
         if not isinstance(op, str):
@@ -923,8 +917,6 @@ class Expression(Term):
             a.get_column_names(columns_seen)
 
     def to_python(self, *, want_inline_parens=False):
-        if self.op in py_formatters.keys():
-            return py_formatters[self.op](self)
         subs = [ai.to_python(want_inline_parens=True) for ai in self.args]
         if len(subs) <= 0:
             return "_" + self.op + "()"
