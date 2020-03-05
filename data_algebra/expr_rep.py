@@ -789,7 +789,7 @@ class ListTerm(PreTerm):
         if not isinstance(value, list):
             raise TypeError("value type must be a list")
         self.value = value
-        Term.__init__(self)
+        PreTerm.__init__(self)
 
     def is_equal(self, other):
         # can't use == as that builds a larger expression
