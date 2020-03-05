@@ -88,17 +88,11 @@ class PreTerm(ABC):
     def to_pandas(self, *, want_inline_parens=False):
         return self.to_python(want_inline_parens=want_inline_parens)
 
-    # noinspection PyPep8Naming
-    def to_R(self, *, want_inline_parens=False):
-        return self.to_pandas(want_inline_parens=want_inline_parens)
-
     def to_source(self, *, want_inline_parens=False, dialect="Python"):
         if dialect == "Python":
             return self.to_python(want_inline_parens=want_inline_parens)
         elif dialect == "Pandas":
             return self.to_pandas(want_inline_parens=want_inline_parens)
-        elif dialect == "R":
-            return self.to_R(want_inline_parens=want_inline_parens)
         else:
             raise ValueError("unexpected dialect string: " + str(dialect))
 
@@ -246,10 +240,8 @@ class Term(PreTerm, ABC):
     def __ror__(self, other):
         return self.__rop_expr__("|", other)
 
-    ## not isn't applicable to objects
-    ## https://docs.python.org/3/library/operator.html
-    #def __not__(self):
-    #    return self.__uop_expr__("~")
+    # not/~ isn't applicable to objects
+    # https://docs.python.org/3/library/operator.html
 
     def __neg__(self):
         # return self.__uop_expr__("neg")
@@ -709,13 +701,14 @@ class UnQuotedStr(str):
 
 class FnValue(PreTerm):
     # represent a function
-    def __init__(self, value, *, name = None):
+    def __init__(self, value, *, name=None):
         if not callable(value):
             raise TypeError("value must be callable")
         if name is None:
             name = value.__name__
         self.value = value
         self.name = name
+        PreTerm.__init__(self)
 
     def is_equal(self, other):
         # can't use == as that builds a larger expression
@@ -753,10 +746,9 @@ class FnCall(PreTerm):
                 raise TypeError("Expected fn_args to be None or all ColumnReference")
         self.args = fn_args
         self.display_form = (name
-                                + '('
-                                + ', '.join([fi.column_name for fi in fn_args])
-                                + ')'
-                                )
+                             + '('
+                             + ', '.join([fi.column_name for fi in fn_args])
+                             + ')')
         PreTerm.__init__(self)
 
     def is_equal(self, other):
@@ -880,9 +872,6 @@ py_formatters = {
 }
 
 
-r_formatters = {"neg": lambda expr: "-" + expr.args[0].to_R(want_inline_parens=True)}
-
-
 class Expression(Term):
     def __init__(self, op, args, *, params=None, inline=False, method=False):
         if not isinstance(op, str):
@@ -941,7 +930,7 @@ class Expression(Term):
             return "_" + self.op + "()"
         if len(subs) == 1:
             if self.inline:
-                return self.op + '('+ self.args[0].to_pandas(want_inline_parens=False) + ')'
+                return self.op + '(' + self.args[0].to_pandas(want_inline_parens=False) + ')'
             return subs[0] + "." + self.op + "()"
         if len(subs) == 2 and self.inline:
             if want_inline_parens:
@@ -958,23 +947,6 @@ class Expression(Term):
             return cfmap[self.op].pandas_formatter(self)
         if len(self.args) <= 0:
             return "_" + self.op + "()"
-        if len(self.args) == 1:
-            return (
-                self.op + "(" + self.args[0].to_pandas(want_inline_parens=False) + ")"
-            )
-        subs = [ai.to_pandas(want_inline_parens=True) for ai in self.args]
-        if len(subs) == 2 and self.inline:
-            if want_inline_parens:
-                return "(" + subs[0] + " " + self.op + " " + subs[1] + ")"
-            else:
-                return subs[0] + " " + self.op + " " + subs[1]
-        return self.op + "(" + ", ".join(subs) + ")"
-
-    def to_R(self, *, want_inline_parens=False):
-        if self.op in r_formatters.keys():
-            return r_formatters[self.op](self)
-        if len(self.args) <= 0:
-            return self.op + "()"
         if len(self.args) == 1:
             return (
                 self.op + "(" + self.args[0].to_pandas(want_inline_parens=False) + ")"

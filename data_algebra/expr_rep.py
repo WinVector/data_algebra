@@ -88,17 +88,11 @@ class PreTerm(ABC):
     def to_pandas(self, *, want_inline_parens=False):
         return self.to_python(want_inline_parens=want_inline_parens)
 
-    # noinspection PyPep8Naming
-    def to_R(self, *, want_inline_parens=False):
-        return self.to_pandas(want_inline_parens=want_inline_parens)
-
     def to_source(self, *, want_inline_parens=False, dialect="Python"):
         if dialect == "Python":
             return self.to_python(want_inline_parens=want_inline_parens)
         elif dialect == "Pandas":
             return self.to_pandas(want_inline_parens=want_inline_parens)
-        elif dialect == "R":
-            return self.to_R(want_inline_parens=want_inline_parens)
         else:
             raise ValueError("unexpected dialect string: " + str(dialect))
 
@@ -878,9 +872,6 @@ py_formatters = {
 }
 
 
-r_formatters = {"neg": lambda expr: "-" + expr.args[0].to_R(want_inline_parens=True)}
-
-
 class Expression(Term):
     def __init__(self, op, args, *, params=None, inline=False, method=False):
         if not isinstance(op, str):
@@ -956,23 +947,6 @@ class Expression(Term):
             return cfmap[self.op].pandas_formatter(self)
         if len(self.args) <= 0:
             return "_" + self.op + "()"
-        if len(self.args) == 1:
-            return (
-                self.op + "(" + self.args[0].to_pandas(want_inline_parens=False) + ")"
-            )
-        subs = [ai.to_pandas(want_inline_parens=True) for ai in self.args]
-        if len(subs) == 2 and self.inline:
-            if want_inline_parens:
-                return "(" + subs[0] + " " + self.op + " " + subs[1] + ")"
-            else:
-                return subs[0] + " " + self.op + " " + subs[1]
-        return self.op + "(" + ", ".join(subs) + ")"
-
-    def to_R(self, *, want_inline_parens=False):
-        if self.op in r_formatters.keys():
-            return r_formatters[self.op](self)
-        if len(self.args) <= 0:
-            return self.op + "()"
         if len(self.args) == 1:
             return (
                 self.op + "(" + self.args[0].to_pandas(want_inline_parens=False) + ")"
