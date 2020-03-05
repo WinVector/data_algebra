@@ -118,7 +118,7 @@ def test_ordered_agg_group():
         return ', '.join(sorted([str(vi) for vi in set(vals)]))
 
     ops3 = describe_table(d, table_name='d'). \
-        project({'OP': sorted_concat},
+        project({'OP': user_fn(sorted_concat, 'OP')},
                 group_by=['ID', 'DATE']). \
         extend({'rank': '_row_number()'},
                partition_by=['ID'],

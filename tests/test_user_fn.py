@@ -12,7 +12,7 @@ from data_algebra.expr_rep import *
 def test_term_combine():
     t1 = ColumnReference(view = None, column_name='x')
     t1 + 1  # allowed
-    t2 = FnTerm(numpy.sin, [t1])
+    t2 = FnCall(numpy.sin, [t1])
     with pytest.raises(TypeError):
         t2 + 1  # not allowed
 

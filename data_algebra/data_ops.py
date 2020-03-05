@@ -36,33 +36,26 @@ except ImportError:
 
 # wrap a single argument function as a user callable function in pipeline
 # used for custom aggregators
-def user_fn(fn, fvars=None, *, display_form=None):
+def user_fn(fn, args=None, *, name=None):
     if isinstance(fn, str):
-        if display_form is None:
-            display_form = fn
+        if name is None:
+            name = fn
         fn = eval(fn)
     if not callable(fn):
         raise TypeError("expected fn to be callable")
-    if fvars is None:
-        fvars = []
-    if isinstance(fvars, str):
-        fn_args = [data_algebra.expr_rep.ColumnReference(view=None, column_name=fvars)]
+    if args is None:
+        args = []
+    if isinstance(args, str):
+        fn_args = [data_algebra.expr_rep.ColumnReference(view=None, column_name=args)]
     else:
-        for v in fvars:
+        for v in args:
             if not isinstance(v, str):
                 raise TypeError("Expect all vars names to be strings")
-        fn_args = [data_algebra.expr_rep.ColumnReference(view=None, column_name=v) for v in fvars]
-    qvars = [v.__repr__() for v in fvars]
-    if display_form is None:
-        display_form = ('user_fn('
-                        + fn.__name__
-                        + ', ['
-                        + ', '.join(qvars)
-                        + '])')
-    return data_algebra.expr_rep.FnTerm(
+        fn_args = [data_algebra.expr_rep.ColumnReference(view=None, column_name=v) for v in args]
+    return data_algebra.expr_rep.FnCall(
         fn,
         fn_args=fn_args,
-        display_form=display_form,
+        name=name
     )
 
 
@@ -1079,7 +1072,7 @@ class ProjectNode(ViewRepresentation):
                             + str(opk)
                         )
             else:
-                if not isinstance(opk, data_algebra.expr_rep.FnTerm):
+                if not isinstance(opk, data_algebra.expr_rep.FnCall):
                     raise ValueError(
                         "non-aggregated expression in project: "
                         + str(k)

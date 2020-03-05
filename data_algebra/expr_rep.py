@@ -707,17 +707,43 @@ class UnQuotedStr(str):
         return self.v
 
 
-class FnTerm(PreTerm):
+class FnValue(PreTerm):
+    # represent a function
+    def __init__(self, value, *, name = None):
+        if not callable(value):
+            raise TypeError("value must be callable")
+        if name is None:
+            name = value.__name__
+        self.value = value
+        self.name = name
+
+    def is_equal(self, other):
+        # can't use == as that builds a larger expression
+        if not isinstance(other, FnValue):
+            return False
+        if self.name != other.name:
+            return False
+        return True
+
+    def get_column_names(self, columns_seen):
+        pass
+
+    def replace_view(self, view):
+        pass
+
+    def to_python(self, *, want_inline_parens=False):
+        return UnQuotedStr(self.name)
+
+
+class FnCall(PreTerm):
     # represent a function of columns
-    def __init__(self, value, fn_args=None, name=None, display_form=None, op=None):
+    def __init__(self, value, fn_args=None, *, name=None):
         if not callable(value):
             raise TypeError("value type must be callable")
         self.value = value
         if name is None:
             name = value.__name__
         self.name = name
-        if op is None:
-            op = value.__name__
         if fn_args is None:
             fn_args = []
         if isinstance(fn_args, ColumnReference):
@@ -726,22 +752,16 @@ class FnTerm(PreTerm):
             if not isinstance(v, ColumnReference):
                 raise TypeError("Expected fn_args to be None or all ColumnReference")
         self.args = fn_args
-        if display_form is None:
-            if len(fn_args)<1:
-                display_form = name
-            else:
-                display_form = (name
+        self.display_form = (name
                                 + '('
                                 + ', '.join([fi.column_name for fi in fn_args])
                                 + ')'
                                 )
-        self.display_form = display_form
-        self.op = op
         PreTerm.__init__(self)
 
     def is_equal(self, other):
         # can't use == as that builds a larger expression
-        if not isinstance(other, FnTerm):
+        if not isinstance(other, FnCall):
             return False
         if self.display_form != other.display_form:
             return False
@@ -814,7 +834,7 @@ def _enc_value(value):
     if isinstance(value, Term):
         return value
     if callable(value):
-        return FnTerm(value)
+        return FnValue(value)
     if isinstance(value, list):
         return ListTerm(value)
     return Value(value)
@@ -1079,8 +1099,7 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
         v = ov
         if not isinstance(v, PreTerm):
             if callable(v):
-                # k = f(k) implicit form
-                v = FnTerm(v, fn_args=[ColumnReference(view=view, column_name=k)])
+                v = FnValue(v)
             else:
                 v = _parse_by_eval(
                     source_str=v, data_def=mp, outter_environemnt=parse_env

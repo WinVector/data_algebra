@@ -30,12 +30,12 @@ def test_agg_fn():
         'g': [1, 1, 2, 2],
     })
 
-    def user_fn(vals):
+    def our_fn(vals):
         return ', '.join(sorted([str(vi) for vi in set(vals)]))
 
     ops = describe_table(d, table_name='d'). \
         project({
-            'x': user_fn
+            'x': user_fn(our_fn, ['x'])
             },
         group_by=['g'])
 

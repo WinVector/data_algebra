@@ -78,7 +78,7 @@ def make_custom_function_map(data_model):
             name="partitioned_eval",
             pandas_formatter=lambda expr: (
                 "@partitioned_eval("
-                # expr.args[0] is a FnTerm
+                # expr.args[0] is a FnValue
                 + "@"
                 + expr.args[0].to_pandas()
                 + ", "
