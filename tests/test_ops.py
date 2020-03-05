@@ -262,6 +262,14 @@ def test_ops():
     check_ops(ops, expect)
 
     ops = td. \
+        extend({'x': '-(1 + x)'})
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        'x': [-2, -3, -4, -5],
+        'g': [1, 1, 2, 2],
+    })
+    check_ops(ops, expect)
+
+    ops = td. \
         extend({'x': '+x'})
     expect = data_algebra.default_data_model.pd.DataFrame({
         'x': [+1, +2, +3, +4],

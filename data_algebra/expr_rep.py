@@ -930,7 +930,7 @@ class Expression(Term):
             return "_" + self.op + "()"
         if len(subs) == 1:
             if self.inline:
-                return self.op + '(' + self.args[0].to_pandas(want_inline_parens=False) + ')'
+                return self.op + self.args[0].to_pandas(want_inline_parens=True)
             return subs[0] + "." + self.op + "()"
         if len(subs) == 2 and self.inline:
             if want_inline_parens:
