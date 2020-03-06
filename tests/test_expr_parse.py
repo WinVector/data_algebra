@@ -29,17 +29,3 @@ def test_expr_parse():
         {"a": [True, False], "b": [1, 2], "c": [3, 4], "d": [1, 4],}
     )
     assert data_algebra.test_util.equivalent_frames(res1, expect1)
-
-    # # TODO: implement and test
-    # ops2 = TableDescription('d', ['a', 'b', 'c']). \
-    #     extend({'d': 'b.fmax(1.5)'})
-    #
-    # assert formats_to_self(ops2)
-    #
-    # res2 = ops2.transform(d)
-    # expect2 = data_algebra.default_data_model.pd.DataFrame({
-    #     'a': [True, False],
-    #     'b': [1, 2],
-    #     'c': [3, 4],
-    #     'd': [1.5, 2],
-    #     })

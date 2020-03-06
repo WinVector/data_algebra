@@ -335,9 +335,6 @@ class Term(PreTerm, ABC):
     def abs(self):
         return self.__uop_expr__("abs")
 
-    def heaviside(self, other):
-        return self.__op_expr__("heaviside", other)
-
     def maximum(self, other):
         return self.__op_expr__("maximum", other)
 
@@ -349,9 +346,6 @@ class Term(PreTerm, ABC):
 
     def fmin(self, other):
         return self.__op_expr__("fmin", other, inline=False)
-
-    def interp(self, xp, fp):
-        return self.__triop_expr__("interp", xp, fp)
 
     # pandas style definitions
     # https://pandas.pydata.org/pandas-docs/stable/reference/groupby.html
@@ -422,12 +416,6 @@ class Term(PreTerm, ABC):
     def nunique(self):
         return self.__uop_expr__("nunique")
 
-    def ohlc(self):
-        return self.__uop_expr__("ohlc")
-
-    def pct_change(self):
-        return self.__uop_expr__("pct_change")
-
     def rank(self):
         return self.__uop_expr__("rank")
 
@@ -439,9 +427,6 @@ class Term(PreTerm, ABC):
 
     def std(self):
         return self.__uop_expr__("std")
-
-    def tail(self):
-        return self.__uop_expr__("tail")
 
     def unique(self):
         return self.__uop_expr__("unique")
