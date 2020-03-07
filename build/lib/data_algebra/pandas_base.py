@@ -13,11 +13,6 @@ import data_algebra.custom_functions
 
 
 # TODO: possibly import dask, Nvidia Rapids, or modin instead
-# can't do that now
-# https://github.com/modin-project/modin/issues/865
-# requires: modin, ray, distributed
-# pip install modin[ray]
-# pd = importlib.import_module("modin.pandas")  # https://github.com/modin-project/modin
 
 # base class for Pandas-like API realization
 class PandasModelBase(data_algebra.data_model.DataModel, ABC):

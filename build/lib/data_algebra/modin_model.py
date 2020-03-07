@@ -1,6 +1,5 @@
 
 
-import importlib
 import os
 
 import data_algebra.eval_model
@@ -23,7 +22,8 @@ class ModinModel(data_algebra.eval_model.EvalModel):
             MODIN_ENGINE = modin_engine
             # https://github.com/modin-project/modin
             os.environ["MODIN_ENGINE"] = MODIN_ENGINE
-            MODIN_PANDAS = importlib.import_module("modin.pandas")
+            import modin.pandas
+            MODIN_PANDAS = modin.pandas
         else:
             if (modin_engine is not None) and (modin_engine != MODIN_ENGINE):
                 raise ValueError("MODIN_ENGINE already set to "

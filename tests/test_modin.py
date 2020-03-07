@@ -1,11 +1,10 @@
 
-import importlib
 import pytest
 import warnings
 
 import data_algebra
 from data_algebra.data_ops import *
-from data_algebra.modin_model import ModinModel
+import data_algebra.modin_model
 import data_algebra.test_util
 
 modin_engine_choice = 'ray'
@@ -15,8 +14,8 @@ def test_modin():
     modin_pandas = None
     data_model = None
     try:
-        modin_pandas = importlib.import_module("modin.pandas")
-        data_model = ModinModel(modin_engine=modin_engine_choice)
+        data_model = data_algebra.modin_model.ModinModel(modin_engine=modin_engine_choice)
+        modin_pandas = data_algebra.modin_model.MODIN_PANDAS
     except:
         pass
 
@@ -57,8 +56,8 @@ def test_modin_gcalc():
     modin_pandas = None
     data_model = None
     try:
-        modin_pandas = importlib.import_module("modin.pandas")
-        data_model = ModinModel(modin_engine=modin_engine_choice)
+        data_model = data_algebra.modin_model.ModinModel(modin_engine=modin_engine_choice)
+        modin_pandas = data_algebra.modin_model.MODIN_PANDAS
     except:
         pass
 

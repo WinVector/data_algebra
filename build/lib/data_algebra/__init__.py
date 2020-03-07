@@ -17,9 +17,9 @@ the `rquery`<https://github.com/WinVector/rquery> and `rqdatatable`<https://gith
 Recommended packages include: Pandas, PyYAML (supplies yaml), sqlparse, and black. 
 """
 
-import importlib
 import data_algebra.pandas_model
+import pandas
 
 default_data_model = data_algebra.pandas_model.PandasModel(
-    pd=importlib.import_module("pandas"),
+    pd=pandas,
     presentation_model_name='pandas')
