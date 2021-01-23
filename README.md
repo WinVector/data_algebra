@@ -46,6 +46,7 @@ Related work includes:
   * [`SQLAlchemy`](https://www.sqlalchemy.org)
   * [`rquery`](https://github.com/WinVector/rquery/)
   * [`cdata`](https://github.com/WinVector/cdata/)
+  * [`siuba`](https://github.com/machow/siuba)
   
 The `data_algebra` principles include:
 
@@ -540,7 +541,7 @@ dot
 
 
 
-However, `data_algebra` also supports exporting a pipeline to and from simple structures that are in turn optimized for conversion  to [`YAML`](https://yaml.org).  The simple structure format is particularly useful for writing more `data_algebra` tools (such as pipeline analysis and presentation tools).  And the `YAML` tooling makes moving a processing pipeline to another a language (such as `R`) quite easy.
+`data_algebra` also supports exporting a pipeline to and from simple structures that are in turn optimized for conversion  to [`YAML`](https://yaml.org).  The simple structure format is particularly useful for writing more `data_algebra` tools (such as pipeline analysis and presentation tools).  And the `YAML` tooling makes moving a processing pipeline to another a language (such as `R`) quite easy.
 
 We will demonstrate this next.
 
