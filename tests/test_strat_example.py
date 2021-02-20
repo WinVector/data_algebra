@@ -42,10 +42,7 @@ def test_strat_example_size():
     res = ops.transform(prepared_stratified)
 
     expect = data_algebra.default_data_model.pd.DataFrame(
-        {
-            "g": [0, 1],
-            "size": [3, 3],
-        }
+        {"g": [0, 1], "size": [3, 3],}
     )
 
     assert data_algebra.test_util.equivalent_frames(res, expect)

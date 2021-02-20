@@ -536,10 +536,9 @@ class FnCall(PreTerm):
             if not isinstance(v, ColumnReference):
                 raise TypeError("Expected fn_args to be None or all ColumnReference")
         self.args = fn_args
-        self.display_form = (name
-                             + '('
-                             + ', '.join([fi.column_name for fi in fn_args])
-                             + ')')
+        self.display_form = (
+            name + "(" + ", ".join([fi.column_name for fi in fn_args]) + ")"
+        )
         PreTerm.__init__(self)
 
     def is_equal(self, other):
@@ -665,7 +664,9 @@ class Expression(Term):
             if method:
                 raise ValueError("can't set both inline and method")
             if len(args) > 2:
-                raise ValueError("must have no more than two arguments if inline is True")
+                raise ValueError(
+                    "must have no more than two arguments if inline is True"
+                )
         self.op = op
         self.args = [_enc_value(ai) for ai in args]
         self.params = params

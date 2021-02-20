@@ -11,13 +11,13 @@
 Install `data_algebra` with either of:
 
   * `pip install data_algebra`
-  * `pip install https://github.com/WinVector/data_algebra/raw/master/dist/data_algebra-0.5.3.tar.gz`
+  * `pip install https://github.com/WinVector/data_algebra/raw/master/dist/data_algebra-0.5.4.tar.gz`
 
 # Announcement
 
 This article introduces the [`data_algebra`](https://github.com/WinVector/data_algebra) project: a data processing tool family available in `R` and `Python`.  These tools are designed to transform data either in-memory or on remote databases.  For an example (with video) of using `data_algebra` to re-arrange data layout please see [here](https://github.com/WinVector/data_algebra/blob/master/Examples/cdata/ranking_pivot_example.md).
 
-In particular we will discuss the `Python` implementation (also called `data_algebra`) and its relation to the mature `R` implementations (`rquery` and `rqdatatable`).
+In particular, we will discuss the `Python` implementation (also called `data_algebra`) and its relation to the mature `R` implementations (`rquery` and `rqdatatable`).
 
 ## Introduction
 

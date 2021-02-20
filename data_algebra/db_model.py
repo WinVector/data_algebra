@@ -111,7 +111,9 @@ class DBModel:
     # database helpers
 
     # noinspection SqlNoDataSourceInspection
-    def insert_table(self, conn, d, table_name, *, qualifiers=None, allow_overwrite=False):
+    def insert_table(
+        self, conn, d, table_name, *, qualifiers=None, allow_overwrite=False
+    ):
         """
 
         :param conn: a database connection
@@ -258,7 +260,9 @@ class DBModel:
 
     def expr_to_sql(self, expression, *, want_inline_parens=False):
         if not isinstance(expression, data_algebra.expr_rep.PreTerm):
-            raise TypeError("expression should be of class data_algebra.table_rep.PreTerm")
+            raise TypeError(
+                "expression should be of class data_algebra.table_rep.PreTerm"
+            )
         if isinstance(expression, data_algebra.expr_rep.Value):
             return self.value_to_sql(expression.value)
         if isinstance(expression, data_algebra.expr_rep.ColumnReference):
@@ -871,7 +875,8 @@ class DBHandle(data_algebra.eval_model.EvalModel):
             column_names=head.columns,
             table_name=table_name,
             head=head,
-            limit_was=row_limit)
+            limit_was=row_limit,
+        )
 
     def to_pandas(self, handle, *, data_map=None):
         if isinstance(handle, data_algebra.data_ops.TableDescription):
@@ -901,7 +906,9 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         return self.db_model.read_table(self.conn, handle)
 
     def insert_table(self, d, *, table_name, allow_overwrite=False):
-        self.db_model.insert_table(conn=self.conn, d=d, table_name=table_name, allow_overwrite=allow_overwrite)
+        self.db_model.insert_table(
+            conn=self.conn, d=d, table_name=table_name, allow_overwrite=allow_overwrite
+        )
         return self.build_rep(table_name)
 
     def eval(self, ops, *, data_map=None, result_name=None, eval_env=None, narrow=True):
@@ -933,12 +940,7 @@ class DBHandle(data_algebra.eval_model.EvalModel):
             raise ValueError("Can not write over an input table")
         q_table_name = self.db_model.quote_table_name(result_name)
         drop_query = "DROP TABLE " + q_table_name
-        create_query = (
-            "CREATE TABLE "
-            + q_table_name
-            + " AS "
-            + query
-        )
+        create_query = "CREATE TABLE " + q_table_name + " AS " + query
         cur = self.conn.cursor()
         # noinspection PyBroadException
         try:

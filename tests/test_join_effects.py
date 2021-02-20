@@ -11,7 +11,9 @@ def test_join_warn1():
         {"k": ["a", "a", "b"], "x": [1, None, 3], "y": [1, None, None],}
     )
 
-    d_right = data_algebra.default_data_model.pd.DataFrame({"k": ["a", "b", "q"], "y": [10, 20, 30],})
+    d_right = data_algebra.default_data_model.pd.DataFrame(
+        {"k": ["a", "b", "q"], "y": [10, 20, 30],}
+    )
 
     ops = describe_table(d_left, table_name="d_left").natural_join(
         b=describe_table(d_right, table_name="d_right"), by="k", jointype="LEFT"

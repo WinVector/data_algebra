@@ -17,7 +17,9 @@ def test_concat_rows():
         {"x": [-1, 0, 1, numpy.nan], "y": [1, 2, numpy.nan, 3]}
     )
 
-    d2 = data_algebra.default_data_model.pd.DataFrame({"x": [0, 4, None], "y": [2, 7, None]})
+    d2 = data_algebra.default_data_model.pd.DataFrame(
+        {"x": [0, 4, None], "y": [2, 7, None]}
+    )
 
     ops4 = describe_table(d1, "d1").concat_rows(b=describe_table(d2, "d2"))
 

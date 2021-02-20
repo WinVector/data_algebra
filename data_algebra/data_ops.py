@@ -51,13 +51,11 @@ def user_fn(fn, args=None, *, name=None):
         for v in args:
             if not isinstance(v, str):
                 raise TypeError("Expect all vars names to be strings")
-        fn_args = [data_algebra.expr_rep.ColumnReference(view=None, column_name=v) for v in args]
-    return data_algebra.expr_rep.FnCall(
-        fn,
-        fn_args=fn_args,
-        name=name
-    )
-
+        fn_args = [
+            data_algebra.expr_rep.ColumnReference(view=None, column_name=v)
+            for v in args
+        ]
+    return data_algebra.expr_rep.FnCall(fn, fn_args=fn_args, name=name)
 
 
 class ViewRepresentation(OperatorPlatform, ABC):
@@ -120,7 +118,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
             ti = s.get_tables()
             for (k, v) in ti.items():
                 if not isinstance(v, TableDescription):
-                    raise TypeError("Expected v to be data_algebra.data_ops.TableDescription")
+                    raise TypeError(
+                        "Expected v to be data_algebra.data_ops.TableDescription"
+                    )
                 if k in tables.keys():
                     if not v.same_table(tables[k]):
                         raise ValueError(
@@ -154,16 +154,21 @@ class ViewRepresentation(OperatorPlatform, ABC):
             crec.update(using)
         cu_list = self.columns_used_from_sources(crec.copy())
         for i in range(len(self.sources)):
-            self.sources[i]._columns_used_implementation(using=cu_list[i],
-                                                         columns_currenty_using_records=columns_currenty_using_records)
+            self.sources[i]._columns_used_implementation(
+                using=cu_list[i],
+                columns_currenty_using_records=columns_currenty_using_records,
+            )
 
     def columns_used(self, *, using=None):
         """Determine which columns are used from source tables."""
 
         tables = self.get_tables()
-        columns_currenty_using_records = {v.merged_rep_id(): set() for v in tables.values()}
-        self._columns_used_implementation(using=using,
-                                          columns_currenty_using_records=columns_currenty_using_records)
+        columns_currenty_using_records = {
+            v.merged_rep_id(): set() for v in tables.values()
+        }
+        self._columns_used_implementation(
+            using=using, columns_currenty_using_records=columns_currenty_using_records
+        )
         columns_used = dict()
         for k in tables.keys():
             ti = tables[k]
@@ -619,10 +624,16 @@ class TableDescription(ViewRepresentation):
     qualifiers: Dict[str, str]
     key: str
 
-    def __init__(self, table_name, column_names,
-                 *,
-                 qualifiers=None, column_types=None,
-                 head=None, limit_was=None):
+    def __init__(
+        self,
+        table_name,
+        column_names,
+        *,
+        qualifiers=None,
+        column_types=None,
+        head=None,
+        limit_was=None
+    ):
         ViewRepresentation.__init__(
             self, column_names=column_names, node_name="TableDescription"
         )
@@ -806,8 +817,12 @@ def describe_table(d, table_name="data_frame", *, qualifiers=None, column_types=
         head = d.copy()
     head = head.reset_index(drop=True, inplace=False)
     return TableDescription(
-        table_name, column_names, column_types=column_types, qualifiers=qualifiers,
-        head=head, limit_was=limit_was
+        table_name,
+        column_names,
+        column_types=column_types,
+        qualifiers=qualifiers,
+        head=head,
+        limit_was=limit_was,
     )
 
 

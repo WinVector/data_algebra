@@ -1,11 +1,13 @@
-
 from data_algebra.eval_model import EvalModel
 from data_algebra.pandas_base import PandasModelBase
 
+
 class PandasModel(EvalModel, PandasModelBase):
-    def __init__(self, *, pd, presentation_model_name='pandas'):
+    def __init__(self, *, pd, presentation_model_name="pandas"):
         EvalModel.__init__(self)
-        PandasModelBase.__init__(self, pd=pd, presentation_model_name=presentation_model_name)
+        PandasModelBase.__init__(
+            self, pd=pd, presentation_model_name=presentation_model_name
+        )
 
     # EvalModel interface
 

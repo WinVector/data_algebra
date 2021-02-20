@@ -17,13 +17,15 @@ def test_apply():
         {"x": [-1, 0, 1, numpy.nan], "y": [1, 2, numpy.nan, 3]}
     )
 
-    expect_1 = data_algebra.default_data_model.pd.DataFrame({"x": [0.0], "y": [2.0], "z": [0.0]})
+    expect_1 = data_algebra.default_data_model.pd.DataFrame(
+        {"x": [0.0], "y": [2.0], "z": [0.0]}
+    )
     expect_2 = data_algebra.default_data_model.pd.DataFrame(
         {"x": [0.0], "y": [2.0], "z": [0.0], "q": [2.0]}
     )
 
     ops0 = (
-        describe_table(d, table_name='t1').extend({"z": "x / y"}).select_rows("z >= 0")
+        describe_table(d, table_name="t1").extend({"z": "x / y"}).select_rows("z >= 0")
     )
 
     res_0_0 = ops0.eval(data_map={"t1": d})

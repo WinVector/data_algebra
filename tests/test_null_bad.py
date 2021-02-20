@@ -20,7 +20,9 @@ def test_null_bad():
         {"x_is_null": "x.is_null()", "x_is_bad": "x.is_bad()"}
     )
 
-    d = data_algebra.default_data_model.pd.DataFrame({"x": [1, numpy.nan, math.inf, -math.inf, None, 0]})
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"x": [1, numpy.nan, math.inf, -math.inf, None, 0]}
+    )
 
     d2 = ops.transform(d)
 
@@ -61,7 +63,9 @@ def test_null_bad():
     assert all(res["x_is_bad"] == expect_r["x_is_bad"])
 
     # can't copy NA/None into db through current path
-    d = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2, math.inf, -math.inf, 2, 0]})
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"x": [1, 2, math.inf, -math.inf, 2, 0]}
+    )
 
     db_model_p = data_algebra.PostgreSQL.PostgreSQLModel()
     sql_p = ops.to_sql(db_model_p, pretty=True)

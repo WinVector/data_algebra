@@ -17,6 +17,15 @@ class RecordSpecification:
         strict=False,
         local_data_model=None
     ):
+        """
+        Class to represent a multi-row data record.
+
+        :param control_table: data.frame describing record layout
+        :param record_keys: array of record key column names
+        :param control_table_keys: array of control_table key column names
+        :param strict: logical, if True more checks on transform
+        :param local_data_model: data.frame data model
+        """
         if local_data_model is None:
             local_data_model = data_algebra.default_data_model
         control_table = control_table.reset_index(inplace=False, drop=True)
@@ -105,6 +114,11 @@ class RecordSpecification:
         return self.__repr__() == other.__repr__()
 
     def fmt(self):
+        """
+        Prepare for printing
+
+        :return: multi line string representation.
+        """
         s = (
             "RecordSpecification\n"
             + "   record_keys: "
@@ -124,7 +138,11 @@ class RecordSpecification:
         return self.fmt()
 
     def to_simple_obj(self):
-        """Create an object for YAML encoding"""
+        """
+        Create an object for YAML encoding
+
+        :return: OrderedDict suitible for YAML encoding
+        """
 
         obj = collections.OrderedDict()
         obj["type"] = "data_algebra.cdata.RecordSpecification"
@@ -135,6 +153,26 @@ class RecordSpecification:
             tbl[k] = [v for v in self.control_table[k]]
         obj["control_table"] = tbl
         return obj
+
+    def map_to_rows(self, *, strict=False):
+        """
+        Build a RecordMap mapping this RecordSpecification to rowrecs
+
+        :param strict:
+        :return: RecordMap
+        """
+
+        return RecordMap(blocks_in=self, strict=strict)
+
+    def map_from_rows(self, *, strict=False):
+        """
+        Build a RecordMap mapping this RecordSpecification from rowrecs
+
+        :param strict:
+        :return: RecordMap
+        """
+
+        return RecordMap(blocks_out=self, strict=strict)
 
 
 def record_spec_from_simple_obj(obj, *, local_data_model=None):
@@ -562,3 +600,81 @@ class RecordMap:
     # noinspection PyPep8Naming
     def inverse_transform(self, X):
         return self.inverse().transform(X)
+
+
+def pivot_blocks_to_rowrecs(
+    *,
+    attribute_key_column,
+    attribute_value_column,
+    record_keys,
+    record_value_columns,
+    strict=False,
+    local_data_model=None
+):
+    """
+    Build a block records to row records map.
+
+    :param attribute_key_column: column to identify record attribute keys
+    :param attribute_value_column: column for record attribute values
+    :param record_keys: names of key columns identifying row record blocks
+    :param record_value_columns: names of columns to take row record values from
+    :param strict: logical, if True more checks on transform
+    :param local_data_model: data.frame data model
+    :return: RecordMap
+    """
+
+    if local_data_model is None:
+        local_data_model = data_algebra.default_data_model
+    control_table = local_data_model.data_frame(
+        {
+            attribute_key_column: record_value_columns,
+            attribute_value_column: record_value_columns,
+        }
+    )
+    ct = RecordSpecification(
+        control_table,
+        record_keys=record_keys,
+        control_table_keys=[attribute_key_column],
+        strict=strict,
+        local_data_model=local_data_model,
+    )
+    return ct.map_to_rows(strict=strict)
+
+
+def pivot_rowrecs_to_blocks(
+    *,
+    attribute_key_column,
+    attribute_value_column,
+    record_keys,
+    record_value_columns,
+    strict=False,
+    local_data_model=None
+):
+    """
+    Build a row records to block records map.
+
+    :param attribute_key_column: column to identify record attribute keys
+    :param attribute_value_column: column for record attribute values
+    :param record_keys: names of key columns identifying row record blocks
+    :param record_value_columns: names of columns to take row record values from
+    :param strict: logical, if True more checks on transform
+    :param local_data_model: data.frame data model
+    :return: RecordMap
+    """
+
+    if local_data_model is None:
+        local_data_model = data_algebra.default_data_model
+    control_table = local_data_model.data_frame(
+        {
+            attribute_key_column: record_value_columns,
+            attribute_value_column: record_value_columns,
+        }
+    )
+    ct = RecordSpecification(
+        control_table,
+        record_keys=record_keys,
+        control_table_keys=[attribute_key_column],
+        strict=strict,
+        local_data_model=local_data_model,
+    )
+    return ct.map_from_rows(strict=strict)

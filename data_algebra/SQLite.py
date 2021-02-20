@@ -127,26 +127,26 @@ class SQLiteModel(data_algebra.db_model.DBModel):
                 saw.add(k)
         # numpy fns
         numpy_fns = {
-            'abs': numpy.abs,
-            'arccos': numpy.arccos,
-            'arccosh': numpy.arccosh,
-            'arcsin': numpy.arcsin,
-            'arcsinh': numpy.arcsinh,
-            'arctan': numpy.arctan,
-            'arctanh': numpy.arctanh,
-            'ceil': numpy.ceil,
-            'cos': numpy.cos,
-            'cosh': numpy.cosh,
-            'exp': numpy.exp,
-            'expm1': numpy.expm1,
-            'floor': numpy.floor,
-            'log': numpy.log,
-            'log10': numpy.log10,
-            'log1p': numpy.log1p,
-            'sin': numpy.sin,
-            'sinh': numpy.sinh,
-            'sqrt': numpy.sqrt,
-            'tanh': numpy.tanh,
+            "abs": numpy.abs,
+            "arccos": numpy.arccos,
+            "arccosh": numpy.arccosh,
+            "arcsin": numpy.arcsin,
+            "arcsinh": numpy.arcsinh,
+            "arctan": numpy.arctan,
+            "arctanh": numpy.arctanh,
+            "ceil": numpy.ceil,
+            "cos": numpy.cos,
+            "cosh": numpy.cosh,
+            "exp": numpy.exp,
+            "expm1": numpy.expm1,
+            "floor": numpy.floor,
+            "log": numpy.log,
+            "log10": numpy.log10,
+            "log1p": numpy.log1p,
+            "sin": numpy.sin,
+            "sinh": numpy.sinh,
+            "sqrt": numpy.sqrt,
+            "tanh": numpy.tanh,
         }
         for k, f in numpy_fns.items():
             if not k in saw:
@@ -173,7 +173,9 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         return qt
 
     # noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection
-    def insert_table(self, conn, d, table_name, *, qualifiers=None, allow_overwrite=False):
+    def insert_table(
+        self, conn, d, table_name, *, qualifiers=None, allow_overwrite=False
+    ):
         """
 
         :param conn: a database connection

@@ -7,7 +7,9 @@ from data_algebra.data_ops import *
 
 
 def test_degenerate_project():
-    d = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2, 3, 4], "y": ["a", "a", "b", "b"]})
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"x": [1, 2, 3, 4], "y": ["a", "a", "b", "b"]}
+    )
 
     ops_good = describe_table(d).project({"x2": "x.max()"})
     res = ops_good.transform(d)

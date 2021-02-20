@@ -10,7 +10,9 @@ import pytest
 
 
 def test_R_yaml():
-    d = data_algebra.default_data_model.pd.DataFrame({"x": [1, 1, 2, 2], "y": [1, 2, 3, 4],})
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"x": [1, 1, 2, 2], "y": [1, 2, 3, 4],}
+    )
 
     ops1 = describe_table(d).project({"sum_y": "y.sum()"})
     res1 = ops1.transform(d)
@@ -19,7 +21,9 @@ def test_R_yaml():
 
     ops2 = describe_table(d).project({"sum_y": "y.sum()"}, group_by=["x"])
     res2 = ops2.transform(d)
-    expect2 = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2], "sum_y": [3, 7],})
+    expect2 = data_algebra.default_data_model.pd.DataFrame(
+        {"x": [1, 2], "sum_y": [3, 7],}
+    )
     assert data_algebra.test_util.equivalent_frames(res2, expect2)
 
 
@@ -33,7 +37,9 @@ def test_project0():
     assert formats_to_self(ops)
 
     res = ops.transform(d)
-    expect = data_algebra.default_data_model.pd.DataFrame({"c": [1, 1], "g": ["a", "b"]})
+    expect = data_algebra.default_data_model.pd.DataFrame(
+        {"c": [1, 1], "g": ["a", "b"]}
+    )
     assert data_algebra.test_util.equivalent_frames(expect, res)
 
 
@@ -69,14 +75,14 @@ def test_project():
     )
 
     ops = describe_table(d, "d").project(
-        {'ymax': "y.max()", 'ymin': "y.min()"}, group_by=["c", "g"]
+        {"ymax": "y.max()", "ymin": "y.min()"}, group_by=["c", "g"]
     )
 
     sql = ops.to_sql(db_model)
 
     data_algebra.test_util.check_op_round_trip(ops)
 
-    res = ops.eval(data_map={'d': d})
+    res = ops.eval(data_map={"d": d})
 
     expect = data_algebra.default_data_model.pd.DataFrame(
         {"c": [1, 1], "g": ["a", "b"], "ymax": [3, 4], "ymin": [1, 2]}

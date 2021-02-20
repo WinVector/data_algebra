@@ -23,7 +23,7 @@ def test_example_data_ops_extend():
 
         ops = ops + [
             TableDescription("d", ["x", "y"]).extend(
-                {'z': "1/q + _.x/_[var_name]", 'f': 1, 'g': '"2"', 'h': True}
+                {"z": "1/q + _.x/_[var_name]", "f": 1, "g": '"2"', "h": True}
             )
         ]
 

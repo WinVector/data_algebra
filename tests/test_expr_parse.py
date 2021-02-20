@@ -8,7 +8,9 @@ import data_algebra.util
 
 def test_expr_parse():
     # check some differences in back to Python versus sending to Pandas
-    d = data_algebra.default_data_model.pd.DataFrame({"a": [True, False], "b": [1, 2], "c": [3, 4]})
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"a": [True, False], "b": [1, 2], "c": [3, 4]}
+    )
 
     ops0 = TableDescription("d", ["a", "b", "c"]).extend({"d": "a + 1"})
 

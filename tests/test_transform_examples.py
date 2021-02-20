@@ -1,4 +1,3 @@
-
 import pytest
 
 import data_algebra.SQLite
@@ -30,7 +29,9 @@ def test_project_transform_2():
 
 def test_natural_join_transform_1():
     d1 = data_algebra.default_data_model.pd.DataFrame({"k": ["a", "b"], "x": [1, 2],})
-    d2 = data_algebra.default_data_model.pd.DataFrame({"k": ["b", "c"], "x": [3, 4], "y": [5, 6],})
+    d2 = data_algebra.default_data_model.pd.DataFrame(
+        {"k": ["b", "c"], "x": [3, 4], "y": [5, 6],}
+    )
     ops = describe_table(d1, table_name="d1").natural_join(
         b=describe_table(d2, table_name="d2"), by=["k"], jointype="LEFT"
     )
@@ -128,16 +129,54 @@ def test_convert_records_transform_1():
         # "cdata_temp_record": ops.record_map.blocks_out.control_table,
     }
 
-    expect = data_algebra.default_data_model.pd.DataFrame({
-        'id': [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2],
-        'Species': ['setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa',
-                    'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa'],
-        'Part': ['Petal', 'Petal', 'Sepal', 'Sepal', 'Petal', 'Petal', 'Sepal',
-                 'Sepal', 'Petal', 'Petal', 'Sepal', 'Sepal'],
-        'Measure': ['Length', 'Width', 'Length', 'Width', 'Length', 'Width',
-                    'Length', 'Width', 'Length', 'Width', 'Length', 'Width'],
-        'Value': [1.4, 0.2, 5.1, 3.5, 1.4, 0.2, 4.9, 3.0, 1.3, 0.2, 4.7, 3.2],
-        })
+    expect = data_algebra.default_data_model.pd.DataFrame(
+        {
+            "id": [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2],
+            "Species": [
+                "setosa",
+                "setosa",
+                "setosa",
+                "setosa",
+                "setosa",
+                "setosa",
+                "setosa",
+                "setosa",
+                "setosa",
+                "setosa",
+                "setosa",
+                "setosa",
+            ],
+            "Part": [
+                "Petal",
+                "Petal",
+                "Sepal",
+                "Sepal",
+                "Petal",
+                "Petal",
+                "Sepal",
+                "Sepal",
+                "Petal",
+                "Petal",
+                "Sepal",
+                "Sepal",
+            ],
+            "Measure": [
+                "Length",
+                "Width",
+                "Length",
+                "Width",
+                "Length",
+                "Width",
+                "Length",
+                "Width",
+                "Length",
+                "Width",
+                "Length",
+                "Width",
+            ],
+            "Value": [1.4, 0.2, 5.1, 3.5, 1.4, 0.2, 4.9, 3.0, 1.3, 0.2, 4.7, 3.2],
+        }
+    )
 
     res_pandas = ops.transform(iris_small)
     assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
@@ -153,4 +192,3 @@ def test_convert_records_transform_1():
     assert isinstance(temp_tables[k], data_algebra.default_data_model.pd.DataFrame)
 
     data_algebra.test_util.check_transform(ops, data, expect)
-

@@ -1,4 +1,3 @@
-
 import data_algebra
 import data_algebra.test_util
 import data_algebra.util
@@ -29,7 +28,9 @@ def test_cc():
 
 
 def test_cc_ops():
-    d = data_algebra.default_data_model.pd.DataFrame({"f": [1, 4, 6, 2, 1], "g": [2, 5, 7, 3, 7],})
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"f": [1, 4, 6, 2, 1], "g": [2, 5, 7, 3, 7],}
+    )
 
     ops = describe_table(d).extend({"c": "f.co_equalizer(g)"})
     assert formats_to_self(ops)
@@ -42,7 +43,9 @@ def test_cc_ops():
 
 
 def test_cc_ops_f():
-    d = data_algebra.default_data_model.pd.DataFrame({"f": [1, 4, 6, 2, 1], "g": [2, 5, 7, 3, 7],})
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"f": [1, 4, 6, 2, 1], "g": [2, 5, 7, 3, 7],}
+    )
 
     ops = describe_table(d).extend({"c": "connected_components(f, g)"})
     assert formats_to_self(ops)

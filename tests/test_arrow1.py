@@ -213,35 +213,26 @@ def test_arrow1():
 
 
 def test_arrow_cod_dom():
-    d = data_algebra.default_data_model.pd.DataFrame({
-        'x': [1, 2, 3],
-        'y': [3, 4, 4],
-    })
+    d = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2, 3], "y": [3, 4, 4],})
 
     td = describe_table(d)
 
-    a = td.extend(
-        {'z': 'x.mean()'},
-        partition_by=['y']
-    )
+    a = td.extend({"z": "x.mean()"}, partition_by=["y"])
 
     a1 = DataOpArrow(a)
 
-    a2 = DataOpArrow(a1.cod_as_table().extend({
-        'ratio': 'y / x'
-    }))
+    a2 = DataOpArrow(a1.cod_as_table().extend({"ratio": "y / x"}))
 
     assert a1.cod_as_table() == a2.dom_as_table()
     assert a1.cod() == a2.dom()
 
+
 def test_arrow_compose_2():
-    b1 = DataOpArrow(TableDescription(column_names=['x', 'y'], table_name=None). \
-        extend({
-        'y': 7
-    }))
-    b2 = DataOpArrow(TableDescription(column_names=['x', 'y'], table_name=None). \
-        extend({
-        'y': 9
-    }))
+    b1 = DataOpArrow(
+        TableDescription(column_names=["x", "y"], table_name=None).extend({"y": 7})
+    )
+    b2 = DataOpArrow(
+        TableDescription(column_names=["x", "y"], table_name=None).extend({"y": 9})
+    )
     ops = b1 >> b2
     assert isinstance(ops.pipeline.sources[0], TableDescription)
