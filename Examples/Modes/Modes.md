@@ -1,9 +1,13 @@
-
 The [`data_algebra`](https://github.com/WinVector/data_algebra) is designed to have a number of different modes of use.  The primary intended one the considered mode of building up a pipelines from a description of the tables to be acted on.
 
 (Note the `Python`/`data_algebra` version can be found [here](https://github.com/WinVector/data_algebra/blob/master/Examples/Modes/Modes.md), and the `R`/`rquery` version of this example can be found [here](https://github.com/WinVector/rquery/blob/master/Examples/Modes/Modes.md).)
 
 For our example, lets start with the following example data.
+
+
+```python
+
+```
 
 
 ```python
@@ -22,7 +26,19 @@ d
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -114,7 +130,19 @@ ops.eval({'d': d})
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -199,7 +227,19 @@ ops.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -312,117 +352,19 @@ print(str(DataOpArrow(ops)))
 
     [
      'd':
-      [ x: <class 'numpy.int64'>, y: <class 'numpy.int64'>, g: <class 'str'> ]
+      at least [ x: <class 'numpy.int64'>, y: <class 'numpy.int64'>, g: <class 'str'> ]
        ->
-      [ x, y, g, ratio, simple_rank, choice ]
+      at least [ choice, g, ratio, simple_rank, x, y ]
     ]
     
 
 
-Another way to use `data_algebra` is in "wapped mode", where we capture the tables to be operated on and descriptions at the same time.
-
 
 ```python
-ops_wrapped = wrap(d, table_name='d'). \
-  extend(       # add a new column
-         {'ratio': 'y / x'}). \
-  extend(       # rank the rows by group and order
-         {'simple_rank': '_row_number()'},
-         partition_by = ['g'],
-         order_by = ['ratio'],
-         reverse = ['ratio']). \
-  extend(       # mark the rows we want
-         {'choice': 'simple_rank == 1'})
+
 ```
 
 
 ```python
-ops_wrapped.ex()
+
 ```
-
-
-
-
-<div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>x</th>
-      <th>y</th>
-      <th>g</th>
-      <th>ratio</th>
-      <th>simple_rank</th>
-      <th>choice</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>2</td>
-      <td>a</td>
-      <td>2.000000</td>
-      <td>1</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>2</td>
-      <td>2</td>
-      <td>a</td>
-      <td>1.000000</td>
-      <td>2</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>3</td>
-      <td>2</td>
-      <td>a</td>
-      <td>0.666667</td>
-      <td>3</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>4</td>
-      <td>3</td>
-      <td>b</td>
-      <td>0.750000</td>
-      <td>3</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>5</td>
-      <td>7</td>
-      <td>b</td>
-      <td>1.400000</td>
-      <td>2</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>6</td>
-      <td>10</td>
-      <td>b</td>
-      <td>1.666667</td>
-      <td>1</td>
-      <td>True</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-The difference is: we use the `wrap` to build a special operator collecting (and checking) pipeline, and then later `ex` to say we are done specifying steps and to apply the operations to the data. Prior to the `ex` step the operator pipeline is available as a field called `underlying` and the set of wrapped `data.frame`s is available as a field called `data_map`.  
-
-The wrapping of data as a different kind of `data_algebra` pipeline is an example of using the ["decorator pattern"](https://en.wikipedia.org/wiki/Decorator_pattern) (which can be considered as an object oriented variation of the functional monad pattern, [ref](https://en.wikipedia.org/wiki/Monad_(functional_programming))).  However, these are technical considerations that are the package developer's problem- not problems for the package users. Think of these terms as examples of things developers worry about so users don't have to worry about them.
-
-`data_algebra` operator are designed to check pre and post-conditions early.  This can be specialized into [interpreting `data_algebra` pipelines as category theory arrows](https://github.com/WinVector/data_algebra/blob/master/Examples/Arrow/Arrow.md).
-More commonly a less controlled form of operator abstraction/composition based on [lambda-abstraction](https://en.wikipedia.org/wiki/Lambda_calculus), [lazy evaluation](https://en.wikipedia.org/wiki/Lazy_evaluation) is used in `R` packages.
-
-

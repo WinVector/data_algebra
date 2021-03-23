@@ -63,7 +63,19 @@ d
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -98,22 +110,35 @@ d
 
 
 
-For example: `drop_columns` works as follows. `drop_columns` creates a new `DataFrame` without certain columns. We can start by wrapping our `DataFrame` `d` for processing, then applying the `drop_columns()` operators, and finally ending and executing the chain with the `ex()` method.
+For example: `drop_columns` works as follows. `drop_columns` creates a new `DataFrame` without certain columns. We can start by describine our `DataFrame` `d` for processing, then applying the `drop_columns()` operators, and finally ending and executing the chain with the `transform()` method. We can execute the chain on the original table, or any table with similar column structure.
 
 
 ```python
 from data_algebra.data_ops import *
 
-wrap(d). \
-    drop_columns(['y', 'z']). \
-    ex()
+ops = describe_table(d). \
+    drop_columns(['y', 'z'])
+
+ops.transform(d)
 ```
 
 
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -146,16 +171,29 @@ In all cases the first argument of a `data_algebra` operator is either the data 
 
 
 ```python
-wrap(d). \
-  select_columns(['x', 'y']). \
-  ex()
+ops = describe_table(d). \
+  select_columns(['x', 'y'])
+
+ops.transform(d)
 ```
 
 
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -190,19 +228,32 @@ wrap(d). \
 
 
 ```python
-wrap(d). \
+ops = describe_table(d). \
   rename_columns({
      'x_new_name': 'x',
      'y_new_name': 'y'
-    }). \
-  ex()
+    })
+
+ops.transform(d)
 ```
 
 
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -248,16 +299,29 @@ The simple row operations are:
 
 
 ```python
-wrap(d). \
-  select_rows('x == 1'). \
-  ex()
+ops = describe_table(d). \
+  select_rows('x == 1')
+
+ops.transform(d)
 ```
 
 
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -291,18 +355,31 @@ wrap(d). \
 
 
 ```python
-wrap(d). \
+ops = describe_table(d). \
   order_rows(
              ['x', 'y'],
-             reverse = ['x']). \
-  ex()
+             reverse = ['x'])
+
+ops.transform(d)
 ```
 
 
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -349,16 +426,29 @@ The important create or replace column operation is:
 
 
 ```python
-wrap(d). \
-  extend({'zzz': 'y / x'}). \
-  ex()
+ops = describe_table(d). \
+  extend({'zzz': 'y / x'})
+
+ops.transform(d)
 ```
 
 
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -403,22 +493,35 @@ We can use `=` or `:=` for column assignment.  In these examples we will use `:=
 
 
 ```python
-wrap(d). \
+ops = describe_table(d). \
   extend({
          'max_y': 'y.max()',
          'shift_z': 'z.shift()',
          'row_number': '_row_number()',
          'cumsum_z': 'z.cumsum()',},
          partition_by = 'x',
-         order_by = ['y', 'z']). \
-  ex()
+         order_by = ['y', 'z'])
+
+ops.transform(d)
 ```
 
 
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -484,19 +587,32 @@ The main aggregation method for `data_algebra` is:
 
 
 ```python
-wrap(d). \
+ops = describe_table(d). \
   project({
          'max_y': 'y.max()',
          'count': '_size()',},
-         group_by = ['x']). \
-  ex()
+         group_by = ['x'])
+
+ops.transform(d)
 ```
 
 
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -529,19 +645,32 @@ Notice we only get one row for each unique combination of the grouping variables
 
 
 ```python
-wrap(d). \
+ops = describe_table(d). \
   project({
          'max_y': 'y.max()',
          'count': '_size()',
-          }). \
-  ex()
+          })
+
+ops.transform(d)
 ```
 
 
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -591,7 +720,19 @@ d_left
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -640,7 +781,19 @@ d_right
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -687,7 +840,19 @@ ops.eval({'d_left': d_left, 'd_right': d_right})
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -743,7 +908,19 @@ d_a
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -793,7 +970,19 @@ d_b
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -840,7 +1029,19 @@ ops.eval({'d_a': d_a, 'd_b': d_b})
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -922,7 +1123,19 @@ iris_small
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1021,7 +1234,19 @@ ops.eval({'iris_small': iris_small,
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1143,11 +1368,10 @@ Record transformation is "simple once you get it".  However, we suggest reading 
 We could, of course, perform complicated data manipulation by sequencing `data_algebra` operations, and saving intermediate values. 
 `data_algebra` operators can also act on `data_algebra` pipelines instead of acting on data. We can write our operations as follows.
 
-We can use the `wrap()`/`ex()` pattern to capture both the operator pipeline and to apply it.
 
 
 ```python
-wrapped_ops = wrap(d). \
+ops = describe_table(d). \
   extend({
          'row_number': '_row_number()',
          },
@@ -1157,36 +1381,30 @@ wrapped_ops = wrap(d). \
               'row_number == 1') . \
   drop_columns(
                "row_number")
-
-wrapped_ops.underlying
 ```
 
 
-
-
-    TableDescription(
-     table_name='data_frame',
-     column_names=[
-       'x', 'y', 'z']) .\
-       extend({
-        'row_number': '_row_number()'},
-       partition_by=['x'],
-       order_by=['y', 'z']) .\
-       select_rows('row_number == 1') .\
-       drop_columns(['row_number'])
-
-
-
-
 ```python
-wrapped_ops.ex()
+ops.transform(d)
 ```
 
 
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1260,7 +1478,19 @@ ops.transform(d)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1316,4 +1546,3 @@ Some advanced notes on the category theory ideas used in the package can be foun
 ```python
 
 ```
-
