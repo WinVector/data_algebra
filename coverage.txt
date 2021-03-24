@@ -162,4 +162,4 @@ TOTAL                                   4148    839    80%
 
 =========================== short test summary info ============================
 FAILED tests/test_user_fn_name.py::test_u_2 -   File "<unknown>", line 1
-======================== 1 failed, 104 passed in 7.93s =========================
+======================== 1 failed, 104 passed in 7.61s =========================
