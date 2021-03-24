@@ -36,7 +36,9 @@ except ImportError:
 
 # wrap a single argument function as a user callable function in pipeline
 # used for custom aggregators
-def user_fn(fn, args=None, *, name=None):
+def user_fn(fn, args=None, *,
+            name=None,
+            sql_name=None, sql_prefix=None, sql_suffix=None):
     if isinstance(fn, str):
         if name is None:
             name = fn
@@ -55,7 +57,9 @@ def user_fn(fn, args=None, *, name=None):
             data_algebra.expr_rep.ColumnReference(view=None, column_name=v)
             for v in args
         ]
-    return data_algebra.expr_rep.FnCall(fn, fn_args=fn_args, name=name)
+    return data_algebra.expr_rep.FnCall(fn, fn_args=fn_args,
+                                        name=name,
+                                        sql_name=sql_name, sql_prefix=sql_prefix, sql_suffix=sql_suffix)
 
 
 class ViewRepresentation(OperatorPlatform, ABC):

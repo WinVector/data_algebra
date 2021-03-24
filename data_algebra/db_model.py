@@ -284,7 +284,7 @@ class DBModel:
                     return subs[0] + " " + op.upper() + " " + subs[1]
             return op.upper() + "(" + ", ".join(subs) + ")"
         if isinstance(expression, data_algebra.expr_rep.FnCall):
-            op = expression.name
+            op = expression.sql_name()
             if op in self.op_replacements.keys():
                 op = self.op_replacements[op]
             if op in self.sql_formatters.keys():
@@ -292,7 +292,9 @@ class DBModel:
             subs = [
                 self.expr_to_sql(ai, want_inline_parens=True) for ai in expression.args
             ]
-            return op.upper() + "(" + ", ".join(subs) + ")"
+            before = expression.sql_prefix()
+            after = expression.sql_suffix()
+            return op.upper() + "(" + before + ", ".join(subs) + after + ")"
         if isinstance(expression, data_algebra.expr_rep.FnValue):
             op = expression.name
             if op in self.op_replacements.keys():

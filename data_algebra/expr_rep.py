@@ -83,7 +83,7 @@ class PreTerm(ABC):
     # emitters
 
     def to_python(self, *, want_inline_parens=False):
-        raise NotImplementedError("base class called")
+        raise NotImplementedError("base class method called")  # https://docs.python.org/3/library/exceptions.html
 
     def to_pandas(self, *, want_inline_parens=False):
         return self.to_python(want_inline_parens=want_inline_parens)
@@ -521,13 +521,25 @@ class FnValue(PreTerm):
 
 class FnCall(PreTerm):
     # represent a function of columns
-    def __init__(self, value, fn_args=None, *, name=None):
+    def __init__(self, value, fn_args=None, *,
+                 name=None,
+                 sql_name=None, sql_prefix=None, sql_suffix=None):
         if not callable(value):
             raise TypeError("value type must be callable")
         self.value = value
         if name is None:
             name = value.__name__
         self.name = name
+        if sql_name is None:
+            self.sql_name_ = self.name
+        else:
+            self.sql_name_ = sql_name
+        self.sql_prefix_ = ''
+        if sql_prefix is not None:
+            self.sql_prefix_ = sql_prefix
+        self.sql_suffix_ = ''
+        if sql_suffix is not None:
+            self.sql_suffix_ = sql_suffix
         if fn_args is None:
             fn_args = []
         if isinstance(fn_args, ColumnReference):
@@ -564,6 +576,15 @@ class FnCall(PreTerm):
 
     def to_python(self, *, want_inline_parens=False):
         return UnQuotedStr(self.display_form)
+
+    def sql_name(self):
+        return self.sql_name_
+
+    def sql_prefix(self):
+        return self.sql_prefix_
+
+    def sql_suffix(self):
+        return self.sql_suffix_
 
 
 class ListTerm(PreTerm):
