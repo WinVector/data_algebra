@@ -43,6 +43,17 @@ def make_custom_function_map(data_model):
             implementation=lambda c, x, y: numpy.where(c, x, y),
         ),
         CustomFunction(
+            name="is_in",
+            pandas_formatter=lambda expr: (
+                    "@is_in("
+                    + expr.args[0].to_pandas()
+                    + ", "
+                    + expr.args[1].to_pandas()
+                    + ")"
+            ),
+            implementation=lambda c, v: numpy.isin(c, v),
+        ),
+        CustomFunction(
             name="neg",
             pandas_formatter=lambda expr: "-"
             + expr.args[0].to_pandas(want_inline_parens=True),

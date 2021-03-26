@@ -64,10 +64,22 @@ def _db_if_else_expr(dbmodel, expression):
     )
 
 
+def _db_is_in_expr(dbmodel, expression):
+    is_in_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    x_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
+    return (
+        is_in_expr
+        + " IN ("
+        + ', '.join([repr(v) for v in x_expr])
+        + ")"
+    )
+
+
 db_expr_formatters = {
     "is_null": _db_is_null_expr,
     "is_bad": _db_is_bad_expr,
     "if_else": _db_if_else_expr,
+    "is_in": _db_is_in_expr,
 }
 
 

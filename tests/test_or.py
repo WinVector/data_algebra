@@ -1,14 +1,17 @@
 
+import sqlite3
+
 import numpy
 import pandas
 
 from data_algebra.data_ops import *
 import data_algebra.util
 import data_algebra.test_util
+import data_algebra.SQLite
 
 import pytest
 
-# TODO: SQL tests and doc!
+# TODO: more SQL tests and doc!
 
 def test_or_1():
     # some example data
@@ -49,12 +52,23 @@ def test_in_1():
     })
 
     ops = describe_table(d, table_name='d'). \
-        select_rows('ID in [3, 4]')
+        extend({'v': 'ID.is_in([3, 4])'})
+    ops_str = str(ops)  # see if this throws
     d2 = ops.transform(d)
 
     expect = pandas.DataFrame({
-        'ID': [3, 4, 4, 4, 4],
-        'OP': ['D', 'C', 'A', 'D', 'B'],
+        'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
+        'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
+        'v': [False]*3 + [True]*5 + [False]*3,
     })
 
     assert data_algebra.test_util.equivalent_frames(expect, d2)
+
+    db_model = data_algebra.SQLite.SQLiteModel()
+    sql = ops.to_sql(db_model, pretty=True)
+    with sqlite3.connect(':memory:') as con:
+        db_model.prepare_connection(con)
+        d.to_sql(name='d', con=con)
+        res_db = pandas.read_sql(sql, con=con)
+
+    assert data_algebra.test_util.equivalent_frames(expect, res_db)
