@@ -529,6 +529,8 @@ class FnCall(PreTerm):
         self.value = value
         if name is None:
             name = value.__name__
+            if name == '<lambda>':
+                raise ValueError("lambda functions must have name argument set")
         self.name = name
         if sql_name is None:
             self.sql_name_ = self.name

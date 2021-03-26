@@ -4,6 +4,8 @@ import sqlite3
 import numpy
 import pandas
 
+import pytest
+
 from data_algebra.data_ops import *
 import data_algebra.SQLite
 
@@ -51,20 +53,10 @@ def test_u_2():
                  '2003-11-09 00:00:00', '2004-01-09 00:00:00'],
     })
 
-    trim_date = user_fn(lambda x: x.str.slice(start=0, stop=10),
-                        'DATE',
-                        sql_name='SUBSTR', sql_suffix=', 1, 10')
-
-    ops = describe_table(d, table_name='d'). \
-        extend({'date_trimmed': trim_date})
-
-    res_1 = ops.transform(d)
-
-    q = ops.to_sql(db_model)
-
-    with sqlite3.connect(':memory:') as con:
-        d.to_sql(name='d', con=con)
-        res_db = pandas.read_sql(q, con=con)
+    with pytest.raises(ValueError):
+        trim_date = user_fn(lambda x: x.str.slice(start=0, stop=10),
+                            'DATE',
+                            sql_name='SUBSTR', sql_suffix=', 1, 10')
 
 
 def test_u_3():
