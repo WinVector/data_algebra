@@ -10,7 +10,9 @@ import data_algebra.eval_model
 
 # map from op-name to special SQL formatting code
 
-
+# Standard SQL code for checking isbad doesn't work in SQLlite, so
+# at least capture to is_bad, which appears to not be implemented
+# unless we call prepare connection
 def _sqlite_is_bad_expr(dbmodel, expression):
     return (
         "is_bad("

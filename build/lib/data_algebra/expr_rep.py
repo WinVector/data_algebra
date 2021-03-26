@@ -453,13 +453,16 @@ class Term(PreTerm, ABC):
     def if_else(self, x, y):
         return self.__triop_expr__("if_else", x, y, method=True)
 
+    def is_in(self, x):
+        return self.__op_expr__("is_in", x, inline=False, method=True)
+
     def co_equalizer(self, x):
         return self.__op_expr__("co_equalizer", x, inline=False, method=True)
 
 
 class Value(Term):
     def __init__(self, value):
-        allowed = [int, float, str, bool]
+        allowed = [int, float, str, bool, ListTerm]
         if not any([isinstance(value, tp) for tp in allowed]):
             raise TypeError("value type must be one of: " + str(allowed))
         self.value = value
@@ -529,6 +532,8 @@ class FnCall(PreTerm):
         self.value = value
         if name is None:
             name = value.__name__
+            if name == '<lambda>':
+                raise ValueError("lambda functions must have name argument set")
         self.name = name
         if sql_name is None:
             self.sql_name_ = self.name
@@ -605,11 +610,17 @@ class ListTerm(PreTerm):
         return ListTerm(new_list)
 
     def to_python(self, *, want_inline_parens=False):
+        def li_to_python(value, *, want_inline_parens=False):
+            try:
+                return value.to_python(want_inline_parens=want_inline_parens)
+            except AttributeError:
+                return str(value)  # TODO: check if this should be repr?
+
         return (
             "["
             + ", ".join(
                 [
-                    ai.to_python(want_inline_parens=want_inline_parens)
+                    li_to_python(ai, want_inline_parens=want_inline_parens)
                     for ai in self.value
                 ]
             )

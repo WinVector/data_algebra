@@ -2,14 +2,15 @@
 platform darwin -- Python 3.7.7, pytest-6.2.2, py-1.10.0, pluggy-0.13.1
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: anyio-2.2.0, cov-2.11.1
-collected 105 items
+collected 110 items
 
 tests/test_R_yaml.py .                                                   [  0%]
 tests/test_agg.py ..                                                     [  2%]
 tests/test_apply.py .                                                    [  3%]
-tests/test_arrow1.py ...                                                 [  6%]
-tests/test_calc_issue.py .                                               [  7%]
-tests/test_calc_warnings_errors.py .                                     [  8%]
+tests/test_arith.py .                                                    [  4%]
+tests/test_arrow1.py ...                                                 [  7%]
+tests/test_calc_issue.py .                                               [  8%]
+tests/test_calc_warnings_errors.py .                                     [  9%]
 tests/test_cc.py ......                                                  [ 14%]
 tests/test_cdata1.py ...                                                 [ 17%]
 tests/test_cdata_convenience.py .                                        [ 18%]
@@ -20,15 +21,15 @@ tests/test_db_model.py .                                                 [ 24%]
 tests/test_degenerate_project.py .                                       [ 25%]
 tests/test_drop_columns.py .                                             [ 26%]
 tests/test_exampe1.py ....                                               [ 30%]
-tests/test_example_data_ops.py .                                         [ 31%]
-tests/test_exp.py .                                                      [ 32%]
-tests/test_expr_parse.py .                                               [ 33%]
-tests/test_extend.py ....                                                [ 37%]
-tests/test_flow_text.py .                                                [ 38%]
-tests/test_forbidden_calculation.py ..                                   [ 40%]
+tests/test_example_data_ops.py .                                         [ 30%]
+tests/test_exp.py .                                                      [ 31%]
+tests/test_expr_parse.py .                                               [ 32%]
+tests/test_extend.py ....                                                [ 36%]
+tests/test_flow_text.py .                                                [ 37%]
+tests/test_forbidden_calculation.py ..                                   [ 39%]
 tests/test_free_expr.py .                                                [ 40%]
-tests/test_ghost_col_issue.py .                                          [ 41%]
-tests/test_if_else.py .                                                  [ 42%]
+tests/test_ghost_col_issue.py .                                          [ 40%]
+tests/test_if_else.py ..                                                 [ 42%]
 tests/test_join_check.py .                                               [ 43%]
 tests/test_join_effects.py .                                             [ 44%]
 tests/test_math.py .                                                     [ 45%]
@@ -36,101 +37,80 @@ tests/test_modin.py ..                                                   [ 47%]
 tests/test_narrow.py .                                                   [ 48%]
 tests/test_natural_join.py .                                             [ 49%]
 tests/test_neg.py .                                                      [ 50%]
-tests/test_null_bad.py .                                                 [ 51%]
-tests/test_ops.py .                                                      [ 52%]
-tests/test_ops_eq.py .                                                   [ 53%]
-tests/test_ordered_agg_group.py .                                        [ 54%]
-tests/test_parse.py .                                                    [ 55%]
-tests/test_project.py .....                                              [ 60%]
-tests/test_ranked_example.py .                                           [ 60%]
-tests/test_ref_detect.py ..                                              [ 62%]
-tests/test_rename.py .                                                   [ 63%]
-tests/test_scatter_example.py .                                          [ 64%]
-tests/test_scoring_example.py .                                          [ 65%]
-tests/test_select.py ..                                                  [ 67%]
-tests/test_select_stacking.py .                                          [ 68%]
-tests/test_shorten.py .                                                  [ 69%]
-tests/test_simple.py ....                                                [ 73%]
-tests/test_spark_sql.py .                                                [ 74%]
-tests/test_sqlite.py ....                                                [ 78%]
+tests/test_null_bad.py .                                                 [ 50%]
+tests/test_ops.py .                                                      [ 51%]
+tests/test_ops_eq.py .                                                   [ 52%]
+tests/test_or.py FF.                                                     [ 55%]
+tests/test_ordered_agg_group.py .                                        [ 56%]
+tests/test_parse.py .                                                    [ 57%]
+tests/test_project.py .....                                              [ 61%]
+tests/test_ranked_example.py .                                           [ 62%]
+tests/test_ref_detect.py ..                                              [ 64%]
+tests/test_rename.py .                                                   [ 65%]
+tests/test_scatter_example.py .                                          [ 66%]
+tests/test_scoring_example.py .                                          [ 67%]
+tests/test_select.py ..                                                  [ 69%]
+tests/test_select_stacking.py .                                          [ 70%]
+tests/test_shorten.py .                                                  [ 70%]
+tests/test_simple.py ....                                                [ 74%]
+tests/test_spark_sql.py .                                                [ 75%]
+tests/test_sqlite.py ....                                                [ 79%]
 tests/test_strat_example.py ..                                           [ 80%]
-tests/test_table_is_key_by_columns.py .                                  [ 80%]
+tests/test_table_is_key_by_columns.py .                                  [ 81%]
 tests/test_transform_examples.py ...........                             [ 91%]
 tests/test_user_fn.py ....                                               [ 95%]
-tests/test_user_fn_name.py .F.                                           [ 98%]
+tests/test_user_fn_name.py ...                                           [ 98%]
 tests/test_window2.py .                                                  [ 99%]
 tests/test_window_fns.py .                                               [100%]
 
 =================================== FAILURES ===================================
-___________________________________ test_u_2 ___________________________________
+__________________________________ test_or_1 ___________________________________
 
-    def test_u_2():
-        db_model = data_algebra.SQLite.SQLiteModel()
-    
+    def test_or_1():
         # some example data
         d = pandas.DataFrame({
             'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
             'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
-            'DATE': ['2001-01-02 00:00:00', '2015-04-25 00:00:00', '2000-04-01 00:00:00',
-                     '2014-04-07 00:00:00', '2012-12-01 00:00:00', '2005-06-16 00:00:00',
-                     '2009-01-20 00:00:00', '2009-01-20 00:00:00', '2010-10-10 00:00:00',
-                     '2003-11-09 00:00:00', '2004-01-09 00:00:00'],
         })
     
-        trim_date = user_fn(lambda x: x.str.slice(start=0, stop=10),
-                            'DATE',
-                            sql_name='SUBSTR', sql_suffix=', 1, 10')
-    
         ops = describe_table(d, table_name='d'). \
-            extend({'date_trimmed': trim_date})
+>           select_rows('(ID == 3) | (ID == 4)')
+
+tests/test_or.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+data_algebra/data_ops.py:561: in select_rows
+    {"expr": expr}, self, parse_env=parse_env
+data_algebra/expr_rep.py:895: in parse_assignments_in_context
+    source_str=v, data_def=mp, outter_environemnt=parse_env
+data_algebra/expr_rep.py:799: in _parse_by_eval
+    source_str, outter_environemnt, data_def
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   TypeError: unsupported operand type(s) for |: 'Expression' and 'Expression'
+
+<string>:1: TypeError
+__________________________________ test_or_2 ___________________________________
+
+    def test_or_2():
+        # some example data
+        d = pandas.DataFrame({
+            'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
+            'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
+        })
     
->       res_1 = ops.transform(d)
+        with pytest.raises(ValueError):
+            ops = describe_table(d, table_name='d'). \
+>               select_rows('(ID == 3) or (ID == 4)')
+E           Failed: DID NOT RAISE <class 'ValueError'>
 
-tests/test_user_fn_name.py:61: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-data_algebra/data_ops.py:404: in transform
-    narrow=narrow,
-data_algebra/data_ops.py:379: in eval
-    data_map=data_map, eval_env=eval_env, data_model=data_model, narrow=narrow
-data_algebra/data_ops.py:1040: in eval_implementation
-    op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
-data_algebra/pandas_base.py:121: in extend_step
-    res[k] = res.eval(op_src, local_dict=pe, global_dict=eval_env)
-../../../opt/anaconda3/envs/ai_academy_3_7/lib/python3.7/site-packages/pandas/core/frame.py:3599: in eval
-    return _eval(expr, inplace=inplace, **kwargs)
-../../../opt/anaconda3/envs/ai_academy_3_7/lib/python3.7/site-packages/pandas/core/computation/eval.py:342: in eval
-    parsed_expr = Expr(expr, engine=engine, parser=parser, env=env)
-../../../opt/anaconda3/envs/ai_academy_3_7/lib/python3.7/site-packages/pandas/core/computation/expr.py:798: in __init__
-    self.terms = self.parse()
-../../../opt/anaconda3/envs/ai_academy_3_7/lib/python3.7/site-packages/pandas/core/computation/expr.py:817: in parse
-    return self._visitor.visit(self.expr)
-../../../opt/anaconda3/envs/ai_academy_3_7/lib/python3.7/site-packages/pandas/core/computation/expr.py:397: in visit
-    raise e
-../../../opt/anaconda3/envs/ai_academy_3_7/lib/python3.7/site-packages/pandas/core/computation/expr.py:393: in visit
-    node = ast.fix_missing_locations(ast.parse(clean))
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-source = '__pd_eval_local_<lambda >(DATE )', filename = '<unknown>'
-mode = 'exec'
-
-    def parse(source, filename='<unknown>', mode='exec'):
-        """
-        Parse the source into an AST node.
-        Equivalent to compile(source, filename, mode, PyCF_ONLY_AST).
-        """
->       return compile(source, filename, mode, PyCF_ONLY_AST)
-E         File "<unknown>", line 1
-E           __pd_eval_local_<lambda >(DATE )
-E                                 ^
-E       SyntaxError: invalid syntax
-
-../../../opt/anaconda3/envs/ai_academy_3_7/lib/python3.7/ast.py:35: SyntaxError
+tests/test_or.py:44: Failed
 
 ---------- coverage: platform darwin, python 3.7.7-final-0 -----------
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
 data_algebra/PostgreSQL.py                19      4    79%
-data_algebra/SQLite.py                    74     16    78%
+data_algebra/SQLite.py                    74     10    86%
 data_algebra/SparkSQL.py                  19      4    79%
 data_algebra/__init__.py                   6      0   100%
 data_algebra/arrow.py                    173     39    77%
@@ -143,12 +123,12 @@ data_algebra/data_ops.py                1225    215    82%
 data_algebra/data_ops_types.py            74     33    55%
 data_algebra/data_ops_utils.py            34      6    82%
 data_algebra/data_pipe.py                189     50    74%
-data_algebra/db_model.py                 491     98    80%
+data_algebra/db_model.py                 495     97    80%
 data_algebra/diagram.py                   56     43    23%
 data_algebra/env.py                       31      3    90%
 data_algebra/eval_model.py                18      2    89%
 data_algebra/expr.py                      20      4    80%
-data_algebra/expr_rep.py                 545    110    80%
+data_algebra/expr_rep.py                 554    108    81%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/modin_model.py               36     22    39%
 data_algebra/near_sql.py                 140     16    89%
@@ -158,8 +138,9 @@ data_algebra/test_util.py                127     18    86%
 data_algebra/util.py                      28      4    86%
 data_algebra/yaml.py                      95     11    88%
 ----------------------------------------------------------
-TOTAL                                   4148    839    80%
+TOTAL                                   4161    830    80%
 
 =========================== short test summary info ============================
-FAILED tests/test_user_fn_name.py::test_u_2 -   File "<unknown>", line 1
-======================== 1 failed, 104 passed in 7.61s =========================
+FAILED tests/test_or.py::test_or_1 - TypeError: unsupported operand type(s) f...
+FAILED tests/test_or.py::test_or_2 - Failed: DID NOT RAISE <class 'ValueError'>
+======================== 2 failed, 108 passed in 7.28s =========================
