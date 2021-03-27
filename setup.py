@@ -24,7 +24,7 @@ setuptools.setup(
     author='John Mount',
     author_email='jmount@win-vector.com',
     url='https://github.com/WinVector/data_algebra',
-    packages=setuptools.find_packages(exclude=['tests', 'Examples', 'lark']),
+    packages=setuptools.find_packages(exclude=['tests', 'Examples']),
     install_requires=[
         "numpy",
         "pandas",
@@ -55,7 +55,5 @@ setuptools.setup(
           'Programming Language :: Python :: 3.9',
           'License :: OSI Approved :: BSD License',
     ],
-    include_package_data=True,
-    package_data={'': ['data/*']},
     long_description=LONG_DESCRIPTION,
 )

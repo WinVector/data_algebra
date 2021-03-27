@@ -1,3 +1,15 @@
+
+
+# python3.lark from:
+#    https://github.com/lark-parser/lark/blob/master/examples/advanced/python3.lark
+#    Copyright © 2017 Erez Shinan
+#    Licence: https://github.com/lark-parser/lark/blob/master/LICENSE (MIT)
+#
+# Python driver example:
+#    https://github.com/lark-parser/lark/blob/master/examples/advanced/python_parser.py
+
+
+grammar=r"""
 // Python 3 grammar for Lark
 
 // NOTE: Work in progress!!! (XXX TODO)
@@ -189,4 +201,4 @@ _NEWLINE: ( /\r?\n[\t ]*/ | COMMENT )+
 %ignore /\\[\t \f]*\r?\n/   // LINE_CONT
 %ignore COMMENT
 %declare _INDENT _DEDENT
-
+"""

@@ -1,6 +1,5 @@
 from abc import ABC
 from typing import Union
-import collections
 
 import data_algebra.util
 import data_algebra.env
@@ -146,7 +145,7 @@ class Term(PreTerm, ABC):
             y = _enc_value(y)
         return Expression(op, (self, x, y), inline=inline, method=method)
 
-    # try to get at == and other comparision operators
+    # try to get at == and other comparison operators
 
     def __eq__(self, other):
         return self.__op_expr__("==", other)
@@ -776,34 +775,6 @@ class Expression(Term):
         return self.op + "(" + ", ".join(subs) + ")"
 
 
-# Some notes on trying to harden eval:
-#  http://lybniz2.sourceforge.net/safeeval.html
-
-
-def _parse_by_eval(source_str, *, data_def, outter_environemnt=None):
-    if not isinstance(source_str, str):
-        source_str = str(source_str)
-    if outter_environemnt is None:
-        outter_environemnt = {}
-    else:
-        outter_environemnt = {
-            k: v for (k, v) in outter_environemnt.items() if not k.startswith("_")
-        }
-    # don't have to completely kill this environment, as the code is something
-    # the user intends to run (and may have even typed in).
-    # But let's cut down the builtins anyway.
-    outter_environemnt["__builtins__"] = {
-        k: v for (k, v) in outter_environemnt.items() if isinstance(v, Exception)
-    }
-    v = eval(
-        source_str, outter_environemnt, data_def
-    )  # eval is eval(source, globals, locals)- so mp is first
-    if not isinstance(v, PreTerm):
-        v = _enc_value(v)
-    v.source_string = source_str
-    return v
-
-
 # define with def so function has usable __name__
 def connected_components(f, g):
     return data_algebra.expr_rep.Expression(op="connected_components", args=[f, g])
@@ -847,67 +818,6 @@ def populate_specials(*, column_defs, destination, user_values=None):
     ] = lambda fn, args, partition: data_algebra.expr_rep.Expression(
         op="partitioned_eval", args=[fn, args, partition]
     )
-
-
-def parse_assignments_in_context(ops, view, *, parse_env=None):
-    """
-    Convert all entries of ops map to Term-expressions
-
-    Note: eval() is called to interpret expressions on some nodes, so this
-       function is not safe to use on untrusted code (though a somewhat restricted
-       version of eval() is used to try and catch some issues).
-    :param ops: dictionary from strings to expressions (either Terms or strings)
-    :param view: a data_algebra.data_ops.ViewRepresentation
-    :param parse_env map of names to values to add to parsing environment
-    :return:
-    """
-    if ops is None:
-        ops = {}
-    if isinstance(ops, tuple) or isinstance(ops, list):
-        opslen = len(ops)
-        ops = {k: v for (k, v) in ops}
-        if opslen != len(ops):
-            raise ValueError("ops keys must be unique")
-    if not isinstance(ops, dict):
-        raise TypeError("ops should be a dictionary")
-    column_defs = view.column_map.__dict__
-    if not isinstance(column_defs, dict):
-        raise TypeError("column_defs should be a dictionary")
-    if parse_env is None:
-        parse_env = data_algebra.env.outer_namespace()
-    if parse_env is None:
-        parse_env = {}
-    # first: make sure all entries are parsed
-    columns_used = set()
-    newops = collections.OrderedDict()
-    mp = column_defs.copy()
-    populate_specials(column_defs=column_defs, destination=mp, user_values=parse_env)
-    for k in ops.keys():
-        if not isinstance(k, str):
-            raise TypeError("ops keys should be strings")
-        ov = ops[k]
-        v = ov
-        if not isinstance(v, PreTerm):
-            if callable(v):
-                v = FnValue(v)
-            else:
-                v = _parse_by_eval(
-                    source_str=v, data_def=mp, outter_environemnt=parse_env
-                )
-        else:
-            v = v.replace_view(view)
-        newops[k] = v
-        used_here = set()
-        v.get_column_names(used_here)
-        columns_used = columns_used.union(
-            used_here - {k}
-        )  # can use a column to update itself
-    intersect = set(ops.keys()).intersection(columns_used)
-    if len(intersect) > 0:
-        raise ValueError(
-            "columns both produced and used in same expression set: " + str(intersect)
-        )
-    return newops
 
 
 def standardize_join_type(join_str):

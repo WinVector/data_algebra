@@ -5,6 +5,7 @@ import collections
 import re
 
 import data_algebra
+import data_algebra.expr_parse
 import data_algebra.flow_text
 import data_algebra.data_model
 import data_algebra.db_model
@@ -489,7 +490,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
     ):
         if (ops is None) or (len(ops) < 1):
             return self
-        parsed_ops = data_algebra.expr_rep.parse_assignments_in_context(
+        parsed_ops = data_algebra.expr_parse.parse_assignments_in_context(
             ops, self, parse_env=parse_env
         )
         return self.extend_parsed(
@@ -516,7 +517,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             group_by = []
         if ((ops is None) or (len(ops) < 1)) and (len(group_by) < 1):
             raise ValueError("must have ops or group_by")
-        parsed_ops = data_algebra.expr_rep.parse_assignments_in_context(
+        parsed_ops = data_algebra.expr_parse.parse_assignments_in_context(
             ops, self, parse_env=parse_env
         )
         return self.project_parsed(parsed_ops=parsed_ops, group_by=group_by)
@@ -557,7 +558,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             return self
         if self.is_trivial_when_intermediate():
             return self.sources[0].select_rows(expr, parse_env=parse_env)
-        ops = data_algebra.expr_rep.parse_assignments_in_context(
+        ops = data_algebra.expr_parse.parse_assignments_in_context(
             {"expr": expr}, self, parse_env=parse_env
         )
         data_model = data_algebra.default_data_model
