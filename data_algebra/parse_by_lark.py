@@ -46,21 +46,24 @@ op_remap = {
     '/': '__truediv__',
     '//': '__floordiv__',
     '**': '__pow__',
-    '>>': '__lshift__',
-    '<<': '__rshift__',
     '&': '__and__',
     '^': '__xor__',
     '|': '__or__',
-    '&&': '__and__',  # may not be mapped to
-    '||': '__or__',  # may not be mapped to
 }
+
 
 factor_remap = {
     '-': '__neg__',  # unary!
     '+': '__pos__',  # unary!
     '~': '__not__',  # unary! # TODO: implement
-    # '!': '__not__',  # not Python syntax
 }
+
+logical_remap = {
+    'expr': '__or__',
+    'and_expr': '__and__',
+    'xor_expr': '__xor__',
+}
+
 
 def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
     """
@@ -109,9 +112,9 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                         return outer_environment[key]
                     except KeyError:
                         raise ValueError("unknown symbol: " + key)
-            if op.data == 'arith_expr':
+            if op.data in ['arith_expr', 'term']:
                 if len(op.children) != 3:
-                    raise ValueError("unexpected arith_expr length")
+                    raise ValueError("unexpected " + op.data + " length")
                 left = _r_walk_lark_tree(op.children[0])
                 op_name = str(op.children[1])
                 try:
@@ -120,9 +123,9 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                     pass
                 right = _r_walk_lark_tree(op.children[2])
                 return getattr(left, op_name)(right)
-            if op.data == 'term':
+            if op.data == 'comparison':
                 if len(op.children) != 3:
-                    raise ValueError("unexpected term length")
+                    raise ValueError("unexpected comparison length")
                 left = _r_walk_lark_tree(op.children[0])
                 op_name = str(op.children[1])
                 try:
@@ -141,18 +144,27 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                     pass
                 right = _r_walk_lark_tree(op.children[1])
                 return getattr(right, op_name)()
-            if op.data == 'or_test':
+            if op.data in logical_remap.keys():
                 if len(op.children) != 2:
-                    raise ValueError("unexpected or_test length")
+                    raise ValueError("unexpected ' + op.data + ' length")
+                op_name = logical_remap[op.data]
                 left = _r_walk_lark_tree(op.children[0])
                 right = _r_walk_lark_tree(op.children[1])
-                return left.__or__(right)
-            if op.data == 'and_test':
-                if len(op.children) != 2:
-                    raise ValueError("unexpected and_test length")
-                left = _r_walk_lark_tree(op.children[0])
-                right = _r_walk_lark_tree(op.children[1])
-                return left.__and__(right)
+                return getattr(left, op_name)(right)
+            if op.data == 'funccall':
+                if len(op.children) > 2:
+                    raise ValueError("unexpected funccall length")
+                fn = op.children[0]
+                var = _r_walk_lark_tree(fn.children[0])
+                op_name = str(fn.children[1])
+                args = []
+                if len(op.children) > 1:
+                    raw_args = op.children[1].children
+                    args = [_r_walk_lark_tree(ai) for ai in raw_args]
+                method = getattr(var, op_name)
+                return method(*args)
+            if (op.data == 'or_test') or (op.data == 'and_test'):
+                raise ValueError("and/or and &&/|| can not be used in vector data context, please use &/|.")
             if op.data == 'not':
                 if len(op.children) != 1:
                     raise ValueError("unexpected not length")
