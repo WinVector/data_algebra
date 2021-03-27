@@ -48,7 +48,10 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
             if callable(v):
                 v = data_algebra.expr_rep.FnValue(v)
             else:
-                v = data_algebra.parse_by_eval._parse_by_eval(
+                # v = data_algebra.parse_by_eval._parse_by_eval(
+                #     source_str=v, data_def=mp, outer_environment=parse_env
+                # )
+                v = data_algebra.parse_by_lark._parse_by_lark(
                     source_str=v, data_def=mp, outer_environment=parse_env
                 )
         else:

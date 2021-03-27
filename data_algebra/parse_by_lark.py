@@ -45,6 +45,7 @@ op_remap = {
     '*': '__mul__',
     '/': '__truediv__',
     '//': '__floordiv__',
+    '%': '__mod__',
     '**': '__pow__',
     '&': '__and__',
     '^': '__xor__',
@@ -100,9 +101,7 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
 
     def _r_walk_lark_tree(op):
         if isinstance(op, lark.lexer.Token):
-            if op.data == 'number':
-                return data_algebra.expr_rep.Value(op.children[0])
-            raise ValueError("unexpected lark Token kind: " + str(op.data))
+            return data_algebra.expr_rep.Value(op.children[0])
         if isinstance(op, lark.tree.Tree):
             if op.data == 'single_input':
                 return _r_walk_lark_tree(op.children[0])
@@ -169,7 +168,12 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                     method = getattr(var, op_name)
                     return method(*args)
                 else:
-                    return lookup_symbol(op_name)
+                    if op_name.startswith('_'):  # TODO: research why we are adding and removing underbar
+                        op_name = op_name[1:len(op_name)]
+                    return data_algebra.expr_rep.Expression(
+                        op = op_name,
+                        args = args
+                    )
             if (op.data == 'or_test') or (op.data == 'and_test'):
                 raise ValueError("and/or and &&/|| can not be used in vector data context, please use &/|.")
             if op.data == 'not':
@@ -177,6 +181,9 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                     raise ValueError("unexpected not length")
                 left = _r_walk_lark_tree(op.children[0])
                 return left.__not__()  # TODO: implement
+            if op.data in ['list', 'tuple']:
+                vals = [_r_walk_lark_tree(vi) for vi in op.children[0].children]
+                return data_algebra.expr_rep.ListTerm(vals)
             raise ValueError("unexpected lark Tree kind: " + str(op.data))
         raise ValueError("unexpected lark parse type: " + str(type(op)))
 
