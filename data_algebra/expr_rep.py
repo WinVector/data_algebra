@@ -217,7 +217,7 @@ class Term(PreTerm, ABC):
     def __pos__(self):
         return self  # Treat as a no-op
 
-    # # TODO: need to work out how to send to Pandas
+    # # TODO: need to work out how to send to Pandas and SQL
     # def __lshift__(self, other):
     #     return self.__op_expr__("<<", other)
     #
@@ -229,24 +229,24 @@ class Term(PreTerm, ABC):
     #
     # def __rrshift__(self, other):
     #     return self.__rop_expr__(">>", other)
-    #
-    # def __and__(self, other):
-    #     return self.__op_expr__("&", other)
-    #
-    # def __rand__(self, other):
-    #     return self.__rop_expr__("&", other)
-    #
-    # def __xor__(self, other):
-    #     return self.__op_expr__("^", other)
-    #
-    # def __rxor__(self, other):
-    #     return self.__rop_expr__("^", other)
-    #
-    # def __or__(self, other):
-    #     return self.__op_expr__("|", other)
-    #
-    # def __ror__(self, other):
-    #     return self.__rop_expr__("|", other)
+
+    def __and__(self, other):
+        return self.__op_expr__("&", other)
+
+    def __rand__(self, other):
+        return self.__rop_expr__("&", other)
+
+    def __xor__(self, other):
+        return self.__op_expr__("^", other)
+
+    def __rxor__(self, other):
+        return self.__rop_expr__("^", other)
+
+    def __or__(self, other):
+        return self.__op_expr__("|", other)
+
+    def __ror__(self, other):
+        return self.__rop_expr__("|", other)
 
     # not/~ isn't applicable to objects
     # https://docs.python.org/3/library/operator.html

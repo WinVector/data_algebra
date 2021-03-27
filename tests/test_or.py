@@ -11,7 +11,7 @@ import data_algebra.SQLite
 
 import pytest
 
-
+# TODO: SQL tests for all non-failing steps
 
 def test_or_1():
     # some example data
@@ -30,18 +30,6 @@ def test_or_1():
     })
 
     assert data_algebra.test_util.equivalent_frames(expect, d2)
-
-
-def test_or_2():
-    # some example data
-    d = pandas.DataFrame({
-        'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
-        'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
-    })
-
-    with pytest.raises(ValueError):
-        ops = describe_table(d, table_name='d'). \
-            select_rows('(ID == 3) or (ID == 4)')
 
 
 def test_in_1():
@@ -115,5 +103,5 @@ def test_in_3():
     with pytest.raises(ValueError):
         ops = describe_table(d, table_name='d'). \
             select_rows('ID.is_in([3, 4])')
-        
+
     # d2 = ops.transform(d)  # this will throw on user fn in a confusing way, so throw where the expr is made
