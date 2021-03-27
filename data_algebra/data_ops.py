@@ -35,7 +35,7 @@ except ImportError:
     pass
 
 
-# wrap a single argument function as a user callable function in pipeline
+# wrap a function as a user callable function in pipeline
 # used for custom aggregators
 def user_fn(fn, args=None, *,
             name=None,

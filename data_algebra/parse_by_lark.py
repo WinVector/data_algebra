@@ -89,6 +89,15 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
         k: v for (k, v) in outer_environment.items() if isinstance(v, Exception)
     }
 
+    def lookup_symbol(key):
+        try:
+            return data_algebra.expr_rep._enc_value(data_def[key])
+        except KeyError:
+            try:
+                return data_algebra.expr_rep._enc_value(outer_environment[key])
+            except KeyError:
+                raise NameError("unknown symbol: " + key)
+
     def _r_walk_lark_tree(op):
         if isinstance(op, lark.lexer.Token):
             if op.data == 'number':
@@ -104,14 +113,7 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                 tok = op.children[0]
                 return data_algebra.expr_rep.Value(str(tok))
             if op.data == 'var':
-                key = str(op.children[0])
-                try:
-                    return data_def[key]
-                except KeyError:
-                    try:
-                        return outer_environment[key]
-                    except KeyError:
-                        raise NameError("unknown symbol: " + key)
+                return lookup_symbol(str(op.children[0]))
             if op.data in ['arith_expr', 'term', 'comparison']:
                 if len(op.children) != 3:
                     raise ValueError("unexpected " + op.data + " length")
@@ -150,15 +152,24 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
             if op.data == 'funccall':
                 if len(op.children) > 2:
                     raise ValueError("unexpected funccall length")
-                fn = op.children[0]
-                var = _r_walk_lark_tree(fn.children[0])
-                op_name = str(fn.children[1])
+                method_carrier = op.children[0]
+                if isinstance(method_carrier, lark.tree.Tree) and (method_carrier.data == 'getattr'):
+                    # method invoke
+                    var = _r_walk_lark_tree(method_carrier.children[0])
+                    op_name = str(method_carrier.children[1])
+                else:
+                    # function invoke
+                    var = None
+                    op_name = str(method_carrier.children[0])
                 args = []
                 if len(op.children) > 1:
                     raw_args = op.children[1].children
                     args = [_r_walk_lark_tree(ai) for ai in raw_args]
-                method = getattr(var, op_name)
-                return method(*args)
+                if var is not None:
+                    method = getattr(var, op_name)
+                    return method(*args)
+                else:
+                    return lookup_symbol(op_name)
             if (op.data == 'or_test') or (op.data == 'and_test'):
                 raise ValueError("and/or and &&/|| can not be used in vector data context, please use &/|.")
             if op.data == 'not':

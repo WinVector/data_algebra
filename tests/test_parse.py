@@ -16,3 +16,16 @@ def test_parse():
         TableDescription("d", ["x", "y"]).extend({"z": "1/q + x"})
 
     TableDescription("d", ["x", "y"]).extend({"z": "x.is_null()", "q": "x.is_bad()"})
+
+
+def test_parse_2():
+    ops = TableDescription("d", ["x", "y", "s"]). \
+        extend({
+            "z": "x.sin()",
+            "q": "x.remainder(y)"}). \
+        extend({
+            "row_number": "_row_number()"},
+            partition_by=["y"],
+            order_by=['s'])
+
+

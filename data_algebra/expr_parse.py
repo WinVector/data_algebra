@@ -4,6 +4,7 @@ import collections
 import data_algebra.env
 import data_algebra.expr_rep
 import data_algebra.parse_by_lark
+import data_algebra.parse_by_eval  # TODO: eliminate this
 
 
 def parse_assignments_in_context(ops, view, *, parse_env=None):
@@ -42,13 +43,12 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
     for k in ops.keys():
         if not isinstance(k, str):
             raise TypeError("ops keys should be strings")
-        ov = ops[k]
-        v = ov
+        v = ops[k]
         if not isinstance(v, data_algebra.expr_rep.PreTerm):
             if callable(v):
                 v = data_algebra.expr_rep.FnValue(v)
             else:
-                v = data_algebra.parse_by_lark._parse_by_lark(
+                v = data_algebra.parse_by_eval._parse_by_eval(
                     source_str=v, data_def=mp, outer_environment=parse_env
                 )
         else:

@@ -6,6 +6,7 @@ import data_algebra.expr_rep
 import data_algebra.parse_by_lark
 from data_algebra.data_ops import *
 
+
 def test_lark_1():
     # raises an exception if no lark parser
     raw_tree = data_algebra.parse_by_lark.parser.parse('1 + 1/2' + "\n")

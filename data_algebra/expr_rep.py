@@ -326,7 +326,7 @@ class Term(PreTerm, ABC):
         return self.__op_expr__("mod", other)
 
     def remainder(self, other):
-        return self.__op_expr__("remainder", other)
+        return self.__op_expr__("remainder", other, inline=False, method=True)
 
     def sqrt(self):
         return self.__uop_expr__("sqrt")
@@ -461,7 +461,7 @@ class Term(PreTerm, ABC):
 
 class Value(Term):
     def __init__(self, value):
-        allowed = [int, float, str, bool, ListTerm]
+        allowed = [int, float, str, bool, ListTerm, tuple]
         if not any([isinstance(value, tp) for tp in allowed]):
             raise TypeError("value type must be one of: " + str(allowed))
         self.value = value
