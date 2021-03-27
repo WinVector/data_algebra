@@ -112,7 +112,7 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                         return outer_environment[key]
                     except KeyError:
                         raise NameError("unknown symbol: " + key)
-            if op.data in ['arith_expr', 'term']:
+            if op.data in ['arith_expr', 'term', 'comparison']:
                 if len(op.children) != 3:
                     raise ValueError("unexpected " + op.data + " length")
                 left = _r_walk_lark_tree(op.children[0])
@@ -123,16 +123,12 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                     pass
                 right = _r_walk_lark_tree(op.children[2])
                 return getattr(left, op_name)(right)
-            if op.data == 'comparison':
-                if len(op.children) != 3:
-                    raise ValueError("unexpected comparison length")
+            if op.data == 'power':
+                if len(op.children) != 2:
+                    raise ValueError("unexpected " + op.data + " length")
                 left = _r_walk_lark_tree(op.children[0])
-                op_name = str(op.children[1])
-                try:
-                    op_name = op_remap[op_name]
-                except KeyError:
-                    pass
-                right = _r_walk_lark_tree(op.children[2])
+                op_name = '__pow__'
+                right = _r_walk_lark_tree(op.children[1])
                 return getattr(left, op_name)(right)
             if op.data == 'factor':
                 if len(op.children) != 2:
