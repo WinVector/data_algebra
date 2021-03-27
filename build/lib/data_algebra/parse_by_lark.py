@@ -19,9 +19,9 @@ import data_algebra.python3_lark
 parser = None
 # noinspection PyBroadException
 try:
-    # https://stackoverflow.com/a/58941536
     kwargs = {
         'start': 'single_input',
+        # 'propagate_positions': True,
         }
     parser = lark.Lark(
         data_algebra.python3_lark.grammar,
