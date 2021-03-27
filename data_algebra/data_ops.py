@@ -560,6 +560,22 @@ class ViewRepresentation(OperatorPlatform, ABC):
         ops = data_algebra.expr_rep.parse_assignments_in_context(
             {"expr": expr}, self, parse_env=parse_env
         )
+        data_model = data_algebra.default_data_model
+        forbid = data_model.custom_function_map.keys()
+
+        def r_walk_expr(op):
+            if not isinstance(op, data_algebra.expr_rep.Expression):
+                return
+            if op.op in forbid:
+                raise ValueError("special functions such as "
+                                 + op.op
+                                 + " not allowed in select_rows.\n"
+                                 + " Work around: please use an extend to materialize this expression.")
+            for oi in op.args:
+                r_walk_expr(oi)
+
+        for op in ops.values():
+            r_walk_expr(op)
         return self.select_rows_parsed(parsed_expr=ops)
 
     def drop_columns(self, column_deletions):
