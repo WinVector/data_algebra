@@ -2,7 +2,7 @@
 platform darwin -- Python 3.7.7, pytest-6.2.2, py-1.10.0, pluggy-0.13.1
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: anyio-2.2.0, cov-2.11.1
-collected 110 items
+collected 111 items
 
 tests/test_R_yaml.py .                                                   [  0%]
 tests/test_agg.py ..                                                     [  2%]
@@ -20,91 +20,48 @@ tests/test_concat_rows.py .                                              [ 23%]
 tests/test_db_model.py .                                                 [ 24%]
 tests/test_degenerate_project.py .                                       [ 25%]
 tests/test_drop_columns.py .                                             [ 26%]
-tests/test_exampe1.py ....                                               [ 30%]
+tests/test_exampe1.py ....                                               [ 29%]
 tests/test_example_data_ops.py .                                         [ 30%]
 tests/test_exp.py .                                                      [ 31%]
 tests/test_expr_parse.py .                                               [ 32%]
 tests/test_extend.py ....                                                [ 36%]
-tests/test_flow_text.py .                                                [ 37%]
-tests/test_forbidden_calculation.py ..                                   [ 39%]
-tests/test_free_expr.py .                                                [ 40%]
+tests/test_flow_text.py .                                                [ 36%]
+tests/test_forbidden_calculation.py ..                                   [ 38%]
+tests/test_free_expr.py .                                                [ 39%]
 tests/test_ghost_col_issue.py .                                          [ 40%]
 tests/test_if_else.py ..                                                 [ 42%]
 tests/test_join_check.py .                                               [ 43%]
 tests/test_join_effects.py .                                             [ 44%]
 tests/test_math.py .                                                     [ 45%]
-tests/test_modin.py ..                                                   [ 47%]
-tests/test_narrow.py .                                                   [ 48%]
-tests/test_natural_join.py .                                             [ 49%]
-tests/test_neg.py .                                                      [ 50%]
+tests/test_modin.py ..                                                   [ 46%]
+tests/test_narrow.py .                                                   [ 47%]
+tests/test_natural_join.py .                                             [ 48%]
+tests/test_neg.py .                                                      [ 49%]
 tests/test_null_bad.py .                                                 [ 50%]
 tests/test_ops.py .                                                      [ 51%]
 tests/test_ops_eq.py .                                                   [ 52%]
-tests/test_or.py FF.                                                     [ 55%]
+tests/test_or.py ....                                                    [ 55%]
 tests/test_ordered_agg_group.py .                                        [ 56%]
 tests/test_parse.py .                                                    [ 57%]
-tests/test_project.py .....                                              [ 61%]
-tests/test_ranked_example.py .                                           [ 62%]
+tests/test_project.py .....                                              [ 62%]
+tests/test_ranked_example.py .                                           [ 63%]
 tests/test_ref_detect.py ..                                              [ 64%]
 tests/test_rename.py .                                                   [ 65%]
 tests/test_scatter_example.py .                                          [ 66%]
 tests/test_scoring_example.py .                                          [ 67%]
 tests/test_select.py ..                                                  [ 69%]
 tests/test_select_stacking.py .                                          [ 70%]
-tests/test_shorten.py .                                                  [ 70%]
+tests/test_shorten.py .                                                  [ 71%]
 tests/test_simple.py ....                                                [ 74%]
 tests/test_spark_sql.py .                                                [ 75%]
 tests/test_sqlite.py ....                                                [ 79%]
-tests/test_strat_example.py ..                                           [ 80%]
+tests/test_strat_example.py ..                                           [ 81%]
 tests/test_table_is_key_by_columns.py .                                  [ 81%]
 tests/test_transform_examples.py ...........                             [ 91%]
 tests/test_user_fn.py ....                                               [ 95%]
 tests/test_user_fn_name.py ...                                           [ 98%]
 tests/test_window2.py .                                                  [ 99%]
 tests/test_window_fns.py .                                               [100%]
-
-=================================== FAILURES ===================================
-__________________________________ test_or_1 ___________________________________
-
-    def test_or_1():
-        # some example data
-        d = pandas.DataFrame({
-            'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
-            'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
-        })
-    
-        ops = describe_table(d, table_name='d'). \
->           select_rows('(ID == 3) | (ID == 4)')
-
-tests/test_or.py:24: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-data_algebra/data_ops.py:561: in select_rows
-    {"expr": expr}, self, parse_env=parse_env
-data_algebra/expr_rep.py:895: in parse_assignments_in_context
-    source_str=v, data_def=mp, outter_environemnt=parse_env
-data_algebra/expr_rep.py:799: in _parse_by_eval
-    source_str, outter_environemnt, data_def
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
->   ???
-E   TypeError: unsupported operand type(s) for |: 'Expression' and 'Expression'
-
-<string>:1: TypeError
-__________________________________ test_or_2 ___________________________________
-
-    def test_or_2():
-        # some example data
-        d = pandas.DataFrame({
-            'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
-            'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
-        })
-    
-        with pytest.raises(ValueError):
-            ops = describe_table(d, table_name='d'). \
->               select_rows('(ID == 3) or (ID == 4)')
-E           Failed: DID NOT RAISE <class 'ValueError'>
-
-tests/test_or.py:44: Failed
 
 ---------- coverage: platform darwin, python 3.7.7-final-0 -----------
 Name                                   Stmts   Miss  Cover
@@ -119,7 +76,7 @@ data_algebra/cdata_impl.py                10      1    90%
 data_algebra/connected_components.py      49      1    98%
 data_algebra/custom_functions.py          17      2    88%
 data_algebra/data_model.py                40     18    55%
-data_algebra/data_ops.py                1225    215    82%
+data_algebra/data_ops.py                1236    215    83%
 data_algebra/data_ops_types.py            74     33    55%
 data_algebra/data_ops_utils.py            34      6    82%
 data_algebra/data_pipe.py                189     50    74%
@@ -128,7 +85,7 @@ data_algebra/diagram.py                   56     43    23%
 data_algebra/env.py                       31      3    90%
 data_algebra/eval_model.py                18      2    89%
 data_algebra/expr.py                      20      4    80%
-data_algebra/expr_rep.py                 554    108    81%
+data_algebra/expr_rep.py                 566    113    80%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/modin_model.py               36     22    39%
 data_algebra/near_sql.py                 140     16    89%
@@ -138,9 +95,7 @@ data_algebra/test_util.py                127     18    86%
 data_algebra/util.py                      28      4    86%
 data_algebra/yaml.py                      95     11    88%
 ----------------------------------------------------------
-TOTAL                                   4161    830    80%
+TOTAL                                   4184    835    80%
 
-=========================== short test summary info ============================
-FAILED tests/test_or.py::test_or_1 - TypeError: unsupported operand type(s) f...
-FAILED tests/test_or.py::test_or_2 - Failed: DID NOT RAISE <class 'ValueError'>
-======================== 2 failed, 108 passed in 7.28s =========================
+
+============================= 111 passed in 7.07s ==============================
