@@ -50,7 +50,7 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
                 v = data_algebra.expr_rep.FnValue(v)
             else:
                 v = data_algebra.parse_by_eval._parse_by_eval(
-                    source_str=v, data_def=mp, outter_environemnt=parse_env
+                    source_str=v, data_def=mp, outer_environment=parse_env
                 )
         else:
             v = v.replace_view(view)
