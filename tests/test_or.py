@@ -62,6 +62,36 @@ def test_in_1():
     assert data_algebra.test_util.equivalent_frames(expect, res_db)
 
 
+def test_in_1b():
+    # some example data
+    d = pandas.DataFrame({
+        'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
+        'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
+    })
+
+    ops = describe_table(d, table_name='d'). \
+        extend({'v': 'ID.is_in((3, 4))'})
+    ops_str = str(ops)  # see if this throws
+    d2 = ops.transform(d)
+
+    expect = pandas.DataFrame({
+        'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
+        'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
+        'v': [False]*3 + [True]*5 + [False]*3,
+    })
+
+    assert data_algebra.test_util.equivalent_frames(expect, d2)
+
+    db_model = data_algebra.SQLite.SQLiteModel()
+    sql = ops.to_sql(db_model, pretty=True)
+    with sqlite3.connect(':memory:') as con:
+        db_model.prepare_connection(con)
+        d.to_sql(name='d', con=con)
+        res_db = pandas.read_sql(sql, con=con)
+
+    assert data_algebra.test_util.equivalent_frames(expect, res_db)
+
+
 def test_in_2():
     # some example data
     d = pandas.DataFrame({

@@ -111,7 +111,7 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                     try:
                         return outer_environment[key]
                     except KeyError:
-                        raise ValueError("unknown symbol: " + key)
+                        raise NameError("unknown symbol: " + key)
             if op.data in ['arith_expr', 'term']:
                 if len(op.children) != 3:
                     raise ValueError("unexpected " + op.data + " length")
