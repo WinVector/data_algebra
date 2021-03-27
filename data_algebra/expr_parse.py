@@ -3,7 +3,7 @@ import collections
 
 import data_algebra.env
 import data_algebra.parse_by_eval
-from data_algebra.expr_rep import populate_specials, PreTerm, FnValue
+import data_algebra.expr_rep
 
 
 def parse_assignments_in_context(ops, view, *, parse_env=None):
@@ -38,15 +38,15 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
     columns_used = set()
     newops = collections.OrderedDict()
     mp = column_defs.copy()
-    populate_specials(column_defs=column_defs, destination=mp, user_values=parse_env)
+    data_algebra.expr_rep.populate_specials(column_defs=column_defs, destination=mp, user_values=parse_env)
     for k in ops.keys():
         if not isinstance(k, str):
             raise TypeError("ops keys should be strings")
         ov = ops[k]
         v = ov
-        if not isinstance(v, PreTerm):
+        if not isinstance(v, data_algebra.expr_rep.PreTerm):
             if callable(v):
-                v = FnValue(v)
+                v = data_algebra.expr_rep.FnValue(v)
             else:
                 v = data_algebra.parse_by_eval._parse_by_eval(
                     source_str=v, data_def=mp, outter_environemnt=parse_env
