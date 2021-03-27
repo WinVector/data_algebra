@@ -145,7 +145,7 @@ class Term(PreTerm, ABC):
             y = _enc_value(y)
         return Expression(op, (self, x, y), inline=inline, method=method)
 
-    # try to get at == and other comparision operators
+    # try to get at == and other comparison operators
 
     def __eq__(self, other):
         return self.__op_expr__("==", other)

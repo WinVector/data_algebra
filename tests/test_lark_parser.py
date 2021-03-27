@@ -27,8 +27,10 @@ def test_lark_2():
     data_def.update({
             k: v for (k, v) in describe_table(d2).column_map.__dict__.items()
         })
-    expr = '1 + x'
-    raw_tree = data_algebra.parse_by_lark.parser.parse(expr + "\n")
-    v = data_algebra.parse_by_lark._walk_lark_tree(raw_tree, data_def=data_def)
-    # tree = data_algebra.parse_by_lark._parse_by_lark(expr, data_def=data_def)
+    expr = 'x / (a+b)'
+    # raw_tree = data_algebra.parse_by_lark.parser.parse(expr + "\n")
+    # v = data_algebra.parse_by_lark._walk_lark_tree(raw_tree, data_def=data_def)
+    tree = data_algebra.parse_by_lark._parse_by_lark(expr, data_def=data_def)
+    assert isinstance(tree, data_algebra.expr_rep.PreTerm)
+    assert str(tree) ==  'x / (a + b)'
 

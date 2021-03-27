@@ -31,10 +31,35 @@ except:
 
 
 # set up tree walker, including re-mapped names
+
 op_remap = {
-    '+': '__add__'
+    '==': '__eq__',
+    '!=': '__ne__',
+    '<': '__lt__',
+    '<=': '__le__',
+    '>': '__gt__',
+    '>=': '__ge__',
+    '+': '__add__',
+    '-': '__sub__',
+    '*': '__mul__',
+    '/': '__truediv__',
+    '//': '__floordiv__',
+    '**': '__pow__',
+    '>>': '__lshift__',
+    '<<': '__rshift__',
+    '&': '__and__',
+    '^': '__xor__',
+    '|': '__or__',
+    '&&': '__and__',  # may not be mapped to
+    '||': '__or__',  # may not be mapped to
 }
 
+factor_remap = {
+    '-': '__neg__',  # unary!
+    '+': '__pos__',  # unary!
+    '~': '__not__',  # unary! # TODO: implement
+    # '!': '__not__',  # not Python syntax
+}
 
 def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
     """
@@ -83,10 +108,9 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                         return outer_environment[key]
                     except KeyError:
                         raise ValueError("unknown symbol: " + key)
-            # not done below here
             if op.data == 'arith_expr':
                 if len(op.children) != 3:
-                    raise ValueError("unexpted arith_expr length")
+                    raise ValueError("unexpected arith_expr length")
                 left = _r_walk_lark_tree(op.children[0])
                 op_name = str(op.children[1])
                 try:
@@ -95,6 +119,44 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                     pass
                 right = _r_walk_lark_tree(op.children[2])
                 return getattr(left, op_name)(right)
+            if op.data == 'term':
+                if len(op.children) != 3:
+                    raise ValueError("unexpected term length")
+                left = _r_walk_lark_tree(op.children[0])
+                op_name = str(op.children[1])
+                try:
+                    op_name = op_remap[op_name]
+                except KeyError:
+                    pass
+                right = _r_walk_lark_tree(op.children[2])
+                return getattr(left, op_name)(right)
+            if op.data == 'factor':
+                if len(op.children) != 2:
+                    raise ValueError("unexpected arith_expr length")
+                op_name = str(op.children[0])
+                try:
+                    op_name = factor_remap[op_name]
+                except KeyError:
+                    pass
+                right = _r_walk_lark_tree(op.children[1])
+                return getattr(right, op_name)()
+            if op.data == 'or_test':
+                if len(op.children) != 2:
+                    raise ValueError("unexpected or_test length")
+                left = _r_walk_lark_tree(op.children[0])
+                right = _r_walk_lark_tree(op.children[1])
+                return left.__or__(right)
+            if op.data == 'and_test':
+                if len(op.children) != 2:
+                    raise ValueError("unexpected and_test length")
+                left = _r_walk_lark_tree(op.children[0])
+                right = _r_walk_lark_tree(op.children[1])
+                return left.__and__(right)
+            if op.data == 'not':
+                if len(op.children) != 1:
+                    raise ValueError("unexpected not length")
+                left = _r_walk_lark_tree(op.children[0])
+                return left.__not__()  # TODO: implement
             raise ValueError("unexpected lark Tree kind: " + str(op.data))
         raise ValueError("unexpected lark parse type: " + str(type(op)))
 
