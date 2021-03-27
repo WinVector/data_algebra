@@ -20,14 +20,15 @@ Recommended packages include: PyYAML (supplies yaml), sqlparse, and black.
 
 setuptools.setup(
     name='data_algebra',
-    version='0.5.5',
+    version='0.6.0',
     author='John Mount',
     author_email='jmount@win-vector.com',
     url='https://github.com/WinVector/data_algebra',
-    packages=setuptools.find_packages(exclude=['tests', 'Examples']),
+    packages=setuptools.find_packages(exclude=['tests', 'Examples', 'lark']),
     install_requires=[
         "numpy",
-        "pandas"
+        "pandas",
+        "lark"
     ],
     extras_require={
         'yaml': ['PyYAML'],
@@ -54,5 +55,7 @@ setuptools.setup(
           'Programming Language :: Python :: 3.9',
           'License :: OSI Approved :: BSD License',
     ],
+    include_package_data=True,
+    package_data={'': ['data/*']},
     long_description=LONG_DESCRIPTION,
 )

@@ -7,9 +7,11 @@ import data_algebra.expr_rep
 
 # Some notes on trying to harden eval:
 #  http://lybniz2.sourceforge.net/safeeval.html
-def _parse_by_eval(source_str, *, data_def, outter_environemnt=None):
+def _parse_by_eval(source_str, *, data_def=None, outter_environemnt=None):
     if not isinstance(source_str, str):
         source_str = str(source_str)
+    if data_def is None:
+        data_def = {}
     if outter_environemnt is None:
         outter_environemnt = {}
     else:

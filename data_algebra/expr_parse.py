@@ -2,8 +2,9 @@
 import collections
 
 import data_algebra.env
-import data_algebra.parse_by_eval
 import data_algebra.expr_rep
+import data_algebra.parse_by_eval
+import data_algebra.parse_by_lark
 
 
 def parse_assignments_in_context(ops, view, *, parse_env=None):
