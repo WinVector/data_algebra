@@ -101,18 +101,22 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
 
     def _r_walk_lark_tree(op):
         if isinstance(op, lark.lexer.Token):
-            return data_algebra.expr_rep.Value(op.children[0])
+            if op.type == 'DEC_NUMBER':
+                return data_algebra.expr_rep.Value(int(op))
+            if op.type == 'FLOAT_NUMBER':
+                return data_algebra.expr_rep.Value(float(op))
+            if op.type == 'STRING':
+                return data_algebra.expr_rep.Value(str(op))
+            if op.type == 'NAME':
+                return lookup_symbol(str(op))
+            raise ValueError("unexepected Token type: " + op.type)
         if isinstance(op, lark.tree.Tree):
-            if op.data == 'single_input':
+            if op.data == 'const_true':
+                return data_algebra.expr_rep.Value(True)
+            if op.data == 'const_false':
+                return data_algebra.expr_rep.Value(False)
+            if op.data in ['single_input', 'number', 'string', 'var']:
                 return _r_walk_lark_tree(op.children[0])
-            if op.data == 'number':
-                tok = op.children[0]
-                return data_algebra.expr_rep.Value(float(tok))
-            if op.data == 'string':
-                tok = op.children[0]
-                return data_algebra.expr_rep.Value(str(tok))
-            if op.data == 'var':
-                return lookup_symbol(str(op.children[0]))
             if op.data in ['arith_expr', 'term', 'comparison']:
                 if len(op.children) != 3:
                     raise ValueError("unexpected " + op.data + " length")

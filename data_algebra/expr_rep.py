@@ -646,6 +646,8 @@ class ListTerm(PreTerm):
 def _enc_value(value):
     if isinstance(value, Term):
         return value
+    if isinstance(value, FnValue):
+        return value
     if callable(value):
         return FnValue(value)
     if isinstance(value, list):

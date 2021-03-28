@@ -12,6 +12,7 @@ def test_lark_1():
     raw_tree = data_algebra.parse_by_lark.parser.parse('1 + 1/2' + "\n")
 
 
+
 def test_lark_2():
     d1 = pandas.DataFrame({
         'x': [1, 2, 3],

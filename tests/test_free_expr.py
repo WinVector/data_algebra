@@ -17,7 +17,7 @@ def test_free_expr():
             partition_by=["subjectID"],
             order_by=["sort_key"],
         )
-        .select_rows(frame().row_number == 1)
+        .select_rows(frame().row_number == 1.0)
         .select_columns(["subjectID", "surveyCategory", "probability"])
         .rename_columns({"diagnosis": "surveyCategory"})
     )
@@ -36,7 +36,7 @@ def test_free_expr():
                 partition_by=["subjectID"],
                 order_by=["sort_key"],
             )
-            .select_rows("row_number == 1")
+            .select_rows("row_number == 1.0")
             .select_columns(["subjectID", "surveyCategory", "probability"])
             .rename_columns({"diagnosis": "surveyCategory"})
         )
@@ -58,7 +58,7 @@ def test_free_expr():
             partition_by=["subjectID"],
             order_by=["sort_key"],
         )
-        .select_rows(f().row_number == 1)
+        .select_rows(f().row_number == 1.0)
         .select_columns(["subjectID", "surveyCategory", "probability"])
         .rename_columns({"diagnosis": "surveyCategory"})
     )
@@ -80,7 +80,7 @@ def test_free_expr():
             partition_by=["subjectID"],
             order_by=["sort_key"],
         )
-        .select_rows(f.row_number == 1)
+        .select_rows(f.row_number == 1.0)
         .select_columns(["subjectID", "surveyCategory", "probability"])
         .rename_columns({"diagnosis": "surveyCategory"})
     )
