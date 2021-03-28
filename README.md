@@ -1,4 +1,3 @@
-
 # data_algebra
 
 [Codd style operators](https://en.wikipedia.org/wiki/Relational_algebra) in a [piped](https://en.wikipedia.org/wiki/Pipeline_(Unix)) or [method-chained](https://en.wikipedia.org/wiki/Method_chaining) notation (or [dplyr](https://CRAN.R-project.org/package=dplyr)-esque) data processing in Python
@@ -69,6 +68,7 @@ The exact meaning of such a scoring method are not the topic of this note.  It i
 Let's start our `Python` example.  First we import the packages we are going to use, and set a few options.
 
 
+
 ```python
 import math
 import io
@@ -76,22 +76,14 @@ import sqlite3
 from pprint import pprint
 import psycopg2       # http://initd.org/psycopg/
 import pandas         # https://pandas.pydata.org
-import yaml           # https://pyyaml.org
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 import data_algebra.env
-import data_algebra.yaml
 import data_algebra.PostgreSQL
 import data_algebra.SQLite
-
-# ask YAML to write simpler structures
-data_algebra.yaml.fix_ordered_dict_yaml_rep()
-
-pandas.set_option('display.max_columns', None)  
-pandas.set_option('display.expand_frame_repr', False)
-pandas.set_option('max_colwidth', -1)
 ```
 
 Now let's type in our example data.  Notice this is an in-memory `Pandas` `Data.Frame`.
+
 
 
 ```python
@@ -109,7 +101,19 @@ d_local
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -160,11 +164,13 @@ d_local
 
 
 
-Let's also copy this data to a [`PostgreSQL`](https://www.postgresql.org) database.  Normally big data is already in the system one wants to work with, so the copying over is just to simulate the data already being there.
+
+Let's also copy this data to a database.  Normally big data is already in the system one wants to work with, so the copying over is just to simulate the data already being there.
+
 
 
 ```python
-use_postgresql = True
+use_postgresql = False
 
 if use_postgresql:
     conn = psycopg2.connect(
@@ -183,8 +189,9 @@ db_model.prepare_connection(conn)  # define any user functions and settings we w
 ```
 
 
-```python
 
+
+```python
 
 db_model.insert_table(conn, d_local, 'd')
 
@@ -195,54 +202,72 @@ db_model.read_table(conn, 'd')
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>subjectid</th>
-      <th>surveycategory</th>
-      <th>assessmenttotal</th>
-      <th>irrelevantcol1</th>
-      <th>irrelevantcol2</th>
+      <th>index</th>
+      <th>subjectID</th>
+      <th>surveyCategory</th>
+      <th>assessmentTotal</th>
+      <th>irrelevantCol1</th>
+      <th>irrelevantCol2</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>1.0</td>
+      <td>0</td>
+      <td>1</td>
       <td>withdrawal behavior</td>
-      <td>5.0</td>
+      <td>5</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>1.0</td>
+      <td>1</td>
+      <td>1</td>
       <td>positive re-framing</td>
-      <td>2.0</td>
+      <td>2</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>2.0</td>
+      <td>2</td>
+      <td>2</td>
       <td>withdrawal behavior</td>
-      <td>3.0</td>
+      <td>3</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>2.0</td>
+      <td>3</td>
+      <td>2</td>
       <td>positive re-framing</td>
-      <td>4.0</td>
+      <td>4</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
   </tbody>
 </table>
 </div>
+
 
 
 
@@ -254,6 +279,7 @@ Also note: case in columns is a bit of nightmare.  It is often best to lower-cas
 Now we continue our example by importing the `data_algebra` components we need.
 
 Now we use the `data_algebra` to define our processing pipeline: `ops`.  We are writing this pipeline using a [method chaining](https://en.wikipedia.org/wiki/Method_chaining) notation where we have placed `Python` method-dot at the end of lines using the `.\` notation.  This notation will look *very* much like a [pipe](https://en.wikipedia.org/wiki/Pipeline_(Unix)) to `R`/[`magrittr`](https://CRAN.R-project.org/package=magrittr) users.
+
 
 
 ```python
@@ -281,6 +307,7 @@ The intent is: the user can build up very sophisticated processing pipelines usi
 For a more Pythonic way of writing the same pipeline we can show how the code would have been formatted by [`black`](https://github.com/psf/black).
 
 
+
 ```python
 py_source = ops.to_python(pretty=True)
 print(py_source)
@@ -295,9 +322,7 @@ print(py_source)
             "irrelevantCol1",
             "irrelevantCol2",
         ],
-    ).extend(
-        {"probability": "(assessmentTotal * 0.237).exp()"}
-    ).extend(
+    ).extend({"probability": "(assessmentTotal * 0.237).exp()"}).extend(
         {"total": "probability.sum()"}, partition_by=["subjectID"]
     ).extend(
         {"probability": "probability / total"}
@@ -334,58 +359,52 @@ The point is: each step is deliberately so trivial one can reason about it. Howe
 Once we have the `ops` object we can do quite a lot with it. We have already exhibited the pretty-printing of the pipeline. Next we demonstrate translating the operator pipeline into `SQL`.
 
 
+
 ```python
 sql = ops.to_sql(db_model, pretty=True)
 print(sql)
 ```
 
-    SELECT "subjectid",
+    SELECT "surveyCategory" AS "diagnosis",
            "probability",
-           "surveycategory" AS "diagnosis"
+           "subjectID"
     FROM
-      (SELECT "subjectid",
-              "surveycategory",
-              "probability"
+      (SELECT "probability",
+              "subjectID",
+              "surveyCategory"
        FROM
-         (SELECT "subjectid",
-                 "surveycategory",
-                 "probability"
+         (SELECT "probability",
+                 ROW_NUMBER() OVER (PARTITION BY "subjectID"
+                                    ORDER BY "sort_key") AS "row_number",
+                                   "subjectID",
+                                   "surveyCategory"
           FROM
-            (SELECT "subjectid",
-                    "surveycategory",
-                    "probability",
-                    "sort_key",
-                    ROW_NUMBER() OVER (PARTITION BY "subjectid"
-                                       ORDER BY "sort_key") AS "row_number"
+            (SELECT -("probability") AS "sort_key",
+                     "probability",
+                     "subjectID",
+                     "surveyCategory"
              FROM
-               (SELECT "subjectid",
-                       "surveycategory",
-                       "probability",
-                       (-"probability") AS "sort_key"
+               (SELECT "probability" / "total" AS "probability",
+                       "subjectID",
+                       "surveyCategory"
                 FROM
-                  (SELECT "subjectid",
-                          "surveycategory",
-                          "probability" / "total" AS "probability"
+                  (SELECT SUM("probability") OVER (PARTITION BY "subjectID") AS "total",
+                                                  "probability",
+                                                  "subjectID",
+                                                  "surveyCategory"
                    FROM
-                     (SELECT "subjectid",
-                             "surveycategory",
-                             "probability",
-                             SUM("probability") OVER (PARTITION BY "subjectid") AS "total"
-                      FROM
-                        (SELECT "subjectid",
-                                "surveycategory",
-                                EXP(("assessmenttotal" * 0.237)) AS "probability"
-                         FROM
-                           (SELECT "subjectid",
-                                   "surveycategory",
-                                   "assessmenttotal"
-                            FROM "d") "sq_0") "sq_1") "sq_2") "sq_3") "sq_4") "sq_5"
-          WHERE "row_number" = 1 ) "sq_6") "sq_7"
+                     (SELECT EXP(("assessmentTotal" * 0.237)) AS "probability",
+                             "subjectID",
+                             "surveyCategory"
+                      FROM "d") "extend_1") "extend_2") "extend_3") "extend_4") "extend_5"
+       WHERE "row_number" = 1 ) "select_rows_6"
+
 
 
 The `SQL` can be hard to read, as `SQL` expresses composition by inner-nesting (inside `SELECT` statements happen first).  The operator pipeline expresses composition by sequencing or method-chaining, which can be a lot more legible.  However the huge advantage of the `SQL` is: we can send it to the database for execution, as we do now.
 
 Also notice the generate `SQL` has applied query narrowing: columns not used in the outer queries are removed from the inner queries. The "irrelevant" columns are not carried into the calculation as they would be with a `SELECT *`.  This early optimization comes in quite handy.
+
 
 
 ```python
@@ -396,32 +415,46 @@ db_model.read_query(conn, sql)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>subjectid</th>
-      <th>probability</th>
       <th>diagnosis</th>
+      <th>probability</th>
+      <th>subjectID</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>1.0</td>
-      <td>0.670622</td>
       <td>withdrawal behavior</td>
+      <td>0.670622</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>2.0</td>
-      <td>0.558974</td>
       <td>positive re-framing</td>
+      <td>0.558974</td>
+      <td>2</td>
     </tr>
   </tbody>
 </table>
 </div>
+
+
 
 
 
@@ -434,15 +467,28 @@ The hope is that the `data_algebra` pipeline is easier to read, write, and maint
 An advantage of the pipeline is it can also be directly used on `Pandas` `DataFrame`s. Let's see how that is achieved.
 
 
+
 ```python
-ops.eval_pandas({'d': d_local})
+ops.eval({'d': d_local})
 ```
 
 
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -468,22 +514,36 @@ ops.eval_pandas({'d': d_local})
   </tbody>
 </table>
 </div>
+
+
 
 
 
 There is also a shorthand notation for single table source pipelines:
 
 
+
 ```python
 ops.transform(d_local)
-
 ```
 
 
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -512,7 +572,8 @@ ops.transform(d_local)
 
 
 
-`eval_pandas` takes a dictionary of `Pandas` `DataFrame`s (names matching names specified in the pipeline) and returns the result of applying the pipeline to the data using `Pandas` commands.  Currently our `Pandas` implementation only allows very simple window functions.  This is why we didn't write `probability = probability/sum(probability)`, but instead broken the calculation into multiple steps by introducing the `total` column (the `SQL` realization does in fact support more complex window functions).  This is a small issue with the grammar: but our feeling encourage simple steps is in fact a good thing (improves debuggability), and in `SQL` the query optimizers likely optimize the different query styles into very similar realizations anyway.
+
+`eval` takes a dictionary of `Pandas` `DataFrame`s (names matching names specified in the pipeline) and returns the result of applying the pipeline to the data using `Pandas` commands.  Currently our `Pandas` implementation only allows very simple window functions.  This is why we didn't write `probability = probability/sum(probability)`, but instead broken the calculation into multiple steps by introducing the `total` column (the `SQL` realization does in fact support more complex window functions).  This is a small issue with the grammar: but our feeling encourage simple steps is in fact a good thing (improves debuggability), and in `SQL` the query optimizers likely optimize the different query styles into very similar realizations anyway.
 
 
 ## Export/Import
@@ -520,6 +581,7 @@ ops.transform(d_local)
 Because our operator pipeline is a `Python` object with no references to external objects (such as the database connection), it can be saved through standard methods such as "[pickling](https://docs.python.org/3/library/pickle.html)."
 
 We can also diagram the pipeline using graphviz.
+
 
 
 ```python
@@ -534,202 +596,19 @@ dot
 
 
 
-![svg](output_24_0.svg)
+    
+![svg](output_21_0.svg)
+    
 
 
 
-`data_algebra` also supports exporting a pipeline to and from simple structures that are in turn optimized for conversion  to [`YAML`](https://yaml.org).  The simple structure format is particularly useful for writing more `data_algebra` tools (such as pipeline analysis and presentation tools).  And the `YAML` tooling makes moving a processing pipeline to another a language (such as `R`) quite easy.
-
-We will demonstrate this next.
-
-
-```python
-# convert pipeline to simple objects
-objs_R = ops.collect_representation(dialect='R')
-```
-
-In the above data structure the recursive operator steps have been linearized into a list, and simplified to just ordered dictionaries of a few defining and derived fields. In particular, the `key` field of the `TableDescription` nodes is the unique identifier for the tables, two `TableDescription` with the same key are referring to the same table.
-
-We can then write this representation to `YAML` format.
-
-
-```python
-# convert objects to a YAML string
-dmp_R = yaml.dump(objs_R)
-# write to file
-with open("pipeline_yaml.txt", "wt") as f:
-    print(dmp_R, file=f)
-```
-
-### `R`
-
-This pipeline can be loaded into `R` and used as follows.
-
-
-```python
-%load_ext rpy2.ipython
-```
-
-
-```r
-%%R 
-
-library(yaml)
-library(wrapr)
-library(rquery)
-library(rqdatatable)
-
-r_yaml <- yaml.load_file("pipeline_yaml.txt")
-r_ops <- convert_yaml_to_pipeline(r_yaml)
-cat(format(r_ops))
-```
-
-    mk_td("d", c(
-      "subjectID",
-      "surveyCategory",
-      "assessmentTotal",
-      "irrelevantCol1",
-      "irrelevantCol2")) %.>%
-     extend(.,
-      probability %:=% exp(assessmentTotal * 0.237)) %.>%
-     extend(.,
-      total %:=% sum(probability),
-      partitionby = c('subjectID'),
-      orderby = c(),
-      reverse = c()) %.>%
-     extend(.,
-      probability %:=% probability / total) %.>%
-     extend(.,
-      sort_key %:=% -(probability)) %.>%
-     extend(.,
-      row_number %:=% row_number(),
-      partitionby = c('subjectID'),
-      orderby = c('sort_key'),
-      reverse = c()) %.>%
-     select_rows(.,
-       row_number == 1) %.>%
-     select_columns(., c(
-       "subjectID", "surveyCategory", "probability")) %.>%
-     rename_columns(.,
-      c('diagnosis' = 'surveyCategory'))
-
-
-The above representation is now the equivalent "`R` code", written using [`wrapr` dot pipe](https://journal.r-project.org/archive/2018/RJ-2018-042/index.html)/[`rquery`](https://github.com/WinVector/rquery) notation. The imported pipeline can be directly executed in `R`.
-
-
-```r
-%%R 
-
-d_local <- build_frame(
-   "subjectID", "surveyCategory"     , "assessmentTotal", "irrelevantCol1", "irrelevantCol2" |
-   1L         , "withdrawal behavior", 5                , "irrel1"        , "irrel2"         |
-   1L         , "positive re-framing", 2                , "irrel1"        , "irrel2"         |
-   2L         , "withdrawal behavior", 3                , "irrel1"        , "irrel2"         |
-   2L         , "positive re-framing", 4                , "irrel1"        , "irrel2"         )
-
-print(d_local)
-```
-
-      subjectID      surveyCategory assessmentTotal irrelevantCol1 irrelevantCol2
-    1         1 withdrawal behavior               5         irrel1         irrel2
-    2         1 positive re-framing               2         irrel1         irrel2
-    3         2 withdrawal behavior               3         irrel1         irrel2
-    4         2 positive re-framing               4         irrel1         irrel2
-
-
-We can execute the `R` pipeline using [`data.table`](http://r-datatable.com) by piping data into the `r_ops` object.
-
-
-```r
-%%R 
-
-d_local %.>% 
-  r_ops %.>% 
-  print(.)
-```
-
-       subjectID           diagnosis probability
-    1:         1 withdrawal behavior   0.6706221
-    2:         2 positive re-framing   0.5589742
-
-
-And the `R` `rquery` package can also perform its own `SQL` translation (and even execution management).
-
-
-```r
-%%R
-
-sql <- to_sql(r_ops, rquery_default_db_info())
-cat(sql)
-```
-
-    SELECT
-     "subjectID" AS "subjectID",
-     "surveyCategory" AS "diagnosis",
-     "probability" AS "probability"
-    FROM (
-     SELECT
-      "subjectID",
-      "surveyCategory",
-      "probability"
-     FROM (
-      SELECT * FROM (
-       SELECT
-        "subjectID",
-        "surveyCategory",
-        "probability",
-        row_number ( ) OVER (  PARTITION BY "subjectID" ORDER BY "sort_key" ) AS "row_number"
-       FROM (
-        SELECT
-         "subjectID",
-         "surveyCategory",
-         "probability",
-         - ( "probability" )  AS "sort_key"
-        FROM (
-         SELECT
-          "subjectID",
-          "surveyCategory",
-          "probability" / "total"  AS "probability"
-         FROM (
-          SELECT
-           "subjectID",
-           "surveyCategory",
-           "probability",
-           sum ( "probability" ) OVER (  PARTITION BY "subjectID" ) AS "total"
-          FROM (
-           SELECT
-            "subjectID",
-            "surveyCategory",
-            exp ( "assessmentTotal" * 0.237 )  AS "probability"
-           FROM (
-            SELECT
-             "subjectID",
-             "surveyCategory",
-             "assessmentTotal"
-            FROM
-             "d"
-            ) tsql_13462271417183976603_0000000000
-           ) tsql_13462271417183976603_0000000001
-          ) tsql_13462271417183976603_0000000002
-         ) tsql_13462271417183976603_0000000003
-        ) tsql_13462271417183976603_0000000004
-      ) tsql_13462271417183976603_0000000005
-      WHERE "row_number" = 1
-     ) tsql_13462271417183976603_0000000006
-    ) tsql_13462271417183976603_0000000007
-
-
-The `R` implementation is mature, and appropriate to use in production.  The [`rquery`](https://github.com/WinVector/rquery) grammar is designed to have minimal state and minimal annotations (no grouping or ordering annotations!).  This makes the grammar, in my opinion, a good design choice. `rquery` has very good performance, often much faster than `dplyr` or base-`R` due to its query generation ideas and use of [`data.table`](https://CRAN.R-project.org/package=data.table) via [`rqdatatable`](https://CRAN.R-project.org/package=rqdatatable).  `rquery` is a mature pure `R` package; [here](https://github.com/WinVector/rquery/blob/master/README.md) is the same example being worked directly in `R`, with no translation from `Python`. 
-
-More of the `R` example (including how another diagram can be produced) can be found [here](https://github.com/WinVector/rquery/blob/master/Examples/yaml/yaml.md).  An example of moving a pipeline from `R` to `Python` can be found [here](https://github.com/WinVector/rquery/blob/master/Examples/data_algebra/interop.md).
 
 ## Advantages of `data_algebra`
 
-Multi-language data science is an important trend, so a cross-language query system that supports at least `R` and `Python` is going to be a useful tool or capability going forward. Obviously `SQL` itself is fairly cross-language, but `data_algebra` adds features that can be real advantages.
-
-In addition to the features shown above, a `data_algebra` operator pipeline carries around usable knowledge of the data transform.
+A `data_algebra` operator pipeline carries around usable knowledge of the data transform.
 
 For example:
+
 
 
 ```python
@@ -741,6 +620,8 @@ ops.columns_used()
 
 
     {'d': {'assessmentTotal', 'subjectID', 'surveyCategory'}}
+
+
 
 
 
@@ -763,69 +644,6 @@ The `data_algebra` is part of a powerful cross-language and mutli-implementaiton
 
 [Win Vector LLC](http://www.win-vector.com/) is looking for sponsors and partners to further the package.  In particular if your group is using both `R` and `Python` in big-data projects (where `SQL` is a need, including [`Apache Spark`](https://spark.apache.org)), or are porting a project from one of these languages to another- please get in touch.
 
-## Appendix:
-
-Demonstrate that we can round-trip a `data_algebra` through `YAML` and recover the code.
-
-
-```python
-# land the pipeline as a file
-objs_Python = ops.collect_representation()
-dmp_Python = yaml.dump(objs_Python)
-with open("pipeline_Python.txt", "wt") as f:
-    print(dmp_Python, file=f)
-```
-
-
-```python
-# read back
-with open("pipeline_Python.txt", "rt") as f:
-    ops_text = f.read()
-ops_back = data_algebra.yaml.to_pipeline(yaml.safe_load(ops_text))
-print(ops_back.to_python(pretty=True))
-```
-
-    TableDescription(
-        table_name="d",
-        column_names=[
-            "subjectID",
-            "surveyCategory",
-            "assessmentTotal",
-            "irrelevantCol1",
-            "irrelevantCol2",
-        ],
-    ).extend(
-        {"probability": "(assessmentTotal * 0.237).exp()"}
-    ).extend(
-        {"total": "probability.sum()"}, partition_by=["subjectID"]
-    ).extend(
-        {"probability": "probability / total"}
-    ).extend(
-        {"sort_key": "-probability"}
-    ).extend(
-        {"row_number": "_row_number()"}, partition_by=["subjectID"], order_by=["sort_key"]
-    ).select_rows(
-        "row_number == 1"
-    ).select_columns(
-        ["subjectID", "surveyCategory", "probability"]
-    ).rename_columns(
-        {"diagnosis": "surveyCategory"}
-    )
-    
-
-
-
-```python
-# confirm we have a data_algebra.data_ops.ViewRepresentation
-# which is the class the data_algebra pipelines are derived from
-isinstance(ops_back, data_algebra.data_ops.ViewRepresentation)
-```
-
-
-
-
-    True
-
 
 
 
@@ -837,3 +655,4 @@ conn.close()
 Note: as with `SQL` the `data_algebra` assumes the processing pipeline is a [`DAG`](https://en.wikipedia.org/wiki/Directed_acyclic_graph) with only table-nodes used more than once.
 
 [Known to not work with Pandas 0.25.1 on Python 3.7](https://github.com/pandas-dev/pandas/issues/29819) (newer Pandas fixes the issue).
+
