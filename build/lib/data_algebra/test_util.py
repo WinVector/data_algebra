@@ -109,8 +109,8 @@ def equivalent_frames(
             if not all(ca_null == cb_null):
                 return False
             if not all(ca_null):
-                ca = ca[~ca_null]
-                cb = cb[~cb_null]
+                ca = ca[ca_null == False]
+                cb = cb[cb_null == False]
                 if local_data_model.can_convert_col_to_numeric(a[c]):
                     ca = numpy.asarray(ca, dtype=float)
                     cb = numpy.asarray(cb, dtype=float)

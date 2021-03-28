@@ -10,6 +10,7 @@ from data_algebra.data_ops import *
 from data_algebra.SQLite import SQLiteModel
 import data_algebra.util
 
+import pytest
 
 def test_if_else():
     d = data_algebra.default_data_model.pd.DataFrame(
@@ -49,17 +50,33 @@ def test_if_else_2():
         'c2': [-1, -2, -3, -4, -5, -6],
     })
 
+    # ! not used
+    with pytest.raises(Exception):
+        ops = describe_table(d, table_name='d'). \
+            extend({'choice': "group=='A'"}). \
+            extend({'choice_fixed': 'choice.is_bad().if_else(0, choice)'}). \
+            extend({'not_c_2': '! choice_fixed'})
+
+    # ~ not used
+    with pytest.raises(Exception):
+        ops = describe_table(d, table_name='d'). \
+            extend({'choice': "group=='A'"}). \
+            extend({'choice_fixed': 'choice.is_bad().if_else(0, choice)'}). \
+            extend({'not_c_2': '~ choice_fixed'})
+
     ops = describe_table(d, table_name='d'). \
         extend({'choice': "group=='A'"}). \
         extend({'choice_fixed': 'choice.is_bad().if_else(0, choice)'}). \
+        extend({'not_c_1': 'choice_fixed == False'}). \
         extend({'rc': 'choice_fixed.if_else(c1, c2)'}). \
-        select_columns(['choice_fixed', 'rc'])
+        select_columns(['choice_fixed', 'rc', 'not_c_1'])
 
     res1 = ops.transform(d)
 
     expect = pandas.DataFrame({
         'choice_fixed': [1, 0, 0, 1, 0, 0],
-        'rc': [1, -2, -3, 4, -5, -6]
+        'rc': [1, -2, -3, 4, -5, -6],
+        'not_c_1': [False, True, True, False, True, True],
     })
 
     assert data_algebra.test_util.equivalent_frames(expect, res1)

@@ -210,7 +210,6 @@ class Term(PreTerm, ABC):
         return self.__rop_expr__("**", other)
 
     def __neg__(self):
-        # return self.__uop_expr__("neg")
         return self.__uop_expr__("-", inline=True)
 
     def __pos__(self):
@@ -247,6 +246,7 @@ class Term(PreTerm, ABC):
     def __ror__(self, other):
         return self.__rop_expr__("|", other)
 
+    # ~ is bitwise negation in Python
     # not/~ isn't applicable to objects
     # https://docs.python.org/3/library/operator.html
 

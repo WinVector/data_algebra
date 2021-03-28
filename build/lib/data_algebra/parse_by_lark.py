@@ -56,7 +56,7 @@ op_remap = {
 factor_remap = {
     '-': '__neg__',  # unary!
     '+': '__pos__',  # unary!
-    '~': '__not__',  # unary! # TODO: implement
+    'not': 'not',  # unary! # TODO: implement
 }
 
 logical_remap = {
@@ -180,15 +180,10 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                     )
             if (op.data == 'or_test') or (op.data == 'and_test'):
                 raise ValueError("and/or and &&/|| can not be used in vector data context, please use &/|.")
-            if op.data == 'not':
-                if len(op.children) != 1:
-                    raise ValueError("unexpected not length")
-                left = _r_walk_lark_tree(op.children[0])
-                return left.__not__()  # TODO: implement
             if op.data in ['list', 'tuple']:
                 vals = [_r_walk_lark_tree(vi) for vi in op.children[0].children]
                 return data_algebra.expr_rep.ListTerm(vals)
-            raise ValueError("unexpected lark Tree kind: " + str(op.data))
+            raise ValueError("unexpected/not-allowed lark Tree kind: " + str(op.data))
         raise ValueError("unexpected lark parse type: " + str(type(op)))
 
     return _r_walk_lark_tree(op)
