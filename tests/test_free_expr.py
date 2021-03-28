@@ -22,8 +22,6 @@ def test_free_expr():
         .rename_columns({"diagnosis": "surveyCategory"})
     )
 
-    data_algebra.test_util.check_op_round_trip(ops1)
-
     with data_algebra.env.Env(locals()) as env:
         ops2 = (
             TableDescription("d", ["subjectID", "surveyCategory", "assessmentTotal"])
@@ -40,8 +38,6 @@ def test_free_expr():
             .select_columns(["subjectID", "surveyCategory", "probability"])
             .rename_columns({"diagnosis": "surveyCategory"})
         )
-
-    data_algebra.test_util.check_op_round_trip(ops2)
 
     assert str(ops1) == str(ops2)
 
@@ -63,8 +59,6 @@ def test_free_expr():
         .rename_columns({"diagnosis": "surveyCategory"})
     )
 
-    data_algebra.test_util.check_op_round_trip(ops3)
-
     assert str(ops1) == str(ops3)
 
     f = frame()
@@ -84,7 +78,5 @@ def test_free_expr():
         .select_columns(["subjectID", "surveyCategory", "probability"])
         .rename_columns({"diagnosis": "surveyCategory"})
     )
-
-    data_algebra.test_util.check_op_round_trip(ops4)
 
     assert str(ops1) == str(ops4)

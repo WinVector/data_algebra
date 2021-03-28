@@ -6,11 +6,9 @@ import data_algebra.util
 from data_algebra.data_ops import *
 from data_algebra.data_pipe import *
 import data_algebra.PostgreSQL
-import data_algebra.yaml
 
 
 def test_apply():
-    data_algebra.yaml.fix_ordered_dict_yaml_rep()
     data_algebra.env.push_onto_namespace_stack(locals())
 
     d = data_algebra.default_data_model.pd.DataFrame(

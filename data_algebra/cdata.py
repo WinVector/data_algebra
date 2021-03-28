@@ -137,23 +137,6 @@ class RecordSpecification:
     def __str__(self):
         return self.fmt()
 
-    def to_simple_obj(self):
-        """
-        Create an object for YAML encoding
-
-        :return: OrderedDict suitible for YAML encoding
-        """
-
-        obj = collections.OrderedDict()
-        obj["type"] = "data_algebra.cdata.RecordSpecification"
-        obj["record_keys"] = self.record_keys.copy()
-        obj["control_table_keys"] = self.control_table_keys.copy()
-        tbl = collections.OrderedDict()
-        for k in self.control_table.columns:
-            tbl[k] = [v for v in self.control_table[k]]
-        obj["control_table"] = tbl
-        return obj
-
     def map_to_rows(self, *, strict=False):
         """
         Build a RecordMap mapping this RecordSpecification to rowrecs
@@ -173,31 +156,6 @@ class RecordSpecification:
         """
 
         return RecordMap(blocks_out=self, strict=strict)
-
-
-def record_spec_from_simple_obj(obj, *, local_data_model=None):
-    if local_data_model is None:
-        local_data_model = data_algebra.default_data_model
-    control_table = local_data_model.data_frame()
-    for k in obj["control_table"].keys():
-        control_table[k] = obj["control_table"][k]
-
-    def maybe_get_list(omap, key):
-        try:
-            v = omap[key]
-            if v is None:
-                return []
-            if isinstance(v, str):
-                v = [v]
-            return v
-        except KeyError:
-            return []
-
-    return RecordSpecification(
-        control_table,
-        record_keys=maybe_get_list(obj, "record_keys"),
-        control_table_keys=maybe_get_list(obj, "control_table_keys"),
-    )
 
 
 def blocks_to_rowrecs(data, *, blocks_in, local_data_model=None):
@@ -564,17 +522,6 @@ class RecordMap:
 
     def __str__(self):
         return self.fmt_string
-
-    def to_simple_obj(self):
-        """Create an object for YAML encoding"""
-
-        obj = collections.OrderedDict()
-        obj["type"] = "data_algebra.cdata.RecordMap"
-        if self.blocks_in is not None:
-            obj["blocks_in"] = self.blocks_in.to_simple_obj()
-        if self.blocks_out is not None:
-            obj["blocks_out"] = self.blocks_out.to_simple_obj()
-        return obj
 
     # more of the sklearn step API
 

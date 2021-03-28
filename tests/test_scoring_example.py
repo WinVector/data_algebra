@@ -1,12 +1,10 @@
 import math
 import sqlite3
-import yaml  # https://pyyaml.org
 
 import data_algebra
 import data_algebra.test_util
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 import data_algebra.env
-import data_algebra.yaml
 import data_algebra.PostgreSQL
 import data_algebra.SQLite
 import data_algebra.util
@@ -17,8 +15,6 @@ import data_algebra.util
 def test_scoring_example():
     # set some things in our environment
     data_algebra.env.push_onto_namespace_stack(locals())
-    # ask YAML to write simpler structures
-    data_algebra.yaml.fix_ordered_dict_yaml_rep()
 
     d_local = data_algebra.default_data_model.pd.DataFrame(
         {
@@ -54,8 +50,6 @@ def test_scoring_example():
             .rename_columns({"diagnosis": "surveyCategory"})
         )
 
-    data_algebra.test_util.check_op_round_trip(ops)
-
     py_source = ops.to_python(strict=True, pretty=False)
     py_sourcep = ops.to_python(strict=True, pretty=True)
 
@@ -69,15 +63,6 @@ def test_scoring_example():
         }
     )
     assert data_algebra.test_util.equivalent_frames(expect, res, float_tol=1e-3)
-
-    # round-trip the operators
-    objs_Python = ops.collect_representation()
-    dmp_Python = yaml.dump(objs_Python)
-    ops_back = data_algebra.yaml.to_pipeline(yaml.safe_load(dmp_Python))
-    assert isinstance(ops_back, data_algebra.data_ops.ViewRepresentation)
-
-    py_sourceb = ops_back.to_python(strict=True, pretty=False)
-    assert py_source == py_sourceb
 
     # test database aspects
 

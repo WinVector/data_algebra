@@ -11,7 +11,6 @@ import sqlite3
 # noinspection PyUnresolvedReferences
 import data_algebra.SQLite
 from data_algebra.data_ops import *
-from data_algebra.yaml import have_yaml, to_pipeline
 
 
 def formats_to_self(ops):
@@ -25,22 +24,6 @@ def formats_to_self(ops):
     ops2 = eval(str1)
     str2 = repr(ops2)
     return str1 == str2
-
-
-def check_op_round_trip(o):
-    if not isinstance(o, ViewRepresentation):
-        raise TypeError("expect o to be a data_algebra.data_ops.ViewRepresentation")
-    if not have_yaml:
-        raise RuntimeError("yaml/PyYAML not installed")
-    strr = o.to_python(strict=True, pretty=False)
-    strp = o.to_python(strict=True, pretty=True)
-    obj = o.collect_representation()
-    back = to_pipeline(obj)
-    strr_back = back.to_python(strict=True, pretty=False)
-    assert strr == strr_back
-    strp_back = back.to_python(strict=True, pretty=True)
-    assert strp == strp_back
-    assert o._equiv_nodes(back)
 
 
 def equivalent_frames(
@@ -159,7 +142,6 @@ def check_transform(
         raise ValueError("no tables used")
     if not formats_to_self(ops):
         raise ValueError("ops did not round-trip format")
-    check_op_round_trip(ops)
     if isinstance(data, dict):
         res = ops.eval(data_map=data)
     else:

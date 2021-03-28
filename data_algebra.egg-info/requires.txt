@@ -3,30 +3,15 @@ pandas
 lark
 
 [all]
-PyYAML
 black
 sqlparse
 graphviz
-dask
-modin[ray]
-
-[dask]
-dask
 
 [diagram]
 graphviz
-
-[modin_ray]
-modin[ray]
 
 [pretty_python]
 black
 
 [pretty_sql]
 sqlparse
-
-[ray]
-ray
-
-[yaml]
-PyYAML

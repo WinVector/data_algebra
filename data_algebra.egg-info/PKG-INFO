@@ -17,7 +17,7 @@ Description:
         the [rquery](https://github.com/WinVector/rquery) and 
         [rqdatatable](https://github.com/WinVector/rqdatatable) packages.
         
-        Recommended packages include: PyYAML (supplies yaml), sqlparse, and black.
+        Recommended packages include: sqlparse, black, and graphviz.
         
 Platform: any
 Classifier: Intended Audience :: Science/Research
@@ -30,11 +30,7 @@ Classifier: Programming Language :: Python :: 3.8
 Classifier: Programming Language :: Python :: 3.9
 Classifier: License :: OSI Approved :: BSD License
 Description-Content-Type: text/markdown
-Provides-Extra: yaml
 Provides-Extra: pretty_python
 Provides-Extra: pretty_sql
 Provides-Extra: diagram
-Provides-Extra: dask
-Provides-Extra: ray
-Provides-Extra: modin_ray
 Provides-Extra: all

@@ -1,12 +1,10 @@
 import re
 import io
 import sqlite3
-import yaml
 
 import data_algebra
 import data_algebra.test_util
 from data_algebra.cdata import *
-from data_algebra.cdata_impl import record_map_from_simple_obj
 import data_algebra.SQLite
 from data_algebra.data_ops import *
 import data_algebra.util
@@ -228,16 +226,6 @@ def test_cdata1():
     arranged_self = mp_to_and_back.transform(iris_blocks)
     assert data_algebra.test_util.equivalent_frames(arranged_self, iris_blocks_orig)
     arranged_self
-
-    #%%
-
-    obj = mp_to_blocks.to_simple_obj()
-    waste_str = str(yaml.dump(obj))
-
-    #%%
-
-    recovered_transform = record_map_from_simple_obj(obj)
-    waste_str = str(recovered_transform)
 
 
 def test_cdata_explode():

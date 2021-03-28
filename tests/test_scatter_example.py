@@ -2,7 +2,6 @@ import data_algebra
 import data_algebra.test_util
 import data_algebra.util
 from data_algebra.cdata import *
-from data_algebra.cdata_impl import record_map_from_simple_obj
 
 # https://github.com/WinVector/cdata
 

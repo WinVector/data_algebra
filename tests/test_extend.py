@@ -3,7 +3,6 @@ import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
 import data_algebra.PostgreSQL
-import data_algebra.yaml
 from data_algebra.test_util import formats_to_self
 
 

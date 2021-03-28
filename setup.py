@@ -15,7 +15,7 @@ database specific SQL. The package also implements the same transforms for Panda
 the [rquery](https://github.com/WinVector/rquery) and 
 [rqdatatable](https://github.com/WinVector/rqdatatable) packages.
 
-Recommended packages include: PyYAML (supplies yaml), sqlparse, and black.
+Recommended packages include: sqlparse, black, and graphviz.
 """
 
 setuptools.setup(
@@ -31,14 +31,10 @@ setuptools.setup(
         "lark"
     ],
     extras_require={
-        'yaml': ['PyYAML'],
         'pretty_python': ['black'],
         'pretty_sql': ['sqlparse'],
         'diagram': ['graphviz'],
-        'dask': ['dask'],
-        'ray': ['ray'],
-        'modin_ray': ['modin[ray]'],
-        'all': ['PyYAML', 'black', 'sqlparse', 'graphviz', 'dask', 'modin[ray]'],
+        'all': ['black', 'sqlparse', 'graphviz'],
     },
     platforms=['any'],
     license='License :: OSI Approved :: BSD 3-clause License',

@@ -6,7 +6,6 @@ data_algebra/SparkSQL.py
 data_algebra/__init__.py
 data_algebra/arrow.py
 data_algebra/cdata.py
-data_algebra/cdata_impl.py
 data_algebra/connected_components.py
 data_algebra/custom_functions.py
 data_algebra/data_model.py
@@ -22,7 +21,6 @@ data_algebra/expr.py
 data_algebra/expr_parse.py
 data_algebra/expr_rep.py
 data_algebra/flow_text.py
-data_algebra/modin_model.py
 data_algebra/near_sql.py
 data_algebra/pandas_base.py
 data_algebra/pandas_model.py
@@ -30,7 +28,6 @@ data_algebra/parse_by_lark.py
 data_algebra/python3_lark.py
 data_algebra/test_util.py
 data_algebra/util.py
-data_algebra/yaml.py
 data_algebra.egg-info/PKG-INFO
 data_algebra.egg-info/SOURCES.txt
 data_algebra.egg-info/dependency_links.txt

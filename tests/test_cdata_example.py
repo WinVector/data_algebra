@@ -6,8 +6,6 @@ import data_algebra
 import data_algebra.test_util
 from data_algebra.data_ops import *
 from data_algebra.cdata import *
-import data_algebra.yaml
-from data_algebra.cdata_impl import record_map_from_simple_obj
 import data_algebra.util
 
 
@@ -44,48 +42,6 @@ def test_cdata_example():
     )
 
     ops = td.convert_records(record_map=RecordMap(blocks_out=record_spec))
-
-    yaml_obj = ops.collect_representation()
-    back = data_algebra.yaml.to_pipeline(yaml_obj)
-
-
-def test_keras_example():
-    obj = {
-        "blocks_out": {
-            "record_keys": "epoch",
-            "control_table_keys": "measure",
-            "control_table": {
-                "measure": ["minus binary cross entropy", "accuracy"],
-                "training": ["loss", "acc"],
-                "validation": ["val_loss", "val_acc"],
-            },
-        }
-    }
-    record_map = record_map_from_simple_obj(obj)
-    data = data_algebra.default_data_model.pd.DataFrame(
-        {
-            "val_loss": [-0.377, -0.2997],
-            "val_acc": [0.8722, 0.8895],
-            "loss": [-0.5067, -0.3002],
-            "acc": [0.7852, 0.904],
-            "epoch": [1, 2],
-        }
-    )
-    res = record_map.transform(data)
-    expect = data_algebra.default_data_model.pd.DataFrame(
-        {
-            "epoch": [1, 1, 2, 2],
-            "measure": [
-                "accuracy",
-                "minus binary cross entropy",
-                "accuracy",
-                "minus binary cross entropy",
-            ],
-            "training": [0.7852, -0.5067, 0.9040, -0.3002],
-            "validation": [0.8722, -0.3770, 0.8895, -0.2997],
-        }
-    )
-    assert data_algebra.test_util.equivalent_frames(res, expect)
 
 
 def test_cdata_block():
