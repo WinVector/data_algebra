@@ -3,6 +3,7 @@ import pytest
 import data_algebra.util
 from data_algebra.data_ops import *
 
+import lark.exceptions
 
 def test_parse():
     q = 4
@@ -29,3 +30,28 @@ def test_parse_2():
             order_by=['s'])
 
 
+def test_parse_3():
+    with pytest.raises(ValueError):
+        ops = TableDescription("d", ["x", "y", "s"]). \
+            extend({
+                "z": "x or y"})
+
+
+def test_parse_4():
+    ops = TableDescription("d", ["x", "y", "s"]). \
+        extend({
+            "z": "x | y"})
+
+
+def test_parse_5():
+    with pytest.raises(lark.exceptions.UnexpectedToken):
+        ops = TableDescription("d", ["x", "y", "s"]). \
+            extend({
+                "z": "x || y"})
+
+def test_parse_6():
+    ops = TableDescription("d", ["u", "v", "w", "x", "y"]). \
+        extend({
+            "z": "(u.sin() + w**2) / x + y / v"})
+    recovered = ops.ops['z']
+    assert str(recovered) == '((u.sin() + (w ** 2)) / x) + (y / v)'
