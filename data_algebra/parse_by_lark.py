@@ -109,7 +109,7 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                 return data_algebra.expr_rep.Value(str(op))
             if op.type == 'NAME':
                 return lookup_symbol(str(op))
-            raise ValueError("unexepected Token type: " + op.type)
+            raise ValueError("unexpected Token type: " + op.type)
         if isinstance(op, lark.tree.Tree):
             if op.data == 'const_true':
                 return data_algebra.expr_rep.Value(True)
