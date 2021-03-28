@@ -1,5 +1,5 @@
 
-import pkgutil
+import ast
 
 import lark
 import lark.tree
@@ -106,7 +106,7 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
             if op.type == 'FLOAT_NUMBER':
                 return data_algebra.expr_rep.Value(float(op))
             if op.type == 'STRING':
-                return data_algebra.expr_rep.Value(str(op))
+                return data_algebra.expr_rep.Value(ast.literal_eval(str(op)))   # strip excess quotes
             if op.type == 'NAME':
                 return lookup_symbol(str(op))
             raise ValueError("unexpected Token type: " + op.type)

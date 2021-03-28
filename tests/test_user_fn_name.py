@@ -8,6 +8,7 @@ import pytest
 
 from data_algebra.data_ops import *
 import data_algebra.SQLite
+import data_algebra.test_util
 
 
 def test_u_1():
@@ -23,21 +24,28 @@ def test_u_1():
                  '2003-11-09 00:00:00', '2004-01-09 00:00:00'],
     })
 
-    trim_date = user_fn(lambda x: x.str.slice(start=0, stop=10),
-                        'DATE',
-                        name='trim_date_zz',
-                        sql_name='SUBSTR', sql_suffix=', 1, 10')
+    trim_DATE_1_10 = user_fn(
+        lambda x: x.str.slice(start=0, stop=10),
+        'DATE',
+        name='trim_DATE_1_10',
+        sql_name='SUBSTR', sql_suffix=', 1, 10')
 
     ops = describe_table(d, table_name='d'). \
-        extend({'date_trimmed': trim_date})
+        extend({'date_trimmed': trim_DATE_1_10})
 
     res_1 = ops.transform(d)
+
+    expect = d.copy()
+    expect['date_trimmed'] = expect.DATE.str.slice(start=0, stop=10)
+    assert data_algebra.test_util.equivalent_frames(expect, res_1)
 
     q = ops.to_sql(db_model)
 
     with sqlite3.connect(':memory:') as con:
         d.to_sql(name='d', con=con)
         res_db = pandas.read_sql(q, con=con)
+
+    assert data_algebra.test_util.equivalent_frames(expect, res_db)
 
 
 def test_u_2():
@@ -74,14 +82,19 @@ def test_u_3():
 
     def trim_date_f(x):
         return x.str.slice(start=0, stop=10)
-    trim_date = user_fn(trim_date_f,
-                    'DATE',
-                    sql_name='SUBSTR', sql_suffix=', 1, 10')
+    trim_DATE_1_10 = user_fn(
+        trim_date_f,
+        'DATE',
+        sql_name='SUBSTR', sql_suffix=', 1, 10')
 
     ops = describe_table(d, table_name='d'). \
-        extend({'date_trimmed': trim_date})
+        extend({'date_trimmed': trim_DATE_1_10})
 
     res_1 = ops.transform(d)
+
+    expect = d.copy()
+    expect['date_trimmed'] = expect.DATE.str.slice(start=0, stop=10)
+    assert data_algebra.test_util.equivalent_frames(expect, res_1)
 
     q = ops.to_sql(db_model)
 
@@ -89,3 +102,4 @@ def test_u_3():
         d.to_sql(name='d', con=con)
         res_db = pandas.read_sql(q, con=con)
 
+    assert data_algebra.test_util.equivalent_frames(expect, res_db)

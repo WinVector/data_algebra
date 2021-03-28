@@ -57,6 +57,13 @@ def test_if_else_2():
 
     res1 = ops.transform(d)
 
+    expect = pandas.DataFrame({
+        'choice_fixed': [1, 0, 0, 1, 0, 0],
+        'rc': [1, -2, -3, 4, -5, -6]
+    })
+
+    assert data_algebra.test_util.equivalent_frames(expect, res1)
+
     db_model = SQLiteModel()
 
     sql = ops.to_sql(db_model, pretty=True)
