@@ -26,7 +26,6 @@ data_algebra/modin_model.py
 data_algebra/near_sql.py
 data_algebra/pandas_base.py
 data_algebra/pandas_model.py
-data_algebra/parse_by_eval.py
 data_algebra/parse_by_lark.py
 data_algebra/python3_lark.py
 data_algebra/test_util.py
