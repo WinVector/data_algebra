@@ -45,6 +45,7 @@ op_remap = {
     '*': '__mul__',
     '/': '__truediv__',
     '//': '__floordiv__',
+    '%': '__mod__',
     '**': '__pow__',
     '&': '__and__',
     '^': '__xor__',
@@ -100,20 +101,22 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
 
     def _r_walk_lark_tree(op):
         if isinstance(op, lark.lexer.Token):
-            if op.data == 'number':
-                return data_algebra.expr_rep.Value(op.children[0])
-            raise ValueError("unexpected lark Token kind: " + str(op.data))
+            if op.type == 'DEC_NUMBER':
+                return data_algebra.expr_rep.Value(int(op))
+            if op.type == 'FLOAT_NUMBER':
+                return data_algebra.expr_rep.Value(float(op))
+            if op.type == 'STRING':
+                return data_algebra.expr_rep.Value(str(op))
+            if op.type == 'NAME':
+                return lookup_symbol(str(op))
+            raise ValueError("unexpected Token type: " + op.type)
         if isinstance(op, lark.tree.Tree):
-            if op.data == 'single_input':
+            if op.data == 'const_true':
+                return data_algebra.expr_rep.Value(True)
+            if op.data == 'const_false':
+                return data_algebra.expr_rep.Value(False)
+            if op.data in ['single_input', 'number', 'string', 'var']:
                 return _r_walk_lark_tree(op.children[0])
-            if op.data == 'number':
-                tok = op.children[0]
-                return data_algebra.expr_rep.Value(float(tok))
-            if op.data == 'string':
-                tok = op.children[0]
-                return data_algebra.expr_rep.Value(str(tok))
-            if op.data == 'var':
-                return lookup_symbol(str(op.children[0]))
             if op.data in ['arith_expr', 'term', 'comparison']:
                 if len(op.children) != 3:
                     raise ValueError("unexpected " + op.data + " length")
@@ -169,7 +172,12 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                     method = getattr(var, op_name)
                     return method(*args)
                 else:
-                    return lookup_symbol(op_name)
+                    if op_name.startswith('_'):  # TODO: research why we are adding and removing underbar
+                        op_name = op_name[1:len(op_name)]
+                    return data_algebra.expr_rep.Expression(
+                        op = op_name,
+                        args = args
+                    )
             if (op.data == 'or_test') or (op.data == 'and_test'):
                 raise ValueError("and/or and &&/|| can not be used in vector data context, please use &/|.")
             if op.data == 'not':
@@ -177,13 +185,16 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                     raise ValueError("unexpected not length")
                 left = _r_walk_lark_tree(op.children[0])
                 return left.__not__()  # TODO: implement
+            if op.data in ['list', 'tuple']:
+                vals = [_r_walk_lark_tree(vi) for vi in op.children[0].children]
+                return data_algebra.expr_rep.ListTerm(vals)
             raise ValueError("unexpected lark Tree kind: " + str(op.data))
         raise ValueError("unexpected lark parse type: " + str(type(op)))
 
     return _r_walk_lark_tree(op)
 
 
-def _parse_by_lark(source_str, *, data_def=None, outer_environment=None):
+def parse_by_lark(source_str, *, data_def=None, outer_environment=None):
     """
     Parse an expression in terms of data views and values.
 

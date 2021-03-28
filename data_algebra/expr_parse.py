@@ -4,7 +4,7 @@ import collections
 import data_algebra.env
 import data_algebra.expr_rep
 import data_algebra.parse_by_lark
-import data_algebra.parse_by_eval  # TODO: eliminate this
+# import data_algebra.parse_by_eval  # TODO: eliminate this
 
 
 def parse_assignments_in_context(ops, view, *, parse_env=None):
@@ -51,7 +51,7 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
                 # v = data_algebra.parse_by_eval._parse_by_eval(
                 #     source_str=v, data_def=mp, outer_environment=parse_env
                 # )
-                v = data_algebra.parse_by_lark._parse_by_lark(
+                v = data_algebra.parse_by_lark.parse_by_lark(
                     source_str=v, data_def=mp, outer_environment=parse_env
                 )
         else:

@@ -595,7 +595,7 @@ class ListTerm(PreTerm):
     def __init__(self, value):
         if not isinstance(value, list):
             raise TypeError("value type must be a list")
-        self.value = value
+        self.value = [v for v in value]  # standardize to a list
         PreTerm.__init__(self)
 
     def is_equal(self, other):
@@ -645,6 +645,8 @@ class ListTerm(PreTerm):
 
 def _enc_value(value):
     if isinstance(value, Term):
+        return value
+    if isinstance(value, FnValue):
         return value
     if callable(value):
         return FnValue(value)

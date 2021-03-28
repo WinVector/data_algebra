@@ -194,7 +194,7 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
     return _r_walk_lark_tree(op)
 
 
-def _parse_by_lark(source_str, *, data_def=None, outer_environment=None):
+def parse_by_lark(source_str, *, data_def=None, outer_environment=None):
     """
     Parse an expression in terms of data views and values.
 

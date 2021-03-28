@@ -8,10 +8,7 @@
 
 # Installing
 
-Install `data_algebra` with either of:
-
-  * `pip install data_algebra`
-  * `pip install https://github.com/WinVector/data_algebra/raw/master/dist/data_algebra-0.5.5.tar.gz`
+Install `data_algebra` with `pip install data_algebra`
 
 # Announcement
 
