@@ -820,7 +820,7 @@ def describe_table(d, table_name="data_frame", *, qualifiers=None, column_types=
         limit_was=limit_was,
     )
 
-
+# TODO: preserve column order where practical
 class ExtendNode(ViewRepresentation):
     def __init__(
         self, *, source, parsed_ops, partition_by=None, order_by=None, reverse=None

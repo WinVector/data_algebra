@@ -1,5 +1,6 @@
 README.md
 setup.py
+data_algebra/BigQuery.py
 data_algebra/PostgreSQL.py
 data_algebra/SQLite.py
 data_algebra/SparkSQL.py

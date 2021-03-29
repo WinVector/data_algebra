@@ -173,7 +173,7 @@ class DBModel:
     def execute(self, conn, q):
         """
 
-        :param conn: database connection
+        :param conn: database connectionex
         :param q: sql query
         """
         cur = conn.cursor()
@@ -219,7 +219,9 @@ class DBModel:
         if not isinstance(identifier, str):
             raise TypeError("expected identifier to be a str")
         if self.identifier_quote in identifier:
-            raise TypeError('did not expect " in identifier')
+            # TODO: escape quote
+            # TODO: unify with derived PostgreSQL and BigQuery
+            raise TypeError('did not expect ' + self.identifier_quote + ' in identifier')
         return self.identifier_quote + identifier + self.identifier_quote
 
     def build_qualified_table_name(self, table_name, *, qualifiers=None):

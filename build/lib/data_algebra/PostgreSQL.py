@@ -21,7 +21,8 @@ class PostgreSQLModel(data_algebra.db_model.DBModel):
         if not isinstance(identifier, str):
             raise TypeError("expected identifier to be a str")
         if self.identifier_quote in identifier:
-            raise ValueError('did not expect " in identifier')
+            # TODO: escape quotes
+            raise ValueError('did not expect ' + self.identifier_quote + ' in identifier')
         return self.identifier_quote + identifier.lower() + self.identifier_quote
 
     def build_qualified_table_name(self, table_name, *, qualifiers=None):

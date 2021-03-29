@@ -33,4 +33,5 @@ Description-Content-Type: text/markdown
 Provides-Extra: pretty_python
 Provides-Extra: pretty_sql
 Provides-Extra: diagram
+Provides-Extra: BigQuery
 Provides-Extra: all

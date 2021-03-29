@@ -2,10 +2,15 @@ numpy
 pandas
 lark
 
+[BigQuery]
+google.cloud
+pyarrow
+
 [all]
 black
 sqlparse
 graphviz
+BigQuery
 
 [diagram]
 graphviz
