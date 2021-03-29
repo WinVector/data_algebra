@@ -49,7 +49,7 @@ class BigQueryModel(data_algebra.db_model.DBModel):
         assert _have_bigquery
         assert isinstance(conn, google.cloud.bigquery.client.Client)
         assert isinstance(q, str)
-        conn.result(q)
+        conn.query(q).result()
 
     def read_query(self, conn, q):
         """
