@@ -8,6 +8,7 @@ from data_algebra.data_ops import *
 import data_algebra.BigQuery
 import data_algebra.SQLite
 
+
 def test_bigquery_1():
     d = pandas.DataFrame({
         'group': ['a', 'a', 'b', 'b'],
@@ -88,6 +89,38 @@ def test_bigquery_2():
         'nu_1': [2, 1],
         'nu_2': [3, 2],
     })
+    assert data_algebra.test_util.equivalent_frames(expect, res_1)
+
+    bigquery_model = data_algebra.BigQuery.BigQueryModel()
+    bigquery_sql = ops.to_sql(bigquery_model, pretty=True)
+
+
+def test_bigquery_date_1():
+    d = pandas.DataFrame({
+        'group': ['a', 'a', 'a', 'b', 'b'],
+        'v1': [1, 2, 2, 0, 0],
+        'v2': [1, 2, 3, 4, 5],
+        'dt': pandas.to_datetime([1490195805, 1490195815, 1490295805, 1490196805, 1490195835], unit='s')
+    })
+    d
+
+    def DATE(col):
+        assert isinstance(col, str)
+        return user_fn(
+            lambda x: x.dt.date.copy(),
+            args = col,
+            name='DATE_' + col,
+            sql_name='DATE')
+
+    ops = describe_table(d, table_name='d') .\
+        extend({
+          'date': DATE('dt'),
+         })
+    res_1 = ops.transform(d)
+    # TODO: look at column ordering here
+
+    expect = d.copy()
+    expect['date'] = expect.dt.dt.date.copy()
     assert data_algebra.test_util.equivalent_frames(expect, res_1)
 
     bigquery_model = data_algebra.BigQuery.BigQueryModel()
