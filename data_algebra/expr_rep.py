@@ -335,10 +335,10 @@ class Term(PreTerm, ABC):
         return self.__uop_expr__("abs")
 
     def maximum(self, other):
-        return self.__op_expr__("maximum", other)
+        return self.__op_expr__("maximum", other, method=True, inline=False)
 
     def minimum(self, other):
-        return self.__op_expr__("minimum", other)
+        return self.__op_expr__("minimum", other, method=True, inline=False)
 
     def fmax(self, other):
         return self.__op_expr__("fmax", other, inline=False)

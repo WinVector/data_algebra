@@ -65,6 +65,40 @@ def _db_if_else_expr(dbmodel, expression):
     )
 
 
+def _db_maximum_expr(dbmodel, expression):
+    x_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    y_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
+    return (
+        "CASE"
+        + " WHEN "
+        + "(" + x_expr + ") >= (" + y_expr + ")"
+        + " THEN "
+        + x_expr
+        + " WHEN NOT "
+        + "(" + x_expr + ") >= (" + y_expr + ")"
+        + " THEN "
+        + y_expr
+        + " ELSE NULL END"
+    )
+
+
+def _db_minimum_expr(dbmodel, expression):
+    x_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    y_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
+    return (
+        "CASE"
+        + " WHEN "
+        + "(" + x_expr + ") <= (" + y_expr + ")"
+        + " THEN "
+        + x_expr
+        + " WHEN NOT "
+        + "(" + x_expr + ") <= (" + y_expr + ")"
+        + " THEN "
+        + y_expr
+        + " ELSE NULL END"
+    )
+
+
 def _db_is_in_expr(dbmodel, expression):
     is_in_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     x_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
@@ -81,6 +115,8 @@ db_expr_formatters = {
     "is_bad": _db_is_bad_expr,
     "if_else": _db_if_else_expr,
     "is_in": _db_is_in_expr,
+    "maximum": _db_maximum_expr,
+    "minimum": _db_minimum_expr,
 }
 
 

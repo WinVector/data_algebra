@@ -43,6 +43,28 @@ def make_custom_function_map(data_model):
             implementation=lambda c, x, y: numpy.where(c, x, y),
         ),
         CustomFunction(
+            name="maximum",
+            pandas_formatter=lambda expr: (
+                    "@maximum("
+                    + expr.args[0].to_pandas()
+                    + ", "
+                    + expr.args[1].to_pandas()
+                    + ")"
+            ),
+            implementation=lambda x, y: numpy.maximum(x, y),
+        ),
+        CustomFunction(
+            name="minimum",
+            pandas_formatter=lambda expr: (
+                    "@minimum("
+                    + expr.args[0].to_pandas()
+                    + ", "
+                    + expr.args[1].to_pandas()
+                    + ")"
+            ),
+            implementation=lambda x, y: numpy.minimum(x, y),
+        ),
+        CustomFunction(
             name="is_in",
             pandas_formatter=lambda expr: (
                     "@is_in("

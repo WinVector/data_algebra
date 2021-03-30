@@ -12,6 +12,7 @@ import data_algebra.util
 
 import pytest
 
+
 def test_if_else():
     d = data_algebra.default_data_model.pd.DataFrame(
         {"a": [True, False], "b": [1, 2], "c": [3, 4]}
@@ -91,3 +92,35 @@ def test_if_else_2():
         res2 = pandas.read_sql(sql, con=con)
 
     assert data_algebra.test_util.equivalent_frames(res1, res2)
+
+
+def test_maximum_1():
+    d = data_algebra.default_data_model.pd.DataFrame({
+        "a": [1, 2, 3, 5],
+        "b": [-1, 3, -7, 6],
+    })
+
+    ops = describe_table(d, table_name='d') .\
+        extend({
+            "c": "a.maximum(b)",
+            "d": "a.minimum(b)"})
+
+    res_pandas = ops.transform(d)
+
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        "a": [1, 2, 3, 5],
+        "b": [-1, 3, -7, 6],
+    })
+    expect['c'] = numpy.maximum(expect.a, expect.b)
+    expect['d'] = numpy.minimum(expect.a, expect.b)
+
+    assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
+
+    db_model = SQLiteModel()
+    ops_sql = ops.to_sql(db_model)
+    with sqlite3.connect(":memory:") as conn:
+        db_model.prepare_connection(conn)
+        db_model.insert_table(conn, d, "d")
+        res_db = db_model.read_query(conn, ops_sql)
+
+    assert data_algebra.test_util.equivalent_frames(res_db, expect)
