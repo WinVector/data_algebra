@@ -102,7 +102,7 @@ def test_bigquery_date_1():
         'v2': [1, 2, 3, 4, 5],
         'dt': pandas.to_datetime([1490195805, 1490195815, 1490295805, 1490196805, 1490195835], unit='s')
     })
-    d
+    d['dt_str'] = d.dt.astype(str)
 
     def DATE(col):
         assert isinstance(col, str)
@@ -112,21 +112,32 @@ def test_bigquery_date_1():
             name='DATE_' + col,
             sql_name='DATE')
 
+    def trim_1_10(col_name):
+        return user_fn(
+            lambda x: x.str.slice(start=0, stop=10),
+            args=col_name,
+            name='trim_1_10_' + col_name,
+            sql_name='SUBSTR', sql_suffix=', 1, 10')
+
     ops = describe_table(d, table_name='d') .\
         extend({
             'date': DATE('dt'),
+            'date_str': trim_1_10('dt_str'),
          }) . \
         extend({
             'mean_v1': 'v1.mean()',
+            'count': '_size()',
             },
             partition_by='group')
     res_1 = ops.transform(d)
-    # TODO: look at column ordering here
 
     expect = d.copy()
     expect['date'] = expect.dt.dt.date.copy()
+    expect['date_str'] = expect.dt_str.str.slice(start=0, stop=10)
     expect['mean_v1'] = [5/3, 5/3, 5/3, 0, 0]
+    expect['count'] = [3, 3, 3, 2, 2]
     assert data_algebra.test_util.equivalent_frames(expect, res_1)
 
     bigquery_model = data_algebra.BigQuery.BigQueryModel()
     bigquery_sql = ops.to_sql(bigquery_model, pretty=True)
+    # TODO: look at column ordering here

@@ -23,15 +23,22 @@ def _bigquery_median_expr(dbmodel, expression):
         "PERCENTILE_CONT(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ", 0.5)"
     )
 
+
 def _bigquery_mean_expr(dbmodel, expression):
     return (
         "avg(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ")"
     )
 
+
+def _bigquery_size_expr(dbmodel, expression):
+    return "SUM(1)"
+
+
 BigQuery_formatters = {
     "nunique": _bigquery_nunique_expr,
     "median": _bigquery_median_expr,
     "mean": _bigquery_mean_expr,
+    "size": _bigquery_size_expr,
 }
 
 
