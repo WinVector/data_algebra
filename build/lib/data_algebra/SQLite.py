@@ -56,6 +56,17 @@ def _check_scalar_bad(x):
     return 0
 
 
+class MedianAgg:
+    def __init__(self):
+        self.collection = []
+
+    def step(self, value):
+        self.collection.append(value)
+
+    def finalize(self):
+        return numpy.median(self.collection)
+
+
 class SQLiteModel(data_algebra.db_model.DBModel):
     """A model of how SQL should be generated for SQLite"""
 
@@ -154,6 +165,9 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             if not k in saw:
                 conn.create_function(k, 1, f)
                 saw.add(k)
+
+        # https://docs.python.org/3/library/sqlite3.html
+        conn.create_aggregate('median', 1, MedianAgg)
 
     def quote_identifier(self, identifier):
         if not isinstance(identifier, str):

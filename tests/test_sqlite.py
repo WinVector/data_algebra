@@ -9,7 +9,9 @@ import data_algebra.util
 
 
 def test_sqlite():
+    db_model = data_algebra.SQLite.SQLiteModel()
     conn = sqlite3.connect(":memory:")
+    db_model.prepare_connection(conn)
     cur = conn.cursor()
 
     # From:
@@ -34,8 +36,6 @@ def test_sqlite():
     ).extend({"cost": "qty * price"})
 
     pp = ops.to_python(pretty=True)
-
-    db_model = data_algebra.SQLite.SQLiteModel()
 
     sql = ops.to_sql(db_model, pretty=True)
 
