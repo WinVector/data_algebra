@@ -21,7 +21,7 @@ def test_bigquery_1():
             {'med_val': 'median(val)'},
             partition_by=['group']). \
         project(
-            {'med_val': 'mean(med_val)'},
+            {'med_val': 'mean(med_val)'},  # pseudo-aggregator
             group_by=['group'])
 
     res_1 = ops.transform(d)
@@ -58,10 +58,13 @@ def test_bigquery_2():
 
     # this is the pattern BigQuery needs to compute
     # median, window function then a pseudo-aggregation
+    # refs on BigQuery window fn horeshit:
+    #  https://iamhectorotero.github.io/median-and-group-by/
+    #  https://chartio.com/resources/tutorials/how-countdistinct-field-works-in-google-bigquery/
     ops = describe_table(d, table_name='d'). \
         extend({
-            'med_1': 'v1.median()',
-            'med_2': 'v2.median()',
+            'med_1': 'v1.median()',  # median is only a window fn in Big Query
+            'med_2': 'v2.median()',  # median is only a window fn in Big Query
             },
             partition_by=['group']). \
         project({
