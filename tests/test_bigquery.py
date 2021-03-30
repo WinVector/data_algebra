@@ -114,13 +114,18 @@ def test_bigquery_date_1():
 
     ops = describe_table(d, table_name='d') .\
         extend({
-          'date': DATE('dt'),
-         })
+            'date': DATE('dt'),
+         }) . \
+        extend({
+            'mean_v1': 'v1.mean()',
+            },
+            partition_by='group')
     res_1 = ops.transform(d)
     # TODO: look at column ordering here
 
     expect = d.copy()
     expect['date'] = expect.dt.dt.date.copy()
+    expect['mean_v1'] = [5/3, 5/3, 5/3, 0, 0]
     assert data_algebra.test_util.equivalent_frames(expect, res_1)
 
     bigquery_model = data_algebra.BigQuery.BigQueryModel()
