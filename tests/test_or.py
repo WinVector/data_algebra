@@ -95,18 +95,18 @@ def test_in_1b():
 def test_in_2():
     # some example data
     d = pandas.DataFrame({
-        'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
+        'ID': [1, 1, 2, 34, 44, 44, 44, 44, 5, 5, 6],
         'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
     })
 
     ops = describe_table(d, table_name='d'). \
-        extend({'v': 'ID.is_in([3, 4])'}). \
+        extend({'v': 'ID.is_in([34, 44])'}). \
         select_rows('v')
     ops_str = str(ops)  # see if this throws
     d2 = ops.transform(d)
 
     expect = pandas.DataFrame({
-        'ID': [3, 4, 4, 4, 4,],
+        'ID': [34, 44, 44, 44, 44,],
         'OP': ['D', 'C', 'A', 'D', 'B'],
         'v': [True]*5,
     })
@@ -115,6 +115,8 @@ def test_in_2():
 
     db_model = data_algebra.SQLite.SQLiteModel()
     sql = ops.to_sql(db_model, pretty=True)
+    assert sql.find("'34'") < 0
+    assert sql.find("34") > 0
     with sqlite3.connect(':memory:') as con:
         db_model.prepare_connection(con)
         d.to_sql(name='d', con=con)
