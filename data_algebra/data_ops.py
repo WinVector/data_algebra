@@ -1,7 +1,6 @@
 from abc import ABC
 from typing import Set, Dict, List, Union
 import numbers
-import collections
 import re
 
 import data_algebra
@@ -15,6 +14,7 @@ import data_algebra.env
 from data_algebra.data_ops_types import *
 import data_algebra.data_ops_utils
 import data_algebra.near_sql
+import data_algebra.OrderedSet
 
 _have_black = False
 try:
@@ -83,7 +83,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
                 raise ValueError("non-string column name(s)")
         if len(self.column_names) < 1:
             raise ValueError("no column names")
-        self.column_set = set(self.column_names)
+        self.column_set = data_algebra.OrderedSet.OrderedSet()
+        for c in self.column_names:
+            self.column_set.add(c)
         if not len(self.column_names) == len(self.column_set):
             raise ValueError("duplicate column name(s)")
         column_dict = {

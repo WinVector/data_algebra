@@ -1,6 +1,7 @@
 import math
 import re
 import io
+from collections import OrderedDict
 
 import data_algebra
 
@@ -357,7 +358,10 @@ class DBModel:
         using = using.union(
             extend_node.partition_by, extend_node.order_by, extend_node.reverse
         )
-        subops = {k: op for (k, op) in extend_node.ops.items() if k in using}
+        subops = OrderedDict()
+        for (k, op) in extend_node.ops.items():
+            if k in using:
+                subops[k] = op
         if len(subops) <= 0:
             # know using was not None is this case as len(extend_node.ops)>0 and all keys are in extend_node.column_set
             return extend_node.sources[0].to_sql_implementation(
@@ -391,10 +395,12 @@ class DBModel:
                 ]
                 window_term = window_term + "ORDER BY " + ", ".join(rt) + " "
             window_term = window_term + " ) "
-        terms = {ci: self.expr_to_sql(oi) + window_term for (ci, oi) in subops.items()}
-        origcols = {k: None for k in using if k not in subops.keys()}
-        if len(origcols) > 0:
-            terms.update(origcols)
+        terms = OrderedDict()
+        origcols = [k for k in using if k not in subops.keys()]
+        for k in origcols:
+            terms[k] = None
+        for (ci, oi) in subops.items():
+            terms[ci] = self.expr_to_sql(oi) + window_term
         view_name = "extend_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         near_sql = data_algebra.near_sql.NearSQLUnaryStep(

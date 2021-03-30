@@ -140,4 +140,3 @@ def test_bigquery_date_1():
 
     bigquery_model = data_algebra.BigQuery.BigQueryModel()
     bigquery_sql = ops.to_sql(bigquery_model, pretty=True)
-    # TODO: look at column ordering here
