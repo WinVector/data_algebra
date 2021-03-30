@@ -67,8 +67,8 @@ def test_bigquery_2():
         project({
             'med_1': 'med_1.mean()',  # pseudo aggregator
             'med_2': 'med_2.mean()',  # pseudo aggregator
-            'mean_1': 'v1.mean()',  # pseudo aggregator
-            'mean_2': 'v2.mean()',  # pseudo aggregator
+            'mean_1': 'v1.mean()',
+            'mean_2': 'v2.mean()',
             'nu_1': 'v1.nunique()',
             'nu_2': 'v2.nunique()',
             },
