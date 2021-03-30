@@ -33,7 +33,6 @@ def _sqlite_lag_expr(dbmodel, expression):
     )
 
 
-# noinspection PyUnusedLocal
 def _sqlite_size_expr(dbmodel, expression):
     return "SUM(1)"
 

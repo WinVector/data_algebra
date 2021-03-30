@@ -12,6 +12,23 @@ except ImportError:
     pass
 
 
+def _bigquery_nunique_expr(dbmodel, expression):
+    return (
+        "COUNT(DISTINCT(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + "))"
+    )
+
+
+def _bigquery_median_expr(dbmodel, expression):
+    return (
+        "PERCENTILE_CONT(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ", 0.5)"
+    )
+
+BigQuery_formatters = {
+    "nunique": _bigquery_nunique_expr,
+    "median": _bigquery_median_expr,
+}
+
+
 class BigQueryModel(data_algebra.db_model.DBModel):
     """A model of how SQL should be generated for BigQuery
        connection should be google.cloud.bigquery.client.Client"""
@@ -21,6 +38,7 @@ class BigQueryModel(data_algebra.db_model.DBModel):
             self,
             identifier_quote='`',
             string_quote='"',
+            sql_formatters=BigQuery_formatters,
         )
 
     def quote_identifier(self, identifier):
