@@ -145,7 +145,7 @@ class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
             )
         data_algebra.db_model.DBHandle.__init__(self, db_model=db_model, conn=conn)
 
-    def describe_table(self, table_catalog, table_schema, table_name, *, row_limit=7):
+    def describe_bq_table(self, *, table_catalog, table_schema, table_name, row_limit=7):
         full_name = f'{table_catalog}.{table_schema}.{table_name}'
         head = self.db_model.read_query(
             conn=self.conn,
