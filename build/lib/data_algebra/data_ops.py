@@ -639,6 +639,7 @@ class TableDescription(ViewRepresentation):
         column_names,
         *,
         qualifiers=None,
+        sql_meta=None,
         column_types=None,
         head=None,
         limit_was=None
@@ -655,6 +656,7 @@ class TableDescription(ViewRepresentation):
                 raise ValueError("head.columns != column_names")
         self.head = head
         self.limit_was = limit_was
+        self.sql_meta = sql_meta
         self.table_name = table_name
         if isinstance(column_names, str):
             column_names = [column_names]

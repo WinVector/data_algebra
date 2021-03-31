@@ -164,12 +164,12 @@ class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
             'table_schema': table_schema,
             'table_name': table_name,
             'full_name': full_name,
-            'sql_meta': sql_meta,
         }
         td = data_algebra.data_ops.describe_table(
             head,
             table_name=full_name,
             row_limit=row_limit,
-            qualifiers=qualifiers
+            qualifiers=qualifiers,
+            sql_meta=sql_meta,
         )
         return td
