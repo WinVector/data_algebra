@@ -140,3 +140,6 @@ def test_bigquery_date_1():
 
     bigquery_model = data_algebra.BigQuery.BigQueryModel()
     bigquery_sql = ops.to_sql(bigquery_model, pretty=True)
+
+    handle = data_algebra.BigQuery.BigQuery_DBHandle(
+        db_model=bigquery_model, conn=None)

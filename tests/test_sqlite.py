@@ -173,7 +173,7 @@ def test_unionall_g2():
 
     conn = sqlite3.connect(":memory:")
     sql_model.prepare_connection(conn)
-    db_handle = data_algebra.db_model.DBHandle(sql_model, conn)
+    db_handle = data_algebra.db_model.DBHandle(db_model=sql_model, conn=conn)
 
     tbl_map = {
         "d1": db_handle.insert_table(d1, table_name="d1"),

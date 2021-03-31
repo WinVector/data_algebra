@@ -132,6 +132,7 @@ class DBModel:
     on_start: str
     on_end: str
     on_joiner: str
+    drop_text: str
 
     def __init__(
         self,
@@ -144,6 +145,7 @@ class DBModel:
         on_start='',
         on_end='',
         on_joiner=', ',
+        drop_text='DROP TABLE',
     ):
         if local_data_model is None:
             local_data_model = data_algebra.default_data_model
@@ -162,6 +164,10 @@ class DBModel:
         self.on_start = on_start
         self.on_end = on_end
         self.on_joiner = on_joiner
+        self.drop_text = drop_text
+
+    def db_handle(self, conn):
+        return DBHandle(db_model=self, conn=conn)
 
     def prepare_connection(self, conn):
         pass
@@ -206,7 +212,7 @@ class DBModel:
             if not allow_overwrite:
                 raise ValueError("table " + q_table_name + " already exists")
             else:
-                cur.execute("DROP TABLE " + q_table_name)
+                cur.execute(self.drop_text + ' ' + q_table_name)
                 conn.commit()
         create_stmt = "CREATE TABLE " + q_table_name + " ( " + ", ".join(cr) + " )"
         cur.execute(create_stmt)
@@ -931,7 +937,7 @@ class DBModel:
 
 
 class DBHandle(data_algebra.eval_model.EvalModel):
-    def __init__(self, db_model, conn):
+    def __init__(self, *, db_model, conn):
         if not isinstance(db_model, DBModel):
             raise TypeError(
                 "expected db_model to be of class data_algebra.db_model.DBHandle"
@@ -940,19 +946,22 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         self.db_model = db_model
         self.conn = conn
 
-    def build_rep(self, table_name, *, row_limit=7):
-        head = self.db_model.read_query(
-            conn=self.conn,
+    def read_query(self, q):
+        assert isinstance(q, str)
+        return self.db_model.read_query(conn=self.conn, q=q)
+
+    def describe_table(self, table_name, *, qualifiers=None, row_limit=7):
+        head = self.read_query(
             q="SELECT * FROM "
-            + self.db_model.quote_table_name(table_name)
-            + " LIMIT "
-            + str(row_limit),
+                + self.db_model.quote_table_name(table_name)
+                + " LIMIT "
+                + str(row_limit),
         )
-        return data_algebra.data_ops.TableDescription(
-            column_names=head.columns,
+        return data_algebra.data_ops.describe_table(
+            head,
             table_name=table_name,
-            head=head,
-            limit_was=row_limit,
+            qualifiers=qualifiers,
+            row_limit=row_limit
         )
 
     def to_pandas(self, handle, *, data_map=None):
@@ -986,7 +995,10 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         self.db_model.insert_table(
             conn=self.conn, d=d, table_name=table_name, allow_overwrite=allow_overwrite
         )
-        return self.build_rep(table_name)
+        return self.describe_table(table_name)
+
+    def execute(self, q):
+        self.db_model.execute(conn=self.conn, q=q)
 
     def eval(self, ops, *, data_map=None, result_name=None, eval_env=None, narrow=True):
         query = ops.to_sql(self.db_model)
@@ -1016,7 +1028,7 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         if result_name in tables_needed:
             raise ValueError("Can not write over an input table")
         q_table_name = self.db_model.quote_table_name(result_name)
-        drop_query = "DROP TABLE " + q_table_name
+        drop_query = self.db_model.drop_text + ' ' + q_table_name
         create_query = "CREATE TABLE " + q_table_name + " AS " + query
         cur = self.conn.cursor()
         # noinspection PyBroadException
@@ -1025,7 +1037,7 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         except Exception:
             pass
         cur.execute(create_query)
-        res = self.build_rep(result_name)
+        res = self.describe_table(result_name)
         if data_map is not None:
             data_map[result_name] = res
         return result_name

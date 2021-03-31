@@ -16,7 +16,7 @@ def test_db_model_base():
     conn = sqlite3.connect(":memory:")
 
     # just for testing, should use a data_algebra.SQLite.SQLiteModel in practice
-    db_handle = data_algebra.db_model.DBHandle(db_model, conn=conn)
+    db_handle = data_algebra.db_model.DBHandle(db_model=db_model, conn=conn)
     str(db_handle)
     db_handle.__repr__()
 

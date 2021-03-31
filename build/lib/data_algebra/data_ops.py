@@ -801,25 +801,27 @@ class TableDescription(ViewRepresentation):
         return self.key.__hash__()
 
 
-def describe_table(d, table_name="data_frame", *, qualifiers=None, column_types=None):
+def describe_table(d, table_name="data_frame",
+                   *,
+                   qualifiers=None, column_types=None,
+                   row_limit=7):
     # Expect a pandas.DataFrame style object
     column_names = [c for c in d.columns]
     if column_types is None:
         if d.shape[0] > 0:
             column_types = {k: type(d.loc[0, k]) for k in column_names}
-    limit_was = 6
-    if d.shape[0] > limit_was:
-        head = d.iloc[range(limit_was), :]
+    if d.shape[0] > row_limit:
+        head = d.iloc[range(row_limit), :].copy()
     else:
         head = d.copy()
-    head = head.reset_index(drop=True, inplace=False)
+    head.reset_index(drop=True, inplace=True)
     return TableDescription(
         table_name,
         column_names,
         column_types=column_types,
         qualifiers=qualifiers,
         head=head,
-        limit_was=limit_was,
+        limit_was=row_limit,
     )
 
 

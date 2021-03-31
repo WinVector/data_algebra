@@ -24,7 +24,7 @@ def test_ops():
     sql_model = data_algebra.SQLite.SQLiteModel()
     conn = sqlite3.connect(":memory:")
     sql_model.prepare_connection(conn)
-    db_handle = data_algebra.db_model.DBHandle(sql_model, conn)
+    db_handle = data_algebra.db_model.DBHandle(db_model=sql_model, conn=conn)
     tbl_map = {"d": db_handle.insert_table(d, table_name="d")}
 
     def check_ops(ops, expect=None, *, test_sql=True):
