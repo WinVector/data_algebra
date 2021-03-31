@@ -24,10 +24,3 @@ class SparkSQLModel(data_algebra.db_model.DBModel):
             raise ValueError('did not expect " in identifier')
         return self.identifier_quote + identifier.lower() + self.identifier_quote
 
-    def build_qualified_table_name(self, table_name, *, qualifiers=None):
-        qt = self.quote_identifier(table_name)
-        if qualifiers is None:
-            qualifiers = {}
-        if "schema" in qualifiers.keys():
-            qt = self.quote_identifier(qualifiers["schema"]) + "." + qt
-        return qt

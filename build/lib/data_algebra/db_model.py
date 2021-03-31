@@ -197,8 +197,8 @@ class DBModel:
             )
             for i in range(d.shape[1])
         ]
-        q_table_name = self.build_qualified_table_name(
-            table_name, qualifiers=qualifiers
+        q_table_name = self.quote_table_name(
+            table_name
         )
         cur = conn.cursor()
         # check for table
@@ -250,8 +250,8 @@ class DBModel:
     def read_table(self, conn, table_name, *, qualifiers=None, limit=None):
         if not isinstance(table_name, str):
             raise TypeError("Expect table_name to be a str")
-        q_table_name = self.build_qualified_table_name(
-            table_name, qualifiers=qualifiers
+        q_table_name = self.quote_table_name(
+            table_name
         )
         sql = "SELECT * FROM " + q_table_name
         if limit is not None:
@@ -276,14 +276,6 @@ class DBModel:
             raise TypeError('did not expect ' + self.identifier_quote + ' in identifier')
         return self.identifier_quote + identifier + self.identifier_quote
 
-    def build_qualified_table_name(self, table_name, *, qualifiers=None):
-        qt = self.quote_identifier(table_name)
-        if qualifiers is None:
-            qualifiers = {}
-        if len(qualifiers) > 0:
-            raise ValueError("This data model does not expect table qualifiers")
-        return qt
-
     def quote_table_name(self, table_description):
         if isinstance(table_description, str):
             return self.quote_identifier(table_description)
@@ -291,9 +283,7 @@ class DBModel:
             raise TypeError(
                 "Expected table_description to be a data_algebra.data_ops.TableDescription)"
             )
-        return self.build_qualified_table_name(
-            table_description.table_name, qualifiers=table_description.qualifiers
-        )
+        return self.quote_identifier(table_description.table_name)
 
     def quote_string(self, string):
         if not isinstance(string, str):

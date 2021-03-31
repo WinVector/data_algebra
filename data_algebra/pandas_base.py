@@ -72,10 +72,6 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.TableDescription"
             )
-        if len(op.qualifiers) > 0:
-            raise ValueError(
-                "table descriptions used with table_step() must not have qualifiers"
-            )
         df = data_map[op.table_name]
         if not self.is_appropriate_data_instance(df):
             raise ValueError("data_map[" + op.table_name + "] was not the right type")

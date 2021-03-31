@@ -143,3 +143,24 @@ def test_bigquery_date_1():
 
     handle = data_algebra.BigQuery.BigQuery_DBHandle(
         db_model=bigquery_model, conn=None)
+
+
+def test_big_query_table_step():
+    bigquery_model = data_algebra.BigQuery.BigQueryModel()
+    handle = data_algebra.BigQuery.BigQuery_DBHandle(
+        db_model=bigquery_model, conn=None)
+    d = pandas.DataFrame({
+        'group': ['a', 'a', 'a', 'b', 'b'],
+        'v1': [1, 2, 2, 0, 0],
+        'v2': [1, 2, 3, 4, 5],
+        'dt': pandas.to_datetime([1490195805, 1490195815, 1490295805, 1490196805, 1490195835], unit='s')
+    })
+    # build a description that looks like the BigQuery db handle built it.
+    td = describe_table(d, table_name='big.honking.dt')
+    td.sql_meta = pandas.DataFrame()
+    td.qualifiers['table_catalog'] = 'big'
+    td.qualifiers['table_schema'] = 'honking'
+    td.qualifiers['table_name'] =  'dt'
+    td.qualifiers['full_name'] = td.table_name
+    # see if we can use this locally
+    td.transform(d)

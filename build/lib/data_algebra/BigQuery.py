@@ -65,14 +65,6 @@ class BigQueryModel(data_algebra.db_model.DBModel):
             raise ValueError('did not expect ' + self.identifier_quote + ' in identifier')
         return self.identifier_quote + identifier + self.identifier_quote
 
-    def build_qualified_table_name(self, table_name, *, qualifiers=None):
-        qt = table_name
-        if qualifiers is None:
-            qualifiers = {}
-        if "schema" in qualifiers.keys():
-            qt = self.quote_identifier(qualifiers["schema"]) + "." + qt
-        return self.quote_identifier(qt)
-
     # noinspection PyMethodMayBeStatic
     def execute(self, conn, q):
         """
@@ -116,15 +108,16 @@ def AS_INT64(col):
 
 
 # trim string to date portion
-def trim_1_10(col_name, *, start=0, stop):
-    assert isinstance(col_name, str)
+def TRIMSTR(col_name, *, start=0, stop):
     assert isinstance(start, int)
     assert isinstance(stop, int)
-    return data_algebra.data_ops.user_fn(
-        lambda x: x.str.slice(start=start, stop=stop),  # x is a pandas Series
-        args=col_name,
-        name=f'trim_{start+1}_{stop}_{col_name}',
-        sql_name='SUBSTR', sql_suffix=f', {start+1}, {stop}')
+    def f(col_name):
+        assert isinstance(col_name, str)
+        return data_algebra.data_ops.user_fn(
+            lambda x: x.str.slice(start=start, stop=stop),  # x is a pandas Series
+            args=col_name,
+            name=f'TRIMSTR_{start+1}_{stop}_{col_name}',
+            sql_name='SUBSTR', sql_suffix=f', {start+1}, {stop}')
 
 
 # convert datetime to date

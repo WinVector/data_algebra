@@ -669,17 +669,9 @@ class TableDescription(ViewRepresentation):
         if not isinstance(qualifiers, dict):
             raise TypeError("qualifiers must be a dictionary")
         self.qualifiers = qualifiers.copy()
-        key = ""
-        if len(self.qualifiers) > 0:
-            keys = [k for k in self.qualifiers.keys()]
-            keys.sort()
-            key = "{"
-            for k in keys:
-                key = key + "(" + k + ", " + str(self.qualifiers[k]) + ")"
-            key = key + "}."
+        self.key = ""
         if self.table_name is not None:
-            key = key + self.table_name
-        self.key = key
+            self.key = self.table_name
 
     def same_table(self, other):
         if not isinstance(other, data_algebra.data_ops.TableDescription):
@@ -805,7 +797,9 @@ class TableDescription(ViewRepresentation):
 
 def describe_table(d, table_name="data_frame",
                    *,
-                   qualifiers=None, column_types=None,
+                   qualifiers=None,
+                   sql_meta=None,
+                   column_types=None,
                    row_limit=7):
     # Expect a pandas.DataFrame style object
     column_names = [c for c in d.columns]
@@ -822,6 +816,7 @@ def describe_table(d, table_name="data_frame",
         column_names,
         column_types=column_types,
         qualifiers=qualifiers,
+        sql_meta=sql_meta,
         head=head,
         limit_was=row_limit,
     )
