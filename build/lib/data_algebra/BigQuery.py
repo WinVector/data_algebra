@@ -108,7 +108,7 @@ def AS_INT64(col):
 
 
 # trim string to date portion
-def TRIMSTR(col_name, *, start=0, stop):
+def TRIMSTR(*, start=0, stop):
     assert isinstance(start, int)
     assert isinstance(stop, int)
     def f(col_name):
@@ -116,8 +116,9 @@ def TRIMSTR(col_name, *, start=0, stop):
         return data_algebra.data_ops.user_fn(
             lambda x: x.str.slice(start=start, stop=stop),  # x is a pandas Series
             args=col_name,
-            name=f'TRIMSTR_{start+1}_{stop}_{col_name}',
+            name=f'TRIMSTR_{start+1}_{stop}',
             sql_name='SUBSTR', sql_suffix=f', {start+1}, {stop}')
+    return f
 
 
 # convert datetime to date
