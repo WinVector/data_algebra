@@ -129,6 +129,9 @@ class DBModel:
 
     identifier_quote: str
     string_quote: str
+    on_start: str
+    on_end: str
+    on_joiner: str
 
     def __init__(
         self,
@@ -137,7 +140,10 @@ class DBModel:
         string_quote="'",
         sql_formatters=None,
         op_replacements=None,
-        local_data_model=None
+        local_data_model=None,
+        on_start='',
+        on_end='',
+        on_joiner=', ',
     ):
         if local_data_model is None:
             local_data_model = data_algebra.default_data_model
@@ -153,6 +159,9 @@ class DBModel:
         if op_replacements is None:
             op_replacements = db_default_op_replacements
         self.op_replacements = op_replacements
+        self.on_start = on_start
+        self.on_end = on_end
+        self.on_joiner = on_joiner
 
     def prepare_connection(self, conn):
         pass
@@ -682,7 +691,8 @@ class DBModel:
         if len(join_node.by) > 0:
             on_terms = (
                 " ON "
-                + ", ".join(
+                + self.on_start
+                + self.on_joiner.join(
                     [
                         sub_view_name_left
                         + "."
@@ -694,6 +704,7 @@ class DBModel:
                         for c in join_node.by
                     ]
                 )
+                + self.on_end
                 + " "
             )
         confused_temps = set(sql_left.temp_tables.keys()).intersection(

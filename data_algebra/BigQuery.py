@@ -52,6 +52,9 @@ class BigQueryModel(data_algebra.db_model.DBModel):
             identifier_quote='`',
             string_quote='"',
             sql_formatters=BigQuery_formatters,
+            on_start='(',
+            on_end=')',
+            on_joiner=' AND ',
         )
 
     def quote_identifier(self, identifier):
