@@ -938,7 +938,10 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         self.conn = conn
 
     def read_query(self, q):
-        assert isinstance(q, str)
+        if isinstance(q, data_algebra.data_ops.ViewRepresentation):
+            q = q.to_sql(self.db_model)
+        else:
+            q = str(q)
         return self.db_model.read_query(conn=self.conn, q=q)
 
     def describe_table(self, table_name, *, qualifiers=None, row_limit=7):
