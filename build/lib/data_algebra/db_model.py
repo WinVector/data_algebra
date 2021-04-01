@@ -995,8 +995,8 @@ class DBHandle(data_algebra.eval_model.EvalModel):
             q = str(q)
         self.db_model.execute(conn=self.conn, q=q)
 
-    def to_sql(self, ops):
-        return ops.to_sql(self.db_model)
+    def to_sql(self, ops, *, pretty=False):
+        return ops.to_sql(self.db_model, pretty=pretty)
 
     def eval(self, ops, *, data_map=None, result_name=None, eval_env=None, narrow=True):
         query = ops.to_sql(self.db_model)
