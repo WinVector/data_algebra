@@ -103,10 +103,11 @@ def _db_is_in_expr(dbmodel, expression):
     is_in_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     x_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
     return (
-        is_in_expr
+        "("
+        + is_in_expr
         + " IN ("
         + ', '.join([repr(v) for v in x_expr])
-        + ")"
+        + "))"
     )
 
 
@@ -988,7 +989,14 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         return self.describe_table(table_name)
 
     def execute(self, q):
+        if isinstance(q, data_algebra.data_ops.ViewRepresentation):
+            q = q.to_sql(self.db_model)
+        else:
+            q = str(q)
         self.db_model.execute(conn=self.conn, q=q)
+
+    def to_sql(self, ops):
+        return ops.to_sql(self.db_model)
 
     def eval(self, ops, *, data_map=None, result_name=None, eval_env=None, narrow=True):
         query = ops.to_sql(self.db_model)

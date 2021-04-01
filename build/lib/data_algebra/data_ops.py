@@ -275,9 +275,11 @@ class ViewRepresentation(OperatorPlatform, ABC):
     ):
         if sqlparse_options is None:
             sqlparse_options = {"reindent": True, "keyword_case": "upper"}
+        if isinstance(db_model, data_algebra.db_model.DBHandle):
+            db_model = db_model.db_model
         if not isinstance(db_model, data_algebra.db_model.DBModel):
             raise TypeError(
-                "Expected db_model to be derived from data_algebra.db_model.DBModel"
+                "Expected db_model to be derived from data_algebra.db_model.DBModel or data_algebra.db_model.DBHandle"
             )
         self.columns_used()  # for table consistency check/raise
         temp_id_source = [0]
