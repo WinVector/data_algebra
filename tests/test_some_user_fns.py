@@ -1,9 +1,12 @@
 
+import datetime
+import sqlite3
 
 import pandas
 
 from data_algebra.data_ops import *
 
+import data_algebra.SQLite
 import data_algebra.BigQuery
 import data_algebra.test_util
 
@@ -33,6 +36,14 @@ def test_TRIMSTR():
         db_model=bigquery_model, conn=None)
     bigquery_sql = handle.to_sql(ops)
 
+    # see if the query works in SQLite
+    sqllite_model = data_algebra.SQLite.SQLiteModel()
+    with sqlite3.connect(":memory:") as sqllite_conn:
+        sqllite_model.prepare_connection(sqllite_conn)
+        sqllite_model.insert_table(sqllite_conn, d, 'd')
+        res_sqlite = sqllite_model.read_query(sqllite_conn, bigquery_sql)
+    assert data_algebra.test_util.equivalent_frames(expect, res_sqlite)
+
 
 def test_AS_INT64():
     d = pandas.DataFrame({
@@ -57,6 +68,14 @@ def test_AS_INT64():
         db_model=bigquery_model, conn=None)
     bigquery_sql = handle.to_sql(ops)
 
+    # see if the query works in SQLite
+    sqllite_model = data_algebra.SQLite.SQLiteModel()
+    with sqlite3.connect(":memory:") as sqllite_conn:
+        sqllite_model.prepare_connection(sqllite_conn)
+        sqllite_model.insert_table(sqllite_conn, d, 'd')
+        res_sqlite = sqllite_model.read_query(sqllite_conn, bigquery_sql)
+    assert data_algebra.test_util.equivalent_frames(expect, res_sqlite)
+
 
 def test_DATE():
     d = pandas.DataFrame({
@@ -77,4 +96,56 @@ def test_DATE():
     handle = data_algebra.BigQuery.BigQuery_DBHandle(
         db_model=bigquery_model, conn=None)
     bigquery_sql = handle.to_sql(ops)
+    # can't test on SQLite as SQLite loses date types
 
+def test_COALESCE_0():
+    d = pandas.DataFrame({
+        'x': [1, None, 3]
+    })
+    ops = describe_table(d, table_name='d') .\
+        extend({
+         'nx': data_algebra.BigQuery.COALESCE_0('x')
+        })
+    res = ops.transform(d)
+
+    expect = pandas.DataFrame({
+        'x': [1, None, 3],
+        'nx': [1, 0, 3]
+    })
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+
+    bigquery_model = data_algebra.BigQuery.BigQueryModel()
+    handle = data_algebra.BigQuery.BigQuery_DBHandle(
+        db_model=bigquery_model, conn=None)
+    bigquery_sql = handle.to_sql(ops)
+
+    # see if the query works in SQLite
+    sqllite_model = data_algebra.SQLite.SQLiteModel()
+    with sqlite3.connect(":memory:") as sqllite_conn:
+        sqllite_model.prepare_connection(sqllite_conn)
+        sqllite_model.insert_table(sqllite_conn, d, 'd')
+        res_sqlite = sqllite_model.read_query(sqllite_conn, bigquery_sql)
+    assert data_algebra.test_util.equivalent_frames(expect, res_sqlite)
+
+
+def test_PARSE_DATE():
+    d = pandas.DataFrame({
+        'x': ['2001-01-01', '2020-04-02']
+    })
+    ops = describe_table(d, table_name='d') .\
+        extend({
+         'nx': data_algebra.BigQuery.PARSE_DATE('x')
+        })
+    res = ops.transform(d)
+    assert isinstance(res.nx[0], datetime.date)
+
+    expect = pandas.DataFrame({
+        'x': ['2001-01-01', '2020-04-02']
+    })
+    expect['nx'] = pandas.to_datetime(d.x, format="%Y-%m-%d")
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+
+    bigquery_model = data_algebra.BigQuery.BigQueryModel()
+    handle = data_algebra.BigQuery.BigQuery_DBHandle(
+        db_model=bigquery_model, conn=None)
+    bigquery_sql = handle.to_sql(ops)

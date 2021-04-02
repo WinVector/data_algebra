@@ -1,3 +1,5 @@
+
+import data_algebra
 import data_algebra.data_ops
 import data_algebra.db_model
 
@@ -101,7 +103,7 @@ def AS_INT64(col):
     return data_algebra.data_ops.user_fn(
         lambda x: x.astype('int64'),  # x is a pandas Series
         args=col,
-        name=f'AS_INT64_{col}',
+        name='AS_INT64',
         sql_name='CAST',
         sql_suffix=' AS INT64'
     )
@@ -127,8 +129,31 @@ def DATE(col):
     return data_algebra.data_ops.user_fn(
         lambda x: x.dt.date.copy(),  # x is a pandas Series
         args=col,
-        name='DATE_' + col,
+        name='DATE',
         sql_name='DATE')
+
+
+# convert str to date
+def PARSE_DATE(col):
+    assert isinstance(col, str)
+    return data_algebra.data_ops.user_fn(
+        # https://pandas.pydata.org/docs/reference/api/pandas.to_datetime.html
+        lambda x: data_algebra.default_data_model.pd.to_datetime(x, format="%Y-%m-%d").dt.date.copy(),  # x is a pandas Series
+        args=col,
+        name='PARSE_DATE',
+        sql_name='PARSE_DATE',  # https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
+        sql_prefix='"%Y-%m-%d", ')
+
+
+# replace missing with zeros
+def COALESCE_0(col):
+    assert isinstance(col, str)
+    return data_algebra.data_ops.user_fn(
+        lambda x: x.fillna(0),
+        args=col,
+        name='COALESCE_0',
+        sql_name='COALESCE',
+        sql_suffix=', 0')
 
 
 class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
