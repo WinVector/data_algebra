@@ -164,3 +164,40 @@ def test_big_query_table_step():
     td.qualifiers['full_name'] = td.table_name
     # see if we can use this locally
     td.transform(d)
+
+
+def test_big_query_and():
+    bigquery_handle = data_algebra.BigQuery.BigQuery_DBHandle(
+        db_model=data_algebra.BigQuery.BigQueryModel(), conn=None)
+    d = pandas.DataFrame({
+        'group': ['a', 'a', 'a', 'b', 'b'],
+        'v1': [1, 2, 2, 0, 2],
+        'v2': [1, 2, 3, 4, 5],
+        'dt': pandas.to_datetime([1490195805, 1490195815, 1490295805, 1490196805, 1490195835], unit='s')
+    })
+    # build a description that looks like the BigQuery db handle built it.
+    ops = describe_table(d, table_name='d') .\
+        select_rows("(group == 'a') & (v1 == 2)")
+
+    # see & gets translated to AND
+    sql = bigquery_handle.to_sql(ops)
+    assert sql.find('&') < 0
+    assert sql.find('AND') > 0
+
+    # see if we can use this locally
+    res = ops.transform(d)
+    expect = pandas.DataFrame({
+        'group': ['a', 'a'],
+        'v1': [2, 2],
+        'v2': [2, 3],
+        'dt': pandas.to_datetime([1490195815, 1490295805], unit='s')
+    })
+    assert data_algebra.test_util.equivalent_frames(expect, res)
+
+    # see if the query works in SQLite
+    sqllite_model = data_algebra.SQLite.SQLiteModel()
+    with sqlite3.connect(":memory:") as sqllite_conn:
+        sqllite_model.prepare_connection(sqllite_conn)
+        sqllite_model.insert_table(sqllite_conn, d, 'd')
+        res_sqlite = sqllite_model.read_query(sqllite_conn, sql)
+    assert data_algebra.test_util.equivalent_frames(expect, res_sqlite)
