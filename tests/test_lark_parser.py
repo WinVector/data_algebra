@@ -9,8 +9,41 @@ from data_algebra.data_ops import *
 
 def test_lark_1():
     # raises an exception if no lark parser
-    raw_tree = data_algebra.parse_by_lark.parser.parse('1 + 1/2' + "\n")
+    raw_tree = data_algebra.parse_by_lark.parser.parse('1 + 1/2')
 
+
+def test_lark_1b():
+    d1 = pandas.DataFrame({
+        'x': [1, 2, 3],
+        'y': [2, 8, -1],
+    })
+    data_def = {
+            k: v for (k, v) in describe_table(d1).column_map.__dict__.items()
+        }
+    tree = data_algebra.parse_by_lark.parse_by_lark('x == 1', data_def=data_def)
+
+
+def test_lark_1c():
+    d1 = pandas.DataFrame({
+        'x': [1, 2, 3],
+        'y': [2, 8, -1],
+    })
+    data_def = {
+        k: v for (k, v) in describe_table(d1).column_map.__dict__.items()
+    }
+    with pytest.raises(Exception):
+        tree = data_algebra.parse_by_lark.parse_by_lark('x = 1', data_def=data_def)
+
+
+def test_lark_1b():
+    d1 = pandas.DataFrame({
+        'x': [1, 2, 3],
+        'y': [2, 8, -1],
+    })
+    data_def = {
+            k: v for (k, v) in describe_table(d1).column_map.__dict__.items()
+        }
+    tree = data_algebra.parse_by_lark.parse_by_lark('7', data_def=data_def)
 
 
 def test_lark_2():
