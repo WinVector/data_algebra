@@ -190,6 +190,12 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                     op_name = '__and__'
                 right = _r_walk_lark_tree(op.children[1])
                 return getattr(left, op_name)(right)
+            if op.data == 'not':
+                if len(op.children) != 1:
+                    raise ValueError("unexpected " + op.data + " length")
+                left = _r_walk_lark_tree(op.children[0])
+                op_name = '__eq__'
+                return getattr(left, op_name)(data_algebra.expr_rep.Value(False))
             if op.data in ['list', 'tuple']:
                 vals = [_r_walk_lark_tree(vi) for vi in op.children[0].children]
                 return data_algebra.expr_rep.ListTerm(vals)
