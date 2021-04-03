@@ -30,13 +30,6 @@ def test_parse_2():
             order_by=['s'])
 
 
-def test_parse_3():
-    with pytest.raises(ValueError):
-        ops = TableDescription("d", ["x", "y", "s"]). \
-            extend({
-                "z": "x or y"})
-
-
 def test_parse_4():
     ops = TableDescription("d", ["x", "y", "s"]). \
         extend({
@@ -48,6 +41,7 @@ def test_parse_5():
         ops = TableDescription("d", ["x", "y", "s"]). \
             extend({
                 "z": "x || y"})
+
 
 def test_parse_6():
     ops = TableDescription("d", ["u", "v", "w", "x", "y"]). \
