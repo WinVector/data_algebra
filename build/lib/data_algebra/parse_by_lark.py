@@ -19,14 +19,13 @@ import data_algebra.python3_lark
 parser = None
 # noinspection PyBroadException
 try:
-    kwargs = {
-        'start': 'single_input',
-        # 'propagate_positions': True,
-        }
     parser = lark.Lark(
         data_algebra.python3_lark.grammar,
         parser='lalr',
-        **kwargs)
+        #start='single_input',
+        start='test',  # In the lark Python grammar test falls through to expression, making it a good entry point
+        # propagate_positions=True,
+    )
 except:
     parser = None
 
@@ -199,6 +198,8 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
             if op.data in ['list', 'tuple']:
                 vals = [_r_walk_lark_tree(vi) for vi in op.children[0].children]
                 return data_algebra.expr_rep.ListTerm(vals)
+            if op.data == 'expr_stmt':
+                raise ValueError("Error must use == for comparison, not =")
             raise ValueError("unexpected/not-allowed lark Tree kind: " + str(op.data))
         raise ValueError("unexpected lark parse type: " + str(type(op)))
 
@@ -217,7 +218,7 @@ def parse_by_lark(source_str, *, data_def=None, outer_environment=None):
     assert parser is not None
     if not isinstance(source_str, str):
         source_str = str(source_str)
-    tree = parser.parse(source_str + '\n')
+    tree = parser.parse(source_str)
     # convert parse tree to our data structures for isolation
     v = _walk_lark_tree(tree, data_def=data_def, outer_environment=outer_environment)
     v.source_string = source_str
