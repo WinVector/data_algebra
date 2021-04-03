@@ -1,11 +1,9 @@
 
-import sqlite3
 
 import pandas
 
 from data_algebra.data_ops import *
 
-import data_algebra.SQLite
 import data_algebra.test_util
 
 import pytest

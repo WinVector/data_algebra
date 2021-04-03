@@ -319,7 +319,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         if not isinstance(jointype, str):
             raise TypeError("expected jointype to be a string")
         jointype = jointype.lower()
-        mp = {"full": "outer"}
+        mp = {
+            "full": "outer",
+            "cross": "outer"  # cross new to Pandas 1.2.0 December 2020
+        }
         try:
             return mp[jointype]
         except KeyError:
@@ -340,16 +343,27 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         common_cols = set([c for c in left.columns]).intersection(
             [c for c in right.columns]
         )
+        by = op.by
+        if by is None:
+            by = []
+        scratch_col = None  # extra column to prevent empty-by issues
+        if len(by) <= 0:
+            scratch_col = 'data_algebra_temp_merge_col'
+            by = [scratch_col]
+            left[scratch_col] = 1
+            right[scratch_col] = 1
         # noinspection PyUnresolvedReferences
         res = self.pd.merge(
             left=left,
             right=right,
             how=self.standardize_join_code(op.jointype),
-            on=op.by,
+            on=by,
             sort=False,
             suffixes=("", "_tmp_right_col"),
         )
         res = res.reset_index(drop=True)
+        if scratch_col is not None:
+            del res[scratch_col]
         for c in common_cols:
             if c not in op.by:
                 is_null = res[c].isnull()
