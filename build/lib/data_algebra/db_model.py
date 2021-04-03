@@ -121,7 +121,16 @@ db_expr_formatters = {
 }
 
 
-db_default_op_replacements = {"==": "=", "cumsum": "sum"}
+db_default_op_replacements = {
+    "==": "=",
+    "cumsum": "sum",
+    "&": "AND",
+    "&&": "AND",
+    "|": "OR",
+    "||": "OR",
+    "!": "NOT",
+    "~": "NOT",
+    }
 
 
 class DBModel:
