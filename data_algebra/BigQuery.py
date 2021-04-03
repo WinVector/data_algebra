@@ -156,6 +156,80 @@ def COALESCE_0(col):
         sql_suffix=', 0')
 
 
+# convert date to dayofweek 1 through 7
+# https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
+def DAYOFWEEK(col):
+    assert isinstance(col, str)
+    return data_algebra.data_ops.user_fn(
+        # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.dt.dayofweek.html#pandas.Series.dt.dayofweek
+        # https://stackoverflow.com/a/30222759
+        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.dayofweek + 1,  # x is a pandas Series
+        args=col,
+        name='DAYOFWEEK',
+        sql_name='EXTRACT',
+        sql_prefix='DAYOFWEEK FROM ')
+
+
+# convert date to dayofweek 1 through 7
+# https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
+def DAYOFYEAR(col):
+    assert isinstance(col, str)
+    return data_algebra.data_ops.user_fn(
+        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.dayofyear,  # x is a pandas Series
+        args=col,
+        name='DAYOFYEAR',
+        sql_name='EXTRACT',
+        sql_prefix='DAYOFYEAR FROM ')
+
+
+# convert date to dayofweek 1 through 7
+# https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
+def DAYOFMONTH(col):
+    assert isinstance(col, str)
+    return data_algebra.data_ops.user_fn(
+        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.day,  # x is a pandas Series
+        args=col,
+        name='DAYOFMONTH',
+        sql_name='EXTRACT',
+        sql_prefix='DAYOFMONTH FROM ')
+
+
+# convert date to month
+# https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
+def MONTH(col):
+    assert isinstance(col, str)
+    return data_algebra.data_ops.user_fn(
+        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.dayofweek + 1,  # x is a pandas Series
+        args=col,
+        name='MONTH',
+        sql_name='EXTRACT',
+        sql_prefix='MONTH FROM ')
+
+
+# convert date to quarter
+# https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
+def QUARTER(col):
+    assert isinstance(col, str)
+    return data_algebra.data_ops.user_fn(
+        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.quarter,  # x is a pandas Series
+        args=col,
+        name='QUARTER',
+        sql_name='EXTRACT',
+        sql_prefix='QUARTER FROM ')
+
+
+# convert date to year
+# https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
+def YEAR(col):
+    assert isinstance(col, str)
+    return data_algebra.data_ops.user_fn(
+        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.year,  # x is a pandas Series
+        args=col,
+        name='YEAR',
+        sql_name='EXTRACT',
+        sql_prefix='YEAR FROM ')
+
+
 class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
     def __init__(self, *, db_model, conn):
         if not isinstance(db_model, BigQueryModel):
