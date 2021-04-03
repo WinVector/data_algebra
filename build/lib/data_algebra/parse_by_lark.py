@@ -115,6 +115,8 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                 return data_algebra.expr_rep.Value(True)
             if op.data == 'const_false':
                 return data_algebra.expr_rep.Value(False)
+            if op.data == 'const_none':
+                return data_algebra.expr_rep.Value(None)
             if op.data in ['single_input', 'number', 'string', 'var']:
                 return _r_walk_lark_tree(op.children[0])
             if op.data in ['arith_expr', 'term', 'comparison']:
@@ -179,7 +181,21 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                         args = args
                     )
             if (op.data == 'or_test') or (op.data == 'and_test'):
-                raise ValueError("and/or and &&/|| can not be used in vector data context, please use &/|.")
+                if len(op.children) != 2:
+                    raise ValueError("unexpected " + op.data + " length")
+                left = _r_walk_lark_tree(op.children[0])
+                if op.data == 'or_test':
+                    op_name = '__or__'
+                else:
+                    op_name = '__and__'
+                right = _r_walk_lark_tree(op.children[1])
+                return getattr(left, op_name)(right)
+            if op.data == 'not':
+                if len(op.children) != 1:
+                    raise ValueError("unexpected " + op.data + " length")
+                left = _r_walk_lark_tree(op.children[0])
+                op_name = '__eq__'
+                return getattr(left, op_name)(data_algebra.expr_rep.Value(False))
             if op.data in ['list', 'tuple']:
                 vals = [_r_walk_lark_tree(vi) for vi in op.children[0].children]
                 return data_algebra.expr_rep.ListTerm(vals)
