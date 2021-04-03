@@ -104,25 +104,12 @@ def test_bigquery_date_1():
     })
     d['dt_str'] = d.dt.astype(str)
 
-    def DATE(col):
-        assert isinstance(col, str)
-        return user_fn(
-            lambda x: x.dt.date.copy(),
-            args = col,
-            name='DATE_' + col,
-            sql_name='DATE')
-
-    def trim_1_10(col_name):
-        return user_fn(
-            lambda x: x.str.slice(start=0, stop=10),
-            args=col_name,
-            name='trim_1_10_' + col_name,
-            sql_name='SUBSTR', sql_suffix=', 1, 10')
+    trim_0_10 = data_algebra.BigQuery.TRIMSTR(start=0, stop=10)
 
     ops = describe_table(d, table_name='d') .\
         extend({
-            'date': DATE('dt'),
-            'date_str': trim_1_10('dt_str'),
+            'date': data_algebra.BigQuery.DATE('dt'),
+            'date_str': trim_0_10('dt_str'),
          }) . \
         extend({
             'mean_v1': 'v1.mean()',
