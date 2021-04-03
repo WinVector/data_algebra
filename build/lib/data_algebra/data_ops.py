@@ -512,7 +512,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         )
         return self.project_parsed(parsed_ops=parsed_ops, group_by=group_by)
 
-    def natural_join(self, b, *, by=None, jointype="INNER"):
+    def natural_join(self, b, *, by, jointype="INNER"):
         if not isinstance(b, ViewRepresentation):
             raise TypeError(
                 "expected b to be a data_algebra.dat_ops.ViewRepresentation"
@@ -1536,10 +1536,12 @@ class NaturalJoinNode(ViewRepresentation):
     by: List[str]
     jointype: str
 
-    def __init__(self, a, b, *, by=None, jointype="INNER"):
+    def __init__(self, a, b, *, by, jointype="INNER"):
         # check set of tables is consistent in both sub-dags
         a_tables = a.get_tables()
         b_tables = b.get_tables()
+        if by is None:
+            raise ValueError("Must specify by in natural joins ([] for empty conditions)")
         common_keys = set(a_tables.keys()).intersection(b_tables.keys())
         for k in common_keys:
             if not a_tables[k].same_table(b_tables[k]):
