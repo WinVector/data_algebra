@@ -96,6 +96,7 @@ def test_bigquery_2():
 
 
 def test_bigquery_date_1():
+    db_handle = data_algebra.BigQuery.BigQuery_DBHandle(conn=None)
     d = pandas.DataFrame({
         'group': ['a', 'a', 'a', 'b', 'b'],
         'v1': [1, 2, 2, 0, 0],
@@ -104,12 +105,10 @@ def test_bigquery_date_1():
     })
     d['dt_str'] = d.dt.astype(str)
 
-    trim_0_10 = data_algebra.BigQuery.TRIMSTR(start=0, stop=10)
-
     ops = describe_table(d, table_name='d') .\
         extend({
-            'date': data_algebra.BigQuery.DATETIME_TO_DATE('dt'),
-            'date_str': trim_0_10('dt_str'),
+            'date': db_handle.fns.datetime_to_date('dt'),
+            'date_str': db_handle.fns.trimstr('dt_str', start=0, stop=10),
          }) . \
         extend({
             'mean_v1': 'v1.mean()',
@@ -125,11 +124,7 @@ def test_bigquery_date_1():
     expect['count'] = [3, 3, 3, 2, 2]
     assert data_algebra.test_util.equivalent_frames(expect, res_1)
 
-    bigquery_model = data_algebra.BigQuery.BigQueryModel()
-    bigquery_sql = ops.to_sql(bigquery_model, pretty=True)
-
-    handle = data_algebra.BigQuery.BigQuery_DBHandle(
-        db_model=bigquery_model, conn=None)
+    bigquery_sql = db_handle.to_sql(ops, pretty=True)
 
 
 def test_big_query_table_step():
@@ -191,8 +186,7 @@ def test_big_query_and():
 
 
 def test_big_query_notor():
-    bigquery_handle = data_algebra.BigQuery.BigQuery_DBHandle(
-        db_model=data_algebra.BigQuery.BigQueryModel(), conn=None)
+    bigquery_handle = data_algebra.BigQuery.BigQuery_DBHandle(conn=None)
     d = pandas.DataFrame({
         'group': ['a', 'a', 'a', 'b', 'b'],
         'v1': [1, 2, 2, 0, 2],

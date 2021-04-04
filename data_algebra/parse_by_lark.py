@@ -12,7 +12,7 @@ import data_algebra.custom_functions
 import data_algebra.expr_rep
 import data_algebra.python3_lark
 
-# TODO: switch to lark parsing and use
+# TODO: documentation pages (esp logical symbol issues and assignment).
 
 
 # set up parser

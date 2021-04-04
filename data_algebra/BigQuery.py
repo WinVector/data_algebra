@@ -2,7 +2,7 @@
 import data_algebra
 import data_algebra.data_ops
 import data_algebra.db_model
-
+import data_algebra.bigquery_user_fns
 
 _have_bigquery = False
 try:
@@ -97,162 +97,13 @@ class BigQueryModel(data_algebra.db_model.DBModel):
         return BigQuery_DBHandle(db_model=self, conn=conn)
 
 
-# convert datetime to date
-def AS_INT64(col):
-    assert isinstance(col, str)
-    return data_algebra.data_ops.user_fn(
-        lambda x: x.astype('int64'),  # x is a pandas Series
-        args=col,
-        name='AS_INT64',
-        sql_name='CAST',
-        sql_suffix=' AS INT64'
-    )
-
-
-# trim string to date portion
-def TRIMSTR(*, start=0, stop):
-    assert isinstance(start, int)
-    assert isinstance(stop, int)
-    def f(col_name):
-        assert isinstance(col_name, str)
-        return data_algebra.data_ops.user_fn(
-            lambda x: x.str.slice(start=start, stop=stop),  # x is a pandas Series
-            args=col_name,
-            name=f'TRIMSTR_{start+1}_{stop}',
-            sql_name='SUBSTR', sql_suffix=f', {start+1}, {stop}')
-    return f
-
-
-# TODO: format date, format datetime, date diff (days), datetime diff (seconds)
-# TODO: try to abstract to more db defs, perhaps move all these common usefns to db_handle/db_model?
-
-# convert datetime to date
-def DATETIME_TO_DATE(col):
-    assert isinstance(col, str)
-    return data_algebra.data_ops.user_fn(
-        lambda x: x.dt.date.copy(),  # x is a pandas Series
-        args=col,
-        name='DATE',
-        sql_name='DATE')
-
-
-# convert str to datetime
-# https://cloud.google.com/bigquery/docs/reference/standard-sql/datetime_functions
-def PARSE_DATETIME(col, *, format="%Y-%m-%d %H:%M:%S"):
-    assert isinstance(col, str)
-    return data_algebra.data_ops.user_fn(
-        # https://pandas.pydata.org/docs/reference/api/pandas.to_datetime.html
-        lambda x: data_algebra.default_data_model.pd.to_datetime(x, format=format),  # x is a pandas Series
-        args=col,
-        name='PARSE_DATETIME',
-        sql_name='PARSE_DATETIME',  # https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
-        sql_prefix='f"{format}", ')
-
-
-# convert str to date
-def PARSE_DATE(col, *, format="%Y-%m-%d"):
-    assert isinstance(col, str)
-    return data_algebra.data_ops.user_fn(
-        # https://pandas.pydata.org/docs/reference/api/pandas.to_datetime.html
-        lambda x: data_algebra.default_data_model.pd.to_datetime(x, format=format).dt.date.copy(),  # x is a pandas Series
-        args=col,
-        name='PARSE_DATE',
-        sql_name='PARSE_DATE',  # https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
-        sql_prefix=f'"{format}", ')
-
-
-# replace missing with zeros
-def COALESCE_0(col):
-    assert isinstance(col, str)
-    return data_algebra.data_ops.user_fn(
-        lambda x: x.fillna(0),
-        args=col,
-        name='COALESCE_0',
-        sql_name='COALESCE',
-        sql_suffix=', 0')
-
-
-# convert date to dayofweek 1 through 7
-# https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
-def DAYOFWEEK(col):
-    assert isinstance(col, str)
-    return data_algebra.data_ops.user_fn(
-        # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.dt.dayofweek.html#pandas.Series.dt.dayofweek
-        # https://stackoverflow.com/a/30222759
-        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.dayofweek + 1,  # x is a pandas Series
-        args=col,
-        name='DAYOFWEEK',
-        sql_name='EXTRACT',
-        sql_prefix='DAYOFWEEK FROM ')
-
-
-# convert date to dayofweek 1 through 7
-# https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
-def DAYOFYEAR(col):
-    assert isinstance(col, str)
-    return data_algebra.data_ops.user_fn(
-        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.dayofyear,  # x is a pandas Series
-        args=col,
-        name='DAYOFYEAR',
-        sql_name='EXTRACT',
-        sql_prefix='DAYOFYEAR FROM ')
-
-
-# convert date to dayofweek 1 through 7
-# https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
-def DAYOFMONTH(col):
-    assert isinstance(col, str)
-    return data_algebra.data_ops.user_fn(
-        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.day,  # x is a pandas Series
-        args=col,
-        name='DAYOFMONTH',
-        sql_name='EXTRACT',
-        sql_prefix='DAYOFMONTH FROM ')
-
-
-# convert date to month
-# https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
-def MONTH(col):
-    assert isinstance(col, str)
-    return data_algebra.data_ops.user_fn(
-        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.dayofweek + 1,  # x is a pandas Series
-        args=col,
-        name='MONTH',
-        sql_name='EXTRACT',
-        sql_prefix='MONTH FROM ')
-
-
-# convert date to quarter
-# https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
-def QUARTER(col):
-    assert isinstance(col, str)
-    return data_algebra.data_ops.user_fn(
-        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.quarter,  # x is a pandas Series
-        args=col,
-        name='QUARTER',
-        sql_name='EXTRACT',
-        sql_prefix='QUARTER FROM ')
-
-
-# convert date to year
-# https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
-def YEAR(col):
-    assert isinstance(col, str)
-    return data_algebra.data_ops.user_fn(
-        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.year,  # x is a pandas Series
-        args=col,
-        name='YEAR',
-        sql_name='EXTRACT',
-        sql_prefix='YEAR FROM ')
-
-
 class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
-    def __init__(self, *, db_model, conn):
+    def __init__(self, *, db_model=BigQueryModel(), conn, fns=data_algebra.bigquery_user_fns.fns):
         if not isinstance(db_model, BigQueryModel):
             raise TypeError(
                 "expected db_model to be of class data_algebra.BigQuery.BigQueryModel"
             )
-        data_algebra.db_model.DBHandle.__init__(self, db_model=db_model, conn=conn)
+        data_algebra.db_model.DBHandle.__init__(self, db_model=db_model, conn=conn, fns=fns)
 
     def describe_bq_table(self, *, table_catalog, table_schema, table_name, row_limit=7):
         full_name = f'{table_catalog}.{table_schema}.{table_name}'

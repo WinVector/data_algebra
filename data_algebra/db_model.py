@@ -1,6 +1,7 @@
 import math
 import re
 import io
+from types import SimpleNamespace
 from collections import OrderedDict
 
 import data_algebra
@@ -937,7 +938,7 @@ class DBModel:
 
 
 class DBHandle(data_algebra.eval_model.EvalModel):
-    def __init__(self, *, db_model, conn):
+    def __init__(self, *, db_model, conn, fns = None):
         if not isinstance(db_model, DBModel):
             raise TypeError(
                 "expected db_model to be of class data_algebra.db_model.DBHandle"
@@ -945,6 +946,9 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         data_algebra.eval_model.EvalModel.__init__(self)
         self.db_model = db_model
         self.conn = conn
+        if fns is None:
+            fns = {}
+        self.fns = SimpleNamespace(**fns)
 
     def read_query(self, q):
         if isinstance(q, data_algebra.data_ops.ViewRepresentation):
