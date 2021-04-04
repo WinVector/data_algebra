@@ -60,7 +60,7 @@ def parse_datetime(col, *, format="%Y-%m-%d %H:%M:%S"):
         args=col,
         name='parse_datetime',
         sql_name='PARSE_DATETIME',  # https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
-        sql_prefix='f"{format}", ')
+        sql_prefix=f'"{format}", ')
 
 
 # convert str to date
@@ -72,6 +72,31 @@ def parse_date(col, *, format="%Y-%m-%d"):
         args=col,
         name='parse_date',
         sql_name='PARSE_DATE',  # https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
+        sql_prefix=f'"{format}", ')
+
+
+# convert datetime to str
+# https://cloud.google.com/bigquery/docs/reference/standard-sql/datetime_functions
+def format_datetime(col, *, format="%Y-%m-%d %H:%M:%S"):
+    assert isinstance(col, str)
+    return data_algebra.data_ops.user_fn(
+        # x is a pandas Series
+        lambda x: x.dt.strftime(date_format=format),
+        args=col,
+        name='format_datetime',
+        sql_name='FORMAT_DATETIME',
+        sql_prefix=f'"{format}", ')
+
+
+# convert date to str
+def format_date(col, *, format="%Y-%m-%d"):
+    assert isinstance(col, str)
+    return data_algebra.data_ops.user_fn(
+        # x is a pandas Series
+        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.strftime(date_format=format),
+        args=col,
+        name='format_date',
+        sql_name='FORMAT_DATE',
         sql_prefix=f'"{format}", ')
 
 
@@ -151,20 +176,40 @@ def year(col):
 
 # compute difference in timestamps in seconds
 # https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp_diff
-# TODO: implement and test
 def timestamp_diff(col1, col2):
     assert isinstance(col1, str)
     assert isinstance(col2, str)
     return data_algebra.data_ops.user_fn(
         # https://stackoverflow.com/a/41340398
-        lambda c1, c2: data_algebra.default_data_model.pd.Timedelta(c2 - c1).total_seconds(),
+        # looks like Timedelta is scalar
+        # TODO: find vectorized form
+        lambda c1, c2: [
+            data_algebra.default_data_model.pd.Timedelta(c1[i] - c2[i]).total_seconds() for i in range(len(c1))],
         args=[col1, col2],
         name='timestamp_diff',
         sql_name='TIMESTAMP_DIFF',
-        sql_suffix=', HOUR')
+        sql_suffix=', SECOND')
 
-# TODO: format date, format datetime, date diff (days)
+
+# compute difference in dates in days
+def date_diff(col1, col2):
+    assert isinstance(col1, str)
+    assert isinstance(col2, str)
+    return data_algebra.data_ops.user_fn(
+        # https://stackoverflow.com/a/41340398
+        # looks like Timedelta is scalar
+        # TODO: find vectorized form
+        lambda c1, c2: [
+            data_algebra.default_data_model.pd.Timedelta(c1[i] - c2[i]).days for i in range(len(c1))],
+        args=[col1, col2],
+        name='date_diff',
+        sql_name='TIMESTAMP_DIFF',
+        sql_suffix=', DAY')
+
+
+# TODO: bigquery tests
 # TODO: documentation page
+
 
 fns = {
     'as_int64': as_int64,
@@ -173,6 +218,8 @@ fns = {
     'datetime_to_date': datetime_to_date,
     'parse_datetime': parse_datetime,
     'parse_date': parse_date,
+    'format_datetime': format_datetime,
+    'format_date': format_date,
     'dayofweek': dayofweek,
     'dayofyear': dayofyear,
     'dayofmonth': dayofmonth,
@@ -180,4 +227,5 @@ fns = {
     'quarter': quarter,
     'year': year,
     'timestamp_diff': timestamp_diff,
+    'date_diff': date_diff,
 }
