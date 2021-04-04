@@ -108,7 +108,7 @@ def test_bigquery_date_1():
 
     ops = describe_table(d, table_name='d') .\
         extend({
-            'date': data_algebra.BigQuery.DATE('dt'),
+            'date': data_algebra.BigQuery.DATETIME_TO_DATE('dt'),
             'date_str': trim_0_10('dt_str'),
          }) . \
         extend({

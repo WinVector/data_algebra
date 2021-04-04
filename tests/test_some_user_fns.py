@@ -84,7 +84,7 @@ def test_DATE():
     })
     ops = describe_table(d, table_name='d') .\
         extend({
-         'nx': data_algebra.BigQuery.DATE('x')
+         'nx': data_algebra.BigQuery.DATETIME_TO_DATE('x')
         })
     res = ops.transform(d)
 
@@ -153,13 +153,16 @@ def test_PARSE_DATE():
 
 def test_DATE_PARTS():
     d = pandas.DataFrame({
-        'x': ['2001-01-01', '2020-04-02']
+        'x': ['2001-01-01', '2020-04-02'],
+        't': ['2001-01-01 01:33:22', '2020-04-02 13:11:10'],
     })
     ops = describe_table(d, table_name='d') .\
         extend({
-         'nx': data_algebra.BigQuery.PARSE_DATE('x')
+            'nx': data_algebra.BigQuery.PARSE_DATE('x', format="%Y-%m-%d"),
+            'nt': data_algebra.BigQuery.PARSE_DATETIME('x', format="%Y-%m-%d %H:%M:%S"),
         }) .\
         extend({
+            'date2': data_algebra.BigQuery.DATETIME_TO_DATE('nt'),
             'day_of_week': data_algebra.BigQuery.DAYOFWEEK('nx'),
             'day_of_year': data_algebra.BigQuery.DAYOFYEAR('nx'),
             'month': data_algebra.BigQuery.MONTH('nx'),
@@ -172,6 +175,7 @@ def test_DATE_PARTS():
 
     expect = pandas.DataFrame({
         'x': ['2001-01-01', '2020-04-02'],
+        't': ['2001-01-01 01:33:22', '2020-04-02 13:11:10'],
         'day_of_week': [1, 4],
         'day_of_year': [1, 93],
         'month': [1, 4],
@@ -179,7 +183,9 @@ def test_DATE_PARTS():
         'quarter': [1, 2],
         'year': [2001, 2020],
     })
-    expect['nx'] = pandas.to_datetime(d.x, format="%Y-%m-%d")
+    expect['nx'] = pandas.to_datetime(d.x, format="%Y-%m-%d").dt.date.copy()
+    expect['nt'] = pandas.to_datetime(d.x, format="%Y-%m-%d %H:%M:%S")
+    expect['date2'] = expect.nt.dt.date.copy()
     assert data_algebra.test_util.equivalent_frames(res, expect)
 
     bigquery_model = data_algebra.BigQuery.BigQueryModel()

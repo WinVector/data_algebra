@@ -123,8 +123,11 @@ def TRIMSTR(*, start=0, stop):
     return f
 
 
+# TODO: format date, format datetime, date diff (days), datetime diff (seconds)
+# TODO: try to abstract to more db defs, perhaps move all these common usefns to db_handle/db_model?
+
 # convert datetime to date
-def DATE(col):
+def DATETIME_TO_DATE(col):
     assert isinstance(col, str)
     return data_algebra.data_ops.user_fn(
         lambda x: x.dt.date.copy(),  # x is a pandas Series
@@ -133,16 +136,29 @@ def DATE(col):
         sql_name='DATE')
 
 
-# convert str to date
-def PARSE_DATE(col):
+# convert str to datetime
+# https://cloud.google.com/bigquery/docs/reference/standard-sql/datetime_functions
+def PARSE_DATETIME(col, *, format="%Y-%m-%d %H:%M:%S"):
     assert isinstance(col, str)
     return data_algebra.data_ops.user_fn(
         # https://pandas.pydata.org/docs/reference/api/pandas.to_datetime.html
-        lambda x: data_algebra.default_data_model.pd.to_datetime(x, format="%Y-%m-%d").dt.date.copy(),  # x is a pandas Series
+        lambda x: data_algebra.default_data_model.pd.to_datetime(x, format=format),  # x is a pandas Series
+        args=col,
+        name='PARSE_DATETIME',
+        sql_name='PARSE_DATETIME',  # https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
+        sql_prefix='f"{format}", ')
+
+
+# convert str to date
+def PARSE_DATE(col, *, format="%Y-%m-%d"):
+    assert isinstance(col, str)
+    return data_algebra.data_ops.user_fn(
+        # https://pandas.pydata.org/docs/reference/api/pandas.to_datetime.html
+        lambda x: data_algebra.default_data_model.pd.to_datetime(x, format=format).dt.date.copy(),  # x is a pandas Series
         args=col,
         name='PARSE_DATE',
         sql_name='PARSE_DATE',  # https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
-        sql_prefix='"%Y-%m-%d", ')
+        sql_prefix=f'"{format}", ')
 
 
 # replace missing with zeros
