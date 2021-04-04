@@ -149,7 +149,8 @@ def test_DATE_PARTS():
     ops = describe_table(d, table_name='d') .\
         extend({
             'nx': db_handle.fns.parse_date('x', format="%Y-%m-%d"),
-            'nt': db_handle.fns.parse_datetime('x', format="%Y-%m-%d %H:%M:%S"),
+            'nt': db_handle.fns.parse_datetime('t', format="%Y-%m-%d %H:%M:%S"),
+            'nd': db_handle.fns.parse_datetime('x', format="%Y-%m-%d"),
         }) .\
         extend({
             'date2': db_handle.fns.datetime_to_date('nt'),
@@ -159,9 +160,14 @@ def test_DATE_PARTS():
             'day_of_month': db_handle.fns.dayofmonth('nx'),
             'quarter': db_handle.fns.quarter('nx'),
             'year': db_handle.fns.year('nx'),
+            'diff': db_handle.fns.timestamp_diff('nt', 'nd'),
+            'sdt': db_handle.fns.format_datetime('nt', format="%Y-%m-%d %H:%M:%S"),
+            'sd': db_handle.fns.format_date('nx', format="%Y-%m-%d"),
         })
     res = ops.transform(d)
     assert isinstance(res.nx[0], datetime.date)
+    assert isinstance(res.sdt[0], str)
+    assert isinstance(res.sd[0], str)
 
     expect = pandas.DataFrame({
         'x': ['2001-01-01', '2020-04-02'],
@@ -173,9 +179,15 @@ def test_DATE_PARTS():
         'quarter': [1, 2],
         'year': [2001, 2020],
     })
-    expect['nx'] = pandas.to_datetime(d.x, format="%Y-%m-%d").dt.date.copy()
-    expect['nt'] = pandas.to_datetime(d.x, format="%Y-%m-%d %H:%M:%S")
+    expect['nx'] = pandas.to_datetime(expect.x, format="%Y-%m-%d").dt.date.copy()
+    expect['nt'] = pandas.to_datetime(expect.t, format="%Y-%m-%d %H:%M:%S")
+    expect['nd'] = pandas.to_datetime(expect.x, format="%Y-%m-%d")
     expect['date2'] = expect.nt.dt.date.copy()
+    expect['diff'] = [
+            data_algebra.default_data_model.pd.Timedelta(expect['nt'][i] - expect['nd'][i]).total_seconds()
+            for i in range(len(expect['nt']))]
+    expect['sdt'] = expect.t
+    expect['sd'] = expect.x
     assert data_algebra.test_util.equivalent_frames(res, expect)
 
     bigquery_sql = db_handle.to_sql(ops, pretty=True)
