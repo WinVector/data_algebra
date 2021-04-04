@@ -190,8 +190,26 @@ def timestamp_diff(col1, col2):
         sql_name='TIMESTAMP_DIFF',
         sql_suffix=', SECOND')
 
-# TODO: format date, format datetime, date diff (days)
+
+# compute difference in dates in days
+def date_diff(col1, col2):
+    assert isinstance(col1, str)
+    assert isinstance(col2, str)
+    return data_algebra.data_ops.user_fn(
+        # https://stackoverflow.com/a/41340398
+        # looks like Timedelta is scalar
+        # TODO: find vectorized form
+        lambda c1, c2: [
+            data_algebra.default_data_model.pd.Timedelta(c1[i] - c2[i]).days for i in range(len(c1))],
+        args=[col1, col2],
+        name='date_diff',
+        sql_name='TIMESTAMP_DIFF',
+        sql_suffix=', DAY')
+
+
+# TODO: bigquery tests
 # TODO: documentation page
+
 
 fns = {
     'as_int64': as_int64,
@@ -209,4 +227,5 @@ fns = {
     'quarter': quarter,
     'year': year,
     'timestamp_diff': timestamp_diff,
+    'date_diff': date_diff,
 }

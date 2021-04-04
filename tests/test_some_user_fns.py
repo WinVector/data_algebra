@@ -163,6 +163,7 @@ def test_DATE_PARTS():
             'diff': db_handle.fns.timestamp_diff('nt', 'nd'),
             'sdt': db_handle.fns.format_datetime('nt', format="%Y-%m-%d %H:%M:%S"),
             'sd': db_handle.fns.format_date('nx', format="%Y-%m-%d"),
+            'dd': db_handle.fns.date_diff('nx', 'nx'),
         })
     res = ops.transform(d)
     assert isinstance(res.nx[0], datetime.date)
@@ -178,6 +179,7 @@ def test_DATE_PARTS():
         'day_of_month': [1, 2],
         'quarter': [1, 2],
         'year': [2001, 2020],
+        'dd': [0, 0],
     })
     expect['nx'] = pandas.to_datetime(expect.x, format="%Y-%m-%d").dt.date.copy()
     expect['nt'] = pandas.to_datetime(expect.t, format="%Y-%m-%d %H:%M:%S")
