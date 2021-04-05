@@ -1,4 +1,6 @@
 
+import gzip
+
 import data_algebra
 import data_algebra.data_ops
 import data_algebra.db_model
@@ -133,3 +135,19 @@ class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
             sql_meta=sql_meta,
         )
         return td
+
+    def query_to_csv(self, q, *, res_name):
+        if isinstance(q, data_algebra.data_ops.ViewRepresentation):
+            q = q.to_sql(self.db_model)
+        else:
+            q = str(q)
+        op = lambda: open(res_name, 'w')
+        if res_name.endswith('.gz'):
+            op = lambda: gzip.open(res_name, 'w')
+        with op() as res:
+            res_iter = self.conn.query(q).result().to_dataframe_iterable()
+            is_first = True
+            for block in res_iter:
+                block.to_csv(res, index=False, header=is_first)
+                is_first = False
+
