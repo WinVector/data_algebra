@@ -92,8 +92,8 @@ class BigQueryModel(data_algebra.db_model.DBModel):
         assert isinstance(conn, google.cloud.bigquery.client.Client)
         assert isinstance(q, str)
         r = self.local_data_model.pd.DataFrame(conn.query(q).result().to_dataframe())
-        r = r.reset_index(drop=True)
-        return r
+        r.reset_index(drop=True, inplace=True)
+        return r.copy()  # fresh copy
 
     def db_handle(self, conn):
         return BigQuery_DBHandle(db_model=self, conn=conn)
@@ -150,4 +150,10 @@ class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
             for block in res_iter:
                 block.to_csv(res, index=False, header=is_first)
                 is_first = False
+
+    def insert_table(self, d, *, table_name, allow_overwrite=False):
+        # TODO: wire up allow_overwrite
+        self.conn.load_table_from_dataframe(
+            d,
+            table_name)
 

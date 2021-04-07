@@ -1068,3 +1068,7 @@ class DBHandle(data_algebra.eval_model.EvalModel):
 
     def __repr__(self):
         return self.__str__()
+
+    def close(self):
+        self.conn.close()
+        self.conn = None
