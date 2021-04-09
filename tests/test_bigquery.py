@@ -11,10 +11,20 @@ import data_algebra.SQLite
 
 import pytest
 
+# running bigquery tests depends on environment variable
+# example:
+#  export GOOGLE_APPLICATION_CREDENTIALS="/Users/johnmount/big_query/big_query_jm.json"
+# to clear:
+# unset GOOGLE_APPLICATION_CREDENTIALS
 @pytest.fixture(scope='module')
 def get_bq_handle():
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/johnmount/big_query/big_query_jm.json"
-    bq_client = bigquery.Client()
+    bq_client = None
+    gac = None
+    try:
+        gac = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
+        bq_client = bigquery.Client()
+    except KeyError:
+        pass
     bq_handle = data_algebra.BigQuery.BigQueryModel().db_handle(bq_client)
     data_catalog = 'data-algebra-test'
     data_schema = 'test_1'
