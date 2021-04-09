@@ -239,6 +239,10 @@ class DBModel:
         :param conn: database connectionex
         :param q: sql query
         """
+        if isinstance(q, data_algebra.data_ops.ViewRepresentation):
+            q = q.to_sql(db_model=self)
+        else:
+            q = str(q)
         cur = conn.cursor()
         cur.execute(q)
 
@@ -249,6 +253,10 @@ class DBModel:
         :param q: sql query
         :return: query results as table
         """
+        if isinstance(q, data_algebra.data_ops.ViewRepresentation):
+            q = q.to_sql(db_model=self)
+        else:
+            q = str(q)
         cur = conn.cursor()
         cur.execute(q)
         r = cur.fetchall()

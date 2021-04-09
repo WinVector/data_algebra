@@ -78,6 +78,10 @@ class BigQueryModel(data_algebra.db_model.DBModel):
         """
         assert _have_bigquery
         assert isinstance(conn, google.cloud.bigquery.client.Client)
+        if isinstance(q, data_algebra.data_ops.ViewRepresentation):
+            q = q.to_sql(db_model=self)
+        else:
+            q = str(q)
         assert isinstance(q, str)
         conn.query(q).result()
 
@@ -90,6 +94,10 @@ class BigQueryModel(data_algebra.db_model.DBModel):
         """
         assert _have_bigquery
         assert isinstance(conn, google.cloud.bigquery.client.Client)
+        if isinstance(q, data_algebra.data_ops.ViewRepresentation):
+            q = q.to_sql(db_model=self)
+        else:
+            q = str(q)
         assert isinstance(q, str)
         r = self.local_data_model.pd.DataFrame(conn.query(q).result().to_dataframe())
         r.reset_index(drop=True, inplace=True)
