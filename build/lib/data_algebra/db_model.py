@@ -1022,6 +1022,10 @@ class DBHandle(data_algebra.eval_model.EvalModel):
     def to_sql(self, ops, *, pretty=False):
         return ops.to_sql(self.db_model, pretty=pretty)
 
+    def drop_table(self, table_name):
+        q_table_name = self.db_model.quote_table_name(table_name)
+        self.execute(f'DROP TABLE IF EXISTS {q_table_name}')
+
     def eval(self, ops, *, data_map=None, result_name=None, eval_env=None, narrow=True):
         query = ops.to_sql(self.db_model)
         if result_name is None:

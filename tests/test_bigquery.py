@@ -1,5 +1,6 @@
 
 import os
+import datetime
 
 import pandas
 from google.cloud import bigquery
@@ -7,7 +8,6 @@ from google.cloud import bigquery
 import data_algebra.test_util
 from data_algebra.data_ops import *
 import data_algebra.BigQuery
-import data_algebra.SQLite
 
 import pytest
 
@@ -15,7 +15,7 @@ import pytest
 # example:
 #  export GOOGLE_APPLICATION_CREDENTIALS="/Users/johnmount/big_query/big_query_jm.json"
 # to clear:
-# unset GOOGLE_APPLICATION_CREDENTIALS
+#  unset GOOGLE_APPLICATION_CREDENTIALS
 @pytest.fixture(scope='module')
 def get_bq_handle():
     bq_client = None
@@ -74,7 +74,6 @@ def test_bigquery_1(get_bq_handle):
         'med_val': [1.5, 3.5],
     })
     assert data_algebra.test_util.equivalent_frames(expect, res_1)
-
 
     bigquery_sql = bq_handle.to_sql(ops, pretty=True)
     if bq_client is not None:
@@ -140,7 +139,6 @@ def test_bigquery_2(get_bq_handle):
 
 
 def test_bigquery_date_1(get_bq_handle):
-    db_handle = data_algebra.BigQuery.BigQuery_DBHandle(conn=None)
     d = pandas.DataFrame({
         'group': ['a', 'a', 'a', 'b', 'b'],
         'v1': [1, 2, 2, 0, 0],
@@ -159,8 +157,8 @@ def test_bigquery_date_1(get_bq_handle):
 
     ops = describe_table(d, table_name=table_name) .\
         extend({
-            'date': db_handle.fns.datetime_to_date('dt'),
-            'date_str': db_handle.fns.trimstr('dt_str', start=0, stop=10),
+            'date': bq_handle.fns.datetime_to_date('dt'),
+            'date_str': bq_handle.fns.trimstr('dt_str', start=0, stop=10),
          }) . \
         extend({
             'mean_v1': 'v1.mean()',
@@ -184,22 +182,26 @@ def test_bigquery_date_1(get_bq_handle):
         # assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
 
 
-def test_big_query_table_step():
-    bigquery_model = data_algebra.BigQuery.BigQueryModel()
-    handle = data_algebra.BigQuery.BigQuery_DBHandle(
-        db_model=bigquery_model, conn=None)
+def test_big_query_table_step(get_bq_handle):
     d = pandas.DataFrame({
         'group': ['a', 'a', 'a', 'b', 'b'],
         'v1': [1, 2, 2, 0, 0],
         'v2': [1, 2, 3, 4, 5],
         'dt': pandas.to_datetime([1490195805, 1490195815, 1490295805, 1490196805, 1490195835], unit='s')
     })
+
+    bq_client = get_bq_handle['bq_client']
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    tables_to_delete = get_bq_handle['tables_to_delete']
+
     # build a description that looks like the BigQuery db handle built it.
     td = describe_table(d, table_name='big.honking.dt')
     td.sql_meta = pandas.DataFrame()
     td.qualifiers['table_catalog'] = 'big'
     td.qualifiers['table_schema'] = 'honking'
-    td.qualifiers['table_name'] =  'dt'
+    td.qualifiers['table_name'] = 'dt'
     td.qualifiers['full_name'] = td.table_name
     # see if we can use this locally
     td.transform(d)
@@ -286,3 +288,227 @@ def test_big_query_notor(get_bq_handle):
         bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
         bigquery_res = bq_handle.read_query(bigquery_sql)
         assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
+
+
+def test_TRIMSTR(get_bq_handle):
+    d = pandas.DataFrame({
+        'x': ['0123456', 'abcdefghijk'],
+        'y': ['012345', 'abcdefghij'],
+    })
+
+    bq_client = get_bq_handle['bq_client']
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    tables_to_delete = get_bq_handle['tables_to_delete']
+    table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name)
+
+    ops = describe_table(d, table_name=table_name) .\
+        extend({
+         'nx': bq_handle.fns.trimstr('x', start=0, stop=5)
+        })
+    res = ops.transform(d)
+
+    expect = pandas.DataFrame({
+        'x': ['0123456', 'abcdefghijk'],
+        'y': ['012345', 'abcdefghij'],
+        'nx': ['01234', 'abcde'],
+    })
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+
+    bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+    if bq_client is not None:
+        bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
+        bigquery_res = bq_handle.read_query(bigquery_sql)
+        assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
+
+
+def test_AS_INT64(get_bq_handle):
+    d = pandas.DataFrame({
+        'x': ['0123456', '66'],
+        'y': ['012345', '77'],
+    })
+
+    bq_client = get_bq_handle['bq_client']
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    tables_to_delete = get_bq_handle['tables_to_delete']
+    table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name)
+
+    ops = describe_table(d, table_name=table_name) .\
+        extend({
+         'nx': bq_handle.fns.as_int64('x')
+        })
+    res = ops.transform(d)
+
+    expect = pandas.DataFrame({
+        'x': ['0123456', '66'],
+        'y': ['012345', '77'],
+        'nx': [123456, 66]
+    })
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+
+    bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+    if bq_client is not None:
+        bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
+        bigquery_res = bq_handle.read_query(bigquery_sql)
+        assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
+
+
+def test_DATE(get_bq_handle):
+    d = pandas.DataFrame({
+        'x': pandas.to_datetime([1490196805, 1490195835], unit='s'),
+        'y': ['012345', '77'],
+    })
+
+    bq_client = get_bq_handle['bq_client']
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    tables_to_delete = get_bq_handle['tables_to_delete']
+    table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name)
+
+    ops = describe_table(d, table_name=table_name) .\
+        extend({
+         'nx': bq_handle.fns.datetime_to_date('x')
+        })
+    res = ops.transform(d)
+
+    expect = d.copy()
+    expect['nx'] = expect.x.dt.date.copy()
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+
+    bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+    if bq_client is not None:
+        bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
+        bigquery_res = bq_handle.read_query(bigquery_sql)
+        # BigQuery adds timezones, so can't compare just yet
+        # assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
+
+
+def test_COALESCE_0(get_bq_handle):
+    d = pandas.DataFrame({
+        'x': [1, None, 3]
+    })
+
+    bq_client = get_bq_handle['bq_client']
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    tables_to_delete = get_bq_handle['tables_to_delete']
+    table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name)
+
+    ops = describe_table(d, table_name=table_name) .\
+        extend({
+         'nx': bq_handle.fns.coalesce_0('x')
+        })
+    res = ops.transform(d)
+
+    expect = pandas.DataFrame({
+        'x': [1, None, 3],
+        'nx': [1, 0, 3]
+    })
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+
+    bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+    if bq_client is not None:
+        bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
+        bigquery_res = bq_handle.read_query(bigquery_sql)
+        assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
+
+
+def test_PARSE_DATE(get_bq_handle):
+    d = pandas.DataFrame({
+        'x': ['2001-01-01', '2020-04-02']
+    })
+
+    bq_client = get_bq_handle['bq_client']
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    tables_to_delete = get_bq_handle['tables_to_delete']
+    table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name)
+
+    ops = describe_table(d, table_name=table_name) .\
+        extend({
+         'nx': bq_handle.fns.parse_date('x')
+        })
+    res = ops.transform(d)
+    assert isinstance(res.nx[0], datetime.date)
+
+    expect = pandas.DataFrame({
+        'x': ['2001-01-01', '2020-04-02']
+    })
+    expect['nx'] = pandas.to_datetime(d.x, format="%Y-%m-%d")
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+
+    bigquery_sql = bq_handle.to_sql(ops)
+
+
+def test_DATE_PARTS(get_bq_handle):
+    d = pandas.DataFrame({
+        'x': ['2001-01-01', '2020-04-02'],
+        't': ['2001-01-01 01:33:22', '2020-04-02 13:11:10'],
+    })
+
+    bq_client = get_bq_handle['bq_client']
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    tables_to_delete = get_bq_handle['tables_to_delete']
+    table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name)
+
+    ops = describe_table(d, table_name=table_name) .\
+        extend({
+            'nx': bq_handle.fns.parse_date('x', format="%Y-%m-%d"),
+            'nt': bq_handle.fns.parse_datetime('t', format="%Y-%m-%d %H:%M:%S"),
+            'nd': bq_handle.fns.parse_datetime('x', format="%Y-%m-%d"),
+        }) .\
+        extend({
+            'date2': bq_handle.fns.datetime_to_date('nt'),
+            'day_of_week': bq_handle.fns.dayofweek('nx'),
+            'day_of_year': bq_handle.fns.dayofyear('nx'),
+            'month': bq_handle.fns.month('nx'),
+            'day_of_month': bq_handle.fns.dayofmonth('nx'),
+            'quarter': bq_handle.fns.quarter('nx'),
+            'year': bq_handle.fns.year('nx'),
+            'diff': bq_handle.fns.timestamp_diff('nt', 'nd'),
+            'sdt': bq_handle.fns.format_datetime('nt', format="%Y-%m-%d %H:%M:%S"),
+            'sd': bq_handle.fns.format_date('nx', format="%Y-%m-%d"),
+            'dd': bq_handle.fns.date_diff('nx', 'nx'),
+        })
+    res = ops.transform(d)
+    assert isinstance(res.nx[0], datetime.date)
+    assert isinstance(res.sdt[0], str)
+    assert isinstance(res.sd[0], str)
+
+    expect = pandas.DataFrame({
+        'x': ['2001-01-01', '2020-04-02'],
+        't': ['2001-01-01 01:33:22', '2020-04-02 13:11:10'],
+        'day_of_week': [1, 4],
+        'day_of_year': [1, 93],
+        'month': [1, 4],
+        'day_of_month': [1, 2],
+        'quarter': [1, 2],
+        'year': [2001, 2020],
+        'dd': [0, 0],
+    })
+    expect['nx'] = pandas.to_datetime(expect.x, format="%Y-%m-%d").dt.date.copy()
+    expect['nt'] = pandas.to_datetime(expect.t, format="%Y-%m-%d %H:%M:%S")
+    expect['nd'] = pandas.to_datetime(expect.x, format="%Y-%m-%d")
+    expect['date2'] = expect.nt.dt.date.copy()
+    expect['diff'] = [
+            data_algebra.default_data_model.pd.Timedelta(expect['nt'][i] - expect['nd'][i]).total_seconds()
+            for i in range(len(expect['nt']))]
+    expect['sdt'] = expect.t
+    expect['sd'] = expect.x
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+
+    bigquery_sql = bq_handle.to_sql(ops, pretty=True)
