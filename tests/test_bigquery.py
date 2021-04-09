@@ -1,23 +1,44 @@
 
-import sqlite3
+import os
 
 import pandas
+from google.cloud import bigquery
 
 import data_algebra.test_util
 from data_algebra.data_ops import *
 import data_algebra.BigQuery
 import data_algebra.SQLite
 
+import pytest
 
-def test_bigquery_1():
+@pytest.fixture(scope='module')
+def get_bq_handle():
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/johnmount/big_query/big_query_jm.json"
+    bq_handle = data_algebra.BigQuery.BigQueryModel().db_handle(bigquery.Client())
+    data_catalog = 'data-algebra-test'
+    data_schema = 'test_1'
+    yield {
+        'bq_handle': bq_handle,
+        'data_catalog': data_catalog,
+        'data_schema': data_schema,
+    }
+    bq_handle.close()
+
+
+def test_bigquery_1(get_bq_handle):
     d = pandas.DataFrame({
         'group': ['a', 'a', 'b', 'b'],
         'val': [1, 2, 3, 4],
     })
 
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    table_name = f'{data_catalog}.{data_schema}.d'
+
     # this is the pattern BigQuery needs to compute
     # median, window function then a pseudo-aggregation
-    ops = describe_table(d, table_name='d'). \
+    ops = describe_table(d, table_name=table_name). \
         extend(
             {'med_val': 'median(val)'},
             partition_by=['group']). \
@@ -33,36 +54,30 @@ def test_bigquery_1():
     })
     assert data_algebra.test_util.equivalent_frames(expect, res_1)
 
-    bigquery_model = data_algebra.BigQuery.BigQueryModel()
-    bigquery_sql = ops.to_sql(bigquery_model, pretty=True)
-
-    # run through std sqllite style code as an example
-    ops_natural = describe_table(d, table_name='d'). \
-        project(
-            {'med_val': 'median(val)'},
-            group_by=['group'])
-    sqllite_model = data_algebra.SQLite.SQLiteModel()
-    with sqlite3.connect(":memory:") as sqllite_conn:
-        sqllite_model.prepare_connection(sqllite_conn)
-        sqllite_model.insert_table(sqllite_conn, d, 'd')
-        sqllite_sql = ops_natural.to_sql(sqllite_model, pretty=True)
-        res_sqlite = sqllite_model.read_query(sqllite_conn, sqllite_sql)
-    assert data_algebra.test_util.equivalent_frames(expect, res_sqlite)
+    bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+    bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
+    bigquery_res = bq_handle.read_query(bigquery_sql)
+    assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
 
 
-def test_bigquery_2():
+def test_bigquery_2(get_bq_handle):
     d = pandas.DataFrame({
         'group': ['a', 'a', 'a', 'b', 'b'],
         'v1': [1, 2, 2, 0, 0],
         'v2': [1, 2, 3, 4, 5],
     })
 
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    table_name = f'{data_catalog}.{data_schema}.d'
+
     # this is the pattern BigQuery needs to compute
     # median, window function then a pseudo-aggregation
     # refs on BigQuery window fn horeshit:
     #  https://iamhectorotero.github.io/median-and-group-by/
     #  https://chartio.com/resources/tutorials/how-countdistinct-field-works-in-google-bigquery/
-    ops = describe_table(d, table_name='d'). \
+    ops = describe_table(d, table_name=table_name). \
         extend({
             'med_1': 'v1.median()',  # median is only a window fn in Big Query
             'med_2': 'v2.median()',  # median is only a window fn in Big Query
@@ -91,11 +106,13 @@ def test_bigquery_2():
     })
     assert data_algebra.test_util.equivalent_frames(expect, res_1)
 
-    bigquery_model = data_algebra.BigQuery.BigQueryModel()
-    bigquery_sql = ops.to_sql(bigquery_model, pretty=True)
+    bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+    bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
+    bigquery_res = bq_handle.read_query(bigquery_sql)
+    assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
 
 
-def test_bigquery_date_1():
+def test_bigquery_date_1(get_bq_handle):
     db_handle = data_algebra.BigQuery.BigQuery_DBHandle(conn=None)
     d = pandas.DataFrame({
         'group': ['a', 'a', 'a', 'b', 'b'],
@@ -105,7 +122,12 @@ def test_bigquery_date_1():
     })
     d['dt_str'] = d.dt.astype(str)
 
-    ops = describe_table(d, table_name='d') .\
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    table_name = f'{data_catalog}.{data_schema}.d'
+
+    ops = describe_table(d, table_name=table_name) .\
         extend({
             'date': db_handle.fns.datetime_to_date('dt'),
             'date_str': db_handle.fns.trimstr('dt_str', start=0, stop=10),
@@ -124,7 +146,11 @@ def test_bigquery_date_1():
     expect['count'] = [3, 3, 3, 2, 2]
     assert data_algebra.test_util.equivalent_frames(expect, res_1)
 
-    bigquery_sql = db_handle.to_sql(ops, pretty=True)
+    bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+    bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
+    bigquery_res = bq_handle.read_query(bigquery_sql)
+    # # big query adding timezones to timestamps, so can't compare
+    # assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
 
 
 def test_big_query_table_step():
@@ -148,17 +174,22 @@ def test_big_query_table_step():
     td.transform(d)
 
 
-def test_big_query_and():
+def test_big_query_and(get_bq_handle):
     bigquery_handle = data_algebra.BigQuery.BigQuery_DBHandle(
         db_model=data_algebra.BigQuery.BigQueryModel(), conn=None)
     d = pandas.DataFrame({
         'group': ['a', 'a', 'a', 'b', 'b'],
         'v1': [1, 2, 2, 0, 2],
         'v2': [1, 2, 3, 4, 5],
-        'dt': pandas.to_datetime([1490195805, 1490195815, 1490295805, 1490196805, 1490195835], unit='s')
     })
+
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    table_name = f'{data_catalog}.{data_schema}.d'
+
     # build a description that looks like the BigQuery db handle built it.
-    ops = describe_table(d, table_name='d') .\
+    ops = describe_table(d, table_name=table_name) .\
         select_rows("(group == 'a') & (v1 == 2)")
 
     # see & gets translated to AND
@@ -172,29 +203,30 @@ def test_big_query_and():
         'group': ['a', 'a'],
         'v1': [2, 2],
         'v2': [2, 3],
-        'dt': pandas.to_datetime([1490195815, 1490295805], unit='s')
     })
     assert data_algebra.test_util.equivalent_frames(expect, res)
 
-    # see if the query works in SQLite
-    sqllite_model = data_algebra.SQLite.SQLiteModel()
-    with sqlite3.connect(":memory:") as sqllite_conn:
-        sqllite_model.prepare_connection(sqllite_conn)
-        sqllite_model.insert_table(sqllite_conn, d, 'd')
-        res_sqlite = sqllite_model.read_query(sqllite_conn, sql)
-    assert data_algebra.test_util.equivalent_frames(expect, res_sqlite)
+    bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+    bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
+    bigquery_res = bq_handle.read_query(bigquery_sql)
+    assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
 
 
-def test_big_query_notor():
+def test_big_query_notor(get_bq_handle):
     bigquery_handle = data_algebra.BigQuery.BigQuery_DBHandle(conn=None)
     d = pandas.DataFrame({
         'group': ['a', 'a', 'a', 'b', 'b'],
         'v1': [1, 2, 2, 0, 2],
         'v2': [1, 2, 3, 4, 5],
-        'dt': pandas.to_datetime([1490195805, 1490195815, 1490295805, 1490196805, 1490195835], unit='s')
     })
+
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    table_name = f'{data_catalog}.{data_schema}.d'
+
     # build a description that looks like the BigQuery db handle built it.
-    ops = describe_table(d, table_name='d') .\
+    ops = describe_table(d, table_name=table_name) .\
         select_rows("not ((group == 'a') or (v1 == 2))")
 
     # see & gets translated to AND
@@ -208,14 +240,10 @@ def test_big_query_notor():
         'group': ['b'],
         'v1': [0],
         'v2': [4],
-        'dt': pandas.to_datetime([1490196805], unit='s')
     })
     assert data_algebra.test_util.equivalent_frames(expect, res)
 
-    # see if the query works in SQLite
-    sqllite_model = data_algebra.SQLite.SQLiteModel()
-    with sqlite3.connect(":memory:") as sqllite_conn:
-        sqllite_model.prepare_connection(sqllite_conn)
-        sqllite_model.insert_table(sqllite_conn, d, 'd')
-        res_sqlite = sqllite_model.read_query(sqllite_conn, sql)
-    assert data_algebra.test_util.equivalent_frames(expect, res_sqlite)
+    bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+    bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
+    bigquery_res = bq_handle.read_query(bigquery_sql)
+    assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)

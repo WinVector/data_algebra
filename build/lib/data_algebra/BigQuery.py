@@ -152,8 +152,9 @@ class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
                 is_first = False
 
     def insert_table(self, d, *, table_name, allow_overwrite=False):
-        # TODO: wire up allow_overwrite
-        self.conn.load_table_from_dataframe(
+        if allow_overwrite:
+            self.execute(f'DROP TABLE IF EXISTS `{table_name}`')
+        job = self.conn.load_table_from_dataframe(
             d,
             table_name)
-
+        job.result()
