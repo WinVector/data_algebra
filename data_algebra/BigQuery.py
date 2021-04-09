@@ -159,9 +159,12 @@ class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
                 block.to_csv(res, index=False, header=is_first)
                 is_first = False
 
+    def drop_table(self, table_name):
+        self.execute(f'DROP TABLE IF EXISTS `{table_name}`')
+
     def insert_table(self, d, *, table_name, allow_overwrite=False):
         if allow_overwrite:
-            self.execute(f'DROP TABLE IF EXISTS `{table_name}`')
+            self.drop_table(table_name)
         job = self.conn.load_table_from_dataframe(
             d,
             table_name)

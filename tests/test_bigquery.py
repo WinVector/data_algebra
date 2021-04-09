@@ -28,12 +28,18 @@ def get_bq_handle():
     bq_handle = data_algebra.BigQuery.BigQueryModel().db_handle(bq_client)
     data_catalog = 'data-algebra-test'
     data_schema = 'test_1'
+    tables_to_delete = set()
     yield {
         'bq_client': bq_client,
         'bq_handle': bq_handle,
         'data_catalog': data_catalog,
         'data_schema': data_schema,
+        'tables_to_delete': tables_to_delete,
     }
+    # back from yield, clean up
+    if bq_client is not None:
+        for tn in tables_to_delete:
+            bq_handle.drop_table(tn)
     bq_handle.close()
 
 
@@ -47,7 +53,9 @@ def test_bigquery_1(get_bq_handle):
     bq_handle = get_bq_handle['bq_handle']
     data_catalog = get_bq_handle['data_catalog']
     data_schema = get_bq_handle['data_schema']
-    table_name = f'{data_catalog}.{data_schema}.d'
+    tables_to_delete = get_bq_handle['tables_to_delete']
+    table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name)
 
     # this is the pattern BigQuery needs to compute
     # median, window function then a pseudo-aggregation
@@ -86,7 +94,9 @@ def test_bigquery_2(get_bq_handle):
     bq_handle = get_bq_handle['bq_handle']
     data_catalog = get_bq_handle['data_catalog']
     data_schema = get_bq_handle['data_schema']
-    table_name = f'{data_catalog}.{data_schema}.d'
+    tables_to_delete = get_bq_handle['tables_to_delete']
+    table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name)
 
     # this is the pattern BigQuery needs to compute
     # median, window function then a pseudo-aggregation
@@ -143,7 +153,9 @@ def test_bigquery_date_1(get_bq_handle):
     bq_handle = get_bq_handle['bq_handle']
     data_catalog = get_bq_handle['data_catalog']
     data_schema = get_bq_handle['data_schema']
-    table_name = f'{data_catalog}.{data_schema}.d'
+    tables_to_delete = get_bq_handle['tables_to_delete']
+    table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name)
 
     ops = describe_table(d, table_name=table_name) .\
         extend({
@@ -206,7 +218,9 @@ def test_big_query_and(get_bq_handle):
     bq_handle = get_bq_handle['bq_handle']
     data_catalog = get_bq_handle['data_catalog']
     data_schema = get_bq_handle['data_schema']
-    table_name = f'{data_catalog}.{data_schema}.d'
+    tables_to_delete = get_bq_handle['tables_to_delete']
+    table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name)
 
     # build a description that looks like the BigQuery db handle built it.
     ops = describe_table(d, table_name=table_name) .\
@@ -245,7 +259,9 @@ def test_big_query_notor(get_bq_handle):
     bq_handle = get_bq_handle['bq_handle']
     data_catalog = get_bq_handle['data_catalog']
     data_schema = get_bq_handle['data_schema']
-    table_name = f'{data_catalog}.{data_schema}.d'
+    tables_to_delete = get_bq_handle['tables_to_delete']
+    table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name)
 
     # build a description that looks like the BigQuery db handle built it.
     ops = describe_table(d, table_name=table_name) .\
