@@ -1070,5 +1070,6 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         return self.__str__()
 
     def close(self):
-        self.conn.close()
-        self.conn = None
+        if self.conn is not None:
+            self.conn.close()
+            self.conn = None

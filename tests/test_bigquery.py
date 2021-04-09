@@ -14,10 +14,12 @@ import pytest
 @pytest.fixture(scope='module')
 def get_bq_handle():
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/johnmount/big_query/big_query_jm.json"
-    bq_handle = data_algebra.BigQuery.BigQueryModel().db_handle(bigquery.Client())
+    bq_client = bigquery.Client()
+    bq_handle = data_algebra.BigQuery.BigQueryModel().db_handle(bq_client)
     data_catalog = 'data-algebra-test'
     data_schema = 'test_1'
     yield {
+        'bq_client': bq_client,
         'bq_handle': bq_handle,
         'data_catalog': data_catalog,
         'data_schema': data_schema,
@@ -31,6 +33,7 @@ def test_bigquery_1(get_bq_handle):
         'val': [1, 2, 3, 4],
     })
 
+    bq_client = get_bq_handle['bq_client']
     bq_handle = get_bq_handle['bq_handle']
     data_catalog = get_bq_handle['data_catalog']
     data_schema = get_bq_handle['data_schema']
@@ -54,10 +57,12 @@ def test_bigquery_1(get_bq_handle):
     })
     assert data_algebra.test_util.equivalent_frames(expect, res_1)
 
+
     bigquery_sql = bq_handle.to_sql(ops, pretty=True)
-    bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
-    bigquery_res = bq_handle.read_query(bigquery_sql)
-    assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
+    if bq_client is not None:
+        bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
+        bigquery_res = bq_handle.read_query(bigquery_sql)
+        assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
 
 
 def test_bigquery_2(get_bq_handle):
@@ -67,6 +72,7 @@ def test_bigquery_2(get_bq_handle):
         'v2': [1, 2, 3, 4, 5],
     })
 
+    bq_client = get_bq_handle['bq_client']
     bq_handle = get_bq_handle['bq_handle']
     data_catalog = get_bq_handle['data_catalog']
     data_schema = get_bq_handle['data_schema']
@@ -107,9 +113,10 @@ def test_bigquery_2(get_bq_handle):
     assert data_algebra.test_util.equivalent_frames(expect, res_1)
 
     bigquery_sql = bq_handle.to_sql(ops, pretty=True)
-    bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
-    bigquery_res = bq_handle.read_query(bigquery_sql)
-    assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
+    if bq_client is not None:
+        bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
+        bigquery_res = bq_handle.read_query(bigquery_sql)
+        assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
 
 
 def test_bigquery_date_1(get_bq_handle):
@@ -122,6 +129,7 @@ def test_bigquery_date_1(get_bq_handle):
     })
     d['dt_str'] = d.dt.astype(str)
 
+    bq_client = get_bq_handle['bq_client']
     bq_handle = get_bq_handle['bq_handle']
     data_catalog = get_bq_handle['data_catalog']
     data_schema = get_bq_handle['data_schema']
@@ -147,10 +155,11 @@ def test_bigquery_date_1(get_bq_handle):
     assert data_algebra.test_util.equivalent_frames(expect, res_1)
 
     bigquery_sql = bq_handle.to_sql(ops, pretty=True)
-    bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
-    bigquery_res = bq_handle.read_query(bigquery_sql)
-    # # big query adding timezones to timestamps, so can't compare
-    # assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
+    if bq_client is not None:
+        bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
+        bigquery_res = bq_handle.read_query(bigquery_sql)
+        # # big query adding timezones to timestamps, so can't compare
+        # assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
 
 
 def test_big_query_table_step():
@@ -183,6 +192,7 @@ def test_big_query_and(get_bq_handle):
         'v2': [1, 2, 3, 4, 5],
     })
 
+    bq_client = get_bq_handle['bq_client']
     bq_handle = get_bq_handle['bq_handle']
     data_catalog = get_bq_handle['data_catalog']
     data_schema = get_bq_handle['data_schema']
@@ -207,9 +217,10 @@ def test_big_query_and(get_bq_handle):
     assert data_algebra.test_util.equivalent_frames(expect, res)
 
     bigquery_sql = bq_handle.to_sql(ops, pretty=True)
-    bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
-    bigquery_res = bq_handle.read_query(bigquery_sql)
-    assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
+    if bq_client is not None:
+        bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
+        bigquery_res = bq_handle.read_query(bigquery_sql)
+        assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
 
 
 def test_big_query_notor(get_bq_handle):
@@ -220,6 +231,7 @@ def test_big_query_notor(get_bq_handle):
         'v2': [1, 2, 3, 4, 5],
     })
 
+    bq_client = get_bq_handle['bq_client']
     bq_handle = get_bq_handle['bq_handle']
     data_catalog = get_bq_handle['data_catalog']
     data_schema = get_bq_handle['data_schema']
@@ -244,6 +256,7 @@ def test_big_query_notor(get_bq_handle):
     assert data_algebra.test_util.equivalent_frames(expect, res)
 
     bigquery_sql = bq_handle.to_sql(ops, pretty=True)
-    bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
-    bigquery_res = bq_handle.read_query(bigquery_sql)
-    assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
+    if bq_client is not None:
+        bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
+        bigquery_res = bq_handle.read_query(bigquery_sql)
+        assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
