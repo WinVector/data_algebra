@@ -126,6 +126,18 @@ def dayofyear(col):
         sql_prefix='DAYOFYEAR FROM ')
 
 
+# convert date to week of year
+# https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
+def weekofyear(col):
+    assert isinstance(col, str)
+    return data_algebra.data_ops.user_fn(
+        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.isocalendar().week,  # x is a pandas Series
+        args=col,
+        name='weekofyear',
+        sql_name='EXTRACT',
+        sql_prefix='WEEK FROM ')
+
+
 # convert date to dayofweek 1 through 7
 # https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
 def dayofmonth(col):
@@ -223,6 +235,7 @@ fns = {
     'dayofweek': dayofweek,
     'dayofyear': dayofyear,
     'dayofmonth': dayofmonth,
+    'weekofyear': weekofyear,
     'month': month,
     'quarter': quarter,
     'year': year,
