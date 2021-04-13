@@ -668,7 +668,7 @@ class ColumnReference(Term):
             raise TypeError("column_name must be a string")
         if view is not None:
             if column_name not in view.column_set:
-                raise KeyError("column_name must be a column of the given view")
+                raise KeyError("column_name '" + str(column_name) + "' must be a column of the given view")
         Term.__init__(self)
 
     def is_equal(self, other):
