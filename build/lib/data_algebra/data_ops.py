@@ -804,6 +804,9 @@ def describe_table(d, table_name="data_frame",
                    column_types=None,
                    row_limit=7):
     # Expect a pandas.DataFrame style object
+    assert d is not None
+    assert not isinstance(d, OperatorPlatform)
+    assert not isinstance(d, ViewRepresentation)
     column_names = [c for c in d.columns]
     if column_types is None:
         if d.shape[0] > 0:
