@@ -5,6 +5,7 @@ from data_algebra.data_ops import *
 
 import lark.exceptions
 
+
 def test_parse():
     q = 4
 
@@ -49,3 +50,59 @@ def test_parse_6():
             "z": "(u.sin() + w**2) / x + y / v"})
     recovered = ops.ops['z']
     assert str(recovered) == '((u.sin() + (w ** 2)) / x) + (y / v)'
+
+
+def test_parse_7():
+    ops = TableDescription("d", ["u", "v", "w", "x", "y"]). \
+        extend({
+            "z": "u & v & w"})
+    recovered = ops.ops['z']
+    assert str(recovered) == '(u & v) & w'
+
+
+def test_parse_8():
+    ops = TableDescription("d", ["u", "v", "w", "x", "y"]). \
+        extend({
+            "z": "u + v + w"})
+    recovered = ops.ops['z']
+    assert str(recovered) == '(u + v) + w'
+
+
+def test_parse_9():
+    ops = TableDescription("d", ["u", "v", "w", "x", "y"]). \
+        extend({
+            "z": "u + v / w"})
+    recovered = ops.ops['z']
+    assert str(recovered) == 'u + (v / w)'
+
+
+def test_parse_10():
+    ops = TableDescription("d", ["u", "v", "w", "x", "y"]). \
+        extend({
+            "z": "u - v + w"})
+    recovered = ops.ops['z']
+    assert str(recovered) == '(u - v) + w'
+
+
+def test_parse_11():
+    ops = TableDescription("d", ["u", "v", "w", "x", "y"]). \
+        extend({
+            "z": "u /v"})
+    recovered = ops.ops['z']
+    assert str(recovered) == 'u / v'
+
+
+def test_parse_12():
+    ops = TableDescription("d", ["u", "v", "w", "x", "y"]). \
+        extend({
+            "z": "u * (v + w)"})
+    recovered = ops.ops['z']
+    assert str(recovered) == 'u * (v + w)'
+
+
+def test_parse_13():
+    ops = TableDescription("d", ["u", "v", "w", "x", "y"]). \
+        extend({
+            "z": "u * v + w"})
+    recovered = ops.ops['z']
+    assert str(recovered) == '(u * v) + w'
