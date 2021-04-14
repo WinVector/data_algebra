@@ -944,6 +944,12 @@ class DBModel:
         )
         return sql
 
+    def __str__(self):
+        return str(type(self).__name__)
+
+    def __repr__(self):
+        return self.__str__()
+
 
 class DBHandle(data_algebra.eval_model.EvalModel):
     def __init__(self, *, db_model, conn, fns = None):
@@ -1070,7 +1076,8 @@ class DBHandle(data_algebra.eval_model.EvalModel):
 
     def __str__(self):
         return (
-            "data_algebra.db_model.DBHandle("
+            str(type(self).__name__) +
+            "("
             + "db_model="
             + str(self.db_model)
             + ", conn="
