@@ -107,7 +107,8 @@ def dayofweek(col):
     return data_algebra.data_ops.user_fn(
         # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.dt.dayofweek.html#pandas.Series.dt.dayofweek
         # https://stackoverflow.com/a/30222759
-        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.dayofweek + 1,  # x is a pandas Series
+        # x is a pandas Series
+        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.dayofweek.astype('int64') + 1,
         args=col,
         name='dayofweek',
         sql_name='EXTRACT',
@@ -119,7 +120,8 @@ def dayofweek(col):
 def dayofyear(col):
     assert isinstance(col, str)
     return data_algebra.data_ops.user_fn(
-        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.dayofyear,  # x is a pandas Series
+        # x is a pandas Series
+        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.dayofyear.astype('int64'),
         args=col,
         name='dayofyear',
         sql_name='EXTRACT',
@@ -131,7 +133,8 @@ def dayofyear(col):
 def weekofyear(col):
     assert isinstance(col, str)
     return data_algebra.data_ops.user_fn(
-        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.isocalendar().week,  # x is a pandas Series
+        # x is a pandas Series
+        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.isocalendar().week.astype('int64'),
         args=col,
         name='weekofyear',
         sql_name='EXTRACT',
@@ -143,7 +146,8 @@ def weekofyear(col):
 def dayofmonth(col):
     assert isinstance(col, str)
     return data_algebra.data_ops.user_fn(
-        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.day,  # x is a pandas Series
+        # x is a pandas Series
+        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.day.astype('int64'),
         args=col,
         name='dayofmonth',
         sql_name='EXTRACT',
@@ -155,7 +159,8 @@ def dayofmonth(col):
 def month(col):
     assert isinstance(col, str)
     return data_algebra.data_ops.user_fn(
-        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.dayofweek + 1,  # x is a pandas Series
+        # x is a pandas Series
+        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.dayofweek.astype('int64') + 1,
         args=col,
         name='month',
         sql_name='EXTRACT',
@@ -167,7 +172,8 @@ def month(col):
 def quarter(col):
     assert isinstance(col, str)
     return data_algebra.data_ops.user_fn(
-        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.quarter,  # x is a pandas Series
+        # x is a pandas Series
+        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.quarter.astype('int64'),
         args=col,
         name='quarter',
         sql_name='EXTRACT',
@@ -179,7 +185,8 @@ def quarter(col):
 def year(col):
     assert isinstance(col, str)
     return data_algebra.data_ops.user_fn(
-        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.year,  # x is a pandas Series
+        # x is a pandas Series
+        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.year.astype('int64'),
         args=col,
         name='year',
         sql_name='EXTRACT',
