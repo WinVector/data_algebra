@@ -40,6 +40,28 @@ def coalesce_0(col):
         sql_suffix=', 0')
 
 
+# compute difference in dates in days
+def coalesce(cols):
+    if isinstance(cols, str):
+        cols = [cols]
+    assert len(cols) > 1
+    assert all([isinstance(ci, str) for ci in cols])
+    assert len(set(cols)) == len(cols)
+    cols = cols.copy()
+
+    def f(*args):
+        res = args[0].copy()
+        for i in range(1, len(args)):
+            res = res.combine_first(args[i])
+        return res
+
+    return data_algebra.data_ops.user_fn(
+        f,
+        args=cols,
+        name='coalesce',
+        sql_name='COALESCE')  # TODO: implement SQL
+
+
 # convert datetime to date
 def datetime_to_date(col):
     assert isinstance(col, str)
@@ -234,6 +256,7 @@ fns = {
     'as_int64': as_int64,
     'trimstr': trimstr,
     'coalesce_0': coalesce_0,
+    'coalesce': coalesce,
     'datetime_to_date': datetime_to_date,
     'parse_datetime': parse_datetime,
     'parse_date': parse_date,

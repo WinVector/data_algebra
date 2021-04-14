@@ -512,3 +512,35 @@ def test_DATE_PARTS(get_bq_handle):
     assert data_algebra.test_util.equivalent_frames(res, expect)
 
     bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+
+
+def test_coalesce(get_bq_handle):
+    # TODO: test db version
+    d = pandas.DataFrame({
+        'a': [1, None, None, None, None, 6, 7, None],
+        'b': [10, 20, None, None, None, 60, None, None],
+        'c': [None, 200, 300, None, 500, 600, 700, None],
+        'd': [1000, None, 3000, 4000, None, 6000, None, None],
+    })
+
+    bq_client = get_bq_handle['bq_client']
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    tables_to_delete = get_bq_handle['tables_to_delete']
+    table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name)
+
+    ops = describe_table(d, table_name='d')  .\
+        extend({'fixed': bq_handle.fns.coalesce(['a','b', 'c', 'd'])})
+
+    res = ops.transform(d)
+
+    expect = pandas.DataFrame({
+        'a': [1, None, None, None, None, 6, 7, None],
+        'b': [10, 20, None, None, None, 60, None, None],
+        'c': [None, 200, 300, None, 500, 600, 700, None],
+        'd': [1000, None, 3000, 4000, None, 6000, None, None],
+        'fixed': [1, 20, 300, 4000, 500, 6, 7, None],
+    })
+    assert data_algebra.test_util.equivalent_frames(res, expect)
