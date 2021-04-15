@@ -182,7 +182,7 @@ def month(col):
     assert isinstance(col, str)
     return data_algebra.data_ops.user_fn(
         # x is a pandas Series
-        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.dayofweek.astype('int64') + 1,
+        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.month.astype('int64'),
         args=col,
         name='month',
         sql_name='EXTRACT',
