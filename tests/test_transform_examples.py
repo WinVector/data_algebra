@@ -1,5 +1,7 @@
 import pytest
 
+import sqlite3
+
 import data_algebra.SQLite
 import data_algebra.test_util
 from data_algebra.data_ops import *
@@ -192,3 +194,12 @@ def test_convert_records_transform_1():
     assert isinstance(temp_tables[k], data_algebra.default_data_model.pd.DataFrame)
 
     data_algebra.test_util.check_transform(ops, data, expect)
+
+    with sqlite3.connect(":memory:") as conn:
+        db_model.prepare_connection(conn)
+        db_handle = db_model.db_handle(conn)
+        db_handle.insert_table(d=iris_small, table_name='iris_small')
+        for k, v in temp_tables.items():
+            db_handle.insert_table(d=v, table_name=k)
+        res_db = db_handle.read_query(sql)
+    assert data_algebra.test_util.equivalent_frames(res_db, expect)

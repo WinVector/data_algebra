@@ -603,12 +603,12 @@ class ViewRepresentation(OperatorPlatform, ABC):
             return self.sources[0].order_rows(columns, reverse=reverse, limit=limit)
         return OrderRowsNode(source=self, columns=columns, reverse=reverse, limit=limit)
 
-    def convert_records(self, record_map):
+    def convert_records(self, record_map, *, temp_namer=None):
         if record_map is None:
             return self
         if self.is_trivial_when_intermediate():
             return self.sources[0].convert_records(record_map)
-        return ConvertRecordsNode(source=self, record_map=record_map)
+        return ConvertRecordsNode(source=self, record_map=record_map, temp_namer=temp_namer)
 
 
 # Could also have general query as starting node, but don't see a lot of point to
@@ -1739,9 +1739,10 @@ class ConcatRowsNode(ViewRepresentation):
 
 
 class ConvertRecordsNode(ViewRepresentation):
-    def __init__(self, source, record_map):
+    def __init__(self, *, source, record_map, temp_namer=None):
         sources = [source]
         self.record_map = record_map
+        self.temp_namer = temp_namer
         unknown = set(self.record_map.columns_needed) - set(source.column_names)
         if len(unknown) > 0:
             raise ValueError("missing required columns: " + str(unknown))
@@ -1753,7 +1754,10 @@ class ConvertRecordsNode(ViewRepresentation):
         )
 
     def blocks_out_table(self, *, temp_id_source):
-        view_name = "cdata_temp_record_" + str(temp_id_source[0])
+        if self.temp_namer is None:
+            view_name = "cdata_temp_record_" + str(temp_id_source[0])
+        else:
+            view_name = self.temp_namer(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         res = TableDescription(
             view_name,

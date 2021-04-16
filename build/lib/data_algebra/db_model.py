@@ -1025,8 +1025,17 @@ class DBHandle(data_algebra.eval_model.EvalModel):
             q = str(q)
         self.db_model.execute(conn=self.conn, q=q)
 
-    def to_sql(self, ops, *, pretty=False):
-        return ops.to_sql(self.db_model, pretty=pretty)
+    def to_sql(self, ops,
+               *,
+               pretty=False,
+               encoding=None,
+               sqlparse_options=None,
+               temp_tables=None):
+        return ops.to_sql(self.db_model,
+                          pretty=pretty,
+                          encoding=encoding,
+                          sqlparse_options=sqlparse_options,
+                          temp_tables=temp_tables)
 
     def drop_table(self, table_name):
         q_table_name = self.db_model.quote_table_name(table_name)

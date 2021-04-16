@@ -140,7 +140,7 @@ class OperatorPlatform:
     def order_rows(self, columns, *, reverse=None, limit=None):
         raise NotImplementedError("base class called")
 
-    def convert_records(self, record_map):
+    def convert_records(self, record_map, *, temp_namer=None):
         raise NotImplementedError("base class called")
 
     # sklearn step style interface
