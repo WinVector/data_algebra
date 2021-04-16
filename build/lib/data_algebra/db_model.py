@@ -144,6 +144,7 @@ class DBModel:
     on_end: str
     on_joiner: str
     drop_text: str
+    string_type: str
 
     def __init__(
         self,
@@ -157,6 +158,7 @@ class DBModel:
         on_end='',
         on_joiner=', ',
         drop_text='DROP TABLE',
+        string_type='VARCHAR',
     ):
         if local_data_model is None:
             local_data_model = data_algebra.default_data_model
@@ -176,6 +178,7 @@ class DBModel:
         self.on_end = on_end
         self.on_joiner = on_joiner
         self.drop_text = drop_text
+        self.string_type = string_type
 
     def db_handle(self, conn):
         return DBHandle(db_model=self, conn=conn)
@@ -204,7 +207,7 @@ class DBModel:
             + (
                 "double precision"
                 if self.local_data_model.can_convert_col_to_numeric(d[d.columns[i]])
-                else "VARCHAR"
+                else self.string_type
             )
             for i in range(d.shape[1])
         ]
@@ -858,7 +861,7 @@ class DBModel:
                     col_sql = (
                         "  WHEN CAST(b."
                         + self.quote_identifier(result_col)
-                        + " AS VARCHAR) = "
+                        + " AS " + self.string_type + ") = "
                         + self.quote_string(str(source_col))
                         + " THEN a."
                         + self.quote_identifier(source_col)
@@ -915,7 +918,7 @@ class DBModel:
                         clauses.append(
                             " ( CAST("
                             + self.quote_identifier(cc)
-                            + " AS VARCHAR) = "
+                            + " AS " + self.string_type + ") = "
                             + self.quote_string(str(record_spec.control_table[cc][i]))
                             + " ) "
                         )
