@@ -1753,16 +1753,15 @@ class ConvertRecordsNode(ViewRepresentation):
             node_name="ConvertRecordsNode",
         )
 
-    def blocks_out_table(self, *, temp_id_source):
+    def control_out_table(self, *, temp_id_source):
         if self.temp_namer is None:
             view_name = "cdata_temp_record_" + str(temp_id_source[0])
         else:
             view_name = self.temp_namer(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         res = TableDescription(
-            view_name,
-            [c for c in self.record_map.blocks_out.record_keys]
-            + [c for c in self.record_map.blocks_out.control_table.columns],
+            table_name=view_name,
+            column_names=self.record_map.blocks_out.control_table.columns
         )
         return res
 
@@ -1807,17 +1806,17 @@ class ConvertRecordsNode(ViewRepresentation):
         query = sub_query.to_sql(
             columns=self.columns_used_from_sources()[0], db_model=db_model
         )
-        blocks_out_table = None
+        control_out_table = None
         if self.record_map.blocks_in is not None:
             query = db_model.blocks_to_row_recs_query(
                 query, record_spec=self.record_map.blocks_in
             )
         if self.record_map.blocks_out is not None:
-            blocks_out_table = self.blocks_out_table(temp_id_source=temp_id_source)
+            control_out_table = self.control_out_table(temp_id_source=temp_id_source)
             query = db_model.row_recs_to_blocks_query(
                 query,
                 record_spec=self.record_map.blocks_out,
-                record_view=blocks_out_table,
+                control_view=control_out_table,
             )
         view_name = "convert_records_in_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
@@ -1825,12 +1824,12 @@ class ConvertRecordsNode(ViewRepresentation):
         temp_id_source[0] = temp_id_source[0] + 1
         terms = {k: None for k in self.record_map.columns_produced}
         temp_tables = sub_query.temp_tables.copy()
-        if blocks_out_table is not None:
-            if blocks_out_table.key in temp_tables.keys():
+        if control_out_table is not None:
+            if control_out_table.key in temp_tables.keys():
                 raise ValueError(
-                    "key collision in temp_tables construction: " + blocks_out_table.key
+                    "key collision in temp_tables construction: " + control_out_table.key
                 )
-            temp_tables[blocks_out_table.key] = self.record_map.blocks_out.control_table
+            temp_tables[control_out_table.key] = self.record_map.blocks_out.control_table
         near_sql = data_algebra.near_sql.NearSQLq(
             quoted_query_name=db_model.quote_identifier(view_name),
             prev_quoted_query_name=db_model.quote_identifier(prev_view_name),

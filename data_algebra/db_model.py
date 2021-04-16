@@ -809,7 +809,7 @@ class DBModel:
         return near_sql
 
     def row_recs_to_blocks_query(
-        self, source_sql, record_spec, record_view, *, using=None, temp_id_source=None
+        self, source_sql, record_spec, control_view, *, using=None, temp_id_source=None
     ):
         if temp_id_source is None:
             temp_id_source = [0]
@@ -817,9 +817,9 @@ class DBModel:
         #     raise TypeError(
         #         "record_spec should be a data_algebra.cdata.RecordSpecification"
         #     )
-        if not isinstance(record_view, data_algebra.data_ops_types.OperatorPlatform):
+        if not isinstance(control_view, data_algebra.data_ops_types.OperatorPlatform):
             raise TypeError(
-                "record_view should be a data_algebra.data_ops_types.OperatorPlatform"
+                "control_view should be a data_algebra.data_ops_types.OperatorPlatform"
             )
         control_value_cols = [
             c
@@ -875,7 +875,7 @@ class DBModel:
             + source_sql
             + " ) a\n"
             + "CROSS JOIN (\n  "
-            + record_view.to_sql_implementation(
+            + control_view.to_sql_implementation(
                 self, using=using, temp_id_source=temp_id_source
             ).to_sql(db_model=self, columns=using, force_sql=True)
             + " ) b\n"
