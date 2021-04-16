@@ -607,7 +607,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         if record_map is None:
             return self
         if self.is_trivial_when_intermediate():
-            return self.sources[0].convert_records(record_map)
+            return self.sources[0].convert_records(record_map, temp_namer=temp_namer)
         return ConvertRecordsNode(source=self, record_map=record_map, temp_namer=temp_namer)
 
 
