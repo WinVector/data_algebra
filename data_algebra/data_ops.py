@@ -512,7 +512,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         )
         return self.project_parsed(parsed_ops=parsed_ops, group_by=group_by)
 
-    def natural_join(self, b, *, by, jointype="INNER"):
+    def natural_join(self, b, *, by, jointype):
         if not isinstance(b, ViewRepresentation):
             raise TypeError(
                 "expected b to be a data_algebra.dat_ops.ViewRepresentation"
@@ -1539,7 +1539,7 @@ class NaturalJoinNode(ViewRepresentation):
     by: List[str]
     jointype: str
 
-    def __init__(self, a, b, *, by, jointype="INNER"):
+    def __init__(self, a, b, *, by, jointype):
         # check set of tables is consistent in both sub-dags
         a_tables = a.get_tables()
         b_tables = b.get_tables()
