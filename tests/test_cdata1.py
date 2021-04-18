@@ -2,6 +2,8 @@ import re
 import io
 import sqlite3
 
+import pandas
+
 import data_algebra
 import data_algebra.test_util
 from data_algebra.cdata import *
@@ -388,3 +390,42 @@ def test_cdata_explode():
     transform = RecordMap(blocks_out=record_spec)
     res = transform.transform(iris)
     assert data_algebra.test_util.equivalent_frames(res, expect)
+
+
+def test_cdata_query_details():
+    d = pandas.DataFrame({
+        'measure_1': [1, 2],
+        'measure_2': [3, 4],
+        'rec': ['a', 'b']
+    })
+    td = describe_table(d, table_name='d')
+
+    ops = td. \
+        convert_records(pivot_rowrecs_to_blocks(
+        attribute_key_column="measurement",  # output column
+        attribute_value_column="value",  # output column
+        record_keys=['rec'],
+        record_value_columns=['measure_1', 'measure_2']))
+
+    expect = pandas.DataFrame({
+        'rec': ['a', 'a', 'b', 'b'],
+        'measurement': ['measure_1', 'measure_2', 'measure_1', 'measure_2'],
+        'value': [1, 3, 2, 4]
+    })
+
+    res_pandas = ops.transform(d)
+    assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
+
+    db_model = data_algebra.SQLite.SQLiteModel()
+    cdata_temps = {}
+    sql = ops.to_sql(db_model, temp_tables=cdata_temps, pretty=True)
+
+    with sqlite3.connect(":memory:") as conn:
+        db_model.prepare_connection(conn)
+        db_handle = db_model.db_handle(conn)
+        for k, v in cdata_temps.items():
+            db_handle.insert_table(v, table_name=k)
+        db_handle.insert_table(d, table_name='d')
+        res_db = db_handle.read_query(sql)
+
+    assert data_algebra.test_util.equivalent_frames(res_db, expect)
