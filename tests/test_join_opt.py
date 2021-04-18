@@ -78,10 +78,10 @@ def test_join_opt_1():
 
     sql_model = data_algebra.SQLite.SQLiteModel()
 
-    # see that we get at least 2 selects in derived sql
+    # see that we get exactly 2 selects in derived sql
     for ops in ops_list:
-        sql = ops_sel.to_sql(sql_model, pretty=True)
-        assert sql.count('SELECT') > 1
+        sql = ops.to_sql(sql_model, pretty=True)
+        assert sql.count('SELECT') == 2
 
     with sqlite3.connect(":memory:") as conn:
         sql_model.prepare_connection(conn)

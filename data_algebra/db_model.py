@@ -410,11 +410,24 @@ class DBModel:
         cols_using = [c for c in table_def.column_names if c in using]
         view_name = "table_reference_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        near_sql = data_algebra.near_sql.NearSQLTable(
+        subsql = data_algebra.near_sql.NearSQLTable(
             terms={k: self.quote_identifier(k) for k in cols_using},
             quoted_query_name=self.quote_identifier(view_name),
             quoted_table_name=self.quote_table_name(table_def),
         )
+        near_sql = subsql
+        if not set([k for k in using]) == set([k for k in table_def.column_names]):
+            # need a non-trivial select here
+            terms = OrderedDict()
+            for k in using:
+                terms[k] = k
+            near_sql = data_algebra.near_sql.NearSQLUnaryStep(
+                previous_step_summary=subsql.summary(),
+                terms=terms,  # TODO: implement!
+                quoted_query_name=self.quote_identifier(view_name),
+                sub_sql=subsql.to_sql(columns=using, db_model=self),
+                temp_tables=subsql.temp_tables.copy(),
+            )
         return near_sql
 
     def extend_to_sql(self, extend_node, *, using=None, temp_id_source=None):
