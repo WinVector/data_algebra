@@ -270,7 +270,7 @@ class NaturalJoin(PipeStep):
     _jointype: str
     _b: OperatorPlatform
 
-    def __init__(self, *, b=None, by=None, jointype="INNER"):
+    def __init__(self, *, b, by, jointype):
         PipeStep.__init__(self)
         if not isinstance(b, ViewRepresentation):
             raise TypeError("b must be a data_algebra.data_ops.ViewRepresentation")
