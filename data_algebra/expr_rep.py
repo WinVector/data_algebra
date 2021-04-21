@@ -800,7 +800,7 @@ def populate_specials(*, column_defs, destination, user_values=None):
         raise TypeError("user_values should be a dictionary")
     nd = column_defs.copy()
     ns = data_algebra.env.SimpleNamespaceDict(**nd)
-    # TODO: unify with custom_functions
+    # TODO: unify with custom_functions, and more doc!
     # makes these symbols available for parsing step
     # need to enter user functions here or as methods on variables
     destination["_"] = ns

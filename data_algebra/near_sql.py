@@ -1,3 +1,4 @@
+
 # TODO: buld a term object that carries the column use information
 class NearSQL:
     """
@@ -5,8 +6,8 @@ class NearSQL:
     """
 
     def __init__(self, *, terms, quoted_query_name, temp_tables):
-        if (terms is None) or (not isinstance(terms, dict)) or (len(terms) <= 0):
-            raise ValueError("terms is supposed to be a non-empty dictionary")
+        if (terms is None) or (not isinstance(terms, dict)):
+            raise ValueError("terms is supposed to be a dictionary")
         self.terms = terms.copy()
         self.quoted_query_name = quoted_query_name
         self.temp_tables = temp_tables
@@ -36,6 +37,8 @@ class NearSQLTable(NearSQL):
                     v + " AS " + db_model.quote_identifier(k)
                     for (k, v) in constants.items()
                 ]
+            if len(terms_strs) < 1:
+                terms_strs = [f'1 AS {db_model.quote_identifier("data_algebra_placeholder_col_name")}']
             return "SELECT " + ", ".join(terms_strs) + " FROM " + self.quoted_table_name
         return self.quoted_table_name
 
@@ -80,6 +83,8 @@ class NearSQLUnaryStep(NearSQL):
             return v + " AS " + db_model.quote_identifier(k)
 
         terms_strs = [enc_term(k) for k in columns]
+        if len(terms_strs) < 1:
+            terms_strs = [f'1 AS {db_model.quote_identifier("data_algebra_placeholder_col_name")}']
         if self.previous_step_summary["is_table"]:
             sql = "SELECT " + ", ".join(terms_strs) + " FROM " + self.sub_sql
         else:
@@ -141,6 +146,8 @@ class NearSQLBinaryStep(NearSQL):
             return v + " AS " + db_model.quote_identifier(k)
 
         terms_strs = [enc_term(k) for k in columns]
+        if len(terms_strs) < 1:
+            terms_strs = [f'1 AS {db_model.quote_identifier("data_algebra_placeholder_col_name")}']
         sql = "SELECT " + ", ".join(terms_strs) + " FROM "
         if self.previous_step_summary1["is_table"]:
             sql = (
@@ -220,6 +227,8 @@ class NearSQLUStep(NearSQL):
             return v + " AS " + db_model.quote_identifier(k)
 
         terms_strs = [enc_term(k) for k in columns]
+        if len(terms_strs) < 1:
+            terms_strs = [f'1 AS {db_model.quote_identifier("data_algebra_placeholder_col_name")}']
         sql = "SELECT " + ", ".join(terms_strs) + " FROM ( "
         if self.previous_step_summary1["is_table"]:
             sql = (
@@ -285,6 +294,8 @@ class NearSQLq(NearSQL):
             return v + " AS " + db_model.quote_identifier(k)
 
         terms_strs = [enc_term(k) for k in columns]
+        if len(terms_strs) < 1:
+            terms_strs = [f'1 AS {db_model.quote_identifier("data_algebra_placeholder_col_name")}']
         return (
             "SELECT "
             + ", ".join(terms_strs)
