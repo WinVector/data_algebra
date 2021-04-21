@@ -402,8 +402,6 @@ class DBModel:
             temp_id_source = [0]
         if using is None:
             using = table_def.column_set
-        if len(using) < 1:
-            raise ValueError("must select at least one column")
         missing = using - table_def.column_set
         if len(missing) > 0:
             raise KeyError("referred to unknown columns: " + str(missing))
@@ -507,8 +505,6 @@ class DBModel:
             using = project_node.column_set
         subops = {k: op for (k, op) in project_node.ops.items() if k in using}
         subusing = project_node.columns_used_from_sources(using=using)[0]
-        if (len(project_node.group_by) + len(subusing)) < 1:
-            raise ValueError("must use at least one column")
         terms = {ci: self.expr_to_sql(oi) for (ci, oi) in subops.items()}
         terms.update({g: None for g in project_node.group_by})
         subsql = project_node.sources[0].to_sql_implementation(
@@ -979,6 +975,12 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         if fns is None:
             fns = {}
         self.fns = SimpleNamespace(**fns)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.close()
 
     def read_query(self, q):
         if isinstance(q, data_algebra.data_ops.ViewRepresentation):
