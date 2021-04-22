@@ -684,13 +684,12 @@ class DBModel:
         if using is None:
             using = join_node.column_set
         by_set = set(join_node.by)
-        using = using.union(by_set)
         if len(using) < 1:
             raise ValueError("must select at least one column")
         missing = using - join_node.column_set
         if len(missing) > 0:
             raise KeyError("referred to unknown columns: " + str(missing))
-        subusing = join_node.columns_used_from_sources(using=using)
+        subusing = join_node.columns_used_from_sources(using=using.union(by_set))
         using_left = subusing[0]
         using_right = subusing[1]
         sql_left = join_node.sources[0].to_sql_implementation(
@@ -714,7 +713,7 @@ class DBModel:
             + "."
             + self.quote_identifier(ci)
             + ")"
-            for ci in common
+            for ci in common if ci in using
         }
         terms.update({ci: None for ci in using_left - common})
         terms.update({ci: None for ci in using_right - common})
