@@ -571,7 +571,7 @@ class DBModel:
         subsql = select_columns_node.sources[0].to_sql_implementation(
             db_model=self, using=set(subusing), temp_id_source=temp_id_source
         )
-        # see if we can order columns
+        # order/limit columns
         subsql.terms = {
             k: subsql.terms[k]
             for k in select_columns_node.column_selection
@@ -594,6 +594,10 @@ class DBModel:
         subsql = drop_columns_node.sources[0].to_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
+        # /limit columns
+        subsql.terms = {
+            k: v for k, v in subsql.terms.items() if k not in drop_columns_node.column_deletions
+        }
         return subsql
 
     def order_to_sql(self, order_node, *, using=None, temp_id_source=None):
