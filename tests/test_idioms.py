@@ -351,5 +351,3 @@ def test_ideom_cross_join(get_bq_handle):
         bq_handle.insert_table(e, table_name=table_name_e, allow_overwrite=True)
         bigquery_res = bq_handle.read_query(bigquery_sql)
         assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
-
-# TODO: see if we can stop always passing keys out of joins.
