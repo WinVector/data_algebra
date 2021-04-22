@@ -180,3 +180,174 @@ def test_ideom_extend_test_trinary(get_bq_handle):
         bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
         bigquery_res = bq_handle.read_query(bigquery_sql)
         assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
+
+
+def test_ideom_simulate_cross_join(get_bq_handle):
+    bq_client = get_bq_handle['bq_client']
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    tables_to_delete = get_bq_handle['tables_to_delete']
+
+    d = pandas.DataFrame({
+        'x': [1, 2, 3, 4],
+    })
+    e = pandas.DataFrame({
+        'y': ['a', 'b', 'c'],
+    })
+
+    table_name_d = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name_d)
+    table_name_e = f'{data_catalog}.{data_schema}.pytest_temp_e'
+    tables_to_delete.add(table_name_e)
+
+    ops = describe_table(d, table_name=table_name_d) .\
+        extend({ # {'select': '(val > 2.5).if_else("high", "low")' } # doesn't work in Pandas
+            'one': 1
+        }) .\
+        natural_join(
+            b=describe_table(e, table_name=table_name_e) . \
+                extend({  # {'select': '(val > 2.5).if_else("high", "low")' } # doesn't work in Pandas
+                    'one': 1
+                }),
+            by=['one'],
+            jointype='left'
+        ) .\
+        drop_columns(['one'])
+    expect = pandas.DataFrame({
+        'x': [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4],
+        'y': ['a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c'],
+    })
+
+    res_pandas = ops.eval({table_name_d: d , table_name_e: e})
+    assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
+
+    db_model = data_algebra.SQLite.SQLiteModel()
+    sql = ops.to_sql(db_model, pretty=True)
+    assert isinstance(sql, str)
+
+    with db_model.db_handle(sqlite3.connect(":memory:")) as sqlite_handle:
+        db_model.prepare_connection(sqlite_handle.conn)
+        sqlite_handle.insert_table(d, table_name=table_name_d)
+        sqlite_handle.insert_table(e, table_name=table_name_e)
+        res_sqlite = sqlite_handle.read_query(ops)
+    assert data_algebra.test_util.equivalent_frames(expect, res_sqlite)
+
+    bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+    if bq_client is not None:
+        bq_handle.insert_table(d, table_name=table_name_d, allow_overwrite=True)
+        bq_handle.insert_table(e, table_name=table_name_e, allow_overwrite=True)
+        bigquery_res = bq_handle.read_query(bigquery_sql)
+        assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
+
+
+def test_ideom_simulate_cross_join_select(get_bq_handle):
+    bq_client = get_bq_handle['bq_client']
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    tables_to_delete = get_bq_handle['tables_to_delete']
+
+    d = pandas.DataFrame({
+        'x': [1, 2, 3, 4],
+    })
+    e = pandas.DataFrame({
+        'y': ['a', 'b', 'c'],
+    })
+
+    table_name_d = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name_d)
+    table_name_e = f'{data_catalog}.{data_schema}.pytest_temp_e'
+    tables_to_delete.add(table_name_e)
+
+    ops = describe_table(d, table_name=table_name_d) .\
+        extend({ # {'select': '(val > 2.5).if_else("high", "low")' } # doesn't work in Pandas
+            'one': 1
+        }) .\
+        natural_join(
+            b=describe_table(e, table_name=table_name_e) . \
+                extend({  # {'select': '(val > 2.5).if_else("high", "low")' } # doesn't work in Pandas
+                    'one': 1
+                }),
+            by=['one'],
+            jointype='left'
+        ) .\
+        select_columns(['x', 'y'])
+    expect = pandas.DataFrame({
+        'x': [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4],
+        'y': ['a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c'],
+    })
+
+    res_pandas = ops.eval({table_name_d: d , table_name_e: e})
+    assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
+
+    db_model = data_algebra.SQLite.SQLiteModel()
+    sql = ops.to_sql(db_model, pretty=True)
+    assert isinstance(sql, str)
+
+    with db_model.db_handle(sqlite3.connect(":memory:")) as sqlite_handle:
+        db_model.prepare_connection(sqlite_handle.conn)
+        sqlite_handle.insert_table(d, table_name=table_name_d)
+        sqlite_handle.insert_table(e, table_name=table_name_e)
+        res_sqlite = sqlite_handle.read_query(ops)
+    assert data_algebra.test_util.equivalent_frames(expect, res_sqlite)
+
+    bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+    if bq_client is not None:
+        bq_handle.insert_table(d, table_name=table_name_d, allow_overwrite=True)
+        bq_handle.insert_table(e, table_name=table_name_e, allow_overwrite=True)
+        bigquery_res = bq_handle.read_query(bigquery_sql)
+        assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
+
+
+def test_ideom_cross_join(get_bq_handle):
+    bq_client = get_bq_handle['bq_client']
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    tables_to_delete = get_bq_handle['tables_to_delete']
+
+    d = pandas.DataFrame({
+        'x': [1, 2, 3, 4],
+    })
+    e = pandas.DataFrame({
+        'y': ['a', 'b', 'c'],
+    })
+
+    table_name_d = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name_d)
+    table_name_e = f'{data_catalog}.{data_schema}.pytest_temp_e'
+    tables_to_delete.add(table_name_e)
+
+    ops = describe_table(d, table_name=table_name_d) .\
+        natural_join(
+            b=describe_table(e, table_name=table_name_e),
+            by=[],
+            jointype='cross'
+        ) .\
+        drop_columns(['one'])
+    expect = pandas.DataFrame({
+        'x': [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4],
+        'y': ['a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c'],
+    })
+
+    res_pandas = ops.eval({table_name_d: d , table_name_e: e})
+    assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
+
+    db_model = data_algebra.SQLite.SQLiteModel()
+    sql = ops.to_sql(db_model, pretty=True)
+    assert isinstance(sql, str)
+
+    with db_model.db_handle(sqlite3.connect(":memory:")) as sqlite_handle:
+        db_model.prepare_connection(sqlite_handle.conn)
+        sqlite_handle.insert_table(d, table_name=table_name_d)
+        sqlite_handle.insert_table(e, table_name=table_name_e)
+        res_sqlite = sqlite_handle.read_query(ops)
+    assert data_algebra.test_util.equivalent_frames(expect, res_sqlite)
+
+    bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+    if bq_client is not None:
+        bq_handle.insert_table(d, table_name=table_name_d, allow_overwrite=True)
+        bq_handle.insert_table(e, table_name=table_name_e, allow_overwrite=True)
+        bigquery_res = bq_handle.read_query(bigquery_sql)
+        assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
