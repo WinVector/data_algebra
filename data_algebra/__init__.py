@@ -16,9 +16,10 @@ the `rquery`<https://github.com/WinVector/rquery> and `rqdatatable`<https://gith
 """
 
 import data_algebra.pandas_model
-# need to import pandas for eval calls
-import pandas
+
+# set up what pandas supplier we are using
+import pandas as pd
 
 default_data_model = data_algebra.pandas_model.PandasModel(
-    pd=pandas, presentation_model_name="pandas"
+    pd=pd, presentation_model_name="pd"
 )

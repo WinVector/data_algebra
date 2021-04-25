@@ -1,6 +1,4 @@
-# needed for the eval
-# noinspection PyUnresolvedReferences
-import pandas
+
 import numpy
 
 # noinspection PyUnresolvedReferences
@@ -21,7 +19,11 @@ def formats_to_self(ops):
     :return: logical, True if formats and evals back to self
     """
     str1 = repr(ops)
-    ops2 = eval(str1)
+    ops2 = eval(
+        str1,
+        globals(),
+        {'pd': data_algebra.pd}  # make our definition of pandas available
+    )
     str2 = repr(ops2)
     return str1 == str2
 
