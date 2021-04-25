@@ -1,7 +1,6 @@
 import numpy
 
 import data_algebra
-import data_algebra.env
 import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
@@ -21,10 +20,7 @@ def test_exp():
         }
     )
 
-    scale = 0.237
-
-    with data_algebra.env.Env(locals()) as env:
-        ops = TableDescription(
+    ops = TableDescription(
             "d", ["subjectID", "surveyCategory", "assessmentTotal"]
         ).extend({"v": "assessmentTotal.exp()+1"})
 

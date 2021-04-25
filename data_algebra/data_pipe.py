@@ -10,18 +10,17 @@ class Extend(PipeStep):
 
        Example:
            from data_algebra.data_ops import *
-           import data_algebra.env
-           with data_algebra.env.Env(locals()) as env:
-               q = 4
-               x = 2
-               var_name = 'y'
 
-               print("first example")
-               ops = (
-                  TableDescription('d', ['x', 'y']) .
-                     extend({'z':_.x + _[var_name]/q + _get('x')})
-                )
-                print(ops)
+           q = 4
+           x = 2
+           var_name = 'y'
+
+           print("first example")
+           ops = (
+              TableDescription('d', ['x', 'y']) .
+                 extend({'z': f'x + {var_name}/{q}'})
+            )
+            print(ops)
     """
 
     ops: Dict[str, data_algebra.expr_rep.Expression]

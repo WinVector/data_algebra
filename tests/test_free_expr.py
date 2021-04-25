@@ -22,22 +22,21 @@ def test_free_expr():
         .rename_columns({"diagnosis": "surveyCategory"})
     )
 
-    with data_algebra.env.Env(locals()) as env:
-        ops2 = (
-            TableDescription("d", ["subjectID", "surveyCategory", "assessmentTotal"])
-            .extend({"probability": "(assessmentTotal * scale).exp()"})
-            .extend({"total": "probability.sum()"}, partition_by=["subjectID"])
-            .extend({"probability": "probability/total"})
-            .extend({"sort_key": "-probability"})
-            .extend(
-                {"row_number": "_row_number()"},
-                partition_by=["subjectID"],
-                order_by=["sort_key"],
-            )
-            .select_rows("row_number == 1.0")
-            .select_columns(["subjectID", "surveyCategory", "probability"])
-            .rename_columns({"diagnosis": "surveyCategory"})
+    ops2 = (
+        TableDescription("d", ["subjectID", "surveyCategory", "assessmentTotal"])
+        .extend({"probability": f"(assessmentTotal * {scale}).exp()"})
+        .extend({"total": "probability.sum()"}, partition_by=["subjectID"])
+        .extend({"probability": "probability/total"})
+        .extend({"sort_key": "-probability"})
+        .extend(
+            {"row_number": "_row_number()"},
+            partition_by=["subjectID"],
+            order_by=["sort_key"],
         )
+        .select_rows("row_number == 1.0")
+        .select_columns(["subjectID", "surveyCategory", "probability"])
+        .rename_columns({"diagnosis": "surveyCategory"})
+    )
 
     assert str(ops1) == str(ops2)
 

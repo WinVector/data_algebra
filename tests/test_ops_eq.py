@@ -1,16 +1,14 @@
 import data_algebra
 import data_algebra.test_util
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
-import data_algebra.env
 
 
 def test_ops_eq():
     scale = 0.237
 
-    with data_algebra.env.Env(locals()) as env:
-        ops_1 = (
+    ops_1 = (
             TableDescription("d", ["subjectID", "surveyCategory", "assessmentTotal"])
-            .extend({"probability": "(assessmentTotal * scale).exp()"})
+            .extend({"probability": f"(assessmentTotal * {scale}).exp()"})
             .extend({"total": "probability.sum()"}, partition_by="subjectID")
             .extend({"probability": "probability/total"})
             .extend({"sort_key": "-probability"})

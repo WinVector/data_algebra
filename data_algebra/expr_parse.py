@@ -1,7 +1,6 @@
 
 import collections
 
-import data_algebra.env
 import data_algebra.expr_rep
 import data_algebra.parse_by_lark
 
@@ -15,7 +14,7 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
        version of eval() is used to try and catch some issues).
     :param ops: dictionary from strings to expressions (either Terms or strings)
     :param view: a data_algebra.data_ops.ViewRepresentation
-    :param parse_env map of names to values to add to parsing environment
+    :param parse_env map of names to values to add to parsing environment, TODO: get rid of this
     :return:
     """
     if ops is None:
@@ -27,11 +26,9 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
             raise ValueError("ops keys must be unique")
     if not isinstance(ops, dict):
         raise TypeError("ops should be a dictionary")
-    column_defs = view.column_map.__dict__
+    column_defs = view.column_map
     if not isinstance(column_defs, dict):
         raise TypeError("column_defs should be a dictionary")
-    if parse_env is None:
-        parse_env = data_algebra.env.outer_namespace()
     if parse_env is None:
         parse_env = {}
     # first: make sure all entries are parsed

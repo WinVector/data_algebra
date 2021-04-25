@@ -6,7 +6,6 @@ import lark.tree
 import lark.lexer
 
 import data_algebra.util
-import data_algebra.env
 import data_algebra.custom_functions
 
 import data_algebra.expr_rep

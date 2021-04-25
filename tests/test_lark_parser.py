@@ -18,7 +18,7 @@ def test_lark_1b():
         'y': [2, 8, -1],
     })
     data_def = {
-            k: v for (k, v) in describe_table(d1).column_map.__dict__.items()
+            k: v for (k, v) in describe_table(d1).column_map.items()
         }
     tree = data_algebra.parse_by_lark.parse_by_lark('x == 1', data_def=data_def)
 
@@ -29,7 +29,7 @@ def test_lark_1c():
         'y': [2, 8, -1],
     })
     data_def = {
-        k: v for (k, v) in describe_table(d1).column_map.__dict__.items()
+        k: v for (k, v) in describe_table(d1).column_map.items()
     }
     with pytest.raises(Exception):
         tree = data_algebra.parse_by_lark.parse_by_lark('x = 1', data_def=data_def)
@@ -41,7 +41,7 @@ def test_lark_1b():
         'y': [2, 8, -1],
     })
     data_def = {
-            k: v for (k, v) in describe_table(d1).column_map.__dict__.items()
+            k: v for (k, v) in describe_table(d1).column_map.items()
         }
     tree = data_algebra.parse_by_lark.parse_by_lark('7', data_def=data_def)
 
@@ -57,10 +57,10 @@ def test_lark_2():
         'c': ['x', 'y', None],
     })
     data_def = {
-            k: v for (k, v) in describe_table(d1).column_map.__dict__.items()
+            k: v for (k, v) in describe_table(d1).column_map.items()
         }
     data_def.update({
-            k: v for (k, v) in describe_table(d2).column_map.__dict__.items()
+            k: v for (k, v) in describe_table(d2).column_map.items()
         })
     expr = 'x / (a+b)'
     # raw_tree = data_algebra.parse_by_lark.parser.parse(expr + "\n")
@@ -69,6 +69,7 @@ def test_lark_2():
     assert isinstance(tree, data_algebra.expr_rep.PreTerm)
     assert str(tree) ==  'x / (a + b)'
 
+
 def test_lark_quote():
     d2 = pandas.DataFrame({
         'a': [11.6, None, 13],
@@ -76,7 +77,7 @@ def test_lark_quote():
         'c': ['x', 'y', None],
     })
     data_def = {
-        k: v for (k, v) in describe_table(d2).column_map.__dict__.items()
+        k: v for (k, v) in describe_table(d2).column_map.items()
     }
     expr = 'c == "x"'
     # raw_tree = data_algebra.parse_by_lark.parser.parse(expr + "\n")

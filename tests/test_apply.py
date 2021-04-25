@@ -9,8 +9,6 @@ import data_algebra.PostgreSQL
 
 
 def test_apply():
-    data_algebra.env.push_onto_namespace_stack(locals())
-
     d = data_algebra.default_data_model.pd.DataFrame(
         {"x": [-1, 0, 1, numpy.nan], "y": [1, 2, numpy.nan, 3]}
     )

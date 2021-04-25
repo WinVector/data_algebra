@@ -2,7 +2,6 @@ from abc import ABC
 from typing import Union
 
 import data_algebra.util
-import data_algebra.env
 import data_algebra.custom_functions
 
 # for some ideas in capturing expressions in Python see:
@@ -782,12 +781,13 @@ def connected_components(f, g):
     return data_algebra.expr_rep.Expression(op="connected_components", args=[f, g])
 
 
+# TODO: get rid of user_values
 def populate_specials(*, column_defs, destination, user_values=None):
     """populate a dictionary with special values
        column_defs is a dictionary,
-         usually formed from a ViewRepresentation.column_map.__dict__
+         usually formed from a ViewRepresentation.column_map
        destination is a dictionary,
-         usually formed from a ViewRepresentation.column_map.__dict__.copy()
+         usually formed from a ViewRepresentation.column_map.copy()
     """
 
     if not isinstance(column_defs, dict):
@@ -799,12 +799,9 @@ def populate_specials(*, column_defs, destination, user_values=None):
     if not isinstance(user_values, dict):
         raise TypeError("user_values should be a dictionary")
     nd = column_defs.copy()
-    ns = data_algebra.env.SimpleNamespaceDict(**nd)
     # TODO: unify with custom_functions, and more doc!
     # makes these symbols available for parsing step
     # need to enter user functions here or as methods on variables
-    destination["_"] = ns
-    destination["_get"] = lambda key: user_values[key]
     # Note: a lot of the re-emitters add back the underbar, allow the non
     # underbar names we see here.  See expr_rep.py Expression to_python and to_pandas.
     destination["_row_number"] = lambda: data_algebra.expr_rep.Expression(

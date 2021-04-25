@@ -4,7 +4,6 @@ import sqlite3
 import data_algebra
 import data_algebra.test_util
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
-import data_algebra.env
 import data_algebra.PostgreSQL
 import data_algebra.SQLite
 import data_algebra.util
@@ -13,9 +12,6 @@ import data_algebra.util
 
 
 def test_scoring_example():
-    # set some things in our environment
-    data_algebra.env.push_onto_namespace_stack(locals())
-
     d_local = data_algebra.default_data_model.pd.DataFrame(
         {
             "subjectID": [1, 1, 2, 2],
@@ -33,10 +29,9 @@ def test_scoring_example():
 
     scale = 0.237
 
-    with data_algebra.env.Env(locals()) as env:
-        ops = (
+    ops = (
             TableDescription("d", ["subjectID", "surveyCategory", "assessmentTotal"])
-            .extend({"probability": "(assessmentTotal * scale).exp()"})
+            .extend({"probability": f"(assessmentTotal * {scale}).exp()"})
             .extend({"total": "probability.sum()"}, partition_by="subjectID")
             .extend({"probability": "probability/total"})
             .extend({"sort_key": "-probability"})
