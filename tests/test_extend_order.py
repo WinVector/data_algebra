@@ -1,17 +1,14 @@
 
-
-
 import sqlite3
 
-import pandas
-
+import data_algebra
 import data_algebra.test_util
 from data_algebra.data_ops import *
 import data_algebra.SQLite
 
 
 def test_extend_order_1():
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         ('x_' + str(i)): range(i*20, i*20 + 5) for i in range(10)
     })
 

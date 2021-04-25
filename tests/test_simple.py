@@ -1,5 +1,4 @@
 import numpy
-import pandas  # for eval test
 
 import data_algebra
 

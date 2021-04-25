@@ -3,8 +3,8 @@
 import sqlite3
 
 import numpy
-import pandas
 
+import data_algebra
 import data_algebra.test_util
 from data_algebra.data_ops import *
 from data_algebra.SQLite import SQLiteModel
@@ -45,7 +45,7 @@ def test_if_else():
 
 
 def test_if_else_2():
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         'group': ['A', 'B', None, 'A', numpy.NAN, 'C'],
         'c1': [1, 2, 3, 4, 5, 6],
         'c2': [-1, -2, -3, -4, -5, -6],
@@ -74,7 +74,7 @@ def test_if_else_2():
 
     res1 = ops.transform(d)
 
-    expect = pandas.DataFrame({
+    expect = data_algebra.pd.DataFrame({
         'choice_fixed': [1, 0, 0, 1, 0, 0],
         'rc': [1, -2, -3, 4, -5, -6],
         'not_c_1': [False, True, True, False, True, True],
@@ -89,7 +89,7 @@ def test_if_else_2():
     with sqlite3.connect(':memory:') as con:
         db_model.prepare_connection(con)
         d.to_sql(name='d', con=con)
-        res2 = pandas.read_sql(sql, con=con)
+        res2 = data_algebra.pd.read_sql(sql, con=con)
 
     assert data_algebra.test_util.equivalent_frames(res1, res2)
 

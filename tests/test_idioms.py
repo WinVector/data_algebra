@@ -2,9 +2,9 @@
 import os
 import sqlite3
 
-import pandas
 from google.cloud import bigquery
 
+import data_algebra
 import data_algebra.test_util
 from data_algebra.data_ops import *
 import data_algebra.BigQuery
@@ -52,7 +52,7 @@ def test_ideom_extend_one_count(get_bq_handle):
     data_schema = get_bq_handle['data_schema']
     tables_to_delete = get_bq_handle['tables_to_delete']
 
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         'group': ['a', 'a', 'b', 'b'],
         'val': [1, 2, 3, 4],
     })
@@ -67,7 +67,7 @@ def test_ideom_extend_one_count(get_bq_handle):
         project({
             'count': 'one.sum()'
         })
-    expect = pandas.DataFrame({
+    expect = data_algebra.pd.DataFrame({
         'count': [4]
     })
 
@@ -98,7 +98,7 @@ def test_ideom_extend_special_count(get_bq_handle):
     data_schema = get_bq_handle['data_schema']
     tables_to_delete = get_bq_handle['tables_to_delete']
 
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         'group': ['a', 'a', 'b', 'b'],
         'val': [1, 2, 3, 4],
     })
@@ -110,7 +110,7 @@ def test_ideom_extend_special_count(get_bq_handle):
         project({
             'count': '_count()'
         })
-    expect = pandas.DataFrame({
+    expect = data_algebra.pd.DataFrame({
         'count': [4]
     })
 
@@ -141,7 +141,7 @@ def test_ideom_extend_test_trinary(get_bq_handle):
     data_schema = get_bq_handle['data_schema']
     tables_to_delete = get_bq_handle['tables_to_delete']
 
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         'group': ['a', 'a', 'b', 'b'],
         'val': [1, 2, 3, 4],
     })
@@ -156,7 +156,7 @@ def test_ideom_extend_test_trinary(get_bq_handle):
         extend({
             'select': 'select.if_else("high", "low")'
         })
-    expect = pandas.DataFrame({
+    expect = data_algebra.pd.DataFrame({
         'group': ['a', 'a', 'b', 'b'],
         'val': [1, 2, 3, 4],
         'select': ['low', 'low', 'high', 'high']
@@ -189,10 +189,10 @@ def test_ideom_simulate_cross_join(get_bq_handle):
     data_schema = get_bq_handle['data_schema']
     tables_to_delete = get_bq_handle['tables_to_delete']
 
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         'x': [1, 2, 3, 4],
     })
-    e = pandas.DataFrame({
+    e = data_algebra.pd.DataFrame({
         'y': ['a', 'b', 'c'],
     })
 
@@ -214,7 +214,7 @@ def test_ideom_simulate_cross_join(get_bq_handle):
             jointype='left'
         ) .\
         drop_columns(['one'])
-    expect = pandas.DataFrame({
+    expect = data_algebra.pd.DataFrame({
         'x': [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4],
         'y': ['a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c'],
     })
@@ -248,10 +248,10 @@ def test_ideom_simulate_cross_join_select(get_bq_handle):
     data_schema = get_bq_handle['data_schema']
     tables_to_delete = get_bq_handle['tables_to_delete']
 
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         'x': [1, 2, 3, 4],
     })
-    e = pandas.DataFrame({
+    e = data_algebra.pd.DataFrame({
         'y': ['a', 'b', 'c'],
     })
 
@@ -273,7 +273,7 @@ def test_ideom_simulate_cross_join_select(get_bq_handle):
             jointype='left'
         ) .\
         select_columns(['x', 'y'])
-    expect = pandas.DataFrame({
+    expect = data_algebra.pd.DataFrame({
         'x': [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4],
         'y': ['a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c'],
     })
@@ -307,10 +307,10 @@ def test_ideom_cross_join(get_bq_handle):
     data_schema = get_bq_handle['data_schema']
     tables_to_delete = get_bq_handle['tables_to_delete']
 
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         'x': [1, 2, 3, 4],
     })
-    e = pandas.DataFrame({
+    e = data_algebra.pd.DataFrame({
         'y': ['a', 'b', 'c'],
     })
 
@@ -326,7 +326,7 @@ def test_ideom_cross_join(get_bq_handle):
             jointype='cross'
         ) .\
         drop_columns(['one'])
-    expect = pandas.DataFrame({
+    expect = data_algebra.pd.DataFrame({
         'x': [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4],
         'y': ['a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c'],
     })

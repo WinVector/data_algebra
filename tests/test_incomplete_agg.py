@@ -1,7 +1,5 @@
 
-
-import pandas
-
+import data_algebra
 from data_algebra.data_ops import *
 
 import data_algebra.test_util
@@ -10,7 +8,7 @@ import pytest
 
 
 def test_incomplete_agg_1():
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         'genus': (1, 1, 1, 2),
         'group': ('a', 'a', 'b', 'b'),
         'x': (1, 2, 3, 4),
@@ -24,7 +22,7 @@ def test_incomplete_agg_1():
             group_by=['genus', 'group'])
     res_1 = ops_1.transform(d)
 
-    expect = pandas.DataFrame({
+    expect = data_algebra.pd.DataFrame({
         'genus': (1, 1, 2),
         'group': ('a', 'b', 'b'),
         'x': (1.5, 3, 4),

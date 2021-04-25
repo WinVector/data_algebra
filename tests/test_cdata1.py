@@ -2,8 +2,6 @@ import re
 import io
 import sqlite3
 
-import pandas
-
 import data_algebra
 import data_algebra.test_util
 from data_algebra.cdata import *
@@ -393,7 +391,7 @@ def test_cdata_explode():
 
 
 def test_cdata_query_details():
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         'measure_1': [1, 2],
         'measure_2': [3, 4],
         'rec': ['a', 'b']
@@ -402,12 +400,12 @@ def test_cdata_query_details():
 
     ops = td. \
         convert_records(pivot_rowrecs_to_blocks(
-        attribute_key_column="measurement",  # output column
-        attribute_value_column="value",  # output column
-        record_keys=['rec'],
-        record_value_columns=['measure_1', 'measure_2']))
+            attribute_key_column="measurement",  # output column
+            attribute_value_column="value",  # output column
+            record_keys=['rec'],
+            record_value_columns=['measure_1', 'measure_2']))
 
-    expect = pandas.DataFrame({
+    expect = data_algebra.pd.DataFrame({
         'rec': ['a', 'a', 'b', 'b'],
         'measurement': ['measure_1', 'measure_2', 'measure_1', 'measure_2'],
         'value': [1, 3, 2, 4]

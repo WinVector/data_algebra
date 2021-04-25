@@ -1,13 +1,14 @@
 
 import numpy
-import pandas
 
+
+import data_algebra
 from data_algebra.data_ops import *
 import data_algebra.util
 import data_algebra.test_util
 
 def test_arith_1():
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         'x': [1, 2, 3, 4],
         'y': [6, 9, 3, 8],
     })

@@ -2,8 +2,7 @@ import pytest
 
 import sqlite3
 
-import pandas
-
+import data_algebra
 from data_algebra.data_ops import *
 import data_algebra.SQLite
 
@@ -12,14 +11,14 @@ import data_algebra.util
 
 
 def test_join_opt_1():
-    d1 = pandas.DataFrame({
+    d1 = data_algebra.pd.DataFrame({
         'x': [1, 2, 3, 4],
         'y': [5, 6, 7, 8],
         'z': [9, 10, None, None]
     })
     td1 = describe_table(d1, table_name='d1')
 
-    d2 = pandas.DataFrame({
+    d2 = data_algebra.pd.DataFrame({
         'x': [1, 2, 3, 4],
         'y': [5, 6, 7, 8],
         'z': [90, None, 110, None]
@@ -66,7 +65,7 @@ def test_join_opt_1():
         ops_sel, ops_drop, ops_sel_2, ops_drop_2
     ]
 
-    expect = pandas.DataFrame({
+    expect = data_algebra.pd.DataFrame({
         'x': [1, 2, 3, 4],
         'y': [5, 6, 7, 8],
         'z': [9, 10, 110, None]

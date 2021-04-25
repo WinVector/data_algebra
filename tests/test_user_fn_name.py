@@ -2,10 +2,10 @@
 import sqlite3
 
 import numpy
-import pandas
 
 import pytest
 
+import data_algebra
 from data_algebra.data_ops import *
 import data_algebra.SQLite
 import data_algebra.test_util
@@ -15,7 +15,7 @@ def test_u_1():
     db_model = data_algebra.SQLite.SQLiteModel()
 
     # some example data
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
         'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
         'DATE': ['2001-01-02 00:00:00', '2015-04-25 00:00:00', '2000-04-01 00:00:00',
@@ -43,7 +43,7 @@ def test_u_1():
 
     with sqlite3.connect(':memory:') as con:
         d.to_sql(name='d', con=con)
-        res_db = pandas.read_sql(q, con=con)
+        res_db = data_algebra.pd.read_sql(q, con=con)
 
     assert data_algebra.test_util.equivalent_frames(expect, res_db)
 
@@ -52,7 +52,7 @@ def test_u_2():
     db_model = data_algebra.SQLite.SQLiteModel()
 
     # some example data
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
         'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
         'DATE': ['2001-01-02 00:00:00', '2015-04-25 00:00:00', '2000-04-01 00:00:00',
@@ -71,7 +71,7 @@ def test_u_3():
     db_model = data_algebra.SQLite.SQLiteModel()
 
     # some example data
-    d = pandas.DataFrame({
+    d = data_algebra.pd.DataFrame({
         'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
         'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
         'DATE': ['2001-01-02 00:00:00', '2015-04-25 00:00:00', '2000-04-01 00:00:00',
@@ -100,6 +100,6 @@ def test_u_3():
 
     with sqlite3.connect(':memory:') as con:
         d.to_sql(name='d', con=con)
-        res_db = pandas.read_sql(q, con=con)
+        res_db = data_algebra.pd.read_sql(q, con=con)
 
     assert data_algebra.test_util.equivalent_frames(expect, res_db)
