@@ -9,9 +9,6 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
     """
     Convert all entries of ops map to Term-expressions
 
-    Note: eval() is called to interpret expressions on some nodes, so this
-       function is not safe to use on untrusted code (though a somewhat restricted
-       version of eval() is used to try and catch some issues).
     :param ops: dictionary from strings to expressions (either Terms or strings)
     :param view: a data_algebra.data_ops.ViewRepresentation
     :param parse_env map of names to values to add to parsing environment, TODO: get rid of this
