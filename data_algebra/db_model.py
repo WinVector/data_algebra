@@ -419,7 +419,7 @@ class DBModel:
             quoted_table_name=self.quote_table_name(table_def),
         )
         near_sql = subsql
-        if not set([k for k in using]) == set([k for k in table_def.column_names]):
+        if (len(using) > 0) and (not (set([k for k in using]) == set([k for k in table_def.column_names]))):
             # need a non-trivial select here
             terms = OrderedDict()
             for k in using:
