@@ -105,7 +105,10 @@ class PreTerm(ABC):
 
 class Term(PreTerm, ABC):
     """Inherit from this class to capture expressions.
-    Abstract class, should be extended for use."""
+    Abstract class, should be extended for use.
+
+    Used by the parse by lark path via method lookup.
+    """
 
     def __init__(self):
         PreTerm.__init__(self)

@@ -112,6 +112,10 @@ def _db_is_in_expr(dbmodel, expression):
     )
 
 
+def _db_count_expr(dbmodel, expression):
+    return 'SUM(1)'
+
+
 db_expr_formatters = {
     "is_null": _db_is_null_expr,
     "is_bad": _db_is_bad_expr,
@@ -119,6 +123,7 @@ db_expr_formatters = {
     "is_in": _db_is_in_expr,
     "maximum": _db_maximum_expr,
     "minimum": _db_minimum_expr,
+    'count': _db_count_expr,
 }
 
 
