@@ -99,10 +99,10 @@ data_algebra/pandas_base.py              233     22    91%
 data_algebra/pandas_model.py              25     17    32%
 data_algebra/parse_by_lark.py            151     23    85%
 data_algebra/python3_lark.py               1      0   100%
-data_algebra/test_util.py                111     16    86%
+data_algebra/test_util.py                110     16    85%
 data_algebra/util.py                      28      4    86%
 ----------------------------------------------------------
-TOTAL                                   4278    982    77%
+TOTAL                                   4277    982    77%
 
 
-============================= 148 passed in 11.80s =============================
+============================= 148 passed in 9.13s ==============================
