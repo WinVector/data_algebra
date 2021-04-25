@@ -43,7 +43,7 @@ def user_fn(fn, args=None, *,
     if isinstance(fn, str):
         if name is None:
             name = fn
-        fn = eval(fn)
+        fn = eval(fn)  # TODO: replace with an explicit lookup in globals()
     if not callable(fn):
         raise TypeError("expected fn to be callable")
     if args is None:
