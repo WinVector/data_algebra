@@ -16,6 +16,7 @@ the `rquery`<https://github.com/WinVector/rquery> and `rqdatatable`<https://gith
 """
 
 import data_algebra.pandas_model
+# need to import pandas for eval calls
 import pandas
 
 default_data_model = data_algebra.pandas_model.PandasModel(

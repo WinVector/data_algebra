@@ -71,8 +71,7 @@ def test_simple():
     x = 2
     var_name = "y"
 
-    with data_algebra.env.Env(locals()) as env:
-        ops = TableDescription("d", ["x", "y"]).extend({"z": "1/q + x"})
+    ops = TableDescription("d", ["x", "y"]).extend({"z": f"1/({q}) + x"})
 
     d_local = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2], "y": [3, 4]})
     res = ops.eval(data_map={"d": d_local})
