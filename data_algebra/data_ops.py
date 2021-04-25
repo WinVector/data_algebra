@@ -104,16 +104,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
     def merged_rep_id(self):
         return "node+ " + str(id(self))
 
-    # adaptors
-
-    def get_column_symbols(self):
-        """Return a representation of this step as columns we can perform algebraic operations over.
-        These objects capture the operations as an expression tree."""
-        column_defs = self.column_map.__dict__
-        nd = column_defs.copy()
-        ns = data_algebra.env.SimpleNamespaceDict(**nd)
-        return ns
-
     # characterization
 
     def get_tables(self):
@@ -618,15 +608,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
 class TableDescription(ViewRepresentation):
     """Describe columns, and qualifiers, of a table.
 
-       If outer namespace is set user values are visible and
-       _-side effects can be written back.
-
        Example:
            from data_algebra.data_ops import *
-           import data_algebra.env
-           with data_algebra.env.Env(globals()) as env:
-               d = TableDescription('d', ['x', 'y'])
-           print(_) # should be a SimpleNamespaceDict, not d/ViewRepresentation
+           d = TableDescription('d', ['x', 'y'])
            print(d)
     """
 
