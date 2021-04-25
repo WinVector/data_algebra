@@ -29,6 +29,8 @@ class NearSQLTable(NearSQL):
     def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model):
         if columns is None:
             columns = [k for k in self.terms.keys()]
+        if len(columns) <= 0:
+            force_sql = False
         have_constants = (constants is not None) and (len(constants) > 0)
         if force_sql or have_constants:
             terms_strs = [db_model.quote_identifier(k) for k in columns]
