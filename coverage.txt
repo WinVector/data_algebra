@@ -2,7 +2,7 @@
 platform darwin -- Python 3.7.7, pytest-6.2.2, py-1.10.0, pluggy-0.13.1
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: anyio-2.2.0, cov-2.11.1
-collected 149 items
+collected 148 items
 
 tests/test_OrderedSet.py .                                               [  0%]
 tests/test_agg.py ..                                                     [  2%]
@@ -15,40 +15,39 @@ tests/test_calc_warnings_errors.py .                                     [ 15%]
 tests/test_cc.py ......                                                  [ 19%]
 tests/test_cdata1.py ....                                                [ 22%]
 tests/test_cdata_convenience.py .                                        [ 22%]
-tests/test_cdata_example.py ...                                          [ 24%]
+tests/test_cdata_example.py ...                                          [ 25%]
 tests/test_cols_used.py .                                                [ 25%]
 tests/test_concat_rows.py .                                              [ 26%]
-tests/test_cross_product_join.py .                                       [ 26%]
+tests/test_cross_product_join.py .                                       [ 27%]
 tests/test_db_model.py .                                                 [ 27%]
 tests/test_degenerate_project.py .                                       [ 28%]
-tests/test_drop_columns.py .                                             [ 28%]
+tests/test_drop_columns.py .                                             [ 29%]
 tests/test_exampe1.py ....                                               [ 31%]
-tests/test_example_data_ops.py .                                         [ 32%]
 tests/test_exp.py .                                                      [ 32%]
 tests/test_expr_parse.py .                                               [ 33%]
-tests/test_extend.py ....                                                [ 36%]
+tests/test_extend.py ....                                                [ 35%]
 tests/test_extend_order.py .                                             [ 36%]
 tests/test_flow_text.py .                                                [ 37%]
 tests/test_forbidden_calculation.py ..                                   [ 38%]
 tests/test_free_expr.py .                                                [ 39%]
-tests/test_ghost_col_issue.py .                                          [ 40%]
-tests/test_idioms.py ......                                              [ 44%]
-tests/test_if_else.py ...                                                [ 46%]
+tests/test_ghost_col_issue.py .                                          [ 39%]
+tests/test_idioms.py ......                                              [ 43%]
+tests/test_if_else.py ...                                                [ 45%]
 tests/test_incomplete_agg.py .                                           [ 46%]
 tests/test_join_check.py .                                               [ 47%]
-tests/test_join_effects.py .                                             [ 48%]
+tests/test_join_effects.py .                                             [ 47%]
 tests/test_join_opt.py .                                                 [ 48%]
 tests/test_lark_parser.py .....                                          [ 52%]
-tests/test_math.py .                                                     [ 53%]
+tests/test_math.py .                                                     [ 52%]
 tests/test_narrow.py .                                                   [ 53%]
 tests/test_natural_join.py .                                             [ 54%]
-tests/test_neg.py .                                                      [ 55%]
+tests/test_neg.py .                                                      [ 54%]
 tests/test_null_bad.py .                                                 [ 55%]
 tests/test_ops.py .                                                      [ 56%]
-tests/test_ops_eq.py .                                                   [ 57%]
+tests/test_ops_eq.py .                                                   [ 56%]
 tests/test_or.py .....                                                   [ 60%]
-tests/test_ordered_agg_group.py .                                        [ 61%]
-tests/test_parse.py ............                                         [ 69%]
+tests/test_ordered_agg_group.py .                                        [ 60%]
+tests/test_parse.py ............                                         [ 68%]
 tests/test_project.py ....                                               [ 71%]
 tests/test_ranked_example.py .                                           [ 72%]
 tests/test_ref_detect.py ..                                              [ 73%]
@@ -84,27 +83,26 @@ data_algebra/cdata.py                    331     83    75%
 data_algebra/connected_components.py      49      1    98%
 data_algebra/custom_functions.py          17      2    88%
 data_algebra/data_model.py                40     18    55%
-data_algebra/data_ops.py                1136    243    79%
+data_algebra/data_ops.py                1131    239    79%
 data_algebra/data_ops_types.py            74     33    55%
 data_algebra/data_ops_utils.py            34      5    85%
 data_algebra/data_pipe.py                189    107    43%
 data_algebra/db_model.py                 561    102    82%
 data_algebra/diagram.py                   56     44    21%
-data_algebra/env.py                       31      4    87%
 data_algebra/eval_model.py                18      2    89%
 data_algebra/expr.py                      20      5    75%
-data_algebra/expr_parse.py                43      4    91%
-data_algebra/expr_rep.py                 516    121    77%
+data_algebra/expr_parse.py                40      4    90%
+data_algebra/expr_rep.py                 512    121    76%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 150     19    87%
 data_algebra/pandas_base.py              233     22    91%
 data_algebra/pandas_model.py              25     17    32%
-data_algebra/parse_by_lark.py            152     23    85%
+data_algebra/parse_by_lark.py            151     23    85%
 data_algebra/python3_lark.py               1      0   100%
 data_algebra/test_util.py                111     16    86%
 data_algebra/util.py                      28      4    86%
 ----------------------------------------------------------
-TOTAL                                   4322    990    77%
+TOTAL                                   4278    982    77%
 
 
-============================= 149 passed in 9.57s ==============================
+============================= 148 passed in 11.80s =============================

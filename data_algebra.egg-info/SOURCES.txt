@@ -18,7 +18,6 @@ data_algebra/data_ops_utils.py
 data_algebra/data_pipe.py
 data_algebra/db_model.py
 data_algebra/diagram.py
-data_algebra/env.py
 data_algebra/eval_model.py
 data_algebra/expr.py
 data_algebra/expr_parse.py

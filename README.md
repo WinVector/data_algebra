@@ -77,7 +77,6 @@ from pprint import pprint
 import psycopg2       # http://initd.org/psycopg/
 import pandas         # https://pandas.pydata.org
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
-import data_algebra.env
 import data_algebra.PostgreSQL
 import data_algebra.SQLite
 ```
@@ -285,19 +284,18 @@ Now we use the `data_algebra` to define our processing pipeline: `ops`.  We are 
 ```python
 scale = 0.237
 
-with data_algebra.env.Env(locals()) as env:
-    ops = data_algebra.data_ops.describe_table(d_local, 'd'). \
-        extend({'probability': '(assessmentTotal * scale).exp()'}). \
-        extend({'total': 'probability.sum()'},
-               partition_by='subjectID'). \
-        extend({'probability': 'probability/total'}). \
-        extend({'sort_key': '-probability'}). \
-        extend({'row_number': '_row_number()'},
-               partition_by=['subjectID'],
-               order_by=['sort_key']). \
-        select_rows('row_number == 1'). \
-        select_columns(['subjectID', 'surveyCategory', 'probability']). \
-        rename_columns({'diagnosis': 'surveyCategory'})
+ops = data_algebra.data_ops.describe_table(d_local, 'd'). \
+    extend({'probability': f'(assessmentTotal * {scale}).exp()'}). \
+    extend({'total': 'probability.sum()'},
+           partition_by='subjectID'). \
+    extend({'probability': 'probability/total'}). \
+    extend({'sort_key': '-probability'}). \
+    extend({'row_number': '_row_number()'},
+           partition_by=['subjectID'],
+           order_by=['sort_key']). \
+    select_rows('row_number == 1'). \
+    select_columns(['subjectID', 'surveyCategory', 'probability']). \
+    rename_columns({'diagnosis': 'surveyCategory'})
 ```
 
 We are deliberately writing a longer pipeline of simple steps, so we can use the same pipeline locally with Pandas, and (potentially) great scale with `PostgreSQL` or Apache `Spark`.  A more concise variation of this pipeline can be found in the R example [here](https://github.com/WinVector/rquery).
@@ -370,33 +368,36 @@ print(sql)
            "subjectID"
     FROM
       (SELECT "probability",
-              "subjectID",
-              "surveyCategory"
+              "surveyCategory",
+              "subjectID"
        FROM
          (SELECT "probability",
+                 "surveyCategory",
+                 "subjectID",
                  ROW_NUMBER() OVER (PARTITION BY "subjectID"
-                                    ORDER BY "sort_key") AS "row_number",
-                                   "subjectID",
-                                   "surveyCategory"
+                                    ORDER BY "sort_key") AS "row_number"
           FROM
-            (SELECT -("probability") AS "sort_key",
-                     "probability",
-                     "subjectID",
-                     "surveyCategory"
+            (SELECT "probability",
+                    "surveyCategory",
+                    "subjectID", -("probability") AS "sort_key"
              FROM
                (SELECT "probability" / "total" AS "probability",
-                       "subjectID",
-                       "surveyCategory"
+                       "surveyCategory",
+                       "subjectID"
                 FROM
-                  (SELECT SUM("probability") OVER (PARTITION BY "subjectID") AS "total",
-                                                  "probability",
-                                                  "subjectID",
-                                                  "surveyCategory"
+                  (SELECT "surveyCategory",
+                          "subjectID",
+                          "probability",
+                          SUM("probability") OVER (PARTITION BY "subjectID") AS "total"
                    FROM
-                     (SELECT EXP(("assessmentTotal" * 0.237)) AS "probability",
+                     (SELECT "surveyCategory",
                              "subjectID",
-                             "surveyCategory"
-                      FROM "d") "extend_1") "extend_2") "extend_3") "extend_4") "extend_5"
+                             EXP(("assessmentTotal" * 0.237)) AS "probability"
+                      FROM
+                        (SELECT surveyCategory AS "surveyCategory",
+                                subjectID AS "subjectID",
+                                assessmentTotal AS "assessmentTotal"
+                         FROM "d") "table_reference_0") "extend_1") "extend_2") "extend_3") "extend_4") "extend_5"
        WHERE "row_number" = 1 ) "select_rows_6"
 
 
