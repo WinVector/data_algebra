@@ -150,6 +150,7 @@ class DBModel:
     on_joiner: str
     drop_text: str
     string_type: str
+    join_name_map: dict
 
     def __init__(
         self,
@@ -164,6 +165,7 @@ class DBModel:
         on_joiner=', ',
         drop_text='DROP TABLE',
         string_type='VARCHAR',
+        join_name_map=None,
     ):
         if local_data_model is None:
             local_data_model = data_algebra.default_data_model
@@ -184,6 +186,9 @@ class DBModel:
         self.on_joiner = on_joiner
         self.drop_text = drop_text
         self.string_type = string_type
+        if join_name_map is None:
+            join_name_map = {}
+        self.join_name_map = join_name_map.copy()
 
     def db_handle(self, conn):
         return DBHandle(db_model=self, conn=conn)
@@ -749,6 +754,11 @@ class DBModel:
             raise ValueError("name collisions on temp_tables: " + str(confused_temps))
         temp_tables = sql_left.temp_tables.copy()
         temp_tables.update(sql_right.temp_tables)
+        jointype = join_node.jointype
+        try:
+            jointype = self.join_name_map[jointype]
+        except KeyError:
+            pass
         near_sql = data_algebra.near_sql.NearSQLBinaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),

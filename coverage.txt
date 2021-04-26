@@ -71,7 +71,7 @@ tests/test_window_fns.py .                                               [100%]
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
 data_algebra/BigQuery.py                  82     45    45%
-data_algebra/OrderedSet.py                52     12    77%
+data_algebra/OrderedSet.py                52     11    79%
 data_algebra/PostgreSQL.py                12      2    83%
 data_algebra/SQLite.py                    82     12    85%
 data_algebra/SparkSQL.py                  12      2    83%
@@ -82,15 +82,15 @@ data_algebra/cdata.py                    331     83    75%
 data_algebra/connected_components.py      49      1    98%
 data_algebra/custom_functions.py          17      2    88%
 data_algebra/data_model.py                40     18    55%
-data_algebra/data_ops.py                1131    239    79%
+data_algebra/data_ops.py                1131    237    79%
 data_algebra/data_ops_types.py            74     33    55%
 data_algebra/data_ops_utils.py            34      5    85%
 data_algebra/data_pipe.py                189    107    43%
-data_algebra/db_model.py                 563    102    82%
+data_algebra/db_model.py                 572    102    82%
 data_algebra/diagram.py                   56     44    21%
 data_algebra/eval_model.py                18      2    89%
 data_algebra/expr_parse.py                40      4    90%
-data_algebra/expr_rep.py                 512    124    76%
+data_algebra/expr_rep.py                 510    124    76%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 152     20    87%
 data_algebra/pandas_base.py              233     22    91%
@@ -100,7 +100,7 @@ data_algebra/python3_lark.py               1      0   100%
 data_algebra/test_util.py                110     16    85%
 data_algebra/util.py                      28      4    86%
 ----------------------------------------------------------
-TOTAL                                   4264    982    77%
+TOTAL                                   4271    979    77%
 
 
-============================= 148 passed in 9.53s ==============================
+============================= 148 passed in 9.84s ==============================

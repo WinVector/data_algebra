@@ -503,6 +503,13 @@ class ViewRepresentation(OperatorPlatform, ABC):
         return self.project_parsed(parsed_ops=parsed_ops, group_by=group_by)
 
     def natural_join(self, b, *, by, jointype):
+        """
+
+        :param b: right table
+        :param by: list of keys to join by
+        :param jointype: one of 'INNER', 'LEFT', 'RIGHT', 'OUTER', 'FULL', 'CROSS' (case insensitive)
+        :return: ops describing join
+        """
         if not isinstance(b, ViewRepresentation):
             raise TypeError(
                 "expected b to be a data_algebra.dat_ops.ViewRepresentation"
