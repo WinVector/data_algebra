@@ -826,11 +826,9 @@ def standardize_join_type(join_str):
     if not isinstance(join_str, str):
         raise TypeError("Expected join_str to be a string")
     join_str = join_str.upper()
-    re_map = {"OUTER": "FULL"}
-    try:
-        return re_map[join_str]
-    except KeyError:
-        pass
+    allowed = set(['INNER', 'LEFT', 'RIGHT', 'OUTER', 'FULL', 'CROSS'])
+    if not join_str in allowed:  # TOOO put this back in!
+        raise KeyError(f"join type {join_str} not supported")
     return join_str
 
 
