@@ -338,8 +338,7 @@ def test_ideom_cross_join(get_bq_handle):
             b=describe_table(e, table_name=table_name_e),
             by=[],
             jointype='cross'
-        ) .\
-        drop_columns(['one'])
+        )
     expect = data_algebra.pd.DataFrame({
         'x': [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4],
         'y': ['a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c'],

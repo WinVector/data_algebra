@@ -108,7 +108,7 @@ def test_calc_interface():
     with pytest.raises(ValueError):
         ops_strict.apply_to(td_extra)
 
-    new_ops = ops_strict.apply_to(td.drop_columns("b"))
+    new_ops = ops_strict.apply_to(td)
     fmt_as_arrow(ops_strict)
     fmt_as_arrow(new_ops)
 

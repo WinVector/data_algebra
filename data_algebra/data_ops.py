@@ -1223,9 +1223,11 @@ class SelectColumnsNode(ViewRepresentation):
             columns = [columns]
         column_selection = [c for c in columns]
         self.column_selection = column_selection
+        if len(column_selection) < 1:
+            raise ValueError("can not drop all columns")
         unknown = set(column_selection) - set(source.column_names)
         if len(unknown) > 0:
-            raise ValueError("selecting unknown columns " + str(unknown))
+            raise KeyError("selecting unknown columns " + str(unknown))
         if isinstance(source, SelectColumnsNode):
             source = source.sources[0]
         ViewRepresentation.__init__(
@@ -1292,9 +1294,14 @@ class DropColumnsNode(ViewRepresentation):
             column_deletions = [column_deletions]
         column_deletions = [c for c in column_deletions]
         self.column_deletions = column_deletions
+        unknown = set(column_deletions) - set(source.column_names)
+        if len(unknown) > 0:
+            raise KeyError("dropping unknown columns " + str(unknown))
         remaining_columns = [
             c for c in source.column_names if c not in column_deletions
         ]
+        if len(remaining_columns) < 1:
+            raise ValueError("can not drop all columns")
         ViewRepresentation.__init__(
             self,
             column_names=remaining_columns,
