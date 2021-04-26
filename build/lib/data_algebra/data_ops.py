@@ -1574,6 +1574,8 @@ class NaturalJoinNode(ViewRepresentation):
         )
         self.by = by
         self.jointype = data_algebra.expr_rep.standardize_join_type(jointype)
+        if (self.jointype == 'CROSS') and (len(self.by) != 0):
+            raise ValueError("CROSS joins must have an empty 'by' list")
         self.get_tables()  # causes a throw if left and right table descriptions are inconsistent
 
     def apply_to(self, a, *, target_table_key=None):
