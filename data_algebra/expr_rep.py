@@ -481,6 +481,10 @@ class Value(Term):
     def to_python(self, *, want_inline_parens=False):
         return self.value.__repr__()
 
+    # don't collect -5 as a complex expression
+    def __neg__(self):
+        return Value(-self.value)
+
 
 class UnQuotedStr(str):
     def __init__(self, v):
