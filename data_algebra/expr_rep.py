@@ -586,11 +586,8 @@ class FnCall(PreTerm):
     def sql_name(self):
         return self.sql_name_
 
-    def sql_prefix(self):
-        return self.sql_prefix_
-
-    def sql_suffix(self):
-        return self.sql_suffix_
+    def to_sql(self, *, subs, db_model=None):
+        return self.sql_name().upper() + "(" + self.sql_prefix_ + ','.join(subs) + self.sql_suffix_ + ")"
 
 
 class ListTerm(PreTerm):

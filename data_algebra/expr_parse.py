@@ -39,12 +39,9 @@ def parse_assignments_in_context(ops, view, *, parse_env=None):
         orig_v = ops[k]  # make debugging easier
         v = orig_v
         if not isinstance(v, data_algebra.expr_rep.PreTerm):
-            if callable(v):
-                v = data_algebra.expr_rep.FnValue(v)
-            else:
-                v = data_algebra.parse_by_lark.parse_by_lark(
-                    source_str=str(v), data_def=mp, outer_environment=parse_env
-                )
+            v = data_algebra.parse_by_lark.parse_by_lark(
+                source_str=str(v), data_def=mp, outer_environment=parse_env
+            )
         else:
             v = v.replace_view(view)
         newops[k] = v
