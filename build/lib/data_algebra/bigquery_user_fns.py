@@ -1,9 +1,13 @@
 
+import datetime
+
 import data_algebra
 import data_algebra.data_ops
 
 
 # TODO: share some common fns such as as_int64 and coalesce_0 to all db_handles
+
+# TODO: re-eng all userfns to just be SQL constants, without pasting, perhaps pass in db handle
 
 # convert datetime to date
 def as_int64(col):
@@ -122,7 +126,7 @@ def format_date(col, *, format="%Y-%m-%d"):
         sql_prefix=f'"{format}", ')
 
 
-# convert date to dayofweek 1 through 7
+# convert date to dayofweek Sunday=1 through Saturday=7
 # https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
 def dayofweek(col):
     assert isinstance(col, str)
@@ -130,14 +134,13 @@ def dayofweek(col):
         # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.dt.dayofweek.html#pandas.Series.dt.dayofweek
         # https://stackoverflow.com/a/30222759
         # x is a pandas Series
-        lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.dayofweek.astype('int64') + 1,
+        lambda x: 1 + ((data_algebra.default_data_model.pd.to_datetime(x).dt.dayofweek.astype('int64') + 1) % 7),
         args=col,
         name='dayofweek',
         sql_name='EXTRACT',
         sql_prefix='DAYOFWEEK FROM ')
 
 
-# convert date to dayofweek 1 through 7
 # https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
 def dayofyear(col):
     assert isinstance(col, str)
@@ -248,7 +251,20 @@ def date_diff(col1, col2):
         sql_suffix=', DAY')
 
 
-# TODO: bigquery tests
+# find the nearest Sunday at or before this date
+def base_Sunday(col):
+    assert isinstance(col, str)
+    return data_algebra.data_ops.user_fn(
+        # x is a pandas Series of datetime.date
+        # TODO: vectorize
+        lambda x: [x[i] - datetime.timedelta(days= (x[i].weekday() + 1) % 7) for i in range(len(x))],
+        args=[col],
+        name='base_Sunday',
+        sql_name='DATE_SUB',
+        sql_prefix='',
+        sql_suffix=f', INTERVAL (EXTRACT(DAYOFWEEK FROM `{col}`)-1) DAY')
+
+
 # TODO: documentation page
 
 
@@ -271,4 +287,5 @@ fns = {
     'year': year,
     'timestamp_diff': timestamp_diff,
     'date_diff': date_diff,
+    'base_Sunday': base_Sunday,
 }
