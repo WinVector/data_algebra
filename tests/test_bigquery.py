@@ -11,6 +11,7 @@ import data_algebra.BigQuery
 
 import pytest
 
+
 # running bigquery tests depends on environment variable
 # example:
 #  export GOOGLE_APPLICATION_CREDENTIALS="/Users/johnmount/big_query/big_query_jm.json"
@@ -19,9 +20,9 @@ import pytest
 @pytest.fixture(scope='module')
 def get_bq_handle():
     bq_client = None
-    gac = None
+    # os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/johnmount/big_query/big_query_jm.json"
     try:
-        gac = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"]  # trigger key error if not present
         bq_client = bigquery.Client()
     except KeyError:
         pass
@@ -449,6 +450,7 @@ def test_PARSE_DATE(get_bq_handle):
     assert data_algebra.test_util.equivalent_frames(res, expect)
 
     bigquery_sql = bq_handle.to_sql(ops)
+    # TODO: test db version
 
 
 def test_DATE_PARTS(get_bq_handle):
@@ -492,7 +494,7 @@ def test_DATE_PARTS(get_bq_handle):
     expect = data_algebra.pd.DataFrame({
         'x': ['2001-01-01', '2020-04-02'],
         't': ['2001-01-01 01:33:22', '2020-04-02 13:11:10'],
-        'day_of_week': [1, 4],
+        'day_of_week': [2, 5],
         'day_of_year': [1, 93],
         'month': [1, 4],
         'day_of_month': [1, 2],
@@ -512,6 +514,7 @@ def test_DATE_PARTS(get_bq_handle):
     assert data_algebra.test_util.equivalent_frames(res, expect)
 
     bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+    # TODO: test db version
 
 
 def test_coalesce(get_bq_handle):
@@ -544,3 +547,44 @@ def test_coalesce(get_bq_handle):
         'fixed': [1, 20, 300, 4000, 500, 6, 7, None],
     })
     assert data_algebra.test_util.equivalent_frames(res, expect)
+    # TODO: test db version
+
+
+def test_base_Sunday(get_bq_handle):
+    bq_client = get_bq_handle['bq_client']
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    tables_to_delete = get_bq_handle['tables_to_delete']
+    table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name)
+
+    d = data_algebra.pd.DataFrame({
+        'date_str': ['2021-04-25', '2021-04-27']
+    })
+
+    ops = describe_table(d, table_name=table_name) .\
+        extend({
+            'dt': bq_handle.fns.parse_date('date_str', format="%Y-%m-%d")
+        }) .\
+        extend({
+            's': bq_handle.fns.base_Sunday('dt')
+        }) .\
+        drop_columns(['dt']) .\
+        extend({
+            's': bq_handle.fns.format_date('s', format="%Y-%m-%d")
+        })
+
+    res = ops.transform(d)
+
+    expect = data_algebra.pd.DataFrame({
+        'date_str': ['2021-04-25', '2021-04-27'],
+        's': ['2021-04-25', '2021-04-25']
+    })
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+
+    bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+    if bq_client is not None:
+        bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
+        bigquery_res = bq_handle.read_query(bigquery_sql)
+        assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)

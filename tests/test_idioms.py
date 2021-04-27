@@ -21,9 +21,8 @@ import pytest
 @pytest.fixture(scope='module')
 def get_bq_handle():
     bq_client = None
-    gac = None
     try:
-        gac = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"]  # cause an early key error if not present
         bq_client = bigquery.Client()
     except KeyError:
         pass
