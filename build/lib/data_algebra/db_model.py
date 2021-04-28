@@ -8,6 +8,7 @@ import data_algebra
 
 import data_algebra.near_sql
 import data_algebra.expr_rep
+import data_algebra.user_fn
 import data_algebra.util
 import data_algebra.data_ops_types
 import data_algebra.eval_model
@@ -379,11 +380,8 @@ class DBModel:
                     # SQL window functions don't like parens
                     return subs[0] + " " + op.upper() + " " + subs[1]
             return op.upper() + "(" + ", ".join(subs) + ")"
-        if isinstance(expression, data_algebra.expr_rep.FnCall):
-            subs = [
-                self.expr_to_sql(ai, want_inline_parens=True) for ai in expression.args
-            ]
-            return expression.to_sql(subs=subs, db_model=self)
+        if isinstance(expression, data_algebra.user_fn.FnTerm):
+            return expression.to_sql(db_model=self)
         raise TypeError("unexpected type: " + str(type(expression)))
 
     def table_def_to_sql(self, table_def, *, using=None, temp_id_source=None):

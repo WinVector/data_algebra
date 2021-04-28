@@ -4,6 +4,7 @@ import numbers
 
 import numpy
 
+import data_algebra.user_fn
 import data_algebra.util
 import data_algebra.data_model
 import data_algebra.expr_rep
@@ -103,10 +104,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         standin_name = "_data_algebra_temp_g"  # name of an arbitrary input variable
         if not window_situation:
             for (k, opk) in op.ops.items():
-                if isinstance(opk, data_algebra.expr_rep.FnCall):
+                if isinstance(opk, data_algebra.user_fn.FnTerm):
                     # res[k] = opk.value(*[res[nm.column_name] for nm in opk.args])
                     pe = self.pandas_eval_env.copy()
-                    pe[opk.name] = opk.value
+                    pe[opk.name] = opk.pandas_fn
                     op_src = (
                         "@"
                         + opk.name
@@ -223,8 +224,8 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         if len(op.ops) > 0:
             cols = {}
             for k, opk in op.ops.items():
-                if isinstance(opk, data_algebra.expr_rep.FnCall):
-                    fn = opk.value
+                if isinstance(opk, data_algebra.user_fn.FnTerm):
+                    fn = opk.pandas_fn
                     vk = res[str(opk.args[0])].agg(fn)
                 else:
                     if len(opk.args) > 0:
