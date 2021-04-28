@@ -2,18 +2,10 @@ import numpy
 
 import pytest
 
-import data_algebra
 from data_algebra.data_ops import *
 import data_algebra.test_util
 from data_algebra.expr_rep import *
-
-
-def test_term_combine():
-    t1 = ColumnReference(view=None, column_name="x")
-    t1 + 1  # allowed
-    t2 = FnCall(numpy.sin, [t1])
-    with pytest.raises(TypeError):
-        t2 + 1  # not allowed
+from data_algebra.user_fn import FnTerm, user_fn
 
 
 def test_user_fn_1():

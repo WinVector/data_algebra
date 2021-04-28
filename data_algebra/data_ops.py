@@ -11,6 +11,7 @@ import data_algebra.data_model
 import data_algebra.db_model
 import data_algebra.pandas_model
 import data_algebra.expr_rep
+import data_algebra.user_fn
 from data_algebra.data_ops_types import *
 import data_algebra.data_ops_utils
 import data_algebra.near_sql
@@ -33,34 +34,6 @@ try:
     _have_sqlparse = True
 except ImportError:
     pass
-
-
-# wrap a function as a user callable function in pipeline
-# used for custom aggregators
-def user_fn(fn, args=None, *,
-            name=None,
-            sql_name=None, sql_prefix=None, sql_suffix=None):
-    if isinstance(fn, str):
-        if name is None:
-            name = fn
-        fn = eval(fn)  # TODO: replace with an explicit lookup in globals()
-    if not callable(fn):
-        raise TypeError("expected fn to be callable")
-    if args is None:
-        args = []
-    if isinstance(args, str):
-        fn_args = [data_algebra.expr_rep.ColumnReference(view=None, column_name=args)]
-    else:
-        for v in args:
-            if not isinstance(v, str):
-                raise TypeError("Expect all vars names to be strings")
-        fn_args = [
-            data_algebra.expr_rep.ColumnReference(view=None, column_name=v)
-            for v in args
-        ]
-    return data_algebra.expr_rep.FnCall(fn, fn_args=fn_args,
-                                        name=name,
-                                        sql_name=sql_name, sql_prefix=sql_prefix, sql_suffix=sql_suffix)
 
 
 class ViewRepresentation(OperatorPlatform, ABC):
@@ -1065,7 +1038,7 @@ class ProjectNode(ViewRepresentation):
                             + str(opk)
                         )
             else:
-                if not isinstance(opk, data_algebra.expr_rep.FnCall):
+                if not isinstance(opk, data_algebra.user_fn.FnTerm):
                     raise ValueError(
                         "non-aggregated expression in project: "
                         + str(k)

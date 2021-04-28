@@ -5,6 +5,7 @@ import data_algebra.test_util
 from data_algebra.cdata import *
 from data_algebra.data_ops import *
 import data_algebra.SQLite
+from data_algebra.user_fn import user_fn
 
 
 def test_ordered_agg_group():
