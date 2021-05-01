@@ -1,3 +1,7 @@
+
+import data_algebra.cdata
+
+
 class PipeStep:
     def __init__(self):
         pass
@@ -142,6 +146,11 @@ class OperatorPlatform:
 
     def convert_records(self, record_map, *, temp_namer=None):
         raise NotImplementedError("base class called")
+
+    def map_records(self, blocks_in=None, blocks_out=None, strict=False, temp_namer=None):
+        return self.convert_records(
+            data_algebra.cdata.RecordMap(blocks_in=blocks_in, blocks_out=blocks_out, strict=strict),
+            temp_namer=temp_namer)
 
     # sklearn step style interface
 
