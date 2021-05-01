@@ -44,7 +44,7 @@ class RecordSpecification:
         if len(control_table_keys) <= 0:
             raise ValueError("must have at least one control table key")
         if isinstance(control_table_keys, str):
-            record_keys = [control_table_keys]
+            control_table_keys = [control_table_keys]
         self.control_table_keys = [k for k in control_table_keys]
         unknown = set(self.control_table_keys) - set(control_table.columns)
         if len(unknown) > 0:

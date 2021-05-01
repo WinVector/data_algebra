@@ -71,7 +71,7 @@ tests/test_window_fns.py .                                               [100%]
 ---------- coverage: platform darwin, python 3.9.4-final-0 -----------
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
-data_algebra/BigQuery.py                  82     26    68%
+data_algebra/BigQuery.py                  82     45    45%
 data_algebra/OrderedSet.py                52     11    79%
 data_algebra/PostgreSQL.py                12      2    83%
 data_algebra/SQLite.py                    82     13    84%
@@ -87,7 +87,7 @@ data_algebra/data_ops.py                1125    238    79%
 data_algebra/data_ops_types.py            74     33    55%
 data_algebra/data_ops_utils.py            34      5    85%
 data_algebra/data_pipe.py                189    107    43%
-data_algebra/db_model.py                 557     92    83%
+data_algebra/db_model.py                 557     95    83%
 data_algebra/diagram.py                   56     43    23%
 data_algebra/eval_model.py                18      2    89%
 data_algebra/expr_parse.py                38      3    92%
@@ -102,7 +102,7 @@ data_algebra/test_util.py                110     16    85%
 data_algebra/user_fn.py                   72     20    72%
 data_algebra/util.py                      28      4    86%
 ----------------------------------------------------------
-TOTAL                                   4278    956    78%
+TOTAL                                   4278    978    77%
 
 
-======================= 149 passed in 154.86s (0:02:34) ========================
+============================= 149 passed in 10.49s =============================
