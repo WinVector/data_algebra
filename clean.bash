@@ -2,7 +2,7 @@
 pip uninstall -y data_algebra
 
 rm -f coverage.txt
-rm -rf dist build data_algebra.egg-info
+rm -rf dist build data_algebra.egg-info docs
 
 find . -name .DS_Store -exec rm {} \;
 find . -name '*~' -exec rm {} \;
