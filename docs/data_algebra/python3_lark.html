@@ -52,6 +52,10 @@
 <span class="c1"># Python driver example:</span>
 <span class="c1">#    https://github.com/lark-parser/lark/blob/master/examples/advanced/python_parser.py</span>
 
+<span class="c1"># changes</span>
+<span class="c1"># !_shift_op: &quot;&lt;&lt;&quot;|&quot;&gt;&gt;&quot;</span>
+<span class="c1"># redefined as</span>
+<span class="c1"># !_shift_op: &quot;&lt;&lt;&quot;|&quot;&gt;&gt;&quot;|&quot;@+&quot;|&quot;@|&quot;</span>
 
 <span class="n">grammar</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">// Python 3 grammar for Lark</span>
@@ -159,7 +163,7 @@
 
 <span class="s2">!_factor_op: &quot;+&quot;|&quot;-&quot;|&quot;~&quot;</span>
 <span class="s2">!_add_op: &quot;+&quot;|&quot;-&quot;</span>
-<span class="s2">!_shift_op: &quot;&lt;&lt;&quot;|&quot;&gt;&gt;&quot;</span>
+<span class="s2">!_shift_op: &quot;&lt;&lt;&quot;|&quot;&gt;&gt;&quot;|&quot;@+&quot;|&quot;@|&quot;</span>
 <span class="s2">!_mul_op: &quot;*&quot;|&quot;@&quot;|&quot;/&quot;|&quot;%&quot;|&quot;//&quot;</span>
 <span class="s2">// &lt;&gt; isn&#39;t actually a valid comparison operator in Python. It&#39;s here for the</span>
 <span class="s2">// sake of a __future__ import described in PEP 401 (which really works :-)</span>

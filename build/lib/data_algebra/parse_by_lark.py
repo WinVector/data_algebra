@@ -46,8 +46,10 @@ op_remap = {
     '%': '__mod__',
     '**': '__pow__',
     '&': '__and__',
+    '&&': '__and__',
     '^': '__xor__',
     '|': '__or__',
+    '||': '__or__',
 }
 
 
@@ -224,6 +226,15 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
             if op.data in ['list', 'tuple']:
                 vals = [_r_walk_lark_tree(vi) for vi in op.children[0].children]
                 return data_algebra.expr_rep.ListTerm(vals)
+            if op.data == 'shift_expr':
+                if len(op.children) != 3:
+                    raise ValueError("unexpected " + op.data + " length")
+                tok = str(op.children[1])
+                if tok not in ['@|', '@+']:  # TODO: @+ string concat, @| coalesce
+                    raise ValueError("operator " + tok + " not currently supported")
+                left = _r_walk_lark_tree(op.children[0])
+                right = _r_walk_lark_tree(op.children[2])
+                raise ValueError("not yet implemented")  # TODO: implement
             if op.data == 'expr_stmt':
                 raise ValueError("Error must use == for comparison, not =")
             raise ValueError("unexpected/not-allowed lark Tree kind: " + str(op.data))

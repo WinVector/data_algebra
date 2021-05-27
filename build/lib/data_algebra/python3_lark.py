@@ -8,6 +8,10 @@
 # Python driver example:
 #    https://github.com/lark-parser/lark/blob/master/examples/advanced/python_parser.py
 
+# changes
+# !_shift_op: "<<"|">>"
+# redefined as
+# !_shift_op: "<<"|">>"|"@+"|"@|"
 
 grammar=r"""
 // Python 3 grammar for Lark
@@ -115,7 +119,7 @@ star_expr: "*" expr
 
 !_factor_op: "+"|"-"|"~"
 !_add_op: "+"|"-"
-!_shift_op: "<<"|">>"
+!_shift_op: "<<"|">>"|"@+"|"@|"
 !_mul_op: "*"|"@"|"/"|"%"|"//"
 // <> isn't actually a valid comparison operator in Python. It's here for the
 // sake of a __future__ import described in PEP 401 (which really works :-)
