@@ -363,3 +363,53 @@ def test_ideom_cross_join(get_bq_handle):
         bq_handle.insert_table(e, table_name=table_name_e, allow_overwrite=True)
         bigquery_res = bq_handle.read_query(bigquery_sql)
         assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
+
+
+def test_ideom_row_number(get_bq_handle):
+    bq_client = get_bq_handle['bq_client']
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    tables_to_delete = get_bq_handle['tables_to_delete']
+
+    d = data_algebra.pd.DataFrame({
+        'i': [1, 3, 2, 4, 5],
+        'g': [1, 2, 2, 1, 1],
+    })
+    table_name_d = f'{data_catalog}.{data_schema}.pytest_temp_d'
+
+    ops = describe_table(d, table_name=table_name_d) .\
+        extend({
+            'n': '_row_number()'
+            },
+            partition_by=['g'],
+            order_by=['i'],
+        ) .\
+        order_rows(['i'])
+
+    res_pandas = ops.transform(d)
+
+    expect = data_algebra.pd.DataFrame({
+        'i': [1, 2, 3, 4, 5],
+        'g': [1, 2, 2, 1, 1],
+        'n': [1, 1, 2, 2, 3],
+    })
+
+    assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
+
+    db_model = data_algebra.SQLite.SQLiteModel()
+    sql = ops.to_sql(db_model, pretty=True)
+    assert isinstance(sql, str)
+
+    with db_model.db_handle(sqlite3.connect(":memory:")) as sqlite_handle:
+        db_model.prepare_connection(sqlite_handle.conn)
+        sqlite_handle.insert_table(d, table_name=table_name_d)
+        res_sqlite = sqlite_handle.read_query(ops)
+    assert data_algebra.test_util.equivalent_frames(expect, res_sqlite)
+
+    # TODO: test (should fail) and fix
+    bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+    if bq_client is not None:
+        bq_handle.insert_table(d, table_name=table_name_d, allow_overwrite=True)
+        bigquery_res = bq_handle.read_query(bigquery_sql)
+        assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
