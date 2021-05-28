@@ -71,6 +71,12 @@ def test_parse_4g():
             "z": "x @+ y @+ s"})
 
 
+def test_parse_4h():
+    ops = TableDescription("d", ["x", "y", "s"]). \
+        extend({
+            "z": "x @| y @| s"})
+
+
 def test_parse_5():
     with pytest.raises(lark.exceptions.UnexpectedToken):
         ops = TableDescription("d", ["x", "y", "s"]). \

@@ -34,6 +34,7 @@ except:
 op_remap = {
     '==': '__eq__',
     '!=': '__ne__',
+    '<>': '__ne__',
     '<': '__lt__',
     '<=': '__le__',
     '>': '__gt__',
@@ -50,6 +51,8 @@ op_remap = {
     '^': '__xor__',
     '|': '__or__',
     '||': '__or__',
+    '@+': 'concat',
+    '@|': 'coalesce',
 }
 
 
@@ -125,7 +128,7 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                 return data_algebra.expr_rep.Value(None)
             if op.data in ['single_input', 'number', 'string', 'var']:
                 return _r_walk_lark_tree(op.children[0])
-            if op.data == 'arith_expr':
+            if op.data in ['arith_expr', 'term', 'comparison']:
                 # expect a v (op v)+ pattern
                 nc = len(op.children)
                 if (nc < 1) or ((nc % 2) != 1):
@@ -140,17 +143,6 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                         pass
                     res = getattr(res, op_name)(_r_walk_lark_tree(op.children[2*i + 2]))
                 return res
-            if op.data in ['term', 'comparison']:
-                if len(op.children) != 3:
-                    raise ValueError("unexpected " + op.data + " length")
-                left = _r_walk_lark_tree(op.children[0])
-                op_name = str(op.children[1])
-                try:
-                    op_name = op_remap[op_name]
-                except KeyError:
-                    pass
-                right = _r_walk_lark_tree(op.children[2])
-                return getattr(left, op_name)(right)
             if op.data == 'power':
                 if len(op.children) != 2:
                     raise ValueError("unexpected " + op.data + " length")
