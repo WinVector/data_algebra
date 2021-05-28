@@ -35,6 +35,42 @@ def test_parse_4():
             "z": "x | y"})
 
 
+def test_parse_4b():
+    ops = TableDescription("d", ["x", "y", "s"]). \
+        extend({
+            "z": "x | y | s"})
+
+
+def test_parse_4c():
+    ops = TableDescription("d", ["x", "y", "s"]). \
+        extend({
+            "z": "x + y + s"})
+
+
+def test_parse_4d():
+    ops = TableDescription("d", ["x", "y", "s"]). \
+        extend({
+            "z": "x * y * s"})
+
+
+def test_parse_4e():
+    ops = TableDescription("d", ["x", "y", "s"]). \
+        extend({
+            "z": "x * y / s"})
+
+
+def test_parse_4f():
+    ops = TableDescription("d", ["x", "y", "s"]). \
+        extend({
+            "z": "x @+ s"})
+
+
+def test_parse_4g():
+    ops = TableDescription("d", ["x", "y", "s"]). \
+        extend({
+            "z": "x @+ y @+ s"})
+
+
 def test_parse_5():
     with pytest.raises(lark.exceptions.UnexpectedToken):
         ops = TableDescription("d", ["x", "y", "s"]). \
