@@ -74,7 +74,7 @@ def test_parse_4g():
 def test_parse_4h():
     ops = TableDescription("d", ["x", "y", "s"]). \
         extend({
-            "z": "x %|% y %|% s"})
+            "z": "x %?% y %?% s"})
 
 
 def test_parse_4i():

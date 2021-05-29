@@ -52,7 +52,7 @@ op_remap = {
     '|': '__or__',
     '||': '__or__',
     '%+%': 'concat',
-    '%|%': 'coalesce',
+    '%?%': 'coalesce',
 }
 
 

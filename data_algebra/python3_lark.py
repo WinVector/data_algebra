@@ -11,7 +11,7 @@
 # changes:
 # !_mul_op: "*"|"@"|"/"|"%"|"//"
 # redefined as
-# !_mul_op: "*"|"@"|"/"|"%+%"|"%|%"|"%"|"//"
+# !_mul_op: "*"|"@"|"/"|"%+%"|"%?%"|"%"|"//"
 
 grammar=r"""
 // Python 3 grammar for Lark
@@ -121,7 +121,7 @@ star_expr: "*" expr
 !_add_op: "+"|"-"
 !_shift_op: "<<"|">>"
 // !_mul_op: "*"|"@"|"/"|"%"|"//"
-!_mul_op: "*"|"@"|"/"|"%+%"|"%|%"|"%"|"//"
+!_mul_op: "*"|"@"|"/"|"%+%"|"%?%"|"%"|"//"
 // <> isn't actually a valid comparison operator in Python. It's here for the
 // sake of a __future__ import described in PEP 401 (which really works :-)
 !_comp_op: "<"|">"|"=="|">="|"<="|"<>"|"!="|"in"|"not" "in"|"is"|"is" "not"
