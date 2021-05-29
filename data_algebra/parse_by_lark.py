@@ -51,8 +51,8 @@ op_remap = {
     '^': '__xor__',
     '|': '__or__',
     '||': '__or__',
-    '@+': 'concat',
-    '@|': 'coalesce',
+    '%+%': 'concat',
+    '%|%': 'coalesce',
 }
 
 

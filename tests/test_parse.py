@@ -62,19 +62,25 @@ def test_parse_4e():
 def test_parse_4f():
     ops = TableDescription("d", ["x", "y", "s"]). \
         extend({
-            "z": "x @+ s"})
+            "z": "x %+% s"})
 
 
 def test_parse_4g():
     ops = TableDescription("d", ["x", "y", "s"]). \
         extend({
-            "z": "x @+ y @+ s"})
+            "z": "x %+% y %+% s"})
 
 
 def test_parse_4h():
     ops = TableDescription("d", ["x", "y", "s"]). \
         extend({
-            "z": "x @| y @| s"})
+            "z": "x %|% y %|% s"})
+
+
+def test_parse_4i():
+    ops = TableDescription("d", ["x", "y", "s"]). \
+        extend({
+            "z": "x % y"})
 
 
 def test_parse_5():
