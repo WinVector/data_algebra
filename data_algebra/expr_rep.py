@@ -41,14 +41,33 @@ fn_names_that_imply_windowed_situation = {
     "ohlc",
     "pct_change",
     "rank",
-    "sem",
     "shift",
     "size",
     "std",
+    "sum",
     "tail",
     "unique",
     "value_counts",
     "var",
+}
+
+
+fn_names_that_imply_ordered_windowed_situation = {
+    "cumcount",
+    "cummax",
+    "cummin",
+    "cumprod",
+    "cumsum",
+    "row_number",
+}
+
+
+fn_names_that_contradict_ordered_windowed_situation = {
+    "count",
+    "max",
+    "min",
+    "prod",
+    "sum",
 }
 
 
@@ -419,9 +438,6 @@ class Term(PreTerm, ABC):
 
     def rank(self):
         return self.__uop_expr__("rank")
-
-    def sem(self):
-        return self.__uop_expr__("sem")
 
     def size(self):
         return self.__uop_expr__("size")

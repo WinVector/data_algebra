@@ -381,11 +381,15 @@ def test_ideom_row_number(get_bq_handle):
 
     ops = describe_table(d, table_name=table_name_d) .\
         extend({
-            'n': '_count()'  # TODO: make this and _row_number aliases
+            'one': 1
+            }) .\
+        extend({
+            'n': 'one.cumsum()'
             },
             partition_by=['g'],
             order_by=['i'],
-        ) .\
+            ) .\
+        drop_columns(['one']) .\
         order_rows(['i'])
 
     res_pandas = ops.transform(d)
@@ -394,6 +398,83 @@ def test_ideom_row_number(get_bq_handle):
         'i': [1, 2, 3, 4, 5],
         'g': [1, 2, 2, 1, 1],
         'n': [1, 1, 2, 2, 3],
+    })
+
+    assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
+
+    db_model = data_algebra.SQLite.SQLiteModel()
+    sql = ops.to_sql(db_model, pretty=True)
+    assert isinstance(sql, str)
+
+    with db_model.db_handle(sqlite3.connect(":memory:")) as sqlite_handle:
+        db_model.prepare_connection(sqlite_handle.conn)
+        sqlite_handle.insert_table(d, table_name=table_name_d)
+        res_sqlite = sqlite_handle.read_query(ops)
+    assert data_algebra.test_util.equivalent_frames(expect, res_sqlite)
+
+    # TODO: test (should fail) and fix
+    bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+    if bq_client is not None:
+        bq_handle.insert_table(d, table_name=table_name_d, allow_overwrite=True)
+        bigquery_res = bq_handle.read_query(bigquery_sql)
+        assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
+
+
+def test_ideom_sum_cumsum(get_bq_handle):
+    bq_client = get_bq_handle['bq_client']
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    tables_to_delete = get_bq_handle['tables_to_delete']
+
+    d = data_algebra.pd.DataFrame({
+        'i': [1, 2, 3, 4, 5],
+        'o': [1, 1, 1, 1, 1],
+        'g': [1, 2, 2, 1, 1],
+    })
+    table_name_d = f'{data_catalog}.{data_schema}.pytest_temp_d'
+
+    with pytest.raises(ValueError):
+        ops = describe_table(d, table_name=table_name_d). \
+                extend({
+                's2': 'o.sum()',
+                },
+                partition_by=['g'],
+                order_by=['i'],
+            )
+
+    with pytest.raises(ValueError):
+        ops = describe_table(d, table_name=table_name_d). \
+                extend({
+                's2': 'o.cumsum()',
+                },
+                partition_by=['g'],
+            )
+
+    ops = describe_table(d, table_name=table_name_d). \
+        extend({
+            's': 'o.cumsum()',
+            },
+            partition_by=['g'],
+            order_by=['i'],
+            ). \
+        extend({
+            'n': 's.max()',  # max over cumsum to get sum!
+            'n2': 'o.sum()',  # no order present, so meaning is non-cumulative.
+            },
+            partition_by=['g']
+        ). \
+        order_rows(['i'])
+
+    res_pandas = ops.transform(d)
+
+    expect = data_algebra.pd.DataFrame({
+        'i':  [1, 2, 3, 4, 5],
+        'o':  [1, 1, 1, 1, 1],
+        'g':  [1, 2, 2, 1, 1],
+        'n':  [3, 2, 2, 3, 3],
+        'n2': [3, 2, 2, 3, 3],
+        's':  [1, 1, 2, 2, 3],
     })
 
     assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
