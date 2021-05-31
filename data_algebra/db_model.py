@@ -117,6 +117,22 @@ def _db_count_expr(dbmodel, expression):
     return 'SUM(1)'
 
 
+def _db_concat_expr(dbmodel, expression):
+    return (
+        "CONCAT("  # TODO: cast each to char on way in
+        + ", ".join([dbmodel.expr_to_sql(ai, want_inline_parens=False) for ai in expression.args])
+        + ")"
+    )
+
+
+def _db_coalesce_expr(dbmodel, expression):
+    return (
+        "COALESCE("
+        + ", ".join([dbmodel.expr_to_sql(ai, want_inline_parens=False) for ai in expression.args])
+        + ")"
+    )
+
+
 db_expr_formatters = {
     "is_null": _db_is_null_expr,
     "is_bad": _db_is_bad_expr,

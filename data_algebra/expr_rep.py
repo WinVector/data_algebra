@@ -457,6 +457,12 @@ class Term(PreTerm, ABC):
     def is_in(self, x):
         return self.__op_expr__("is_in", x, inline=False, method=True)
 
+    def concat(self, x):
+        return self.__op_expr__("concat", x, inline=False, method=True)
+
+    def coalesce(self, x):
+        return self.__op_expr__("coalesce", x, inline=False, method=True)
+
     def co_equalizer(self, x):
         return self.__op_expr__("co_equalizer", x, inline=False, method=True)
 

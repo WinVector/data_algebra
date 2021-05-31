@@ -18,6 +18,7 @@ class CustomFunction:
 def make_custom_function_map(data_model):
     if data_model is None:
         raise ValueError("Expect data_model to not be None")
+
     custom_functions = [
         CustomFunction(
             name="is_bad",
@@ -135,13 +136,24 @@ def make_custom_function_map(data_model):
         CustomFunction(
             name="max",
             pandas_formatter=lambda expr: ("@max(" + expr.args[0].to_pandas() + ")"),
-            implementation=lambda x: [numpy.max(x)] * len(x),
+            implementation=lambda x: numpy.asarray([numpy.max(x)] * len(x)),
         ),
         CustomFunction(
             name="min",
             pandas_formatter=lambda expr: ("@min(" + expr.args[0].to_pandas() + ")"),
-            implementation=lambda x: [numpy.min(x)] * len(x),
+            implementation=lambda x: numpy.asarray([numpy.min(x)] * len(x)),
+        ),
+        CustomFunction(
+            name="concat",
+            pandas_formatter=lambda expr: ("@concat(" + expr.args[0].to_pandas() + ")"),
+            implementation=lambda x, y: numpy.asarray(numpy.char.array(x) + numpy.char.array(y)),
+        ),
+        CustomFunction(
+            name="coalesce",
+            pandas_formatter=lambda expr: ("@coalesce(" + expr.args[0].to_pandas() + ")"),
+            implementation=lambda x, y: x.combine_first(y),  # assuming Pandas series
         ),
     ]
+
     mp = {cf.name: cf for cf in custom_functions}
     return mp

@@ -65,10 +65,22 @@ def test_parse_4f():
             "z": "x %+% s"})
 
 
+def test_parse_4f2():
+    ops = TableDescription("d", ["x", "y", "s"]). \
+        extend({
+            "z": "x.concat(s)"})
+
+
 def test_parse_4g():
     ops = TableDescription("d", ["x", "y", "s"]). \
         extend({
             "z": "x %+% y %+% s"})
+
+
+def test_parse_4g2():
+    ops = TableDescription("d", ["x", "y", "s"]). \
+        extend({
+            "z": "x.coalesce(s)"})
 
 
 def test_parse_4h():

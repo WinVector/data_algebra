@@ -365,6 +365,7 @@ def test_ideom_cross_join(get_bq_handle):
         assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
 
 
+# Note: switching from _row_number to _count
 def test_ideom_row_number(get_bq_handle):
     bq_client = get_bq_handle['bq_client']
     bq_handle = get_bq_handle['bq_handle']
@@ -380,7 +381,7 @@ def test_ideom_row_number(get_bq_handle):
 
     ops = describe_table(d, table_name=table_name_d) .\
         extend({
-            'n': '_row_number()'
+            'n': '_count()'  # TODO: make this and _row_number aliases
             },
             partition_by=['g'],
             order_by=['i'],
