@@ -226,9 +226,6 @@
                                 <a class="function" href="#Term.rank">rank</a>
                         </li>
                         <li>
-                                <a class="function" href="#Term.sem">sem</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#Term.size">size</a>
                         </li>
                         <li>
@@ -257,6 +254,12 @@
                         </li>
                         <li>
                                 <a class="function" href="#Term.is_in">is_in</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.concat">concat</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.coalesce">coalesce</a>
                         </li>
                         <li>
                                 <a class="function" href="#Term.co_equalizer">co_equalizer</a>
@@ -466,14 +469,35 @@
     <span class="s2">&quot;ohlc&quot;</span><span class="p">,</span>
     <span class="s2">&quot;pct_change&quot;</span><span class="p">,</span>
     <span class="s2">&quot;rank&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;sem&quot;</span><span class="p">,</span>
     <span class="s2">&quot;shift&quot;</span><span class="p">,</span>
     <span class="s2">&quot;size&quot;</span><span class="p">,</span>
     <span class="s2">&quot;std&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
     <span class="s2">&quot;tail&quot;</span><span class="p">,</span>
     <span class="s2">&quot;unique&quot;</span><span class="p">,</span>
     <span class="s2">&quot;value_counts&quot;</span><span class="p">,</span>
     <span class="s2">&quot;var&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="n">fn_names_that_imply_ordered_windowed_situation</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;cumcount&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cummax&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cummin&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cumprod&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cumsum&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;row_number&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="c1"># a competing idea sould be to remove ordering if</span>
+<span class="c1"># operator is one of these (instead of forbid)</span>
+<span class="n">fn_names_that_contradict_ordered_windowed_situation</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;count&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;max&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;min&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;prod&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -845,9 +869,6 @@
     <span class="k">def</span> <span class="nf">rank</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;rank&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">sem</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;sem&quot;</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;size&quot;</span><span class="p">)</span>
 
@@ -881,6 +902,12 @@
 
     <span class="k">def</span> <span class="nf">is_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;is_in&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">concat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;concat&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">coalesce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;coalesce&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">co_equalizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;co_equalizer&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1771,9 +1798,6 @@ inheritance.</p>
     <span class="k">def</span> <span class="nf">rank</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;rank&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">sem</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;sem&quot;</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;size&quot;</span><span class="p">)</span>
 
@@ -1807,6 +1831,12 @@ inheritance.</p>
 
     <span class="k">def</span> <span class="nf">is_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;is_in&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">concat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;concat&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">coalesce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;coalesce&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">co_equalizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;co_equalizer&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -2846,25 +2876,6 @@ Abstract class, should be extended for use.</p>
     
 
                             </div>
-                            <div id="Term.sem" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#Term.sem">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">sem</span><span class="signature">(self)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">sem</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;sem&quot;</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            </div>
                             <div id="Term.size" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#Term.size">#&nbsp;&nbsp</a>
 
@@ -3048,6 +3059,44 @@ Abstract class, should be extended for use.</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">is_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;is_in&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.concat" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.concat">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">concat</span><span class="signature">(self, x)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">concat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;concat&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.coalesce" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.coalesce">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">coalesce</span><span class="signature">(self, x)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">coalesce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;coalesce&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -3274,7 +3323,6 @@ Abstract class, should be extended for use.</p>
                 <dd id="Value.nth" class="function"><a href="#Term.nth">nth</a></dd>
                 <dd id="Value.nunique" class="function"><a href="#Term.nunique">nunique</a></dd>
                 <dd id="Value.rank" class="function"><a href="#Term.rank">rank</a></dd>
-                <dd id="Value.sem" class="function"><a href="#Term.sem">sem</a></dd>
                 <dd id="Value.size" class="function"><a href="#Term.size">size</a></dd>
                 <dd id="Value.std" class="function"><a href="#Term.std">std</a></dd>
                 <dd id="Value.unique" class="function"><a href="#Term.unique">unique</a></dd>
@@ -3285,6 +3333,8 @@ Abstract class, should be extended for use.</p>
                 <dd id="Value.is_bad" class="function"><a href="#Term.is_bad">is_bad</a></dd>
                 <dd id="Value.if_else" class="function"><a href="#Term.if_else">if_else</a></dd>
                 <dd id="Value.is_in" class="function"><a href="#Term.is_in">is_in</a></dd>
+                <dd id="Value.concat" class="function"><a href="#Term.concat">concat</a></dd>
+                <dd id="Value.coalesce" class="function"><a href="#Term.coalesce">coalesce</a></dd>
                 <dd id="Value.co_equalizer" class="function"><a href="#Term.co_equalizer">co_equalizer</a></dd>
 
             </div>
@@ -4064,7 +4114,6 @@ inheritance.</p>
                 <dd id="ColumnReference.nth" class="function"><a href="#Term.nth">nth</a></dd>
                 <dd id="ColumnReference.nunique" class="function"><a href="#Term.nunique">nunique</a></dd>
                 <dd id="ColumnReference.rank" class="function"><a href="#Term.rank">rank</a></dd>
-                <dd id="ColumnReference.sem" class="function"><a href="#Term.sem">sem</a></dd>
                 <dd id="ColumnReference.size" class="function"><a href="#Term.size">size</a></dd>
                 <dd id="ColumnReference.std" class="function"><a href="#Term.std">std</a></dd>
                 <dd id="ColumnReference.unique" class="function"><a href="#Term.unique">unique</a></dd>
@@ -4075,6 +4124,8 @@ inheritance.</p>
                 <dd id="ColumnReference.is_bad" class="function"><a href="#Term.is_bad">is_bad</a></dd>
                 <dd id="ColumnReference.if_else" class="function"><a href="#Term.if_else">if_else</a></dd>
                 <dd id="ColumnReference.is_in" class="function"><a href="#Term.is_in">is_in</a></dd>
+                <dd id="ColumnReference.concat" class="function"><a href="#Term.concat">concat</a></dd>
+                <dd id="ColumnReference.coalesce" class="function"><a href="#Term.coalesce">coalesce</a></dd>
                 <dd id="ColumnReference.co_equalizer" class="function"><a href="#Term.co_equalizer">co_equalizer</a></dd>
 
             </div>
@@ -4437,7 +4488,6 @@ Abstract class, should be extended for use.</p>
                 <dd id="Expression.nth" class="function"><a href="#Term.nth">nth</a></dd>
                 <dd id="Expression.nunique" class="function"><a href="#Term.nunique">nunique</a></dd>
                 <dd id="Expression.rank" class="function"><a href="#Term.rank">rank</a></dd>
-                <dd id="Expression.sem" class="function"><a href="#Term.sem">sem</a></dd>
                 <dd id="Expression.size" class="function"><a href="#Term.size">size</a></dd>
                 <dd id="Expression.std" class="function"><a href="#Term.std">std</a></dd>
                 <dd id="Expression.unique" class="function"><a href="#Term.unique">unique</a></dd>
@@ -4448,6 +4498,8 @@ Abstract class, should be extended for use.</p>
                 <dd id="Expression.is_bad" class="function"><a href="#Term.is_bad">is_bad</a></dd>
                 <dd id="Expression.if_else" class="function"><a href="#Term.if_else">if_else</a></dd>
                 <dd id="Expression.is_in" class="function"><a href="#Term.is_in">is_in</a></dd>
+                <dd id="Expression.concat" class="function"><a href="#Term.concat">concat</a></dd>
+                <dd id="Expression.coalesce" class="function"><a href="#Term.coalesce">coalesce</a></dd>
                 <dd id="Expression.co_equalizer" class="function"><a href="#Term.co_equalizer">co_equalizer</a></dd>
 
             </div>

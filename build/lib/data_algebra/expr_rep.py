@@ -41,14 +41,35 @@ fn_names_that_imply_windowed_situation = {
     "ohlc",
     "pct_change",
     "rank",
-    "sem",
     "shift",
     "size",
     "std",
+    "sum",
     "tail",
     "unique",
     "value_counts",
     "var",
+}
+
+
+fn_names_that_imply_ordered_windowed_situation = {
+    "cumcount",
+    "cummax",
+    "cummin",
+    "cumprod",
+    "cumsum",
+    "row_number",
+}
+
+
+# a competing idea sould be to remove ordering if
+# operator is one of these (instead of forbid)
+fn_names_that_contradict_ordered_windowed_situation = {
+    "count",
+    "max",
+    "min",
+    "prod",
+    "sum",
 }
 
 
@@ -420,9 +441,6 @@ class Term(PreTerm, ABC):
     def rank(self):
         return self.__uop_expr__("rank")
 
-    def sem(self):
-        return self.__uop_expr__("sem")
-
     def size(self):
         return self.__uop_expr__("size")
 
@@ -456,6 +474,12 @@ class Term(PreTerm, ABC):
 
     def is_in(self, x):
         return self.__op_expr__("is_in", x, inline=False, method=True)
+
+    def concat(self, x):
+        return self.__op_expr__("concat", x, inline=False, method=True)
+
+    def coalesce(self, x):
+        return self.__op_expr__("coalesce", x, inline=False, method=True)
 
     def co_equalizer(self, x):
         return self.__op_expr__("co_equalizer", x, inline=False, method=True)

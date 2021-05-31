@@ -162,14 +162,14 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                         col_list = col_list + [value_name]
                 # TODO: document exactly which of these are available
                 if len(opk.args) == 0:
-                    if opk.op == "row_number":
+                    if opk.op in ["row_number", "count"]:
                         subframe[k] = opframe.cumcount() + 1
                     elif opk.op == "ngroup":
                         subframe[k] = opframe.ngroup()
                     elif opk.op == "size":
                         subframe[k] = opframe[standin_name].transform(
                             opk.op
-                        )  # Pandas transform, not data_algegra
+                        )  # Pandas transform, not data_algebra
                     else:
                         raise KeyError("not implemented: " + str(k) + ": " + str(opk))
                 else:

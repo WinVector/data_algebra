@@ -796,6 +796,7 @@ class ExtendNode(ViewRepresentation):
         self, *, source, parsed_ops, partition_by=None, order_by=None, reverse=None
     ):
         windowed_situation = data_algebra.expr_rep.implies_windowed(parsed_ops)
+        ordered_windowed_situation = False
         self.ops = parsed_ops
         self.cols_used_in_calc = data_algebra.expr_rep.get_columns_used(parsed_ops)
         self.cols_produced_in_calc = [k for k in parsed_ops.keys()]
@@ -815,6 +816,7 @@ class ExtendNode(ViewRepresentation):
             order_by = [order_by]
         if len(order_by) > 0:
             windowed_situation = True
+            ordered_windowed_situation = True
         self.windowed_situation = windowed_situation
         self.order_by = order_by
         if reverse is None:
@@ -885,6 +887,18 @@ class ExtendNode(ViewRepresentation):
                             + opk.to_pandas()
                             + "' term is too complex an expression"
                         )
+                if (ordered_windowed_situation and
+                        (opk.op in data_algebra.expr_rep.fn_names_that_contradict_ordered_windowed_situation)):
+                    raise ValueError(
+                        opk.to_pandas()
+                        + "' is not allowed in an ordered windowed situation"
+                    )
+                if ((not ordered_windowed_situation) and
+                        (opk.op in data_algebra.expr_rep.fn_names_that_imply_ordered_windowed_situation)):
+                    raise ValueError(
+                        opk.to_pandas()
+                        + "' is not allowed in not-ordered windowed situation"
+                    )
         ViewRepresentation.__init__(
             self, column_names=column_names, sources=[source], node_name="ExtendNode"
         )
@@ -1037,6 +1051,11 @@ class ProjectNode(ViewRepresentation):
                             + ": "
                             + str(opk)
                         )
+                if opk.op in data_algebra.expr_rep.fn_names_that_imply_ordered_windowed_situation:
+                    raise ValueError(
+                        opk.to_pandas()
+                        + "' is not allowed in project"
+                    )
             else:
                 if not isinstance(opk, data_algebra.user_fn.FnTerm):
                     raise ValueError(
