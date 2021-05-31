@@ -1,10 +1,11 @@
-import data_algebra
+
 import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
 import data_algebra.PostgreSQL
 from data_algebra.test_util import formats_to_self
 
+import pytest
 
 def test_extend_0():
     d = data_algebra.default_data_model.pd.DataFrame(
@@ -87,3 +88,12 @@ def test_extend_shrink_1():
     ops3 = describe_table(d, "d").extend({"c": "y.max()"}).extend({"d": "y"})
 
     assert isinstance(ops3.sources[0], ExtendNode)
+
+
+def test_extend_catch_nonagg():
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
+    )
+
+    with pytest.raises(ValueError):
+        ops = describe_table(d, "d").extend({'y': 'y'}, partition_by=["c", "g"])

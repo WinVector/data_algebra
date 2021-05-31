@@ -1,4 +1,4 @@
-import data_algebra
+
 import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
@@ -67,3 +67,12 @@ def test_project():
     )
 
     assert data_algebra.test_util.equivalent_frames(expect, res)
+
+
+def test_project_catch_nonagg():
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
+    )
+
+    with pytest.raises(ValueError):
+        ops = describe_table(d, "d").project({'y': 'y'}, group_by=["c", "g"])
