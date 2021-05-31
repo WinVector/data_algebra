@@ -62,6 +62,8 @@ fn_names_that_imply_ordered_windowed_situation = {
 }
 
 
+# a competing idea sould be to remove ordering if
+# operator is one of these (instead of forbid)
 fn_names_that_contradict_ordered_windowed_situation = {
     "count",
     "max",
