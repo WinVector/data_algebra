@@ -453,14 +453,14 @@ def test_ideom_sum_cumsum(get_bq_handle):
 
     ops = describe_table(d, table_name=table_name_d). \
         extend({
-            's': 'o.cumsum()',
+            's': '(1).cumsum()',
             },
             partition_by=['g'],
             order_by=['i'],
             ). \
         extend({
             'n': 's.max()',  # max over cumsum to get sum!
-            'n2': 'o.sum()',  # no order present, so meaning is non-cumulative.
+            'n2': '(1).sum()',  # no order present, so meaning is non-cumulative.
             },
             partition_by=['g']
         ). \

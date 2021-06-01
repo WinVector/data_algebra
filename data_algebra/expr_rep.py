@@ -708,14 +708,20 @@ class Expression(Term):
         if len(subs) == 1:
             if self.inline:
                 return self.op + self.args[0].to_pandas(want_inline_parens=True)
-            return subs[0] + "." + self.op + "()"
+            if isinstance(self.args[0], ColumnReference):
+                return subs[0] + "." + self.op + "()"
+            else:
+                return "(" + subs[0] + ")." + self.op + "()"
         if len(subs) == 2 and self.inline:
             if want_inline_parens:
                 return "(" + subs[0] + " " + self.op + " " + subs[1] + ")"
             else:
                 return subs[0] + " " + self.op + " " + subs[1]
         if self.method:
-            return subs[0] + "." + self.op + "(" + ", ".join(subs[1:]) + ")"
+            if isinstance(self.args[0], ColumnReference):
+                return subs[0] + "." + self.op + "(" + ", ".join(subs[1:]) + ")"
+            else:
+                return "(" + subs[0] + ")." + self.op + "(" + ", ".join(subs[1:]) + ")"
         return self.op + "(" + ", ".join(subs) + ")"
 
     def to_pandas(self, *, want_inline_parens=False):

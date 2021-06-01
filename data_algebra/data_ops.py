@@ -877,16 +877,22 @@ class ExtendNode(ViewRepresentation):
                         + "' term is too complex an expression"
                     )
                 if len(opk.args) > 0:
-                    value_name = opk.args[0].to_pandas()
-                    if value_name not in source.column_set:
-                        raise ValueError(
-                            "in windowed situations only simple operators are allowed, "
-                            + "'"
-                            + k
-                            + "': '"
-                            + opk.to_pandas()
-                            + "' term is too complex an expression"
-                        )
+                    if isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
+                        value_name = opk.args[0].to_pandas()
+                        if value_name not in source.column_set:
+                            raise ValueError(
+                                opk.to_pandas() + " not in source column set"
+                            )
+                    else:
+                        if not isinstance(opk.args[0], data_algebra.expr_rep.Value):
+                            raise ValueError(
+                                "in windowed situations only simple operators are allowed, "
+                                + "'"
+                                + k
+                                + "': '"
+                                + opk.to_pandas()
+                                + "' term is too complex an expression"
+                            )
                 if (ordered_windowed_situation and
                         (opk.op in data_algebra.expr_rep.fn_names_that_contradict_ordered_windowed_situation)):
                     raise ValueError(
@@ -941,11 +947,10 @@ class ExtendNode(ViewRepresentation):
                     if len(opk.args) > 1:
                         raise ValueError("window function with more than one argument")
                     for i in range(len(opk.args)):
-                        if not isinstance(
-                            opk.args[0], data_algebra.expr_rep.ColumnReference
-                        ):
+                        if not (isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference)
+                            or isinstance(opk.args[0], data_algebra.expr_rep.Value)):
                             raise ValueError(
-                                "window expression argument must be a column: "
+                                "window expression argument must be a column or value: "
                                 + str(k)
                                 + ": "
                                 + str(opk)
