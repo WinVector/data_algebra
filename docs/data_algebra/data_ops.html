@@ -1383,16 +1383,22 @@
                         <span class="o">+</span> <span class="s2">&quot;&#39; term is too complex an expression&quot;</span>
                     <span class="p">)</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">value_name</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
-                    <span class="k">if</span> <span class="n">value_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">column_set</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                            <span class="s2">&quot;in windowed situations only simple operators are allowed, &quot;</span>
-                            <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
-                            <span class="o">+</span> <span class="n">k</span>
-                            <span class="o">+</span> <span class="s2">&quot;&#39;: &#39;&quot;</span>
-                            <span class="o">+</span> <span class="n">opk</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
-                            <span class="o">+</span> <span class="s2">&quot;&#39; term is too complex an expression&quot;</span>
-                        <span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ColumnReference</span><span class="p">):</span>
+                        <span class="n">value_name</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">value_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">column_set</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                                <span class="n">opk</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; not in source column set&quot;</span>
+                            <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                                <span class="s2">&quot;in windowed situations only simple operators are allowed, &quot;</span>
+                                <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+                                <span class="o">+</span> <span class="n">k</span>
+                                <span class="o">+</span> <span class="s2">&quot;&#39;: &#39;&quot;</span>
+                                <span class="o">+</span> <span class="n">opk</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+                                <span class="o">+</span> <span class="s2">&quot;&#39; term is too complex an expression&quot;</span>
+                            <span class="p">)</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">ordered_windowed_situation</span> <span class="ow">and</span>
                         <span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">op</span> <span class="ow">in</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">fn_names_that_contradict_ordered_windowed_situation</span><span class="p">)):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1447,11 +1453,10 @@
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;window function with more than one argument&quot;</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)):</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
-                            <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ColumnReference</span>
-                        <span class="p">):</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ColumnReference</span><span class="p">)</span>
+                            <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">)):</span>
                             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                                <span class="s2">&quot;window expression argument must be a column: &quot;</span>
+                                <span class="s2">&quot;window expression argument must be a column or value: &quot;</span>
                                 <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
                                 <span class="o">+</span> <span class="s2">&quot;: &quot;</span>
                                 <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span>
@@ -4696,16 +4701,22 @@ with the using columns (None means all).</p>
                         <span class="o">+</span> <span class="s2">&quot;&#39; term is too complex an expression&quot;</span>
                     <span class="p">)</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">value_name</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
-                    <span class="k">if</span> <span class="n">value_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">column_set</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                            <span class="s2">&quot;in windowed situations only simple operators are allowed, &quot;</span>
-                            <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
-                            <span class="o">+</span> <span class="n">k</span>
-                            <span class="o">+</span> <span class="s2">&quot;&#39;: &#39;&quot;</span>
-                            <span class="o">+</span> <span class="n">opk</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
-                            <span class="o">+</span> <span class="s2">&quot;&#39; term is too complex an expression&quot;</span>
-                        <span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ColumnReference</span><span class="p">):</span>
+                        <span class="n">value_name</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">value_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">column_set</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                                <span class="n">opk</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; not in source column set&quot;</span>
+                            <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                                <span class="s2">&quot;in windowed situations only simple operators are allowed, &quot;</span>
+                                <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+                                <span class="o">+</span> <span class="n">k</span>
+                                <span class="o">+</span> <span class="s2">&quot;&#39;: &#39;&quot;</span>
+                                <span class="o">+</span> <span class="n">opk</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+                                <span class="o">+</span> <span class="s2">&quot;&#39; term is too complex an expression&quot;</span>
+                            <span class="p">)</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">ordered_windowed_situation</span> <span class="ow">and</span>
                         <span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">op</span> <span class="ow">in</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">fn_names_that_contradict_ordered_windowed_situation</span><span class="p">)):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -4760,11 +4771,10 @@ with the using columns (None means all).</p>
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;window function with more than one argument&quot;</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)):</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
-                            <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ColumnReference</span>
-                        <span class="p">):</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ColumnReference</span><span class="p">)</span>
+                            <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">)):</span>
                             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                                <span class="s2">&quot;window expression argument must be a column: &quot;</span>
+                                <span class="s2">&quot;window expression argument must be a column or value: &quot;</span>
                                 <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
                                 <span class="o">+</span> <span class="s2">&quot;: &quot;</span>
                                 <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span>
@@ -4929,16 +4939,22 @@ Abstract base class.</p>
                         <span class="o">+</span> <span class="s2">&quot;&#39; term is too complex an expression&quot;</span>
                     <span class="p">)</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">value_name</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
-                    <span class="k">if</span> <span class="n">value_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">column_set</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                            <span class="s2">&quot;in windowed situations only simple operators are allowed, &quot;</span>
-                            <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
-                            <span class="o">+</span> <span class="n">k</span>
-                            <span class="o">+</span> <span class="s2">&quot;&#39;: &#39;&quot;</span>
-                            <span class="o">+</span> <span class="n">opk</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
-                            <span class="o">+</span> <span class="s2">&quot;&#39; term is too complex an expression&quot;</span>
-                        <span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ColumnReference</span><span class="p">):</span>
+                        <span class="n">value_name</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">value_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">column_set</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                                <span class="n">opk</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; not in source column set&quot;</span>
+                            <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                                <span class="s2">&quot;in windowed situations only simple operators are allowed, &quot;</span>
+                                <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+                                <span class="o">+</span> <span class="n">k</span>
+                                <span class="o">+</span> <span class="s2">&quot;&#39;: &#39;&quot;</span>
+                                <span class="o">+</span> <span class="n">opk</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+                                <span class="o">+</span> <span class="s2">&quot;&#39; term is too complex an expression&quot;</span>
+                            <span class="p">)</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">ordered_windowed_situation</span> <span class="ow">and</span>
                         <span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">op</span> <span class="ow">in</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">fn_names_that_contradict_ordered_windowed_situation</span><span class="p">)):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -5013,11 +5029,10 @@ Abstract base class.</p>
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;window function with more than one argument&quot;</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)):</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
-                            <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ColumnReference</span>
-                        <span class="p">):</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ColumnReference</span><span class="p">)</span>
+                            <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">)):</span>
                             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                                <span class="s2">&quot;window expression argument must be a column: &quot;</span>
+                                <span class="s2">&quot;window expression argument must be a column or value: &quot;</span>
                                 <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
                                 <span class="o">+</span> <span class="s2">&quot;: &quot;</span>
                                 <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span>

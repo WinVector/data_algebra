@@ -102,6 +102,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
         standin_name = "_data_algebra_temp_g"  # name of an arbitrary input variable
+        data_algebra_temp_cols = {}  # TODO: need this mechanism in project also
         if not window_situation:
             for (k, opk) in op.ops.items():
                 if isinstance(opk, data_algebra.user_fn.FnTerm):
@@ -129,14 +130,26 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                 if c not in col_set:
                     col_list = col_list + [c]
                     col_set.add(c)
-            order_cols = [c for c in col_list]  # must be partion by followed by order
+            order_cols = [c for c in col_list]  # must be partition by followed by order
+
             for (k, opk) in op.ops.items():
-                # assumes all args are column names, enforce this earlier
-                if len(opk.args) > 0:
-                    value_name = opk.args[0].to_pandas()
-                    if value_name not in col_set:
-                        col_list = col_list + [value_name]
-                        col_set.add(value_name)
+                # assumes all args are column names or values, enforce this earlier
+                if (len(opk.args) > 0):
+                    assert len(opk.args) == 1
+                    if isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
+                        value_name = opk.args[0].to_pandas()
+                        if value_name not in col_set:
+                            col_list = col_list + [value_name]
+                            col_set.add(value_name)
+                    elif isinstance(opk.args[0], data_algebra.expr_rep.Value):
+                        key = str(opk.args[0].value)
+                        if not key in data_algebra_temp_cols.keys():
+                            value_name = 'data_algebra_temp_col_' + str(len(data_algebra_temp_cols))
+                            data_algebra_temp_cols[key] = value_name
+                            col_list.append(value_name)
+                            res[value_name] = opk.args[0].value
+                    else:
+                        raise ValueError("opk must be a ColumnReference or Value")
             ascending = [c not in set(op.reverse) for c in col_list]
             subframe = res[col_list].reset_index(drop=True)
             subframe["_data_algebra_orig_index"] = subframe.index
@@ -154,14 +167,8 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             # perform calculations
             for (k, opk) in op.ops.items():
                 # work on a slice of the data frame
-                value_name = None
-                # assumes all args are column names, enforce this earlier
-                if len(opk.args) > 0:
-                    value_name = opk.args[0].to_pandas()
-                    if value_name not in set(col_list):
-                        col_list = col_list + [value_name]
                 # TODO: document exactly which of these are available
-                if len(opk.args) == 0:
+                if len(opk.args) <= 0:
                     if opk.op in ["row_number", "count"]:
                         subframe[k] = opframe.cumcount() + 1
                     elif opk.op == "ngroup":
@@ -174,9 +181,24 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                         raise KeyError("not implemented: " + str(k) + ": " + str(opk))
                 else:
                     # len(opk.args) == 1
-                    subframe[k] = opframe[value_name].transform(
-                        opk.op
-                    )  # Pandas transform, not data_algegra
+                    assert len(opk.args) == 1
+                    if isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
+                        value_name = opk.args[0].to_pandas()
+                        if value_name not in set(col_list):
+                            col_list = col_list + [value_name]
+                        subframe[k] = opframe[value_name].transform(
+                            opk.op
+                        )  # Pandas transform, not data_algegra
+                    elif isinstance(opk.args[0], data_algebra.expr_rep.Value):
+                        value_name = data_algebra_temp_cols[str(opk.args[0].value)]
+                        subframe[k] = opframe[value_name].transform(
+                            opk.op
+                        )  # Pandas transform, not data_algegra
+                    else:
+                        raise ValueError("opk must be a ColumnReference or Value")
+            # clear some temps
+            for value_name in data_algebra_temp_cols.values():
+                del res[value_name]
             # copy out results
             subframe = subframe.reset_index(drop=True)
             subframe = subframe.sort_values(by=["_data_algebra_orig_index"])
