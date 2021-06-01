@@ -102,7 +102,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
         standin_name = "_data_algebra_temp_g"  # name of an arbitrary input variable
-        data_algebra_temp_cols = {}  # TODO: need this mechanism in project also
+        data_algebra_temp_cols = {}
         if not window_situation:
             for (k, opk) in op.ops.items():
                 if isinstance(opk, data_algebra.user_fn.FnTerm):
@@ -144,7 +144,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                     elif isinstance(opk.args[0], data_algebra.expr_rep.Value):
                         key = str(opk.args[0].value)
                         if not key in data_algebra_temp_cols.keys():
-                            value_name = 'data_algebra_temp_col_' + str(len(data_algebra_temp_cols))
+                            value_name = 'data_algebra_extend_temp_col_' + str(len(data_algebra_temp_cols))
                             data_algebra_temp_cols[key] = value_name
                             col_list.append(value_name)
                             res[value_name] = opk.args[0].value
@@ -224,34 +224,48 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         # https://stackoverflow.com/questions/44635626/rename-result-columns-from-pandas-aggregation-futurewarning-using-a-dict-with
         # try the following tutorial:
         # https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
+        data_algebra_temp_cols = {}
+        res = op.sources[0].eval_implementation(
+            data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
+        )
         for (k, opk) in op.ops.items():
             if len(opk.args) > 1:
                 raise ValueError(
                     "non-trivial aggregation expression: " + str(k) + ": " + str(opk)
                 )
             if len(opk.args) > 0:
-                if not isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
+                if isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
+                    pass
+                elif isinstance(opk.args[0], data_algebra.expr_rep.Value):
+                    key = str(opk.args[0].value)
+                    if not key in data_algebra_temp_cols.keys():
+                        value_name = 'data_algebra_project_temp_col_' + str(len(data_algebra_temp_cols))
+                        data_algebra_temp_cols[key] = value_name
+                        res[value_name] = opk.args[0].value
+                else:
                     raise ValueError(
-                        "windows expression argument must be a column: "
+                        "windows expression argument must be a column or value: "
                         + str(k)
                         + ": "
                         + str(opk)
                     )
-        res = op.sources[0].eval_implementation(
-            data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
-        )
         res["_data_table_temp_col"] = 1
         if len(op.group_by) > 0:
             res = res.groupby(op.group_by)
         if len(op.ops) > 0:
             cols = {}
             for k, opk in op.ops.items():
+                value_name = None
+                if len(opk.args) > 0:
+                    value_name = str(opk.args[0])
+                    if isinstance(opk.args[0], data_algebra.expr_rep.Value):
+                        value_name = data_algebra_temp_cols[value_name]
                 if isinstance(opk, data_algebra.user_fn.FnTerm):
                     fn = opk.pandas_fn
-                    vk = res[str(opk.args[0])].agg(fn)
+                    vk = res[value_name].agg(fn)
                 else:
                     if len(opk.args) > 0:
-                        vk = res[str(opk.args[0])].agg(opk.op)
+                        vk = res[value_name].agg(opk.op)
                     else:
                         vk = res["_data_table_temp_col"].agg(opk.op)
                 cols[k] = vk
