@@ -1047,11 +1047,10 @@ class ProjectNode(ViewRepresentation):
                         + str(opk)
                     )
                 if len(opk.args) > 0:
-                    if not isinstance(
-                        opk.args[0], data_algebra.expr_rep.ColumnReference
-                    ):
+                    if not (isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference)
+                        or isinstance(opk.args[0], data_algebra.expr_rep.Value)):
                         raise ValueError(
-                            "windows expression argument must be a column: "
+                            "windows expression argument must be a column or value: "
                             + str(k)
                             + ": "
                             + str(opk)
