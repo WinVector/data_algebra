@@ -145,12 +145,12 @@ def make_custom_function_map(data_model):
         ),
         CustomFunction(
             name="concat",
-            pandas_formatter=lambda expr: ("@concat(" + expr.args[0].to_pandas() + ")"),
-            implementation=lambda x, y: numpy.asarray(numpy.char.array(x) + numpy.char.array(y)),
+            pandas_formatter=lambda expr: ("@concat(" + expr.args[0].to_pandas() + ", " + expr.args[1].to_pandas() + ")"),
+            implementation=lambda x, y: numpy.char.add(numpy.asarray(x, dtype=numpy.str), numpy.asarray(y, dtype=numpy.str))
         ),
         CustomFunction(
             name="coalesce",
-            pandas_formatter=lambda expr: ("@coalesce(" + expr.args[0].to_pandas() + ")"),
+            pandas_formatter=lambda expr: ("@coalesce(" + expr.args[0].to_pandas() + ", " + expr.args[1].to_pandas() + ")"),
             implementation=lambda x, y: x.combine_first(y),  # assuming Pandas series
         ),
     ]
