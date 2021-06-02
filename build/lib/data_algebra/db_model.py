@@ -119,8 +119,8 @@ def _db_count_expr(dbmodel, expression):
 
 def _db_concat_expr(dbmodel, expression):
     return (
-        "CONCAT("  # TODO: cast each to char on way in
-        + ", ".join([dbmodel.expr_to_sql(ai, want_inline_parens=False) for ai in expression.args])
+        "("  # TODO: cast each to char on way in
+        + "|| ".join([dbmodel.expr_to_sql(ai, want_inline_parens=True) for ai in expression.args])
         + ")"
     )
 
@@ -141,6 +141,8 @@ db_expr_formatters = {
     "maximum": _db_maximum_expr,
     "minimum": _db_minimum_expr,
     'count': _db_count_expr,
+    'concat': _db_concat_expr,
+    'coalesce': _db_coalesce_expr,
 }
 
 
