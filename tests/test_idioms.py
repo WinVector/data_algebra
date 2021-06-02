@@ -542,8 +542,7 @@ def test_ideom_project_sum(get_bq_handle):
         assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
 
 
-
-def test_ideom_concat(get_bq_handle):
+def test_ideom_concat_op(get_bq_handle):
     bq_client = get_bq_handle['bq_client']
     bq_handle = get_bq_handle['bq_handle']
     data_catalog = get_bq_handle['data_catalog']
@@ -567,6 +566,51 @@ def test_ideom_concat(get_bq_handle):
         'x': ['a', 'b', 'c'],
         'y': ['1', '2', '3'],
         'z': ['a1a', 'b2b', 'c3c']
+    })
+
+    assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
+
+    db_model = data_algebra.SQLite.SQLiteModel()
+    sql = ops.to_sql(db_model, pretty=True)
+    assert isinstance(sql, str)
+
+    with db_model.db_handle(sqlite3.connect(":memory:")) as sqlite_handle:
+        db_model.prepare_connection(sqlite_handle.conn)
+        sqlite_handle.insert_table(d, table_name=table_name_d)
+        res_sqlite = sqlite_handle.read_query(ops)
+    assert data_algebra.test_util.equivalent_frames(expect, res_sqlite)
+
+    bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+    if bq_client is not None:
+        bq_handle.insert_table(d, table_name=table_name_d, allow_overwrite=True)
+        bigquery_res = bq_handle.read_query(bigquery_sql)
+        assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
+
+
+def test_ideom_coalesce_op(get_bq_handle):
+    bq_client = get_bq_handle['bq_client']
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    tables_to_delete = get_bq_handle['tables_to_delete']
+
+    d = data_algebra.pd.DataFrame({
+        'x': ['a', 'b', None, None],
+        'y': ['1', None, '3', None],
+    })
+    table_name_d = f'{data_catalog}.{data_schema}.pytest_temp_d'
+
+    ops = describe_table(d, table_name=table_name_d). \
+        extend({
+            'z': 'x %?% y'
+            })
+
+    res_pandas = ops.transform(d)
+
+    expect = data_algebra.pd.DataFrame({
+        'x': ['a', 'b', None, None],
+        'y': ['1', None, '3', None],
+        'z': ['a', 'b', '3', None],
     })
 
     assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
