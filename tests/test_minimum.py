@@ -6,6 +6,7 @@ from data_algebra.data_ops import *
 
 import pytest
 
+
 def test_mimimum_1():
     d = pandas.DataFrame({
         'x': [1, 2, 3, 4, 5, 6],
@@ -24,7 +25,6 @@ def test_mimimum_1():
             })
 
     # res_pandas = ops.transform(d)  # throws deep in Pandas!
-    # # TODO: throw during expression construction, instead
     #
     # expect = pandas.DataFrame({
     #     'x': [1, 2, 3, 4, 5, 6],
