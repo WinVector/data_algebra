@@ -8,6 +8,8 @@ import data_algebra.test_util
 import data_algebra.util
 
 
+# TODO: get this working, and also ceil, floor, and possibly trunc
+
 def test_round_1():
     d = data_algebra.default_data_model.pd.DataFrame({"x": [0.2, 0.6, 1.2, 1.7]})
     td = describe_table(d, table_name="d")
