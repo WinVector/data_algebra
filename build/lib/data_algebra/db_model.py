@@ -133,6 +133,30 @@ def _db_coalesce_expr(dbmodel, expression):
     )
 
 
+def _db_round_expr(dbmodel, expression):
+    return (
+        "ROUND("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
+    )
+
+
+def _db_floor_expr(dbmodel, expression):
+    return (
+        "FLOOR("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
+    )
+
+
+def _db_ceil_expr(dbmodel, expression):
+    return (
+        "CEILING("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
+    )
+
+
 db_expr_formatters = {
     "is_null": _db_is_null_expr,
     "is_bad": _db_is_bad_expr,
@@ -143,6 +167,9 @@ db_expr_formatters = {
     'count': _db_count_expr,
     'concat': _db_concat_expr,
     'coalesce': _db_coalesce_expr,
+    'round': _db_round_expr,
+    'floor': _db_floor_expr,
+    'ceil': _db_ceil_expr,
 }
 
 

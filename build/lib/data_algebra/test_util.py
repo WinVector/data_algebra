@@ -167,22 +167,20 @@ def check_transform(
     ):
         raise ValueError("Pandas result did not match expect")
     # try Sqlite path
-    conn = sqlite3.connect(":memory:")
-    db_model = data_algebra.SQLite.SQLiteModel()
-    db_model.prepare_connection(conn)
-    if isinstance(data, dict):
-        for (k, v) in data.items():
+    with sqlite3.connect(":memory:") as conn:
+        db_model = data_algebra.SQLite.SQLiteModel()
+        db_model.prepare_connection(conn)
+        if isinstance(data, dict):
+            for (k, v) in data.items():
+                db_model.insert_table(conn, v, table_name=k)
+        else:
+            table_name = [k for k in cols_used.keys()][0]
+            db_model.insert_table(conn, data, table_name=table_name)
+        temp_tables = dict()
+        sql = ops.to_sql(db_model, pretty=True, temp_tables=temp_tables)
+        for (k, v) in temp_tables.items():
             db_model.insert_table(conn, v, table_name=k)
-    else:
-        table_name = [k for k in cols_used.keys()][0]
-        db_model.insert_table(conn, data, table_name=table_name)
-    temp_tables = dict()
-    sql = ops.to_sql(db_model, pretty=True, temp_tables=temp_tables)
-    for (k, v) in temp_tables.items():
-        db_model.insert_table(conn, v, table_name=k)
-    res_db = db_model.read_query(conn, sql)
-    # clean up
-    conn.close()
+        res_db = db_model.read_query(conn, sql)
     if not equivalent_frames(
         res_db,
         expect,

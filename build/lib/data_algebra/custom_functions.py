@@ -6,7 +6,7 @@ import data_algebra.connected_components
 
 
 class CustomFunction:
-    def __init__(self, name, pandas_formatter, implementation):
+    def __init__(self, *, name, pandas_formatter, implementation):
         self.name = name
         self.pandas_formatter = pandas_formatter
         self.implementation = implementation
@@ -78,9 +78,13 @@ def make_custom_function_map(data_model):
         ),
         CustomFunction(
             name="neg",
-            pandas_formatter=lambda expr: "-"
-            + expr.args[0].to_pandas(want_inline_parens=True),
-            implementation=lambda x: numpy.negative(x),
+            pandas_formatter=lambda expr: "-" + expr.args[0].to_pandas(want_inline_parens=True),
+            implementation=lambda x: numpy.negative(x),  #
+        ),
+        CustomFunction(
+            name="round",
+            pandas_formatter=lambda expr: "@round(" + expr.args[0].to_pandas(want_inline_parens=False) + ")",
+            implementation=lambda x: numpy.round(x),
         ),
         CustomFunction(
             name="co_equalizer",

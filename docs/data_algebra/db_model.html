@@ -327,6 +327,30 @@
     <span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">_db_round_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;ROUND(&quot;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_db_floor_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;FLOOR(&quot;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_db_ceil_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;CEILING(&quot;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+    <span class="p">)</span>
+
+
 <span class="n">db_expr_formatters</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;is_null&quot;</span><span class="p">:</span> <span class="n">_db_is_null_expr</span><span class="p">,</span>
     <span class="s2">&quot;is_bad&quot;</span><span class="p">:</span> <span class="n">_db_is_bad_expr</span><span class="p">,</span>
@@ -337,6 +361,9 @@
     <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="n">_db_count_expr</span><span class="p">,</span>
     <span class="s1">&#39;concat&#39;</span><span class="p">:</span> <span class="n">_db_concat_expr</span><span class="p">,</span>
     <span class="s1">&#39;coalesce&#39;</span><span class="p">:</span> <span class="n">_db_coalesce_expr</span><span class="p">,</span>
+    <span class="s1">&#39;round&#39;</span><span class="p">:</span> <span class="n">_db_round_expr</span><span class="p">,</span>
+    <span class="s1">&#39;floor&#39;</span><span class="p">:</span> <span class="n">_db_floor_expr</span><span class="p">,</span>
+    <span class="s1">&#39;ceil&#39;</span><span class="p">:</span> <span class="n">_db_ceil_expr</span><span class="p">,</span>
 <span class="p">}</span>
 
 
