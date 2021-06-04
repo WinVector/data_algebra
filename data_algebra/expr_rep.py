@@ -370,6 +370,14 @@ class Term(PreTerm, ABC):
     def fmin(self, other):
         return self.__op_expr__("fmin", other, inline=False)
 
+    # more numpy stuff
+    def round(self):
+        return self.__uop_expr__("round")
+
+    def around(self, other):
+        assert isinstance(other, Value)  # digits control
+        return self.__op_expr__("round", other, inline=False)
+
     # pandas style definitions
     # https://pandas.pydata.org/pandas-docs/stable/reference/groupby.html
 
