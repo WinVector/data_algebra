@@ -19,6 +19,12 @@ def test_sign_parse_1():
             }
         )
 
+    # we don't want this error, but it is something we can't work around
+    # yet. It is also the kind of thing we are trying to avoid in the
+    # test_if_else_complex() test.
+    with pytest.raises(AttributeError):
+        res_pandas = ops.transform(d)
+
     # # Pandas mis-parses -3 is unary_op(3) and then throws!
     # # TODO: look towards non-eval implementations for non-windowed situations?
     # # TODO: look into pre-landing columns in many cases?
