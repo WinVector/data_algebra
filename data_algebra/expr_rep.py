@@ -376,7 +376,7 @@ class Term(PreTerm, ABC):
 
     def around(self, other):
         assert isinstance(other, Value)  # digits control
-        return self.__op_expr__("round", other, inline=False)
+        return self.__op_expr__("around", other, inline=False)
 
     # pandas style definitions
     # https://pandas.pydata.org/pandas-docs/stable/reference/groupby.html

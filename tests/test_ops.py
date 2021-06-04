@@ -298,6 +298,7 @@ def test_ops():
         "log": numpy.log,
         "log10": numpy.log10,
         "log1p": numpy.log1p,
+        "round": numpy.round,
         "sin": numpy.sin,
         "sinh": numpy.sinh,
         "sqrt": numpy.sqrt,
