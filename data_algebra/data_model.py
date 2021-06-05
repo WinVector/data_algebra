@@ -13,12 +13,6 @@ def negate_or_subtract(*args):
     raise ValueError("unexpected number of arguments in negate_or_subtract")
 
 
-def is_in(a, b):
-    b = [v.value for v in b]
-    res = numpy.isin(a, b)
-    return res
-
-
 def populate_impl_map(data_model):
     impl_map = {
         '==': numpy.equal,
@@ -49,7 +43,7 @@ def populate_impl_map(data_model):
         'if_else': numpy.where,
         'is_null': data_model.isnull,
         'is_bad': data_model.bad_column_positions,
-        'is_in': is_in,
+        'is_in': numpy.isin,
         'concat': lambda a, b: numpy.char.add(numpy.asarray(a, dtype=numpy.str),
                                               numpy.asarray(b, dtype=numpy.str)),
         'coalesce': lambda a, b: a.combine_first(b),  # assuming Pandas series

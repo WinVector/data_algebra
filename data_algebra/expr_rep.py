@@ -547,8 +547,11 @@ class UnQuotedStr(str):
         return self.v
 
 
+
 class FnValue(PreTerm):
-    # represent a function
+    """
+    Carry a function as data
+    """
     def __init__(self, value, *, name=None):
         if not callable(value):
             raise TypeError("value must be callable")
@@ -575,14 +578,15 @@ class FnValue(PreTerm):
     def to_python(self, *, want_inline_parens=False):
         return UnQuotedStr(self.name)
 
+    def evaluate(self, data_frame):
+        return self.value
+
 
 class ListTerm(PreTerm):
     # derived from PreTerm as this is not combinable
     def __init__(self, value):
         if not isinstance(value, (list, tuple)):
             raise TypeError("value type must be a list or tuple")
-        if not all([isinstance(v, data_algebra.expr_rep.PreTerm) for v in value]):
-            raise TypeError("Expected all list items to be parsed to data_algebra.expr_rep.PreTerm")
         self.value = [v for v in value]  # copy and standardize to a list
         PreTerm.__init__(self)
 
@@ -597,7 +601,13 @@ class ListTerm(PreTerm):
         return ListTerm(new_list)
 
     def evaluate(self, data_frame):
-        return self.value
+        res = [None] * len(self.value)
+        for i in range(len(self.value)):
+            vi = self.value[i]
+            if isinstance(vi, PreTerm):
+                vi = vi.evaluate(data_frame)
+            res[i] = vi
+        return res
 
     def to_python(self, *, want_inline_parens=False):
         def li_to_python(value, *, want_inline_parens=False):

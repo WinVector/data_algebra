@@ -74,7 +74,7 @@ def get_index_lists(partition_columns):
 
 def partitioned_eval(fn, arg_columns, partition_columns):
     """
-    Evaluate fn(fn_columns) on level-sets of partition columms.
+    Evaluate fn(fn_columns) on level-sets of partition columns.
 
     :param fn: function with arity length(fn_columns) then returns lists/vectors of the common length of its arguments.
     :param arg_columns: non-empty list of lists of length n
