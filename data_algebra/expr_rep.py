@@ -498,7 +498,7 @@ class Term(PreTerm, ABC):
 
 class Value(Term):
     def __init__(self, value):
-        allowed = [int, float, str, bool, ListTerm, tuple]
+        allowed = [int, float, str, bool]
         if not any([isinstance(value, tp) for tp in allowed]):
             raise TypeError("value type must be one of: " + str(allowed))
         self.value = value
@@ -565,9 +565,9 @@ class FnValue(PreTerm):
 class ListTerm(PreTerm):
     # derived from PreTerm as this is not combinable
     def __init__(self, value):
-        if not isinstance(value, list):
-            raise TypeError("value type must be a list")
-        self.value = [v for v in value]  # standardize to a list
+        if not isinstance(value, (list, tuple)):
+            raise TypeError("value type must be a list or tuple")
+        self.value = [v for v in value]  # copy and standardize to a list
         PreTerm.__init__(self)
 
     def is_equal(self, other):
@@ -616,9 +616,9 @@ class ListTerm(PreTerm):
 
 
 def _enc_value(value):
-    if isinstance(value, Term):
-        return value
-    if isinstance(value, FnValue):
+    #if isinstance(value, ListTerm):
+    #    return Value(value)  # this is the path we are trying to isolate and eliminate
+    if isinstance(value, PreTerm):
         return value
     if callable(value):
         return FnValue(value)

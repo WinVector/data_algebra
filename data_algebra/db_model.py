@@ -425,6 +425,9 @@ class DBModel:
                     # SQL window functions don't like parens
                     return subs[0] + " " + op.upper() + " " + subs[1]
             return op.upper() + "(" + ", ".join(subs) + ")"
+        if isinstance(expression, data_algebra.expr_rep.ListTerm):
+            return self.value_to_sql(expression.value)
+        # does FnValue need to be here?
         if isinstance(expression, data_algebra.user_fn.FnTerm):
             return expression.to_sql(db_model=self)
         raise TypeError("unexpected type: " + str(type(expression)))
