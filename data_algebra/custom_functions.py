@@ -115,31 +115,6 @@ def make_custom_function_map(data_model):
             ),
         ),
         CustomFunction(
-            name="partitioned_eval",
-            pandas_formatter=lambda expr: (
-                "@partitioned_eval("
-                # expr.args[0] is a FnValue
-                + "@"
-                + expr.args[0].to_pandas()
-                + ", "
-                # expr.args[1] is a ListTerm
-                + "["
-                + ", ".join([ei.to_pandas() for ei in expr.args[1].value])
-                + "]"
-                + ", "
-                # expr.args[2] is a ListTerm
-                + "["
-                + ", ".join([ei.to_pandas() for ei in expr.args[2].value])
-                + "]"
-                + ")"
-            ),
-            implementation=lambda fn, arg_columns, partition_columns: (
-                data_algebra.connected_components.partitioned_eval(
-                    fn, arg_columns, partition_columns
-                )
-            ),
-        ),
-        CustomFunction(
             name="max",
             pandas_formatter=lambda expr: ("@max(" + expr.args[0].to_pandas() + ")"),
             implementation=lambda x: numpy.asarray([numpy.max(x)] * len(x)),

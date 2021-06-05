@@ -49,7 +49,6 @@ def populate_impl_map(data_model):
         'coalesce': lambda a, b: a.combine_first(b),  # assuming Pandas series
         'connected_components': lambda a, b: data_algebra.connected_components.connected_components(a, b),
         'co_equalizer': lambda a, b: data_algebra.connected_components.connected_components(a, b),
-        'partitioned_eval': data_algebra.connected_components.partitioned_eval,
     }
     return impl_map
 

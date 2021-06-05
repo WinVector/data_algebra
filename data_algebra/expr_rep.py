@@ -547,41 +547,6 @@ class UnQuotedStr(str):
         return self.v
 
 
-
-class FnValue(PreTerm):
-    """
-    Carry a function as data
-    """
-    def __init__(self, value, *, name=None):
-        if not callable(value):
-            raise TypeError("value must be callable")
-        if name is None:
-            name = value.__name__
-        self.value = value
-        self.name = name
-        PreTerm.__init__(self)
-
-    def is_equal(self, other):
-        # can't use == as that builds a larger expression
-        if not isinstance(other, FnValue):
-            return False
-        if self.name != other.name:
-            return False
-        return True
-
-    def get_column_names(self, columns_seen):
-        pass
-
-    def replace_view(self, view):
-        pass
-
-    def to_python(self, *, want_inline_parens=False):
-        return UnQuotedStr(self.name)
-
-    def evaluate(self, data_frame):
-        return self.value
-
-
 class ListTerm(PreTerm):
     # derived from PreTerm as this is not combinable
     def __init__(self, value):
@@ -648,7 +613,7 @@ def _enc_value(value):
     if isinstance(value, PreTerm):
         return value
     if callable(value):
-        return FnValue(value)
+        raise ValueError("callable as an argument")
     if isinstance(value, list):
         return ListTerm(value)
     return Value(value)
@@ -850,11 +815,6 @@ def populate_specials(*, column_defs, destination, user_values=None):
     )
     destination["_size"] = lambda: data_algebra.expr_rep.Expression(op="size", args=[])
     destination["connected_components"] = connected_components
-    destination[
-        "partitioned_eval"
-    ] = lambda fn, args, partition: data_algebra.expr_rep.Expression(
-        op="partitioned_eval", args=[fn, args, partition], allows_expression_args=False
-    )
 
 
 def standardize_join_type(join_str):
