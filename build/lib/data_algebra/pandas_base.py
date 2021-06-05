@@ -101,28 +101,16 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
-        standin_name = "_data_algebra_temp_g"  # name of an arbitrary input variable
         data_algebra_temp_cols = {}
         if not window_situation:
             for (k, opk) in op.ops.items():
-                # TODO: execute expression recursively to keep eval() calls nearly trivial
-                if isinstance(opk, data_algebra.user_fn.FnTerm):
-                    pe = self.pandas_eval_env.copy()
-                    pe[opk.name] = opk.pandas_fn
-                    op_src = (
-                        "@"
-                        + opk.name
-                        + "("
-                        + ", ".join([nm.column_name for nm in opk.args])
-                        + ")"
-                    )
-                    res[k] = res.eval(op_src, local_dict=pe, global_dict=eval_env)
-                else:
-                    op_src = opk.to_pandas()
-                    res[k] = res.eval(
-                        op_src, local_dict=self.pandas_eval_env, global_dict=eval_env
-                    )
+                res[k] = data_algebra.expr_rep.eval_expression(
+                    opk,
+                    data_frame=res,
+                    local_dict=self.pandas_eval_env,
+                    global_dict=eval_env)
         else:
+            standin_name = "_data_algebra_temp_g"  # name of an arbitrary input variable
             # build up a sub-frame to work on
             col_list = [c for c in set(op.partition_by)]
             col_set = set(col_list)

@@ -1,6 +1,7 @@
 from abc import ABC
 from typing import Union
 
+import data_algebra
 import data_algebra.util
 import data_algebra.custom_functions
 
@@ -74,7 +75,10 @@ fn_names_that_contradict_ordered_windowed_situation = {
 
 
 class PreTerm(ABC):
-    # abstract base class, without combination ability
+    """
+    abstract base class, without combination ability
+    """
+
     source_string: Union[str, None]
 
     def __init__(self):
@@ -125,10 +129,8 @@ class PreTerm(ABC):
 
 
 class Term(PreTerm, ABC):
-    """Inherit from this class to capture expressions.
-    Abstract class, should be extended for use.
-
-    Used by the parse by lark path via method lookup.
+    """
+    Abstract intermediate class with combination ability
     """
 
     def __init__(self):
@@ -496,7 +498,7 @@ class Term(PreTerm, ABC):
 
 class Value(Term):
     def __init__(self, value):
-        allowed = [int, float, str, bool, ListTerm, tuple]
+        allowed = [int, float, str, bool]
         if not any([isinstance(value, tp) for tp in allowed]):
             raise TypeError("value type must be one of: " + str(allowed))
         self.value = value
@@ -561,10 +563,11 @@ class FnValue(PreTerm):
 
 
 class ListTerm(PreTerm):
+    # derived from PreTerm as this is not combinable
     def __init__(self, value):
-        if not isinstance(value, list):
-            raise TypeError("value type must be a list")
-        self.value = [v for v in value]  # standardize to a list
+        if not isinstance(value, (list, tuple)):
+            raise TypeError("value type must be a list or tuple")
+        self.value = [v for v in value]  # copy and standardize to a list
         PreTerm.__init__(self)
 
     def is_equal(self, other):
@@ -613,9 +616,9 @@ class ListTerm(PreTerm):
 
 
 def _enc_value(value):
-    if isinstance(value, Term):
-        return value
-    if isinstance(value, FnValue):
+    #if isinstance(value, ListTerm):
+    #    return Value(value)  # this is the path we are trying to isolate and eliminate
+    if isinstance(value, PreTerm):
         return value
     if callable(value):
         return FnValue(value)
@@ -832,3 +835,28 @@ def implies_windowed(parsed_exprs):
             if opk.op in data_algebra.expr_rep.fn_names_that_imply_windowed_situation:
                 return True
     return False
+
+
+def eval_expression(op, data_frame, *, local_dict, global_dict):
+    # TODO: execute expression recursively to keep eval() calls nearly trivial
+    assert isinstance(op, data_algebra.expr_rep.PreTerm)
+    assert isinstance(data_frame, data_algebra.default_data_model.pd.DataFrame)
+    assert isinstance(local_dict, dict)
+    # assert isinstance(global_dict, dict)  # often None, possibly a namespace?
+    if isinstance(op, data_algebra.user_fn.FnTerm):
+        pe = local_dict.copy()
+        pe[op.name] = op.pandas_fn
+        op_src = (
+                "@"
+                + op.name
+                + "("
+                + ", ".join([nm.column_name for nm in op.args])
+                + ")"
+        )
+        res = data_frame.eval(op_src, local_dict=pe, global_dict=global_dict)
+    else:
+        op_src = op.to_pandas()
+        res = data_frame.eval(
+            op_src, local_dict=local_dict, global_dict=global_dict
+        )
+    return res

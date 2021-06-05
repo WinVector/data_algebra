@@ -122,12 +122,12 @@ def make_custom_function_map(data_model):
                 + ", "
                 # expr.args[1] is a ListTerm
                 + "["
-                + ", ".join([ei.to_pandas() for ei in expr.args[1].value.value])
+                + ", ".join([ei.to_pandas() for ei in expr.args[1].value])
                 + "]"
                 + ", "
                 # expr.args[2] is a ListTerm
                 + "["
-                + ", ".join([ei.to_pandas() for ei in expr.args[2].value.value])
+                + ", ".join([ei.to_pandas() for ei in expr.args[2].value])
                 + "]"
                 + ")"
             ),
