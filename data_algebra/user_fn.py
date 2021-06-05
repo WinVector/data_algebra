@@ -62,6 +62,11 @@ class FnTerm(PreTerm):
         ]
         return self.sql_fn(subs, db_model)
 
+    def evaluate(self, data_frame):
+        args = [ai.evaluate(data_frame) for ai in self.args]
+        res = self.pandas_fn(*args)
+        return res
+
 
 # old adapter, phase out
 # wrap a function as a user callable function in pipeline
