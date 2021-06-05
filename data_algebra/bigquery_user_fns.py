@@ -9,7 +9,7 @@ import data_algebra.data_ops
 
 # TODO: re-eng all userfns to just be SQL constants, without pasting, perhaps pass in db handle
 
-# convert datetime to date
+
 import data_algebra.user_fn
 
 

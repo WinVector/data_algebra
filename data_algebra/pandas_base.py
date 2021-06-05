@@ -289,8 +289,12 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = op.sources[0].eval_implementation(
             data_map=data_map, eval_env=eval_env, data_model=self, narrow=narrow
         )
-        q = op.expr.to_pandas()
-        res = res.query(q).reset_index(drop=True)
+        selection = data_algebra.expr_rep.eval_expression(  # makes debugging easier
+            op.expr,
+            data_frame=res,
+            local_dict=self.pandas_eval_env,
+            global_dict=eval_env)
+        res = res.loc[selection, :].reset_index(drop=True, inplace=False)
         return res
 
     def select_columns_step(self, op, *, data_map, eval_env, narrow):
