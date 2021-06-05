@@ -221,8 +221,8 @@
         <span class="n">data_algebra_temp_cols</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">window_situation</span><span class="p">:</span>
             <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">opk</span><span class="p">)</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1"># TODO: execute expression recursively to keep eval() calls nearly trivial</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">):</span>
-                    <span class="c1"># res[k] = opk.value(*[res[nm.column_name] for nm in opk.args])</span>
                     <span class="n">pe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pandas_eval_env</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
                     <span class="n">pe</span><span class="p">[</span><span class="n">opk</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">pandas_fn</span>
                     <span class="n">op_src</span> <span class="o">=</span> <span class="p">(</span>
@@ -658,8 +658,8 @@
         <span class="n">data_algebra_temp_cols</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">window_situation</span><span class="p">:</span>
             <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">opk</span><span class="p">)</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1"># TODO: execute expression recursively to keep eval() calls nearly trivial</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">):</span>
-                    <span class="c1"># res[k] = opk.value(*[res[nm.column_name] for nm in opk.args])</span>
                     <span class="n">pe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pandas_eval_env</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
                     <span class="n">pe</span><span class="p">[</span><span class="n">opk</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">pandas_fn</span>
                     <span class="n">op_src</span> <span class="o">=</span> <span class="p">(</span>
@@ -1231,8 +1231,8 @@ inheritance.</p>
         <span class="n">data_algebra_temp_cols</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">window_situation</span><span class="p">:</span>
             <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">opk</span><span class="p">)</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1"># TODO: execute expression recursively to keep eval() calls nearly trivial</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">):</span>
-                    <span class="c1"># res[k] = opk.value(*[res[nm.column_name] for nm in opk.args])</span>
                     <span class="n">pe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pandas_eval_env</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
                     <span class="n">pe</span><span class="p">[</span><span class="n">opk</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">pandas_fn</span>
                     <span class="n">op_src</span> <span class="o">=</span> <span class="p">(</span>

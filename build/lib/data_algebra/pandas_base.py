@@ -105,8 +105,8 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         data_algebra_temp_cols = {}
         if not window_situation:
             for (k, opk) in op.ops.items():
+                # TODO: execute expression recursively to keep eval() calls nearly trivial
                 if isinstance(opk, data_algebra.user_fn.FnTerm):
-                    # res[k] = opk.value(*[res[nm.column_name] for nm in opk.args])
                     pe = self.pandas_eval_env.copy()
                     pe[opk.name] = opk.pandas_fn
                     op_src = (
