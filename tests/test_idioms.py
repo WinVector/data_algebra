@@ -133,18 +133,30 @@ def test_ideom_extend_special_count(get_bq_handle):
         assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
 
 
+# previously forbidden
 def test_ideom_forbind_extend_test_trinary():
     d = data_algebra.pd.DataFrame({
         'group': ['a', 'a', 'b', 'b'],
         'val': [1, 2, 3, 4],
     })
 
-    # forbid this form early, as Pandas throws on ops.transform(d)
-    with pytest.raises(Exception):
-        ops = describe_table(d, table_name='d') .\
-            extend({ # {'select': '(val > 2.5).if_else("high", "low")' } # doesn't work in Pandas
-                'select': '(val > 2.5).if_else("high", "low")'
-            })
+    ops = describe_table(d, table_name='d') .\
+        extend({ # {'select': '(val > 2.5).if_else("high", "low")' } # doesn't work in Pandas
+            'select': '(val > 2.5).if_else("high", "low")'
+        })
+
+    res_pandas = ops.transform(d)
+
+    expect = data_algebra.pd.DataFrame({
+        'group': ['a', 'a', 'b', 'b'],
+        'val': [1, 2, 3, 4],
+        'select': ['low', 'low', 'high', 'high']
+    })
+
+    assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
+
+    # TODO: add sqlite and bigquery tests!!!
+
 
 
 def test_ideom_extend_test_trinary(get_bq_handle):

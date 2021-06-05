@@ -5,6 +5,8 @@ import data_algebra.util
 import data_algebra.connected_components
 
 
+# TODO: obsolete these folding all into the impl_map and a similar SQL structure
+
 class CustomFunction:
     def __init__(self, *, name, pandas_formatter, implementation):
         self.name = name
@@ -95,7 +97,7 @@ def make_custom_function_map(data_model):
                 + expr.args[1].to_pandas()
                 + ")"
             ),
-            implementation=lambda f, g: data_algebra.connected_components.connected_components(
+            implementation=lambda f, g: data_algebra.connected_components(
                 f, g
             ),
         ),

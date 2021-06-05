@@ -104,11 +104,12 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         data_algebra_temp_cols = {}
         if not window_situation:
             for (k, opk) in op.ops.items():
-                res[k] = data_algebra.expr_rep.eval_expression(
+                res_k = data_algebra.expr_rep.eval_expression(  # makes debugging easier
                     opk,
                     data_frame=res,
                     local_dict=self.pandas_eval_env,
                     global_dict=eval_env)
+                res[k] = res_k
         else:
             standin_name = "_data_algebra_temp_g"  # name of an arbitrary input variable
             # build up a sub-frame to work on

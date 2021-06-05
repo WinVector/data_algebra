@@ -1,7 +1,5 @@
 import numpy
 
-import data_algebra
-
 import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *

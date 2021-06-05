@@ -1,9 +1,12 @@
 from abc import ABC
 from typing import Union
 
+import numpy
+
 import data_algebra
 import data_algebra.util
 import data_algebra.custom_functions
+
 
 # for some ideas in capturing expressions in Python see:
 #  scipy
@@ -102,6 +105,11 @@ class PreTerm(ABC):
         :return:
         """
         pass
+
+    # eval
+
+    def evaluate(self, data_frame):
+        raise NotImplementedError("base class called")
 
     # emitters
 
@@ -281,6 +289,9 @@ class Term(PreTerm, ABC):
 
     # TODO: double check https://docs.python.org/3/library/operator.html
     # for more ops such as concat() and so on
+
+    def sign(self):
+        return self.__uop_expr__("sign")
 
     def sin(self):
         return self.__uop_expr__("sin")
@@ -513,6 +524,9 @@ class Value(Term):
     def replace_view(self, view):
         return self
 
+    def evaluate(self, data_frame):
+        return self.value
+
     def to_python(self, *, want_inline_parens=False):
         return self.value.__repr__()
 
@@ -567,6 +581,8 @@ class ListTerm(PreTerm):
     def __init__(self, value):
         if not isinstance(value, (list, tuple)):
             raise TypeError("value type must be a list or tuple")
+        if not all([isinstance(v, data_algebra.expr_rep.PreTerm) for v in value]):
+            raise TypeError("Expected all list items to be parsed to data_algebra.expr_rep.PreTerm")
         self.value = [v for v in value]  # copy and standardize to a list
         PreTerm.__init__(self)
 
@@ -579,6 +595,9 @@ class ListTerm(PreTerm):
     def replace_view(self, view):
         new_list = [ai.replace_view(view) for ai in self.value]
         return ListTerm(new_list)
+
+    def evaluate(self, data_frame):
+        return self.value
 
     def to_python(self, *, want_inline_parens=False):
         def li_to_python(value, *, want_inline_parens=False):
@@ -616,8 +635,6 @@ class ListTerm(PreTerm):
 
 
 def _enc_value(value):
-    #if isinstance(value, ListTerm):
-    #    return Value(value)  # this is the path we are trying to isolate and eliminate
     if isinstance(value, PreTerm):
         return value
     if callable(value):
@@ -642,6 +659,9 @@ class ColumnReference(Term):
             if column_name not in view.column_set:
                 raise KeyError("column_name '" + str(column_name) + "' must be a column of the given view")
         Term.__init__(self)
+
+    def evaluate(self, data_frame):
+        return data_frame[self.column_name]
 
     def is_equal(self, other):
         # can't use == as that builds a larger expression
@@ -718,6 +738,29 @@ class Expression(Term):
     def get_column_names(self, columns_seen):
         for a in self.args:
             a.get_column_names(columns_seen)
+
+    def evaluate(self, data_frame):
+        args = [ai.evaluate(data_frame) for ai in self.args]
+        # first check chosen mappings
+        try:
+            return data_algebra.default_data_model.impl_map[self.op](*args)
+        except KeyError:
+            pass
+        # now see if argument (usually Pandas) can do this
+        # doubt we hit in this, as most exposed methods are window methods
+        try:
+            method = getattr(args[0], self.op)
+            if callable(method):
+                return method(*args[1: ])
+        except AttributeError:
+            pass
+        # new see if numpy can do this
+        try:
+            fn = numpy.__dict__[self.op]
+            if callable(fn):
+                return fn(*args)
+        except KeyError:
+            pass
 
     def to_python(self, *, want_inline_parens=False):
         subs = [ai.to_python(want_inline_parens=True) for ai in self.args]
@@ -837,26 +880,29 @@ def implies_windowed(parsed_exprs):
     return False
 
 
+# TODO: move to a method
 def eval_expression(op, data_frame, *, local_dict, global_dict):
     # TODO: execute expression recursively to keep eval() calls nearly trivial
     assert isinstance(op, data_algebra.expr_rep.PreTerm)
     assert isinstance(data_frame, data_algebra.default_data_model.pd.DataFrame)
     assert isinstance(local_dict, dict)
     # assert isinstance(global_dict, dict)  # often None, possibly a namespace?
-    if isinstance(op, data_algebra.user_fn.FnTerm):
-        pe = local_dict.copy()
-        pe[op.name] = op.pandas_fn
-        op_src = (
-                "@"
-                + op.name
-                + "("
-                + ", ".join([nm.column_name for nm in op.args])
-                + ")"
-        )
-        res = data_frame.eval(op_src, local_dict=pe, global_dict=global_dict)
-    else:
-        op_src = op.to_pandas()
-        res = data_frame.eval(
-            op_src, local_dict=local_dict, global_dict=global_dict
-        )
-    return res
+    return op.evaluate(data_frame)
+    # TODO: strip out local_dict, global_dict stuff
+    # if isinstance(op, data_algebra.user_fn.FnTerm):
+    #     pe = local_dict.copy()
+    #     pe[op.name] = op.pandas_fn
+    #     op_src = (
+    #             "@"
+    #             + op.name
+    #             + "("
+    #             + ", ".join([nm.column_name for nm in op.args])
+    #             + ")"
+    #     )
+    #     res = data_frame.eval(op_src, local_dict=pe, global_dict=global_dict)
+    # else:
+    #     op_src = op.to_pandas()
+    #     res = data_frame.eval(
+    #         op_src, local_dict=local_dict, global_dict=global_dict
+    #     )
+    # return res

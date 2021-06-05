@@ -1,9 +1,69 @@
 from abc import ABC
 
+import numpy
+
+import data_algebra.connected_components
+
+
+def negate_or_subtract(*args):
+    if len(args) == 1:
+        return numpy.negative(args[0])
+    if len(args) == 2:
+        return numpy.subtract(args[0], args[1])
+    raise ValueError("unexpected number of arguments in negate_or_subtract")
+
+
+def is_in(a, b):
+    b = [v.value for v in b]
+    res = numpy.isin(a, b)
+    return res
+
+
+def populate_impl_map(data_model):
+    impl_map = {
+        '==': numpy.equal,
+        '!=': numpy.not_equal,
+        '<>': numpy.not_equal,
+        '<': numpy.less,
+        '<=': numpy.less_equal,
+        '>': numpy.greater,
+        '>=': numpy.greater_equal,
+        '+': numpy.add,
+        '-': negate_or_subtract,
+        'neg': numpy.negative,
+        '*': numpy.multiply,
+        '/': numpy.divide,
+        '//': numpy.floor_divide,
+        '%': numpy.mod,
+        '**': numpy.power,
+        'and': numpy.logical_and,
+        '&': numpy.logical_and,
+        '&&': numpy.logical_and,
+        'or': numpy.logical_or,
+        '|': numpy.logical_or,
+        '||': numpy.logical_or,
+        'xor': numpy.logical_xor,
+        '^': numpy.logical_xor,
+        'not': numpy.logical_not,
+        '!': numpy.logical_not,
+        'if_else': numpy.where,
+        'is_null': data_model.isnull,
+        'is_bad': data_model.bad_column_positions,
+        'is_in': is_in,
+        'concat': lambda a, b: numpy.char.add(numpy.asarray(a, dtype=numpy.str),
+                                              numpy.asarray(b, dtype=numpy.str)),
+        'coalesce': lambda a, b: a.combine_first(b),  # assuming Pandas series
+        'connected_components': lambda a, b: data_algebra.connected_components.connected_components(a, b),
+        'co_equalizer': lambda a, b: data_algebra.connected_components.connected_components(a, b),
+        'partitioned_eval': data_algebra.connected_components.partitioned_eval,
+    }
+    return impl_map
+
 
 class DataModel(ABC):
     def __init__(self, presentation_model_name):
         self.presentation_model_name = presentation_model_name
+        self.impl_map = populate_impl_map(data_model=self)
 
     # helper functions
 

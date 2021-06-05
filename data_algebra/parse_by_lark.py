@@ -69,12 +69,6 @@ logical_remap = {
 }
 
 
-# TODO maintain this or get it from another structure
-forbid_inline_arg = set([
-    'if_else'
-])
-
-
 def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
     """
     Walk a lark parse tree and return our own reperesentation.
@@ -178,9 +172,6 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
                     # method invoke
                     var = _r_walk_lark_tree(method_carrier.children[0])
                     op_name = str(method_carrier.children[1])
-                    if ((isinstance(var, data_algebra.expr_rep.Expression))
-                            and (var.inline) and (op_name in forbid_inline_arg)):
-                        raise ValueError(f'operation {op_name} can only be non-inlined expressions.')
                 else:
                     # function invoke
                     var = None

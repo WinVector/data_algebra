@@ -13,6 +13,7 @@ import pytest
 
 # TODO: SQL tests for all non-failing steps
 
+
 def test_or_1():
     # some example data
     d = data_algebra.pd.DataFrame({
