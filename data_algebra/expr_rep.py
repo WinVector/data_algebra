@@ -75,7 +75,10 @@ fn_names_that_contradict_ordered_windowed_situation = {
 
 
 class PreTerm(ABC):
-    # abstract base class, without combination ability
+    """
+    abstract base class, without combination ability
+    """
+
     source_string: Union[str, None]
 
     def __init__(self):
@@ -126,10 +129,8 @@ class PreTerm(ABC):
 
 
 class Term(PreTerm, ABC):
-    """Inherit from this class to capture expressions.
-    Abstract class, should be extended for use.
-
-    Used by the parse by lark path via method lookup.
+    """
+    Abstract intermediate class with combination ability
     """
 
     def __init__(self):
@@ -562,6 +563,7 @@ class FnValue(PreTerm):
 
 
 class ListTerm(PreTerm):
+    # derived from PreTerm as this is not combinable
     def __init__(self, value):
         if not isinstance(value, list):
             raise TypeError("value type must be a list")
