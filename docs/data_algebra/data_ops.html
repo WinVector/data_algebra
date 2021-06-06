@@ -2327,7 +2327,7 @@
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLq</span><span class="p">(</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">prev_quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">prev_view_name</span><span class="p">),</span>
-            <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
+            <span class="n">query</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">sql_text</span><span class="o">=</span><span class="n">query</span><span class="p">),</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
@@ -8200,7 +8200,7 @@ with the using columns (None means all).</p>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLq</span><span class="p">(</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">prev_quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">prev_view_name</span><span class="p">),</span>
-            <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
+            <span class="n">query</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">sql_text</span><span class="o">=</span><span class="n">query</span><span class="p">),</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
@@ -8406,7 +8406,7 @@ with the using columns (None means all).</p>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLq</span><span class="p">(</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">prev_quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">prev_view_name</span><span class="p">),</span>
-            <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
+            <span class="n">query</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">sql_text</span><span class="o">=</span><span class="n">query</span><span class="p">),</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
