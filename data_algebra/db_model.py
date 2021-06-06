@@ -461,7 +461,7 @@ class DBModel:
                 previous_step_summary=subsql.summary(),
                 terms=terms,  # TODO: implement!
                 quoted_query_name=self.quote_identifier(view_name),
-                sub_sql=subsql.to_sql(columns=using, db_model=self),
+                sub_sql=subsql.to_near_sql(columns=using),
                 temp_tables=subsql.temp_tables.copy(),
             )
         return near_sql
@@ -527,7 +527,7 @@ class DBModel:
             previous_step_summary=subsql.summary(),
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
-            sub_sql=subsql.to_sql(columns=subusing, db_model=self),
+            sub_sql=subsql.to_near_sql(columns=subusing),
             temp_tables=subsql.temp_tables.copy(),
         )
         return near_sql
@@ -558,7 +558,7 @@ class DBModel:
             previous_step_summary=subsql.summary(),
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
-            sub_sql=subsql.to_sql(columns=subusing, db_model=self),
+            sub_sql=subsql.to_near_sql(columns=subusing),
             suffix=suffix,
             temp_tables=subsql.temp_tables.copy(),
         )
@@ -585,7 +585,7 @@ class DBModel:
             previous_step_summary=subsql.summary(),
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
-            sub_sql=subsql.to_sql(columns=subusing, db_model=self),
+            sub_sql=subsql.to_near_sql(columns=subusing),
             suffix=suffix,
             temp_tables=subsql.temp_tables.copy(),
         )
@@ -674,7 +674,7 @@ class DBModel:
             previous_step_summary=subsql.summary(),
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
-            sub_sql=subsql.to_sql(columns=subusing, db_model=self),
+            sub_sql=subsql.to_near_sql(columns=subusing),
             suffix=suffix,
             temp_tables=subsql.temp_tables.copy(),
         )
@@ -707,7 +707,7 @@ class DBModel:
             previous_step_summary=subsql.summary(),
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
-            sub_sql=subsql.to_sql(columns=subusing, db_model=self),
+            sub_sql=subsql.to_near_sql(columns=subusing),
             temp_tables=subsql.temp_tables.copy(),
         )
         return near_sql
@@ -790,10 +790,10 @@ class DBModel:
         near_sql = data_algebra.near_sql.NearSQLBinaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
-            sub_sql1=sql_left.to_sql(columns=using_left, db_model=self),
+            sub_sql1=sql_left.to_near_sql(columns=using_left),
             previous_step_summary1=sql_left.summary(),
             joiner=join_node.jointype + " JOIN",
-            sub_sql2=sql_right.to_sql(columns=using_right, db_model=self),
+            sub_sql2=sql_right.to_near_sql(columns=using_right),
             previous_step_summary2=sql_right.summary(),
             suffix=on_terms,
             temp_tables=temp_tables,
@@ -848,16 +848,14 @@ class DBModel:
         near_sql = data_algebra.near_sql.NearSQLUStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
-            sub_sql1=sql_left.to_sql(
+            sub_sql1=sql_left.to_near_sql(
                 columns=using_left,
-                db_model=self,
                 force_sql=True,
                 constants=constants_left,
             ),
             previous_step_summary1=sql_left.summary(),
-            sub_sql2=sql_right.to_sql(
+            sub_sql2=sql_right.to_near_sql(
                 columns=using_right,
-                db_model=self,
                 force_sql=True,
                 constants=constants_right,
             ),

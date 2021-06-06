@@ -45,16 +45,16 @@ def get_bq_handle():
 
 
 def test_bigquery_1(get_bq_handle):
-    d = data_algebra.default_data_model.pd.DataFrame({
-        'group': ['a', 'a', 'b', 'b'],
-        'val': [1, 2, 3, 4],
-    })
-
     bq_client = get_bq_handle['bq_client']
     bq_handle = get_bq_handle['bq_handle']
     data_catalog = get_bq_handle['data_catalog']
     data_schema = get_bq_handle['data_schema']
     tables_to_delete = get_bq_handle['tables_to_delete']
+
+    d = data_algebra.default_data_model.pd.DataFrame({
+        'group': ['a', 'a', 'b', 'b'],
+        'val': [1, 2, 3, 4],
+    })
     table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
     tables_to_delete.add(table_name)
 

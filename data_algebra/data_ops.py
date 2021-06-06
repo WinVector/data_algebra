@@ -1821,7 +1821,7 @@ class ConvertRecordsNode(ViewRepresentation):
         near_sql = data_algebra.near_sql.NearSQLq(
             quoted_query_name=db_model.quote_identifier(view_name),
             prev_quoted_query_name=db_model.quote_identifier(prev_view_name),
-            query=query,
+            query=data_algebra.near_sql.NearSQLContainer(sql_text=query),
             terms=terms,
             temp_tables=temp_tables,
         )

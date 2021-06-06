@@ -158,7 +158,6 @@ def test_ideom_forbind_extend_test_trinary():
     # TODO: add sqlite and bigquery tests!!!
 
 
-
 def test_ideom_extend_test_trinary(get_bq_handle):
     bq_client = get_bq_handle['bq_client']
     bq_handle = get_bq_handle['bq_handle']
