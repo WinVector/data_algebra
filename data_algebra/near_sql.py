@@ -72,6 +72,7 @@ class NearSQLUnaryStep(NearSQL):
             temp_tables=temp_tables,
         )
         # assert isinstance(sub_sql, NearSQL)
+        assert isinstance(sub_sql, str)
         assert isinstance(suffix,  (str, type(None)))
         assert isinstance(previous_step_summary, dict)
         self.sub_sql = sub_sql
@@ -131,7 +132,9 @@ class NearSQLBinaryStep(NearSQL):
             temp_tables=temp_tables,
         )
         # assert isinstance(sub_sql1, NearSQL)
-        # assert isinstance(sub_sql2, NearSQL)
+        #assert isinstance(sub_sql2, NearSQL)
+        assert isinstance(sub_sql1, str)
+        assert isinstance(sub_sql2, str)
         assert isinstance(previous_step_summary1, dict)
         assert isinstance(previous_step_summary2, dict)
         assert isinstance(suffix,  (str, type(None)))
@@ -218,6 +221,8 @@ class NearSQLUStep(NearSQL):
         )
         # assert isinstance(sub_sql1, NearSQL)
         # assert isinstance(sub_sql2, NearSQL)
+        assert isinstance(sub_sql1, str)
+        assert isinstance(sub_sql2, str)
         assert isinstance(previous_step_summary1, dict)
         assert isinstance(previous_step_summary2, dict)
         self.sub_sql1 = sub_sql1
@@ -289,6 +294,7 @@ class NearSQLq(NearSQL):
             quoted_query_name=quoted_query_name,
             temp_tables=temp_tables,
         )
+        # assert isinstance(query, NearSQL)
         assert isinstance(query, str)
         assert isinstance(prev_quoted_query_name, str)
         self.query = query
