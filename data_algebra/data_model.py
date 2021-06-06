@@ -16,6 +16,7 @@ def negate_or_subtract(*args):
 def populate_impl_map(data_model):
     impl_map = {
         '==': numpy.equal,
+        '=': numpy.equal,
         '!=': numpy.not_equal,
         '<>': numpy.not_equal,
         '<': numpy.less,

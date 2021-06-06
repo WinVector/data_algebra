@@ -140,22 +140,21 @@ class Term(PreTerm, ABC):
 
     # builders
 
-    def __op_expr__(self, op, other, *, inline=True, method=False, allows_expression_args=True):
+    def __op_expr__(self, op, other, *, inline=True, method=False):
         """binary expression"""
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
         if not isinstance(other, Term):
             other = _enc_value(other)
-        return Expression(op, (self, other), inline=inline, method=method,
-                          allows_expression_args=allows_expression_args)
+        return Expression(op, (self, other), inline=inline, method=method)
 
-    def __rop_expr__(self, op, other, allows_expression_args=True):
+    def __rop_expr__(self, op, other):
         """reversed binary expression"""
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
         if not isinstance(other, Term):
             other = _enc_value(other)
-        return Expression(op, (other, self), inline=True, allows_expression_args=allows_expression_args)
+        return Expression(op, (other, self), inline=True)
 
     def __uop_expr__(self, op, *, params=None, inline=False):
         """unary expression"""
@@ -163,7 +162,7 @@ class Term(PreTerm, ABC):
             raise TypeError("op is supposed to be a string")
         return Expression(op, (self,), params=params, inline=inline)
 
-    def __triop_expr__(self, op, x, y, inline=False, method=False, allows_expression_args=True):
+    def __triop_expr__(self, op, x, y, inline=False, method=False):
         """three argument expression"""
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
@@ -171,7 +170,7 @@ class Term(PreTerm, ABC):
             x = _enc_value(x)
         if not isinstance(y, Term):
             y = _enc_value(y)
-        return Expression(op, (self, x, y), inline=inline, method=method, allows_expression_args=allows_expression_args)
+        return Expression(op, (self, x, y), inline=inline, method=method)
 
     # try to get at == and other comparison operators
 
@@ -366,10 +365,10 @@ class Term(PreTerm, ABC):
         return self.__uop_expr__("abs")
 
     def maximum(self, other):
-        return self.__op_expr__("maximum", other, method=True, inline=False, allows_expression_args=False)
+        return self.__op_expr__("maximum", other, method=True, inline=False)
 
     def minimum(self, other):
-        return self.__op_expr__("minimum", other, method=True, inline=False, allows_expression_args=False)
+        return self.__op_expr__("minimum", other, method=True, inline=False)
 
     def fmax(self, other):
         return self.__op_expr__("fmax", other, inline=False)
@@ -486,19 +485,19 @@ class Term(PreTerm, ABC):
         return self.__uop_expr__("is_bad")
 
     def if_else(self, x, y):
-        return self.__triop_expr__("if_else", x, y, method=True, allows_expression_args=False)
+        return self.__triop_expr__("if_else", x, y, method=True)
 
     def is_in(self, x):
-        return self.__op_expr__("is_in", x, inline=False, method=True, allows_expression_args=False)
+        return self.__op_expr__("is_in", x, inline=False, method=True)
 
     def concat(self, x):
-        return self.__op_expr__("concat", x, inline=False, method=True, allows_expression_args=False)
+        return self.__op_expr__("concat", x, inline=False, method=True)
 
     def coalesce(self, x):
-        return self.__op_expr__("coalesce", x, inline=False, method=True, allows_expression_args=False)
+        return self.__op_expr__("coalesce", x, inline=False, method=True)
 
     def co_equalizer(self, x):
-        return self.__op_expr__("co_equalizer", x, inline=False, method=True, allows_expression_args=False)
+        return self.__op_expr__("co_equalizer", x, inline=False, method=True)
 
 
 class Value(Term):
@@ -639,7 +638,7 @@ class ColumnReference(Term):
 
 
 class Expression(Term):
-    def __init__(self, op, args, *, params=None, inline=False, method=False, allows_expression_args=True):
+    def __init__(self, op, args, *, params=None, inline=False, method=False):
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
         if inline:
@@ -651,12 +650,6 @@ class Expression(Term):
                 )
         self.op = op
         self.args = [_enc_value(ai) for ai in args]
-        if (not allows_expression_args) and (len(self.args) > 1):
-            # method part can be complex, but possibly not additional aruments
-            for i in range(1, len(self.args)):
-                ai = self.args[i]
-                if isinstance(ai, Expression):
-                    raise ValueError(f"{op} isn't allowed to have expression arguments")
         self.params = params
         self.inline = inline
         self.method = method
@@ -745,7 +738,7 @@ class Expression(Term):
 
 # define with def so function has usable __name__
 def connected_components(f, g):
-    return data_algebra.expr_rep.Expression(op="connected_components", args=[f, g], allows_expression_args=False)
+    return data_algebra.expr_rep.Expression(op="connected_components", args=[f, g])
 
 
 # TODO: get rid of user_values
