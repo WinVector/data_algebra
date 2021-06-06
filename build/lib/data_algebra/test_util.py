@@ -22,7 +22,7 @@ def formats_to_self(ops):
     ops2 = eval(
         str1,
         globals(),
-        {'pd': data_algebra.pd}  # make our definition of pandas available
+        {'pd': data_algebra.default_data_model.pd}  # make our definition of pandas available
     )
     str2 = repr(ops2)
     return str1 == str2
