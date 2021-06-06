@@ -1,13 +1,12 @@
 
 import numpy
-import pandas
 
 from data_algebra.data_ops import *
 import data_algebra.test_util
 
 
 def test_simple_expr_1():
-    d_orig = pandas.DataFrame({
+    d_orig = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, -3, 4]
     })
     d = d_orig.copy()
@@ -22,7 +21,7 @@ def test_simple_expr_1():
 
     res_pandas = ops.transform(d)
 
-    expect = pandas.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, -3, 4]
     })
     expect['z'] = expect['x'] + 1

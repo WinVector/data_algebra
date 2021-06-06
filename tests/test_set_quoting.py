@@ -1,12 +1,12 @@
 
-import pandas
 
+import data_algebra
 from data_algebra.data_ops import *
 import data_algebra.BigQuery
 
 
 def test_set_quoting_1():
-    d = pandas.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, -2, 3, -4]
     })
     targets = [-2, -5]
@@ -24,7 +24,7 @@ def test_set_quoting_1():
 
 
 def test_set_quoting_2():
-    d = pandas.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, -2, 3, -4]
     })
 

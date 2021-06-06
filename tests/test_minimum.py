@@ -1,13 +1,11 @@
 
-import pandas
-
-
+import data_algebra
 from data_algebra.data_ops import *
 import data_algebra.test_util
 
 
 def test_mimimum_1():
-    d = pandas.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, 3, 4, 5, 6],
         'g': [1, 1, 1, 2, 2, 2],
     })
@@ -24,7 +22,7 @@ def test_mimimum_1():
 
     res_pandas = ops.transform(d)  # throws deep in Pandas!
 
-    expect = pandas.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, 3, 4, 5, 6],
         'g': [1, 1, 1, 2, 2, 2],
         'x_g_max': [3, 3, 3, 6, 6, 6],
