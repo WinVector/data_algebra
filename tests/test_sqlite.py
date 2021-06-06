@@ -1,3 +1,5 @@
+
+import re
 import sqlite3
 
 import data_algebra
@@ -102,20 +104,30 @@ def test_sqllite_g2():
 
     sql_model = data_algebra.SQLite.SQLiteModel()
 
-    q = ops.to_sql(db_model=sql_model)
+    q = ops.to_sql(db_model=sql_model, pretty=False)
+    q_pretty = ops.to_sql(db_model=sql_model, pretty=True)
 
-    conn = sqlite3.connect(":memory:")
-    sql_model.prepare_connection(conn)
-    sql_model.insert_table(conn, d, table_name="d")
+    pattern_ws = re.compile(r'\s+')
+    q_ns = re.sub(pattern_ws, '', q)
+    q_pretty_ns = re.sub(pattern_ws, '', q_pretty)
+    assert q_ns == q_pretty_ns
 
-    # conn.execute('CREATE TABLE res AS ' + q)
-    # res_sql = sql_model.read_table(conn, 'res')
-    res_sql = sql_model.read_query(conn, q)
+    with sqlite3.connect(":memory:") as conn:
+        sql_model.prepare_connection(conn)
+        db_handle = sql_model.db_handle(conn)
+        db_handle.insert_table(d, table_name="d")
 
-    conn.close()
+        # conn.execute('CREATE TABLE res AS ' + q)
+        # res_sql = sql_model.read_table(conn, 'res')
+        res_sql = db_handle.read_query(q)
+        res_sql_pretty = db_handle.read_query(q_pretty)
 
     assert data_algebra.test_util.equivalent_frames(
         res_pandas, res_sql, check_row_order=True
+    )
+
+    assert data_algebra.test_util.equivalent_frames(
+        res_pandas, res_sql_pretty, check_row_order=True
     )
 
 
