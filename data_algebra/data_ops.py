@@ -520,16 +520,10 @@ class ViewRepresentation(OperatorPlatform, ABC):
             {"expr": expr}, self, parse_env=parse_env
         )
         data_model = data_algebra.default_data_model
-        forbid = data_model.custom_function_map.keys()
 
         def r_walk_expr(op):
             if not isinstance(op, data_algebra.expr_rep.Expression):
                 return
-            if op.op in forbid:
-                raise ValueError("special functions such as "
-                                 + op.op
-                                 + " not allowed in select_rows.\n"
-                                 + " Work around: please use an extend to materialize this expression.")
             for oi in op.args:
                 r_walk_expr(oi)
 

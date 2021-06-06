@@ -133,8 +133,23 @@ def test_in_3():
         'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
     })
 
-    with pytest.raises(ValueError):
-        ops = describe_table(d, table_name='d'). \
-            select_rows('ID.is_in([3, 4])')
+    ops = describe_table(d, table_name='d'). \
+        select_rows('ID.is_in([3, 4])')
 
-    # d2 = ops.transform(d)  # this will throw on user fn in a confusing way, so throw where the expr is made
+    res_pandas = ops.transform(d)
+
+    expect = data_algebra.pd.DataFrame({
+        'ID': [3, 4, 4, 4, 4],
+        'OP': ['D', 'C', 'A', 'D', 'B'],
+    })
+
+    assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
+
+    db_model = data_algebra.SQLite.SQLiteModel()
+    sql = ops.to_sql(db_model, pretty=True)
+    with sqlite3.connect(':memory:') as con:
+        db_model.prepare_connection(con)
+        d.to_sql(name='d', con=con)
+        res_db = data_algebra.pd.read_sql(sql, con=con)
+
+    assert data_algebra.test_util.equivalent_frames(expect, res_db)
