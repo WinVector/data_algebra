@@ -11,10 +11,10 @@ import pytest
 
 
 def test_cross_project_join_1():
-    d1 = data_algebra.pd.DataFrame({
+    d1 = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, 3],
     })
-    d2 = data_algebra.pd.DataFrame({
+    d2 = data_algebra.default_data_model.pd.DataFrame({
         'y': ['a', 'b', 'c', 'd'],
     })
     ops = describe_table(d1, table_name='d1') .\
@@ -23,7 +23,7 @@ def test_cross_project_join_1():
                          jointype='CROSS')
     res_pandas = ops.eval({'d1': d1, 'd2': d2})
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3],
         'y': ['a', 'b', 'c', 'd', 'a', 'b', 'c', 'd', 'a', 'b', 'c', 'd',],
     })

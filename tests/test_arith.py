@@ -8,7 +8,7 @@ import data_algebra.util
 import data_algebra.test_util
 
 def test_arith_1():
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, 3, 4],
         'y': [6, 9, 3, 8],
     })

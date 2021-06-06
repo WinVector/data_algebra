@@ -391,7 +391,7 @@ def test_cdata_explode():
 
 
 def test_cdata_query_details():
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'measure_1': [1, 2],
         'measure_2': [3, 4],
         'rec': ['a', 'b']
@@ -405,7 +405,7 @@ def test_cdata_query_details():
             record_keys=['rec'],
             record_value_columns=['measure_1', 'measure_2']))
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'rec': ['a', 'a', 'b', 'b'],
         'measurement': ['measure_1', 'measure_2', 'measure_1', 'measure_2'],
         'value': [1, 3, 2, 4]

@@ -96,5 +96,5 @@ def test_pandas_to_example():
         }
     )
     d_str = data_algebra.util.pandas_to_example_str(d)
-    d_back = eval(d_str, globals(), {'pd': data_algebra.pd})
+    d_back = eval(d_str, globals(), {'pd': data_algebra.default_data_model.pd})
     assert data_algebra.test_util.equivalent_frames(d, d_back)

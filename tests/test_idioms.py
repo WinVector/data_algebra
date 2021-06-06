@@ -51,7 +51,7 @@ def test_ideom_extend_one_count(get_bq_handle):
     data_schema = get_bq_handle['data_schema']
     tables_to_delete = get_bq_handle['tables_to_delete']
 
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'a', 'b', 'b'],
         'val': [1, 2, 3, 4],
     })
@@ -66,7 +66,7 @@ def test_ideom_extend_one_count(get_bq_handle):
         project({
             'count': 'one.sum()'
         })
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'count': [4]
     })
 
@@ -97,7 +97,7 @@ def test_ideom_extend_special_count(get_bq_handle):
     data_schema = get_bq_handle['data_schema']
     tables_to_delete = get_bq_handle['tables_to_delete']
 
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'a', 'b', 'b'],
         'val': [1, 2, 3, 4],
     })
@@ -109,7 +109,7 @@ def test_ideom_extend_special_count(get_bq_handle):
         project({
             'count': '_count()'
         })
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'count': [4]
     })
 
@@ -135,7 +135,7 @@ def test_ideom_extend_special_count(get_bq_handle):
 
 # previously forbidden
 def test_ideom_forbind_extend_test_trinary():
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'a', 'b', 'b'],
         'val': [1, 2, 3, 4],
     })
@@ -147,7 +147,7 @@ def test_ideom_forbind_extend_test_trinary():
 
     res_pandas = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'a', 'b', 'b'],
         'val': [1, 2, 3, 4],
         'select': ['low', 'low', 'high', 'high']
@@ -166,7 +166,7 @@ def test_ideom_extend_test_trinary(get_bq_handle):
     data_schema = get_bq_handle['data_schema']
     tables_to_delete = get_bq_handle['tables_to_delete']
 
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'a', 'b', 'b'],
         'val': [1, 2, 3, 4],
     })
@@ -181,7 +181,7 @@ def test_ideom_extend_test_trinary(get_bq_handle):
         extend({
             'select': 'select.if_else("high", "low")'
         })
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'a', 'b', 'b'],
         'val': [1, 2, 3, 4],
         'select': ['low', 'low', 'high', 'high']
@@ -214,10 +214,10 @@ def test_ideom_simulate_cross_join(get_bq_handle):
     data_schema = get_bq_handle['data_schema']
     tables_to_delete = get_bq_handle['tables_to_delete']
 
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, 3, 4],
     })
-    e = data_algebra.pd.DataFrame({
+    e = data_algebra.default_data_model.pd.DataFrame({
         'y': ['a', 'b', 'c'],
     })
 
@@ -239,7 +239,7 @@ def test_ideom_simulate_cross_join(get_bq_handle):
             jointype='left'
         ) .\
         drop_columns(['one'])
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4],
         'y': ['a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c'],
     })
@@ -273,10 +273,10 @@ def test_ideom_simulate_cross_join_select(get_bq_handle):
     data_schema = get_bq_handle['data_schema']
     tables_to_delete = get_bq_handle['tables_to_delete']
 
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, 3, 4],
     })
-    e = data_algebra.pd.DataFrame({
+    e = data_algebra.default_data_model.pd.DataFrame({
         'y': ['a', 'b', 'c'],
     })
 
@@ -298,7 +298,7 @@ def test_ideom_simulate_cross_join_select(get_bq_handle):
             jointype='left'
         ) .\
         select_columns(['x', 'y'])
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4],
         'y': ['a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c'],
     })
@@ -332,10 +332,10 @@ def test_ideom_cross_join(get_bq_handle):
     data_schema = get_bq_handle['data_schema']
     tables_to_delete = get_bq_handle['tables_to_delete']
 
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, 3, 4],
     })
-    e = data_algebra.pd.DataFrame({
+    e = data_algebra.default_data_model.pd.DataFrame({
         'y': ['a', 'b', 'c'],
     })
 
@@ -350,7 +350,7 @@ def test_ideom_cross_join(get_bq_handle):
             by=[],
             jointype='cross'
         )
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4],
         'y': ['a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c'],
     })
@@ -385,7 +385,7 @@ def test_ideom_row_number(get_bq_handle):
     data_schema = get_bq_handle['data_schema']
     tables_to_delete = get_bq_handle['tables_to_delete']
 
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'i': [1, 3, 2, 4, 5],
         'g': [1, 2, 2, 1, 1],
     })
@@ -406,7 +406,7 @@ def test_ideom_row_number(get_bq_handle):
 
     res_pandas = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'i': [1, 2, 3, 4, 5],
         'g': [1, 2, 2, 1, 1],
         'n': [1, 1, 2, 2, 3],
@@ -438,7 +438,7 @@ def test_ideom_sum_cumsum(get_bq_handle):
     data_schema = get_bq_handle['data_schema']
     tables_to_delete = get_bq_handle['tables_to_delete']
 
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'i': [1, 2, 3, 4, 5],
         'o': [1, 1, 1, 1, 1],
         'g': [1, 2, 2, 1, 1],
@@ -479,7 +479,7 @@ def test_ideom_sum_cumsum(get_bq_handle):
 
     res_pandas = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'i':  [1, 2, 3, 4, 5],
         'o':  [1, 1, 1, 1, 1],
         'g':  [1, 2, 2, 1, 1],
@@ -514,7 +514,7 @@ def test_ideom_project_sum(get_bq_handle):
     data_schema = get_bq_handle['data_schema']
     tables_to_delete = get_bq_handle['tables_to_delete']
 
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'i': [1, 2, 3, 4, 5],
         'g': [1, 2, 2, 1, 1],
     })
@@ -530,7 +530,7 @@ def test_ideom_project_sum(get_bq_handle):
 
     res_pandas = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'g':  [1, 2],
         's':  [3, 2],
     })
@@ -561,7 +561,7 @@ def test_ideom_concat_op(get_bq_handle):
     data_schema = get_bq_handle['data_schema']
     tables_to_delete = get_bq_handle['tables_to_delete']
 
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'x': ['a', 'b', 'c'],
         'y': ['1', '2', '3'],
     })
@@ -574,7 +574,7 @@ def test_ideom_concat_op(get_bq_handle):
 
     res_pandas = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'x': ['a', 'b', 'c'],
         'y': ['1', '2', '3'],
         'z': ['a1a', 'b2b', 'c3c']
@@ -606,7 +606,7 @@ def test_ideom_coalesce_op(get_bq_handle):
     data_schema = get_bq_handle['data_schema']
     tables_to_delete = get_bq_handle['tables_to_delete']
 
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'x': ['a', 'b', None, None],
         'y': ['1', None, '3', None],
     })
@@ -619,7 +619,7 @@ def test_ideom_coalesce_op(get_bq_handle):
 
     res_pandas = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'x': ['a', 'b', None, None],
         'y': ['1', None, '3', None],
         'z': ['a', 'b', '3', None],

@@ -16,7 +16,7 @@ import pytest
 
 def test_or_1():
     # some example data
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
         'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
     })
@@ -25,7 +25,7 @@ def test_or_1():
         select_rows('(ID == 3) | (ID == 4)')
     d2 = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'ID': [3, 4, 4, 4, 4],
         'OP': ['D', 'C', 'A', 'D', 'B'],
     })
@@ -35,7 +35,7 @@ def test_or_1():
 
 def test_in_1():
     # some example data
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
         'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
     })
@@ -45,7 +45,7 @@ def test_in_1():
     ops_str = str(ops)  # see if this throws
     d2 = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
         'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
         'v': [False]*3 + [True]*5 + [False]*3,
@@ -58,14 +58,14 @@ def test_in_1():
     with sqlite3.connect(':memory:') as con:
         db_model.prepare_connection(con)
         d.to_sql(name='d', con=con)
-        res_db = data_algebra.pd.read_sql(sql, con=con)
+        res_db = data_algebra.default_data_model.pd.read_sql(sql, con=con)
 
     assert data_algebra.test_util.equivalent_frames(expect, res_db)
 
 
 def test_in_1b():
     # some example data
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
         'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
     })
@@ -75,7 +75,7 @@ def test_in_1b():
     ops_str = str(ops)  # see if this throws
     d2 = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
         'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
         'v': [False]*3 + [True]*5 + [False]*3,
@@ -88,14 +88,14 @@ def test_in_1b():
     with sqlite3.connect(':memory:') as con:
         db_model.prepare_connection(con)
         d.to_sql(name='d', con=con)
-        res_db = data_algebra.pd.read_sql(sql, con=con)
+        res_db = data_algebra.default_data_model.pd.read_sql(sql, con=con)
 
     assert data_algebra.test_util.equivalent_frames(expect, res_db)
 
 
 def test_in_2():
     # some example data
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'ID': [1, 1, 2, 34, 44, 44, 44, 44, 5, 5, 6],
         'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
     })
@@ -106,7 +106,7 @@ def test_in_2():
     ops_str = str(ops)  # see if this throws
     d2 = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'ID': [34, 44, 44, 44, 44,],
         'OP': ['D', 'C', 'A', 'D', 'B'],
         'v': [True]*5,
@@ -121,14 +121,14 @@ def test_in_2():
     with sqlite3.connect(':memory:') as con:
         db_model.prepare_connection(con)
         d.to_sql(name='d', con=con)
-        res_db = data_algebra.pd.read_sql(sql, con=con)
+        res_db = data_algebra.default_data_model.pd.read_sql(sql, con=con)
 
     assert data_algebra.test_util.equivalent_frames(expect, res_db)
 
 
 def test_in_3():
     # some example data
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
         'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
     })
@@ -138,7 +138,7 @@ def test_in_3():
 
     res_pandas = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'ID': [3, 4, 4, 4, 4],
         'OP': ['D', 'C', 'A', 'D', 'B'],
     })
@@ -150,6 +150,6 @@ def test_in_3():
     with sqlite3.connect(':memory:') as con:
         db_model.prepare_connection(con)
         d.to_sql(name='d', con=con)
-        res_db = data_algebra.pd.read_sql(sql, con=con)
+        res_db = data_algebra.default_data_model.pd.read_sql(sql, con=con)
 
     assert data_algebra.test_util.equivalent_frames(expect, res_db)

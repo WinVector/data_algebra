@@ -44,7 +44,7 @@ def get_bq_handle():
 
 
 def test_bigquery_1(get_bq_handle):
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'a', 'b', 'b'],
         'val': [1, 2, 3, 4],
     })
@@ -69,7 +69,7 @@ def test_bigquery_1(get_bq_handle):
 
     res_1 = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'b'],
         'med_val': [1.5, 3.5],
     })
@@ -83,7 +83,7 @@ def test_bigquery_1(get_bq_handle):
 
 
 def test_bigquery_2(get_bq_handle):
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'a', 'a', 'b', 'b'],
         'v1': [1, 2, 2, 0, 0],
         'v2': [1, 2, 3, 4, 5],
@@ -120,7 +120,7 @@ def test_bigquery_2(get_bq_handle):
 
     res_1 = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'b'],
         'med_1': [2, 0],
         'med_2': [2.0, 4.5],
@@ -145,11 +145,11 @@ def test_bigquery_date_1(get_bq_handle):
     data_schema = get_bq_handle['data_schema']
     tables_to_delete = get_bq_handle['tables_to_delete']
 
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'a', 'a', 'b', 'b'],
         'v1': [1, 2, 2, 0, 0],
         'v2': [1, 2, 3, 4, 5],
-        'dt': data_algebra.pd.to_datetime([1490195805, 1490195815, 1490295805, 1490196805, 1490195835], unit='s')
+        'dt': data_algebra.default_data_model.pd.to_datetime([1490195805, 1490195815, 1490295805, 1490196805, 1490195835], unit='s')
     })
     d['dt_str'] = d.dt.astype(str)
 
@@ -184,11 +184,11 @@ def test_bigquery_date_1(get_bq_handle):
 
 
 def test_big_query_table_step(get_bq_handle):
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'a', 'a', 'b', 'b'],
         'v1': [1, 2, 2, 0, 0],
         'v2': [1, 2, 3, 4, 5],
-        'dt': data_algebra.pd.to_datetime([1490195805, 1490195815, 1490295805, 1490196805, 1490195835], unit='s')
+        'dt': data_algebra.default_data_model.pd.to_datetime([1490195805, 1490195815, 1490295805, 1490196805, 1490195835], unit='s')
     })
 
     bq_client = get_bq_handle['bq_client']
@@ -199,7 +199,7 @@ def test_big_query_table_step(get_bq_handle):
 
     # build a description that looks like the BigQuery db handle built it.
     td = describe_table(d, table_name='big.honking.dt')
-    td.sql_meta = data_algebra.pd.DataFrame()
+    td.sql_meta = data_algebra.default_data_model.pd.DataFrame()
     td.qualifiers['table_catalog'] = 'big'
     td.qualifiers['table_schema'] = 'honking'
     td.qualifiers['table_name'] = 'dt'
@@ -211,7 +211,7 @@ def test_big_query_table_step(get_bq_handle):
 def test_big_query_and(get_bq_handle):
     bigquery_handle = data_algebra.BigQuery.BigQuery_DBHandle(
         db_model=data_algebra.BigQuery.BigQueryModel(), conn=None)
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'a', 'a', 'b', 'b'],
         'v1': [1, 2, 2, 0, 2],
         'v2': [1, 2, 3, 4, 5],
@@ -236,7 +236,7 @@ def test_big_query_and(get_bq_handle):
 
     # see if we can use this locally
     res = ops.transform(d)
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'a'],
         'v1': [2, 2],
         'v2': [2, 3],
@@ -252,7 +252,7 @@ def test_big_query_and(get_bq_handle):
 
 def test_big_query_notor(get_bq_handle):
     bigquery_handle = data_algebra.BigQuery.BigQuery_DBHandle(conn=None)
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'a', 'a', 'b', 'b'],
         'v1': [1, 2, 2, 0, 2],
         'v2': [1, 2, 3, 4, 5],
@@ -277,7 +277,7 @@ def test_big_query_notor(get_bq_handle):
 
     # see if we can use this locally
     res = ops.transform(d)
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'group': ['b'],
         'v1': [0],
         'v2': [4],
@@ -292,7 +292,7 @@ def test_big_query_notor(get_bq_handle):
 
 
 def test_TRIMSTR(get_bq_handle):
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'x': ['0123456', 'abcdefghijk'],
         'y': ['012345', 'abcdefghij'],
     })
@@ -311,7 +311,7 @@ def test_TRIMSTR(get_bq_handle):
         })
     res = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'x': ['0123456', 'abcdefghijk'],
         'y': ['012345', 'abcdefghij'],
         'nx': ['01234', 'abcde'],
@@ -326,7 +326,7 @@ def test_TRIMSTR(get_bq_handle):
 
 
 def test_AS_INT64(get_bq_handle):
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'x': ['0123456', '66'],
         'y': ['012345', '77'],
     })
@@ -345,7 +345,7 @@ def test_AS_INT64(get_bq_handle):
         })
     res = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'x': ['0123456', '66'],
         'y': ['012345', '77'],
         'nx': [123456, 66]
@@ -360,8 +360,8 @@ def test_AS_INT64(get_bq_handle):
 
 
 def test_DATE(get_bq_handle):
-    d = data_algebra.pd.DataFrame({
-        'x': data_algebra.pd.to_datetime([1490196805, 1490195835], unit='s'),
+    d = data_algebra.default_data_model.pd.DataFrame({
+        'x': data_algebra.default_data_model.pd.to_datetime([1490196805, 1490195835], unit='s'),
         'y': ['012345', '77'],
     })
 
@@ -392,7 +392,7 @@ def test_DATE(get_bq_handle):
 
 
 def test_COALESCE_0(get_bq_handle):
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, None, 3]
     })
 
@@ -410,7 +410,7 @@ def test_COALESCE_0(get_bq_handle):
         })
     res = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, None, 3],
         'nx': [1, 0, 3]
     })
@@ -424,7 +424,7 @@ def test_COALESCE_0(get_bq_handle):
 
 
 def test_PARSE_DATE(get_bq_handle):
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'x': ['2001-01-01', '2020-04-02']
     })
 
@@ -443,10 +443,10 @@ def test_PARSE_DATE(get_bq_handle):
     res = ops.transform(d)
     assert isinstance(res.nx[0], datetime.date)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'x': ['2001-01-01', '2020-04-02']
     })
-    expect['nx'] = data_algebra.pd.to_datetime(d.x, format="%Y-%m-%d")
+    expect['nx'] = data_algebra.default_data_model.pd.to_datetime(d.x, format="%Y-%m-%d")
     assert data_algebra.test_util.equivalent_frames(res, expect)
 
     bigquery_sql = bq_handle.to_sql(ops)
@@ -454,7 +454,7 @@ def test_PARSE_DATE(get_bq_handle):
 
 
 def test_DATE_PARTS(get_bq_handle):
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'x': ['2001-01-01', '2020-04-02'],
         't': ['2001-01-01 01:33:22', '2020-04-02 13:11:10'],
     })
@@ -491,7 +491,7 @@ def test_DATE_PARTS(get_bq_handle):
     assert isinstance(res.sdt[0], str)
     assert isinstance(res.sd[0], str)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'x': ['2001-01-01', '2020-04-02'],
         't': ['2001-01-01 01:33:22', '2020-04-02 13:11:10'],
         'day_of_week': [2, 5],
@@ -502,9 +502,9 @@ def test_DATE_PARTS(get_bq_handle):
         'year': [2001, 2020],
         'dd': [0, 0],
     })
-    expect['nx'] = data_algebra.pd.to_datetime(expect.x, format="%Y-%m-%d").dt.date.copy()
-    expect['nt'] = data_algebra.pd.to_datetime(expect.t, format="%Y-%m-%d %H:%M:%S")
-    expect['nd'] = data_algebra.pd.to_datetime(expect.x, format="%Y-%m-%d")
+    expect['nx'] = data_algebra.default_data_model.pd.to_datetime(expect.x, format="%Y-%m-%d").dt.date.copy()
+    expect['nt'] = data_algebra.default_data_model.pd.to_datetime(expect.t, format="%Y-%m-%d %H:%M:%S")
+    expect['nd'] = data_algebra.default_data_model.pd.to_datetime(expect.x, format="%Y-%m-%d")
     expect['date2'] = expect.nt.dt.date.copy()
     expect['diff'] = [
             data_algebra.default_data_model.pd.Timedelta(expect['nt'][i] - expect['nd'][i]).total_seconds()
@@ -519,7 +519,7 @@ def test_DATE_PARTS(get_bq_handle):
 
 def test_coalesce(get_bq_handle):
     # TODO: test db version
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'a': [1, None, None, None, None, 6, 7, None],
         'b': [10, 20, None, None, None, 60, None, None],
         'c': [None, 200, 300, None, 500, 600, 700, None],
@@ -539,7 +539,7 @@ def test_coalesce(get_bq_handle):
 
     res = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'a': [1, None, None, None, None, 6, 7, None],
         'b': [10, 20, None, None, None, 60, None, None],
         'c': [None, 200, 300, None, 500, 600, 700, None],
@@ -559,7 +559,7 @@ def test_base_Sunday(get_bq_handle):
     table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
     tables_to_delete.add(table_name)
 
-    d = data_algebra.pd.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'date_str': ['2021-04-25', '2021-04-27']
     })
 
@@ -577,7 +577,7 @@ def test_base_Sunday(get_bq_handle):
 
     res = ops.transform(d)
 
-    expect = data_algebra.pd.DataFrame({
+    expect = data_algebra.default_data_model.pd.DataFrame({
         'date_str': ['2021-04-25', '2021-04-27'],
         's': ['2021-04-25', '2021-04-25']
     })
