@@ -7,6 +7,9 @@ import numpy
 import data_algebra.test_util
 from data_algebra.data_ops import *
 from data_algebra.SQLite import SQLiteModel
+
+
+import data_algebra
 import data_algebra.util
 
 import pytest

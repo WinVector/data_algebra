@@ -3,6 +3,7 @@ import sqlite3
 
 import pytest
 
+import data_algebra
 from data_algebra.data_ops import *
 import data_algebra.SQLite
 import data_algebra.test_util

@@ -1,5 +1,6 @@
 import pytest
 
+import data_algebra
 import data_algebra.util
 from data_algebra.data_ops import *
 

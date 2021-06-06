@@ -4,6 +4,7 @@ import datetime
 
 from google.cloud import bigquery
 
+import data_algebra
 import data_algebra.test_util
 from data_algebra.data_ops import *
 import data_algebra.BigQuery

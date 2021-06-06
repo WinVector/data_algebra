@@ -1,3 +1,5 @@
+
+import data_algebra
 from data_algebra.data_ops import *
 
 

@@ -1,5 +1,6 @@
 import sqlite3
 
+import data_algebra
 import data_algebra.util
 import data_algebra.test_util
 from data_algebra.cdata import *
