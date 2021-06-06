@@ -722,7 +722,7 @@ class Expression(Term):
             if isinstance(self.args[0], ColumnReference):
                 return subs[0] + "." + self.op + "()"
             else:
-                return "(" + subs[0] + ")." + self.op + "()"
+                return subs[0] + "." + self.op + "()"
         if len(subs) == 2 and self.inline:
             if want_inline_parens:
                 return "(" + subs[0] + " " + self.op + " " + subs[1] + ")"
@@ -732,7 +732,7 @@ class Expression(Term):
             if isinstance(self.args[0], ColumnReference):
                 return subs[0] + "." + self.op + "(" + ", ".join(subs[1:]) + ")"
             else:
-                return "(" + subs[0] + ")." + self.op + "(" + ", ".join(subs[1:]) + ")"
+                return subs[0] + "." + self.op + "(" + ", ".join(subs[1:]) + ")"
         return self.op + "(" + ", ".join(subs) + ")"
 
 

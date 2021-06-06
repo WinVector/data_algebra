@@ -17,7 +17,7 @@ def test_simple_expr_1():
             'z': 'x + 1',
             'sin_x': 'x.sin()',  # triggers numpy path
             'xm': '-x',
-            'xs': '2 * (x-2).sign()',  # TODO: see why this is formatting with additional parens (possibly in parse)?
+            'xs': '2 * (x-2).sign()',
         })
 
     res_pandas = ops.transform(d)
