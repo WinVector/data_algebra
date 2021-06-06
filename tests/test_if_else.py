@@ -123,3 +123,36 @@ def test_maximum_1():
         res_db = db_model.read_query(conn, ops_sql)
 
     assert data_algebra.test_util.equivalent_frames(res_db, expect)
+
+
+def test_if_else_complex():
+    d = data_algebra.default_data_model.pd.DataFrame({
+        "a": [-4, 2],
+        "b": [1, 2],
+        "c": [3, 4]}
+    )
+
+    ops = describe_table(d, table_name='d') .\
+        extend({"d": "((a + 2).sign() > 0).if_else(b+1, c-2)"})
+
+    res_pandas = ops.transform(d)
+
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        "a": [-4, 2],
+        "b": [1, 2],
+        "c": [3, 4],
+        "d": [1, 3]}
+    )
+
+    assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
+
+    db_model = SQLiteModel()
+
+    ops_sql = ops.to_sql(db_model)
+
+    with sqlite3.connect(":memory:") as conn:
+        db_model.prepare_connection(conn)
+        db_model.insert_table(conn, d, "d")
+        res_db = db_model.read_query(conn, ops_sql)
+
+    assert data_algebra.test_util.equivalent_frames(res_db, expect)
