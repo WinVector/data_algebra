@@ -10,7 +10,6 @@ import data_algebra.data_model
 import data_algebra.expr_rep
 import data_algebra.data_ops_types
 import data_algebra.connected_components
-import data_algebra.custom_functions
 
 
 # TODO: possibly import dask, Nvidia Rapids, or modin instead
@@ -24,9 +23,6 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         if not isinstance(pd, types.ModuleType):
             raise TypeError("Expected pd to be a module")
         self.pd = pd
-        self.custom_function_map = data_algebra.custom_functions.make_custom_function_map(
-            self
-        )
 
     # utils
 

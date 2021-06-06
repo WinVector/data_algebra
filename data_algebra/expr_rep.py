@@ -5,7 +5,6 @@ import numpy
 
 import data_algebra
 import data_algebra.util
-import data_algebra.custom_functions
 
 
 # for some ideas in capturing expressions in Python see:
@@ -767,7 +766,7 @@ def populate_specials(*, column_defs, destination, user_values=None):
     if not isinstance(user_values, dict):
         raise TypeError("user_values should be a dictionary")
     nd = column_defs.copy()
-    # TODO: unify with custom_functions, and more doc!
+    # more doc!
     # makes these symbols available for parsing step
     # need to enter user functions here or as methods on variables
     # Note: a lot of the re-emitters add back the underbar, allow the non
