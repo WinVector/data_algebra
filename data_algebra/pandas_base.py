@@ -101,9 +101,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         data_algebra_temp_cols = {}
         if not window_situation:
             for (k, opk) in op.ops.items():
-                res_k = data_algebra.expr_rep.eval_expression(  # makes debugging easier
-                    opk,
-                    data_frame=res)
+                res_k = opk.evaluate(res)  # makes debugging easier
                 res[k] = res_k
         else:
             standin_name = "_data_algebra_temp_g"  # name of an arbitrary input variable
@@ -284,9 +282,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = op.sources[0].eval_implementation(
             data_map=data_map, data_model=self, narrow=narrow
         )
-        selection = data_algebra.expr_rep.eval_expression(  # makes debugging easier
-            op.expr,
-            data_frame=res)
+        selection = op.expr.evaluate(res)
         res = res.loc[selection, :].reset_index(drop=True, inplace=False)
         return res
 

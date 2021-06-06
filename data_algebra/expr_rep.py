@@ -848,12 +848,3 @@ def implies_windowed(parsed_exprs):
             if opk.op in data_algebra.expr_rep.fn_names_that_imply_windowed_situation:
                 return True
     return False
-
-
-# TODO: move to a method
-def eval_expression(op, data_frame):
-    # TODO: execute expression recursively to keep eval() calls nearly trivial
-    assert isinstance(op, data_algebra.expr_rep.PreTerm)
-    assert isinstance(data_frame, data_algebra.default_data_model.pd.DataFrame)
-    return op.evaluate(data_frame)
-
