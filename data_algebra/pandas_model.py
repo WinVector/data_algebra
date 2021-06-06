@@ -21,7 +21,7 @@ class PandasModel(EvalModel, PandasModelBase):
             raise TypeError("expected handle to be of type self.pd.DataFrame")
         return res
 
-    def eval(self, ops, *, data_map=None, result_name=None, eval_env=None, narrow=True):
+    def eval(self, ops, *, data_map=None, result_name=None, narrow=True):
         tables_needed = [k for k in ops.get_tables().keys()]
         missing_tables = set(tables_needed) - set(data_map.keys())
         if len(missing_tables) > 0:
@@ -30,6 +30,6 @@ class PandasModel(EvalModel, PandasModelBase):
             result_name = self.mk_tmp_name(data_map)
         if result_name in tables_needed:
             raise ValueError("Can not write over an input table")
-        res = ops.eval(data_map, eval_env=eval_env, data_model=self, narrow=narrow)
+        res = ops.eval(data_map, data_model=self, narrow=narrow)
         data_map[result_name] = res
         return result_name

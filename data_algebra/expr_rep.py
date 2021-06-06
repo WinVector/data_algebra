@@ -851,28 +851,9 @@ def implies_windowed(parsed_exprs):
 
 
 # TODO: move to a method
-def eval_expression(op, data_frame, *, local_dict, global_dict):
+def eval_expression(op, data_frame):
     # TODO: execute expression recursively to keep eval() calls nearly trivial
     assert isinstance(op, data_algebra.expr_rep.PreTerm)
     assert isinstance(data_frame, data_algebra.default_data_model.pd.DataFrame)
-    assert isinstance(local_dict, dict)
-    # assert isinstance(global_dict, dict)  # often None, possibly a namespace?
     return op.evaluate(data_frame)
-    # TODO: strip out local_dict, global_dict stuff
-    # if isinstance(op, data_algebra.user_fn.FnTerm):
-    #     pe = local_dict.copy()
-    #     pe[op.name] = op.pandas_fn
-    #     op_src = (
-    #             "@"
-    #             + op.name
-    #             + "("
-    #             + ", ".join([nm.column_name for nm in op.args])
-    #             + ")"
-    #     )
-    #     res = data_frame.eval(op_src, local_dict=pe, global_dict=global_dict)
-    # else:
-    #     op_src = op.to_pandas()
-    #     res = data_frame.eval(
-    #         op_src, local_dict=local_dict, global_dict=global_dict
-    #     )
-    # return res
+

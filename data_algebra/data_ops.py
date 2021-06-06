@@ -267,7 +267,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     # Pandas realization
 
-    def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
+    def eval_implementation(self, *, data_map, data_model, narrow):
         raise NotImplementedError("base method called")
 
     def check_constraints(self, data_model, *, strict=True):
@@ -298,11 +298,10 @@ class ViewRepresentation(OperatorPlatform, ABC):
                         "Table " + k + " has forbidden columns: " + str(excess)
                     )
 
-    def eval(self, data_map, *, eval_env=None, data_model=None, narrow=True):
+    def eval(self, data_map, *, data_model=None, narrow=True):
         """
          Evaluate operators with respect to Pandas data frames.
          :param data_map: map from table names to data frames
-         :param eval_env: environment to evaluate in
          :param data_model: adaptor to data dialect (Pandas for now)
          :param narrow logical, if True don't copy unexpected columns
          :return:
@@ -330,11 +329,11 @@ class ViewRepresentation(OperatorPlatform, ABC):
                 if not data_model.is_appropriate_data_instance(data_map[k]):
                     raise ValueError("data_map[" + k + "] was not a usable type")
         return self.eval_implementation(
-            data_map=data_map, eval_env=eval_env, data_model=data_model, narrow=narrow
+            data_map=data_map, data_model=data_model, narrow=narrow
         )
 
     # noinspection PyPep8Naming
-    def transform(self, X, *, eval_env=None, data_model=None, narrow=True):
+    def transform(self, X, *, data_model=None, narrow=True):
         if data_model is None:
             data_model = data_algebra.default_data_model
         if not isinstance(data_model, data_algebra.data_model.DataModel):
@@ -353,7 +352,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
             data_map = {k: X}
             return self.eval(
                 data_map=data_map,
-                eval_env=eval_env,
                 data_model=data_model,
                 narrow=narrow,
             )
@@ -725,11 +723,11 @@ class TableDescription(ViewRepresentation):
         raise an exception if the values are not consistent"""
         return {self.key: self}
 
-    def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
+    def eval_implementation(self, *, data_map, data_model, narrow):
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.table_step(
-            op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
+            op=self, data_map=data_map, narrow=narrow
         )
 
     def columns_used_from_sources(self, using=None):
@@ -999,11 +997,11 @@ class ExtendNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.extend_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
+    def eval_implementation(self, *, data_map, data_model, narrow):
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.extend_step(
-            op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
+            op=self, data_map=data_map, narrow=narrow
         )
 
 
@@ -1136,11 +1134,11 @@ class ProjectNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.project_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
+    def eval_implementation(self, *, data_map, data_model, narrow):
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.project_step(
-            op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
+            op=self, data_map=data_map, narrow=narrow
         )
 
 
@@ -1203,11 +1201,11 @@ class SelectRowsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
+    def eval_implementation(self, *, data_map, data_model, narrow):
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.select_rows_step(
-            op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
+            op=self, data_map=data_map, narrow=narrow
         )
 
 
@@ -1274,11 +1272,11 @@ class SelectColumnsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
+    def eval_implementation(self, *, data_map, data_model, narrow):
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.select_columns_step(
-            op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
+            op=self, data_map=data_map, narrow=narrow
         )
 
 
@@ -1345,11 +1343,11 @@ class DropColumnsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
+    def eval_implementation(self, *, data_map, data_model, narrow):
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.drop_columns_step(
-            op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
+            op=self, data_map=data_map, narrow=narrow
         )
 
 
@@ -1426,11 +1424,11 @@ class OrderRowsNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.order_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
+    def eval_implementation(self, *, data_map, data_model, narrow):
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.order_rows_step(
-            op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
+            op=self, data_map=data_map, narrow=narrow
         )
 
     # short-cut main interface
@@ -1521,11 +1519,11 @@ class RenameColumnsNode(ViewRepresentation):
     def to_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.rename_to_sql(self, using=using, temp_id_source=temp_id_source)
 
-    def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
+    def eval_implementation(self, *, data_map, data_model, narrow):
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.rename_columns_step(
-            op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
+            op=self, data_map=data_map, narrow=narrow
         )
 
 
@@ -1626,11 +1624,11 @@ class NaturalJoinNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
+    def eval_implementation(self, *, data_map, data_model, narrow):
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.natural_join_step(
-            op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
+            op=self, data_map=data_map, narrow=narrow
         )
 
 
@@ -1726,11 +1724,11 @@ class ConcatRowsNode(ViewRepresentation):
             self, using=using, temp_id_source=temp_id_source
         )
 
-    def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
+    def eval_implementation(self, *, data_map, data_model, narrow):
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.concat_rows_step(
-            op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
+            op=self, data_map=data_map, narrow=narrow
         )
 
 
@@ -1835,9 +1833,9 @@ class ConvertRecordsNode(ViewRepresentation):
         )
         return near_sql
 
-    def eval_implementation(self, *, data_map, eval_env, data_model, narrow):
+    def eval_implementation(self, *, data_map, data_model, narrow):
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.convert_records_step(
-            op=self, data_map=data_map, eval_env=eval_env, narrow=narrow
+            op=self, data_map=data_map, narrow=narrow
         )

@@ -17,12 +17,11 @@ class OperatorPlatform:
         self.node_name = node_name
 
     # noinspection PyPep8Naming
-    def transform(self, X, *, eval_env=None, data_model=None, narrow=True):
+    def transform(self, X, *, data_model=None, narrow=True):
         """
         apply self to data frame X, may or may not commute with composition
 
         :param X: input data frame
-        :param eval_env environment to look for symbols in
         :param data_model implementation to use
         :param narrow logical, if True don't copy unexpected columns
         :return: transformed dataframe
@@ -30,17 +29,16 @@ class OperatorPlatform:
         raise NotImplementedError("base class called")
 
     # noinspection PyPep8Naming
-    def act_on(self, X, *, eval_env=None, data_model=None):
+    def act_on(self, X, *, data_model=None):
         """
         apply self to data frame X, must commute with composition
 
         :param X: input data frame
-        :param eval_env environment to look for symbols in
         :param data_model implementation to use
         :return: transformed dataframe
         """
         return self.transform(
-            X=X, eval_env=eval_env, data_model=data_model, narrow=False
+            X=X, data_model=data_model, narrow=False
         )
 
     def apply_to(self, a, *, target_table_key=None):
