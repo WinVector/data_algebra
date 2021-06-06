@@ -126,18 +126,24 @@
                 
                         <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="c1"># TODO: buld a term object that carries the column use information</span>
-<span class="k">class</span> <span class="nc">NearSQL</span><span class="p">:</span>
+            <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
+
+
+<span class="c1"># TODO: buld a term object that carries the column use information</span>
+
+
+<span class="k">class</span> <span class="nc">NearSQL</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represent SQL queries in a mostly string-form</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">terms</span><span class="p">,</span> <span class="n">quoted_query_name</span><span class="p">,</span> <span class="n">temp_tables</span><span class="p">):</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">terms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">terms</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;terms is supposed to be a dictionary&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">terms</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quoted_query_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">temp_tables</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">terms</span> <span class="o">=</span> <span class="n">terms</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quoted_query_name</span> <span class="o">=</span> <span class="n">quoted_query_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">temp_tables</span> <span class="o">=</span> <span class="n">temp_tables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temp_tables</span> <span class="o">=</span> <span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">db_model</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
@@ -192,10 +198,12 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="c1"># assert isinstance(sub_sql, NearSQL)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span>  <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql</span> <span class="o">=</span> <span class="n">sub_sql</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected previous step to be a dict&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_step_summary</span> <span class="o">=</span> <span class="n">previous_step_summary</span>
 
     <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">db_model</span><span class="p">):</span>
@@ -250,14 +258,18 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="c1"># assert isinstance(sub_sql1, NearSQL)</span>
+        <span class="c1">#assert isinstance(sub_sql2, NearSQL)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_sql1</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_sql2</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary1</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary2</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span>  <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">joiner</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql1</span> <span class="o">=</span> <span class="n">sub_sql1</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary1</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected previous step to be a dict&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_step_summary1</span> <span class="o">=</span> <span class="n">previous_step_summary1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">joiner</span> <span class="o">=</span> <span class="n">joiner</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql2</span> <span class="o">=</span> <span class="n">sub_sql2</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary2</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected previous step to be a dict&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_step_summary2</span> <span class="o">=</span> <span class="n">previous_step_summary2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span>
 
@@ -315,6 +327,7 @@
         <span class="k">return</span> <span class="n">sql</span>
 
 
+<span class="c1"># UNION ALL step, can we merge this to binary step?</span>
 <span class="k">class</span> <span class="nc">NearSQLUStep</span><span class="p">(</span><span class="n">NearSQL</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -333,13 +346,15 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="c1"># assert isinstance(sub_sql1, NearSQL)</span>
+        <span class="c1"># assert isinstance(sub_sql2, NearSQL)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_sql1</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_sql2</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary1</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary2</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql1</span> <span class="o">=</span> <span class="n">sub_sql1</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary1</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected previous step to be a dict&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_step_summary1</span> <span class="o">=</span> <span class="n">previous_step_summary1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql2</span> <span class="o">=</span> <span class="n">sub_sql2</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary2</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected previous step to be a dict&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_step_summary2</span> <span class="o">=</span> <span class="n">previous_step_summary2</span>
 
     <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">db_model</span><span class="p">):</span>
@@ -406,6 +421,9 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="c1"># assert isinstance(query, NearSQL)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prev_quoted_query_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">query</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prev_quoted_query_name</span> <span class="o">=</span> <span class="n">prev_quoted_query_name</span>
 
@@ -444,22 +462,23 @@
 
         
         <span class="def">class</span>
-        <span class="name">NearSQL</span>:
+        <span class="name">NearSQL</span><wbr>(<span class="base">abc.ABC</span>):
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">NearSQL</span><span class="p">:</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">NearSQL</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represent SQL queries in a mostly string-form</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">terms</span><span class="p">,</span> <span class="n">quoted_query_name</span><span class="p">,</span> <span class="n">temp_tables</span><span class="p">):</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">terms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">terms</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;terms is supposed to be a dictionary&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">terms</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quoted_query_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">temp_tables</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">terms</span> <span class="o">=</span> <span class="n">terms</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quoted_query_name</span> <span class="o">=</span> <span class="n">quoted_query_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">temp_tables</span> <span class="o">=</span> <span class="n">temp_tables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temp_tables</span> <span class="o">=</span> <span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">db_model</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
@@ -484,11 +503,12 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">terms</span><span class="p">,</span> <span class="n">quoted_query_name</span><span class="p">,</span> <span class="n">temp_tables</span><span class="p">):</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">terms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">terms</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;terms is supposed to be a dictionary&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">terms</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quoted_query_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">temp_tables</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">terms</span> <span class="o">=</span> <span class="n">terms</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quoted_query_name</span> <span class="o">=</span> <span class="n">quoted_query_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">temp_tables</span> <span class="o">=</span> <span class="n">temp_tables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temp_tables</span> <span class="o">=</span> <span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 </pre></div>
 
         </details>
@@ -684,10 +704,12 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="c1"># assert isinstance(sub_sql, NearSQL)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span>  <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql</span> <span class="o">=</span> <span class="n">sub_sql</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected previous step to be a dict&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_step_summary</span> <span class="o">=</span> <span class="n">previous_step_summary</span>
 
     <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">db_model</span><span class="p">):</span>
@@ -761,10 +783,12 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="c1"># assert isinstance(sub_sql, NearSQL)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span>  <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql</span> <span class="o">=</span> <span class="n">sub_sql</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected previous step to be a dict&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_step_summary</span> <span class="o">=</span> <span class="n">previous_step_summary</span>
 </pre></div>
 
@@ -861,14 +885,18 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="c1"># assert isinstance(sub_sql1, NearSQL)</span>
+        <span class="c1">#assert isinstance(sub_sql2, NearSQL)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_sql1</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_sql2</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary1</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary2</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span>  <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">joiner</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql1</span> <span class="o">=</span> <span class="n">sub_sql1</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary1</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected previous step to be a dict&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_step_summary1</span> <span class="o">=</span> <span class="n">previous_step_summary1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">joiner</span> <span class="o">=</span> <span class="n">joiner</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql2</span> <span class="o">=</span> <span class="n">sub_sql2</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary2</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected previous step to be a dict&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_step_summary2</span> <span class="o">=</span> <span class="n">previous_step_summary2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span>
 
@@ -971,14 +999,18 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="c1"># assert isinstance(sub_sql1, NearSQL)</span>
+        <span class="c1">#assert isinstance(sub_sql2, NearSQL)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_sql1</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_sql2</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary1</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary2</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span>  <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">joiner</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql1</span> <span class="o">=</span> <span class="n">sub_sql1</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary1</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected previous step to be a dict&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_step_summary1</span> <span class="o">=</span> <span class="n">previous_step_summary1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">joiner</span> <span class="o">=</span> <span class="n">joiner</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql2</span> <span class="o">=</span> <span class="n">sub_sql2</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary2</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected previous step to be a dict&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_step_summary2</span> <span class="o">=</span> <span class="n">previous_step_summary2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span>
 </pre></div>
@@ -1096,13 +1128,15 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="c1"># assert isinstance(sub_sql1, NearSQL)</span>
+        <span class="c1"># assert isinstance(sub_sql2, NearSQL)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_sql1</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_sql2</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary1</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary2</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql1</span> <span class="o">=</span> <span class="n">sub_sql1</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary1</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected previous step to be a dict&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_step_summary1</span> <span class="o">=</span> <span class="n">previous_step_summary1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql2</span> <span class="o">=</span> <span class="n">sub_sql2</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary2</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected previous step to be a dict&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_step_summary2</span> <span class="o">=</span> <span class="n">previous_step_summary2</span>
 
     <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">db_model</span><span class="p">):</span>
@@ -1199,13 +1233,15 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="c1"># assert isinstance(sub_sql1, NearSQL)</span>
+        <span class="c1"># assert isinstance(sub_sql2, NearSQL)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_sql1</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_sql2</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary1</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary2</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql1</span> <span class="o">=</span> <span class="n">sub_sql1</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary1</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected previous step to be a dict&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_step_summary1</span> <span class="o">=</span> <span class="n">previous_step_summary1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql2</span> <span class="o">=</span> <span class="n">sub_sql2</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_step_summary2</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected previous step to be a dict&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_step_summary2</span> <span class="o">=</span> <span class="n">previous_step_summary2</span>
 </pre></div>
 
@@ -1313,6 +1349,9 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="c1"># assert isinstance(query, NearSQL)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prev_quoted_query_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">query</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prev_quoted_query_name</span> <span class="o">=</span> <span class="n">prev_quoted_query_name</span>
 
@@ -1373,6 +1412,9 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="c1"># assert isinstance(query, NearSQL)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prev_quoted_query_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">query</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prev_quoted_query_name</span> <span class="o">=</span> <span class="n">prev_quoted_query_name</span>
 </pre></div>
