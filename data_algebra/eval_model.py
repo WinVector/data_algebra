@@ -16,9 +16,6 @@ class EvalModel(ABC):
             new_name = "TMP_" + str(new_id).zfill(7) + "_T"
         return new_name
 
-    def to_pandas(self, handle, *, data_map=None):
-        raise NotImplementedError("base class called")
-
     def eval(self, ops, *, data_map=None, result_name=None, narrow=True):
         """
         apply ops to data frames in data_map

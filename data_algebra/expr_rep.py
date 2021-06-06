@@ -116,14 +116,9 @@ class PreTerm(ABC):
     def to_python(self, *, want_inline_parens=False):
         raise NotImplementedError("base class method called")  # https://docs.python.org/3/library/exceptions.html
 
-    def to_pandas(self, *, want_inline_parens=False):
-        return self.to_python(want_inline_parens=want_inline_parens)
-
     def to_source(self, *, want_inline_parens=False, dialect="Python"):
         if dialect == "Python":
             return self.to_python(want_inline_parens=want_inline_parens)
-        elif dialect == "Pandas":
-            return self.to_pandas(want_inline_parens=want_inline_parens)
         else:
             raise ValueError("unexpected dialect string: " + str(dialect))
 
@@ -592,18 +587,6 @@ class ListTerm(PreTerm):
             + "]"
         )
 
-    def to_pandas(self, *, want_inline_parens=False):
-        return (
-            "["
-            + ", ".join(
-                [
-                    ai.to_pandas(want_inline_parens=want_inline_parens)
-                    for ai in self.value
-                ]
-            )
-            + "]"
-        )
-
     def get_column_names(self, columns_seen):
         for ti in self.value:
             ti.get_column_names(columns_seen)
@@ -743,7 +726,7 @@ class Expression(Term):
             return "_" + self.op + "()"
         if len(subs) == 1:
             if self.inline:
-                return self.op + self.args[0].to_pandas(want_inline_parens=True)
+                return self.op + self.args[0].to_python(want_inline_parens=True)
             if isinstance(self.args[0], ColumnReference):
                 return subs[0] + "." + self.op + "()"
             else:
@@ -758,24 +741,6 @@ class Expression(Term):
                 return subs[0] + "." + self.op + "(" + ", ".join(subs[1:]) + ")"
             else:
                 return "(" + subs[0] + ")." + self.op + "(" + ", ".join(subs[1:]) + ")"
-        return self.op + "(" + ", ".join(subs) + ")"
-
-    def to_pandas(self, *, want_inline_parens=False):
-        cfmap = data_algebra.default_data_model.custom_function_map
-        if self.op in cfmap.keys():
-            return cfmap[self.op].pandas_formatter(self)
-        if len(self.args) <= 0:
-            return "_" + self.op + "()"
-        if len(self.args) == 1:
-            return (
-                self.op + "(" + self.args[0].to_pandas(want_inline_parens=False) + ")"
-            )
-        subs = [ai.to_pandas(want_inline_parens=True) for ai in self.args]
-        if len(subs) == 2 and self.inline:
-            if want_inline_parens:
-                return "(" + subs[0] + " " + self.op + " " + subs[1] + ")"
-            else:
-                return subs[0] + " " + self.op + " " + subs[1]
         return self.op + "(" + ", ".join(subs) + ")"
 
 
@@ -806,7 +771,7 @@ def populate_specials(*, column_defs, destination, user_values=None):
     # makes these symbols available for parsing step
     # need to enter user functions here or as methods on variables
     # Note: a lot of the re-emitters add back the underbar, allow the non
-    # underbar names we see here.  See expr_rep.py Expression to_python and to_pandas.
+    # underbar names we see here.  See expr_rep.py Expression to_python.
     destination["_row_number"] = lambda: data_algebra.expr_rep.Expression(
         op="row_number", args=[]
     )

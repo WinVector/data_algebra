@@ -862,7 +862,7 @@ class ExtendNode(ViewRepresentation):
                         + "'"
                         + k
                         + "': '"
-                        + opk.to_pandas()
+                        + str(opk)
                         + "'"
                     )
                 if len(opk.args) > 1:
@@ -871,15 +871,15 @@ class ExtendNode(ViewRepresentation):
                         + "'"
                         + k
                         + "': '"
-                        + opk.to_pandas()
+                        + str(opk)
                         + "' term is too complex an expression"
                     )
                 if len(opk.args) > 0:
                     if isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
-                        value_name = opk.args[0].to_pandas()
+                        value_name = opk.args[0].column_name
                         if value_name not in source.column_set:
                             raise ValueError(
-                                opk.to_pandas() + " not in source column set"
+                                value_name + " not in source column set"
                             )
                     else:
                         if not isinstance(opk.args[0], data_algebra.expr_rep.Value):
@@ -888,19 +888,19 @@ class ExtendNode(ViewRepresentation):
                                 + "'"
                                 + k
                                 + "': '"
-                                + opk.to_pandas()
+                                + str(opk)
                                 + "' term is too complex an expression"
                             )
                 if (ordered_windowed_situation and
                         (opk.op in data_algebra.expr_rep.fn_names_that_contradict_ordered_windowed_situation)):
                     raise ValueError(
-                        opk.to_pandas()
+                        str(opk)
                         + "' is not allowed in an ordered windowed situation"
                     )
                 if ((not ordered_windowed_situation) and
                         (opk.op in data_algebra.expr_rep.fn_names_that_imply_ordered_windowed_situation)):
                     raise ValueError(
-                        opk.to_pandas()
+                        str(opk)
                         + "' is not allowed in not-ordered windowed situation"
                     )
         ViewRepresentation.__init__(
@@ -1055,7 +1055,7 @@ class ProjectNode(ViewRepresentation):
                         )
                 if opk.op in data_algebra.expr_rep.fn_names_that_imply_ordered_windowed_situation:
                     raise ValueError(
-                        opk.to_pandas()
+                        str(opk)
                         + "' is not allowed in project"
                     )
             else:

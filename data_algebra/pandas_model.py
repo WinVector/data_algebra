@@ -11,16 +11,6 @@ class PandasModel(EvalModel, PandasModelBase):
 
     # EvalModel interface
 
-    def to_pandas(self, handle, *, data_map=None):
-        if isinstance(data_map, str):
-            res = data_map[handle]
-        else:
-            res = handle
-        # noinspection PyUnresolvedReferences
-        if not isinstance(res, self.pd.DataFrame):
-            raise TypeError("expected handle to be of type self.pd.DataFrame")
-        return res
-
     def eval(self, ops, *, data_map=None, result_name=None, narrow=True):
         tables_needed = [k for k in ops.get_tables().keys()]
         missing_tables = set(tables_needed) - set(data_map.keys())
