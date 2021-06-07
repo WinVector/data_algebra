@@ -14259,6 +14259,13 @@ a.anchor-link {
 
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>This is a small demonstration of the <a href="https://github.com/WinVector/data_algebra"><code>data_algebra</code></a>.</p>
+
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>First let's import our packages and set up an example data frame.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -14351,6 +14358,12 @@ a.anchor-link {
 
 </div>
 
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Now let's define our data transform using the data algebra. New columns are defined by specifying a Python dictionary where new column names are the keys and the source-code for the operations are the values. We try to use Codd's names for operators: adding columns is <code>extend()</code>, and summarizing data is <code>project()</code>.</p>
+
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
@@ -14361,14 +14374,14 @@ a.anchor-link {
 
 <span class="n">operations</span> <span class="o">=</span> <span class="n">describe_table</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">)</span> <span class="o">.</span>\
     <span class="n">extend</span><span class="p">({</span>
-        <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="s1">&#39;&quot;prefix_&quot; </span><span class="si">%+%</span><span class="s1"> c&#39;</span>
+        <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="s1">&#39;&quot;prefix_&quot; </span><span class="si">%+%</span><span class="s1"> c&#39;</span>  <span class="c1"># concatinate strings</span>
          <span class="p">})</span> <span class="o">.</span>\
-    <span class="n">project</span><span class="p">({</span>
+    <span class="n">project</span><span class="p">({</span>  <span class="c1"># build per- group g totals of v</span>
         <span class="s1">&#39;group_total&#39;</span><span class="p">:</span> <span class="s1">&#39;v.sum()&#39;</span>
         <span class="p">},</span>
         <span class="n">group_by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span>
         <span class="p">)</span> <span class="o">.</span>\
-    <span class="n">order_rows</span><span class="p">([</span><span class="s1">&#39;g&#39;</span><span class="p">])</span>
+    <span class="n">order_rows</span><span class="p">([</span><span class="s1">&#39;g&#39;</span><span class="p">])</span>  <span class="c1"># choose a presentation order of rows</span>
 </pre></div>
 
      </div>
@@ -14376,6 +14389,12 @@ a.anchor-link {
 </div>
 </div>
 
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>We can then apply these operations to any data frame that has the columns specified in the table description (and appropriate column types).</p>
+
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
@@ -14454,7 +14473,13 @@ a.anchor-link {
 
 </div>
 
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Applying the same operations in a database is quite simple. First we connect to our database. Here we are inserting the data as an example, in serious applications the source table would usually already be present.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
@@ -14466,8 +14491,27 @@ a.anchor-link {
 
 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;/Users/johnmount/big_query/big_query_jm.json&quot;</span>
 <span class="n">biqquery_handle</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">BigQueryModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">())</span>
+<span class="n">biqquery_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
 
-<span class="n">bigquery_sql</span> <span class="o">=</span> <span class="n">biqquery_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">operations</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Then we can generate SQL tailored to the specific database.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">bigquery_sql</span> <span class="o">=</span> <span class="n">biqquery_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">operations</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">bigquery_sql</span><span class="p">)</span>
 </pre></div>
@@ -14495,8 +14539,8 @@ FROM
   (SELECT `g`,
           SUM(`v`) AS `group_total`
    FROM
-     (SELECT `v`,
-             (&#34;prefix_&#34;|| `c`) AS `g`
+     (SELECT (&#34;prefix_&#34;|| `c`) AS `g`,
+             `v`
       FROM `data-algebra-test.test_1.d`) `extend_1`
    GROUP BY `g`) `project_2`
 ORDER BY `g`
@@ -14508,15 +14552,19 @@ ORDER BY `g`
 
 </div>
 
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Operations can be used to land results in the database (using <code>CREATE TABLE AS</code>, avoiding round-tripping data in and out of the database). Operations can as be used to return results as a Pandas data frame.</p>
+
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">biqquery_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="n">res_bigquery</span> <span class="o">=</span> <span class="n">biqquery_handle</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">operations</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">res_bigquery</span> <span class="o">=</span> <span class="n">biqquery_handle</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">operations</span><span class="p">)</span>
 
 <span class="n">res_bigquery</span>
 </pre></div>
@@ -14534,7 +14582,7 @@ ORDER BY `g`
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[5]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[6]:</div>
 
 
 
@@ -14588,10 +14636,16 @@ ORDER BY `g`
 
 </div>
 
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>And we can check we get equivilent results in Pandas and from the database.</p>
+
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">assert</span> <span class="n">res_pandas</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">res_bigquery</span><span class="p">)</span>
@@ -14605,7 +14659,7 @@ ORDER BY `g`
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">biqquery_handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -14616,10 +14670,16 @@ ORDER BY `g`
 </div>
 </div>
 
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>We can repeat the database example using another database, simply by building a different database handle.</p>
+
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">sqlite3</span>
@@ -14655,8 +14715,8 @@ FROM
   (SELECT &#34;g&#34;,
           SUM(&#34;v&#34;) AS &#34;group_total&#34;
    FROM
-     (SELECT &#34;v&#34;,
-             (&#39;prefix_&#39;|| &#34;c&#34;) AS &#34;g&#34;
+     (SELECT (&#39;prefix_&#39;|| &#34;c&#34;) AS &#34;g&#34;,
+             &#34;v&#34;
       FROM &#34;data-algebra-test.test_1.d&#34;) &#34;extend_1&#34;
    GROUP BY &#34;g&#34;) &#34;project_2&#34;
 ORDER BY &#34;g&#34;
@@ -14671,7 +14731,7 @@ ORDER BY &#34;g&#34;
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[10]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">sqlite_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -14693,7 +14753,7 @@ ORDER BY &#34;g&#34;
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[9]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[10]:</div>
 
 
 
@@ -14750,7 +14810,7 @@ ORDER BY &#34;g&#34;
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[10]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[11]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">assert</span> <span class="n">res_sqlite</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">res_bigquery</span><span class="p">)</span>
@@ -14761,10 +14821,16 @@ ORDER BY &#34;g&#34;
 </div>
 </div>
 
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Also operations have pretty good printing method.</p>
+
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[11]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[12]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">operations</span>
@@ -14783,7 +14849,7 @@ ORDER BY &#34;g&#34;
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[11]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[12]:</div>
 
 
 
@@ -14807,6 +14873,12 @@ ORDER BY &#34;g&#34;
 
 </div>
 
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>And that is a small demonstration of the data algebra.</p>
+
+</div>
 </div>
 </body>
 
