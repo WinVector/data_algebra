@@ -75,7 +75,7 @@ tests/test_with.py .                                                     [100%]
 ---------- coverage: platform darwin, python 3.9.4-final-0 -----------
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
-data_algebra/BigQuery.py                  82     26    68%
+data_algebra/BigQuery.py                  90     53    41%
 data_algebra/OrderedSet.py                52     11    79%
 data_algebra/PostgreSQL.py                12      2    83%
 data_algebra/SQLite.py                    82     13    84%
@@ -90,7 +90,7 @@ data_algebra/data_ops.py                1133    240    79%
 data_algebra/data_ops_types.py            79     36    54%
 data_algebra/data_ops_utils.py            34      5    85%
 data_algebra/data_pipe.py                189    107    43%
-data_algebra/db_model.py                 569     92    84%
+data_algebra/db_model.py                 569     95    83%
 data_algebra/diagram.py                   56     43    23%
 data_algebra/eval_model.py                16      1    94%
 data_algebra/expr_parse.py                38      3    92%
@@ -105,7 +105,7 @@ data_algebra/test_util.py                109     16    85%
 data_algebra/user_fn.py                   76     20    74%
 data_algebra/util.py                      28      4    86%
 ----------------------------------------------------------
-TOTAL                                   4324    953    78%
+TOTAL                                   4332    983    77%
 
 
-======================= 173 passed in 192.71s (0:03:12) ========================
+============================= 173 passed in 9.87s ==============================

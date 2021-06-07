@@ -257,6 +257,15 @@
     <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">allow_overwrite</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
+                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
         <span class="n">job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">load_table_from_dataframe</span><span class="p">(</span>
             <span class="n">d</span><span class="p">,</span>
             <span class="n">table_name</span><span class="p">)</span>
@@ -595,6 +604,15 @@ connection should be google.cloud.bigquery.client.Client</p>
     <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">allow_overwrite</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
+                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
         <span class="n">job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">load_table_from_dataframe</span><span class="p">(</span>
             <span class="n">d</span><span class="p">,</span>
             <span class="n">table_name</span><span class="p">)</span>
@@ -616,7 +634,7 @@ inheritance.</p>
     *,
     db_model=BigQueryModel,
     conn,
-    fns={&#39;as_int64&#39;: &lt;function as_int64 at 0x7fcf902a3b80&gt;, &#39;trimstr&#39;: &lt;function trimstr at 0x7fcf902a3c10&gt;, &#39;coalesce_0&#39;: &lt;function coalesce_0 at 0x7fcf902a3ee0&gt;, &#39;coalesce&#39;: &lt;function coalesce at 0x7fcf784ec1f0&gt;, &#39;datetime_to_date&#39;: &lt;function datetime_to_date at 0x7fcf784ec0d0&gt;, &#39;parse_datetime&#39;: &lt;function parse_datetime at 0x7fcf80fd61f0&gt;, &#39;parse_date&#39;: &lt;function parse_date at 0x7fcf80fdae50&gt;, &#39;format_datetime&#39;: &lt;function format_datetime at 0x7fcf80fdaee0&gt;, &#39;format_date&#39;: &lt;function format_date at 0x7fcf80fdaf70&gt;, &#39;dayofweek&#39;: &lt;function dayofweek at 0x7fcf68410040&gt;, &#39;dayofyear&#39;: &lt;function dayofyear at 0x7fcf684100d0&gt;, &#39;dayofmonth&#39;: &lt;function dayofmonth at 0x7fcf684101f0&gt;, &#39;weekofyear&#39;: &lt;function weekofyear at 0x7fcf68410160&gt;, &#39;month&#39;: &lt;function month at 0x7fcf68410280&gt;, &#39;quarter&#39;: &lt;function quarter at 0x7fcf68410310&gt;, &#39;year&#39;: &lt;function year at 0x7fcf684103a0&gt;, &#39;timestamp_diff&#39;: &lt;function timestamp_diff at 0x7fcf68410430&gt;, &#39;date_diff&#39;: &lt;function date_diff at 0x7fcf684104c0&gt;, &#39;base_Sunday&#39;: &lt;function base_Sunday at 0x7fcf68410550&gt;}
+    fns={&#39;as_int64&#39;: &lt;function as_int64 at 0x7fa8a87a3b80&gt;, &#39;trimstr&#39;: &lt;function trimstr at 0x7fa8a87a3c10&gt;, &#39;coalesce_0&#39;: &lt;function coalesce_0 at 0x7fa8a87a3ee0&gt;, &#39;coalesce&#39;: &lt;function coalesce at 0x7fa8a87921f0&gt;, &#39;datetime_to_date&#39;: &lt;function datetime_to_date at 0x7fa8a87920d0&gt;, &#39;parse_datetime&#39;: &lt;function parse_datetime at 0x7fa8d8b051f0&gt;, &#39;parse_date&#39;: &lt;function parse_date at 0x7fa8d8b0ae50&gt;, &#39;format_datetime&#39;: &lt;function format_datetime at 0x7fa8d8b0aee0&gt;, &#39;format_date&#39;: &lt;function format_date at 0x7fa8d8b0af70&gt;, &#39;dayofweek&#39;: &lt;function dayofweek at 0x7fa8d8b10040&gt;, &#39;dayofyear&#39;: &lt;function dayofyear at 0x7fa8d8b100d0&gt;, &#39;dayofmonth&#39;: &lt;function dayofmonth at 0x7fa8d8b101f0&gt;, &#39;weekofyear&#39;: &lt;function weekofyear at 0x7fa8d8b10160&gt;, &#39;month&#39;: &lt;function month at 0x7fa8d8b10280&gt;, &#39;quarter&#39;: &lt;function quarter at 0x7fa8d8b10310&gt;, &#39;year&#39;: &lt;function year at 0x7fa8d8b103a0&gt;, &#39;timestamp_diff&#39;: &lt;function timestamp_diff at 0x7fa8d8b10430&gt;, &#39;date_diff&#39;: &lt;function date_diff at 0x7fa8d8b104c0&gt;, &#39;base_Sunday&#39;: &lt;function base_Sunday at 0x7fa8d8b10550&gt;}
 )</span>
     </div>
 
@@ -743,6 +761,15 @@ inheritance.</p>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">allow_overwrite</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
+                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
         <span class="n">job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">load_table_from_dataframe</span><span class="p">(</span>
             <span class="n">d</span><span class="p">,</span>
             <span class="n">table_name</span><span class="p">)</span>

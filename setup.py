@@ -20,7 +20,7 @@ Recommended packages include: sqlparse, black, and graphviz.
 
 setuptools.setup(
     name='data_algebra',
-    version='0.7.0',
+    version='0.7.1',
     author='John Mount',
     author_email='jmount@win-vector.com',
     url='https://github.com/WinVector/data_algebra',
