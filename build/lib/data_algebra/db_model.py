@@ -120,7 +120,7 @@ def _db_count_expr(dbmodel, expression):
 def _db_concat_expr(dbmodel, expression):
     return (
         "("  # TODO: cast each to char on way in
-        + "|| ".join([dbmodel.expr_to_sql(ai, want_inline_parens=True) for ai in expression.args])
+        + " || ".join([dbmodel.expr_to_sql(ai, want_inline_parens=True) for ai in expression.args])
         + ")"
     )
 
