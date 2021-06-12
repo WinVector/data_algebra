@@ -845,7 +845,7 @@ class DBModel:
             raise ValueError("name collisions on temp_tables: " + str(confused_temps))
         temp_tables = sql_left.temp_tables.copy()
         temp_tables.update(sql_right.temp_tables)
-        near_sql = data_algebra.near_sql.NearSQLUStep(
+        near_sql = data_algebra.near_sql.NearSQLBinaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql1=sql_left.to_near_sql(
@@ -854,6 +854,7 @@ class DBModel:
                 constants=constants_left,
             ),
             previous_step_summary1=sql_left.summary(),
+            joiner="UNION ALL",
             sub_sql2=sql_right.to_near_sql(
                 columns=using_right,
                 force_sql=True,

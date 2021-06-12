@@ -164,7 +164,7 @@ class NearSQLBinaryStep(NearSQL):
         quoted_query_name,
         sub_sql1,
         previous_step_summary1,
-        joiner="",
+        joiner,
         sub_sql2,
         previous_step_summary2,
         suffix="",
@@ -205,7 +205,7 @@ class NearSQLBinaryStep(NearSQL):
         terms_strs = [enc_term(k) for k in columns]
         if len(terms_strs) < 1:
             terms_strs = [f'1 AS {db_model.quote_identifier("data_algebra_placeholder_col_name")}']
-        sql = "SELECT " + ", ".join(terms_strs) + " FROM "
+        sql = "SELECT " + ", ".join(terms_strs) + " FROM ( "
         if self.previous_step_summary1["is_table"]:
             sql = (
                 sql
@@ -216,7 +216,7 @@ class NearSQLBinaryStep(NearSQL):
         else:
             sql = (
                 sql
-                + "( "
+                + " ( "
                 + self.sub_sql1.to_sql(db_model)
                 + " ) "
                 + self.previous_step_summary1["quoted_query_name"]
@@ -240,6 +240,7 @@ class NearSQLBinaryStep(NearSQL):
             )
         if (self.suffix is not None) and (len(self.suffix) > 0):
             sql = sql + " " + self.suffix
+        sql = sql + " ) "
         return sql
 
 
