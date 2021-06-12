@@ -652,7 +652,6 @@
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">using</span><span class="p">:</span>
                 <span class="n">terms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
             <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-                <span class="n">previous_step_summary</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
                 <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>  <span class="c1"># TODO: implement!</span>
                 <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using</span><span class="p">),</span>
@@ -718,7 +717,6 @@
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;extend_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-            <span class="n">previous_step_summary</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
@@ -749,7 +747,6 @@
             <span class="n">group_terms</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">project_node</span><span class="o">.</span><span class="n">group_by</span><span class="p">]</span>
             <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;GROUP BY &quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">group_terms</span><span class="p">)</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-            <span class="n">previous_step_summary</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
@@ -776,7 +773,6 @@
         <span class="n">terms</span> <span class="o">=</span> <span class="p">{</span><span class="n">ci</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">using</span><span class="p">}</span>
         <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot; WHERE &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">select_rows_node</span><span class="o">.</span><span class="n">expr</span><span class="p">)</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-            <span class="n">previous_step_summary</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
@@ -865,7 +861,6 @@
         <span class="k">if</span> <span class="n">order_node</span><span class="o">.</span><span class="n">limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span> <span class="o">+</span> <span class="s2">&quot; LIMIT &quot;</span> <span class="o">+</span> <span class="n">order_node</span><span class="o">.</span><span class="n">limit</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-            <span class="n">previous_step_summary</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
@@ -898,7 +893,6 @@
         <span class="p">}</span>
         <span class="n">terms</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">vi</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">vi</span> <span class="ow">in</span> <span class="n">unchanged_columns</span><span class="p">})</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-            <span class="n">previous_step_summary</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
@@ -985,10 +979,8 @@
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql1</span><span class="o">=</span><span class="n">sql_left</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using_left</span><span class="p">),</span>
-            <span class="n">previous_step_summary1</span><span class="o">=</span><span class="n">sql_left</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">joiner</span><span class="o">=</span><span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">+</span> <span class="s2">&quot; JOIN&quot;</span><span class="p">,</span>
             <span class="n">sub_sql2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using_right</span><span class="p">),</span>
-            <span class="n">previous_step_summary2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">suffix</span><span class="o">=</span><span class="n">on_terms</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
@@ -1039,7 +1031,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;name collisions on temp_tables: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">confused_temps</span><span class="p">))</span>
         <span class="n">temp_tables</span> <span class="o">=</span> <span class="n">sql_left</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">temp_tables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sql_right</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span>
-        <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUStep</span><span class="p">(</span>
+        <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLBinaryStep</span><span class="p">(</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql1</span><span class="o">=</span><span class="n">sql_left</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span>
@@ -1047,13 +1039,12 @@
                 <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">constants</span><span class="o">=</span><span class="n">constants_left</span><span class="p">,</span>
             <span class="p">),</span>
-            <span class="n">previous_step_summary1</span><span class="o">=</span><span class="n">sql_left</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
+            <span class="n">joiner</span><span class="o">=</span><span class="s2">&quot;UNION ALL&quot;</span><span class="p">,</span>
             <span class="n">sub_sql2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span>
                 <span class="n">columns</span><span class="o">=</span><span class="n">using_right</span><span class="p">,</span>
                 <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">constants</span><span class="o">=</span><span class="n">constants_right</span><span class="p">,</span>
             <span class="p">),</span>
-            <span class="n">previous_step_summary2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
@@ -1646,7 +1637,6 @@
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">using</span><span class="p">:</span>
                 <span class="n">terms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
             <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-                <span class="n">previous_step_summary</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
                 <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>  <span class="c1"># TODO: implement!</span>
                 <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using</span><span class="p">),</span>
@@ -1712,7 +1702,6 @@
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;extend_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-            <span class="n">previous_step_summary</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
@@ -1743,7 +1732,6 @@
             <span class="n">group_terms</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">project_node</span><span class="o">.</span><span class="n">group_by</span><span class="p">]</span>
             <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;GROUP BY &quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">group_terms</span><span class="p">)</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-            <span class="n">previous_step_summary</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
@@ -1770,7 +1758,6 @@
         <span class="n">terms</span> <span class="o">=</span> <span class="p">{</span><span class="n">ci</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">using</span><span class="p">}</span>
         <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot; WHERE &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">select_rows_node</span><span class="o">.</span><span class="n">expr</span><span class="p">)</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-            <span class="n">previous_step_summary</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
@@ -1859,7 +1846,6 @@
         <span class="k">if</span> <span class="n">order_node</span><span class="o">.</span><span class="n">limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span> <span class="o">+</span> <span class="s2">&quot; LIMIT &quot;</span> <span class="o">+</span> <span class="n">order_node</span><span class="o">.</span><span class="n">limit</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-            <span class="n">previous_step_summary</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
@@ -1892,7 +1878,6 @@
         <span class="p">}</span>
         <span class="n">terms</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">vi</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">vi</span> <span class="ow">in</span> <span class="n">unchanged_columns</span><span class="p">})</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-            <span class="n">previous_step_summary</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
@@ -1979,10 +1964,8 @@
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql1</span><span class="o">=</span><span class="n">sql_left</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using_left</span><span class="p">),</span>
-            <span class="n">previous_step_summary1</span><span class="o">=</span><span class="n">sql_left</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">joiner</span><span class="o">=</span><span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">+</span> <span class="s2">&quot; JOIN&quot;</span><span class="p">,</span>
             <span class="n">sub_sql2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using_right</span><span class="p">),</span>
-            <span class="n">previous_step_summary2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">suffix</span><span class="o">=</span><span class="n">on_terms</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
@@ -2033,7 +2016,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;name collisions on temp_tables: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">confused_temps</span><span class="p">))</span>
         <span class="n">temp_tables</span> <span class="o">=</span> <span class="n">sql_left</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">temp_tables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sql_right</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span>
-        <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUStep</span><span class="p">(</span>
+        <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLBinaryStep</span><span class="p">(</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql1</span><span class="o">=</span><span class="n">sql_left</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span>
@@ -2041,13 +2024,12 @@
                 <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">constants</span><span class="o">=</span><span class="n">constants_left</span><span class="p">,</span>
             <span class="p">),</span>
-            <span class="n">previous_step_summary1</span><span class="o">=</span><span class="n">sql_left</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
+            <span class="n">joiner</span><span class="o">=</span><span class="s2">&quot;UNION ALL&quot;</span><span class="p">,</span>
             <span class="n">sub_sql2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span>
                 <span class="n">columns</span><span class="o">=</span><span class="n">using_right</span><span class="p">,</span>
                 <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">constants</span><span class="o">=</span><span class="n">constants_right</span><span class="p">,</span>
             <span class="p">),</span>
-            <span class="n">previous_step_summary2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
@@ -2787,7 +2769,6 @@
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">using</span><span class="p">:</span>
                 <span class="n">terms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
             <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-                <span class="n">previous_step_summary</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
                 <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>  <span class="c1"># TODO: implement!</span>
                 <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using</span><span class="p">),</span>
@@ -2869,7 +2850,6 @@
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;extend_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-            <span class="n">previous_step_summary</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
@@ -2916,7 +2896,6 @@
             <span class="n">group_terms</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">project_node</span><span class="o">.</span><span class="n">group_by</span><span class="p">]</span>
             <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;GROUP BY &quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">group_terms</span><span class="p">)</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-            <span class="n">previous_step_summary</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
@@ -2959,7 +2938,6 @@
         <span class="n">terms</span> <span class="o">=</span> <span class="p">{</span><span class="n">ci</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">using</span><span class="p">}</span>
         <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot; WHERE &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">select_rows_node</span><span class="o">.</span><span class="n">expr</span><span class="p">)</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-            <span class="n">previous_step_summary</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
@@ -3096,7 +3074,6 @@
         <span class="k">if</span> <span class="n">order_node</span><span class="o">.</span><span class="n">limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span> <span class="o">+</span> <span class="s2">&quot; LIMIT &quot;</span> <span class="o">+</span> <span class="n">order_node</span><span class="o">.</span><span class="n">limit</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-            <span class="n">previous_step_summary</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
@@ -3145,7 +3122,6 @@
         <span class="p">}</span>
         <span class="n">terms</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">vi</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">vi</span> <span class="ow">in</span> <span class="n">unchanged_columns</span><span class="p">})</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-            <span class="n">previous_step_summary</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
@@ -3248,10 +3224,8 @@
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql1</span><span class="o">=</span><span class="n">sql_left</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using_left</span><span class="p">),</span>
-            <span class="n">previous_step_summary1</span><span class="o">=</span><span class="n">sql_left</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">joiner</span><span class="o">=</span><span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">+</span> <span class="s2">&quot; JOIN&quot;</span><span class="p">,</span>
             <span class="n">sub_sql2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using_right</span><span class="p">),</span>
-            <span class="n">previous_step_summary2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">suffix</span><span class="o">=</span><span class="n">on_terms</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
@@ -3318,7 +3292,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;name collisions on temp_tables: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">confused_temps</span><span class="p">))</span>
         <span class="n">temp_tables</span> <span class="o">=</span> <span class="n">sql_left</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">temp_tables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sql_right</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span>
-        <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUStep</span><span class="p">(</span>
+        <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLBinaryStep</span><span class="p">(</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql1</span><span class="o">=</span><span class="n">sql_left</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span>
@@ -3326,13 +3300,12 @@
                 <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">constants</span><span class="o">=</span><span class="n">constants_left</span><span class="p">,</span>
             <span class="p">),</span>
-            <span class="n">previous_step_summary1</span><span class="o">=</span><span class="n">sql_left</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
+            <span class="n">joiner</span><span class="o">=</span><span class="s2">&quot;UNION ALL&quot;</span><span class="p">,</span>
             <span class="n">sub_sql2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span>
                 <span class="n">columns</span><span class="o">=</span><span class="n">using_right</span><span class="p">,</span>
                 <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">constants</span><span class="o">=</span><span class="n">constants_right</span><span class="p">,</span>
             <span class="p">),</span>
-            <span class="n">previous_step_summary2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">summary</span><span class="p">(),</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
