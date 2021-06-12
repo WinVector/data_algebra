@@ -6,7 +6,7 @@ import data_algebra.OrderedSet
 
 # classes for holding object for SQL generation
 
-# TODO: buld a term object that carries the column use information
+# TODO: build a term object that carries the column use information
 
 
 class NearSQL(ABC):
@@ -14,12 +14,14 @@ class NearSQL(ABC):
     Represent SQL queries in a mostly string-form
     """
 
-    def __init__(self, *, terms, quoted_query_name, temp_tables):
+    def __init__(self, *, terms, quoted_query_name, temp_tables, is_table=False):
         assert isinstance(terms, dict)
         assert isinstance(quoted_query_name, str)
         assert isinstance(temp_tables, dict)
+        assert isinstance(is_table, bool)
         self.terms = terms.copy()
         self.quoted_query_name = quoted_query_name
+        self.is_table = is_table
         self.temp_tables = temp_tables.copy()
 
     def to_near_sql(self, *, columns=None, force_sql=False, constants=None):
@@ -27,9 +29,6 @@ class NearSQL(ABC):
 
     def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model):
         raise NotImplementedError("base method called")
-
-    def summary(self):
-        return {"quoted_query_name": self.quoted_query_name, "is_table": False}
 
 
 class NearSQLContainer:
@@ -64,7 +63,7 @@ class NearSQLContainer:
 class NearSQLTable(NearSQL):
     def __init__(self, *, terms, quoted_query_name, quoted_table_name):
         NearSQL.__init__(
-            self, terms=terms, quoted_query_name=quoted_query_name, temp_tables=dict()
+            self, terms=terms, quoted_query_name=quoted_query_name, temp_tables=dict(), is_table=True
         )
         self.quoted_table_name = quoted_table_name
 
@@ -98,7 +97,6 @@ class NearSQLUnaryStep(NearSQL):
         quoted_query_name,
         sub_sql,
         suffix="",
-        previous_step_summary,
         temp_tables
     ):
         NearSQL.__init__(
@@ -109,10 +107,8 @@ class NearSQLUnaryStep(NearSQL):
         )
         assert isinstance(sub_sql, NearSQLContainer)
         assert isinstance(suffix,  (str, type(None)))
-        assert isinstance(previous_step_summary, dict)
         self.sub_sql = sub_sql
         self.suffix = suffix
-        self.previous_step_summary = previous_step_summary
 
     def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model):
         if columns is None:
@@ -130,7 +126,7 @@ class NearSQLUnaryStep(NearSQL):
         terms_strs = [enc_term(k) for k in columns]
         if len(terms_strs) < 1:
             terms_strs = [f'1 AS {db_model.quote_identifier("data_algebra_placeholder_col_name")}']
-        if self.previous_step_summary["is_table"]:
+        if self.sub_sql.near_sql.is_table:
             sql = "SELECT " + ", ".join(terms_strs) + " FROM " + self.sub_sql.to_sql(db_model)
         else:
             sql = (
@@ -139,7 +135,7 @@ class NearSQLUnaryStep(NearSQL):
                 + " FROM ( "
                 + self.sub_sql.to_sql(db_model)
                 + " ) "
-                + self.previous_step_summary["quoted_query_name"]
+                + self.sub_sql.near_sql.quoted_query_name
             )
         if (self.suffix is not None) and (len(self.suffix) > 0):
             sql = sql + " " + self.suffix
@@ -153,10 +149,8 @@ class NearSQLBinaryStep(NearSQL):
         terms,
         quoted_query_name,
         sub_sql1,
-        previous_step_summary1,
         joiner,
         sub_sql2,
-        previous_step_summary2,
         suffix="",
         temp_tables
     ):
@@ -168,15 +162,11 @@ class NearSQLBinaryStep(NearSQL):
         )
         assert isinstance(sub_sql1,  NearSQLContainer)
         assert isinstance(sub_sql2, NearSQLContainer)
-        assert isinstance(previous_step_summary1, dict)
-        assert isinstance(previous_step_summary2, dict)
         assert isinstance(suffix,  (str, type(None)))
         assert isinstance(joiner, str)
         self.sub_sql1 = sub_sql1
-        self.previous_step_summary1 = previous_step_summary1
         self.joiner = joiner
         self.sub_sql2 = sub_sql2
-        self.previous_step_summary2 = previous_step_summary2
         self.suffix = suffix
 
     def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model):
@@ -196,12 +186,12 @@ class NearSQLBinaryStep(NearSQL):
         if len(terms_strs) < 1:
             terms_strs = [f'1 AS {db_model.quote_identifier("data_algebra_placeholder_col_name")}']
         sql = "SELECT " + ", ".join(terms_strs) + " FROM ( "
-        if self.previous_step_summary1["is_table"]:
+        if self.sub_sql1.near_sql.is_table:
             sql = (
                 sql
                 + self.sub_sql1.to_sql(db_model)
                 + " "
-                + self.previous_step_summary1["quoted_query_name"]
+                + self.sub_sql1.near_sql.quoted_query_name
             )
         else:
             sql = (
@@ -209,16 +199,16 @@ class NearSQLBinaryStep(NearSQL):
                 + " ( "
                 + self.sub_sql1.to_sql(db_model)
                 + " ) "
-                + self.previous_step_summary1["quoted_query_name"]
+                + self.sub_sql1.near_sql.quoted_query_name
             )
         sql = sql + " " + self.joiner + " "
-        if self.previous_step_summary2["is_table"]:
+        if self.sub_sql2.near_sql.is_table:
             sql = (
                 sql
                 + " "
                 + self.sub_sql2.to_sql(db_model)
                 + " "
-                + self.previous_step_summary2["quoted_query_name"]
+                + self.sub_sql2.near_sql.quoted_query_name
             )
         else:
             sql = (
@@ -226,7 +216,7 @@ class NearSQLBinaryStep(NearSQL):
                 + " ( "
                 + self.sub_sql2.to_sql(db_model)
                 + " ) "
-                + self.previous_step_summary2["quoted_query_name"]
+                + self.sub_sql2.near_sql.quoted_query_name
             )
         if (self.suffix is not None) and (len(self.suffix) > 0):
             sql = sql + " " + self.suffix

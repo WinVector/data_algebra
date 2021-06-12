@@ -458,7 +458,6 @@ class DBModel:
             for k in using:
                 terms[k] = k
             near_sql = data_algebra.near_sql.NearSQLUnaryStep(
-                previous_step_summary=subsql.summary(),
                 terms=terms,  # TODO: implement!
                 quoted_query_name=self.quote_identifier(view_name),
                 sub_sql=subsql.to_near_sql(columns=using),
@@ -524,7 +523,6 @@ class DBModel:
         view_name = "extend_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         near_sql = data_algebra.near_sql.NearSQLUnaryStep(
-            previous_step_summary=subsql.summary(),
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_near_sql(columns=subusing),
@@ -555,7 +553,6 @@ class DBModel:
             group_terms = [self.quote_identifier(c) for c in project_node.group_by]
             suffix = "GROUP BY " + ", ".join(group_terms)
         near_sql = data_algebra.near_sql.NearSQLUnaryStep(
-            previous_step_summary=subsql.summary(),
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_near_sql(columns=subusing),
@@ -582,7 +579,6 @@ class DBModel:
         terms = {ci: None for ci in using}
         suffix = " WHERE " + self.expr_to_sql(select_rows_node.expr)
         near_sql = data_algebra.near_sql.NearSQLUnaryStep(
-            previous_step_summary=subsql.summary(),
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_near_sql(columns=subusing),
@@ -671,7 +667,6 @@ class DBModel:
         if order_node.limit is not None:
             suffix = suffix + " LIMIT " + order_node.limit.__repr__()
         near_sql = data_algebra.near_sql.NearSQLUnaryStep(
-            previous_step_summary=subsql.summary(),
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_near_sql(columns=subusing),
@@ -704,7 +699,6 @@ class DBModel:
         }
         terms.update({vi: None for vi in unchanged_columns})
         near_sql = data_algebra.near_sql.NearSQLUnaryStep(
-            previous_step_summary=subsql.summary(),
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_near_sql(columns=subusing),
@@ -791,10 +785,8 @@ class DBModel:
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql1=sql_left.to_near_sql(columns=using_left),
-            previous_step_summary1=sql_left.summary(),
             joiner=join_node.jointype + " JOIN",
             sub_sql2=sql_right.to_near_sql(columns=using_right),
-            previous_step_summary2=sql_right.summary(),
             suffix=on_terms,
             temp_tables=temp_tables,
         )
@@ -853,14 +845,12 @@ class DBModel:
                 force_sql=True,
                 constants=constants_left,
             ),
-            previous_step_summary1=sql_left.summary(),
             joiner="UNION ALL",
             sub_sql2=sql_right.to_near_sql(
                 columns=using_right,
                 force_sql=True,
                 constants=constants_right,
             ),
-            previous_step_summary2=sql_right.summary(),
             temp_tables=temp_tables,
         )
         return near_sql
