@@ -1,3 +1,5 @@
+
+from abc import ABC
 import math
 import re
 import io
@@ -185,8 +187,7 @@ db_default_op_replacements = {
     }
 
 
-# TODO: check if we should make this an abstract base class
-class DBModel:
+class DBModel(ABC):
     """A model of how SQL should be generated for a given database.
        """
 
