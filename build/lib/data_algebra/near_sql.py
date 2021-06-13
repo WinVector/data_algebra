@@ -9,6 +9,40 @@ import data_algebra.OrderedSet
 # TODO: build a term object that carries the column use information
 
 
+# assemble sub-sql
+def _convert_subsql(*, sub_sql, db_model):
+    assert isinstance(sub_sql, NearSQLContainer)
+    if sub_sql.near_sql.is_table:
+        sql = (
+                " "
+                + sub_sql.to_sql(db_model)
+                + " "
+                + sub_sql.near_sql.quoted_query_name
+                + " "
+        )
+    else:
+        sql = (
+                " ( "
+                + sub_sql.to_sql(db_model)
+                + " ) "
+                + sub_sql.near_sql.quoted_query_name
+                + " "
+        )
+    return sql
+
+
+# encode and name a term for use in a SQL expression
+def _enc_term(k, *, terms, db_model):
+    v = None
+    try:
+        v = terms[k]
+    except KeyError:
+        pass
+    if v is None:
+        return db_model.quote_identifier(k)
+    return v + " AS " + db_model.quote_identifier(k)
+
+
 class NearSQL(ABC):
     """
     Represent SQL queries in a mostly string-form
@@ -85,9 +119,6 @@ class NearSQLTable(NearSQL):
             return "SELECT " + ", ".join(terms_strs) + " FROM " + self.quoted_table_name
         return self.quoted_table_name
 
-    def summary(self):
-        return {"quoted_query_name": self.quoted_query_name, "is_table": True}
-
 
 class NearSQLUnaryStep(NearSQL):
     def __init__(
@@ -116,27 +147,10 @@ class NearSQLUnaryStep(NearSQL):
         terms = self.terms
         if (constants is not None) and (len(constants) > 0):
             terms.update(constants)
-
-        def enc_term(k):
-            v = terms[k]
-            if v is None:
-                return db_model.quote_identifier(k)
-            return v + " AS " + db_model.quote_identifier(k)
-
-        terms_strs = [enc_term(k) for k in columns]
+        terms_strs = [_enc_term(k, terms=terms, db_model=db_model) for k in columns]
         if len(terms_strs) < 1:
             terms_strs = [f'1 AS {db_model.quote_identifier("data_algebra_placeholder_col_name")}']
-        if self.sub_sql.near_sql.is_table:
-            sql = "SELECT " + ", ".join(terms_strs) + " FROM " + self.sub_sql.to_sql(db_model)
-        else:
-            sql = (
-                "SELECT "
-                + ", ".join(terms_strs)
-                + " FROM ( "
-                + self.sub_sql.to_sql(db_model)
-                + " ) "
-                + self.sub_sql.near_sql.quoted_query_name
-            )
+        sql = "SELECT " + ", ".join(terms_strs) + " FROM " + _convert_subsql(sub_sql=self.sub_sql, db_model=db_model)
         if (self.suffix is not None) and (len(self.suffix) > 0):
             sql = sql + " " + self.suffix
         return sql
@@ -175,49 +189,15 @@ class NearSQLBinaryStep(NearSQL):
         terms = self.terms
         if (constants is not None) and (len(constants) > 0):
             terms.update(constants)
-
-        def enc_term(k):
-            v = terms[k]
-            if v is None:
-                return db_model.quote_identifier(k)
-            return v + " AS " + db_model.quote_identifier(k)
-
-        terms_strs = [enc_term(k) for k in columns]
+        terms_strs = [_enc_term(k, terms=terms, db_model=db_model) for k in columns]
         if len(terms_strs) < 1:
             terms_strs = [f'1 AS {db_model.quote_identifier("data_algebra_placeholder_col_name")}']
-        sql = "SELECT " + ", ".join(terms_strs) + " FROM ( "
-        if self.sub_sql1.near_sql.is_table:
-            sql = (
-                sql
-                + self.sub_sql1.to_sql(db_model)
-                + " "
-                + self.sub_sql1.near_sql.quoted_query_name
-            )
-        else:
-            sql = (
-                sql
-                + " ( "
-                + self.sub_sql1.to_sql(db_model)
-                + " ) "
-                + self.sub_sql1.near_sql.quoted_query_name
-            )
-        sql = sql + " " + self.joiner + " "
-        if self.sub_sql2.near_sql.is_table:
-            sql = (
-                sql
-                + " "
-                + self.sub_sql2.to_sql(db_model)
-                + " "
-                + self.sub_sql2.near_sql.quoted_query_name
-            )
-        else:
-            sql = (
-                sql
-                + " ( "
-                + self.sub_sql2.to_sql(db_model)
-                + " ) "
-                + self.sub_sql2.near_sql.quoted_query_name
-            )
+        sql = (
+                "SELECT " + ", ".join(terms_strs) + " FROM " + " ( "
+                + _convert_subsql(sub_sql=self.sub_sql1, db_model=db_model)
+                + " " + self.joiner + " "
+                + _convert_subsql(sub_sql=self.sub_sql2, db_model=db_model)
+                )
         if (self.suffix is not None) and (len(self.suffix) > 0):
             sql = sql + " " + self.suffix
         sql = sql + " ) "

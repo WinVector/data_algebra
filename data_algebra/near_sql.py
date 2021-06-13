@@ -58,8 +58,6 @@ class NearSQL(ABC):
         self.is_table = is_table
         self.temp_tables = temp_tables.copy()
 
-
-
     def to_near_sql(self, *, columns=None, force_sql=False, constants=None):
         return NearSQLContainer(near_sql=self, columns=columns, force_sql=force_sql, constants=constants)
 
@@ -194,7 +192,8 @@ class NearSQLBinaryStep(NearSQL):
         terms_strs = [_enc_term(k, terms=terms, db_model=db_model) for k in columns]
         if len(terms_strs) < 1:
             terms_strs = [f'1 AS {db_model.quote_identifier("data_algebra_placeholder_col_name")}']
-        sql = ( "SELECT " + ", ".join(terms_strs) + " FROM " + " ( "
+        sql = (
+                "SELECT " + ", ".join(terms_strs) + " FROM " + " ( "
                 + _convert_subsql(sub_sql=self.sub_sql1, db_model=db_model)
                 + " " + self.joiner + " "
                 + _convert_subsql(sub_sql=self.sub_sql2, db_model=db_model)
