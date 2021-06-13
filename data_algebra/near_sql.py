@@ -85,9 +85,6 @@ class NearSQLTable(NearSQL):
             return "SELECT " + ", ".join(terms_strs) + " FROM " + self.quoted_table_name
         return self.quoted_table_name
 
-    def summary(self):
-        return {"quoted_query_name": self.quoted_query_name, "is_table": True}
-
 
 class NearSQLUnaryStep(NearSQL):
     def __init__(
