@@ -185,6 +185,7 @@ db_default_op_replacements = {
     }
 
 
+# TODO: check if we should make this an abstract base class
 class DBModel:
     """A model of how SQL should be generated for a given database.
        """
