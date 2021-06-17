@@ -59,3 +59,4 @@ def test_with_query_example_1():
         db_model.prepare_connection(conn)
         db_handle = db_model.db_handle(conn)
         db_handle.insert_table(d, table_name='d')
+        sql = db_handle.to_sql(ops, pretty=True)
