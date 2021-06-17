@@ -234,7 +234,8 @@ class ViewRepresentation(OperatorPlatform, ABC):
         pretty=False,
         encoding=None,
         sqlparse_options=None,
-        temp_tables=None
+        temp_tables=None,
+        use_with=False
     ):
         if sqlparse_options is None:
             sqlparse_options = {"reindent": True, "keyword_case": "upper"}
@@ -519,7 +520,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
         ops = data_algebra.expr_parse.parse_assignments_in_context(
             {"expr": expr}, self, parse_env=parse_env
         )
-        data_model = data_algebra.default_data_model
 
         def r_walk_expr(op):
             if not isinstance(op, data_algebra.expr_rep.Expression):

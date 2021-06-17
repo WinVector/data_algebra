@@ -781,14 +781,14 @@ class DBModel(ABC):
         temp_tables.update(sql_right.temp_tables)
         jointype = join_node.jointype
         try:
-            jointype = self.join_name_map[jointype]
+            jointype = self.join_name_map[jointype]  # TODO: maybe move this mapping earlier
         except KeyError:
             pass
         near_sql = data_algebra.near_sql.NearSQLBinaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql1=sql_left.to_near_sql(columns=using_left),
-            joiner=join_node.jointype + " JOIN",
+            joiner=jointype + " JOIN",
             sub_sql2=sql_right.to_near_sql(columns=using_right),
             suffix=on_terms,
             temp_tables=temp_tables,
@@ -1086,12 +1086,14 @@ class DBHandle(data_algebra.eval_model.EvalModel):
                pretty=False,
                encoding=None,
                sqlparse_options=None,
-               temp_tables=None):
+               temp_tables=None,
+               use_with=False):
         return ops.to_sql(self.db_model,
                           pretty=pretty,
                           encoding=encoding,
                           sqlparse_options=sqlparse_options,
-                          temp_tables=temp_tables)
+                          temp_tables=temp_tables,
+                          use_with=use_with)
 
     def drop_table(self, table_name):
         q_table_name = self.db_model.quote_table_name(table_name)
