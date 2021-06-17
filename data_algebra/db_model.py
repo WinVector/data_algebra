@@ -485,7 +485,7 @@ class DBModel(ABC):
                 subops[k] = op
         if len(subops) <= 0:
             # know using was not None is this case as len(extend_node.ops)>0 and all keys are in extend_node.column_set
-            return extend_node.sources[0].to_sql_implementation(
+            return extend_node.sources[0].to_near_sql_implementation(
                 db_model=self, using=using, temp_id_source=temp_id_source
             )
         if len(using) < 1:
@@ -495,7 +495,7 @@ class DBModel(ABC):
             raise KeyError("referred to unknown columns: " + str(missing))
         # get set of columns we need from subquery
         subusing = extend_node.columns_used_from_sources(using=using)[0]
-        subsql = extend_node.sources[0].to_sql_implementation(
+        subsql = extend_node.sources[0].to_near_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
         window_term = ""
@@ -545,7 +545,7 @@ class DBModel(ABC):
         subusing = project_node.columns_used_from_sources(using=using)[0]
         terms = {ci: self.expr_to_sql(oi) for (ci, oi) in subops.items()}
         terms.update({g: None for g in project_node.group_by})
-        subsql = project_node.sources[0].to_sql_implementation(
+        subsql = project_node.sources[0].to_near_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
         view_name = "project_" + str(temp_id_source[0])
@@ -573,7 +573,7 @@ class DBModel(ABC):
         if using is None:
             using = select_rows_node.column_set
         subusing = select_rows_node.columns_used_from_sources(using=using)[0]
-        subsql = select_rows_node.sources[0].to_sql_implementation(
+        subsql = select_rows_node.sources[0].to_near_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
         view_name = "select_rows_" + str(temp_id_source[0])
@@ -604,7 +604,7 @@ class DBModel(ABC):
         subusing = [
             c for c in select_columns_node.column_selection if c in subusing
         ]  # fix order
-        subsql = select_columns_node.sources[0].to_sql_implementation(
+        subsql = select_columns_node.sources[0].to_near_sql_implementation(
             db_model=self, using=set(subusing), temp_id_source=temp_id_source
         )
         # order/limit columns
@@ -627,7 +627,7 @@ class DBModel(ABC):
         if using is None:
             using = drop_columns_node.column_set
         subusing = drop_columns_node.columns_used_from_sources(using=using)[0]
-        subsql = drop_columns_node.sources[0].to_sql_implementation(
+        subsql = drop_columns_node.sources[0].to_near_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
         # /limit columns
@@ -647,7 +647,7 @@ class DBModel(ABC):
             using = order_node.column_set
         subusing = order_node.columns_used_from_sources(using=using)[0]
         subusing = [c for c in order_node.column_names if c in subusing]  # fix order
-        subsql = order_node.sources[0].to_sql_implementation(
+        subsql = order_node.sources[0].to_near_sql_implementation(
             db_model=self, using=set(subusing), temp_id_source=temp_id_source
         )
         view_name = "order_rows_" + str(temp_id_source[0])
@@ -687,7 +687,7 @@ class DBModel(ABC):
         if using is None:
             using = rename_node.column_set
         subusing = rename_node.columns_used_from_sources(using=using)[0]
-        subsql = rename_node.sources[0].to_sql_implementation(
+        subsql = rename_node.sources[0].to_near_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
         view_name = "rename_" + str(temp_id_source[0])
@@ -726,11 +726,11 @@ class DBModel(ABC):
         subusing = join_node.columns_used_from_sources(using=using.union(by_set))
         using_left = subusing[0]
         using_right = subusing[1]
-        sql_left = join_node.sources[0].to_sql_implementation(
+        sql_left = join_node.sources[0].to_near_sql_implementation(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
         sub_view_name_left = sql_left.quoted_query_name
-        sql_right = join_node.sources[1].to_sql_implementation(
+        sql_right = join_node.sources[1].to_near_sql_implementation(
             db_model=self, using=using_right, temp_id_source=temp_id_source
         )
         sub_view_name_right = sql_right.quoted_query_name
@@ -813,10 +813,10 @@ class DBModel(ABC):
         using_right = subusing[1]
         if set(using_left) != set(using_right):
             raise ValueError("left/right usings did not match")
-        sql_left = concat_node.sources[0].to_sql_implementation(
+        sql_left = concat_node.sources[0].to_near_sql_implementation(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
-        sql_right = concat_node.sources[1].to_sql_implementation(
+        sql_right = concat_node.sources[1].to_near_sql_implementation(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
         view_name = "concat_rows_" + str(temp_id_source[0])
@@ -924,7 +924,7 @@ class DBModel(ABC):
             + source_sql
             + " ) a\n"
             + "CROSS JOIN (\n  "
-            + control_view.to_sql_implementation(
+            + control_view.to_near_sql_implementation(
                 self, using=using, temp_id_source=temp_id_source
             ).to_sql(db_model=self, columns=using, force_sql=True)
             + " ) b\n"

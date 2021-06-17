@@ -97,7 +97,7 @@ class OperatorPlatform:
 
     # query generation
 
-    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
         raise NotImplementedError("base method called")
 
     # define builders for all non-initial node types on base class
