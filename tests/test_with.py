@@ -49,10 +49,10 @@ def test_with_query_example_1():
     d = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, 3]
     })
-    ops = describe_table(d, table_name='d') .\
-        extend({'z': 'x + 1'}) .\
-        extend({'q': 'z + 2'}) .\
-        extend({'h': 'q + 3'})
+    ops = describe_table(d, table_name='d')  # .\
+        # extend({'z': 'x + 1'}) # .\
+        # extend({'q': 'z + 2'}) # .\
+        # extend({'h': 'q + 3'})
 
     db_model = data_algebra.SQLite.SQLiteModel()
     with sqlite3.connect(":memory:") as conn:
@@ -60,4 +60,4 @@ def test_with_query_example_1():
         db_handle = db_model.db_handle(conn)
         db_handle.insert_table(d, table_name='d')
         sql_regular = db_handle.to_sql(ops, pretty=True, use_with=False)
-        sql_with = db_handle.to_sql(ops, pretty=True, use_with=True)
+        # sql_with = db_handle.to_sql(ops, pretty=True, use_with=True)

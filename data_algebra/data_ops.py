@@ -17,6 +17,7 @@ import data_algebra.data_ops_utils
 import data_algebra.near_sql
 import data_algebra.OrderedSet
 
+
 _have_black = False
 try:
     # noinspection PyUnresolvedReferences
@@ -25,6 +26,7 @@ try:
     _have_black = True
 except ImportError:
     pass
+
 
 _have_sqlparse = False
 try:
@@ -36,12 +38,44 @@ except ImportError:
     pass
 
 
+# noinspection PyBroadException
+def pretty_format_python(python_str, *, black_mode=None):
+    assert isinstance(python_str, str)
+    formatted_python = python_str
+    if _have_black:
+        try:
+            if black_mode is None:
+                black_mode = black.FileMode()
+            formatted_python = black.format_str(python_str, mode=black_mode)
+        except Exception:
+            pass
+    return formatted_python
+
+
+# noinspection PyBroadException
+def pretty_format_sql(sql, *, encoding=None, sqlparse_options=None):
+    assert isinstance(sql, str)
+    assert isinstance(encoding, (str, type(None)))
+    assert isinstance(encoding, (dict, type(None)))
+    if sqlparse_options is None:
+        sqlparse_options = {"reindent": True, "keyword_case": "upper"}
+    formatted_sql = sql
+    if _have_sqlparse:
+        try:
+            formatted_sql = sqlparse.format(
+                sql, encoding=encoding, **sqlparse_options
+            )
+        except Exception:
+            pass
+    return formatted_sql
+
+
 class ViewRepresentation(OperatorPlatform, ABC):
     """Structure to represent the columns of a query or a table.
        Abstract base class."""
 
     column_names: List[str]
-    column_set: Set[str]
+    column_set: data_algebra.OrderedSet.OrderedSet
     column_map: collections.OrderedDict
     sources: List[
         "ViewRepresentation"
@@ -176,13 +210,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             indent=indent, strict=strict, print_sources=True
         )
         if pretty:
-            if _have_black:
-                try:
-                    if black_mode is None:
-                        black_mode = black.FileMode()
-                    python_str = black.format_str(python_str, mode=black_mode)
-                except Exception:
-                    pass
+            python_str = pretty_format_python(python_str, black_mode=black_mode)
         return python_str
 
     def __repr__(self):
@@ -226,7 +254,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
     def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
         raise NotImplementedError("base method called")
 
-    # noinspection PyBroadException
     def to_sql(
         self,
         db_model,
@@ -256,14 +283,12 @@ class ViewRepresentation(OperatorPlatform, ABC):
                     "need temp_tables to be a dictionary to copy back found temporary table values"
                 )
             temp_tables.update(near_sql.temp_tables)
-        sql_str = near_sql.to_sql(db_model=db_model, force_sql=True)
-        if pretty and _have_sqlparse:
-            try:
-                sql_str = sqlparse.format(
-                    sql_str, encoding=encoding, **sqlparse_options
-                )
-            except Exception:
-                pass
+        formatting_near_sql = near_sql
+        if use_with:
+            formatting_near_sql = near_sql.to_with_form()
+        sql_str = formatting_near_sql.to_sql(db_model=db_model, force_sql=True)
+        if pretty:
+            sql_str = pretty_format_sql(sql_str, encoding=encoding, sqlparse_options=sqlparse_options)
         return sql_str
 
     # Pandas realization
@@ -521,10 +546,10 @@ class ViewRepresentation(OperatorPlatform, ABC):
             {"expr": expr}, self, parse_env=parse_env
         )
 
-        def r_walk_expr(op):
-            if not isinstance(op, data_algebra.expr_rep.Expression):
+        def r_walk_expr(opv):
+            if not isinstance(opv, data_algebra.expr_rep.Expression):
                 return
-            for oi in op.args:
+            for oi in opv.args:
                 r_walk_expr(oi)
 
         for op in ops.values():
@@ -940,7 +965,7 @@ class ExtendNode(ViewRepresentation):
                         raise ValueError("window function with more than one argument")
                     for i in range(len(opk.args)):
                         if not (isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference)
-                            or isinstance(opk.args[0], data_algebra.expr_rep.Value)):
+                                or isinstance(opk.args[0], data_algebra.expr_rep.Value)):
                             raise ValueError(
                                 "window expression argument must be a column or value: "
                                 + str(k)
@@ -1040,7 +1065,7 @@ class ProjectNode(ViewRepresentation):
                     )
                 if len(opk.args) > 0:
                     if not (isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference)
-                        or isinstance(opk.args[0], data_algebra.expr_rep.Value)):
+                            or isinstance(opk.args[0], data_algebra.expr_rep.Value)):
                         raise ValueError(
                             "windows expression argument must be a column or value: "
                             + str(k)
