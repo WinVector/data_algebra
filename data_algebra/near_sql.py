@@ -93,6 +93,9 @@ class NearSQLContainer:
             constants=self.constants,
             db_model=db_model)
 
+    def to_with_form(self):
+        raise Exception("not implemented yet")  # TODO: implement
+
 
 class NearSQLTable(NearSQL):
     def __init__(self, *, terms, quoted_query_name, quoted_table_name):

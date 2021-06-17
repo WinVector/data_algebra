@@ -446,11 +446,10 @@ class DBModel(ABC):
         if len(missing) > 0:
             raise KeyError("referred to unknown columns: " + str(missing))
         cols_using = [c for c in table_def.column_names if c in using]
-        view_name = "table_reference_" + str(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
+
         subsql = data_algebra.near_sql.NearSQLTable(
             terms={k: self.quote_identifier(k) for k in cols_using},
-            quoted_query_name=self.quote_identifier(view_name),
+            quoted_query_name=self.quote_table_name(table_def),
             quoted_table_name=self.quote_table_name(table_def),
         )
         near_sql = subsql
@@ -459,8 +458,10 @@ class DBModel(ABC):
             terms = OrderedDict()
             for k in using:
                 terms[k] = k
+            view_name = "table_reference_" + str(temp_id_source[0])
+            temp_id_source[0] = temp_id_source[0] + 1
             near_sql = data_algebra.near_sql.NearSQLUnaryStep(
-                terms=terms,  # TODO: implement!
+                terms=terms,  # TODO: implement pruning
                 quoted_query_name=self.quote_identifier(view_name),
                 sub_sql=subsql.to_near_sql(columns=using),
                 temp_tables=subsql.temp_tables.copy(),

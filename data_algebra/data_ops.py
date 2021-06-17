@@ -246,16 +246,16 @@ class ViewRepresentation(OperatorPlatform, ABC):
             )
         self.columns_used()  # for table consistency check/raise
         temp_id_source = [0]
-        sub_sql = self.to_near_sql_implementation(
+        near_sql = self.to_near_sql_implementation(
             db_model=db_model, using=None, temp_id_source=temp_id_source
         )
-        if (sub_sql.temp_tables is not None) and (len(sub_sql.temp_tables) > 0):
+        if (near_sql.temp_tables is not None) and (len(near_sql.temp_tables) > 0):
             if temp_tables is None:
                 raise ValueError(
                     "need temp_tables to be a dictionary to copy back found temporary table values"
                 )
-            temp_tables.update(sub_sql.temp_tables)
-        sql_str = sub_sql.to_sql(db_model=db_model, force_sql=True)
+            temp_tables.update(near_sql.temp_tables)
+        sql_str = near_sql.to_sql(db_model=db_model, force_sql=True)
         if pretty and _have_sqlparse:
             try:
                 sql_str = sqlparse.format(
