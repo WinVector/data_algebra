@@ -80,18 +80,28 @@ class NearSQLContainer:
         assert isinstance(self.near_sql, NearSQL)
         return db_model.convert_nearsql_container_subsql_(nearsql_container=self, annotate=annotate)
 
-    # return a list where last element is a NearSQLContainer previous elements are (name, NearSQLContainer) pairs
-    def to_with_form_c(self):
+    # sequence: a list where last element is a NearSQLContainer previous elements are (name, NearSQLContainer) pairs
+    # stub the replacement common table expression in a NearSQLContainer
+    def to_with_form_stub(self):
+        stub = None
         if self.near_sql.is_table:
+            stub = self
             sequence = list()
-            sequence.append(self)
-            return sequence
-        sequence = self.near_sql.to_with_form()
-        endi = len(sequence) - 1
-        last_step = sequence[endi]
-        sequence[endi] = NearSQLContainer(
-            near_sql=last_step, columns=self.columns, force_sql=self.force_sql, constants=self.constants)
-        return sequence
+        else:
+            sequence = self.near_sql.to_with_form()
+            endi = len(sequence) - 1
+            last_step = sequence[endi]
+            sequence[endi] = NearSQLContainer(
+                near_sql=last_step, columns=self.columns, force_sql=self.force_sql, constants=self.constants)
+            endi = len(sequence) - 1
+            last_step = sequence[endi]
+            stub = last_step
+            if not stub.near_sql.is_table:
+                stub = NearSQLContainer(
+                    near_sql=NearSQLCommonTableExpression(quoted_query_name=last_step.near_sql.quoted_query_name)
+                )
+            sequence[endi] = (last_step.near_sql.quoted_query_name, last_step)
+        return stub, sequence
 
 
 class NearSQLCommonTableExpression(NearSQL):
@@ -161,15 +171,7 @@ class NearSQLUnaryStep(NearSQL):
             sequence.append(self)
             return sequence
         # non-trivial sequence
-        sequence = self.sub_sql.to_with_form_c()
-        endi = len(sequence) - 1
-        last_step = sequence[endi]
-        stub = last_step
-        if not stub.near_sql.is_table:
-            stub = NearSQLContainer(
-                near_sql=NearSQLCommonTableExpression(quoted_query_name=last_step.near_sql.quoted_query_name)
-            )
-        sequence[endi] = (last_step.near_sql.quoted_query_name, last_step)
+        stub, sequence = self.sub_sql.to_with_form_stub()
         stubbed_step = NearSQLUnaryStep(
             terms=self.terms,
             quoted_query_name=self.quoted_query_name,
