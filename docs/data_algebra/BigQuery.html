@@ -532,6 +532,12 @@ connection should be google.cloud.bigquery.client.Client</p>
                 <dd id="BigQueryModel.to_sql" class="function"><a href="db_model.html#DBModel.to_sql">to_sql</a></dd>
                 <dd id="BigQueryModel.row_recs_to_blocks_query" class="function"><a href="db_model.html#DBModel.row_recs_to_blocks_query">row_recs_to_blocks_query</a></dd>
                 <dd id="BigQueryModel.blocks_to_row_recs_query" class="function"><a href="db_model.html#DBModel.blocks_to_row_recs_query">blocks_to_row_recs_query</a></dd>
+                <dd id="BigQueryModel.enc_term_" class="function"><a href="db_model.html#DBModel.enc_term_">enc_term_</a></dd>
+                <dd id="BigQueryModel.convert_nearsql_container_subsql_" class="function"><a href="db_model.html#DBModel.convert_nearsql_container_subsql_">convert_nearsql_container_subsql_</a></dd>
+                <dd id="BigQueryModel.nearsqltable_to_sql_" class="function"><a href="db_model.html#DBModel.nearsqltable_to_sql_">nearsqltable_to_sql_</a></dd>
+                <dd id="BigQueryModel.nearsqlunary_to_sql_" class="function"><a href="db_model.html#DBModel.nearsqlunary_to_sql_">nearsqlunary_to_sql_</a></dd>
+                <dd id="BigQueryModel.nearsqlbinary_to_sql_" class="function"><a href="db_model.html#DBModel.nearsqlbinary_to_sql_">nearsqlbinary_to_sql_</a></dd>
+                <dd id="BigQueryModel.nearsqlq_to_sql_" class="function"><a href="db_model.html#DBModel.nearsqlq_to_sql_">nearsqlq_to_sql_</a></dd>
 
             </div>
                                 </dl>
@@ -636,7 +642,7 @@ inheritance.</p>
     *,
     db_model=BigQueryModel,
     conn,
-    fns={&#39;as_int64&#39;: &lt;function as_int64 at 0x7f884837cb80&gt;, &#39;trimstr&#39;: &lt;function trimstr at 0x7f884837cc10&gt;, &#39;coalesce_0&#39;: &lt;function coalesce_0 at 0x7f884837cee0&gt;, &#39;coalesce&#39;: &lt;function coalesce at 0x7f884836a1f0&gt;, &#39;datetime_to_date&#39;: &lt;function datetime_to_date at 0x7f884836a0d0&gt;, &#39;parse_datetime&#39;: &lt;function parse_datetime at 0x7f8848478700&gt;, &#39;parse_date&#39;: &lt;function parse_date at 0x7f884847e3a0&gt;, &#39;format_datetime&#39;: &lt;function format_datetime at 0x7f884847e430&gt;, &#39;format_date&#39;: &lt;function format_date at 0x7f884847e4c0&gt;, &#39;dayofweek&#39;: &lt;function dayofweek at 0x7f884847e550&gt;, &#39;dayofyear&#39;: &lt;function dayofyear at 0x7f884847e5e0&gt;, &#39;dayofmonth&#39;: &lt;function dayofmonth at 0x7f884847e700&gt;, &#39;weekofyear&#39;: &lt;function weekofyear at 0x7f884847e670&gt;, &#39;month&#39;: &lt;function month at 0x7f884847e790&gt;, &#39;quarter&#39;: &lt;function quarter at 0x7f884847e820&gt;, &#39;year&#39;: &lt;function year at 0x7f884847e8b0&gt;, &#39;timestamp_diff&#39;: &lt;function timestamp_diff at 0x7f884847e940&gt;, &#39;date_diff&#39;: &lt;function date_diff at 0x7f884847e9d0&gt;, &#39;base_Sunday&#39;: &lt;function base_Sunday at 0x7f884847ea60&gt;}
+    fns={&#39;as_int64&#39;: &lt;function as_int64 at 0x7f91c160bb80&gt;, &#39;trimstr&#39;: &lt;function trimstr at 0x7f91c160bc10&gt;, &#39;coalesce_0&#39;: &lt;function coalesce_0 at 0x7f91c160bee0&gt;, &#39;coalesce&#39;: &lt;function coalesce at 0x7f91c15cf1f0&gt;, &#39;datetime_to_date&#39;: &lt;function datetime_to_date at 0x7f91c15cf0d0&gt;, &#39;parse_datetime&#39;: &lt;function parse_datetime at 0x7f91c1b77a60&gt;, &#39;parse_date&#39;: &lt;function parse_date at 0x7f919000d700&gt;, &#39;format_datetime&#39;: &lt;function format_datetime at 0x7f919000d790&gt;, &#39;format_date&#39;: &lt;function format_date at 0x7f919000d820&gt;, &#39;dayofweek&#39;: &lt;function dayofweek at 0x7f919000d8b0&gt;, &#39;dayofyear&#39;: &lt;function dayofyear at 0x7f919000d940&gt;, &#39;dayofmonth&#39;: &lt;function dayofmonth at 0x7f919000da60&gt;, &#39;weekofyear&#39;: &lt;function weekofyear at 0x7f919000d9d0&gt;, &#39;month&#39;: &lt;function month at 0x7f919000daf0&gt;, &#39;quarter&#39;: &lt;function quarter at 0x7f919000db80&gt;, &#39;year&#39;: &lt;function year at 0x7f919000dc10&gt;, &#39;timestamp_diff&#39;: &lt;function timestamp_diff at 0x7f919000dca0&gt;, &#39;date_diff&#39;: &lt;function date_diff at 0x7f919000dd30&gt;, &#39;base_Sunday&#39;: &lt;function base_Sunday at 0x7f919000ddc0&gt;}
 )</span>
     </div>
 
