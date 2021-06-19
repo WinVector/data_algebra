@@ -283,10 +283,21 @@ class ViewRepresentation(OperatorPlatform, ABC):
                     "need temp_tables to be a dictionary to copy back found temporary table values"
                 )
             temp_tables.update(near_sql.temp_tables)
-        formatting_near_sql = near_sql
-        if use_with:
-            formatting_near_sql = near_sql.to_with_form()
-        sql_str = formatting_near_sql.to_sql(db_model=db_model, force_sql=True)
+        sql_str = None
+        if use_with and db_model.supports_with:
+            sequence = near_sql.to_with_form()
+            len_sequence = len(sequence)
+            if len(sequence) >= 2:
+                sql_sequence = [None] * (len_sequence - 1)
+                for i in range(len_sequence - 1):
+                    nmi = sequence[i][0]  # already quoted
+                    sqli = sequence[i][1].to_sql(db_model=db_model)
+                    sql_sequence[i] = f' {nmi} AS (\n {sqli} \n)'
+                sql_last = sequence[len_sequence - 1].to_sql(db_model=db_model, force_sql=True)
+                sql_str = 'WITH\n' + ',\n'.join(sql_sequence) + '\n' + sql_last
+        if sql_str is None:
+            # non-with path
+            sql_str = near_sql.to_sql(db_model=db_model, force_sql=True)
         if pretty:
             sql_str = pretty_format_sql(sql_str, encoding=encoding, sqlparse_options=sqlparse_options)
         return sql_str

@@ -199,6 +199,7 @@ class DBModel(ABC):
     drop_text: str
     string_type: str
     join_name_map: dict
+    supports_with: bool
 
     def __init__(
         self,
@@ -214,6 +215,7 @@ class DBModel(ABC):
         drop_text='DROP TABLE',
         string_type='VARCHAR',
         join_name_map=None,
+        supports_with=True
     ):
         if local_data_model is None:
             local_data_model = data_algebra.default_data_model
@@ -237,6 +239,7 @@ class DBModel(ABC):
         if join_name_map is None:
             join_name_map = {}
         self.join_name_map = join_name_map.copy()
+        self.supports_with = supports_with
 
     def db_handle(self, conn):
         return DBHandle(db_model=self, conn=conn)
