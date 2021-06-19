@@ -9,18 +9,6 @@ import data_algebra.OrderedSet
 # TODO: build a term object that carries the column use information
 
 
-# encode and name a term for use in a SQL expression
-def _enc_term(k, *, terms, db_model):
-    v = None
-    try:
-        v = terms[k]
-    except KeyError:
-        pass
-    if v is None:
-        return db_model.quote_identifier(k)
-    return v + " AS " + db_model.quote_identifier(k)
-
-
 class NearSQL(ABC):
     """
     Represent SQL queries in a mostly string-form
@@ -40,7 +28,7 @@ class NearSQL(ABC):
         self.temp_tables = temp_tables.copy()
         self.annotation = annotation
 
-    def to_near_sql(self, *, columns=None, force_sql=False, constants=None):
+    def to_bound_near_sql(self, *, columns=None, force_sql=False, constants=None):
         return NearSQLContainer(
             near_sql=self,
             columns=columns,
@@ -197,7 +185,7 @@ class NearSQLUnaryStep(NearSQL):
         terms = self.terms
         if (constants is not None) and (len(constants) > 0):
             terms.update(constants)
-        terms_strs = [_enc_term(k, terms=terms, db_model=db_model) for k in columns]
+        terms_strs = [db_model.enc_term_(k, terms=terms) for k in columns]
         if len(terms_strs) < 1:
             terms_strs = [f'1 AS {db_model.quote_identifier("data_algebra_placeholder_col_name")}']
         sql = "SELECT "
@@ -269,7 +257,7 @@ class NearSQLBinaryStep(NearSQL):
         terms = self.terms
         if (constants is not None) and (len(constants) > 0):
             terms.update(constants)
-        terms_strs = [_enc_term(k, terms=terms, db_model=db_model) for k in columns]
+        terms_strs = [db_model.enc_term_(k, terms=terms) for k in columns]
         if len(terms_strs) < 1:
             terms_strs = [f'1 AS {db_model.quote_identifier("data_algebra_placeholder_col_name")}']
         sql = (

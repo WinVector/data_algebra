@@ -495,7 +495,7 @@ class DBModel(ABC):
             near_sql = data_algebra.near_sql.NearSQLUnaryStep(
                 terms=terms,  # TODO: implement pruning
                 quoted_query_name=self.quote_identifier(view_name),
-                sub_sql=subsql.to_near_sql(columns=using),
+                sub_sql=subsql.to_bound_near_sql(columns=using),
                 temp_tables=subsql.temp_tables.copy(),
             )
         return near_sql
@@ -560,7 +560,7 @@ class DBModel(ABC):
         near_sql = data_algebra.near_sql.NearSQLUnaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
-            sub_sql=subsql.to_near_sql(columns=subusing),
+            sub_sql=subsql.to_bound_near_sql(columns=subusing),
             temp_tables=subsql.temp_tables.copy(),
             annotation=extend_node.to_python_implementation(print_sources=False, indent=-1)
         )
@@ -591,7 +591,7 @@ class DBModel(ABC):
         near_sql = data_algebra.near_sql.NearSQLUnaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
-            sub_sql=subsql.to_near_sql(columns=subusing),
+            sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
             temp_tables=subsql.temp_tables.copy(),
         )
@@ -617,7 +617,7 @@ class DBModel(ABC):
         near_sql = data_algebra.near_sql.NearSQLUnaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
-            sub_sql=subsql.to_near_sql(columns=subusing),
+            sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
             temp_tables=subsql.temp_tables.copy(),
         )
@@ -705,7 +705,7 @@ class DBModel(ABC):
         near_sql = data_algebra.near_sql.NearSQLUnaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
-            sub_sql=subsql.to_near_sql(columns=subusing),
+            sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
             temp_tables=subsql.temp_tables.copy(),
         )
@@ -737,7 +737,7 @@ class DBModel(ABC):
         near_sql = data_algebra.near_sql.NearSQLUnaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
-            sub_sql=subsql.to_near_sql(columns=subusing),
+            sub_sql=subsql.to_bound_near_sql(columns=subusing),
             temp_tables=subsql.temp_tables.copy(),
         )
         return near_sql
@@ -820,9 +820,9 @@ class DBModel(ABC):
         near_sql = data_algebra.near_sql.NearSQLBinaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
-            sub_sql1=sql_left.to_near_sql(columns=using_left),
+            sub_sql1=sql_left.to_bound_near_sql(columns=using_left),
             joiner=jointype + " JOIN",
-            sub_sql2=sql_right.to_near_sql(columns=using_right),
+            sub_sql2=sql_right.to_bound_near_sql(columns=using_right),
             suffix=on_terms,
             temp_tables=temp_tables,
         )
@@ -876,13 +876,13 @@ class DBModel(ABC):
         near_sql = data_algebra.near_sql.NearSQLBinaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
-            sub_sql1=sql_left.to_near_sql(
+            sub_sql1=sql_left.to_bound_near_sql(
                 columns=using_left,
                 force_sql=True,
                 constants=constants_left,
             ),
             joiner="UNION ALL",
-            sub_sql2=sql_right.to_near_sql(
+            sub_sql2=sql_right.to_bound_near_sql(
                 columns=using_right,
                 force_sql=True,
                 constants=constants_right,
@@ -1071,6 +1071,17 @@ class DBModel(ABC):
             + ", ".join(control_cols)
         )
         return sql
+
+    # encode and name a term for use in a SQL expression
+    def enc_term_(self, k, *, terms):
+        v = None
+        try:
+            v = terms[k]
+        except KeyError:
+            pass
+        if v is None:
+            return self.quote_identifier(k)
+        return v + " AS " + self.quote_identifier(k)
 
     def __str__(self):
         return str(type(self).__name__)
