@@ -17,6 +17,35 @@ import data_algebra.eval_model
 import data_algebra.data_ops
 
 
+_have_sqlparse = False
+try:
+    # noinspection PyUnresolvedReferences
+    import sqlparse
+
+    _have_sqlparse = True
+except ImportError:
+    pass
+
+
+# noinspection PyBroadException
+def pretty_format_sql(sql, *, encoding=None, sqlparse_options=None):
+    assert isinstance(sql, str)
+    assert isinstance(encoding, (str, type(None)))
+    assert isinstance(encoding, (dict, type(None)))
+    if sqlparse_options is None:
+        sqlparse_options = {"reindent": True, "keyword_case": "upper"}
+    formatted_sql = sql
+    if _have_sqlparse:
+        try:
+            formatted_sql = sqlparse.format(
+                sql, encoding=encoding, **sqlparse_options
+            )
+        except Exception:
+            pass
+    return formatted_sql
+
+
+
 # map from op-name to special SQL formatting code
 
 
@@ -860,6 +889,50 @@ class DBModel(ABC):
             temp_tables=temp_tables,
         )
         return near_sql
+
+    def to_sql(
+        self,
+        ops,
+        *,
+        pretty=False,
+        encoding=None,
+        sqlparse_options=None,
+        temp_tables=None,
+        use_with=False
+    ):
+        assert isinstance(self, DBModel)
+        assert isinstance(ops, data_algebra.data_ops.ViewRepresentation)
+        if sqlparse_options is None:
+            sqlparse_options = {"reindent": True, "keyword_case": "upper"}
+        ops.columns_used()  # for table consistency check/raise
+        temp_id_source = [0]
+        near_sql = ops.to_near_sql_implementation(
+            db_model=self, using=None, temp_id_source=temp_id_source
+        )
+        if (near_sql.temp_tables is not None) and (len(near_sql.temp_tables) > 0):
+            if temp_tables is None:
+                raise ValueError(
+                    "need temp_tables to be a dictionary to copy back found temporary table values"
+                )
+            temp_tables.update(near_sql.temp_tables)
+        sql_str = None
+        if use_with and self.supports_with:
+            sequence = near_sql.to_with_form()
+            len_sequence = len(sequence)
+            if len(sequence) >= 2:
+                sql_sequence = [None] * (len_sequence - 1)
+                for i in range(len_sequence - 1):
+                    nmi = sequence[i][0]  # already quoted
+                    sqli = sequence[i][1].to_sql(db_model=self)
+                    sql_sequence[i] = f' {nmi} AS (\n {sqli} \n)'
+                sql_last = sequence[len_sequence - 1].to_sql(db_model=self, force_sql=True)
+                sql_str = 'WITH\n' + ',\n'.join(sql_sequence) + '\n' + sql_last
+        if sql_str is None:
+            # non-with path
+            sql_str = near_sql.to_sql(db_model=self, force_sql=True)
+        if pretty:
+            sql_str = pretty_format_sql(sql_str, encoding=encoding, sqlparse_options=sqlparse_options)
+        return sql_str
 
     def row_recs_to_blocks_query(
         self, source_sql, record_spec, control_view, *, using=None, temp_id_source=None

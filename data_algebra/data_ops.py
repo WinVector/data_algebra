@@ -28,16 +28,6 @@ except ImportError:
     pass
 
 
-_have_sqlparse = False
-try:
-    # noinspection PyUnresolvedReferences
-    import sqlparse
-
-    _have_sqlparse = True
-except ImportError:
-    pass
-
-
 # noinspection PyBroadException
 def pretty_format_python(python_str, *, black_mode=None):
     assert isinstance(python_str, str)
@@ -50,24 +40,6 @@ def pretty_format_python(python_str, *, black_mode=None):
         except Exception:
             pass
     return formatted_python
-
-
-# noinspection PyBroadException
-def pretty_format_sql(sql, *, encoding=None, sqlparse_options=None):
-    assert isinstance(sql, str)
-    assert isinstance(encoding, (str, type(None)))
-    assert isinstance(encoding, (dict, type(None)))
-    if sqlparse_options is None:
-        sqlparse_options = {"reindent": True, "keyword_case": "upper"}
-    formatted_sql = sql
-    if _have_sqlparse:
-        try:
-            formatted_sql = sqlparse.format(
-                sql, encoding=encoding, **sqlparse_options
-            )
-        except Exception:
-            pass
-    return formatted_sql
 
 
 class ViewRepresentation(OperatorPlatform, ABC):
@@ -264,43 +236,17 @@ class ViewRepresentation(OperatorPlatform, ABC):
         temp_tables=None,
         use_with=False
     ):
-        if sqlparse_options is None:
-            sqlparse_options = {"reindent": True, "keyword_case": "upper"}
         if isinstance(db_model, data_algebra.db_model.DBHandle):
             db_model = db_model.db_model
-        if not isinstance(db_model, data_algebra.db_model.DBModel):
-            raise TypeError(
-                "Expected db_model to be derived from data_algebra.db_model.DBModel or data_algebra.db_model.DBHandle"
-            )
-        self.columns_used()  # for table consistency check/raise
-        temp_id_source = [0]
-        near_sql = self.to_near_sql_implementation(
-            db_model=db_model, using=None, temp_id_source=temp_id_source
+        assert isinstance(db_model, data_algebra.db_model.DBModel)
+        return db_model.to_sql(
+            ops=self,
+            pretty=pretty,
+            encoding=encoding,
+            sqlparse_options=sqlparse_options,
+            temp_tables=temp_tables,
+            use_with=use_with
         )
-        if (near_sql.temp_tables is not None) and (len(near_sql.temp_tables) > 0):
-            if temp_tables is None:
-                raise ValueError(
-                    "need temp_tables to be a dictionary to copy back found temporary table values"
-                )
-            temp_tables.update(near_sql.temp_tables)
-        sql_str = None
-        if use_with and db_model.supports_with:
-            sequence = near_sql.to_with_form()
-            len_sequence = len(sequence)
-            if len(sequence) >= 2:
-                sql_sequence = [None] * (len_sequence - 1)
-                for i in range(len_sequence - 1):
-                    nmi = sequence[i][0]  # already quoted
-                    sqli = sequence[i][1].to_sql(db_model=db_model)
-                    sql_sequence[i] = f' {nmi} AS (\n {sqli} \n)'
-                sql_last = sequence[len_sequence - 1].to_sql(db_model=db_model, force_sql=True)
-                sql_str = 'WITH\n' + ',\n'.join(sql_sequence) + '\n' + sql_last
-        if sql_str is None:
-            # non-with path
-            sql_str = near_sql.to_sql(db_model=db_model, force_sql=True)
-        if pretty:
-            sql_str = pretty_format_sql(sql_str, encoding=encoding, sqlparse_options=sqlparse_options)
-        return sql_str
 
     # Pandas realization
 
