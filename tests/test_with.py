@@ -70,10 +70,20 @@ def test_with_query_example_1():
         db_model.prepare_connection(conn)
         db_handle = db_model.db_handle(conn)
         db_handle.insert_table(d, table_name='d')
-        sql_regular = db_handle.to_sql(ops, pretty=True, use_with=False)
-        res_regular = db_handle.read_query(sql_regular)
-        sql_with = db_handle.to_sql(ops, pretty=True, use_with=True)
+        sql_regular = db_handle.to_sql(ops, pretty=False, use_with=False, annotate=False)
+        res_regular= db_handle.read_query(sql_regular)
+        sql_regular_a = db_handle.to_sql(ops, pretty=False, use_with=False, annotate=True)
+        res_regular_a = db_handle.read_query(sql_regular_a)
+        sql_with = db_handle.to_sql(ops, pretty=False, use_with=True, annotate=False)
         res_with = db_handle.read_query(sql_with)
+        sql_with_a = db_handle.to_sql(ops, pretty=False, use_with=True, annotate=True)
+        res_with_a = db_handle.read_query(sql_with_a)
 
     assert data_algebra.test_util.equivalent_frames(res_regular, expect)
     assert data_algebra.test_util.equivalent_frames(res_with, expect)
+    assert data_algebra.test_util.equivalent_frames(res_regular_a, expect)
+    assert data_algebra.test_util.equivalent_frames(res_with_a, expect)
+    assert '--' in sql_regular_a
+    assert '--' in sql_with_a
+    assert '--' not in sql_regular
+    assert '--' not in sql_with
