@@ -764,7 +764,7 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-            <span class="n">annotation</span><span class="o">=</span><span class="n">extend_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">annotation</span><span class="o">=</span><span class="n">extend_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
@@ -1835,7 +1835,7 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-            <span class="n">annotation</span><span class="o">=</span><span class="n">extend_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">annotation</span><span class="o">=</span><span class="n">extend_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
@@ -3042,7 +3042,7 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-            <span class="n">annotation</span><span class="o">=</span><span class="n">extend_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">annotation</span><span class="o">=</span><span class="n">extend_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span><span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 </pre></div>

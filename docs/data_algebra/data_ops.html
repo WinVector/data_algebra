@@ -1455,7 +1455,10 @@
         <span class="k">return</span> <span class="p">[</span><span class="n">columns_we_take</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="n">spacer</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">   &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">indent</span>
+        <span class="k">if</span> <span class="n">indent</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">spacer</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">spacer</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">   &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">indent</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="k">if</span> <span class="n">print_sources</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">=</span> <span class="p">(</span>
@@ -4741,7 +4744,10 @@ with the using columns (None means all).</p>
         <span class="k">return</span> <span class="p">[</span><span class="n">columns_we_take</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="n">spacer</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">   &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">indent</span>
+        <span class="k">if</span> <span class="n">indent</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">spacer</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">spacer</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">   &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">indent</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="k">if</span> <span class="n">print_sources</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">=</span> <span class="p">(</span>
@@ -5034,7 +5040,10 @@ with the using columns (None means all).</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="n">spacer</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">   &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">indent</span>
+        <span class="k">if</span> <span class="n">indent</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">spacer</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">spacer</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">   &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">indent</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="k">if</span> <span class="n">print_sources</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">=</span> <span class="p">(</span>

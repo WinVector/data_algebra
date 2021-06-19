@@ -946,7 +946,10 @@ class ExtendNode(ViewRepresentation):
         return [columns_we_take]
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
-        spacer = "\n   " + " " * indent
+        if indent < 0:
+            spacer = ' '
+        else:
+            spacer = "\n   " + " " * indent
         s = ""
         if print_sources:
             s = (
