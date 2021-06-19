@@ -50,6 +50,7 @@ class NearSQL(ABC):
     def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False):
         raise NotImplementedError("base method called")
 
+    # return a list where last element is a NearSQL previous elments are (name, NearSQLContainer) pairs
     def to_with_form(self):
         sequence = list()
         sequence.append(self)
