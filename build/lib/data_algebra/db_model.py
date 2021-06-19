@@ -45,7 +45,6 @@ def pretty_format_sql(sql, *, encoding=None, sqlparse_options=None):
     return formatted_sql
 
 
-
 # map from op-name to special SQL formatting code
 
 
@@ -144,6 +143,7 @@ def _db_is_in_expr(dbmodel, expression):
     )
 
 
+# noinspection PyUnusedLocal
 def _db_count_expr(dbmodel, expression):
     return 'SUM(1)'
 
@@ -358,7 +358,7 @@ class DBModel(ABC):
         r = r.reset_index(drop=True)
         return r
 
-    # noinspection PyMethodMayBeStatic
+    # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def read_table(self, conn, table_name, *, qualifiers=None, limit=None):
         if not isinstance(table_name, str):
             raise TypeError("Expect table_name to be a str")
@@ -1080,7 +1080,7 @@ class DBModel(ABC):
 
 
 class DBHandle(data_algebra.eval_model.EvalModel):
-    def __init__(self, *, db_model, conn, fns = None):
+    def __init__(self, *, db_model, conn, fns=None):
         if not isinstance(db_model, DBModel):
             raise TypeError(
                 "expected db_model to be of class data_algebra.db_model.DBHandle"
@@ -1095,6 +1095,7 @@ class DBHandle(data_algebra.eval_model.EvalModel):
     def __enter__(self):
         return self
 
+    # noinspection PyShadowingBuiltins
     def __exit__(self, type, value, traceback):
         self.close()
 
@@ -1108,9 +1109,9 @@ class DBHandle(data_algebra.eval_model.EvalModel):
     def describe_table(self, table_name, *, qualifiers=None, row_limit=7):
         head = self.read_query(
             q="SELECT * FROM "
-                + self.db_model.quote_table_name(table_name)
-                + " LIMIT "
-                + str(row_limit),
+              + self.db_model.quote_table_name(table_name)
+              + " LIMIT "
+              + str(row_limit),
         )
         return data_algebra.data_ops.describe_table(
             head,
