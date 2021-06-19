@@ -80,6 +80,7 @@ class NearSQLContainer:
         assert isinstance(self.near_sql, NearSQL)
         return db_model.convert_nearsql_container_subsql_(nearsql_container=self, annotate=annotate)
 
+    # return a list where last element is a NearSQLContainer previous elements are (name, NearSQLContainer) pairs
     def to_with_form_c(self):
         if self.near_sql.is_table:
             sequence = list()
