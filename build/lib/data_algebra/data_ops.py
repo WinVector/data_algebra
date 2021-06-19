@@ -664,7 +664,9 @@ class TableDescription(ViewRepresentation):
         return True
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
-        spacer = "\n " + " " * indent
+        spacer = ' '
+        if indent >= 0:
+            spacer = "\n " + " " * indent
         column_limit = 20
         truncated = (not strict) and (column_limit < len(self.column_names))
         if truncated:
@@ -674,7 +676,7 @@ class TableDescription(ViewRepresentation):
         else:
             cols_to_print = [c.__repr__() for c in self.column_names]
         col_text = data_algebra.flow_text.flow_text(
-            cols_to_print, align_right=70 - indent, sep_width=2
+            cols_to_print, align_right=70 - max(0, indent), sep_width=2
         )
         col_text = [", ".join(line) for line in col_text]
         col_text = (",  " + spacer).join(col_text)
@@ -946,9 +948,8 @@ class ExtendNode(ViewRepresentation):
         return [columns_we_take]
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
-        if indent < 0:
-            spacer = ' '
-        else:
+        spacer = ' '
+        if indent >= 0:
             spacer = "\n   " + " " * indent
         s = ""
         if print_sources:
@@ -1087,13 +1088,15 @@ class ProjectNode(ViewRepresentation):
         return [columns_we_take]
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
-        spacer = "\n   " + " " * indent
+        spacer = ' '
+        if indent >= 0:
+            spacer = "\n   " + " " * indent
         s = ""
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
                 + " .\\\n"
-                + " " * (indent + 3)
+                + " " * (max(indent, 0) + 3)
             )
         s = s + (
             "project({"
@@ -1172,7 +1175,7 @@ class SelectRowsNode(ViewRepresentation):
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
                 + " .\\\n"
-                + " " * (indent + 3)
+                + " " * (max(indent, 0) + 3)
             )
         s = s + ("select_rows(" + self.expr.to_python().__repr__() + ")")
         return s
@@ -1243,7 +1246,7 @@ class SelectColumnsNode(ViewRepresentation):
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
                 + " .\\\n"
-                + " " * (indent + 3)
+                + " " * (max(indent, 0) + 3)
             )
         s = s + ("select_columns(" + self.column_selection.__repr__() + ")")
         return s
@@ -1314,7 +1317,7 @@ class DropColumnsNode(ViewRepresentation):
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
                 + " .\\\n"
-                + " " * (indent + 3)
+                + " " * (max(indent, 0) + 3)
             )
         s = s + ("drop_columns(" + self.column_deletions.__repr__() + ")")
         return s
@@ -1392,7 +1395,7 @@ class OrderRowsNode(ViewRepresentation):
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
                 + " .\\\n"
-                + " " * (indent + 3)
+                + " " * (max(indent, 0) + 3)
             )
         s = s + ("order_rows(" + self.order_columns.__repr__())
         if len(self.reverse) > 0:
@@ -1492,7 +1495,7 @@ class RenameColumnsNode(ViewRepresentation):
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
                 + " .\\\n"
-                + " " * (indent + 3)
+                + " " * (max(indent, 0) + 3)
             )
         s = s + ("rename_columns(" + self.column_remapping.__repr__() + ")")
         return s
@@ -1582,16 +1585,16 @@ class NaturalJoinNode(ViewRepresentation):
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
                 + " .\\\n"
-                + " " * (indent + 3)
+                + " " * (max(indent, 0) + 3)
             )
         s = s + ("natural_join(b=\n" + " " * (indent + 6))
         if print_sources:
             s = s + (
                 self.sources[1].to_python_implementation(
-                    indent=indent + 6, strict=strict
+                    indent=max(indent, 0) + 6, strict=strict
                 )
                 + ",\n"
-                + " " * (indent + 6)
+                + " " * (max(indent, 0) + 6)
             )
         else:
             s = s + " _1, "
@@ -1676,16 +1679,16 @@ class ConcatRowsNode(ViewRepresentation):
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
                 + " .\\\n"
-                + " " * (indent + 3)
+                + " " * (max(indent, 0) + 3)
             )
         s = s + ("concat_rows(b=\n" + " " * (indent + 6))
         if print_sources:
             s = s + (
                 self.sources[1].to_python_implementation(
-                    indent=indent + 6, strict=strict
+                    indent=max(indent, 0) + 6, strict=strict
                 )
                 + ",\n"
-                + " " * (indent + 6)
+                + " " * (max(indent, 0) + 6)
             )
         else:
             s = s + " _1, "
@@ -1762,7 +1765,7 @@ class ConvertRecordsNode(ViewRepresentation):
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
                 + " .\\\n"
-                + " " * (indent + 3)
+                + " " * (max(indent, 0) + 3)
             )
         rm_str = self.record_map.__repr__()
         rm_str = re.sub("\n", "\n   ", rm_str)
@@ -1811,6 +1814,7 @@ class ConvertRecordsNode(ViewRepresentation):
             query=query,
             terms=terms,
             temp_tables=temp_tables,
+            annotation='convert records'
         )
         return near_sql
 
