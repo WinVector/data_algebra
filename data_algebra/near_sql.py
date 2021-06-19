@@ -78,32 +78,7 @@ class NearSQLContainer:
     def convert_subsql(self, *, db_model, annotate=False):
         assert isinstance(self, NearSQLContainer)
         assert isinstance(self.near_sql, NearSQL)
-        if isinstance(self.near_sql, NearSQLTable):
-            sql = (
-                    " "
-                    + self.to_sql(db_model, annotate=annotate)
-                    + " "
-            )
-            if self.near_sql.quoted_query_name != self.near_sql.quoted_table_name:
-                sql = sql + (
-                        self.near_sql.quoted_query_name
-                        + " "
-                )
-        elif isinstance(self.near_sql, NearSQLCommonTableExpression):
-            sql = (
-                    " "
-                    + self.to_sql(db_model, annotate=annotate)
-                    + " "
-            )
-        else:
-            sql = (
-                    " ( "
-                    + self.to_sql(db_model, annotate=annotate)
-                    + " ) "
-                    + self.near_sql.quoted_query_name
-                    + " "
-            )
-        return sql
+        return db_model.convert_nearsql_container_subsql_(nearsql_container=self, annotate=annotate)
 
     def to_with_form(self):
         if self.near_sql.is_table:
@@ -137,22 +112,13 @@ class NearSQLTable(NearSQL):
         self.quoted_table_name = quoted_table_name
 
     def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False):
-        if columns is None:
-            columns = [k for k in self.terms.keys()]
-        if len(columns) <= 0:
-            force_sql = False
-        have_constants = (constants is not None) and (len(constants) > 0)
-        if force_sql or have_constants:
-            terms_strs = [db_model.quote_identifier(k) for k in columns]
-            if have_constants:
-                terms_strs = terms_strs + [
-                    v + " AS " + db_model.quote_identifier(k)
-                    for (k, v) in constants.items()
-                ]
-            if len(terms_strs) < 1:
-                terms_strs = [f'1 AS {db_model.quote_identifier("data_algebra_placeholder_col_name")}']
-            return "SELECT " + ", ".join(terms_strs) + " FROM " + self.quoted_table_name
-        return self.quoted_table_name
+        return db_model.nearsqltable_to_sql_(
+            near_sql=self,
+            columns=columns,
+            force_sql=force_sql,
+            constants=constants,
+            annotate=annotate
+        )
 
 
 class NearSQLUnaryStep(NearSQL):
@@ -180,21 +146,12 @@ class NearSQLUnaryStep(NearSQL):
         self.suffix = suffix
 
     def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False):
-        if columns is None:
-            columns = [k for k in self.terms.keys()]
-        terms = self.terms
-        if (constants is not None) and (len(constants) > 0):
-            terms.update(constants)
-        terms_strs = [db_model.enc_term_(k, terms=terms) for k in columns]
-        if len(terms_strs) < 1:
-            terms_strs = [f'1 AS {db_model.quote_identifier("data_algebra_placeholder_col_name")}']
-        sql = "SELECT "
-        if annotate and (self.annotation is not None) and (len(self.annotation) > 0):
-            sql = sql + " -- " + self.annotation.replace('\r', ' ').replace('\n', ' ') + "\n "
-        sql = sql + ", ".join(terms_strs) + " FROM " + self.sub_sql.convert_subsql(db_model=db_model, annotate=annotate)
-        if (self.suffix is not None) and (len(self.suffix) > 0):
-            sql = sql + " " + self.suffix
-        return sql
+        return db_model.nearsqlunary_to_sql_(
+            near_sql=self,
+            columns=columns,
+            force_sql=force_sql,
+            constants=constants,
+            annotate=annotate)
 
     def to_with_form(self):
         if self.sub_sql.near_sql.is_table:
@@ -252,24 +209,13 @@ class NearSQLBinaryStep(NearSQL):
         self.suffix = suffix
 
     def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False):
-        if columns is None:
-            columns = [k for k in self.terms.keys()]
-        terms = self.terms
-        if (constants is not None) and (len(constants) > 0):
-            terms.update(constants)
-        terms_strs = [db_model.enc_term_(k, terms=terms) for k in columns]
-        if len(terms_strs) < 1:
-            terms_strs = [f'1 AS {db_model.quote_identifier("data_algebra_placeholder_col_name")}']
-        sql = (
-                "SELECT " + ", ".join(terms_strs) + " FROM " + " ( "
-                + self.sub_sql1.convert_subsql(db_model=db_model, annotate=annotate)
-                + " " + self.joiner + " "
-                + self.sub_sql2.convert_subsql(db_model=db_model, annotate=annotate)
-                )
-        if (self.suffix is not None) and (len(self.suffix) > 0):
-            sql = sql + " " + self.suffix
-        sql = sql + " ) "
-        return sql
+        return db_model.nearsqlbinary_to_sql_(
+            near_sql=self,
+            columns=columns,
+            force_sql=force_sql,
+            constants=constants,
+            annotate=annotate
+        )
 
 
 class NearSQLq(NearSQL):
@@ -293,26 +239,10 @@ class NearSQLq(NearSQL):
         self.prev_quoted_query_name = prev_quoted_query_name
 
     def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False):
-        if columns is None:
-            columns = [k for k in self.terms.keys()]
-        terms = self.terms
-        if (constants is not None) and (len(constants) > 0):
-            terms.update(constants)
-
-        def enc_term(k):
-            v = terms[k]
-            if v is None:
-                return db_model.quote_identifier(k)
-            return v + " AS " + db_model.quote_identifier(k)
-
-        terms_strs = [enc_term(k) for k in columns]
-        if len(terms_strs) < 1:
-            terms_strs = [f'1 AS {db_model.quote_identifier("data_algebra_placeholder_col_name")}']
-        return (
-            "SELECT "
-            + ", ".join(terms_strs)
-            + " FROM ( "
-            + self.query
-            + " ) "
-            + self.prev_quoted_query_name
+        return db_model.nearsqlq_to_sql_(
+            near_sql=self,
+            columns=columns,
+            force_sql=force_sql,
+            constants=constants,
+            annotate=annotate
         )
