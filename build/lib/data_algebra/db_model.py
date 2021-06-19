@@ -562,6 +562,7 @@ class DBModel(ABC):
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_near_sql(columns=subusing),
             temp_tables=subsql.temp_tables.copy(),
+            annotation=extend_node.to_python_implementation(print_sources=False)
         )
         return near_sql
 
@@ -895,6 +896,7 @@ class DBModel(ABC):
         ops,
         *,
         pretty=False,
+        annotate=False,
         encoding=None,
         sqlparse_options=None,
         temp_tables=None,
@@ -923,13 +925,13 @@ class DBModel(ABC):
                 sql_sequence = [None] * (len_sequence - 1)
                 for i in range(len_sequence - 1):
                     nmi = sequence[i][0]  # already quoted
-                    sqli = sequence[i][1].to_sql(db_model=self)
+                    sqli = sequence[i][1].to_sql(db_model=self, annotate=annotate)
                     sql_sequence[i] = f' {nmi} AS (\n {sqli} \n)'
-                sql_last = sequence[len_sequence - 1].to_sql(db_model=self, force_sql=True)
+                sql_last = sequence[len_sequence - 1].to_sql(db_model=self, force_sql=True, annotate=annotate)
                 sql_str = 'WITH\n' + ',\n'.join(sql_sequence) + '\n' + sql_last
         if sql_str is None:
             # non-with path
-            sql_str = near_sql.to_sql(db_model=self, force_sql=True)
+            sql_str = near_sql.to_sql(db_model=self, force_sql=True, annotate=annotate)
         if pretty:
             sql_str = pretty_format_sql(sql_str, encoding=encoding, sqlparse_options=sqlparse_options)
         return sql_str
@@ -1160,12 +1162,14 @@ class DBHandle(data_algebra.eval_model.EvalModel):
     def to_sql(self, ops,
                *,
                pretty=False,
+               annotate=False,
                encoding=None,
                sqlparse_options=None,
                temp_tables=None,
                use_with=False):
         return ops.to_sql(self.db_model,
                           pretty=pretty,
+                          annotate=annotate,
                           encoding=encoding,
                           sqlparse_options=sqlparse_options,
                           temp_tables=temp_tables,

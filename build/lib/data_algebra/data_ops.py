@@ -231,6 +231,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         db_model,
         *,
         pretty=False,
+        annotate=False,
         encoding=None,
         sqlparse_options=None,
         temp_tables=None,
@@ -242,6 +243,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         return db_model.to_sql(
             ops=self,
             pretty=pretty,
+            annotate=annotate,
             encoding=encoding,
             sqlparse_options=sqlparse_options,
             temp_tables=temp_tables,
