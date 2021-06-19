@@ -602,6 +602,7 @@ class DBModel:
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
             temp_tables=subsql.temp_tables.copy(),
+            annotation=project_node.to_python_implementation(print_sources=False, indent=-1)
         )
         return near_sql
 
@@ -628,6 +629,7 @@ class DBModel:
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
             temp_tables=subsql.temp_tables.copy(),
+            annotation=select_rows_node.to_python_implementation(print_sources=False, indent=-1)
         )
         return near_sql
 
@@ -716,6 +718,7 @@ class DBModel:
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
             temp_tables=subsql.temp_tables.copy(),
+            annotation=order_node.to_python_implementation(print_sources=False, indent=-1)
         )
         return near_sql
 
@@ -747,6 +750,7 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             temp_tables=subsql.temp_tables.copy(),
+            annotation=rename_node.to_python_implementation(print_sources=False, indent=-1)
         )
         return near_sql
 
@@ -1201,9 +1205,11 @@ class DBModel:
         terms_strs = [enc_term(k) for k in columns]
         if len(terms_strs) < 1:
             terms_strs = [f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}']
-        return (
-            "SELECT "
-            + ", ".join(terms_strs)
+        sql = "SELECT "
+        if annotate and (near_sql.annotation is not None) and (len(near_sql.annotation) > 0):
+            sql = sql + " -- " + _clean_annotation(near_sql.annotation) + "\n "
+        return sql + (
+            ", ".join(terms_strs)
             + " FROM ( "
             + near_sql.query
             + " ) "

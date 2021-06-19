@@ -1814,6 +1814,7 @@ class ConvertRecordsNode(ViewRepresentation):
             query=query,
             terms=terms,
             temp_tables=temp_tables,
+            annotation='convert records'
         )
         return near_sql
 

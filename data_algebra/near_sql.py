@@ -261,7 +261,7 @@ class NearSQLq(NearSQL):
 
     """
     def __init__(
-        self, *, quoted_query_name, query, terms, prev_quoted_query_name, temp_tables
+        self, *, quoted_query_name, query, terms, prev_quoted_query_name, temp_tables, annotation=None
     ):
         assert isinstance(terms, dict)
         NearSQL.__init__(
@@ -269,6 +269,7 @@ class NearSQLq(NearSQL):
             terms=terms,
             quoted_query_name=quoted_query_name,
             temp_tables=temp_tables,
+            annotation=annotation,
         )
         assert isinstance(query, str)
         assert isinstance(prev_quoted_query_name, str)
@@ -281,5 +282,5 @@ class NearSQLq(NearSQL):
             columns=columns,
             force_sql=force_sql,
             constants=constants,
-            annotate=annotate
+            annotate=annotate,
         )
