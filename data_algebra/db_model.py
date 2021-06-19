@@ -562,7 +562,7 @@ class DBModel(ABC):
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_near_sql(columns=subusing),
             temp_tables=subsql.temp_tables.copy(),
-            annotation=extend_node.to_python_implementation(print_sources=False)
+            annotation=extend_node.to_python_implementation(print_sources=False, indent=-1)
         )
         return near_sql
 
