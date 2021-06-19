@@ -9,39 +9,6 @@ import data_algebra.OrderedSet
 # TODO: build a term object that carries the column use information
 
 
-# assemble sub-sql
-# TODO: make this a method on NearSQLContainer
-def _convert_subsql(*, sub_sql, db_model):
-    assert isinstance(sub_sql, NearSQLContainer)
-    assert isinstance(sub_sql.near_sql, NearSQL)
-    if isinstance(sub_sql.near_sql, NearSQLTable):
-        sql = (
-                " "
-                + sub_sql.to_sql(db_model)
-                + " "
-        )
-        if sub_sql.near_sql.quoted_query_name != sub_sql.near_sql.quoted_table_name:
-            sql = sql + (
-                + sub_sql.near_sql.quoted_query_name
-                + " "
-        )
-    elif isinstance(sub_sql.near_sql, NearSQLCommonTableExpression):
-        sql = (
-                " "
-                + sub_sql.to_sql(db_model)
-                + " "
-        )
-    else:
-        sql = (
-                " ( "
-                + sub_sql.to_sql(db_model)
-                + " ) "
-                + sub_sql.near_sql.quoted_query_name
-                + " "
-        )
-    return sql
-
-
 # encode and name a term for use in a SQL expression
 def _enc_term(k, *, terms, db_model):
     v = None
@@ -78,7 +45,9 @@ class NearSQL(ABC):
         raise NotImplementedError("base method called")
 
     def to_with_form(self):
-        raise NotImplementedError("base method called")
+        sequence = list()
+        sequence.append(self)
+        return sequence
 
 
 class NearSQLContainer:
@@ -108,6 +77,37 @@ class NearSQLContainer:
             force_sql=self.force_sql,
             constants=self.constants,
             db_model=db_model)
+
+    # assemble sub-sql
+    def convert_subsql(self, *, db_model):
+        assert isinstance(self, NearSQLContainer)
+        assert isinstance(self.near_sql, NearSQL)
+        if isinstance(self.near_sql, NearSQLTable):
+            sql = (
+                    " "
+                    + self.to_sql(db_model)
+                    + " "
+            )
+            if self.near_sql.quoted_query_name != self.near_sql.quoted_table_name:
+                sql = sql + (
+                        self.near_sql.quoted_query_name
+                        + " "
+                )
+        elif isinstance(self.near_sql, NearSQLCommonTableExpression):
+            sql = (
+                    " "
+                    + self.to_sql(db_model)
+                    + " "
+            )
+        else:
+            sql = (
+                    " ( "
+                    + self.to_sql(db_model)
+                    + " ) "
+                    + self.near_sql.quoted_query_name
+                    + " "
+            )
+        return sql
 
     def to_with_form(self):
         if self.near_sql.is_table:
@@ -158,11 +158,6 @@ class NearSQLTable(NearSQL):
             return "SELECT " + ", ".join(terms_strs) + " FROM " + self.quoted_table_name
         return self.quoted_table_name
 
-    def to_with_form(self):
-        sequence = list()
-        sequence.append(self)
-        return sequence
-
 
 class NearSQLUnaryStep(NearSQL):
     def __init__(
@@ -195,7 +190,7 @@ class NearSQLUnaryStep(NearSQL):
         terms_strs = [_enc_term(k, terms=terms, db_model=db_model) for k in columns]
         if len(terms_strs) < 1:
             terms_strs = [f'1 AS {db_model.quote_identifier("data_algebra_placeholder_col_name")}']
-        sql = "SELECT " + ", ".join(terms_strs) + " FROM " + _convert_subsql(sub_sql=self.sub_sql, db_model=db_model)
+        sql = "SELECT " + ", ".join(terms_strs) + " FROM " + self.sub_sql.convert_subsql(db_model=db_model)
         if (self.suffix is not None) and (len(self.suffix) > 0):
             sql = sql + " " + self.suffix
         return sql
@@ -265,9 +260,9 @@ class NearSQLBinaryStep(NearSQL):
             terms_strs = [f'1 AS {db_model.quote_identifier("data_algebra_placeholder_col_name")}']
         sql = (
                 "SELECT " + ", ".join(terms_strs) + " FROM " + " ( "
-                + _convert_subsql(sub_sql=self.sub_sql1, db_model=db_model)
+                + self.sub_sql1.convert_subsql(db_model=db_model)
                 + " " + self.joiner + " "
-                + _convert_subsql(sub_sql=self.sub_sql2, db_model=db_model)
+                + self.sub_sql2.convert_subsql(db_model=db_model)
                 )
         if (self.suffix is not None) and (len(self.suffix) > 0):
             sql = sql + " " + self.suffix
