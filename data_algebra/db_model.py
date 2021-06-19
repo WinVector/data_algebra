@@ -44,6 +44,15 @@ def pretty_format_sql(sql, *, encoding=None, sqlparse_options=None):
     return formatted_sql
 
 
+def _clean_annotation(annotation):
+    assert isinstance(annotation, (str, type(None)))
+    if annotation is None:
+        return annotation
+    annotation = annotation.strip()
+    annotation = re.sub(r'\s+', ' ', annotation)
+    return annotation
+
+
 # map from op-name to special SQL formatting code
 
 
@@ -1145,7 +1154,7 @@ class DBModel:
             terms_strs = [f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}']
         sql = "SELECT "
         if annotate and (near_sql.annotation is not None) and (len(near_sql.annotation) > 0):
-            sql = sql + " -- " + near_sql.annotation.replace('\r', ' ').replace('\n', ' ') + "\n "
+            sql = sql + " -- " + _clean_annotation(near_sql.annotation) + "\n "
         sql = sql + ", ".join(terms_strs) + " FROM " + near_sql.sub_sql.convert_subsql(db_model=self, annotate=annotate)
         if (near_sql.suffix is not None) and (len(near_sql.suffix) > 0):
             sql = sql + " " + near_sql.suffix
@@ -1163,7 +1172,7 @@ class DBModel:
             terms_strs = [f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}']
         sql = "SELECT "
         if annotate and (near_sql.annotation is not None) and (len(near_sql.annotation) > 0):
-            sql = sql + " -- " + near_sql.annotation.replace('\r', ' ').replace('\n', ' ') + "\n "
+            sql = sql + " -- " + _clean_annotation(near_sql.annotation) + "\n "
         sql = sql + (
                 ", ".join(terms_strs) + " FROM " + " ( "
                 + near_sql.sub_sql1.convert_subsql(db_model=self, annotate=annotate)
