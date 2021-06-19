@@ -220,6 +220,37 @@ class NearSQLBinaryStep(NearSQL):
             annotate=annotate
         )
 
+    def to_with_form(self):
+        if self.sub_sql1.near_sql.is_table and self.sub_sql2.near_sql.is_table:
+            # tables don't need to be re-encoded
+            sequence = list()
+            sequence.append(self)
+            return sequence
+        # non-trivial sequence
+        stub1, sequence1 = self.sub_sql1.to_with_form_stub()
+        stub2, sequence2 = self.sub_sql2.to_with_form_stub()
+        sequence = list()
+        seen = set()
+        for stepi in sequence1:
+            nmi = stepi[0]
+            seen.add(nmi)
+            sequence.append(stepi)
+        # assume any name collisions are the same table/common_table_expression
+        for stepi in sequence2:
+            nmi = stepi[0]
+            if not nmi in seen:
+                seen.add(nmi)
+                sequence.append(stepi)
+        stubbed_step = NearSQLBinaryStep(
+            terms=self.terms,
+            quoted_query_name=self.quoted_query_name,
+            sub_sql1=stub1,
+            joiner=self.joiner,
+            sub_sql2=stub2,
+            suffix=self.suffix,
+            temp_tables=self.temp_tables)
+        sequence.append(stubbed_step)
+        return sequence
 
 class NearSQLq(NearSQL):
     """
