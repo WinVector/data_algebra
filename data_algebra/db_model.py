@@ -1,5 +1,4 @@
 
-from abc import ABC
 import math
 import re
 import io
@@ -216,7 +215,7 @@ db_default_op_replacements = {
     }
 
 
-class DBModel(ABC):
+class DBModel:
     """A model of how SQL should be generated for a given database.
        """
 
