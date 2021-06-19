@@ -30,8 +30,9 @@ def test_with_query_example_1():
 
     assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
 
+    db_model = data_algebra.SQLite.SQLiteModel()
+
     for pretty in (False, True):
-        db_model = data_algebra.SQLite.SQLiteModel()
         with sqlite3.connect(":memory:") as conn:
             db_model.prepare_connection(conn)
             db_handle = db_model.db_handle(conn)
@@ -88,8 +89,9 @@ def test_with_query_example_2():
 
     assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
 
+    db_model = data_algebra.SQLite.SQLiteModel()
+
     for pretty in (False, True):
-        db_model = data_algebra.SQLite.SQLiteModel()
         with sqlite3.connect(":memory:") as conn:
             db_model.prepare_connection(conn)
             db_handle = db_model.db_handle(conn)

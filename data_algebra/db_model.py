@@ -910,6 +910,7 @@ class DBModel:
         near_sql = ops.to_near_sql_implementation(
             db_model=self, using=None, temp_id_source=temp_id_source
         )
+        assert isinstance(near_sql, data_algebra.near_sql.NearSQL)
         if (near_sql.temp_tables is not None) and (len(near_sql.temp_tables) > 0):
             if temp_tables is None:
                 raise ValueError(

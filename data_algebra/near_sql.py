@@ -38,7 +38,7 @@ class NearSQL(ABC):
     def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False):
         raise NotImplementedError("base method called")
 
-    # return a list where last element is a NearSQL previous elments are (name, NearSQLContainer) pairs
+    # return a list where last element is a NearSQL previous elements are (name, NearSQLContainer) pairs
     def to_with_form(self):
         sequence = list()
         sequence.append(self)
@@ -80,7 +80,7 @@ class NearSQLContainer:
         assert isinstance(self.near_sql, NearSQL)
         return db_model.convert_nearsql_container_subsql_(nearsql_container=self, annotate=annotate)
 
-    def to_with_form(self):
+    def to_with_form_c(self):
         if self.near_sql.is_table:
             sequence = list()
             sequence.append(self)
@@ -160,7 +160,7 @@ class NearSQLUnaryStep(NearSQL):
             sequence.append(self)
             return sequence
         # non-trivial sequence
-        sequence = self.sub_sql.to_with_form()
+        sequence = self.sub_sql.to_with_form_c()
         endi = len(sequence) - 1
         last_step = sequence[endi]
         stub = last_step
