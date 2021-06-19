@@ -193,7 +193,8 @@ class NearSQLBinaryStep(NearSQL):
         joiner,
         sub_sql2,
         suffix="",
-        temp_tables
+        temp_tables,
+        annotation=None
     ):
         assert isinstance(terms, dict)
         NearSQL.__init__(
@@ -201,6 +202,7 @@ class NearSQLBinaryStep(NearSQL):
             terms=terms,
             quoted_query_name=quoted_query_name,
             temp_tables=temp_tables,
+            annotation=annotation
         )
         assert isinstance(sub_sql1,  NearSQLContainer)
         assert isinstance(sub_sql2, NearSQLContainer)
@@ -248,7 +250,8 @@ class NearSQLBinaryStep(NearSQL):
             joiner=self.joiner,
             sub_sql2=stub2,
             suffix=self.suffix,
-            temp_tables=self.temp_tables)
+            temp_tables=self.temp_tables,
+            annotation=self.annotation)
         sequence.append(stubbed_step)
         return sequence
 

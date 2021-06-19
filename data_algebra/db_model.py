@@ -824,6 +824,7 @@ class DBModel:
             sub_sql2=sql_right.to_bound_near_sql(columns=using_right),
             suffix=on_terms,
             temp_tables=temp_tables,
+            annotation=join_node.to_python_implementation(print_sources=False, indent=-1)
         )
         return near_sql
 
@@ -887,6 +888,7 @@ class DBModel:
                 constants=constants_right,
             ),
             temp_tables=temp_tables,
+            annotation=concat_node.to_python_implementation(print_sources=False, indent=-1)
         )
         return near_sql
 
@@ -1159,8 +1161,11 @@ class DBModel:
         terms_strs = [self.enc_term_(k, terms=terms) for k in columns]
         if len(terms_strs) < 1:
             terms_strs = [f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}']
-        sql = (
-                "SELECT " + ", ".join(terms_strs) + " FROM " + " ( "
+        sql = "SELECT "
+        if annotate and (near_sql.annotation is not None) and (len(near_sql.annotation) > 0):
+            sql = sql + " -- " + near_sql.annotation.replace('\r', ' ').replace('\n', ' ') + "\n "
+        sql = sql + (
+                ", ".join(terms_strs) + " FROM " + " ( "
                 + near_sql.sub_sql1.convert_subsql(db_model=self, annotate=annotate)
                 + " " + near_sql.joiner + " "
                 + near_sql.sub_sql2.convert_subsql(db_model=self, annotate=annotate)
