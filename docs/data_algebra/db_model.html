@@ -61,6 +61,9 @@
                                 <a class="variable" href="#DBModel.join_name_map">join_name_map</a>
                         </li>
                         <li>
+                                <a class="variable" href="#DBModel.supports_with">supports_with</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#DBModel.db_handle">db_handle</a>
                         </li>
                         <li>
@@ -392,6 +395,7 @@
     <span class="n">drop_text</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">string_type</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">join_name_map</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="n">supports_with</span><span class="p">:</span> <span class="nb">bool</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -407,6 +411,7 @@
         <span class="n">drop_text</span><span class="o">=</span><span class="s1">&#39;DROP TABLE&#39;</span><span class="p">,</span>
         <span class="n">string_type</span><span class="o">=</span><span class="s1">&#39;VARCHAR&#39;</span><span class="p">,</span>
         <span class="n">join_name_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">supports_with</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
@@ -430,6 +435,7 @@
         <span class="k">if</span> <span class="n">join_name_map</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">join_name_map</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">join_name_map</span> <span class="o">=</span> <span class="n">join_name_map</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span> <span class="o">=</span> <span class="n">supports_with</span>
 
     <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DBHandle</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="n">conn</span><span class="p">)</span>
@@ -639,11 +645,10 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="n">cols_using</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">table_def</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">using</span><span class="p">]</span>
-        <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;table_reference_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+
         <span class="n">subsql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLTable</span><span class="p">(</span>
             <span class="n">terms</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cols_using</span><span class="p">},</span>
-            <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
+            <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_def</span><span class="p">),</span>
             <span class="n">quoted_table_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_def</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">subsql</span>
@@ -652,8 +657,10 @@
             <span class="n">terms</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">using</span><span class="p">:</span>
                 <span class="n">terms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+            <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;table_reference_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-                <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>  <span class="c1"># TODO: implement!</span>
+                <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>  <span class="c1"># TODO: implement pruning</span>
                 <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using</span><span class="p">),</span>
                 <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
@@ -678,7 +685,7 @@
                 <span class="n">subops</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subops</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c1"># know using was not None is this case as len(extend_node.ops)&gt;0 and all keys are in extend_node.column_set</span>
-            <span class="k">return</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+            <span class="k">return</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
                 <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">using</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -688,7 +695,7 @@
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="c1"># get set of columns we need from subquery</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">window_term</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -738,7 +745,7 @@
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">project_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="p">{</span><span class="n">ci</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">oi</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">ci</span><span class="p">,</span> <span class="n">oi</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subops</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="n">terms</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">g</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">project_node</span><span class="o">.</span><span class="n">group_by</span><span class="p">})</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">project_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">project_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;project_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -766,7 +773,7 @@
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">using</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">column_set</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;select_rows_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -797,7 +804,7 @@
         <span class="n">subusing</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">column_selection</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">subusing</span>
         <span class="p">]</span>  <span class="c1"># fix order</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">subusing</span><span class="p">),</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="c1"># order/limit columns</span>
@@ -820,7 +827,7 @@
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">using</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">column_set</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="c1"># /limit columns</span>
@@ -840,7 +847,7 @@
             <span class="n">using</span> <span class="o">=</span> <span class="n">order_node</span><span class="o">.</span><span class="n">column_set</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">order_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">order_node</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">subusing</span><span class="p">]</span>  <span class="c1"># fix order</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">order_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">order_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">subusing</span><span class="p">),</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;order_rows_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -880,7 +887,7 @@
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">using</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">column_set</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;rename_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -919,11 +926,11 @@
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">by_set</span><span class="p">))</span>
         <span class="n">using_left</span> <span class="o">=</span> <span class="n">subusing</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">using_right</span> <span class="o">=</span> <span class="n">subusing</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">sql_left</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">sql_left</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using_left</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">sub_view_name_left</span> <span class="o">=</span> <span class="n">sql_left</span><span class="o">.</span><span class="n">quoted_query_name</span>
-        <span class="n">sql_right</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">sql_right</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using_right</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">sub_view_name_right</span> <span class="o">=</span> <span class="n">sql_right</span><span class="o">.</span><span class="n">quoted_query_name</span>
@@ -973,14 +980,14 @@
         <span class="n">temp_tables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sql_right</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span>
         <span class="n">jointype</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">jointype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">join_name_map</span><span class="p">[</span><span class="n">jointype</span><span class="p">]</span>
+            <span class="n">jointype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">join_name_map</span><span class="p">[</span><span class="n">jointype</span><span class="p">]</span>  <span class="c1"># TODO: maybe move this mapping earlier</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLBinaryStep</span><span class="p">(</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql1</span><span class="o">=</span><span class="n">sql_left</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using_left</span><span class="p">),</span>
-            <span class="n">joiner</span><span class="o">=</span><span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">+</span> <span class="s2">&quot; JOIN&quot;</span><span class="p">,</span>
+            <span class="n">joiner</span><span class="o">=</span><span class="n">jointype</span> <span class="o">+</span> <span class="s2">&quot; JOIN&quot;</span><span class="p">,</span>
             <span class="n">sub_sql2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using_right</span><span class="p">),</span>
             <span class="n">suffix</span><span class="o">=</span><span class="n">on_terms</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
@@ -1006,10 +1013,10 @@
         <span class="n">using_right</span> <span class="o">=</span> <span class="n">subusing</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">using_left</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">using_right</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;left/right usings did not match&quot;</span><span class="p">)</span>
-        <span class="n">sql_left</span> <span class="o">=</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">sql_left</span> <span class="o">=</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using_left</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
-        <span class="n">sql_right</span> <span class="o">=</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">sql_right</span> <span class="o">=</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using_left</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;concat_rows_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -1117,7 +1124,7 @@
             <span class="o">+</span> <span class="n">source_sql</span>
             <span class="o">+</span> <span class="s2">&quot; ) a</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="o">+</span> <span class="s2">&quot;CROSS JOIN (</span><span class="se">\n</span><span class="s2">  &quot;</span>
-            <span class="o">+</span> <span class="n">control_view</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+            <span class="o">+</span> <span class="n">control_view</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
                 <span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
             <span class="p">)</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot; ) b</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -1278,12 +1285,14 @@
                <span class="n">pretty</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                <span class="n">encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                <span class="n">sqlparse_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-               <span class="n">temp_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+               <span class="n">temp_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+               <span class="n">use_with</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ops</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="p">,</span>
                           <span class="n">pretty</span><span class="o">=</span><span class="n">pretty</span><span class="p">,</span>
                           <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span>
                           <span class="n">sqlparse_options</span><span class="o">=</span><span class="n">sqlparse_options</span><span class="p">,</span>
-                          <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
+                          <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
+                          <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">drop_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
         <span class="n">q_table_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
@@ -1377,6 +1386,7 @@
     <span class="n">drop_text</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">string_type</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">join_name_map</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="n">supports_with</span><span class="p">:</span> <span class="nb">bool</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1392,6 +1402,7 @@
         <span class="n">drop_text</span><span class="o">=</span><span class="s1">&#39;DROP TABLE&#39;</span><span class="p">,</span>
         <span class="n">string_type</span><span class="o">=</span><span class="s1">&#39;VARCHAR&#39;</span><span class="p">,</span>
         <span class="n">join_name_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">supports_with</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
@@ -1415,6 +1426,7 @@
         <span class="k">if</span> <span class="n">join_name_map</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">join_name_map</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">join_name_map</span> <span class="o">=</span> <span class="n">join_name_map</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span> <span class="o">=</span> <span class="n">supports_with</span>
 
     <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DBHandle</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="n">conn</span><span class="p">)</span>
@@ -1624,11 +1636,10 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="n">cols_using</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">table_def</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">using</span><span class="p">]</span>
-        <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;table_reference_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+
         <span class="n">subsql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLTable</span><span class="p">(</span>
             <span class="n">terms</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cols_using</span><span class="p">},</span>
-            <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
+            <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_def</span><span class="p">),</span>
             <span class="n">quoted_table_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_def</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">subsql</span>
@@ -1637,8 +1648,10 @@
             <span class="n">terms</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">using</span><span class="p">:</span>
                 <span class="n">terms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+            <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;table_reference_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-                <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>  <span class="c1"># TODO: implement!</span>
+                <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>  <span class="c1"># TODO: implement pruning</span>
                 <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using</span><span class="p">),</span>
                 <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
@@ -1663,7 +1676,7 @@
                 <span class="n">subops</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subops</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c1"># know using was not None is this case as len(extend_node.ops)&gt;0 and all keys are in extend_node.column_set</span>
-            <span class="k">return</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+            <span class="k">return</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
                 <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">using</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -1673,7 +1686,7 @@
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="c1"># get set of columns we need from subquery</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">window_term</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -1723,7 +1736,7 @@
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">project_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="p">{</span><span class="n">ci</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">oi</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">ci</span><span class="p">,</span> <span class="n">oi</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subops</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="n">terms</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">g</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">project_node</span><span class="o">.</span><span class="n">group_by</span><span class="p">})</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">project_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">project_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;project_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -1751,7 +1764,7 @@
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">using</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">column_set</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;select_rows_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -1782,7 +1795,7 @@
         <span class="n">subusing</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">column_selection</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">subusing</span>
         <span class="p">]</span>  <span class="c1"># fix order</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">subusing</span><span class="p">),</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="c1"># order/limit columns</span>
@@ -1805,7 +1818,7 @@
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">using</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">column_set</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="c1"># /limit columns</span>
@@ -1825,7 +1838,7 @@
             <span class="n">using</span> <span class="o">=</span> <span class="n">order_node</span><span class="o">.</span><span class="n">column_set</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">order_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">order_node</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">subusing</span><span class="p">]</span>  <span class="c1"># fix order</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">order_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">order_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">subusing</span><span class="p">),</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;order_rows_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -1865,7 +1878,7 @@
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">using</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">column_set</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;rename_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -1904,11 +1917,11 @@
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">by_set</span><span class="p">))</span>
         <span class="n">using_left</span> <span class="o">=</span> <span class="n">subusing</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">using_right</span> <span class="o">=</span> <span class="n">subusing</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">sql_left</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">sql_left</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using_left</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">sub_view_name_left</span> <span class="o">=</span> <span class="n">sql_left</span><span class="o">.</span><span class="n">quoted_query_name</span>
-        <span class="n">sql_right</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">sql_right</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using_right</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">sub_view_name_right</span> <span class="o">=</span> <span class="n">sql_right</span><span class="o">.</span><span class="n">quoted_query_name</span>
@@ -1958,14 +1971,14 @@
         <span class="n">temp_tables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sql_right</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span>
         <span class="n">jointype</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">jointype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">join_name_map</span><span class="p">[</span><span class="n">jointype</span><span class="p">]</span>
+            <span class="n">jointype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">join_name_map</span><span class="p">[</span><span class="n">jointype</span><span class="p">]</span>  <span class="c1"># TODO: maybe move this mapping earlier</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLBinaryStep</span><span class="p">(</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql1</span><span class="o">=</span><span class="n">sql_left</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using_left</span><span class="p">),</span>
-            <span class="n">joiner</span><span class="o">=</span><span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">+</span> <span class="s2">&quot; JOIN&quot;</span><span class="p">,</span>
+            <span class="n">joiner</span><span class="o">=</span><span class="n">jointype</span> <span class="o">+</span> <span class="s2">&quot; JOIN&quot;</span><span class="p">,</span>
             <span class="n">sub_sql2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using_right</span><span class="p">),</span>
             <span class="n">suffix</span><span class="o">=</span><span class="n">on_terms</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
@@ -1991,10 +2004,10 @@
         <span class="n">using_right</span> <span class="o">=</span> <span class="n">subusing</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">using_left</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">using_right</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;left/right usings did not match&quot;</span><span class="p">)</span>
-        <span class="n">sql_left</span> <span class="o">=</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">sql_left</span> <span class="o">=</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using_left</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
-        <span class="n">sql_right</span> <span class="o">=</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">sql_right</span> <span class="o">=</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using_left</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;concat_rows_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -2102,7 +2115,7 @@
             <span class="o">+</span> <span class="n">source_sql</span>
             <span class="o">+</span> <span class="s2">&quot; ) a</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="o">+</span> <span class="s2">&quot;CROSS JOIN (</span><span class="se">\n</span><span class="s2">  &quot;</span>
-            <span class="o">+</span> <span class="n">control_view</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+            <span class="o">+</span> <span class="n">control_view</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
                 <span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
             <span class="p">)</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot; ) b</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -2200,7 +2213,8 @@
     on_joiner=&#39;, &#39;,
     drop_text=&#39;DROP TABLE&#39;,
     string_type=&#39;VARCHAR&#39;,
-    join_name_map=None
+    join_name_map=None,
+    supports_with=True
 )</span>
     </div>
 
@@ -2220,6 +2234,7 @@
         <span class="n">drop_text</span><span class="o">=</span><span class="s1">&#39;DROP TABLE&#39;</span><span class="p">,</span>
         <span class="n">string_type</span><span class="o">=</span><span class="s1">&#39;VARCHAR&#39;</span><span class="p">,</span>
         <span class="n">join_name_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">supports_with</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
@@ -2243,6 +2258,7 @@
         <span class="k">if</span> <span class="n">join_name_map</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">join_name_map</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">join_name_map</span> <span class="o">=</span> <span class="n">join_name_map</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span> <span class="o">=</span> <span class="n">supports_with</span>
 </pre></div>
 
         </details>
@@ -2317,6 +2333,15 @@
                                             <div class="attr variable"><a class="headerlink" href="#DBModel.join_name_map">#&nbsp;&nbsp</a>
 
         <span class="name">join_name_map</span><span class="annotation">: dict</span>
+    </div>
+
+    
+
+                            </div>
+                            <div id="DBModel.supports_with" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#DBModel.supports_with">#&nbsp;&nbsp</a>
+
+        <span class="name">supports_with</span><span class="annotation">: bool</span>
     </div>
 
     
@@ -2756,11 +2781,10 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="n">cols_using</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">table_def</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">using</span><span class="p">]</span>
-        <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;table_reference_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+
         <span class="n">subsql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLTable</span><span class="p">(</span>
             <span class="n">terms</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cols_using</span><span class="p">},</span>
-            <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
+            <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_def</span><span class="p">),</span>
             <span class="n">quoted_table_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_def</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">subsql</span>
@@ -2769,8 +2793,10 @@
             <span class="n">terms</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">using</span><span class="p">:</span>
                 <span class="n">terms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+            <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;table_reference_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-                <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>  <span class="c1"># TODO: implement!</span>
+                <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>  <span class="c1"># TODO: implement pruning</span>
                 <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using</span><span class="p">),</span>
                 <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
@@ -2811,7 +2837,7 @@
                 <span class="n">subops</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subops</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c1"># know using was not None is this case as len(extend_node.ops)&gt;0 and all keys are in extend_node.column_set</span>
-            <span class="k">return</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+            <span class="k">return</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
                 <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">using</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -2821,7 +2847,7 @@
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="c1"># get set of columns we need from subquery</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">window_term</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -2887,7 +2913,7 @@
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">project_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="p">{</span><span class="n">ci</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">oi</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">ci</span><span class="p">,</span> <span class="n">oi</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subops</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="n">terms</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">g</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">project_node</span><span class="o">.</span><span class="n">group_by</span><span class="p">})</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">project_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">project_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;project_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -2931,7 +2957,7 @@
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">using</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">column_set</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;select_rows_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -2978,7 +3004,7 @@
         <span class="n">subusing</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">column_selection</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">subusing</span>
         <span class="p">]</span>  <span class="c1"># fix order</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">subusing</span><span class="p">),</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="c1"># order/limit columns</span>
@@ -3017,7 +3043,7 @@
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">using</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">column_set</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="c1"># /limit columns</span>
@@ -3053,7 +3079,7 @@
             <span class="n">using</span> <span class="o">=</span> <span class="n">order_node</span><span class="o">.</span><span class="n">column_set</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">order_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">order_node</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">subusing</span><span class="p">]</span>  <span class="c1"># fix order</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">order_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">order_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">subusing</span><span class="p">),</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;order_rows_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -3109,7 +3135,7 @@
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">using</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">column_set</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">subsql</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">subsql</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;rename_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -3164,11 +3190,11 @@
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">by_set</span><span class="p">))</span>
         <span class="n">using_left</span> <span class="o">=</span> <span class="n">subusing</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">using_right</span> <span class="o">=</span> <span class="n">subusing</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">sql_left</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">sql_left</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using_left</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">sub_view_name_left</span> <span class="o">=</span> <span class="n">sql_left</span><span class="o">.</span><span class="n">quoted_query_name</span>
-        <span class="n">sql_right</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">sql_right</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using_right</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">sub_view_name_right</span> <span class="o">=</span> <span class="n">sql_right</span><span class="o">.</span><span class="n">quoted_query_name</span>
@@ -3218,14 +3244,14 @@
         <span class="n">temp_tables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sql_right</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span>
         <span class="n">jointype</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">jointype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">join_name_map</span><span class="p">[</span><span class="n">jointype</span><span class="p">]</span>
+            <span class="n">jointype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">join_name_map</span><span class="p">[</span><span class="n">jointype</span><span class="p">]</span>  <span class="c1"># TODO: maybe move this mapping earlier</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLBinaryStep</span><span class="p">(</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql1</span><span class="o">=</span><span class="n">sql_left</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using_left</span><span class="p">),</span>
-            <span class="n">joiner</span><span class="o">=</span><span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">+</span> <span class="s2">&quot; JOIN&quot;</span><span class="p">,</span>
+            <span class="n">joiner</span><span class="o">=</span><span class="n">jointype</span> <span class="o">+</span> <span class="s2">&quot; JOIN&quot;</span><span class="p">,</span>
             <span class="n">sub_sql2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">to_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using_right</span><span class="p">),</span>
             <span class="n">suffix</span><span class="o">=</span><span class="n">on_terms</span><span class="p">,</span>
             <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
@@ -3267,10 +3293,10 @@
         <span class="n">using_right</span> <span class="o">=</span> <span class="n">subusing</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">using_left</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">using_right</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;left/right usings did not match&quot;</span><span class="p">)</span>
-        <span class="n">sql_left</span> <span class="o">=</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">sql_left</span> <span class="o">=</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using_left</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
-        <span class="n">sql_right</span> <span class="o">=</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+        <span class="n">sql_right</span> <span class="o">=</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using_left</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;concat_rows_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -3402,7 +3428,7 @@
             <span class="o">+</span> <span class="n">source_sql</span>
             <span class="o">+</span> <span class="s2">&quot; ) a</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="o">+</span> <span class="s2">&quot;CROSS JOIN (</span><span class="se">\n</span><span class="s2">  &quot;</span>
-            <span class="o">+</span> <span class="n">control_view</span><span class="o">.</span><span class="n">to_sql_implementation</span><span class="p">(</span>
+            <span class="o">+</span> <span class="n">control_view</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
                 <span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
             <span class="p">)</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot; ) b</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -3589,12 +3615,14 @@
                <span class="n">pretty</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                <span class="n">encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                <span class="n">sqlparse_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-               <span class="n">temp_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+               <span class="n">temp_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+               <span class="n">use_with</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ops</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="p">,</span>
                           <span class="n">pretty</span><span class="o">=</span><span class="n">pretty</span><span class="p">,</span>
                           <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span>
                           <span class="n">sqlparse_options</span><span class="o">=</span><span class="n">sqlparse_options</span><span class="p">,</span>
-                          <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
+                          <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
+                          <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">drop_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
         <span class="n">q_table_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
@@ -3849,7 +3877,8 @@ inheritance.</p>
     pretty=False,
     encoding=None,
     sqlparse_options=None,
-    temp_tables=None
+    temp_tables=None,
+    use_with=False
 )</span>:
     </div>
 
@@ -3860,12 +3889,14 @@ inheritance.</p>
                <span class="n">pretty</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                <span class="n">encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                <span class="n">sqlparse_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-               <span class="n">temp_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+               <span class="n">temp_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+               <span class="n">use_with</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ops</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="p">,</span>
                           <span class="n">pretty</span><span class="o">=</span><span class="n">pretty</span><span class="p">,</span>
                           <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span>
                           <span class="n">sqlparse_options</span><span class="o">=</span><span class="n">sqlparse_options</span><span class="p">,</span>
-                          <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
+                          <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
+                          <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span><span class="p">)</span>
 </pre></div>
 
         </details>

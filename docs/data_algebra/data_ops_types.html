@@ -64,7 +64,7 @@
                                 <a class="function" href="#OperatorPlatform.columns_produced">columns_produced</a>
                         </li>
                         <li>
-                                <a class="function" href="#OperatorPlatform.to_sql_implementation">to_sql_implementation</a>
+                                <a class="function" href="#OperatorPlatform.to_near_sql_implementation">to_near_sql_implementation</a>
                         </li>
                         <li>
                                 <a class="function" href="#OperatorPlatform.extend_parsed">extend_parsed</a>
@@ -245,7 +245,7 @@
 
     <span class="c1"># query generation</span>
 
-    <span class="k">def</span> <span class="nf">to_sql_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_near_sql_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="c1"># define builders for all non-initial node types on base class</span>
@@ -494,7 +494,7 @@
 
     <span class="c1"># query generation</span>
 
-    <span class="k">def</span> <span class="nf">to_sql_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_near_sql_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="c1"># define builders for all non-initial node types on base class</span>
@@ -754,17 +754,17 @@
     
 
                             </div>
-                            <div id="OperatorPlatform.to_sql_implementation" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#OperatorPlatform.to_sql_implementation">#&nbsp;&nbsp</a>
+                            <div id="OperatorPlatform.to_near_sql_implementation" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OperatorPlatform.to_near_sql_implementation">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">to_sql_implementation</span><span class="signature">(self, db_model, *, using, temp_id_source)</span>:
+            <span class="name">to_near_sql_implementation</span><span class="signature">(self, db_model, *, using, temp_id_source)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_near_sql_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 

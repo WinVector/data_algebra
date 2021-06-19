@@ -17,6 +17,7 @@ import data_algebra.data_ops_utils
 import data_algebra.near_sql
 import data_algebra.OrderedSet
 
+
 _have_black = False
 try:
     # noinspection PyUnresolvedReferences
@@ -25,6 +26,7 @@ try:
     _have_black = True
 except ImportError:
     pass
+
 
 _have_sqlparse = False
 try:
@@ -36,12 +38,44 @@ except ImportError:
     pass
 
 
+# noinspection PyBroadException
+def pretty_format_python(python_str, *, black_mode=None):
+    assert isinstance(python_str, str)
+    formatted_python = python_str
+    if _have_black:
+        try:
+            if black_mode is None:
+                black_mode = black.FileMode()
+            formatted_python = black.format_str(python_str, mode=black_mode)
+        except Exception:
+            pass
+    return formatted_python
+
+
+# noinspection PyBroadException
+def pretty_format_sql(sql, *, encoding=None, sqlparse_options=None):
+    assert isinstance(sql, str)
+    assert isinstance(encoding, (str, type(None)))
+    assert isinstance(encoding, (dict, type(None)))
+    if sqlparse_options is None:
+        sqlparse_options = {"reindent": True, "keyword_case": "upper"}
+    formatted_sql = sql
+    if _have_sqlparse:
+        try:
+            formatted_sql = sqlparse.format(
+                sql, encoding=encoding, **sqlparse_options
+            )
+        except Exception:
+            pass
+    return formatted_sql
+
+
 class ViewRepresentation(OperatorPlatform, ABC):
     """Structure to represent the columns of a query or a table.
        Abstract base class."""
 
     column_names: List[str]
-    column_set: Set[str]
+    column_set: data_algebra.OrderedSet.OrderedSet
     column_map: collections.OrderedDict
     sources: List[
         "ViewRepresentation"
@@ -176,13 +210,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             indent=indent, strict=strict, print_sources=True
         )
         if pretty:
-            if _have_black:
-                try:
-                    if black_mode is None:
-                        black_mode = black.FileMode()
-                    python_str = black.format_str(python_str, mode=black_mode)
-                except Exception:
-                    pass
+            python_str = pretty_format_python(python_str, black_mode=black_mode)
         return python_str
 
     def __repr__(self):
@@ -223,10 +251,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     # query generation
 
-    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
         raise NotImplementedError("base method called")
 
-    # noinspection PyBroadException
     def to_sql(
         self,
         db_model,
@@ -234,7 +261,8 @@ class ViewRepresentation(OperatorPlatform, ABC):
         pretty=False,
         encoding=None,
         sqlparse_options=None,
-        temp_tables=None
+        temp_tables=None,
+        use_with=False
     ):
         if sqlparse_options is None:
             sqlparse_options = {"reindent": True, "keyword_case": "upper"}
@@ -246,23 +274,32 @@ class ViewRepresentation(OperatorPlatform, ABC):
             )
         self.columns_used()  # for table consistency check/raise
         temp_id_source = [0]
-        sub_sql = self.to_sql_implementation(
+        near_sql = self.to_near_sql_implementation(
             db_model=db_model, using=None, temp_id_source=temp_id_source
         )
-        if (sub_sql.temp_tables is not None) and (len(sub_sql.temp_tables) > 0):
+        if (near_sql.temp_tables is not None) and (len(near_sql.temp_tables) > 0):
             if temp_tables is None:
                 raise ValueError(
                     "need temp_tables to be a dictionary to copy back found temporary table values"
                 )
-            temp_tables.update(sub_sql.temp_tables)
-        sql_str = sub_sql.to_sql(db_model=db_model, force_sql=True)
-        if pretty and _have_sqlparse:
-            try:
-                sql_str = sqlparse.format(
-                    sql_str, encoding=encoding, **sqlparse_options
-                )
-            except Exception:
-                pass
+            temp_tables.update(near_sql.temp_tables)
+        sql_str = None
+        if use_with and db_model.supports_with:
+            sequence = near_sql.to_with_form()
+            len_sequence = len(sequence)
+            if len(sequence) >= 2:
+                sql_sequence = [None] * (len_sequence - 1)
+                for i in range(len_sequence - 1):
+                    nmi = sequence[i][0]  # already quoted
+                    sqli = sequence[i][1].to_sql(db_model=db_model)
+                    sql_sequence[i] = f' {nmi} AS (\n {sqli} \n)'
+                sql_last = sequence[len_sequence - 1].to_sql(db_model=db_model, force_sql=True)
+                sql_str = 'WITH\n' + ',\n'.join(sql_sequence) + '\n' + sql_last
+        if sql_str is None:
+            # non-with path
+            sql_str = near_sql.to_sql(db_model=db_model, force_sql=True)
+        if pretty:
+            sql_str = pretty_format_sql(sql_str, encoding=encoding, sqlparse_options=sqlparse_options)
         return sql_str
 
     # Pandas realization
@@ -519,12 +556,11 @@ class ViewRepresentation(OperatorPlatform, ABC):
         ops = data_algebra.expr_parse.parse_assignments_in_context(
             {"expr": expr}, self, parse_env=parse_env
         )
-        data_model = data_algebra.default_data_model
 
-        def r_walk_expr(op):
-            if not isinstance(op, data_algebra.expr_rep.Expression):
+        def r_walk_expr(opv):
+            if not isinstance(opv, data_algebra.expr_rep.Expression):
                 return
-            for oi in op.args:
+            for oi in opv.args:
                 r_walk_expr(oi)
 
         for op in ops.values():
@@ -727,7 +763,7 @@ class TableDescription(ViewRepresentation):
     def columns_used_from_sources(self, using=None):
         return []  # no inputs to table description
 
-    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.table_def_to_sql(
             self, using=using, temp_id_source=temp_id_source
         )
@@ -940,7 +976,7 @@ class ExtendNode(ViewRepresentation):
                         raise ValueError("window function with more than one argument")
                     for i in range(len(opk.args)):
                         if not (isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference)
-                            or isinstance(opk.args[0], data_algebra.expr_rep.Value)):
+                                or isinstance(opk.args[0], data_algebra.expr_rep.Value)):
                             raise ValueError(
                                 "window expression argument must be a column or value: "
                                 + str(k)
@@ -988,7 +1024,7 @@ class ExtendNode(ViewRepresentation):
         s = s + ")"
         return s
 
-    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.extend_to_sql(self, using=using, temp_id_source=temp_id_source)
 
     def eval_implementation(self, *, data_map, data_model, narrow):
@@ -1040,7 +1076,7 @@ class ProjectNode(ViewRepresentation):
                     )
                 if len(opk.args) > 0:
                     if not (isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference)
-                        or isinstance(opk.args[0], data_algebra.expr_rep.Value)):
+                            or isinstance(opk.args[0], data_algebra.expr_rep.Value)):
                         raise ValueError(
                             "windows expression argument must be a column or value: "
                             + str(k)
@@ -1125,7 +1161,7 @@ class ProjectNode(ViewRepresentation):
         s = s + ")"
         return s
 
-    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.project_to_sql(self, using=using, temp_id_source=temp_id_source)
 
     def eval_implementation(self, *, data_map, data_model, narrow):
@@ -1190,7 +1226,7 @@ class SelectRowsNode(ViewRepresentation):
         s = s + ("select_rows(" + self.expr.to_python().__repr__() + ")")
         return s
 
-    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.select_rows_to_sql(
             self, using=using, temp_id_source=temp_id_source
         )
@@ -1261,7 +1297,7 @@ class SelectColumnsNode(ViewRepresentation):
         s = s + ("select_columns(" + self.column_selection.__repr__() + ")")
         return s
 
-    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.select_columns_to_sql(
             self, using=using, temp_id_source=temp_id_source
         )
@@ -1332,7 +1368,7 @@ class DropColumnsNode(ViewRepresentation):
         s = s + ("drop_columns(" + self.column_deletions.__repr__() + ")")
         return s
 
-    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.drop_columns_to_sql(
             self, using=using, temp_id_source=temp_id_source
         )
@@ -1415,7 +1451,7 @@ class OrderRowsNode(ViewRepresentation):
         s = s + ")"
         return s
 
-    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.order_to_sql(self, using=using, temp_id_source=temp_id_source)
 
     def eval_implementation(self, *, data_map, data_model, narrow):
@@ -1510,7 +1546,7 @@ class RenameColumnsNode(ViewRepresentation):
         s = s + ("rename_columns(" + self.column_remapping.__repr__() + ")")
         return s
 
-    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.rename_to_sql(self, using=using, temp_id_source=temp_id_source)
 
     def eval_implementation(self, *, data_map, data_model, narrow):
@@ -1613,7 +1649,7 @@ class NaturalJoinNode(ViewRepresentation):
         )
         return s
 
-    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.natural_join_to_sql(
             self, using=using, temp_id_source=temp_id_source
         )
@@ -1713,7 +1749,7 @@ class ConcatRowsNode(ViewRepresentation):
         )
         return s
 
-    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
         return db_model.concat_rows_to_sql(
             self, using=using, temp_id_source=temp_id_source
         )
@@ -1783,11 +1819,11 @@ class ConvertRecordsNode(ViewRepresentation):
         s = s + ")"
         return s
 
-    def to_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
         if temp_id_source is None:
             temp_id_source = [0]
         # TODO: narrow to what we are using
-        sub_query = self.sources[0].to_sql_implementation(
+        sub_query = self.sources[0].to_near_sql_implementation(
             db_model=db_model, using=None, temp_id_source=temp_id_source
         )
         # claims to use all columns

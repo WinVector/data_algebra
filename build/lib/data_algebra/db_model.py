@@ -199,6 +199,7 @@ class DBModel(ABC):
     drop_text: str
     string_type: str
     join_name_map: dict
+    supports_with: bool
 
     def __init__(
         self,
@@ -214,6 +215,7 @@ class DBModel(ABC):
         drop_text='DROP TABLE',
         string_type='VARCHAR',
         join_name_map=None,
+        supports_with=True
     ):
         if local_data_model is None:
             local_data_model = data_algebra.default_data_model
@@ -237,6 +239,7 @@ class DBModel(ABC):
         if join_name_map is None:
             join_name_map = {}
         self.join_name_map = join_name_map.copy()
+        self.supports_with = supports_with
 
     def db_handle(self, conn):
         return DBHandle(db_model=self, conn=conn)
@@ -446,11 +449,10 @@ class DBModel(ABC):
         if len(missing) > 0:
             raise KeyError("referred to unknown columns: " + str(missing))
         cols_using = [c for c in table_def.column_names if c in using]
-        view_name = "table_reference_" + str(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
+
         subsql = data_algebra.near_sql.NearSQLTable(
             terms={k: self.quote_identifier(k) for k in cols_using},
-            quoted_query_name=self.quote_identifier(view_name),
+            quoted_query_name=self.quote_table_name(table_def),
             quoted_table_name=self.quote_table_name(table_def),
         )
         near_sql = subsql
@@ -459,8 +461,10 @@ class DBModel(ABC):
             terms = OrderedDict()
             for k in using:
                 terms[k] = k
+            view_name = "table_reference_" + str(temp_id_source[0])
+            temp_id_source[0] = temp_id_source[0] + 1
             near_sql = data_algebra.near_sql.NearSQLUnaryStep(
-                terms=terms,  # TODO: implement!
+                terms=terms,  # TODO: implement pruning
                 quoted_query_name=self.quote_identifier(view_name),
                 sub_sql=subsql.to_near_sql(columns=using),
                 temp_tables=subsql.temp_tables.copy(),
@@ -485,7 +489,7 @@ class DBModel(ABC):
                 subops[k] = op
         if len(subops) <= 0:
             # know using was not None is this case as len(extend_node.ops)>0 and all keys are in extend_node.column_set
-            return extend_node.sources[0].to_sql_implementation(
+            return extend_node.sources[0].to_near_sql_implementation(
                 db_model=self, using=using, temp_id_source=temp_id_source
             )
         if len(using) < 1:
@@ -495,7 +499,7 @@ class DBModel(ABC):
             raise KeyError("referred to unknown columns: " + str(missing))
         # get set of columns we need from subquery
         subusing = extend_node.columns_used_from_sources(using=using)[0]
-        subsql = extend_node.sources[0].to_sql_implementation(
+        subsql = extend_node.sources[0].to_near_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
         window_term = ""
@@ -545,7 +549,7 @@ class DBModel(ABC):
         subusing = project_node.columns_used_from_sources(using=using)[0]
         terms = {ci: self.expr_to_sql(oi) for (ci, oi) in subops.items()}
         terms.update({g: None for g in project_node.group_by})
-        subsql = project_node.sources[0].to_sql_implementation(
+        subsql = project_node.sources[0].to_near_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
         view_name = "project_" + str(temp_id_source[0])
@@ -573,7 +577,7 @@ class DBModel(ABC):
         if using is None:
             using = select_rows_node.column_set
         subusing = select_rows_node.columns_used_from_sources(using=using)[0]
-        subsql = select_rows_node.sources[0].to_sql_implementation(
+        subsql = select_rows_node.sources[0].to_near_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
         view_name = "select_rows_" + str(temp_id_source[0])
@@ -604,7 +608,7 @@ class DBModel(ABC):
         subusing = [
             c for c in select_columns_node.column_selection if c in subusing
         ]  # fix order
-        subsql = select_columns_node.sources[0].to_sql_implementation(
+        subsql = select_columns_node.sources[0].to_near_sql_implementation(
             db_model=self, using=set(subusing), temp_id_source=temp_id_source
         )
         # order/limit columns
@@ -627,7 +631,7 @@ class DBModel(ABC):
         if using is None:
             using = drop_columns_node.column_set
         subusing = drop_columns_node.columns_used_from_sources(using=using)[0]
-        subsql = drop_columns_node.sources[0].to_sql_implementation(
+        subsql = drop_columns_node.sources[0].to_near_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
         # /limit columns
@@ -647,7 +651,7 @@ class DBModel(ABC):
             using = order_node.column_set
         subusing = order_node.columns_used_from_sources(using=using)[0]
         subusing = [c for c in order_node.column_names if c in subusing]  # fix order
-        subsql = order_node.sources[0].to_sql_implementation(
+        subsql = order_node.sources[0].to_near_sql_implementation(
             db_model=self, using=set(subusing), temp_id_source=temp_id_source
         )
         view_name = "order_rows_" + str(temp_id_source[0])
@@ -687,7 +691,7 @@ class DBModel(ABC):
         if using is None:
             using = rename_node.column_set
         subusing = rename_node.columns_used_from_sources(using=using)[0]
-        subsql = rename_node.sources[0].to_sql_implementation(
+        subsql = rename_node.sources[0].to_near_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
         view_name = "rename_" + str(temp_id_source[0])
@@ -726,11 +730,11 @@ class DBModel(ABC):
         subusing = join_node.columns_used_from_sources(using=using.union(by_set))
         using_left = subusing[0]
         using_right = subusing[1]
-        sql_left = join_node.sources[0].to_sql_implementation(
+        sql_left = join_node.sources[0].to_near_sql_implementation(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
         sub_view_name_left = sql_left.quoted_query_name
-        sql_right = join_node.sources[1].to_sql_implementation(
+        sql_right = join_node.sources[1].to_near_sql_implementation(
             db_model=self, using=using_right, temp_id_source=temp_id_source
         )
         sub_view_name_right = sql_right.quoted_query_name
@@ -780,14 +784,14 @@ class DBModel(ABC):
         temp_tables.update(sql_right.temp_tables)
         jointype = join_node.jointype
         try:
-            jointype = self.join_name_map[jointype]
+            jointype = self.join_name_map[jointype]  # TODO: maybe move this mapping earlier
         except KeyError:
             pass
         near_sql = data_algebra.near_sql.NearSQLBinaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql1=sql_left.to_near_sql(columns=using_left),
-            joiner=join_node.jointype + " JOIN",
+            joiner=jointype + " JOIN",
             sub_sql2=sql_right.to_near_sql(columns=using_right),
             suffix=on_terms,
             temp_tables=temp_tables,
@@ -813,10 +817,10 @@ class DBModel(ABC):
         using_right = subusing[1]
         if set(using_left) != set(using_right):
             raise ValueError("left/right usings did not match")
-        sql_left = concat_node.sources[0].to_sql_implementation(
+        sql_left = concat_node.sources[0].to_near_sql_implementation(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
-        sql_right = concat_node.sources[1].to_sql_implementation(
+        sql_right = concat_node.sources[1].to_near_sql_implementation(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
         view_name = "concat_rows_" + str(temp_id_source[0])
@@ -924,7 +928,7 @@ class DBModel(ABC):
             + source_sql
             + " ) a\n"
             + "CROSS JOIN (\n  "
-            + control_view.to_sql_implementation(
+            + control_view.to_near_sql_implementation(
                 self, using=using, temp_id_source=temp_id_source
             ).to_sql(db_model=self, columns=using, force_sql=True)
             + " ) b\n"
@@ -1085,12 +1089,14 @@ class DBHandle(data_algebra.eval_model.EvalModel):
                pretty=False,
                encoding=None,
                sqlparse_options=None,
-               temp_tables=None):
+               temp_tables=None,
+               use_with=False):
         return ops.to_sql(self.db_model,
                           pretty=pretty,
                           encoding=encoding,
                           sqlparse_options=sqlparse_options,
-                          temp_tables=temp_tables)
+                          temp_tables=temp_tables,
+                          use_with=use_with)
 
     def drop_table(self, table_name):
         q_table_name = self.db_model.quote_table_name(table_name)
