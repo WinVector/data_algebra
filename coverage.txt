@@ -86,17 +86,17 @@ data_algebra/bigquery_user_fns.py         80      3    96%
 data_algebra/cdata.py                    331     83    75%
 data_algebra/connected_components.py      36     13    64%
 data_algebra/data_model.py                52     19    63%
-data_algebra/data_ops.py                1160    241    79%
+data_algebra/data_ops.py                1115    235    79%
 data_algebra/data_ops_types.py            79     36    54%
 data_algebra/data_ops_utils.py            34      5    85%
 data_algebra/data_pipe.py                189    107    43%
-data_algebra/db_model.py                 572     95    83%
+data_algebra/db_model.py                 620    100    84%
 data_algebra/diagram.py                   56     43    23%
 data_algebra/eval_model.py                16      1    94%
 data_algebra/expr_parse.py                38      3    92%
 data_algebra/expr_rep.py                 462    104    77%
 data_algebra/flow_text.py                 17      0   100%
-data_algebra/near_sql.py                 180     19    89%
+data_algebra/near_sql.py                 178     18    90%
 data_algebra/pandas_base.py              256     24    91%
 data_algebra/pandas_model.py              18     11    39%
 data_algebra/parse_by_lark.py            139     21    85%
@@ -105,7 +105,7 @@ data_algebra/test_util.py                109     16    85%
 data_algebra/user_fn.py                   76     20    74%
 data_algebra/util.py                      28      4    86%
 ----------------------------------------------------------
-TOTAL                                   4356    988    77%
+TOTAL                                   4357    986    77%
 
 
-============================= 173 passed in 9.94s ==============================
+============================= 173 passed in 9.95s ==============================

@@ -34,9 +34,6 @@
                     <a class="function" href="#pretty_format_python">pretty_format_python</a>
             </li>
             <li>
-                    <a class="function" href="#pretty_format_sql">pretty_format_sql</a>
-            </li>
-            <li>
                     <a class="class" href="#ViewRepresentation">ViewRepresentation</a>
                             <ul class="memberlist">
                         <li>
@@ -540,16 +537,6 @@
     <span class="k">pass</span>
 
 
-<span class="n">_have_sqlparse</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="c1"># noinspection PyUnresolvedReferences</span>
-    <span class="kn">import</span> <span class="nn">sqlparse</span>
-
-    <span class="n">_have_sqlparse</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="k">pass</span>
-
-
 <span class="c1"># noinspection PyBroadException</span>
 <span class="k">def</span> <span class="nf">pretty_format_python</span><span class="p">(</span><span class="n">python_str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">black_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_str</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
@@ -562,24 +549,6 @@
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
     <span class="k">return</span> <span class="n">formatted_python</span>
-
-
-<span class="c1"># noinspection PyBroadException</span>
-<span class="k">def</span> <span class="nf">pretty_format_sql</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sqlparse_options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)))</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)))</span>
-    <span class="k">if</span> <span class="n">sqlparse_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">sqlparse_options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;reindent&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;keyword_case&quot;</span><span class="p">:</span> <span class="s2">&quot;upper&quot;</span><span class="p">}</span>
-    <span class="n">formatted_sql</span> <span class="o">=</span> <span class="n">sql</span>
-    <span class="k">if</span> <span class="n">_have_sqlparse</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">formatted_sql</span> <span class="o">=</span> <span class="n">sqlparse</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">sql</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span> <span class="o">**</span><span class="n">sqlparse_options</span>
-            <span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="k">pass</span>
-    <span class="k">return</span> <span class="n">formatted_sql</span>
 
 
 <span class="k">class</span> <span class="nc">ViewRepresentation</span><span class="p">(</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
@@ -776,43 +745,17 @@
         <span class="n">temp_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">use_with</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
-        <span class="k">if</span> <span class="n">sqlparse_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">sqlparse_options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;reindent&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;keyword_case&quot;</span><span class="p">:</span> <span class="s2">&quot;upper&quot;</span><span class="p">}</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBHandle</span><span class="p">):</span>
             <span class="n">db_model</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">db_model</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;Expected db_model to be derived from data_algebra.db_model.DBModel or data_algebra.db_model.DBHandle&quot;</span>
-            <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>  <span class="c1"># for table consistency check/raise</span>
-        <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">near_sql</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
-            <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+            <span class="n">ops</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">pretty</span><span class="o">=</span><span class="n">pretty</span><span class="p">,</span>
+            <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span>
+            <span class="n">sqlparse_options</span><span class="o">=</span><span class="n">sqlparse_options</span><span class="p">,</span>
+            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
+            <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span>
         <span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">temp_tables</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">temp_tables</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;need temp_tables to be a dictionary to copy back found temporary table values&quot;</span>
-                <span class="p">)</span>
-            <span class="n">temp_tables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span>
-        <span class="n">sql_str</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">use_with</span> <span class="ow">and</span> <span class="n">db_model</span><span class="o">.</span><span class="n">supports_with</span><span class="p">:</span>
-            <span class="n">sequence</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">to_with_form</span><span class="p">()</span>
-            <span class="n">len_sequence</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="n">sql_sequence</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">len_sequence</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">len_sequence</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-                    <span class="n">nmi</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># already quoted</span>
-                    <span class="n">sqli</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">)</span>
-                    <span class="n">sql_sequence</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39; </span><span class="si">{</span><span class="n">nmi</span><span class="si">}</span><span class="s1"> AS (</span><span class="se">\n</span><span class="s1"> </span><span class="si">{</span><span class="n">sqli</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">)&#39;</span>
-                <span class="n">sql_last</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">len_sequence</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="n">sql_str</span> <span class="o">=</span> <span class="s1">&#39;WITH</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;,</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sql_sequence</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">sql_last</span>
-        <span class="k">if</span> <span class="n">sql_str</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># non-with path</span>
-            <span class="n">sql_str</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">pretty</span><span class="p">:</span>
-            <span class="n">sql_str</span> <span class="o">=</span> <span class="n">pretty_format_sql</span><span class="p">(</span><span class="n">sql_str</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span> <span class="n">sqlparse_options</span><span class="o">=</span><span class="n">sqlparse_options</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">sql_str</span>
 
     <span class="c1"># Pandas realization</span>
 
@@ -2414,38 +2357,6 @@
     
 
                 </section>
-                <section id="pretty_format_sql">
-                            <div class="attr function"><a class="headerlink" href="#pretty_format_sql">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">pretty_format_sql</span><span class="signature">(sql, *, encoding=None, sqlparse_options=None)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">pretty_format_sql</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sqlparse_options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)))</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)))</span>
-    <span class="k">if</span> <span class="n">sqlparse_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">sqlparse_options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;reindent&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;keyword_case&quot;</span><span class="p">:</span> <span class="s2">&quot;upper&quot;</span><span class="p">}</span>
-    <span class="n">formatted_sql</span> <span class="o">=</span> <span class="n">sql</span>
-    <span class="k">if</span> <span class="n">_have_sqlparse</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">formatted_sql</span> <span class="o">=</span> <span class="n">sqlparse</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">sql</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span> <span class="o">**</span><span class="n">sqlparse_options</span>
-            <span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="k">pass</span>
-    <span class="k">return</span> <span class="n">formatted_sql</span>
-</pre></div>
-
-        </details>
-
-    
-
-                </section>
                 <section id="ViewRepresentation">
                                 <div class="attr class">
         <a class="headerlink" href="#ViewRepresentation">#&nbsp;&nbsp</a>
@@ -2651,43 +2562,17 @@
         <span class="n">temp_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">use_with</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
-        <span class="k">if</span> <span class="n">sqlparse_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">sqlparse_options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;reindent&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;keyword_case&quot;</span><span class="p">:</span> <span class="s2">&quot;upper&quot;</span><span class="p">}</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBHandle</span><span class="p">):</span>
             <span class="n">db_model</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">db_model</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;Expected db_model to be derived from data_algebra.db_model.DBModel or data_algebra.db_model.DBHandle&quot;</span>
-            <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>  <span class="c1"># for table consistency check/raise</span>
-        <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">near_sql</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
-            <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+            <span class="n">ops</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">pretty</span><span class="o">=</span><span class="n">pretty</span><span class="p">,</span>
+            <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span>
+            <span class="n">sqlparse_options</span><span class="o">=</span><span class="n">sqlparse_options</span><span class="p">,</span>
+            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
+            <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span>
         <span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">temp_tables</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">temp_tables</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;need temp_tables to be a dictionary to copy back found temporary table values&quot;</span>
-                <span class="p">)</span>
-            <span class="n">temp_tables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span>
-        <span class="n">sql_str</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">use_with</span> <span class="ow">and</span> <span class="n">db_model</span><span class="o">.</span><span class="n">supports_with</span><span class="p">:</span>
-            <span class="n">sequence</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">to_with_form</span><span class="p">()</span>
-            <span class="n">len_sequence</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="n">sql_sequence</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">len_sequence</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">len_sequence</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-                    <span class="n">nmi</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># already quoted</span>
-                    <span class="n">sqli</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">)</span>
-                    <span class="n">sql_sequence</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39; </span><span class="si">{</span><span class="n">nmi</span><span class="si">}</span><span class="s1"> AS (</span><span class="se">\n</span><span class="s1"> </span><span class="si">{</span><span class="n">sqli</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">)&#39;</span>
-                <span class="n">sql_last</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">len_sequence</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="n">sql_str</span> <span class="o">=</span> <span class="s1">&#39;WITH</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;,</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sql_sequence</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">sql_last</span>
-        <span class="k">if</span> <span class="n">sql_str</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># non-with path</span>
-            <span class="n">sql_str</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">pretty</span><span class="p">:</span>
-            <span class="n">sql_str</span> <span class="o">=</span> <span class="n">pretty_format_sql</span><span class="p">(</span><span class="n">sql_str</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span> <span class="n">sqlparse_options</span><span class="o">=</span><span class="n">sqlparse_options</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">sql_str</span>
 
     <span class="c1"># Pandas realization</span>
 
@@ -3346,43 +3231,17 @@ with the using columns (None means all).</p>
         <span class="n">temp_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">use_with</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
-        <span class="k">if</span> <span class="n">sqlparse_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">sqlparse_options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;reindent&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;keyword_case&quot;</span><span class="p">:</span> <span class="s2">&quot;upper&quot;</span><span class="p">}</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBHandle</span><span class="p">):</span>
             <span class="n">db_model</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">db_model</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;Expected db_model to be derived from data_algebra.db_model.DBModel or data_algebra.db_model.DBHandle&quot;</span>
-            <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>  <span class="c1"># for table consistency check/raise</span>
-        <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">near_sql</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
-            <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+            <span class="n">ops</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">pretty</span><span class="o">=</span><span class="n">pretty</span><span class="p">,</span>
+            <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span>
+            <span class="n">sqlparse_options</span><span class="o">=</span><span class="n">sqlparse_options</span><span class="p">,</span>
+            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
+            <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span>
         <span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">temp_tables</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">temp_tables</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;need temp_tables to be a dictionary to copy back found temporary table values&quot;</span>
-                <span class="p">)</span>
-            <span class="n">temp_tables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span>
-        <span class="n">sql_str</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">use_with</span> <span class="ow">and</span> <span class="n">db_model</span><span class="o">.</span><span class="n">supports_with</span><span class="p">:</span>
-            <span class="n">sequence</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">to_with_form</span><span class="p">()</span>
-            <span class="n">len_sequence</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="n">sql_sequence</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">len_sequence</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">len_sequence</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-                    <span class="n">nmi</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># already quoted</span>
-                    <span class="n">sqli</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">)</span>
-                    <span class="n">sql_sequence</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39; </span><span class="si">{</span><span class="n">nmi</span><span class="si">}</span><span class="s1"> AS (</span><span class="se">\n</span><span class="s1"> </span><span class="si">{</span><span class="n">sqli</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">)&#39;</span>
-                <span class="n">sql_last</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">len_sequence</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="n">sql_str</span> <span class="o">=</span> <span class="s1">&#39;WITH</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;,</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sql_sequence</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">sql_last</span>
-        <span class="k">if</span> <span class="n">sql_str</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># non-with path</span>
-            <span class="n">sql_str</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">pretty</span><span class="p">:</span>
-            <span class="n">sql_str</span> <span class="o">=</span> <span class="n">pretty_format_sql</span><span class="p">(</span><span class="n">sql_str</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span> <span class="n">sqlparse_options</span><span class="o">=</span><span class="n">sqlparse_options</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">sql_str</span>
 </pre></div>
 
         </details>
