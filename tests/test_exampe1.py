@@ -30,6 +30,7 @@ def test_example1_1():
         .project({"meany": "delta.mean()",}, group_by=["x_s"])
         .order_rows(["x_s"])
     )
+    assert ops1 == ops1
     assert data_algebra.test_util.formats_to_self(ops1)
     res1 = ops1.transform(d)
     expect1 = data_algebra.default_data_model.pd.DataFrame(
@@ -55,6 +56,7 @@ def test_example1_1():
         .project({"meany": "delta.mean()",}, group_by=["x_n"])
         .order_rows(["x_n"])
     )
+    assert ops2 != ops1
     assert data_algebra.test_util.formats_to_self(ops2)
     res2 = ops2.transform(d)
     expect2 = data_algebra.default_data_model.pd.DataFrame(

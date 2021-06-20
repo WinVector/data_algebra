@@ -49,6 +49,14 @@ class FnTerm(PreTerm):
         for vi in self.args:
             columns_seen.add(str(vi))
 
+    def get_views(self):
+        views = list()
+        for ai in self.args:
+            vi = ai.get_views()
+            for vii in vi:
+                views.append(vii)
+        return views
+
     def replace_view(self, view):
         self.args = [ai.replace_view(view) for ai in self.args]
         return self

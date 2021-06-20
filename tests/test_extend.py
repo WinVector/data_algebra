@@ -8,6 +8,7 @@ from data_algebra.test_util import formats_to_self
 
 import pytest
 
+
 def test_extend_0():
     d = data_algebra.default_data_model.pd.DataFrame(
         {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
@@ -62,6 +63,7 @@ def test_extend_shrink_1():
     ops = describe_table(d, "d").extend({"c": "y.max()"}).extend({"d": "y.min()"})
 
     assert formats_to_self(ops)
+    assert isinstance(ops.sources[0], TableDescription)
 
     res = ops.transform(d)
     expect = data_algebra.default_data_model.pd.DataFrame(

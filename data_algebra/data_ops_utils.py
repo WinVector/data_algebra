@@ -36,7 +36,27 @@ def try_to_merge_ops(ops1, ops2):
         return None
     if len(ops2_columns_used.intersection(ops1_columns_produced)) > 0:
         return None
+    # all of ops1 must have the same view
+    views1 = list()
+    for v in ops1.values():
+        for vi in v.get_views():
+            views1.append(vi)
+    views2 = list()
+    for v in ops2.values():
+        for vi in v.get_views():
+            views2.append(vi)
+    if len(views1) > 1:
+        for i in range(2, len(views1)):
+            if views1[0] != views1[i]:
+                return None
+    if len(views2) > 1:
+        for i in range(2, len(views2)):
+            if views2[0] != views2[i]:
+                return None
     # merge the extends
     new_ops = ops1.copy()
-    new_ops.update(ops2)
+    new_ops2 = ops2
+    if (len(views1) > 0) and (len(views2) > 0):
+        new_ops2 = {k: v.replace_view(views1[0]) for k, v in ops2.items()}
+    new_ops.update(new_ops2)
     return new_ops

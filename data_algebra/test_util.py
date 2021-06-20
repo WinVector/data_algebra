@@ -25,7 +25,11 @@ def formats_to_self(ops):
         {'pd': data_algebra.default_data_model.pd}  # make our definition of pandas available
     )
     str2 = repr(ops2)
-    return str1 == str2
+    strings_match = str1 == str2   # probably too strict
+    ops_match = ops == ops2
+    if strings_match and (not ops_match):
+        print("strings match, but ops did not")
+    return ops_match
 
 
 def equivalent_frames(
