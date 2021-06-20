@@ -11,7 +11,7 @@ class PandasModel(EvalModel, PandasModelBase):
 
     # EvalModel interface
 
-    def eval(self, ops, *, data_map=None, result_name=None, narrow=True):
+    def managed_eval(self, ops, *, data_map=None, result_name=None, narrow=True):
         tables_needed = [k for k in ops.get_tables().keys()]
         missing_tables = set(tables_needed) - set(data_map.keys())
         if len(missing_tables) > 0:

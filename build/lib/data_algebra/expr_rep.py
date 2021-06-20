@@ -92,6 +92,12 @@ class PreTerm(ABC):
 
     # tree re-write
 
+    def get_views(self):
+        """
+        return list of unique views, expectation list is of size zero or one
+        """
+        raise NotImplementedError("base class called")
+
     def replace_view(self, view):
         raise NotImplementedError("base class called")
 
@@ -514,6 +520,10 @@ class Value(Term):
             return False
         return self.value == other.value
 
+    def get_views(self):
+        views = list()
+        return views
+
     def replace_view(self, view):
         return self
 
@@ -553,6 +563,15 @@ class ListTerm(PreTerm):
         if not isinstance(other, ListTerm):
             return False
         return self.value == other.value
+
+    def get_views(self):
+        views = list()
+        for ai in self.args:
+            vi = ai.get_views()
+            for vii in vi:
+                if vii not in views:  # expect list to be of size zero or one
+                    views.append(vii)
+        return views
 
     def replace_view(self, view):
         new_list = [ai.replace_view(view) for ai in self.value]
@@ -627,6 +646,11 @@ class ColumnReference(Term):
             return False
         return self.column_name == other.column_name
 
+    def get_views(self):
+        views = list()
+        views.append(self.view)
+        return views
+
     def replace_view(self, view):
         return ColumnReference(view=view, column_name=self.column_name)
 
@@ -678,6 +702,15 @@ class Expression(Term):
             if not lft.is_equal(rgt):
                 return False
         return True
+
+    def get_views(self):
+        views = list()
+        for ai in self.args:
+            vi = ai.get_views()
+            for vii in vi:
+                if vii not in views:  # expect list to be of size zero or one
+                    views.append(vii)
+        return views
 
     def replace_view(self, view):
         new_args = [oi.replace_view(view) for oi in self.args]

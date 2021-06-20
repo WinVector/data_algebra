@@ -43,6 +43,9 @@
                                 <a class="function" href="#PreTerm.is_equal">is_equal</a>
                         </li>
                         <li>
+                                <a class="function" href="#PreTerm.get_views">get_views</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#PreTerm.replace_view">replace_view</a>
                         </li>
                         <li>
@@ -286,6 +289,9 @@
                                 <a class="function" href="#Value.is_equal">is_equal</a>
                         </li>
                         <li>
+                                <a class="function" href="#Value.get_views">get_views</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#Value.replace_view">replace_view</a>
                         </li>
                         <li>
@@ -317,6 +323,9 @@
                         </li>
                         <li>
                                 <a class="function" href="#ListTerm.is_equal">is_equal</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#ListTerm.get_views">get_views</a>
                         </li>
                         <li>
                                 <a class="function" href="#ListTerm.replace_view">replace_view</a>
@@ -352,6 +361,9 @@
                                 <a class="function" href="#ColumnReference.is_equal">is_equal</a>
                         </li>
                         <li>
+                                <a class="function" href="#ColumnReference.get_views">get_views</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#ColumnReference.replace_view">replace_view</a>
                         </li>
                         <li>
@@ -371,6 +383,9 @@
                         </li>
                         <li>
                                 <a class="function" href="#Expression.is_equal">is_equal</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Expression.get_views">get_views</a>
                         </li>
                         <li>
                                 <a class="function" href="#Expression.replace_view">replace_view</a>
@@ -513,6 +528,12 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="c1"># tree re-write</span>
+
+    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        return list of unique views, expectation list is of size zero or one</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
@@ -936,6 +957,10 @@
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span>
 
+    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">views</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">views</span>
+
     <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span>
 
@@ -975,6 +1000,15 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">ListTerm</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">views</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="n">vi</span> <span class="o">=</span> <span class="n">ai</span><span class="o">.</span><span class="n">get_views</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">vii</span> <span class="ow">in</span> <span class="n">vi</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">vii</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">views</span><span class="p">:</span>  <span class="c1"># expect list to be of size zero or one</span>
+                    <span class="n">views</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vii</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">views</span>
 
     <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
         <span class="n">new_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">ai</span><span class="o">.</span><span class="n">replace_view</span><span class="p">(</span><span class="n">view</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
@@ -1049,6 +1083,11 @@
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_name</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">column_name</span>
 
+    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">views</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">views</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">views</span>
+
     <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ColumnReference</span><span class="p">(</span><span class="n">view</span><span class="o">=</span><span class="n">view</span><span class="p">,</span> <span class="n">column_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_name</span><span class="p">)</span>
 
@@ -1100,6 +1139,15 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">lft</span><span class="o">.</span><span class="n">is_equal</span><span class="p">(</span><span class="n">rgt</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">views</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="n">vi</span> <span class="o">=</span> <span class="n">ai</span><span class="o">.</span><span class="n">get_views</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">vii</span> <span class="ow">in</span> <span class="n">vi</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">vii</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">views</span><span class="p">:</span>  <span class="c1"># expect list to be of size zero or one</span>
+                    <span class="n">views</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vii</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">views</span>
 
     <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
         <span class="n">new_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">oi</span><span class="o">.</span><span class="n">replace_view</span><span class="p">(</span><span class="n">view</span><span class="p">)</span> <span class="k">for</span> <span class="n">oi</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
@@ -1259,6 +1307,12 @@
 
     <span class="c1"># tree re-write</span>
 
+    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        return list of unique views, expectation list is of size zero or one</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
@@ -1348,6 +1402,30 @@
         </details>
 
     
+
+                            </div>
+                            <div id="PreTerm.get_views" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#PreTerm.get_views">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">get_views</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        return list of unique views, expectation list is of size zero or one</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>return list of unique views, expectation list is of size zero or one</p>
+</div>
+
 
                             </div>
                             <div id="PreTerm.replace_view" class="classattr">
@@ -3181,6 +3259,7 @@
                                     <div><dt><a href="#PreTerm">PreTerm</a></dt>
                                 <dd id="Term.source_string" class="variable"><a href="#PreTerm.source_string">source_string</a></dd>
                 <dd id="Term.is_equal" class="function"><a href="#PreTerm.is_equal">is_equal</a></dd>
+                <dd id="Term.get_views" class="function"><a href="#PreTerm.get_views">get_views</a></dd>
                 <dd id="Term.replace_view" class="function"><a href="#PreTerm.replace_view">replace_view</a></dd>
                 <dd id="Term.get_column_names" class="function"><a href="#PreTerm.get_column_names">get_column_names</a></dd>
                 <dd id="Term.evaluate" class="function"><a href="#PreTerm.evaluate">evaluate</a></dd>
@@ -3215,6 +3294,10 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Value</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">views</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">views</span>
 
     <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span>
@@ -3278,6 +3361,28 @@
         </details>
 
     
+
+                            </div>
+                            <div id="Value.get_views" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Value.get_views">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">get_views</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">views</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">views</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>return list of unique views, expectation list is of size zero or one</p>
+</div>
+
 
                             </div>
                             <div id="Value.replace_view" class="classattr">
@@ -3578,6 +3683,15 @@ errors defaults to 'strict'.</p>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span>
 
+    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">views</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="n">vi</span> <span class="o">=</span> <span class="n">ai</span><span class="o">.</span><span class="n">get_views</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">vii</span> <span class="ow">in</span> <span class="n">vi</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">vii</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">views</span><span class="p">:</span>  <span class="c1"># expect list to be of size zero or one</span>
+                    <span class="n">views</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vii</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">views</span>
+
     <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
         <span class="n">new_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">ai</span><span class="o">.</span><span class="n">replace_view</span><span class="p">(</span><span class="n">view</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">ListTerm</span><span class="p">(</span><span class="n">new_list</span><span class="p">)</span>
@@ -3661,6 +3775,33 @@ errors defaults to 'strict'.</p>
         </details>
 
     
+
+                            </div>
+                            <div id="ListTerm.get_views" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#ListTerm.get_views">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">get_views</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">views</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="n">vi</span> <span class="o">=</span> <span class="n">ai</span><span class="o">.</span><span class="n">get_views</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">vii</span> <span class="ow">in</span> <span class="n">vi</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">vii</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">views</span><span class="p">:</span>  <span class="c1"># expect list to be of size zero or one</span>
+                    <span class="n">views</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vii</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">views</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>return list of unique views, expectation list is of size zero or one</p>
+</div>
+
 
                             </div>
                             <div id="ListTerm.replace_view" class="classattr">
@@ -3815,6 +3956,11 @@ errors defaults to 'strict'.</p>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_name</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">column_name</span>
 
+    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">views</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">views</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">views</span>
+
     <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ColumnReference</span><span class="p">(</span><span class="n">view</span><span class="o">=</span><span class="n">view</span><span class="p">,</span> <span class="n">column_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_name</span><span class="p">)</span>
 
@@ -3915,6 +4061,29 @@ errors defaults to 'strict'.</p>
         </details>
 
     
+
+                            </div>
+                            <div id="ColumnReference.get_views" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#ColumnReference.get_views">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">get_views</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">views</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">views</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">views</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>return list of unique views, expectation list is of size zero or one</p>
+</div>
+
 
                             </div>
                             <div id="ColumnReference.replace_view" class="classattr">
@@ -4114,6 +4283,15 @@ errors defaults to 'strict'.</p>
                 <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
 
+    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">views</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="n">vi</span> <span class="o">=</span> <span class="n">ai</span><span class="o">.</span><span class="n">get_views</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">vii</span> <span class="ow">in</span> <span class="n">vi</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">vii</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">views</span><span class="p">:</span>  <span class="c1"># expect list to be of size zero or one</span>
+                    <span class="n">views</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vii</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">views</span>
+
     <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
         <span class="n">new_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">oi</span><span class="o">.</span><span class="n">replace_view</span><span class="p">(</span><span class="n">view</span><span class="p">)</span> <span class="k">for</span> <span class="n">oi</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span>
@@ -4247,6 +4425,33 @@ errors defaults to 'strict'.</p>
         </details>
 
     
+
+                            </div>
+                            <div id="Expression.get_views" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Expression.get_views">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">get_views</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">views</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="n">vi</span> <span class="o">=</span> <span class="n">ai</span><span class="o">.</span><span class="n">get_views</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">vii</span> <span class="ow">in</span> <span class="n">vi</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">vii</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">views</span><span class="p">:</span>  <span class="c1"># expect list to be of size zero or one</span>
+                    <span class="n">views</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vii</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">views</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>return list of unique views, expectation list is of size zero or one</p>
+</div>
+
 
                             </div>
                             <div id="Expression.replace_view" class="classattr">

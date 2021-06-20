@@ -48,25 +48,3 @@ def connected_components(f, g):
                 components[k] = merged
     assignments = [components[k].id for k in f]
     return assignments
-
-
-def get_index_lists(partition_columns):
-    """
-    Find lists of indices for partition_ids level-sets
-
-    :param partition_columns: non-empty list of lists of list of hashables/comparables
-    :return: dictionary of index lists for each level-set of the keys
-    """
-    index_lists = {}
-    for i in range(len(partition_columns[0])):
-        pi = []
-        for j in range(len(partition_columns)):
-            pi.append(partition_columns[j][i])
-        pi = tuple(pi)
-        try:
-            lst = index_lists[pi]
-        except KeyError:
-            lst = []
-            index_lists[pi] = lst
-        lst.append(i)
-    return index_lists

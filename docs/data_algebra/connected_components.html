@@ -42,9 +42,6 @@
             <li>
                     <a class="function" href="#connected_components">connected_components</a>
             </li>
-            <li>
-                    <a class="function" href="#get_index_lists">get_index_lists</a>
-            </li>
     </ul>
 
 
@@ -111,28 +108,6 @@
                 <span class="n">components</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">merged</span>
     <span class="n">assignments</span> <span class="o">=</span> <span class="p">[</span><span class="n">components</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">f</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">assignments</span>
-
-
-<span class="k">def</span> <span class="nf">get_index_lists</span><span class="p">(</span><span class="n">partition_columns</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Find lists of indices for partition_ids level-sets</span>
-
-<span class="sd">    :param partition_columns: non-empty list of lists of list of hashables/comparables</span>
-<span class="sd">    :return: dictionary of index lists for each level-set of the keys</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">index_lists</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">partition_columns</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
-        <span class="n">pi</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">partition_columns</span><span class="p">)):</span>
-            <span class="n">pi</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">partition_columns</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
-        <span class="n">pi</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">pi</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">lst</span> <span class="o">=</span> <span class="n">index_lists</span><span class="p">[</span><span class="n">pi</span><span class="p">]</span>
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="n">lst</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">index_lists</span><span class="p">[</span><span class="n">pi</span><span class="p">]</span> <span class="o">=</span> <span class="n">lst</span>
-        <span class="n">lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">index_lists</span>
 </pre></div>
 
         </details>
@@ -255,48 +230,6 @@ print(res)</p>
 <p>:param f: list or vector of hashable/comparable items of length n
 :param g: list or vector of hashable/comparable items of length n
 :return: list of assignments of length n (map both f and g to same values.</p>
-</div>
-
-
-                </section>
-                <section id="get_index_lists">
-                            <div class="attr function"><a class="headerlink" href="#get_index_lists">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">get_index_lists</span><span class="signature">(partition_columns)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_index_lists</span><span class="p">(</span><span class="n">partition_columns</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Find lists of indices for partition_ids level-sets</span>
-
-<span class="sd">    :param partition_columns: non-empty list of lists of list of hashables/comparables</span>
-<span class="sd">    :return: dictionary of index lists for each level-set of the keys</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">index_lists</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">partition_columns</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
-        <span class="n">pi</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">partition_columns</span><span class="p">)):</span>
-            <span class="n">pi</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">partition_columns</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
-        <span class="n">pi</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">pi</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">lst</span> <span class="o">=</span> <span class="n">index_lists</span><span class="p">[</span><span class="n">pi</span><span class="p">]</span>
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="n">lst</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">index_lists</span><span class="p">[</span><span class="n">pi</span><span class="p">]</span> <span class="o">=</span> <span class="n">lst</span>
-        <span class="n">lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">index_lists</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Find lists of indices for partition_ids level-sets</p>
-
-<p>:param partition_columns: non-empty list of lists of list of hashables/comparables
-:return: dictionary of index lists for each level-set of the keys</p>
 </div>
 
 
