@@ -63,7 +63,7 @@ def test_extend_shrink_1():
     ops = describe_table(d, "d").extend({"c": "y.max()"}).extend({"d": "y.min()"})
 
     assert formats_to_self(ops)
-    assert isinstance(ops.sources[0], TableDescription)
+    assert isinstance(ops.sources[0], TableDescription)  # check does combine nodes in this case
 
     res = ops.transform(d)
     expect = data_algebra.default_data_model.pd.DataFrame(
@@ -91,6 +91,28 @@ def test_extend_shrink_1():
     ops3 = describe_table(d, "d").extend({"c": "y.max()"}).extend({"d": "y"})
 
     assert isinstance(ops3.sources[0], ExtendNode)
+
+
+def test_extend_shrink_2():
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"c": [1, 1, 1, 1], "g": ["a", "b", "a", "b"], "y": [1, 2, 3, 4]}
+    )
+
+    ops = describe_table(d, "d").extend({"c": "y.max()"}).extend({"d": "c.min()"})
+
+    assert formats_to_self(ops)
+    assert isinstance(ops.sources[0], ExtendNode)  # check doesn't combine nodes in this case
+
+    res = ops.transform(d)
+    expect = data_algebra.default_data_model.pd.DataFrame(
+        {
+            "g": ["a", "b", "a", "b"],
+            "y": [1, 2, 3, 4],
+            "c": [4, 4, 4, 4],
+            "d": [4, 4, 4, 4],
+        }
+    )
+    assert data_algebra.test_util.equivalent_frames(expect, res)
 
 
 def test_extend_catch_nonagg():
