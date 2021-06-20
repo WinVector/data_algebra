@@ -54,7 +54,8 @@ class FnTerm(PreTerm):
         for ai in self.args:
             vi = ai.get_views()
             for vii in vi:
-                views.append(vii)
+                if vi not in views:  # expectation is views is size zero or 1
+                    views.append(vii)
         return views
 
     def replace_view(self, view):

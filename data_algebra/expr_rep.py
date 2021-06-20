@@ -93,6 +93,9 @@ class PreTerm(ABC):
     # tree re-write
 
     def get_views(self):
+        """
+        return list of unique views, expectation list is of size zero or one
+        """
         raise NotImplementedError("base class called")
 
     def replace_view(self, view):
@@ -566,7 +569,8 @@ class ListTerm(PreTerm):
         for ai in self.args:
             vi = ai.get_views()
             for vii in vi:
-                views.append(vii)
+                if vii not in views:  # expect list to be of size zero or one
+                    views.append(vii)
         return views
 
     def replace_view(self, view):
@@ -704,7 +708,8 @@ class Expression(Term):
         for ai in self.args:
             vi = ai.get_views()
             for vii in vi:
-                views.append(vii)
+                if vii not in views:  # expect list to be of size zero or one
+                    views.append(vii)
         return views
 
     def replace_view(self, view):

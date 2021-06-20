@@ -40,19 +40,17 @@ def try_to_merge_ops(ops1, ops2):
     views1 = list()
     for v in ops1.values():
         for vi in v.get_views():
-            views1.append(vi)
+            if vi not in views1:  # expect list to be of size zero or one
+                views1.append(vi)
     views2 = list()
     for v in ops2.values():
         for vi in v.get_views():
-            views2.append(vi)
+            if vi not in views2:  # expect list to be of size zero or one
+                views2.append(vi)
     if len(views1) > 1:
-        for i in range(2, len(views1)):
-            if views1[0] != views1[i]:
-                return None
+        return None
     if len(views2) > 1:
-        for i in range(2, len(views2)):
-            if views2[0] != views2[i]:
-                return None
+        return None
     # merge the extends
     new_ops = ops1.copy()
     new_ops2 = ops2
