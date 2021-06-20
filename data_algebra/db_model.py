@@ -1324,7 +1324,7 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         q_table_name = self.db_model.quote_table_name(table_name)
         self.execute(f'DROP TABLE IF EXISTS {q_table_name}')
 
-    def eval(self, ops, *, data_map=None, result_name=None, narrow=True):
+    def managed_eval(self, ops, *, data_map=None, result_name=None, narrow=True):
         query = ops.to_sql(self.db_model)
         if result_name is None:
             result_name = self.mk_tmp_name(data_map)
