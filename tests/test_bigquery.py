@@ -32,6 +32,7 @@ def get_bq_handle():
     data_catalog = 'data-algebra-test'
     data_schema = 'test_1'
     tables_to_delete = set()
+
     yield {
         'bq_client': bq_client,
         'bq_handle': bq_handle,

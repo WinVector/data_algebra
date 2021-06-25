@@ -1151,9 +1151,12 @@ class DBModel:
         if columns is None:
             columns = [k for k in near_sql.terms.keys()]
         terms = near_sql.terms
-        if (constants is not None) and (len(constants) > 0):
-            terms.update(constants)
         terms_strs = [self.enc_term_(k, terms=terms) for k in columns]
+        if (constants is not None) and (len(constants) > 0):
+            terms_strs = terms_strs + [
+                v + " AS " + self.quote_identifier(k)
+                for (k, v) in constants.items()
+            ]
         if len(terms_strs) < 1:
             terms_strs = [f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}']
         sql = "SELECT "
@@ -1177,11 +1180,17 @@ class DBModel:
         sql = "SELECT "
         if annotate and (near_sql.annotation is not None) and (len(near_sql.annotation) > 0):
             sql = sql + " -- " + _clean_annotation(near_sql.annotation) + "\n "
+        if near_sql.joiner.strip() == 'UNION ALL':
+            substr_1 = near_sql.sub_sql1.to_sql(db_model=self, annotate=annotate)
+            substr_2 = near_sql.sub_sql2.to_sql(db_model=self, annotate=annotate)
+        else:
+            substr_1 = near_sql.sub_sql1.convert_subsql(db_model=self, annotate=annotate)
+            substr_2 = near_sql.sub_sql2.convert_subsql(db_model=self, annotate=annotate)
         sql = sql + (
                 ", ".join(terms_strs) + " FROM " + " ( "
-                + near_sql.sub_sql1.convert_subsql(db_model=self, annotate=annotate)
+                + substr_1
                 + " " + near_sql.joiner + " "
-                + near_sql.sub_sql2.convert_subsql(db_model=self, annotate=annotate)
+                + substr_2
                 )
         if (near_sql.suffix is not None) and (len(near_sql.suffix) > 0):
             sql = sql + " " + near_sql.suffix
