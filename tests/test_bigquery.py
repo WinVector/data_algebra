@@ -1,6 +1,7 @@
 
 import os
 import datetime
+import sqlite3
 
 from google.cloud import bigquery
 
@@ -8,6 +9,7 @@ import data_algebra
 import data_algebra.test_util
 from data_algebra.data_ops import *
 import data_algebra.BigQuery
+import data_algebra.SQLite
 
 import pytest
 
@@ -583,6 +585,48 @@ def test_base_Sunday(get_bq_handle):
         's': ['2021-04-25', '2021-04-25']
     })
     assert data_algebra.test_util.equivalent_frames(res, expect)
+
+    bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+    if bq_client is not None:
+        bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
+        bigquery_res = bq_handle.read_query(bigquery_sql)
+        assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
+
+
+def test_bq_concat_rows(get_bq_handle):
+    bq_client = get_bq_handle['bq_client']
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    tables_to_delete = get_bq_handle['tables_to_delete']
+
+    table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name)
+
+    d = data_algebra.default_data_model.pd.DataFrame({
+        'd': [1, 2]
+    })
+
+    ops = describe_table(d, table_name=table_name) .\
+        extend({'d': 'd + 1'}) .\
+        concat_rows(b=describe_table(d, table_name=table_name))
+
+    res = ops.transform(d)
+
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        'd': [2, 3, 1, 2],
+        'source_name': ['a', 'a', 'b', 'b']
+    })
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+
+    with sqlite3.connect(":memory:") as sqlite_conn:
+        sqlite_model = data_algebra.SQLite.SQLiteModel()
+        sqlite_model.prepare_connection(sqlite_conn)
+        sqlite_handle = data_algebra.db_model.DBHandle(db_model=sqlite_model, conn=sqlite_conn)
+        sqlite_sql = sqlite_handle.to_sql(ops, pretty=True)
+        sqlite_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
+        sqlite_res = sqlite_handle.read_query(sqlite_sql)
+    assert data_algebra.test_util.equivalent_frames(expect, sqlite_res)
 
     bigquery_sql = bq_handle.to_sql(ops, pretty=True)
     if bq_client is not None:
