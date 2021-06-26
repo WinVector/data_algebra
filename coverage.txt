@@ -2,67 +2,67 @@
 platform darwin -- Python 3.9.4, pytest-6.2.3, py-1.10.0, pluggy-0.13.1
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: anyio-2.2.0, cov-2.11.1
-collected 174 items
+collected 175 items
 
 tests/test_OrderedSet.py .                                               [  0%]
 tests/test_agg.py ..                                                     [  1%]
 tests/test_arith.py .                                                    [  2%]
 tests/test_arrow1.py ...                                                 [  4%]
-tests/test_bigquery.py ..............                                    [ 12%]
-tests/test_calc_warnings_errors.py .                                     [ 12%]
-tests/test_cc.py ....                                                    [ 14%]
+tests/test_bigquery.py ...............                                   [ 12%]
+tests/test_calc_warnings_errors.py .                                     [ 13%]
+tests/test_cc.py ....                                                    [ 15%]
 tests/test_cdata1.py ....                                                [ 17%]
-tests/test_cdata_convenience.py .                                        [ 17%]
-tests/test_cdata_example.py ...                                          [ 19%]
+tests/test_cdata_convenience.py .                                        [ 18%]
+tests/test_cdata_example.py ...                                          [ 20%]
 tests/test_cols_used.py .                                                [ 20%]
-tests/test_concat_rows.py .                                              [ 20%]
+tests/test_concat_rows.py .                                              [ 21%]
 tests/test_cross_product_join.py .                                       [ 21%]
-tests/test_db_model.py .                                                 [ 21%]
+tests/test_db_model.py .                                                 [ 22%]
 tests/test_degenerate_project.py .                                       [ 22%]
-tests/test_drop_columns.py .                                             [ 22%]
+tests/test_drop_columns.py .                                             [ 23%]
 tests/test_exampe1.py ....                                               [ 25%]
-tests/test_exp.py .                                                      [ 25%]
+tests/test_exp.py .                                                      [ 26%]
 tests/test_expr_parse.py .                                               [ 26%]
-tests/test_extend.py ......                                              [ 29%]
+tests/test_extend.py ......                                              [ 30%]
 tests/test_extend_order.py .                                             [ 30%]
 tests/test_flow_text.py .                                                [ 31%]
 tests/test_forbidden_calculation.py ..                                   [ 32%]
-tests/test_ghost_col_issue.py .                                          [ 32%]
-tests/test_idioms.py ............                                        [ 39%]
-tests/test_if_else.py ....                                               [ 41%]
+tests/test_ghost_col_issue.py .                                          [ 33%]
+tests/test_idioms.py ............                                        [ 40%]
+tests/test_if_else.py ....                                               [ 42%]
 tests/test_incomplete_agg.py .                                           [ 42%]
 tests/test_join_check.py .                                               [ 43%]
-tests/test_join_effects.py .                                             [ 43%]
+tests/test_join_effects.py .                                             [ 44%]
 tests/test_join_opt.py .                                                 [ 44%]
 tests/test_lark_parser.py .....                                          [ 47%]
-tests/test_math.py .                                                     [ 47%]
+tests/test_math.py .                                                     [ 48%]
 tests/test_minimum.py .                                                  [ 48%]
-tests/test_narrow.py .                                                   [ 48%]
+tests/test_narrow.py .                                                   [ 49%]
 tests/test_natural_join.py .                                             [ 49%]
 tests/test_neg.py .                                                      [ 50%]
 tests/test_null_bad.py .                                                 [ 50%]
 tests/test_ops.py .                                                      [ 51%]
-tests/test_ops_eq.py .                                                   [ 51%]
+tests/test_ops_eq.py .                                                   [ 52%]
 tests/test_or.py .....                                                   [ 54%]
 tests/test_ordered_agg_group.py .                                        [ 55%]
-tests/test_parse.py ......................                               [ 67%]
+tests/test_parse.py ......................                               [ 68%]
 tests/test_project.py .....                                              [ 70%]
 tests/test_ranked_example.py .                                           [ 71%]
 tests/test_ref_detect.py ..                                              [ 72%]
-tests/test_rename.py .                                                   [ 72%]
+tests/test_rename.py .                                                   [ 73%]
 tests/test_round.py ...                                                  [ 74%]
 tests/test_scatter_example.py .                                          [ 75%]
-tests/test_scoring_example.py .                                          [ 75%]
+tests/test_scoring_example.py .                                          [ 76%]
 tests/test_select.py ...                                                 [ 77%]
 tests/test_select_stacking.py .                                          [ 78%]
 tests/test_set_quoting.py ..                                             [ 79%]
-tests/test_shorten.py .                                                  [ 79%]
+tests/test_shorten.py .                                                  [ 80%]
 tests/test_sign_parse.py ..                                              [ 81%]
 tests/test_simple.py ....                                                [ 83%]
-tests/test_simple_expr.py .                                              [ 83%]
+tests/test_simple_expr.py .                                              [ 84%]
 tests/test_spark_sql.py .                                                [ 84%]
 tests/test_sqlite.py ....                                                [ 86%]
-tests/test_strat_example.py ..                                           [ 87%]
+tests/test_strat_example.py ..                                           [ 88%]
 tests/test_table_is_key_by_columns.py .                                  [ 88%]
 tests/test_transform_examples.py ...........                             [ 94%]
 tests/test_user_fn.py ...                                                [ 96%]
@@ -85,10 +85,10 @@ data_algebra/bigquery_user_fns.py         80      3    96%
 data_algebra/cdata.py                    331     77    77%
 data_algebra/connected_components.py      22      0   100%
 data_algebra/data_model.py                52     19    63%
-data_algebra/data_ops.py                1121    206    82%
+data_algebra/data_ops.py                1121    205    82%
 data_algebra/data_ops_types.py            79     38    52%
 data_algebra/data_ops_utils.py            51      7    86%
-data_algebra/db_model.py                 715    112    84%
+data_algebra/db_model.py                 720    111    85%
 data_algebra/diagram.py                   56     43    23%
 data_algebra/eval_model.py                16      1    94%
 data_algebra/expr_parse.py                38      3    92%
@@ -103,7 +103,7 @@ data_algebra/test_util.py                113     17    85%
 data_algebra/user_fn.py                   84     27    68%
 data_algebra/util.py                      28      4    86%
 ----------------------------------------------------------
-TOTAL                                   4268    833    80%
+TOTAL                                   4273    831    81%
 
 
-============================= 174 passed in 14.20s =============================
+============================= 175 passed in 11.03s =============================
