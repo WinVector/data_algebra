@@ -690,6 +690,7 @@ def test_bq_join_rows(get_bq_handle):
 
     bigquery_sql = bq_handle.to_sql(ops, pretty=True)
     if bq_client is not None:
-        bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
+        bq_handle.insert_table(d1, table_name=table_name_d1, allow_overwrite=True)
+        bq_handle.insert_table(d2, table_name=table_name_d2, allow_overwrite=True)
         bigquery_res = bq_handle.read_query(bigquery_sql)
         assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
