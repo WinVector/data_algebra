@@ -98,7 +98,9 @@ class NearSQLContainer:
             stub = last_step
             if not stub.near_sql.is_table:
                 stub = NearSQLContainer(
-                    near_sql=NearSQLCommonTableExpression(quoted_query_name=last_step.near_sql.quoted_query_name)
+                    near_sql=NearSQLCommonTableExpression(
+                        quoted_query_name=last_step.near_sql.quoted_query_name),
+                        force_sql=self.force_sql
                 )
             sequence[endi] = (last_step.near_sql.quoted_query_name, last_step)
         return stub, sequence
@@ -107,11 +109,16 @@ class NearSQLContainer:
 class NearSQLCommonTableExpression(NearSQL):
     def __init__(self, *, quoted_query_name):
         NearSQL.__init__(
-            self, terms=None, quoted_query_name=quoted_query_name, temp_tables=dict(), is_table=True
-        )
+            self, terms=None, quoted_query_name=quoted_query_name, temp_tables=dict(), is_table=True)
 
     def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False):
-        return self.quoted_query_name
+        return db_model.nearsqlcte_to_sql_(
+            near_sql=self,
+            columns=columns,
+            force_sql=force_sql,
+            constants=constants,
+            annotate=annotate
+        )
 
 
 class NearSQLTable(NearSQL):
@@ -254,6 +261,7 @@ class NearSQLBinaryStep(NearSQL):
             annotation=self.annotation)
         sequence.append(stubbed_step)
         return sequence
+
 
 class NearSQLq(NearSQL):
     """
