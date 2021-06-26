@@ -1180,7 +1180,7 @@ class DBModel:
         sql = "SELECT "
         if annotate and (near_sql.annotation is not None) and (len(near_sql.annotation) > 0):
             sql = sql + " -- " + _clean_annotation(near_sql.annotation) + "\n "
-        if near_sql.joiner.strip() == 'UNION ALL':
+        if 'union' in near_sql.joiner.lower():
             substr_1 = near_sql.sub_sql1.to_sql(db_model=self, annotate=annotate)
             substr_2 = near_sql.sub_sql2.to_sql(db_model=self, annotate=annotate)
         else:
