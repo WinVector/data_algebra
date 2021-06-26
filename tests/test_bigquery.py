@@ -637,3 +637,59 @@ def test_bq_concat_rows(get_bq_handle):
         bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
         bigquery_res = bq_handle.read_query(bigquery_sql)
         assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
+
+
+def test_bq_join_rows(get_bq_handle):
+    bq_client = get_bq_handle['bq_client']
+    bq_handle = get_bq_handle['bq_handle']
+    data_catalog = get_bq_handle['data_catalog']
+    data_schema = get_bq_handle['data_schema']
+    tables_to_delete = get_bq_handle['tables_to_delete']
+
+    table_name_d1 = f'{data_catalog}.{data_schema}.pytest_temp_d1'
+    tables_to_delete.add(table_name_d1)
+    table_name_d2 = f'{data_catalog}.{data_schema}.pytest_temp_d2'
+    tables_to_delete.add(table_name_d2)
+
+    d1 = data_algebra.default_data_model.pd.DataFrame({
+        'k': ['a', 'b'],
+        'd': [1, 2]
+    })
+    d2 = data_algebra.default_data_model.pd.DataFrame({
+        'k': ['a', 'b'],
+        'e': [4, 5]
+    })
+
+    ops = describe_table(d1, table_name=table_name_d1) .\
+        extend({'d': 'd + 1'}) .\
+        natural_join(b=describe_table(d2, table_name=table_name_d2),
+                     by=['k'],
+                     jointype='inner')
+
+    res = ops.eval({table_name_d1: d1, table_name_d2: d2})
+
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        'k': ['a', 'b'],
+        'd': [2, 3],
+        'e': [4, 5],
+    })
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+
+    with sqlite3.connect(":memory:") as sqlite_conn:
+        sqlite_model = data_algebra.SQLite.SQLiteModel()
+        sqlite_model.prepare_connection(sqlite_conn)
+        sqlite_handle = data_algebra.db_model.DBHandle(db_model=sqlite_model, conn=sqlite_conn)
+        sqlite_sql = sqlite_handle.to_sql(ops, pretty=True)
+        sqlite_handle.insert_table(d1, table_name=table_name_d1, allow_overwrite=True)
+        sqlite_handle.insert_table(d2, table_name=table_name_d2, allow_overwrite=True)
+        sqlite_res = sqlite_handle.read_query(sqlite_sql)
+        sqlite_sql_with = sqlite_handle.to_sql(ops, pretty=True, use_with=True)
+        sqlite_res_with = sqlite_handle.read_query(sqlite_sql_with)
+    assert data_algebra.test_util.equivalent_frames(expect, sqlite_res)
+    assert data_algebra.test_util.equivalent_frames(expect, sqlite_res_with)
+
+    bigquery_sql = bq_handle.to_sql(ops, pretty=True)
+    if bq_client is not None:
+        bq_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
+        bigquery_res = bq_handle.read_query(bigquery_sql)
+        assert data_algebra.test_util.equivalent_frames(expect, bigquery_res)
