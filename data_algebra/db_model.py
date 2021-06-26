@@ -832,9 +832,9 @@ class DBModel:
         near_sql = data_algebra.near_sql.NearSQLBinaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
-            sub_sql1=sql_left.to_bound_near_sql(columns=using_left),
+            sub_sql1=sql_left.to_bound_near_sql(columns=using_left, force_sql=False),
             joiner=jointype + " JOIN",
-            sub_sql2=sql_right.to_bound_near_sql(columns=using_right),
+            sub_sql2=sql_right.to_bound_near_sql(columns=using_right, force_sql=False),
             suffix=on_terms,
             temp_tables=temp_tables,
             annotation=join_node.to_python_implementation(print_sources=False, indent=-1)
@@ -1126,6 +1126,12 @@ class DBModel:
                     + " "
             )
         return sql
+
+    def nearsqlcte_to_sql_(self, near_sql, *, columns=None, force_sql=False, constants=None, annotate=False):
+        assert isinstance(near_sql, data_algebra.near_sql.NearSQLCommonTableExpression)
+        if force_sql:
+            return "SELECT * FROM " + near_sql.quoted_query_name
+        return near_sql.quoted_query_name
 
     def nearsqltable_to_sql_(self, near_sql, *, columns=None, force_sql=False, constants=None, annotate=False):
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLTable)

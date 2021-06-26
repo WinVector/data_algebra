@@ -627,7 +627,10 @@ def test_bq_concat_rows(get_bq_handle):
         sqlite_sql = sqlite_handle.to_sql(ops, pretty=True)
         sqlite_handle.insert_table(d, table_name=table_name, allow_overwrite=True)
         sqlite_res = sqlite_handle.read_query(sqlite_sql)
+        sqlite_sql_with = sqlite_handle.to_sql(ops, pretty=True, use_with=True)
+        sqlite_res_with = sqlite_handle.read_query(sqlite_sql_with)
     assert data_algebra.test_util.equivalent_frames(expect, sqlite_res)
+    assert data_algebra.test_util.equivalent_frames(expect, sqlite_res_with)
 
     bigquery_sql = bq_handle.to_sql(ops, pretty=True)
     if bq_client is not None:
