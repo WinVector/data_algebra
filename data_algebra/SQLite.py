@@ -215,4 +215,4 @@ class SQLiteModel(data_algebra.db_model.DBModel):
                 raise ValueError("table " + table_name + " already exists")
             else:
                 cur.execute("DROP TABLE " + table_name)
-        d.to_sql(name=table_name, con=conn)
+        d.to_sql(name=table_name, con=conn, index=False)

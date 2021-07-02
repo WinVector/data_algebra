@@ -30,6 +30,7 @@ def get_bq_handle():
     data_catalog = 'data-algebra-test'
     data_schema = 'test_1'
     tables_to_delete = set()
+
     yield {
         'bq_client': bq_client,
         'bq_handle': bq_handle,
@@ -389,6 +390,7 @@ def test_ideom_row_number(get_bq_handle):
         'g': [1, 2, 2, 1, 1],
     })
     table_name_d = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name_d)
 
     ops = describe_table(d, table_name=table_name_d) .\
         extend({
@@ -443,6 +445,7 @@ def test_ideom_sum_cumsum(get_bq_handle):
         'g': [1, 2, 2, 1, 1],
     })
     table_name_d = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name_d)
 
     with pytest.raises(ValueError):
         ops = describe_table(d, table_name=table_name_d). \
@@ -518,6 +521,7 @@ def test_ideom_project_sum(get_bq_handle):
         'g': [1, 2, 2, 1, 1],
     })
     table_name_d = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name_d)
 
     ops = describe_table(d, table_name=table_name_d). \
         project({
@@ -565,6 +569,7 @@ def test_ideom_concat_op(get_bq_handle):
         'y': ['1', '2', '3'],
     })
     table_name_d = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name_d)
 
     ops = describe_table(d, table_name=table_name_d). \
         extend({
@@ -610,6 +615,7 @@ def test_ideom_coalesce_op(get_bq_handle):
         'y': ['1', None, '3', None],
     })
     table_name_d = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    tables_to_delete.add(table_name_d)
 
     ops = describe_table(d, table_name=table_name_d). \
         extend({

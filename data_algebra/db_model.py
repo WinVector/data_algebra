@@ -687,8 +687,10 @@ class DBModel:
             )
         if temp_id_source is None:
             temp_id_source = [0]
+        using_was_None = False
         if using is None:
             using = order_node.column_set
+            using_was_None = True
         subusing = order_node.columns_used_from_sources(using=using)[0]
         subusing = [c for c in order_node.column_names if c in subusing]  # fix order
         subsql = order_node.sources[0].to_near_sql_implementation(
@@ -696,7 +698,9 @@ class DBModel:
         )
         view_name = "order_rows_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        terms = {ci: None for ci in subusing}
+        terms = None
+        if not using_was_None:
+            terms = {ci: None for ci in subusing}
         suffix = ""
         if len(order_node.order_columns) > 0:
             suffix = (
@@ -1154,17 +1158,19 @@ class DBModel:
 
     def nearsqlunary_to_sql_(self, near_sql, *, columns=None, force_sql=False, constants=None, annotate=False):
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLUnaryStep)
-        if columns is None:
-            columns = [k for k in near_sql.terms.keys()]
+        terms_strs = ['*']  # allow * notation if nothing is specified
         terms = near_sql.terms
-        terms_strs = [self.enc_term_(k, terms=terms) for k in columns]
-        if (constants is not None) and (len(constants) > 0):
-            terms_strs = terms_strs + [
-                v + " AS " + self.quote_identifier(k)
-                for (k, v) in constants.items()
-            ]
-        if len(terms_strs) < 1:
-            terms_strs = [f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}']
+        if terms is not None:
+            if columns is None:
+                columns = [k for k in terms.keys()]
+            terms_strs = [self.enc_term_(k, terms=terms) for k in columns]
+            if (constants is not None) and (len(constants) > 0):
+                terms_strs = terms_strs + [
+                    v + " AS " + self.quote_identifier(k)
+                    for (k, v) in constants.items()
+                ]
+            if len(terms_strs) < 1:
+                terms_strs = [f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}']
         sql = "SELECT "
         if annotate and (near_sql.annotation is not None) and (len(near_sql.annotation) > 0):
             sql = sql + " -- " + _clean_annotation(near_sql.annotation) + "\n "
