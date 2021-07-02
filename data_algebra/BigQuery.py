@@ -104,6 +104,25 @@ class BigQueryModel(data_algebra.db_model.DBModel):
         r.reset_index(drop=True, inplace=True)
         return r.copy()  # fresh copy
 
+    def insert_table(
+        self, conn, d, table_name, *, qualifiers=None, allow_overwrite=False
+    ):
+        if allow_overwrite:
+            self.drop_table(conn, table_name)
+        else:
+            table_exists = True
+            try:
+                self.read_query("SELECT * FROM " + table_name + " LIMIT 1")
+                table_exists = True
+            except Exception:
+                table_exists = False
+            if table_exists:
+                raise ValueError("table " + table_name + " already exists")
+        job = conn.load_table_from_dataframe(
+            d,
+            table_name)
+        job.result()
+
     def db_handle(self, conn):
         return BigQuery_DBHandle(db_model=self, conn=conn)
 
@@ -159,23 +178,3 @@ class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
             for block in res_iter:
                 block.to_csv(res, index=False, header=is_first)
                 is_first = False
-
-    def drop_table(self, table_name):
-        self.execute(f'DROP TABLE IF EXISTS `{table_name}`')
-
-    def insert_table(self, d, *, table_name, allow_overwrite=False):
-        if allow_overwrite:
-            self.drop_table(table_name)
-        else:
-            table_exists = True
-            try:
-                self.read_query("SELECT * FROM " + table_name + " LIMIT 1")
-                table_exists = True
-            except Exception:
-                table_exists = False
-            if table_exists:
-                raise ValueError("table " + table_name + " already exists")
-        job = self.conn.load_table_from_dataframe(
-            d,
-            table_name)
-        job.result()
