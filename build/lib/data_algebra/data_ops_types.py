@@ -153,7 +153,7 @@ class OperatorPlatform:
                 blocks_in=blocks_in,
                 blocks_out=blocks_out,
                 strict=strict),
-                temp_namer=temp_namer)
+            temp_namer=temp_namer)
 
     # sklearn step style interface
 

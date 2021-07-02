@@ -186,33 +186,3 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             raise RuntimeError("SQLite adapter does not currently support qualifiers")
         qt = self.quote_identifier(table_description.table_name)
         return qt
-
-    # noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection
-    def insert_table(
-        self, conn, d, table_name, *, qualifiers=None, allow_overwrite=False
-    ):
-        """
-
-        :param conn: a database connection
-        :param d: a Pandas table
-        :param table_name: name to give write to
-        :param qualifiers: schema and such
-        :param allow_overwrite logical, if True drop previous table
-        """
-
-        if qualifiers is not None:
-            raise ValueError("non-empty qualifiers not yet supported on insert")
-        cur = conn.cursor()
-        # check for table
-        table_exists = True
-        # noinspection PyBroadException
-        try:
-            self.read_query(conn, "SELECT * FROM " + table_name + " LIMIT 1")
-        except Exception:
-            table_exists = False
-        if table_exists:
-            if not allow_overwrite:
-                raise ValueError("table " + table_name + " already exists")
-            else:
-                cur.execute("DROP TABLE " + table_name)
-        d.to_sql(name=table_name, con=conn)

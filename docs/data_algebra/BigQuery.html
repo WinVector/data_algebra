@@ -46,6 +46,9 @@
                                 <a class="function" href="#BigQueryModel.read_query">read_query</a>
                         </li>
                         <li>
+                                <a class="function" href="#BigQueryModel.insert_table">insert_table</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#BigQueryModel.db_handle">db_handle</a>
                         </li>
                 </ul>
@@ -62,12 +65,6 @@
                         </li>
                         <li>
                                 <a class="function" href="#BigQuery_DBHandle.query_to_csv">query_to_csv</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#BigQuery_DBHandle.drop_table">drop_table</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#BigQuery_DBHandle.insert_table">insert_table</a>
                         </li>
                 </ul>
 
@@ -195,6 +192,25 @@
         <span class="n">r</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>  <span class="c1"># fresh copy</span>
 
+    <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">allow_overwrite</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
+                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
+        <span class="n">job</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">load_table_from_dataframe</span><span class="p">(</span>
+            <span class="n">d</span><span class="p">,</span>
+            <span class="n">table_name</span><span class="p">)</span>
+        <span class="n">job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+
     <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">BigQuery_DBHandle</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="n">conn</span><span class="p">)</span>
 
@@ -250,26 +266,6 @@
             <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">res_iter</span><span class="p">:</span>
                 <span class="n">block</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">is_first</span><span class="p">)</span>
                 <span class="n">is_first</span> <span class="o">=</span> <span class="kc">False</span>
-
-    <span class="k">def</span> <span class="nf">drop_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;DROP TABLE IF EXISTS `</span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s1">`&#39;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">allow_overwrite</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
-                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
-        <span class="n">job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">load_table_from_dataframe</span><span class="p">(</span>
-            <span class="n">d</span><span class="p">,</span>
-            <span class="n">table_name</span><span class="p">)</span>
-        <span class="n">job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
 </pre></div>
 
         </details>
@@ -343,6 +339,25 @@
         <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">())</span>
         <span class="n">r</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>  <span class="c1"># fresh copy</span>
+
+    <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">allow_overwrite</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
+                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
+        <span class="n">job</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">load_table_from_dataframe</span><span class="p">(</span>
+            <span class="n">d</span><span class="p">,</span>
+            <span class="n">table_name</span><span class="p">)</span>
+        <span class="n">job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">BigQuery_DBHandle</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="n">conn</span><span class="p">)</span>
@@ -478,6 +493,47 @@ connection should be google.cloud.bigquery.client.Client</p>
 
 
                             </div>
+                            <div id="BigQueryModel.insert_table" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#BigQueryModel.insert_table">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">insert_table</span><span class="signature">(self, conn, d, table_name, *, qualifiers=None, allow_overwrite=False)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">allow_overwrite</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
+                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
+        <span class="n">job</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">load_table_from_dataframe</span><span class="p">(</span>
+            <span class="n">d</span><span class="p">,</span>
+            <span class="n">table_name</span><span class="p">)</span>
+        <span class="n">job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>:param conn: a database connection
+:param d: a Pandas table
+:param table_name: name to give write to
+:param qualifiers: schema and such
+:param allow_overwrite logical, if True drop previous table</p>
+</div>
+
+
+                            </div>
                             <div id="BigQueryModel.db_handle" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#BigQueryModel.db_handle">#&nbsp;&nbsp</a>
 
@@ -511,7 +567,7 @@ connection should be google.cloud.bigquery.client.Client</p>
                 <dd id="BigQueryModel.join_name_map" class="variable"><a href="db_model.html#DBModel.join_name_map">join_name_map</a></dd>
                 <dd id="BigQueryModel.supports_with" class="variable"><a href="db_model.html#DBModel.supports_with">supports_with</a></dd>
                 <dd id="BigQueryModel.prepare_connection" class="function"><a href="db_model.html#DBModel.prepare_connection">prepare_connection</a></dd>
-                <dd id="BigQueryModel.insert_table" class="function"><a href="db_model.html#DBModel.insert_table">insert_table</a></dd>
+                <dd id="BigQueryModel.drop_table" class="function"><a href="db_model.html#DBModel.drop_table">drop_table</a></dd>
                 <dd id="BigQueryModel.read_table" class="function"><a href="db_model.html#DBModel.read_table">read_table</a></dd>
                 <dd id="BigQueryModel.read" class="function"><a href="db_model.html#DBModel.read">read</a></dd>
                 <dd id="BigQueryModel.quote_table_name" class="function"><a href="db_model.html#DBModel.quote_table_name">quote_table_name</a></dd>
@@ -606,26 +662,6 @@ connection should be google.cloud.bigquery.client.Client</p>
             <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">res_iter</span><span class="p">:</span>
                 <span class="n">block</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">is_first</span><span class="p">)</span>
                 <span class="n">is_first</span> <span class="o">=</span> <span class="kc">False</span>
-
-    <span class="k">def</span> <span class="nf">drop_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;DROP TABLE IF EXISTS `</span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s1">`&#39;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">allow_overwrite</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
-                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
-        <span class="n">job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">load_table_from_dataframe</span><span class="p">(</span>
-            <span class="n">d</span><span class="p">,</span>
-            <span class="n">table_name</span><span class="p">)</span>
-        <span class="n">job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
 </pre></div>
 
         </details>
@@ -643,7 +679,7 @@ inheritance.</p>
     *,
     db_model=BigQueryModel,
     conn,
-    fns={&#39;as_int64&#39;: &lt;function as_int64 at 0x7feb11132ee0&gt;, &#39;trimstr&#39;: &lt;function trimstr at 0x7feb11132f70&gt;, &#39;coalesce_0&#39;: &lt;function coalesce_0 at 0x7feb110f45e0&gt;, &#39;coalesce&#39;: &lt;function coalesce at 0x7feb110f4280&gt;, &#39;datetime_to_date&#39;: &lt;function datetime_to_date at 0x7feb110f4430&gt;, &#39;parse_datetime&#39;: &lt;function parse_datetime at 0x7fead00def70&gt;, &#39;parse_date&#39;: &lt;function parse_date at 0x7fead00e4c10&gt;, &#39;format_datetime&#39;: &lt;function format_datetime at 0x7fead00e4ca0&gt;, &#39;format_date&#39;: &lt;function format_date at 0x7fead00e4d30&gt;, &#39;dayofweek&#39;: &lt;function dayofweek at 0x7fead00e4dc0&gt;, &#39;dayofyear&#39;: &lt;function dayofyear at 0x7fead00e4e50&gt;, &#39;dayofmonth&#39;: &lt;function dayofmonth at 0x7fead00e4f70&gt;, &#39;weekofyear&#39;: &lt;function weekofyear at 0x7fead00e4ee0&gt;, &#39;month&#39;: &lt;function month at 0x7fead00e5040&gt;, &#39;quarter&#39;: &lt;function quarter at 0x7fead00e50d0&gt;, &#39;year&#39;: &lt;function year at 0x7fead00e5160&gt;, &#39;timestamp_diff&#39;: &lt;function timestamp_diff at 0x7fead00e51f0&gt;, &#39;date_diff&#39;: &lt;function date_diff at 0x7fead00e5280&gt;, &#39;base_Sunday&#39;: &lt;function base_Sunday at 0x7fead00e5310&gt;}
+    fns={&#39;as_int64&#39;: &lt;function as_int64 at 0x7fea70d8aee0&gt;, &#39;trimstr&#39;: &lt;function trimstr at 0x7fea70d8af70&gt;, &#39;coalesce_0&#39;: &lt;function coalesce_0 at 0x7fea70d4a4c0&gt;, &#39;coalesce&#39;: &lt;function coalesce at 0x7fea70d4a1f0&gt;, &#39;datetime_to_date&#39;: &lt;function datetime_to_date at 0x7fea70d4a3a0&gt;, &#39;parse_datetime&#39;: &lt;function parse_datetime at 0x7fea715fbee0&gt;, &#39;parse_date&#39;: &lt;function parse_date at 0x7fea71602b80&gt;, &#39;format_datetime&#39;: &lt;function format_datetime at 0x7fea71602c10&gt;, &#39;format_date&#39;: &lt;function format_date at 0x7fea71602ca0&gt;, &#39;dayofweek&#39;: &lt;function dayofweek at 0x7fea71602d30&gt;, &#39;dayofyear&#39;: &lt;function dayofyear at 0x7fea71602dc0&gt;, &#39;dayofmonth&#39;: &lt;function dayofmonth at 0x7fea71602ee0&gt;, &#39;weekofyear&#39;: &lt;function weekofyear at 0x7fea71602e50&gt;, &#39;month&#39;: &lt;function month at 0x7fea71602f70&gt;, &#39;quarter&#39;: &lt;function quarter at 0x7fea71603040&gt;, &#39;year&#39;: &lt;function year at 0x7fea716030d0&gt;, &#39;timestamp_diff&#39;: &lt;function timestamp_diff at 0x7fea71603160&gt;, &#39;date_diff&#39;: &lt;function date_diff at 0x7fea716031f0&gt;, &#39;base_Sunday&#39;: &lt;function base_Sunday at 0x7fea71603280&gt;}
 )</span>
     </div>
 
@@ -738,58 +774,6 @@ inheritance.</p>
     
 
                             </div>
-                            <div id="BigQuery_DBHandle.drop_table" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#BigQuery_DBHandle.drop_table">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">drop_table</span><span class="signature">(self, table_name)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">drop_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;DROP TABLE IF EXISTS `</span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s1">`&#39;</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            </div>
-                            <div id="BigQuery_DBHandle.insert_table" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#BigQuery_DBHandle.insert_table">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">insert_table</span><span class="signature">(self, d, *, table_name, allow_overwrite=False)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">allow_overwrite</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
-                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
-        <span class="n">job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">load_table_from_dataframe</span><span class="p">(</span>
-            <span class="n">d</span><span class="p">,</span>
-            <span class="n">table_name</span><span class="p">)</span>
-        <span class="n">job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
@@ -798,6 +782,8 @@ inheritance.</p>
                 <dd id="BigQuery_DBHandle.describe_table" class="function"><a href="db_model.html#DBHandle.describe_table">describe_table</a></dd>
                 <dd id="BigQuery_DBHandle.to_pandas" class="function"><a href="db_model.html#DBHandle.to_pandas">to_pandas</a></dd>
                 <dd id="BigQuery_DBHandle.execute" class="function"><a href="db_model.html#DBHandle.execute">execute</a></dd>
+                <dd id="BigQuery_DBHandle.drop_table" class="function"><a href="db_model.html#DBHandle.drop_table">drop_table</a></dd>
+                <dd id="BigQuery_DBHandle.insert_table" class="function"><a href="db_model.html#DBHandle.insert_table">insert_table</a></dd>
                 <dd id="BigQuery_DBHandle.to_sql" class="function"><a href="db_model.html#DBHandle.to_sql">to_sql</a></dd>
                 <dd id="BigQuery_DBHandle.managed_eval" class="function"><a href="db_model.html#DBHandle.managed_eval">managed_eval</a></dd>
                 <dd id="BigQuery_DBHandle.close" class="function"><a href="db_model.html#DBHandle.close">close</a></dd>

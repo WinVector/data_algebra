@@ -150,7 +150,7 @@ class NearSQLUnaryStep(NearSQL):
         temp_tables,
         annotation=None
     ):
-        assert isinstance(terms, dict)
+        # assert isinstance(terms, dict)
         NearSQL.__init__(
             self,
             terms=terms,
