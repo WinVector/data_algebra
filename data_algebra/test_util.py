@@ -5,7 +5,7 @@ import numpy
 import data_algebra
 
 import sqlite3
-import json
+import pickle
 
 # noinspection PyUnresolvedReferences
 import data_algebra.SQLite
@@ -14,7 +14,8 @@ from data_algebra.data_ops import *
 
 def formats_to_self(ops):
     """
-    Check a operator dag formats and parses back to itself
+    Check a operator dag formats and parses back to itself.
+    Can raise exceptions. Also checks pickling.
 
     :param ops: data_algebra.data_ops.ViewRepresentation
     :return: logical, True if formats and evals back to self
@@ -30,6 +31,9 @@ def formats_to_self(ops):
     ops_match = ops == ops2
     if strings_match and (not ops_match):
         raise Exception("strings match, but ops did not")
+    pickle_string = pickle.dumps(ops)
+    ops_3 = pickle.loads(pickle_string)
+    assert ops == ops_3
     return ops_match
 
 
