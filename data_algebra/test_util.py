@@ -112,7 +112,7 @@ def equivalent_frames(
     return True
 
 
-def check_transform(
+def check_transform_multi(
     ops,
     data,
     expect,
@@ -122,6 +122,7 @@ def check_transform(
     cols_case_sensitive=False,
     check_row_order=False,
     local_data_model=None,
+    db_handles=None,
 ):
     """
     Test an operator dag produces the expected result, and parses correctly.
@@ -134,6 +135,7 @@ def check_transform(
     :param cols_case_sensitive passed to equivalent_frames()
     :param check_row_order passed to equivalent_frames()
     :param pd pandas module (defaults to data_algebra.default_data_model if None)
+    :param: db_handles, list of database handles to use in testing
     :return: None, assert if there is an issue
     """
 
@@ -170,34 +172,72 @@ def check_transform(
         check_row_order=check_row_order,
     ):
         raise ValueError("Pandas result did not match expect")
+    # try any db paths
+    if db_handles is not None:
+        for db_handle in db_handles:
+            to_del = set()
+            if isinstance(data, dict):
+                for (k, v) in data.items():
+                    db_handle.insert_table(v, table_name=k)
+                    to_del.add(k)
+            else:
+                table_name = [k for k in cols_used.keys()][0]
+                db_handle.insert_table(data, table_name=table_name)
+                to_del.add(table_name)
+            temp_tables = dict()
+            sql = db_handle.to_sql(ops, pretty=True, temp_tables=temp_tables)
+            for (k, v) in temp_tables.items():
+                db_handle.insert_table(v, table_name=k)
+                to_del.add(k)
+            res_db = db_handle.read_query( sql)
+            for k in to_del:
+                db_handle.drop_table(k)
+            if not equivalent_frames(
+                res_db,
+                expect,
+                float_tol=float_tol,
+                check_column_order=check_column_order,
+                cols_case_sensitive=cols_case_sensitive,
+                check_row_order=check_row_order,
+            ):
+                raise ValueError(f"{db_handle} result did not match expect")
+
+
+def check_transform(
+    ops,
+    data,
+    expect,
+    *,
+    float_tol=1e-8,
+    check_column_order=False,
+    cols_case_sensitive=False,
+    check_row_order=False
+):
+    """
+    Test an operator dag produces the expected result, and parses correctly.
+
+    :param ops: data_algebra.data_ops.ViewRepresentation
+    :param data: pd.DataFrame or map of strings to pd.DataFrame
+    :param expect: pd.DataFrame
+    :param float_tol passed to equivalent_frames()
+    :param check_column_order passed to equivalent_frames()
+    :param cols_case_sensitive passed to equivalent_frames()
+    :param check_row_order passed to equivalent_frames()
+    :param pd pandas module (defaults to data_algebra.default_data_model if None)
+    :return: None, assert if there is an issue
+    """
     # try Sqlite path
     with sqlite3.connect(":memory:") as conn:
         db_model = data_algebra.SQLite.SQLiteModel()
         db_model.prepare_connection(conn)
         db_handle = db_model.db_handle(conn)
-        to_del = set()
-        if isinstance(data, dict):
-            for (k, v) in data.items():
-                db_handle.insert_table(v, table_name=k)
-                to_del.add(k)
-        else:
-            table_name = [k for k in cols_used.keys()][0]
-            db_handle.insert_table(data, table_name=table_name)
-            to_del.add(table_name)
-        temp_tables = dict()
-        sql = db_handle.to_sql(ops, pretty=True, temp_tables=temp_tables)
-        for (k, v) in temp_tables.items():
-            db_handle.insert_table(v, table_name=k)
-            to_del.add(k)
-        res_db = db_handle.read_query( sql)
-        for k in to_del:
-            db_handle.drop_table(k)
-    if not equivalent_frames(
-        res_db,
-        expect,
-        float_tol=float_tol,
-        check_column_order=check_column_order,
-        cols_case_sensitive=cols_case_sensitive,
-        check_row_order=check_row_order,
-    ):
-        raise ValueError("SQLite result did not match expect")
+        check_transform_multi(
+            ops=ops,
+            data=data,
+            expect=expect,
+            float_tol=float_tol,
+            check_column_order=check_column_order,
+            cols_case_sensitive=cols_case_sensitive,
+            check_row_order=check_row_order,
+            db_handles = [db_handle],
+        )
