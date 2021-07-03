@@ -5,6 +5,7 @@ import numpy
 import data_algebra
 
 import sqlite3
+import pickle
 
 # noinspection PyUnresolvedReferences
 import data_algebra.SQLite
@@ -13,7 +14,8 @@ from data_algebra.data_ops import *
 
 def formats_to_self(ops):
     """
-    Check a operator dag formats and parses back to itself
+    Check a operator dag formats and parses back to itself.
+    Can raise exceptions. Also checks pickling.
 
     :param ops: data_algebra.data_ops.ViewRepresentation
     :return: logical, True if formats and evals back to self
@@ -28,7 +30,10 @@ def formats_to_self(ops):
     strings_match = str1 == str2   # probably too strict
     ops_match = ops == ops2
     if strings_match and (not ops_match):
-        print("strings match, but ops did not")
+        raise Exception("strings match, but ops did not")
+    pickle_string = pickle.dumps(ops)
+    ops_3 = pickle.loads(pickle_string)
+    assert ops == ops_3
     return ops_match
 
 
@@ -112,7 +117,7 @@ def equivalent_frames(
     return True
 
 
-def check_transform(
+def check_transform_multi(
     ops,
     data,
     expect,
@@ -121,41 +126,45 @@ def check_transform(
     check_column_order=False,
     cols_case_sensitive=False,
     check_row_order=False,
+    check_parse=True,
+    db_handles=None,
     local_data_model=None,
 ):
     """
     Test an operator dag produces the expected result, and parses correctly.
+    Asserts if there are issues
 
     :param ops: data_algebra.data_ops.ViewRepresentation
-    :param data: pd.DataFrame or map of strings to pd.DataFrame
+    :param data: map of strings to pd.DataFrame
     :param expect: pd.DataFrame
     :param float_tol passed to equivalent_frames()
     :param check_column_order passed to equivalent_frames()
     :param cols_case_sensitive passed to equivalent_frames()
     :param check_row_order passed to equivalent_frames()
-    :param pd pandas module (defaults to data_algebra.default_data_model if None)
+    :param check_parse if True check expression parses/formats to self
+    :param: db_handles  list of database handles to use in testing
+    :param: local_data_model optional alternate evaluation model
     :return: None, assert if there is an issue
     """
 
+    assert isinstance(data, dict)
     if local_data_model is None:
         local_data_model = data_algebra.default_data_model
     if not isinstance(ops, ViewRepresentation):
         raise TypeError("expected ops to be a data_algebra.data_ops.ViewRepresentation")
     if not local_data_model.is_appropriate_data_instance(expect):
-        raise TypeError("exepcted expect to be a local_data_model.pd.DataFrame")
+        raise TypeError("expected expect to be a local_data_model.pd.DataFrame")
     cols_used = ops.columns_used()
     if len(cols_used) < 1:
         raise ValueError("no tables used")
-    if not formats_to_self(ops):
-        raise ValueError("ops did not round-trip format")
-    if isinstance(data, dict):
-        res = ops.eval(data_map=data)
-    else:
-        if len(cols_used) != 1:
-            raise ValueError("more than one table used, but only one table supplied")
-        if not local_data_model.is_appropriate_data_instance(data):
-            raise TypeError("exepcted expect to be a local_data_model.pd.DataFrame")
-        res = ops.transform(data)
+    # check all needed tables are present
+    for k in cols_used.keys():
+        v = data[k]
+        assert local_data_model.is_appropriate_data_instance(v)
+    if check_parse:
+        if not formats_to_self(ops):
+            raise ValueError("ops did not round-trip format")
+    res = ops.eval(data_map=data)
     # try pandas path
     if not local_data_model.is_appropriate_data_instance(res):
         raise ValueError(
@@ -170,27 +179,79 @@ def check_transform(
         check_row_order=check_row_order,
     ):
         raise ValueError("Pandas result did not match expect")
+    # try any db paths
+    if db_handles is not None:
+        for db_handle in db_handles:
+            to_del = set()
+            if isinstance(data, dict):
+                for (k, v) in data.items():
+                    db_handle.insert_table(v, table_name=k)
+                    to_del.add(k)
+            temp_tables = dict()
+            sql = db_handle.to_sql(ops, pretty=True, temp_tables=temp_tables)
+            for (k, v) in temp_tables.items():
+                db_handle.insert_table(v, table_name=k)
+                to_del.add(k)
+            res_db = db_handle.read_query( sql)
+            for k in to_del:
+                db_handle.drop_table(k)
+            if not equivalent_frames(
+                res_db,
+                expect,
+                float_tol=float_tol,
+                check_column_order=check_column_order,
+                cols_case_sensitive=cols_case_sensitive,
+                check_row_order=check_row_order,
+            ):
+                raise ValueError(f"{db_handle} result did not match expect")
+
+
+def check_transform(
+    ops,
+    data,
+    expect,
+    *,
+    float_tol=1e-8,
+    check_column_order=False,
+    cols_case_sensitive=False,
+    check_row_order=False,
+    check_parse=True,
+):
+    """
+    Test an operator dag produces the expected result, and parses correctly.
+    Assert if there are issues.
+
+    :param ops: data_algebra.data_ops.ViewRepresentation
+    :param data: pd.DataFrame or map of strings to pd.DataFrame
+    :param expect: pd.DataFrame
+    :param float_tol passed to equivalent_frames()
+    :param check_column_order passed to equivalent_frames()
+    :param cols_case_sensitive passed to equivalent_frames()
+    :param check_row_order passed to equivalent_frames()
+    :param check_parse if True check expression parses/formats to self
+    :return: nothing
+    """
+
+    # convert single table to dictionary
+    if not isinstance(data, dict):
+        cols_used = ops.columns_used()
+        table_name = [k for k in cols_used.keys()][0]
+        data = {table_name: data}
+
     # try Sqlite path
     with sqlite3.connect(":memory:") as conn:
         db_model = data_algebra.SQLite.SQLiteModel()
         db_model.prepare_connection(conn)
-        if isinstance(data, dict):
-            for (k, v) in data.items():
-                db_model.insert_table(conn, v, table_name=k)
-        else:
-            table_name = [k for k in cols_used.keys()][0]
-            db_model.insert_table(conn, data, table_name=table_name)
-        temp_tables = dict()
-        sql = ops.to_sql(db_model, pretty=True, temp_tables=temp_tables)
-        for (k, v) in temp_tables.items():
-            db_model.insert_table(conn, v, table_name=k)
-        res_db = db_model.read_query(conn, sql)
-    if not equivalent_frames(
-        res_db,
-        expect,
-        float_tol=float_tol,
-        check_column_order=check_column_order,
-        cols_case_sensitive=cols_case_sensitive,
-        check_row_order=check_row_order,
-    ):
-        raise ValueError("SQLite result did not match expect")
+        db_handle = db_model.db_handle(conn)
+        check_transform_multi(
+            ops=ops,
+            data=data,
+            expect=expect,
+            float_tol=float_tol,
+            check_column_order=check_column_order,
+            cols_case_sensitive=cols_case_sensitive,
+            check_row_order=check_row_order,
+            check_parse=check_parse,
+            db_handles = [db_handle],
+        )
+

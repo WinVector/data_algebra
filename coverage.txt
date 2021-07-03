@@ -88,7 +88,7 @@ data_algebra/data_model.py                52     19    63%
 data_algebra/data_ops.py                1121    205    82%
 data_algebra/data_ops_types.py            79     38    52%
 data_algebra/data_ops_utils.py            51      7    86%
-data_algebra/db_model.py                 737    115    84%
+data_algebra/db_model.py                 737    103    86%
 data_algebra/diagram.py                   56     43    23%
 data_algebra/eval_model.py                16      1    94%
 data_algebra/expr_parse.py                38      3    92%
@@ -99,11 +99,11 @@ data_algebra/pandas_base.py              256     24    91%
 data_algebra/pandas_model.py              18      3    83%
 data_algebra/parse_by_lark.py            139     21    85%
 data_algebra/python3_lark.py               1      0   100%
-data_algebra/test_util.py                113     17    85%
+data_algebra/test_util.py                128     15    88%
 data_algebra/user_fn.py                   84     27    68%
 data_algebra/util.py                      28      4    86%
 ----------------------------------------------------------
-TOTAL                                   4287    831    81%
+TOTAL                                   4302    817    81%
 
 
-============================= 176 passed in 10.59s =============================
+============================= 176 passed in 10.47s =============================

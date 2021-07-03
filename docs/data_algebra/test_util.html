@@ -37,6 +37,9 @@
                     <a class="function" href="#equivalent_frames">equivalent_frames</a>
             </li>
             <li>
+                    <a class="function" href="#check_transform_multi">check_transform_multi</a>
+            </li>
+            <li>
                     <a class="function" href="#check_transform">check_transform</a>
             </li>
     </ul>
@@ -63,6 +66,7 @@
 <span class="kn">import</span> <span class="nn">data_algebra</span>
 
 <span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
 
 <span class="c1"># noinspection PyUnresolvedReferences</span>
 <span class="kn">import</span> <span class="nn">data_algebra.SQLite</span>
@@ -71,7 +75,8 @@
 
 <span class="k">def</span> <span class="nf">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Check a operator dag formats and parses back to itself</span>
+<span class="sd">    Check a operator dag formats and parses back to itself.</span>
+<span class="sd">    Can raise exceptions. Also checks pickling.</span>
 
 <span class="sd">    :param ops: data_algebra.data_ops.ViewRepresentation</span>
 <span class="sd">    :return: logical, True if formats and evals back to self</span>
@@ -86,7 +91,10 @@
     <span class="n">strings_match</span> <span class="o">=</span> <span class="n">str1</span> <span class="o">==</span> <span class="n">str2</span>   <span class="c1"># probably too strict</span>
     <span class="n">ops_match</span> <span class="o">=</span> <span class="n">ops</span> <span class="o">==</span> <span class="n">ops2</span>
     <span class="k">if</span> <span class="n">strings_match</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">ops_match</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;strings match, but ops did not&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;strings match, but ops did not&quot;</span><span class="p">)</span>
+    <span class="n">pickle_string</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
+    <span class="n">ops_3</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">pickle_string</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">ops</span> <span class="o">==</span> <span class="n">ops_3</span>
     <span class="k">return</span> <span class="n">ops_match</span>
 
 
@@ -170,7 +178,7 @@
     <span class="k">return</span> <span class="kc">True</span>
 
 
-<span class="k">def</span> <span class="nf">check_transform</span><span class="p">(</span>
+<span class="k">def</span> <span class="nf">check_transform_multi</span><span class="p">(</span>
     <span class="n">ops</span><span class="p">,</span>
     <span class="n">data</span><span class="p">,</span>
     <span class="n">expect</span><span class="p">,</span>
@@ -179,41 +187,45 @@
     <span class="n">check_column_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">db_handles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
+<span class="sd">    Asserts if there are issues</span>
 
 <span class="sd">    :param ops: data_algebra.data_ops.ViewRepresentation</span>
-<span class="sd">    :param data: pd.DataFrame or map of strings to pd.DataFrame</span>
+<span class="sd">    :param data: map of strings to pd.DataFrame</span>
 <span class="sd">    :param expect: pd.DataFrame</span>
 <span class="sd">    :param float_tol passed to equivalent_frames()</span>
 <span class="sd">    :param check_column_order passed to equivalent_frames()</span>
 <span class="sd">    :param cols_case_sensitive passed to equivalent_frames()</span>
 <span class="sd">    :param check_row_order passed to equivalent_frames()</span>
-<span class="sd">    :param pd pandas module (defaults to data_algebra.default_data_model if None)</span>
+<span class="sd">    :param check_parse if True check expression parses/formats to self</span>
+<span class="sd">    :param: db_handles  list of database handles to use in testing</span>
+<span class="sd">    :param: local_data_model optional alternate evaluation model</span>
 <span class="sd">    :return: None, assert if there is an issue</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected ops to be a data_algebra.data_ops.ViewRepresentation&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">expect</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;exepcted expect to be a local_data_model.pd.DataFrame&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected expect to be a local_data_model.pd.DataFrame&quot;</span><span class="p">)</span>
     <span class="n">cols_used</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols_used</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;no tables used&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ops did not round-trip format&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols_used</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;more than one table used, but only one table supplied&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;exepcted expect to be a local_data_model.pd.DataFrame&quot;</span><span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="c1"># check all needed tables are present</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cols_used</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">check_parse</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ops did not round-trip format&quot;</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
     <span class="c1"># try pandas path</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -228,30 +240,81 @@
         <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pandas result did not match expect&quot;</span><span class="p">)</span>
+    <span class="c1"># try any db paths</span>
+    <span class="k">if</span> <span class="n">db_handles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">db_handle</span> <span class="ow">in</span> <span class="n">db_handles</span><span class="p">:</span>
+            <span class="n">to_del</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">db_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+                    <span class="n">to_del</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">sql</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">temp_tables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">db_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+                <span class="n">to_del</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">res_db</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span> <span class="n">sql</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">to_del</span><span class="p">:</span>
+                <span class="n">db_handle</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
+                <span class="n">res_db</span><span class="p">,</span>
+                <span class="n">expect</span><span class="p">,</span>
+                <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
+                <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
+                <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
+                <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
+            <span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db_handle</span><span class="si">}</span><span class="s2"> result did not match expect&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">check_transform</span><span class="p">(</span>
+    <span class="n">ops</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">expect</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">float_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
+    <span class="n">check_column_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
+<span class="sd">    Assert if there are issues.</span>
+
+<span class="sd">    :param ops: data_algebra.data_ops.ViewRepresentation</span>
+<span class="sd">    :param data: pd.DataFrame or map of strings to pd.DataFrame</span>
+<span class="sd">    :param expect: pd.DataFrame</span>
+<span class="sd">    :param float_tol passed to equivalent_frames()</span>
+<span class="sd">    :param check_column_order passed to equivalent_frames()</span>
+<span class="sd">    :param cols_case_sensitive passed to equivalent_frames()</span>
+<span class="sd">    :param check_row_order passed to equivalent_frames()</span>
+<span class="sd">    :param check_parse if True check expression parses/formats to self</span>
+<span class="sd">    :return: nothing</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># convert single table to dictionary</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">cols_used</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>
+        <span class="n">table_name</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cols_used</span><span class="o">.</span><span class="n">keys</span><span class="p">()][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">table_name</span><span class="p">:</span> <span class="n">data</span><span class="p">}</span>
+
     <span class="c1"># try Sqlite path</span>
     <span class="k">with</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;:memory:&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
         <span class="n">db_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span>
         <span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">db_model</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">table_name</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cols_used</span><span class="o">.</span><span class="n">keys</span><span class="p">()][</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">db_model</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">)</span>
-        <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">sql</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
-        <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">temp_tables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">db_model</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
-        <span class="n">res_db</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">sql</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
-        <span class="n">res_db</span><span class="p">,</span>
-        <span class="n">expect</span><span class="p">,</span>
-        <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
-        <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
-        <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
-        <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;SQLite result did not match expect&quot;</span><span class="p">)</span>
+        <span class="n">db_handle</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+        <span class="n">check_transform_multi</span><span class="p">(</span>
+            <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">expect</span><span class="o">=</span><span class="n">expect</span><span class="p">,</span>
+            <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
+            <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
+            <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
+            <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
+            <span class="n">check_parse</span><span class="o">=</span><span class="n">check_parse</span><span class="p">,</span>
+            <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[</span><span class="n">db_handle</span><span class="p">],</span>
+        <span class="p">)</span>
 </pre></div>
 
         </details>
@@ -269,7 +332,8 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Check a operator dag formats and parses back to itself</span>
+<span class="sd">    Check a operator dag formats and parses back to itself.</span>
+<span class="sd">    Can raise exceptions. Also checks pickling.</span>
 
 <span class="sd">    :param ops: data_algebra.data_ops.ViewRepresentation</span>
 <span class="sd">    :return: logical, True if formats and evals back to self</span>
@@ -284,13 +348,17 @@
     <span class="n">strings_match</span> <span class="o">=</span> <span class="n">str1</span> <span class="o">==</span> <span class="n">str2</span>   <span class="c1"># probably too strict</span>
     <span class="n">ops_match</span> <span class="o">=</span> <span class="n">ops</span> <span class="o">==</span> <span class="n">ops2</span>
     <span class="k">if</span> <span class="n">strings_match</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">ops_match</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;strings match, but ops did not&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;strings match, but ops did not&quot;</span><span class="p">)</span>
+    <span class="n">pickle_string</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
+    <span class="n">ops_3</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">pickle_string</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">ops</span> <span class="o">==</span> <span class="n">ops_3</span>
     <span class="k">return</span> <span class="n">ops_match</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Check a operator dag formats and parses back to itself</p>
+            <div class="docstring"><p>Check a operator dag formats and parses back to itself.
+Can raise exceptions. Also checks pickling.</p>
 
 <p>:param ops: <a href="data_ops.html#ViewRepresentation">data_algebra.data_ops.ViewRepresentation</a>
 :return: logical, True if formats and evals back to self</p>
@@ -405,12 +473,12 @@ Ignores indexing.</p>
 
 
                 </section>
-                <section id="check_transform">
-                            <div class="attr function"><a class="headerlink" href="#check_transform">#&nbsp;&nbsp</a>
+                <section id="check_transform_multi">
+                            <div class="attr function"><a class="headerlink" href="#check_transform_multi">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">check_transform</span><span class="signature">(
+            <span class="name">check_transform_multi</span><span class="signature">(
     ops,
     data,
     expect,
@@ -419,13 +487,15 @@ Ignores indexing.</p>
     check_column_order=False,
     cols_case_sensitive=False,
     check_row_order=False,
+    check_parse=True,
+    db_handles=None,
     local_data_model=None
 )</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">check_transform</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">check_transform_multi</span><span class="p">(</span>
     <span class="n">ops</span><span class="p">,</span>
     <span class="n">data</span><span class="p">,</span>
     <span class="n">expect</span><span class="p">,</span>
@@ -434,41 +504,45 @@ Ignores indexing.</p>
     <span class="n">check_column_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">db_handles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
+<span class="sd">    Asserts if there are issues</span>
 
 <span class="sd">    :param ops: data_algebra.data_ops.ViewRepresentation</span>
-<span class="sd">    :param data: pd.DataFrame or map of strings to pd.DataFrame</span>
+<span class="sd">    :param data: map of strings to pd.DataFrame</span>
 <span class="sd">    :param expect: pd.DataFrame</span>
 <span class="sd">    :param float_tol passed to equivalent_frames()</span>
 <span class="sd">    :param check_column_order passed to equivalent_frames()</span>
 <span class="sd">    :param cols_case_sensitive passed to equivalent_frames()</span>
 <span class="sd">    :param check_row_order passed to equivalent_frames()</span>
-<span class="sd">    :param pd pandas module (defaults to data_algebra.default_data_model if None)</span>
+<span class="sd">    :param check_parse if True check expression parses/formats to self</span>
+<span class="sd">    :param: db_handles  list of database handles to use in testing</span>
+<span class="sd">    :param: local_data_model optional alternate evaluation model</span>
 <span class="sd">    :return: None, assert if there is an issue</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected ops to be a data_algebra.data_ops.ViewRepresentation&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">expect</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;exepcted expect to be a local_data_model.pd.DataFrame&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected expect to be a local_data_model.pd.DataFrame&quot;</span><span class="p">)</span>
     <span class="n">cols_used</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols_used</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;no tables used&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ops did not round-trip format&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols_used</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;more than one table used, but only one table supplied&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;exepcted expect to be a local_data_model.pd.DataFrame&quot;</span><span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="c1"># check all needed tables are present</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cols_used</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">check_parse</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ops did not round-trip format&quot;</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
     <span class="c1"># try pandas path</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -483,35 +557,127 @@ Ignores indexing.</p>
         <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pandas result did not match expect&quot;</span><span class="p">)</span>
-    <span class="c1"># try Sqlite path</span>
-    <span class="k">with</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;:memory:&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
-        <span class="n">db_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span>
-        <span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">db_model</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">table_name</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cols_used</span><span class="o">.</span><span class="n">keys</span><span class="p">()][</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">db_model</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">)</span>
-        <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">sql</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
-        <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">temp_tables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">db_model</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
-        <span class="n">res_db</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">sql</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
-        <span class="n">res_db</span><span class="p">,</span>
-        <span class="n">expect</span><span class="p">,</span>
-        <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
-        <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
-        <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
-        <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;SQLite result did not match expect&quot;</span><span class="p">)</span>
+    <span class="c1"># try any db paths</span>
+    <span class="k">if</span> <span class="n">db_handles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">db_handle</span> <span class="ow">in</span> <span class="n">db_handles</span><span class="p">:</span>
+            <span class="n">to_del</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">db_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+                    <span class="n">to_del</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">sql</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">temp_tables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">db_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+                <span class="n">to_del</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">res_db</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span> <span class="n">sql</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">to_del</span><span class="p">:</span>
+                <span class="n">db_handle</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
+                <span class="n">res_db</span><span class="p">,</span>
+                <span class="n">expect</span><span class="p">,</span>
+                <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
+                <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
+                <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
+                <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
+            <span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db_handle</span><span class="si">}</span><span class="s2"> result did not match expect&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Test an operator dag produces the expected result, and parses correctly.</p>
+            <div class="docstring"><p>Test an operator dag produces the expected result, and parses correctly.
+Asserts if there are issues</p>
+
+<p>:param ops: <a href="data_ops.html#ViewRepresentation">data_algebra.data_ops.ViewRepresentation</a>
+:param data: map of strings to pd.DataFrame
+:param expect: pd.DataFrame
+:param float_tol passed to equivalent_frames()
+:param check_column_order passed to equivalent_frames()
+:param cols_case_sensitive passed to equivalent_frames()
+:param check_row_order passed to equivalent_frames()
+:param check_parse if True check expression parses/formats to self
+:param: db_handles  list of database handles to use in testing
+:param: local_data_model optional alternate evaluation model
+:return: None, assert if there is an issue</p>
+</div>
+
+
+                </section>
+                <section id="check_transform">
+                            <div class="attr function"><a class="headerlink" href="#check_transform">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">check_transform</span><span class="signature">(
+    ops,
+    data,
+    expect,
+    *,
+    float_tol=1e-08,
+    check_column_order=False,
+    cols_case_sensitive=False,
+    check_row_order=False,
+    check_parse=True
+)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">check_transform</span><span class="p">(</span>
+    <span class="n">ops</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">expect</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">float_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
+    <span class="n">check_column_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
+<span class="sd">    Assert if there are issues.</span>
+
+<span class="sd">    :param ops: data_algebra.data_ops.ViewRepresentation</span>
+<span class="sd">    :param data: pd.DataFrame or map of strings to pd.DataFrame</span>
+<span class="sd">    :param expect: pd.DataFrame</span>
+<span class="sd">    :param float_tol passed to equivalent_frames()</span>
+<span class="sd">    :param check_column_order passed to equivalent_frames()</span>
+<span class="sd">    :param cols_case_sensitive passed to equivalent_frames()</span>
+<span class="sd">    :param check_row_order passed to equivalent_frames()</span>
+<span class="sd">    :param check_parse if True check expression parses/formats to self</span>
+<span class="sd">    :return: nothing</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># convert single table to dictionary</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">cols_used</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>
+        <span class="n">table_name</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cols_used</span><span class="o">.</span><span class="n">keys</span><span class="p">()][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">table_name</span><span class="p">:</span> <span class="n">data</span><span class="p">}</span>
+
+    <span class="c1"># try Sqlite path</span>
+    <span class="k">with</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;:memory:&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="n">db_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span>
+        <span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+        <span class="n">db_handle</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+        <span class="n">check_transform_multi</span><span class="p">(</span>
+            <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">expect</span><span class="o">=</span><span class="n">expect</span><span class="p">,</span>
+            <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
+            <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
+            <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
+            <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
+            <span class="n">check_parse</span><span class="o">=</span><span class="n">check_parse</span><span class="p">,</span>
+            <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[</span><span class="n">db_handle</span><span class="p">],</span>
+        <span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Test an operator dag produces the expected result, and parses correctly.
+Assert if there are issues.</p>
 
 <p>:param ops: <a href="data_ops.html#ViewRepresentation">data_algebra.data_ops.ViewRepresentation</a>
 :param data: pd.DataFrame or map of strings to pd.DataFrame
@@ -520,8 +686,8 @@ Ignores indexing.</p>
 :param check_column_order passed to equivalent_frames()
 :param cols_case_sensitive passed to equivalent_frames()
 :param check_row_order passed to equivalent_frames()
-:param pd pandas module (defaults to <a href="../data_algebra.html#default_data_model">data_algebra.default_data_model</a> if None)
-:return: None, assert if there is an issue</p>
+:param check_parse if True check expression parses/formats to self
+:return: nothing</p>
 </div>
 
 

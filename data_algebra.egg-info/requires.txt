@@ -6,11 +6,15 @@ lark
 google.cloud
 pyarrow
 
+[PostgreSQL]
+psycopg2
+
 [all]
 black
 sqlparse
 graphviz
 BigQuery
+PostgreSQL
 
 [diagram]
 graphviz
