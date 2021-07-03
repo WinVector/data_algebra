@@ -197,12 +197,20 @@ def check_transform_multi(
     if db_handles is not None:
         for db_handle in db_handles:
             to_del = set()
-            temp_tables = dict()
-            sql = db_handle.to_sql(ops, pretty=True, annotate=True, use_with=False, temp_tables=temp_tables)
-            assert isinstance(sql, str)
-            temp_tables = dict()
-            sql_with = db_handle.to_sql(ops, pretty=True, annotate=True, use_with=True, temp_tables=temp_tables)
-            assert isinstance(sql_with, str)
+            temp_tables = None
+            sql_statements = []
+            for annotate in [True, False]:
+                for pretty in [True, False]:
+                    for use_with in [True, False]:
+                        temp_tables = dict()
+                        sql = db_handle.to_sql(
+                            ops,
+                            pretty=pretty,
+                            annotate=annotate,
+                            use_with=use_with,
+                            temp_tables=temp_tables)
+                        assert isinstance(sql, str)
+                        sql_statements.append(sql)
             if db_handle.conn is not None:
                 for (k, v) in data.items():
                     db_handle.insert_table(v, table_name=k)
@@ -211,13 +219,13 @@ def check_transform_multi(
                     db_handle.insert_table(v, table_name=k)
                     to_del.add(k)
                 caught = None
-                res_db_sql = None
-                res_db_sql_with = None
+                res_db_sql = []
                 res_db_ops = None
                 run_ops_version = len(temp_tables) <= 0
                 try:
-                    res_db_sql = db_handle.read_query(sql)
-                    res_db_sql_with = db_handle.read_query(sql_with)
+                    for sql in sql_statements:
+                        res_db_sql_i = db_handle.read_query(sql)
+                        res_db_sql.append(res_db_sql_i)
                     if run_ops_version:
                         res_db_ops = db_handle.read_query(ops)
                 except Exception as e:
@@ -226,24 +234,16 @@ def check_transform_multi(
                     db_handle.drop_table(k)
                 if caught is not None:
                     raise caught
-                if not equivalent_frames(
-                    res_db_sql,
-                    expect,
-                    float_tol=float_tol,
-                    check_column_order=check_column_order,
-                    cols_case_sensitive=cols_case_sensitive,
-                    check_row_order=check_row_order,
-                ):
-                    raise ValueError(f"{db_handle} SQL result did not match expect")
-                if not equivalent_frames(
-                    res_db_sql_with,
-                    expect,
-                    float_tol=float_tol,
-                    check_column_order=check_column_order,
-                    cols_case_sensitive=cols_case_sensitive,
-                    check_row_order=check_row_order,
-                ):
-                    raise ValueError(f"{db_handle} SQL_with result did not match expect")
+                for res in res_db_sql:
+                    if not equivalent_frames(
+                        res,
+                        expect,
+                        float_tol=float_tol,
+                        check_column_order=check_column_order,
+                        cols_case_sensitive=cols_case_sensitive,
+                        check_row_order=check_row_order,
+                    ):
+                        raise ValueError(f"{db_handle} SQL result did not match expect")
                 if run_ops_version:
                     if not equivalent_frames(
                         res_db_ops,
@@ -294,9 +294,10 @@ def check_transform(
         db_model_sqlite.prepare_connection(conn_sqlite)
         db_handle_sqlite = db_model_sqlite.db_handle(conn_sqlite)
         # non-connected handles, lets us test some of the SQL generation path
-        db_handle_BigQuery = data_algebra.BigQuery.BigQueryModel().db_handle(None)
-        db_handle_PosgreSQL = data_algebra.PostgreSQL.PostgreSQLModel().db_handle(None)
-        db_handle_Spark = data_algebra.SparkSQL.SparkSQLModel().db_handle(None)
+        empty_db_handle_sqlite = data_algebra.SQLite.SQLiteModel().db_handle(None)
+        empty_db_handle_BigQuery = data_algebra.BigQuery.BigQueryModel().db_handle(None)
+        empty_db_handle_PosgreSQL = data_algebra.PostgreSQL.PostgreSQLModel().db_handle(None)
+        empty_db_handle_Spark = data_algebra.SparkSQL.SparkSQLModel().db_handle(None)
         check_transform_multi(
             ops=ops,
             data=data,
@@ -306,6 +307,11 @@ def check_transform(
             cols_case_sensitive=cols_case_sensitive,
             check_row_order=check_row_order,
             check_parse=check_parse,
-            db_handles = [db_handle_sqlite, db_handle_BigQuery, db_handle_PosgreSQL, db_handle_Spark],
+            db_handles = [
+                db_handle_sqlite,
+                empty_db_handle_sqlite,
+                empty_db_handle_BigQuery,
+                empty_db_handle_PosgreSQL,
+                empty_db_handle_Spark],
         )
 

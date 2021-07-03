@@ -367,7 +367,10 @@ class DBModel:
         :return: query results as table
         """
         if isinstance(q, data_algebra.data_ops.ViewRepresentation):
-            q = q.to_sql(db_model=self)
+            temp_tables = dict()
+            q = q.to_sql(db_model=self, temp_tables=temp_tables)
+            if len(temp_tables) > 1:
+                raise ValueError("ops require management of temp tables, please collect them via to_sql(temp_tables)")
         else:
             q = str(q)
         cur = conn.cursor()
