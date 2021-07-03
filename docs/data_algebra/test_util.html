@@ -121,8 +121,8 @@
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">True</span>
-    <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">cols_case_sensitive</span><span class="p">:</span>
         <span class="n">a</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -239,32 +239,78 @@
         <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
         <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pandas result did not match expect&quot;</span><span class="p">)</span>
-    <span class="c1"># try any db paths</span>
-    <span class="k">if</span> <span class="n">db_handles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">db_handle</span> <span class="ow">in</span> <span class="n">db_handles</span><span class="p">:</span>
-            <span class="n">to_del</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="n">db_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
-                    <span class="n">to_del</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-            <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-            <span class="n">sql</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
-            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">temp_tables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">db_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
-                <span class="n">to_del</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-            <span class="n">res_db</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span> <span class="n">sql</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">to_del</span><span class="p">:</span>
-                <span class="n">db_handle</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
-                <span class="n">res_db</span><span class="p">,</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pandas eval result did not match expect&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">res_t</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
+                <span class="n">res_t</span><span class="p">,</span>
                 <span class="n">expect</span><span class="p">,</span>
                 <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
                 <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
                 <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
                 <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
-            <span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db_handle</span><span class="si">}</span><span class="s2"> result did not match expect&quot;</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pandas transform result did not match expect&quot;</span><span class="p">)</span>
+    <span class="c1"># try any db paths</span>
+    <span class="k">if</span> <span class="n">db_handles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">db_handle</span> <span class="ow">in</span> <span class="n">db_handles</span><span class="p">:</span>
+            <span class="n">to_del</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">sql</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">annotate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_with</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+            <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">sql_with</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">annotate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_with</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">db_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+                    <span class="n">to_del</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">temp_tables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">db_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+                    <span class="n">to_del</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="n">caught</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">res_db_sql</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">res_db_sql_with</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">res_db_ops</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">run_ops_version</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">temp_tables</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">res_db_sql</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+                    <span class="n">res_db_sql_with</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">sql_with</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">run_ops_version</span><span class="p">:</span>
+                        <span class="n">res_db_ops</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">caught</span> <span class="o">=</span> <span class="n">e</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">to_del</span><span class="p">:</span>
+                    <span class="n">db_handle</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">caught</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">caught</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
+                    <span class="n">res_db_sql</span><span class="p">,</span>
+                    <span class="n">expect</span><span class="p">,</span>
+                    <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
+                    <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
+                    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
+                    <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
+                <span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db_handle</span><span class="si">}</span><span class="s2"> SQL result did not match expect&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
+                    <span class="n">res_db_sql_with</span><span class="p">,</span>
+                    <span class="n">expect</span><span class="p">,</span>
+                    <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
+                    <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
+                    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
+                    <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
+                <span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db_handle</span><span class="si">}</span><span class="s2"> SQL_with result did not match expect&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">run_ops_version</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
+                        <span class="n">res_db_ops</span><span class="p">,</span>
+                        <span class="n">expect</span><span class="p">,</span>
+                        <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
+                        <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
+                        <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
+                        <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
+                    <span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db_handle</span><span class="si">}</span><span class="s2"> ops result did not match expect&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">check_transform</span><span class="p">(</span>
@@ -408,8 +454,8 @@ Can raise exceptions. Also checks pickling.</p>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">True</span>
-    <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">cols_case_sensitive</span><span class="p">:</span>
         <span class="n">a</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -556,32 +602,78 @@ Ignores indexing.</p>
         <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
         <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pandas result did not match expect&quot;</span><span class="p">)</span>
-    <span class="c1"># try any db paths</span>
-    <span class="k">if</span> <span class="n">db_handles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">db_handle</span> <span class="ow">in</span> <span class="n">db_handles</span><span class="p">:</span>
-            <span class="n">to_del</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="n">db_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
-                    <span class="n">to_del</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-            <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-            <span class="n">sql</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
-            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">temp_tables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">db_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
-                <span class="n">to_del</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-            <span class="n">res_db</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span> <span class="n">sql</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">to_del</span><span class="p">:</span>
-                <span class="n">db_handle</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
-                <span class="n">res_db</span><span class="p">,</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pandas eval result did not match expect&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">res_t</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
+                <span class="n">res_t</span><span class="p">,</span>
                 <span class="n">expect</span><span class="p">,</span>
                 <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
                 <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
                 <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
                 <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
-            <span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db_handle</span><span class="si">}</span><span class="s2"> result did not match expect&quot;</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pandas transform result did not match expect&quot;</span><span class="p">)</span>
+    <span class="c1"># try any db paths</span>
+    <span class="k">if</span> <span class="n">db_handles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">db_handle</span> <span class="ow">in</span> <span class="n">db_handles</span><span class="p">:</span>
+            <span class="n">to_del</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">sql</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">annotate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_with</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+            <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">sql_with</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">annotate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_with</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">db_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+                    <span class="n">to_del</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">temp_tables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">db_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+                    <span class="n">to_del</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="n">caught</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">res_db_sql</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">res_db_sql_with</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">res_db_ops</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">run_ops_version</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">temp_tables</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">res_db_sql</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+                    <span class="n">res_db_sql_with</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">sql_with</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">run_ops_version</span><span class="p">:</span>
+                        <span class="n">res_db_ops</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">caught</span> <span class="o">=</span> <span class="n">e</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">to_del</span><span class="p">:</span>
+                    <span class="n">db_handle</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">caught</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">caught</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
+                    <span class="n">res_db_sql</span><span class="p">,</span>
+                    <span class="n">expect</span><span class="p">,</span>
+                    <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
+                    <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
+                    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
+                    <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
+                <span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db_handle</span><span class="si">}</span><span class="s2"> SQL result did not match expect&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
+                    <span class="n">res_db_sql_with</span><span class="p">,</span>
+                    <span class="n">expect</span><span class="p">,</span>
+                    <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
+                    <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
+                    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
+                    <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
+                <span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db_handle</span><span class="si">}</span><span class="s2"> SQL_with result did not match expect&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">run_ops_version</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
+                        <span class="n">res_db_ops</span><span class="p">,</span>
+                        <span class="n">expect</span><span class="p">,</span>
+                        <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
+                        <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
+                        <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
+                        <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
+                    <span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db_handle</span><span class="si">}</span><span class="s2"> ops result did not match expect&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>

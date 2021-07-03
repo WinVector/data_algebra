@@ -60,8 +60,8 @@ def equivalent_frames(
         return False
     if a.shape[1] < 1:
         return True
-    a = a.reset_index(drop=True)
-    b = b.reset_index(drop=True)
+    a = a.reset_index(drop=True, inplace=False)
+    b = b.reset_index(drop=True, inplace=False)
     if not cols_case_sensitive:
         a.columns = [c.lower() for c in a.columns]
         a = a.reset_index(drop=True)
@@ -178,32 +178,78 @@ def check_transform_multi(
         cols_case_sensitive=cols_case_sensitive,
         check_row_order=check_row_order,
     ):
-        raise ValueError("Pandas result did not match expect")
-    # try any db paths
-    if db_handles is not None:
-        for db_handle in db_handles:
-            to_del = set()
-            if isinstance(data, dict):
-                for (k, v) in data.items():
-                    db_handle.insert_table(v, table_name=k)
-                    to_del.add(k)
-            temp_tables = dict()
-            sql = db_handle.to_sql(ops, pretty=True, temp_tables=temp_tables)
-            for (k, v) in temp_tables.items():
-                db_handle.insert_table(v, table_name=k)
-                to_del.add(k)
-            res_db = db_handle.read_query( sql)
-            for k in to_del:
-                db_handle.drop_table(k)
-            if not equivalent_frames(
-                res_db,
+        raise ValueError("Pandas eval result did not match expect")
+    if len(data) == 1:
+        res_t = ops.transform(list(data.values())[0])
+        if not equivalent_frames(
+                res_t,
                 expect,
                 float_tol=float_tol,
                 check_column_order=check_column_order,
                 cols_case_sensitive=cols_case_sensitive,
                 check_row_order=check_row_order,
-            ):
-                raise ValueError(f"{db_handle} result did not match expect")
+        ):
+            raise ValueError("Pandas transform result did not match expect")
+    # try any db paths
+    if db_handles is not None:
+        for db_handle in db_handles:
+            to_del = set()
+            temp_tables = dict()
+            sql = db_handle.to_sql(ops, pretty=True, annotate=True, use_with=False, temp_tables=temp_tables)
+            assert isinstance(sql, str)
+            temp_tables = dict()
+            sql_with = db_handle.to_sql(ops, pretty=True, annotate=True, use_with=True, temp_tables=temp_tables)
+            if db_handle.conn is not None:
+                for (k, v) in data.items():
+                    db_handle.insert_table(v, table_name=k)
+                    to_del.add(k)
+                for (k, v) in temp_tables.items():
+                    db_handle.insert_table(v, table_name=k)
+                    to_del.add(k)
+                caught = None
+                res_db_sql = None
+                res_db_sql_with = None
+                res_db_ops = None
+                run_ops_version = len(temp_tables) <= 0
+                try:
+                    res_db_sql = db_handle.read_query(sql)
+                    res_db_sql_with = db_handle.read_query(sql_with)
+                    if run_ops_version:
+                        res_db_ops = db_handle.read_query(ops)
+                except Exception as e:
+                    caught = e
+                for k in to_del:
+                    db_handle.drop_table(k)
+                if caught is not None:
+                    raise caught
+                if not equivalent_frames(
+                    res_db_sql,
+                    expect,
+                    float_tol=float_tol,
+                    check_column_order=check_column_order,
+                    cols_case_sensitive=cols_case_sensitive,
+                    check_row_order=check_row_order,
+                ):
+                    raise ValueError(f"{db_handle} SQL result did not match expect")
+                if not equivalent_frames(
+                    res_db_sql_with,
+                    expect,
+                    float_tol=float_tol,
+                    check_column_order=check_column_order,
+                    cols_case_sensitive=cols_case_sensitive,
+                    check_row_order=check_row_order,
+                ):
+                    raise ValueError(f"{db_handle} SQL_with result did not match expect")
+                if run_ops_version:
+                    if not equivalent_frames(
+                        res_db_ops,
+                        expect,
+                        float_tol=float_tol,
+                        check_column_order=check_column_order,
+                        cols_case_sensitive=cols_case_sensitive,
+                        check_row_order=check_row_order,
+                    ):
+                        raise ValueError(f"{db_handle} ops result did not match expect")
 
 
 def check_transform(
