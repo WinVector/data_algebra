@@ -28,7 +28,7 @@ def formats_to_self(ops):
     strings_match = str1 == str2   # probably too strict
     ops_match = ops == ops2
     if strings_match and (not ops_match):
-        print("strings match, but ops did not")
+        raise Exception("strings match, but ops did not")
     return ops_match
 
 
@@ -174,17 +174,24 @@ def check_transform(
     with sqlite3.connect(":memory:") as conn:
         db_model = data_algebra.SQLite.SQLiteModel()
         db_model.prepare_connection(conn)
+        db_handle = db_model.db_handle(conn)
+        to_del = set()
         if isinstance(data, dict):
             for (k, v) in data.items():
-                db_model.insert_table(conn, v, table_name=k)
+                db_handle.insert_table(v, table_name=k)
+                to_del.add(k)
         else:
             table_name = [k for k in cols_used.keys()][0]
-            db_model.insert_table(conn, data, table_name=table_name)
+            db_handle.insert_table(data, table_name=table_name)
+            to_del.add(table_name)
         temp_tables = dict()
-        sql = ops.to_sql(db_model, pretty=True, temp_tables=temp_tables)
+        sql = db_handle.to_sql(ops, pretty=True, temp_tables=temp_tables)
         for (k, v) in temp_tables.items():
-            db_model.insert_table(conn, v, table_name=k)
-        res_db = db_model.read_query(conn, sql)
+            db_handle.insert_table(v, table_name=k)
+            to_del.add(k)
+        res_db = db_handle.read_query( sql)
+        for k in to_del:
+            db_handle.drop_table(k)
     if not equivalent_frames(
         res_db,
         expect,
