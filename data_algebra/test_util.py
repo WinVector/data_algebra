@@ -9,6 +9,9 @@ import pickle
 
 # noinspection PyUnresolvedReferences
 import data_algebra.SQLite
+import data_algebra.BigQuery
+import data_algebra.PostgreSQL
+import data_algebra.SparkSQL
 from data_algebra.data_ops import *
 
 
@@ -199,6 +202,7 @@ def check_transform_multi(
             assert isinstance(sql, str)
             temp_tables = dict()
             sql_with = db_handle.to_sql(ops, pretty=True, annotate=True, use_with=True, temp_tables=temp_tables)
+            assert isinstance(sql_with, str)
             if db_handle.conn is not None:
                 for (k, v) in data.items():
                     db_handle.insert_table(v, table_name=k)
@@ -285,10 +289,14 @@ def check_transform(
         data = {table_name: data}
 
     # try Sqlite path
-    with sqlite3.connect(":memory:") as conn:
-        db_model = data_algebra.SQLite.SQLiteModel()
-        db_model.prepare_connection(conn)
-        db_handle = db_model.db_handle(conn)
+    with sqlite3.connect(":memory:") as conn_sqlite:
+        db_model_sqlite = data_algebra.SQLite.SQLiteModel()
+        db_model_sqlite.prepare_connection(conn_sqlite)
+        db_handle_sqlite = db_model_sqlite.db_handle(conn_sqlite)
+        # non-connected handles, lets us test some of the SQL generation path
+        db_handle_BigQuery = data_algebra.BigQuery.BigQueryModel().db_handle(None)
+        db_handle_PosgreSQL = data_algebra.PostgreSQL.PostgreSQLModel().db_handle(None)
+        db_handle_Spark = data_algebra.SparkSQL.SparkSQLModel().db_handle(None)
         check_transform_multi(
             ops=ops,
             data=data,
@@ -298,6 +306,6 @@ def check_transform(
             cols_case_sensitive=cols_case_sensitive,
             check_row_order=check_row_order,
             check_parse=check_parse,
-            db_handles = [db_handle],
+            db_handles = [db_handle_sqlite, db_handle_BigQuery, db_handle_PosgreSQL, db_handle_Spark],
         )
 
