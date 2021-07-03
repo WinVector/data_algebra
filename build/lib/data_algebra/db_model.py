@@ -312,7 +312,7 @@ class DBModel:
         if table_exists:
             self.execute(conn, self.drop_text + ' ' + q_table_name)
 
-    # noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection
+    # noinspection SqlNoDataSourceInspection
     def insert_table(
         self, conn, d, table_name, *, qualifiers=None, allow_overwrite=False
     ):
@@ -325,22 +325,39 @@ class DBModel:
         :param allow_overwrite logical, if True drop previous table
         """
 
-        if qualifiers is not None:
-            raise ValueError("non-empty qualifiers not yet supported on insert")
+        cr = [
+            d.columns[i].lower()
+            + " "
+            + (
+                "double precision"
+                if self.local_data_model.can_convert_col_to_numeric(d[d.columns[i]])
+                else self.string_type
+            )
+            for i in range(d.shape[1])
+        ]
+        q_table_name = self.quote_table_name(
+            table_name
+        )
         cur = conn.cursor()
         # check for table
         table_exists = True
         # noinspection PyBroadException
         try:
-            self.read_query(conn, "SELECT * FROM " + table_name + " LIMIT 1")
+            self.read_query(conn, "SELECT * FROM " + q_table_name + " LIMIT 1")
         except Exception:
             table_exists = False
         if table_exists:
             if not allow_overwrite:
-                raise ValueError("table " + table_name + " already exists")
+                raise ValueError("table " + q_table_name + " already exists")
             else:
-                cur.execute("DROP TABLE " + table_name)
-        d.to_sql(name=table_name, con=conn, index=False)
+                cur.execute(self.drop_text + ' ' + q_table_name)
+                conn.commit()
+        create_stmt = "CREATE TABLE " + q_table_name + " ( " + ", ".join(cr) + " )"
+        cur.execute(create_stmt)
+        conn.commit()
+        buf = io.StringIO(d.to_csv(index=False, header=False, sep="\t"))
+        cur.copy_from(buf, "d", columns=[c for c in d.columns])
+        conn.commit()
 
     def read_query(self, conn, q):
         """

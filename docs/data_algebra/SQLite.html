@@ -60,6 +60,9 @@
                         <li>
                                 <a class="function" href="#SQLiteModel.quote_table_name">quote_table_name</a>
                         </li>
+                        <li>
+                                <a class="function" href="#SQLiteModel.insert_table">insert_table</a>
+                        </li>
                 </ul>
 
             </li>
@@ -269,6 +272,38 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;SQLite adapter does not currently support qualifiers&quot;</span><span class="p">)</span>
         <span class="n">qt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">table_description</span><span class="o">.</span><span class="n">table_name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">qt</span>
+
+    <span class="c1"># noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection</span>
+    <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param conn: a database connection</span>
+<span class="sd">        :param d: a Pandas table</span>
+<span class="sd">        :param table_name: name to give write to</span>
+<span class="sd">        :param qualifiers: schema and such</span>
+<span class="sd">        :param allow_overwrite logical, if True drop previous table</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">qualifiers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;non-empty qualifiers not yet supported on insert&quot;</span><span class="p">)</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="c1"># check for table</span>
+        <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># noinspection PyBroadException</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_overwrite</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;DROP TABLE &quot;</span> <span class="o">+</span> <span class="n">table_name</span><span class="p">)</span>
+        <span class="c1"># Note: the Pandas to_sql() method appears to have SQLite hard-wired into it</span>
+        <span class="c1"># it refers to sqlite_master</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span> <span class="n">con</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -488,6 +523,38 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;SQLite adapter does not currently support qualifiers&quot;</span><span class="p">)</span>
         <span class="n">qt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">table_description</span><span class="o">.</span><span class="n">table_name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">qt</span>
+
+    <span class="c1"># noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection</span>
+    <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param conn: a database connection</span>
+<span class="sd">        :param d: a Pandas table</span>
+<span class="sd">        :param table_name: name to give write to</span>
+<span class="sd">        :param qualifiers: schema and such</span>
+<span class="sd">        :param allow_overwrite logical, if True drop previous table</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">qualifiers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;non-empty qualifiers not yet supported on insert&quot;</span><span class="p">)</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="c1"># check for table</span>
+        <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># noinspection PyBroadException</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_overwrite</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;DROP TABLE &quot;</span> <span class="o">+</span> <span class="n">table_name</span><span class="p">)</span>
+        <span class="c1"># Note: the Pandas to_sql() method appears to have SQLite hard-wired into it</span>
+        <span class="c1"># it refers to sqlite_master</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span> <span class="n">con</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -677,6 +744,59 @@
     
 
                             </div>
+                            <div id="SQLiteModel.insert_table" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SQLiteModel.insert_table">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">insert_table</span><span class="signature">(self, conn, d, table_name, *, qualifiers=None, allow_overwrite=False)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param conn: a database connection</span>
+<span class="sd">        :param d: a Pandas table</span>
+<span class="sd">        :param table_name: name to give write to</span>
+<span class="sd">        :param qualifiers: schema and such</span>
+<span class="sd">        :param allow_overwrite logical, if True drop previous table</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">qualifiers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;non-empty qualifiers not yet supported on insert&quot;</span><span class="p">)</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="c1"># check for table</span>
+        <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># noinspection PyBroadException</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_overwrite</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;DROP TABLE &quot;</span> <span class="o">+</span> <span class="n">table_name</span><span class="p">)</span>
+        <span class="c1"># Note: the Pandas to_sql() method appears to have SQLite hard-wired into it</span>
+        <span class="c1"># it refers to sqlite_master</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span> <span class="n">con</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>:param conn: a database connection
+:param d: a Pandas table
+:param table_name: name to give write to
+:param qualifiers: schema and such
+:param allow_overwrite logical, if True drop previous table</p>
+</div>
+
+
+                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
@@ -693,7 +813,6 @@
                 <dd id="SQLiteModel.db_handle" class="function"><a href="db_model.html#DBModel.db_handle">db_handle</a></dd>
                 <dd id="SQLiteModel.execute" class="function"><a href="db_model.html#DBModel.execute">execute</a></dd>
                 <dd id="SQLiteModel.drop_table" class="function"><a href="db_model.html#DBModel.drop_table">drop_table</a></dd>
-                <dd id="SQLiteModel.insert_table" class="function"><a href="db_model.html#DBModel.insert_table">insert_table</a></dd>
                 <dd id="SQLiteModel.read_query" class="function"><a href="db_model.html#DBModel.read_query">read_query</a></dd>
                 <dd id="SQLiteModel.read_table" class="function"><a href="db_model.html#DBModel.read_table">read_table</a></dd>
                 <dd id="SQLiteModel.read" class="function"><a href="db_model.html#DBModel.read">read</a></dd>
