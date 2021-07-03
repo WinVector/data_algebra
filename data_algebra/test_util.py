@@ -5,6 +5,7 @@ import numpy
 import data_algebra
 
 import sqlite3
+import json
 
 # noinspection PyUnresolvedReferences
 import data_algebra.SQLite
@@ -121,43 +122,45 @@ def check_transform_multi(
     check_column_order=False,
     cols_case_sensitive=False,
     check_row_order=False,
-    local_data_model=None,
+    check_parse=True,
     db_handles=None,
+    local_data_model=None,
 ):
     """
     Test an operator dag produces the expected result, and parses correctly.
+    Asserts if there are issues
 
     :param ops: data_algebra.data_ops.ViewRepresentation
-    :param data: pd.DataFrame or map of strings to pd.DataFrame
+    :param data: map of strings to pd.DataFrame
     :param expect: pd.DataFrame
     :param float_tol passed to equivalent_frames()
     :param check_column_order passed to equivalent_frames()
     :param cols_case_sensitive passed to equivalent_frames()
     :param check_row_order passed to equivalent_frames()
-    :param pd pandas module (defaults to data_algebra.default_data_model if None)
-    :param: db_handles, list of database handles to use in testing
+    :param check_parse if True check expression parses/formats to self
+    :param: db_handles  list of database handles to use in testing
+    :param: local_data_model optional alternate evaluation model
     :return: None, assert if there is an issue
     """
 
+    assert isinstance(data, dict)
     if local_data_model is None:
         local_data_model = data_algebra.default_data_model
     if not isinstance(ops, ViewRepresentation):
         raise TypeError("expected ops to be a data_algebra.data_ops.ViewRepresentation")
     if not local_data_model.is_appropriate_data_instance(expect):
-        raise TypeError("exepcted expect to be a local_data_model.pd.DataFrame")
+        raise TypeError("expected expect to be a local_data_model.pd.DataFrame")
     cols_used = ops.columns_used()
     if len(cols_used) < 1:
         raise ValueError("no tables used")
-    if not formats_to_self(ops):
-        raise ValueError("ops did not round-trip format")
-    if isinstance(data, dict):
-        res = ops.eval(data_map=data)
-    else:
-        if len(cols_used) != 1:
-            raise ValueError("more than one table used, but only one table supplied")
-        if not local_data_model.is_appropriate_data_instance(data):
-            raise TypeError("exepcted expect to be a local_data_model.pd.DataFrame")
-        res = ops.transform(data)
+    # check all needed tables are present
+    for k in cols_used.keys():
+        v = data[k]
+        assert local_data_model.is_appropriate_data_instance(v)
+    if check_parse:
+        if not formats_to_self(ops):
+            raise ValueError("ops did not round-trip format")
+    res = ops.eval(data_map=data)
     # try pandas path
     if not local_data_model.is_appropriate_data_instance(res):
         raise ValueError(
@@ -180,10 +183,6 @@ def check_transform_multi(
                 for (k, v) in data.items():
                     db_handle.insert_table(v, table_name=k)
                     to_del.add(k)
-            else:
-                table_name = [k for k in cols_used.keys()][0]
-                db_handle.insert_table(data, table_name=table_name)
-                to_del.add(table_name)
             temp_tables = dict()
             sql = db_handle.to_sql(ops, pretty=True, temp_tables=temp_tables)
             for (k, v) in temp_tables.items():
@@ -211,10 +210,12 @@ def check_transform(
     float_tol=1e-8,
     check_column_order=False,
     cols_case_sensitive=False,
-    check_row_order=False
+    check_row_order=False,
+    check_parse=True,
 ):
     """
     Test an operator dag produces the expected result, and parses correctly.
+    Assert if there are issues.
 
     :param ops: data_algebra.data_ops.ViewRepresentation
     :param data: pd.DataFrame or map of strings to pd.DataFrame
@@ -223,9 +224,16 @@ def check_transform(
     :param check_column_order passed to equivalent_frames()
     :param cols_case_sensitive passed to equivalent_frames()
     :param check_row_order passed to equivalent_frames()
-    :param pd pandas module (defaults to data_algebra.default_data_model if None)
-    :return: None, assert if there is an issue
+    :param check_parse if True check expression parses/formats to self
+    :return: nothing
     """
+
+    # convert single table to dictionary
+    if not isinstance(data, dict):
+        cols_used = ops.columns_used()
+        table_name = [k for k in cols_used.keys()][0]
+        data = {table_name: data}
+
     # try Sqlite path
     with sqlite3.connect(":memory:") as conn:
         db_model = data_algebra.SQLite.SQLiteModel()
@@ -239,5 +247,7 @@ def check_transform(
             check_column_order=check_column_order,
             cols_case_sensitive=cols_case_sensitive,
             check_row_order=check_row_order,
+            check_parse=check_parse,
             db_handles = [db_handle],
         )
+
