@@ -112,9 +112,9 @@ class BigQueryModel(data_algebra.db_model.DBModel):
         else:
             table_exists = True
             try:
-                self.read_query("SELECT * FROM " + table_name + " LIMIT 1")
+                self.read_query(conn, "SELECT * FROM " + table_name + " LIMIT 1")
                 table_exists = True
-            except Exception:
+            except Exception as e:
                 table_exists = False
             if table_exists:
                 raise ValueError("table " + table_name + " already exists")

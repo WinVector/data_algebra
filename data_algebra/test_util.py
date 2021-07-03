@@ -120,17 +120,17 @@ def equivalent_frames(
     return True
 
 
-def check_transform_multi(
+def check_transform_on_handles(
+    *,
     ops,
     data,
     expect,
-    *,
+    db_handles,
     float_tol=1e-8,
     check_column_order=False,
     cols_case_sensitive=False,
     check_row_order=False,
     check_parse=True,
-    db_handles=None,
     local_data_model=None,
 ):
     """
@@ -138,17 +138,23 @@ def check_transform_multi(
     Asserts if there are issues
 
     :param ops: data_algebra.data_ops.ViewRepresentation
-    :param data: map of strings to pd.DataFrame
+    :param data: pd.DataFrame or map of strings to pd.DataFrame
     :param expect: pd.DataFrame
+    :param: db_handles  list of database handles to use in testing
     :param float_tol passed to equivalent_frames()
     :param check_column_order passed to equivalent_frames()
     :param cols_case_sensitive passed to equivalent_frames()
     :param check_row_order passed to equivalent_frames()
     :param check_parse if True check expression parses/formats to self
-    :param: db_handles  list of database handles to use in testing
     :param: local_data_model optional alternate evaluation model
     :return: None, assert if there is an issue
     """
+
+    # convert single table to dictionary
+    if not isinstance(data, dict):
+        cols_used = ops.columns_used()
+        table_name = [k for k in cols_used.keys()][0]
+        data = {table_name: data}
 
     assert isinstance(data, dict)
     if local_data_model is None:
@@ -213,10 +219,10 @@ def check_transform_multi(
                         sql_statements.append(sql)
             if db_handle.conn is not None:
                 for (k, v) in data.items():
-                    db_handle.insert_table(v, table_name=k)
+                    db_handle.insert_table(v, table_name=k, allow_overwrite=True)
                     to_del.add(k)
                 for (k, v) in temp_tables.items():
-                    db_handle.insert_table(v, table_name=k)
+                    db_handle.insert_table(v, table_name=k, allow_overwrite=True)
                     to_del.add(k)
                 caught = None
                 res_db_sql = []
@@ -288,7 +294,6 @@ def check_transform(
         table_name = [k for k in cols_used.keys()][0]
         data = {table_name: data}
 
-    # try Sqlite path
     with sqlite3.connect(":memory:") as conn_sqlite:
         db_model_sqlite = data_algebra.SQLite.SQLiteModel()
         db_model_sqlite.prepare_connection(conn_sqlite)
@@ -298,7 +303,7 @@ def check_transform(
         empty_db_handle_BigQuery = data_algebra.BigQuery.BigQueryModel().db_handle(None)
         empty_db_handle_PosgreSQL = data_algebra.PostgreSQL.PostgreSQLModel().db_handle(None)
         empty_db_handle_Spark = data_algebra.SparkSQL.SparkSQLModel().db_handle(None)
-        check_transform_multi(
+        check_transform_on_handles(
             ops=ops,
             data=data,
             expect=expect,
@@ -307,7 +312,7 @@ def check_transform(
             cols_case_sensitive=cols_case_sensitive,
             check_row_order=check_row_order,
             check_parse=check_parse,
-            db_handles = [
+            db_handles=[
                 db_handle_sqlite,
                 empty_db_handle_sqlite,
                 empty_db_handle_BigQuery,
