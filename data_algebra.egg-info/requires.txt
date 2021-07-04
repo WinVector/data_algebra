@@ -8,6 +8,7 @@ pyarrow
 
 [PostgreSQL]
 sqlalchemy
+psycopg2
 
 [all]
 black

@@ -244,6 +244,7 @@ def check_transform_on_handles(
                             temp_tables=temp_tables)
                         assert isinstance(sql, str)
                         sql_statements.append(sql)
+                        # print(sql)
             if db_handle.conn is not None:
                 for (k, v) in data.items():
                     db_handle.insert_table(v, table_name=k, allow_overwrite=True)
@@ -331,8 +332,8 @@ def check_transform(
 
     # controls
     test_sqlite = True
-    test_PostgreSQL = False
-    test_BigQuery = False
+    test_PostgreSQL = False  # causes external dependency
+    test_BigQuery = False  # causes external dependency
     # can't just add BigQuery until we set a default schema somehow
 
     # placeholders
@@ -343,18 +344,22 @@ def check_transform(
     if test_sqlite:
         def build_sqlite_handle():
             # sqlite db
-            conn_sqlite = sqlite3.connect(":memory:")
-            db_model_sqlite = data_algebra.SQLite.SQLiteModel()
-            db_model_sqlite.prepare_connection(conn_sqlite)
-            return db_model_sqlite.db_handle(conn_sqlite)
+            db_handle = data_algebra.SQLite.SQLiteModel().db_handle(
+                conn=sqlite3.connect(':memory:')
+            )
+            db_handle.db_model.prepare_connection(db_handle.conn)
+            return db_handle
 
         db_handle_sqlite = build_sqlite_handle()
 
     if test_PostgreSQL and have_sqlalchemy:
         def build_PostgreSQL_handle():
             # PostgreSQL db
-            engine = sqlalchemy.engine.create_engine(r'postgresql://johnmount@localhost/johnmount')
-            return data_algebra.PostgreSQL.PostgreSQLModel().db_handle(engine)
+            db_handle = data_algebra.PostgreSQL.PostgreSQLModel().db_handle(
+                sqlalchemy.engine.create_engine(r'postgresql://johnmount@localhost/johnmount')
+            )
+            db_handle.db_model.prepare_connection(db_handle.conn)
+            return db_handle
 
         db_handle_PosgreSQL = build_PostgreSQL_handle()
 
@@ -362,13 +367,12 @@ def check_transform(
         def build_BigQuery_handle():
             os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/johnmount/big_query/big_query_jm.json"
             # os.environ["GOOGLE_APPLICATION_CREDENTIALS"]  # trigger key error if not present
-            bq_client = bigquery.Client()
-
-            bq_handle = data_algebra.BigQuery.BigQueryModel().db_handle(bq_client)
             data_catalog = 'data-algebra-test'
             data_schema = 'test_1'
-            return data_algebra.BigQuery.BigQueryModel(
-                table_prefix=f'{data_catalog}.{data_schema}').db_handle(bq_client)
+            db_handle = data_algebra.BigQuery.BigQueryModel(
+                table_prefix=f'{data_catalog}.{data_schema}').db_handle(bigquery.Client())
+            db_handle.db_model.prepare_connection(db_handle.conn)
+            return db_handle
 
         db_handle_BigQuery = build_BigQuery_handle()
 

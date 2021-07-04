@@ -1094,7 +1094,7 @@ class DBModel:
             v = terms[k]
         except KeyError:
             pass
-        if v is None:
+        if (v is None) or (v == k):
             return self.quote_identifier(k)
         return v + " AS " + self.quote_identifier(k)
 
