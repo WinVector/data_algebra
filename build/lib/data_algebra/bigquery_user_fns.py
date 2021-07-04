@@ -24,6 +24,17 @@ def as_int64(col):
     )
 
 
+def as_str(col):
+    assert isinstance(col, str)
+    return data_algebra.user_fn.FnTerm(
+        pandas_fn = lambda x: x.astype('str'),  # x is a pandas Series
+        sql_fn = lambda subs, db_model: f'CAST({subs[0]} AS STRING)',
+        args=[col],
+        display_form = f'as_int64({col})',
+        name='as_str',
+    )
+
+
 # trim string to date portion
 def trimstr(col_name, *, start=0, stop):
     assert isinstance(start, int)
@@ -194,7 +205,7 @@ def dayofmonth(col):
     return data_algebra.user_fn.FnTerm(
         # x is a pandas Series
         pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.day.astype('int64'),
-        sql_fn=lambda subs, db_model: f'EXTRACT(DAYOFMONTH FROM {subs[0]})',
+        sql_fn=lambda subs, db_model: f'EXTRACT(DAY FROM {subs[0]})',
         args=[col],
         display_form=f'dayofmonth({col})',
         name='dayofmonth',
@@ -296,6 +307,7 @@ def base_Sunday(col):
 
 fns = {
     'as_int64': as_int64,
+    'as_str': as_str,
     'trimstr': trimstr,
     'coalesce_0': coalesce_0,
     'coalesce': coalesce,
