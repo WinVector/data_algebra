@@ -15,14 +15,14 @@ import data_algebra.SparkSQL
 from data_algebra.data_ops import *
 
 
-have_psycopg2 = False
+have_sqlalchemy = False
 try:
     # noinspection PyUnresolvedReferences
-    import psycopg2
+    import sqlalchemy
 
-    have_psycopg2 = True
+    have_sqlalchemy = True
 except ImportError:
-    have_psycopg2 = False
+    have_sqlalchemy = False
 
 
 def formats_to_self(ops):
@@ -329,17 +329,11 @@ def check_transform(
 
         db_handle_sqlite = build_sqlite_handle()
 
-    if test_PostgreSQL and have_psycopg2:
+    if test_PostgreSQL and have_sqlalchemy:
         def build_PostgreSQL_handle():
             # PostgreSQL db
-            conn_p = psycopg2.connect(
-                database="johnmount",
-                user="johnmount",
-                host="localhost",
-                password=""
-            )
-            conn_p.autocommit = True
-            return data_algebra.PostgreSQL.PostgreSQLModel().db_handle(conn_p)
+            engine = sqlalchemy.engine.create_engine(r'postgresql://johnmount@localhost/johnmount')
+            return data_algebra.PostgreSQL.PostgreSQLModel().db_handle(engine)
 
         db_handle_p = build_PostgreSQL_handle()
 

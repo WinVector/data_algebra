@@ -8,7 +8,7 @@ def test_ghost_col_issue():
     d2 = data_algebra.default_data_model.pd.DataFrame(
         {
             "x": [1, 4, 5, 7, 8, 9],
-            "v": [10, 40, 50, 70, 80, 90],
+            "v": [10., 40., 50., 70., 80., 90.],
             "g": [1, 2, 2, 3, 3, 3],
             "ngroup": [1, 2, 2, 3, 3, 3],
             "row_number": [1, 1, 2, 1, 2, 3],
@@ -18,7 +18,7 @@ def test_ghost_col_issue():
 
     o2 = describe_table(d2).extend(
         {
-            "size": "_size()",
+            "size": "(1).sum()",
             "max_v": "v.max()",
             "min_v": "v.min()",
             "sum_v": "v.sum()",
@@ -38,10 +38,10 @@ def test_ghost_col_issue():
             "row_number": [1, 1, 2, 1, 2, 3],
             "shift_v": [None, None, 40.0, None, 70.0, 80.0],
             "size": [1, 2, 2, 3, 3, 3],
-            "max_v": [10, 50, 50, 90, 90, 90],
-            "min_v": [10, 40, 40, 70, 70, 70],
-            "sum_v": [10, 90, 90, 240, 240, 240],
-            "mean_v": [10, 45, 45, 80, 80, 80],
+            "max_v": [10., 50., 50., 90., 90., 90.],
+            "min_v": [10., 40., 40., 70., 70., 70.],
+            "sum_v": [10., 90., 90., 240., 240., 240.],
+            "mean_v": [10., 45., 45., 80., 80., 80.],
             "count_v": [1, 2, 2, 3, 3, 3],
             "size_v": [1, 2, 2, 3, 3, 3],
         }
@@ -50,4 +50,5 @@ def test_ghost_col_issue():
     data_algebra.test_util.check_transform(
         ops=o2,
         data=d2,
-        expect=expect)
+        expect=expect,
+        check_parse=False)  # (1).sum() issue

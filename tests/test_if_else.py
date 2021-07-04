@@ -43,19 +43,19 @@ def test_if_else_2():
     with pytest.raises(Exception):
         ops = describe_table(d, table_name='d'). \
             extend({'choice': "group=='A'"}). \
-            extend({'choice_fixed': 'choice.is_bad().if_else(0, choice)'}). \
+            extend({'choice_fixed': 'choice.is_null().if_else(False, choice)'}). \
             extend({'not_c_2': '! choice_fixed'})
 
     # ~ not used
     with pytest.raises(Exception):
         ops = describe_table(d, table_name='d'). \
             extend({'choice': "group=='A'"}). \
-            extend({'choice_fixed': 'choice.is_bad().if_else(0, choice)'}). \
+            extend({'choice_fixed': 'choice.is_null().if_else(False, choice)'}). \
             extend({'not_c_2': '~ choice_fixed'})
 
     ops = describe_table(d, table_name='d'). \
         extend({'choice': "group=='A'"}). \
-        extend({'choice_fixed': 'choice.is_bad().if_else(0, choice)'}). \
+        extend({'choice_fixed': 'choice.is_null().if_else(False, choice)'}). \
         extend({'not_c_1': 'choice_fixed == False'}). \
         extend({'rc': 'choice_fixed.if_else(c1, c2)'}). \
         select_columns(['choice_fixed', 'rc', 'not_c_1'])
