@@ -19,7 +19,7 @@ tests/test_cross_product_join.py .                                       [ 14%]
 tests/test_db_model.py .                                                 [ 15%]
 tests/test_degenerate_project.py .                                       [ 15%]
 tests/test_drop_columns.py .                                             [ 16%]
-tests/test_exampe1.py ....                                               [ 18%]
+tests/test_example1.py ....                                              [ 18%]
 tests/test_exp.py .                                                      [ 19%]
 tests/test_expr_parse.py .                                               [ 20%]
 tests/test_extend.py ......                                              [ 23%]
@@ -73,7 +73,7 @@ tests/test_with.py ..                                                    [100%]
 ---------- coverage: platform darwin, python 3.9.4-final-0 -----------
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
-data_algebra/BigQuery.py                  88     56    36%
+data_algebra/BigQuery.py                  88     54    39%
 data_algebra/OrderedSet.py                52      7    87%
 data_algebra/PostgreSQL.py                12      2    83%
 data_algebra/SQLite.py                    82     10    88%
@@ -87,13 +87,13 @@ data_algebra/data_model.py                52     19    63%
 data_algebra/data_ops.py                1121    206    82%
 data_algebra/data_ops_types.py            79     38    52%
 data_algebra/data_ops_utils.py            51      7    86%
-data_algebra/db_model.py                 740    111    85%
+data_algebra/db_model.py                 740    112    85%
 data_algebra/diagram.py                   56     43    23%
 data_algebra/eval_model.py                16      1    94%
 data_algebra/expr_parse.py                38      3    92%
-data_algebra/expr_rep.py                 487    110    77%
+data_algebra/expr_rep.py                 487    108    78%
 data_algebra/flow_text.py                 17      0   100%
-data_algebra/near_sql.py                 136      3    98%
+data_algebra/near_sql.py                 136      1    99%
 data_algebra/pandas_base.py              256     24    91%
 data_algebra/pandas_model.py              18      3    83%
 data_algebra/parse_by_lark.py            139     31    78%
@@ -102,7 +102,7 @@ data_algebra/test_util.py                167     23    86%
 data_algebra/user_fn.py                   84     27    68%
 data_algebra/util.py                      28      4    86%
 ----------------------------------------------------------
-TOTAL                                   4347    904    79%
+TOTAL                                   4347    899    79%
 
 
-============================= 160 passed in 15.04s =============================
+============================= 160 passed in 23.23s =============================
