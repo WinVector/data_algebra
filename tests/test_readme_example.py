@@ -3,8 +3,7 @@ import data_algebra
 import data_algebra.test_util
 
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
-import data_algebra.PostgreSQL
-import data_algebra.SQLite
+
 
 
 def test_readme_example_1():
@@ -30,14 +29,6 @@ def test_readme_example_1():
         select_rows('row_number == 1'). \
         select_columns(['subjectID', 'surveyCategory', 'probability']). \
         rename_columns({'diagnosis': 'surveyCategory'})
-
-    def build_PostgreSQL_handle():
-        # PostgreSQL db
-        db_handle = data_algebra.PostgreSQL.PostgreSQLModel().db_handle(
-            sqlalchemy.engine.create_engine(r'postgresql://johnmount@localhost/johnmount')
-        )
-        db_handle.db_model.prepare_connection(db_handle.conn)
-        return db_handle
 
     expect = data_algebra.default_data_model.pd.DataFrame({
         'subjectID': [1, 2],

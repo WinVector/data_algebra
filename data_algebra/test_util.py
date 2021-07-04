@@ -332,8 +332,8 @@ def check_transform(
 
     # controls
     test_sqlite = True
-    test_PostgreSQL = True
-    test_BigQuery = False
+    test_PostgreSQL = False  # causes external dependency
+    test_BigQuery = False  # causes external dependency
     # can't just add BigQuery until we set a default schema somehow
 
     # placeholders
