@@ -2,14 +2,18 @@
 import setuptools
 
 DESCRIPTION=\
-    "data_algebra is a data manipulation language that can both generate SQL queries and work on Pandas DataFrames. "
+    "data_algebra is a data manipulation language that can both generate SQL queries and work on Pandas DataFrames."
 
 LONG_DESCRIPTION = """
 [data_algebra](https://github.com/WinVector/data_algebra) is a piped data wrangling system
-based on Codd's relational algebra and experience working with dplyr at scale, and a general 
-data record transform engine.  The primary purpose of the package is to support an easy to 
+based on Codd's relational algebra and experience working with data manipulation languages at scale.  
+The primary purpose of the package is to support an easy to 
 compose and maintain grammar of data processing steps that in turn can be used to generate
 database specific SQL. The package also implements the same transforms for Pandas DataFrames.
+
+Currently the system is primarily adapted and testing for Pandas, Google BigQuery, PostgreSQL, and
+SQLite. Extension to other data processing systems such as Spark and MariaDB is possible, but
+not currently supported/tested.
 
 [R](https://www.r-project.org) versions of the system are available as 
 the [rquery](https://github.com/WinVector/rquery) and 
@@ -33,7 +37,7 @@ setuptools.setup(
         'pretty_sql': ['sqlparse'],
         'diagram': ['graphviz'],
         'BigQuery': ['google.cloud', 'pyarrow'],
-        'PostgreSQL': ['sqlalchemy'],
+        'PostgreSQL': ['sqlalchemy', 'psycopg2'],
         'all': ['black', 'sqlparse', 'graphviz', 'BigQuery', 'PostgreSQL'],
     },
     platforms=['any'],

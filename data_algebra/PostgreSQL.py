@@ -2,9 +2,6 @@ import data_algebra.data_ops
 import data_algebra.db_model
 
 
-
-
-
 def _postgresql_mean_expr(dbmodel, expression):
     return (
         "avg(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ")"

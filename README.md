@@ -1,7 +1,14 @@
 # data_algebra
 
-[Codd style operators](https://en.wikipedia.org/wiki/Relational_algebra) in a [piped](https://en.wikipedia.org/wiki/Pipeline_(Unix)) or [method-chained](https://en.wikipedia.org/wiki/Method_chaining) notation (or [dplyr](https://CRAN.R-project.org/package=dplyr)-esque) data processing in Python
+[data_algebra](https://github.com/WinVector/data_algebra) is a piped data wrangling system
+based on Codd's relational algebra and experience working with data manipulation languages at scale.
+The primary purpose of the package is to support an easy to
+compose and maintain grammar of data processing steps that in turn can be used to generate
+database specific SQL. The package also implements the same transforms for Pandas DataFrames.
 
+Currently the system is primarily adapted and testing for Pandas, Google BigQuery, PostgreSQL, and
+SQLite. Extension to other data processing systems such as Spark and MariaDB is possible, but
+not currently supported/tested.
 
 [This](https://github.com/WinVector/data_algebra) is to be the [`Python`](https://www.python.org) equivalent of the [`R`](https://www.r-project.org) packages [`rquery`](https://github.com/WinVector/rquery/), [`rqdatatable`](https://github.com/WinVector/rqdatatable), and [`cdata`](https://CRAN.R-project.org/package=cdata).  This package will supply piped Codd-transform style notation that can perform data engineering in [`Pandas`](https://pandas.pydata.org) and generate [`SQL`](https://en.wikipedia.org/wiki/SQL) queries from the same specification.
 
@@ -70,16 +77,22 @@ Let's start our `Python` example.  First we import the packages we are going to 
 
 
 ```python
-import math
-import io
 import sqlite3
-from pprint import pprint
-import psycopg2       # http://initd.org/psycopg/
-import pandas         # https://pandas.pydata.org
+import sqlalchemy
+import pandas
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 import data_algebra.PostgreSQL
 import data_algebra.SQLite
+
+data_algebra.__version__
 ```
+
+
+
+
+    '0.7.2'
+
+
 
 Now let's type in our example data.  Notice this is an in-memory `Pandas` `Data.Frame`.
 
@@ -89,10 +102,11 @@ Now let's type in our example data.  Notice this is an in-memory `Pandas` `Data.
 d_local = pandas.DataFrame({
     'subjectID':[1, 1, 2, 2],
     'surveyCategory': [ "withdrawal behavior", "positive re-framing", "withdrawal behavior", "positive re-framing"],
-    'assessmentTotal': [5, 2, 3, 4],
+    'assessmentTotal': [5., 2., 3., 4.],
     'irrelevantCol1': ['irrel1']*4,
     'irrelevantCol2': ['irrel2']*4,
 })
+
 d_local
 ```
 
@@ -129,7 +143,7 @@ d_local
       <th>0</th>
       <td>1</td>
       <td>withdrawal behavior</td>
-      <td>5</td>
+      <td>5.0</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
@@ -137,7 +151,7 @@ d_local
       <th>1</th>
       <td>1</td>
       <td>positive re-framing</td>
-      <td>2</td>
+      <td>2.0</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
@@ -145,7 +159,7 @@ d_local
       <th>2</th>
       <td>2</td>
       <td>withdrawal behavior</td>
-      <td>3</td>
+      <td>3.0</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
@@ -153,7 +167,7 @@ d_local
       <th>3</th>
       <td>2</td>
       <td>positive re-framing</td>
-      <td>4</td>
+      <td>4.0</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
@@ -169,32 +183,28 @@ Let's also copy this data to a database.  Normally big data is already in the sy
 
 
 ```python
-use_postgresql = False
+use_postgresql = True
 
 if use_postgresql:
-    conn = psycopg2.connect(
-        database="johnmount",
-        user="johnmount",
-        host="localhost",
-        password=""
+    db_handle = data_algebra.PostgreSQL.PostgreSQLModel().db_handle(
+        sqlalchemy.engine.create_engine(r'postgresql://johnmount@localhost/johnmount')
     )
-    conn.autocommit=True
-    db_model = data_algebra.PostgreSQL.PostgreSQLModel() 
 else:
-    conn = sqlite3.connect(':memory:')
-    db_model = data_algebra.SQLite.SQLiteModel()
+    db_handle = data_algebra.SQLite.SQLiteModel().db_handle(
+        conn = sqlite3.connect(':memory:')
+    )
 
-db_model.prepare_connection(conn)  # define any user functions and settings we want/need
+db_handle.db_model.prepare_connection(db_handle.conn)  # define any user functions and settings we want/need
 ```
 
 
 
 
 ```python
+remote_table_desciption = db_handle.insert_table(d_local, table_name='d', allow_overwrite=True)
 
-db_model.insert_table(conn, d_local, 'd')
+remote_table_desciption.head
 
-db_model.read_table(conn, 'd')
 ```
 
 
@@ -218,7 +228,6 @@ db_model.read_table(conn, 'd')
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>index</th>
       <th>subjectID</th>
       <th>surveyCategory</th>
       <th>assessmentTotal</th>
@@ -229,37 +238,33 @@ db_model.read_table(conn, 'd')
   <tbody>
     <tr>
       <th>0</th>
-      <td>0</td>
       <td>1</td>
       <td>withdrawal behavior</td>
-      <td>5</td>
+      <td>5.0</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
     <tr>
       <th>1</th>
       <td>1</td>
-      <td>1</td>
       <td>positive re-framing</td>
-      <td>2</td>
+      <td>2.0</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
     <tr>
       <th>2</th>
       <td>2</td>
-      <td>2</td>
       <td>withdrawal behavior</td>
-      <td>3</td>
+      <td>3.0</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>3</td>
       <td>2</td>
       <td>positive re-framing</td>
-      <td>4</td>
+      <td>4.0</td>
       <td>irrel1</td>
       <td>irrel2</td>
     </tr>
@@ -296,6 +301,7 @@ ops = data_algebra.data_ops.describe_table(d_local, 'd'). \
     select_rows('row_number == 1'). \
     select_columns(['subjectID', 'surveyCategory', 'probability']). \
     rename_columns({'diagnosis': 'surveyCategory'})
+
 ```
 
 We are deliberately writing a longer pipeline of simple steps, so we can use the same pipeline locally with Pandas, and (potentially) great scale with `PostgreSQL` or Apache `Spark`.  A more concise variation of this pipeline can be found in the R example [here](https://github.com/WinVector/rquery).
@@ -308,6 +314,7 @@ For a more Pythonic way of writing the same pipeline we can show how the code wo
 
 ```python
 py_source = ops.to_python(pretty=True)
+
 print(py_source)
 ```
 
@@ -359,57 +366,72 @@ Once we have the `ops` object we can do quite a lot with it. We have already exh
 
 
 ```python
-sql = ops.to_sql(db_model, pretty=True)
+sql = db_handle.to_sql(ops, pretty=True, use_with=True, annotate=True)
+
 print(sql)
 ```
 
-    SELECT "surveyCategory" AS "diagnosis",
-           "probability",
-           "subjectID"
-    FROM
-      (SELECT "probability",
-              "surveyCategory",
-              "subjectID"
-       FROM
-         (SELECT "probability",
-                 "surveyCategory",
-                 "subjectID",
-                 ROW_NUMBER() OVER (PARTITION BY "subjectID"
-                                    ORDER BY "sort_key") AS "row_number"
-          FROM
-            (SELECT "probability",
-                    "surveyCategory",
-                    "subjectID", -("probability") AS "sort_key"
-             FROM
-               (SELECT "probability" / "total" AS "probability",
-                       "surveyCategory",
-                       "subjectID"
-                FROM
-                  (SELECT "surveyCategory",
-                          "subjectID",
-                          "probability",
-                          SUM("probability") OVER (PARTITION BY "subjectID") AS "total"
-                   FROM
-                     (SELECT "surveyCategory",
-                             "subjectID",
-                             EXP(("assessmentTotal" * 0.237)) AS "probability"
-                      FROM
-                        (SELECT surveyCategory AS "surveyCategory",
-                                subjectID AS "subjectID",
-                                assessmentTotal AS "assessmentTotal"
-                         FROM "d") "table_reference_0") "extend_1") "extend_2") "extend_3") "extend_4") "extend_5"
-       WHERE "row_number" = 1 ) "select_rows_6"
+    WITH "table_reference_0" AS
+      (SELECT "surveyCategory",
+              "subjectID",
+              "assessmentTotal"
+       FROM "d"),
+         "extend_1" AS
+      (SELECT -- extend({ 'probability': '(assessmentTotal * 0.237).exp()'})
+     "surveyCategory",
+     "subjectID",
+     EXP(("assessmentTotal" * 0.237)) AS "probability"
+       FROM "table_reference_0"),
+         "extend_2" AS
+      (SELECT -- extend({ 'total': 'probability.sum()'}, partition_by=['subjectID'])
+     "surveyCategory",
+     "subjectID",
+     "probability",
+     SUM("probability") OVER (PARTITION BY "subjectID") AS "total"
+       FROM "extend_1"),
+         "extend_3" AS
+      (SELECT -- extend({ 'probability': 'probability / total'})
+     "surveyCategory",
+     "probability" / "total" AS "probability",
+     "subjectID"
+       FROM "extend_2"),
+         "extend_4" AS
+      (SELECT -- extend({ 'sort_key': '-probability'})
+     "surveyCategory",
+     "probability",
+     "subjectID", -("probability") AS "sort_key"
+       FROM "extend_3"),
+         "extend_5" AS
+      (SELECT -- extend({ 'row_number': '_row_number()'}, partition_by=['subjectID'], order_by=['sort_key'])
+     "surveyCategory",
+     "probability",
+     "subjectID",
+     ROW_NUMBER() OVER (PARTITION BY "subjectID"
+                        ORDER BY "sort_key") AS "row_number"
+       FROM "extend_4"),
+         "select_rows_6" AS
+      (SELECT -- select_rows('row_number == 1')
+     "surveyCategory",
+     "probability",
+     "subjectID"
+       FROM "extend_5"
+       WHERE "row_number" = 1 )
+    SELECT -- rename_columns({'diagnosis': 'surveyCategory'})
+     "surveyCategory" AS "diagnosis",
+     "probability",
+     "subjectID"
+    FROM "select_rows_6"
 
 
 
-The `SQL` can be hard to read, as `SQL` expresses composition by inner-nesting (inside `SELECT` statements happen first).  The operator pipeline expresses composition by sequencing or method-chaining, which can be a lot more legible.  However the huge advantage of the `SQL` is: we can send it to the database for execution, as we do now.
+Older `SQL` can be hard to read, as `SQL` expresses composition by inner-nesting (inside `SELECT` statements happen first).  The operator pipeline expresses composition by sequencing or method-chaining, which can be a lot more legible.  In this example we use the SQL-99 common table expression (`WITH`) notation to manage the composition in a more legible manner. A huge advantage of the `SQL` is: we can send it to the database for execution, as we do now.
 
-Also notice the generate `SQL` has applied query narrowing: columns not used in the outer queries are removed from the inner queries. The "irrelevant" columns are not carried into the calculation as they would be with a `SELECT *`.  This early optimization comes in quite handy.
+Also notice the generated `SQL` has applied query narrowing: columns not used in the outer queries are removed from the inner queries. The "irrelevant" columns are not carried into the calculation as they would be with a `SELECT *`.  This early optimization comes in quite handy.
 
 
 
 ```python
-db_model.read_query(conn, sql)
+db_handle.read_query(sql)
 ```
 
 
@@ -650,10 +672,8 @@ The `data_algebra` is part of a powerful cross-language and mutli-implementaiton
 
 ```python
 # be neat
-conn.close()
+db_handle.close()
 ```
 
 Note: as with `SQL` the `data_algebra` assumes the processing pipeline is a [`DAG`](https://en.wikipedia.org/wiki/Directed_acyclic_graph) with only table-nodes used more than once.
-
-[Known to not work with Pandas 0.25.1 on Python 3.7](https://github.com/pandas-dev/pandas/issues/29819) (newer Pandas fixes the issue).
 
