@@ -23,4 +23,4 @@ class PostgreSQLModel(data_algebra.db_model.DBModel):
         if self.identifier_quote in identifier:
             # TODO: escape quotes
             raise ValueError('did not expect ' + self.identifier_quote + ' in identifier')
-        return self.identifier_quote + identifier.lower() + self.identifier_quote
+        return self.identifier_quote + identifier + self.identifier_quote

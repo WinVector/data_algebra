@@ -326,7 +326,7 @@ class DBModel:
         """
 
         cr = [
-            d.columns[i].lower()
+            self.quote_identifier(d.columns[i])
             + " "
             + (
                 "double precision"

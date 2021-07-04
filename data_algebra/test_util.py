@@ -15,6 +15,16 @@ import data_algebra.SparkSQL
 from data_algebra.data_ops import *
 
 
+have_psycopg2 = False
+try:
+    # noinspection PyUnresolvedReferences
+    import psycopg2
+
+    have_psycopg2 = True
+except ImportError:
+    have_psycopg2 = False
+
+
 def formats_to_self(ops):
     """
     Check a operator dag formats and parses back to itself.
@@ -294,29 +304,69 @@ def check_transform(
         table_name = [k for k in cols_used.keys()][0]
         data = {table_name: data}
 
-    with sqlite3.connect(":memory:") as conn_sqlite:
-        db_model_sqlite = data_algebra.SQLite.SQLiteModel()
-        db_model_sqlite.prepare_connection(conn_sqlite)
-        db_handle_sqlite = db_model_sqlite.db_handle(conn_sqlite)
-        # non-connected handles, lets us test some of the SQL generation path
-        empty_db_handle_sqlite = data_algebra.SQLite.SQLiteModel().db_handle(None)
-        empty_db_handle_BigQuery = data_algebra.BigQuery.BigQueryModel().db_handle(None)
-        empty_db_handle_PosgreSQL = data_algebra.PostgreSQL.PostgreSQLModel().db_handle(None)
-        empty_db_handle_Spark = data_algebra.SparkSQL.SparkSQLModel().db_handle(None)
-        check_transform_on_handles(
-            ops=ops,
-            data=data,
-            expect=expect,
-            float_tol=float_tol,
-            check_column_order=check_column_order,
-            cols_case_sensitive=cols_case_sensitive,
-            check_row_order=check_row_order,
-            check_parse=check_parse,
-            db_handles=[
-                db_handle_sqlite,
-                empty_db_handle_sqlite,
-                empty_db_handle_BigQuery,
-                empty_db_handle_PosgreSQL,
-                empty_db_handle_Spark],
-        )
+    # non-connected handles, lets us test some of the SQL generation path
+    empty_db_handle_sqlite = data_algebra.SQLite.SQLiteModel().db_handle(None)
+    empty_db_handle_BigQuery = data_algebra.BigQuery.BigQueryModel().db_handle(None)
+    empty_db_handle_PosgreSQL = data_algebra.PostgreSQL.PostgreSQLModel().db_handle(None)
+    empty_db_handle_Spark = data_algebra.SparkSQL.SparkSQLModel().db_handle(None)
 
+    # controls
+    test_sqlite = True
+    test_PostgreSQL = False
+    # can't just add BigQuery until we set a default schema somehow
+
+    # placeholders
+    db_handle_sqlite = None
+    db_handle_p = None
+
+    if test_sqlite:
+        def build_sqlite_handle():
+            # sqlite db
+            conn_sqlite = sqlite3.connect(":memory:")
+            db_model_sqlite = data_algebra.SQLite.SQLiteModel()
+            db_model_sqlite.prepare_connection(conn_sqlite)
+            return db_model_sqlite.db_handle(conn_sqlite)
+
+        db_handle_sqlite = build_sqlite_handle()
+
+    if test_PostgreSQL and have_psycopg2:
+        def build_PostgreSQL_handle():
+            # PostgreSQL db
+            conn_p = psycopg2.connect(
+                database="johnmount",
+                user="johnmount",
+                host="localhost",
+                password=""
+            )
+            conn_p.autocommit = True
+            return data_algebra.PostgreSQL.PostgreSQLModel().db_handle(conn_p)
+
+        db_handle_p = build_PostgreSQL_handle()
+
+    db_handles = [
+        empty_db_handle_sqlite,
+        empty_db_handle_BigQuery,
+        empty_db_handle_PosgreSQL,
+        empty_db_handle_Spark]
+    if db_handle_sqlite is not None:
+        db_handles.append(db_handle_sqlite)
+    if db_handle_p is not None:
+        db_handles.append(db_handle_p)
+
+    check_transform_on_handles(
+        ops=ops,
+        data=data,
+        expect=expect,
+        float_tol=float_tol,
+        check_column_order=check_column_order,
+        cols_case_sensitive=cols_case_sensitive,
+        check_row_order=check_row_order,
+        check_parse=check_parse,
+        db_handles=db_handles,
+    )
+
+    if db_handle_sqlite is not None:
+        db_handle_sqlite.close()
+
+    if db_handle_p is not None:
+        db_handle_p.close()
