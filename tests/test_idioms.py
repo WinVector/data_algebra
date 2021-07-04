@@ -1,9 +1,4 @@
 
-import os
-import sqlite3
-
-from google.cloud import bigquery
-
 import data_algebra
 import data_algebra.test_util
 from data_algebra.data_ops import *
@@ -13,54 +8,12 @@ import data_algebra.SQLite
 import pytest
 
 
-# running bigquery tests depends on environment variable
-# example:
-#  export GOOGLE_APPLICATION_CREDENTIALS="/Users/johnmount/big_query/big_query_jm.json"
-# to clear:
-#  unset GOOGLE_APPLICATION_CREDENTIALS
-@pytest.fixture(scope='module')
-def get_bq_handle():
-    # set up big query client
-    bq_client = None
-    try:
-        # os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/johnmount/big_query/big_query_jm.json"
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"]  # trigger key error if not present
-        bq_client = bigquery.Client()
-    except KeyError:
-        pass
-    bq_handle = data_algebra.BigQuery.BigQueryModel().db_handle(bq_client)
-    data_catalog = 'data-algebra-test'
-    data_schema = 'test_1'
-
-    # set up sqlite client
-    conn_sqlite = sqlite3.connect(":memory:")
-    db_model_sqlite = data_algebra.SQLite.SQLiteModel()
-    db_model_sqlite.prepare_connection(conn_sqlite)
-    db_handle_sqlite = db_model_sqlite.db_handle(conn_sqlite)
-
-    db_handles = [bq_handle, db_handle_sqlite]
-
-    yield {
-        'bq_handle': bq_handle,
-        'db_handles': db_handles,
-        'data_catalog': data_catalog,
-        'data_schema': data_schema,
-    }
-    # back from yield, clean up
-    bq_handle.close()
-    db_handle_sqlite.close()
-
-
-def test_ideom_extend_one_count(get_bq_handle):
-    db_handles = get_bq_handle['db_handles']
-    data_catalog = get_bq_handle['data_catalog']
-    data_schema = get_bq_handle['data_schema']
-
+def test_ideom_extend_one_count():
     d = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'a', 'b', 'b'],
         'val': [1, 2, 3, 4],
     })
-    table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    table_name = 'pytest_temp_d'
 
     ops = describe_table(d, table_name=table_name) .\
         extend({
@@ -74,25 +27,18 @@ def test_ideom_extend_one_count(get_bq_handle):
         'count': [4]
     })
 
-    data_algebra.test_util.check_transform_on_handles(
+    data_algebra.test_util.check_transform(
         ops=ops,
         data=d,
-        expect=expect,
-        db_handles=db_handles,
-        check_parse=False,
-    )
+        expect=expect)
 
 
-def test_ideom_extend_special_count(get_bq_handle):
-    db_handles = get_bq_handle['db_handles']
-    data_catalog = get_bq_handle['data_catalog']
-    data_schema = get_bq_handle['data_schema']
-
+def test_ideom_extend_special_count():
     d = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'a', 'b', 'b'],
         'val': [1, 2, 3, 4],
     })
-    table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    table_name = 'pytest_temp_d'
 
     ops = describe_table(d, table_name=table_name) .\
         project({
@@ -103,26 +49,19 @@ def test_ideom_extend_special_count(get_bq_handle):
         'count': [4]
     })
 
-    data_algebra.test_util.check_transform_on_handles(
+    data_algebra.test_util.check_transform(
         ops=ops,
         data=d,
-        expect=expect,
-        db_handles=db_handles,
-        check_parse=False,
-    )
+        expect=expect)
 
 
 # previously forbidden
-def test_ideom_forbidden_extend_test_trinary(get_bq_handle):
-    db_handles = get_bq_handle['db_handles']
-    data_catalog = get_bq_handle['data_catalog']
-    data_schema = get_bq_handle['data_schema']
-
+def test_ideom_forbidden_extend_test_trinary():
     d = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'a', 'b', 'b'],
         'val': [1, 2, 3, 4],
     })
-    table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    table_name = 'pytest_temp_d'
 
     ops = describe_table(d, table_name=table_name) .\
         extend({ # {'select': '(val > 2.5).if_else("high", "low")' } # doesn't work in Pandas
@@ -135,25 +74,18 @@ def test_ideom_forbidden_extend_test_trinary(get_bq_handle):
         'select': ['low', 'low', 'high', 'high']
     })
 
-    data_algebra.test_util.check_transform_on_handles(
+    data_algebra.test_util.check_transform(
         ops=ops,
         data=d,
-        expect=expect,
-        db_handles=db_handles,
-        check_parse=False,
-    )
+        expect=expect)
 
 
-def test_ideom_extend_test_trinary(get_bq_handle):
-    db_handles = get_bq_handle['db_handles']
-    data_catalog = get_bq_handle['data_catalog']
-    data_schema = get_bq_handle['data_schema']
-
+def test_ideom_extend_test_trinary():
     d = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'a', 'b', 'b'],
         'val': [1, 2, 3, 4],
     })
-    table_name = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    table_name = 'pytest_temp_d'
 
     ops = describe_table(d, table_name=table_name) .\
         extend({ # {'select': '(val > 2.5).if_else("high", "low")' } # doesn't work in Pandas
@@ -169,30 +101,22 @@ def test_ideom_extend_test_trinary(get_bq_handle):
         'select': ['low', 'low', 'high', 'high']
     })
 
-    data_algebra.test_util.check_transform_on_handles(
+    data_algebra.test_util.check_transform(
         ops=ops,
         data=d,
-        expect=expect,
-        db_handles=db_handles,
-        check_parse=False,
-    )
+        expect=expect)
 
 
-def test_ideom_simulate_cross_join(get_bq_handle):
-    db_handles = get_bq_handle['db_handles']
-    data_catalog = get_bq_handle['data_catalog']
-    data_schema = get_bq_handle['data_schema']
-
-
+def test_ideom_simulate_cross_join():
     d = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, 3, 4],
     })
-    table_name_d = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    table_name_d = 'pytest_temp_d'
 
     e = data_algebra.default_data_model.pd.DataFrame({
         'y': ['a', 'b', 'c'],
     })
-    table_name_e = f'{data_catalog}.{data_schema}.pytest_temp_e'
+    table_name_e = 'pytest_temp_e'
 
     ops = describe_table(d, table_name=table_name_d) .\
         extend({ # {'select': '(val > 2.5).if_else("high", "low")' } # doesn't work in Pandas
@@ -213,29 +137,22 @@ def test_ideom_simulate_cross_join(get_bq_handle):
         'y': ['a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c'],
     })
 
-    data_algebra.test_util.check_transform_on_handles(
+    data_algebra.test_util.check_transform(
         ops=ops,
         data={table_name_d: d, table_name_e: e},
-        expect=expect,
-        db_handles=db_handles,
-        check_parse=False,
-    )
+        expect=expect)
 
 
-def test_ideom_simulate_cross_join_select(get_bq_handle):
-    db_handles = get_bq_handle['db_handles']
-    data_catalog = get_bq_handle['data_catalog']
-    data_schema = get_bq_handle['data_schema']
-
+def test_ideom_simulate_cross_join_select():
     d = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, 3, 4],
     })
-    table_name_d = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    table_name_d = 'pytest_temp_d'
 
     e = data_algebra.default_data_model.pd.DataFrame({
         'y': ['a', 'b', 'c'],
     })
-    table_name_e = f'{data_catalog}.{data_schema}.pytest_temp_e'
+    table_name_e = 'pytest_temp_e'
 
     ops = describe_table(d, table_name=table_name_d) .\
         extend({ # {'select': '(val > 2.5).if_else("high", "low")' } # doesn't work in Pandas
@@ -256,29 +173,22 @@ def test_ideom_simulate_cross_join_select(get_bq_handle):
         'y': ['a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c'],
     })
 
-    data_algebra.test_util.check_transform_on_handles(
+    data_algebra.test_util.check_transform(
         ops=ops,
         data={table_name_d: d, table_name_e: e},
-        expect=expect,
-        db_handles=db_handles,
-        check_parse=False,
-    )
+        expect=expect)
 
 
-def test_ideom_cross_join(get_bq_handle):
-    db_handles = get_bq_handle['db_handles']
-    data_catalog = get_bq_handle['data_catalog']
-    data_schema = get_bq_handle['data_schema']
-
+def test_ideom_cross_join():
     d = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, 3, 4],
     })
-    table_name_d = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    table_name_d = 'pytest_temp_d'
 
     e = data_algebra.default_data_model.pd.DataFrame({
         'y': ['a', 'b', 'c'],
     })
-    table_name_e = f'{data_catalog}.{data_schema}.pytest_temp_e'
+    table_name_e = 'pytest_temp_e'
 
     ops = describe_table(d, table_name=table_name_d) .\
         natural_join(
@@ -292,26 +202,19 @@ def test_ideom_cross_join(get_bq_handle):
         'y': ['a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c'],
     })
 
-    data_algebra.test_util.check_transform_on_handles(
+    data_algebra.test_util.check_transform(
         ops=ops,
         data={table_name_d: d, table_name_e: e},
-        expect=expect,
-        db_handles=db_handles,
-        check_parse=False,
-    )
+        expect=expect)
 
 
 # Note: switching from _row_number to _count
-def test_ideom_row_number(get_bq_handle):
-    db_handles = get_bq_handle['db_handles']
-    data_catalog = get_bq_handle['data_catalog']
-    data_schema = get_bq_handle['data_schema']
-
+def test_ideom_row_number():
     d = data_algebra.default_data_model.pd.DataFrame({
         'i': [1, 3, 2, 4, 5],
         'g': [1, 2, 2, 1, 1],
     })
-    table_name_d = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    table_name_d = 'pytest_temp_d'
 
     ops = describe_table(d, table_name=table_name_d) .\
         extend({
@@ -332,26 +235,19 @@ def test_ideom_row_number(get_bq_handle):
         'n': [1, 1, 2, 2, 3],
     })
 
-    data_algebra.test_util.check_transform_on_handles(
+    data_algebra.test_util.check_transform(
         ops=ops,
         data=d,
-        expect=expect,
-        db_handles=db_handles,
-        check_parse=False,
-    )
+        expect=expect)
 
 
-def test_ideom_sum_cumsum(get_bq_handle):
-    db_handles = get_bq_handle['db_handles']
-    data_catalog = get_bq_handle['data_catalog']
-    data_schema = get_bq_handle['data_schema']
-
+def test_ideom_sum_cumsum():
     d = data_algebra.default_data_model.pd.DataFrame({
         'i': [1, 2, 3, 4, 5],
         'o': [1, 1, 1, 1, 1],
         'g': [1, 2, 2, 1, 1],
     })
-    table_name_d = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    table_name_d = 'pytest_temp_d'
 
     with pytest.raises(ValueError):
         ops = describe_table(d, table_name=table_name_d). \
@@ -394,25 +290,19 @@ def test_ideom_sum_cumsum(get_bq_handle):
         's':  [1, 1, 2, 2, 3],
     })
 
-    data_algebra.test_util.check_transform_on_handles(
+    data_algebra.test_util.check_transform(
         ops=ops,
         data=d,
         expect=expect,
-        db_handles=db_handles,
-        check_parse=False,
-    )
+        check_parse=False)  # (1).cumsum() still formats to 1.cumsum()  # TODO: work on this
 
 
-def test_ideom_project_sum(get_bq_handle):
-    db_handles = get_bq_handle['db_handles']
-    data_catalog = get_bq_handle['data_catalog']
-    data_schema = get_bq_handle['data_schema']
-
+def test_ideom_project_sum():
     d = data_algebra.default_data_model.pd.DataFrame({
         'i': [1, 2, 3, 4, 5],
         'g': [1, 2, 2, 1, 1],
     })
-    table_name_d = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    table_name_d = 'pytest_temp_d'
 
     ops = describe_table(d, table_name=table_name_d). \
         project({
@@ -427,25 +317,19 @@ def test_ideom_project_sum(get_bq_handle):
         's':  [3, 2],
     })
 
-    data_algebra.test_util.check_transform_on_handles(
+    data_algebra.test_util.check_transform(
         ops=ops,
         data=d,
         expect=expect,
-        db_handles=db_handles,
-        check_parse=False,
-    )
+        check_parse=False)  # (1).sum() still formats to 1.sum()  # TODO: work on this
 
 
-def test_ideom_concat_op(get_bq_handle):
-    db_handles = get_bq_handle['db_handles']
-    data_catalog = get_bq_handle['data_catalog']
-    data_schema = get_bq_handle['data_schema']
-
+def test_ideom_concat_op():
     d = data_algebra.default_data_model.pd.DataFrame({
         'x': ['a', 'b', 'c'],
         'y': ['1', '2', '3'],
     })
-    table_name_d = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    table_name_d = 'pytest_temp_d'
 
     ops = describe_table(d, table_name=table_name_d). \
         extend({
@@ -458,25 +342,18 @@ def test_ideom_concat_op(get_bq_handle):
         'z': ['a1a', 'b2b', 'c3c']
     })
 
-    data_algebra.test_util.check_transform_on_handles(
+    data_algebra.test_util.check_transform(
         ops=ops,
         data=d,
-        expect=expect,
-        db_handles=db_handles,
-        check_parse=False,
-    )
+        expect=expect)
 
 
-def test_ideom_coalesce_op(get_bq_handle):
-    db_handles = get_bq_handle['db_handles']
-    data_catalog = get_bq_handle['data_catalog']
-    data_schema = get_bq_handle['data_schema']
-
+def test_ideom_coalesce_op():
     d = data_algebra.default_data_model.pd.DataFrame({
         'x': ['a', 'b', None, None],
         'y': ['1', None, '3', None],
     })
-    table_name_d = f'{data_catalog}.{data_schema}.pytest_temp_d'
+    table_name_d = 'pytest_temp_d'
 
     ops = describe_table(d, table_name=table_name_d). \
         extend({
@@ -489,10 +366,7 @@ def test_ideom_coalesce_op(get_bq_handle):
         'z': ['a', 'b', '3', None],
     })
 
-    data_algebra.test_util.check_transform_on_handles(
+    data_algebra.test_util.check_transform(
         ops=ops,
         data=d,
-        expect=expect,
-        db_handles=db_handles,
-        check_parse=False,
-    )
+        expect=expect)
