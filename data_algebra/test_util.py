@@ -332,7 +332,7 @@ def check_transform(
     # controls
     test_sqlite = True
     test_PostgreSQL = True
-    test_BigQuery = True
+    test_BigQuery = False
     # can't just add BigQuery until we set a default schema somehow
 
     # placeholders
