@@ -1,16 +1,12 @@
 import numpy
-import sqlite3
 
 import data_algebra
 import data_algebra.util
 from data_algebra.data_ops import *
-import data_algebra.SQLite
 import data_algebra.test_util
 
 
 def test_concat_rows():
-    db_model = data_algebra.SQLite.SQLiteModel()
-
     d1 = data_algebra.default_data_model.pd.DataFrame(
         {"x": [-1, 0, 1, numpy.nan], "y": [1, 2, numpy.nan, 3]}
     )

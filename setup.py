@@ -14,8 +14,6 @@ database specific SQL. The package also implements the same transforms for Panda
 [R](https://www.r-project.org) versions of the system are available as 
 the [rquery](https://github.com/WinVector/rquery) and 
 [rqdatatable](https://github.com/WinVector/rqdatatable) packages.
-
-Recommended packages include: sqlparse, black, and graphviz.
 """
 
 setuptools.setup(
@@ -35,7 +33,7 @@ setuptools.setup(
         'pretty_sql': ['sqlparse'],
         'diagram': ['graphviz'],
         'BigQuery': ['google.cloud', 'pyarrow'],
-        'PostgreSQL': ['psycopg2'],
+        'PostgreSQL': ['sqlalchemy'],
         'all': ['black', 'sqlparse', 'graphviz', 'BigQuery', 'PostgreSQL'],
     },
     platforms=['any'],

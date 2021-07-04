@@ -1175,7 +1175,8 @@ class DBModel:
             sql = sql + " " + near_sql.suffix
         return sql
 
-    def nearsqlbinary_to_sql_(self, near_sql, *, columns=None, force_sql=False, constants=None, annotate=False):
+    def nearsqlbinary_to_sql_(self, near_sql, *,
+                              columns=None, force_sql=False, constants=None, annotate=False, quoted_query_name=None):
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLBinaryStep)
         if columns is None:
             columns = [k for k in near_sql.terms.keys()]
@@ -1185,10 +1186,11 @@ class DBModel:
         terms_strs = [self.enc_term_(k, terms=terms) for k in columns]
         if len(terms_strs) < 1:
             terms_strs = [f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}']
+        is_union = 'union' in near_sql.joiner.lower()
         sql = "SELECT "
         if annotate and (near_sql.annotation is not None) and (len(near_sql.annotation) > 0):
             sql = sql + " -- " + _clean_annotation(near_sql.annotation) + "\n "
-        if 'union' in near_sql.joiner.lower():
+        if is_union:
             substr_1 = near_sql.sub_sql1.to_sql(db_model=self, annotate=annotate)
             substr_2 = near_sql.sub_sql2.to_sql(db_model=self, annotate=annotate)
         else:
@@ -1203,6 +1205,8 @@ class DBModel:
         if (near_sql.suffix is not None) and (len(near_sql.suffix) > 0):
             sql = sql + " " + near_sql.suffix
         sql = sql + " ) "
+        if is_union and (quoted_query_name is not None):
+            sql = sql + quoted_query_name + " "
         return sql
 
     def nearsqlq_to_sql_(self, near_sql, *, columns=None, force_sql=False, constants=None, annotate=False):
