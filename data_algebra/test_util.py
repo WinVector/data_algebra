@@ -6,6 +6,7 @@ import data_algebra
 
 import sqlite3
 import pickle
+import os
 
 # noinspection PyUnresolvedReferences
 import data_algebra.SQLite
@@ -23,6 +24,16 @@ try:
     have_sqlalchemy = True
 except ImportError:
     have_sqlalchemy = False
+
+
+have_bigquery = False
+try:
+    # noinspection PyUnresolvedReferences
+    from google.cloud import bigquery
+
+    have_bigquery = True
+except ImportError:
+    have_bigquery = False
 
 
 def formats_to_self(ops):
@@ -142,6 +153,7 @@ def check_transform_on_handles(
     check_row_order=False,
     check_parse=True,
     local_data_model=None,
+    allow_pretty=False,
 ):
     """
     Test an operator dag produces the expected result, and parses correctly.
@@ -150,13 +162,14 @@ def check_transform_on_handles(
     :param ops: data_algebra.data_ops.ViewRepresentation
     :param data: pd.DataFrame or map of strings to pd.DataFrame
     :param expect: pd.DataFrame
-    :param: db_handles  list of database handles to use in testing
-    :param float_tol passed to equivalent_frames()
-    :param check_column_order passed to equivalent_frames()
-    :param cols_case_sensitive passed to equivalent_frames()
-    :param check_row_order passed to equivalent_frames()
-    :param check_parse if True check expression parses/formats to self
-    :param: local_data_model optional alternate evaluation model
+    :param db_handles:  list of database handles to use in testing
+    :param float_tol: passed to equivalent_frames()
+    :param check_column_order: passed to equivalent_frames()
+    :param cols_case_sensitive: passed to equivalent_frames()
+    :param check_row_order: passed to equivalent_frames()
+    :param check_parse: if True check expression parses/formats to self
+    :param local_data_model: optional alternate evaluation model
+    :param allow_pretty: if True try pretty printing SQL
     :return: None, assert if there is an issue
     """
 
@@ -215,8 +228,12 @@ def check_transform_on_handles(
             to_del = set()
             temp_tables = None
             sql_statements = []
+            if allow_pretty:
+                pretty_levels = [True, False]
+            else:
+                pretty_levels = [False]
             for annotate in [True, False]:
-                for pretty in [True, False]:
+                for pretty in pretty_levels:
                     for use_with in [True, False]:
                         temp_tables = dict()
                         sql = db_handle.to_sql(
@@ -282,6 +299,7 @@ def check_transform(
     cols_case_sensitive=False,
     check_row_order=False,
     check_parse=True,
+    allow_pretty=True
 ):
     """
     Test an operator dag produces the expected result, and parses correctly.
@@ -290,11 +308,12 @@ def check_transform(
     :param ops: data_algebra.data_ops.ViewRepresentation
     :param data: pd.DataFrame or map of strings to pd.DataFrame
     :param expect: pd.DataFrame
-    :param float_tol passed to equivalent_frames()
-    :param check_column_order passed to equivalent_frames()
-    :param cols_case_sensitive passed to equivalent_frames()
-    :param check_row_order passed to equivalent_frames()
-    :param check_parse if True check expression parses/formats to self
+    :param float_tol: passed to equivalent_frames()
+    :param check_column_order: passed to equivalent_frames()
+    :param cols_case_sensitive: passed to equivalent_frames()
+    :param check_row_order: passed to equivalent_frames()
+    :param check_parse: if True check expression parses/formats to self
+    :param allow_pretty: if True try pretty printing SQL
     :return: nothing
     """
 
@@ -313,11 +332,13 @@ def check_transform(
     # controls
     test_sqlite = True
     test_PostgreSQL = True
+    test_BigQuery = False
     # can't just add BigQuery until we set a default schema somehow
 
     # placeholders
     db_handle_sqlite = None
-    db_handle_p = None
+    db_handle_PosgreSQL = None
+    db_handle_BigQuery = None
 
     if test_sqlite:
         def build_sqlite_handle():
@@ -335,7 +356,21 @@ def check_transform(
             engine = sqlalchemy.engine.create_engine(r'postgresql://johnmount@localhost/johnmount')
             return data_algebra.PostgreSQL.PostgreSQLModel().db_handle(engine)
 
-        db_handle_p = build_PostgreSQL_handle()
+        db_handle_PosgreSQL = build_PostgreSQL_handle()
+
+    if test_BigQuery and have_bigquery:
+        def build_BigQuery_handle():
+            os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/johnmount/big_query/big_query_jm.json"
+            # os.environ["GOOGLE_APPLICATION_CREDENTIALS"]  # trigger key error if not present
+            bq_client = bigquery.Client()
+
+            bq_handle = data_algebra.BigQuery.BigQueryModel().db_handle(bq_client)
+            data_catalog = 'data-algebra-test'
+            data_schema = 'test_1'
+            return data_algebra.BigQuery.BigQueryModel(
+                table_prefix=f'{data_catalog}.{data_schema}').db_handle(bq_client)
+
+        db_handle_BigQuery = build_BigQuery_handle()
 
     db_handles = [
         empty_db_handle_sqlite,
@@ -344,8 +379,10 @@ def check_transform(
         empty_db_handle_Spark]
     if db_handle_sqlite is not None:
         db_handles.append(db_handle_sqlite)
-    if db_handle_p is not None:
-        db_handles.append(db_handle_p)
+    if db_handle_PosgreSQL is not None:
+        db_handles.append(db_handle_PosgreSQL)
+    if db_handle_BigQuery is not None:
+        db_handles.append(db_handle_BigQuery)
 
     check_transform_on_handles(
         ops=ops,
@@ -357,10 +394,14 @@ def check_transform(
         check_row_order=check_row_order,
         check_parse=check_parse,
         db_handles=db_handles,
+        allow_pretty=allow_pretty,
     )
 
     if db_handle_sqlite is not None:
         db_handle_sqlite.close()
 
-    if db_handle_p is not None:
-        db_handle_p.close()
+    if db_handle_PosgreSQL is not None:
+        db_handle_PosgreSQL.close()
+
+    if db_handle_BigQuery is not None:
+        db_handle_BigQuery.close()

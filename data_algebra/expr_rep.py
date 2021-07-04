@@ -622,7 +622,7 @@ def _enc_value(value):
 class ColumnReference(Term):
     """class to represent referring to a column"""
 
-    view: any  # typically a ViewReference
+    view: any
     column_name: str
 
     def __init__(self, view, column_name):

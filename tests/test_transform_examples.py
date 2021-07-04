@@ -100,10 +100,10 @@ def test_order_rows_transform_1():
 def test_convert_records_transform_1():
     iris_small = data_algebra.default_data_model.pd.DataFrame(
         {
-            "Sepal.Length": [5.1, 4.9, 4.7],
-            "Sepal.Width": [3.5, 3.0, 3.2],
-            "Petal.Length": [1.4, 1.4, 1.3],
-            "Petal.Width": [0.2, 0.2, 0.2],
+            "Sepal_Length": [5.1, 4.9, 4.7],
+            "Sepal_Width": [3.5, 3.0, 3.2],
+            "Petal_Length": [1.4, 1.4, 1.3],
+            "Petal_Width": [0.2, 0.2, 0.2],
             "Species": ["setosa", "setosa", "setosa"],
             "id": [0, 1, 2],
         }
@@ -113,7 +113,7 @@ def test_convert_records_transform_1():
         {
             "Part": ["Sepal", "Sepal", "Petal", "Petal"],
             "Measure": ["Length", "Width", "Length", "Width"],
-            "Value": ["Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"],
+            "Value": ["Sepal_Length", "Sepal_Width", "Petal_Length", "Petal_Width"],
         }
     )
 
