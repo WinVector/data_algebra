@@ -65,18 +65,22 @@ def test_equiv():
 
 
 def test_simple():
-    q = 4
-    x = 2
+    q = 4.
+    x = 2.
     var_name = "y"
 
     ops = TableDescription("d", ["x", "y"]).extend({"z": f"1/({q}) + x"})
 
-    d_local = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2], "y": [3, 4]})
-    res = ops.eval(data_map={"d": d_local})
+    d_local = data_algebra.default_data_model.pd.DataFrame({"x": [1., 2.], "y": [3., 4.]})
+
     expect = data_algebra.default_data_model.pd.DataFrame(
-        {"x": [1, 2], "y": [3, 4], "z": [1.25, 2.25]}
+        {"x": [1., 2.], "y": [3., 4.], "z": [1.25, 2.25]}
     )
-    assert data_algebra.test_util.equivalent_frames(res, expect)
+
+    data_algebra.test_util.check_transform(
+        ops=ops,
+        data=d_local,
+        expect=expect)
 
 
 def test_pandas_to_example():

@@ -45,11 +45,6 @@ def test_scoring_example():
             .rename_columns({"diagnosis": "surveyCategory"})
         )
 
-    py_source = ops.to_python(strict=True, pretty=False)
-    py_sourcep = ops.to_python(strict=True, pretty=True)
-
-    # Pandas calculate
-    res = ops.eval(data_map={"d": d_local})
     expect = data_algebra.default_data_model.pd.DataFrame(
         {
             "subjectID": [1, 2],
@@ -57,30 +52,14 @@ def test_scoring_example():
             "probability": [0.670622, 0.558974],
         }
     )
-    assert data_algebra.test_util.equivalent_frames(expect, res, float_tol=1e-3)
 
-    # test database aspects
-
-    db_model_p = data_algebra.PostgreSQL.PostgreSQLModel()
-    db_model_s = data_algebra.SQLite.SQLiteModel()
-
-    sql_p = ops.to_sql(db_model_p, pretty=True)
-    sql_s = ops.to_sql(db_model_p, pretty=True)
-
-    conn = sqlite3.connect(":memory:")
-    db_model_s.prepare_connection(conn)
-
-    db_model_s.insert_table(conn, d_local, "d")
-    back = db_model_s.read_table(conn, "d")
-
-    res_sql = db_model_s.read_query(conn, sql_s)
-
-    assert data_algebra.test_util.equivalent_frames(expect, res_sql, float_tol=1e-3)
+    data_algebra.test_util.check_transform(
+        ops=ops,
+        data=d_local,
+        expect=expect,
+        float_tol=1e-3)
 
     # test instrumentation
 
     tables = ops.get_tables()
     cols_used = ops.columns_used()
-
-    # be neat
-    conn.close()

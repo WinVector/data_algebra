@@ -20,8 +20,6 @@ def test_mimimum_1():
             'xl': 'x.minimum(x_g_max - 1)'
         })
 
-    res_pandas = ops.transform(d)  # throws deep in Pandas!
-
     expect = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, 3, 4, 5, 6],
         'g': [1, 1, 1, 2, 2, 2],
@@ -29,4 +27,7 @@ def test_mimimum_1():
         'xl': [1, 2, 2, 4, 5, 5],
     })
 
-    assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
+    data_algebra.test_util.check_transform(
+        ops=ops,
+        data=d,
+        expect=expect)

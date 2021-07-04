@@ -28,4 +28,7 @@ def test_join_warn1():
         {"k": ["a", "a", "b"], "x": [1.0, None, 3.0], "y": [1.0, 10.0, 20.0],}
     )
 
-    assert data_algebra.test_util.equivalent_frames(res, expect)
+    data_algebra.test_util.check_transform(
+        ops=ops,
+        data={"d_left": d_left, "d_right": d_right},
+        expect=expect)

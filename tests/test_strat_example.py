@@ -16,8 +16,6 @@ def test_strat_example():
         {"sum": "y.sum()", "mean": "y.mean()", "size": "_size()",}, group_by=["g"]
     )
 
-    res = ops.transform(prepared_stratified)
-
     expect = data_algebra.default_data_model.pd.DataFrame(
         {
             "g": [0, 1],
@@ -27,7 +25,10 @@ def test_strat_example():
         }
     )
 
-    assert data_algebra.test_util.equivalent_frames(res, expect)
+    data_algebra.test_util.check_transform(
+        ops=ops,
+        data=prepared_stratified,
+        expect=expect)
 
 
 def test_strat_example_size():
@@ -39,10 +40,11 @@ def test_strat_example_size():
         {"size": "_size()",}, group_by=["g"]
     )
 
-    res = ops.transform(prepared_stratified)
-
     expect = data_algebra.default_data_model.pd.DataFrame(
         {"g": [0, 1], "size": [3, 3],}
     )
 
-    assert data_algebra.test_util.equivalent_frames(res, expect)
+    data_algebra.test_util.check_transform(
+        ops=ops,
+        data=prepared_stratified,
+        expect=expect)

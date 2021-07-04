@@ -20,8 +20,6 @@ def test_simple_expr_1():
             'xs': '2 * (x-2).sign()',
         })
 
-    res_pandas = ops.transform(d)
-
     expect = data_algebra.default_data_model.pd.DataFrame({
         'x': [1, 2, -3, 4]
     })
@@ -30,5 +28,9 @@ def test_simple_expr_1():
     expect['xm'] = -expect['x']
     expect['xs'] = 2 * numpy.sign(d['x'] - 2)
 
-    assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
+    data_algebra.test_util.check_transform(
+        ops=ops,
+        data=d,
+        expect=expect)
+
     assert d.equals(d_orig)

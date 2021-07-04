@@ -411,19 +411,7 @@ def test_cdata_query_details():
         'value': [1, 3, 2, 4]
     })
 
-    res_pandas = ops.transform(d)
-    assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
-
-    db_model = data_algebra.SQLite.SQLiteModel()
-    cdata_temps = {}
-    sql = ops.to_sql(db_model, temp_tables=cdata_temps, pretty=True)
-
-    with sqlite3.connect(":memory:") as conn:
-        db_model.prepare_connection(conn)
-        db_handle = db_model.db_handle(conn)
-        for k, v in cdata_temps.items():
-            db_handle.insert_table(v, table_name=k)
-        db_handle.insert_table(d, table_name='d')
-        res_db = db_handle.read_query(sql)
-
-    assert data_algebra.test_util.equivalent_frames(res_db, expect)
+    data_algebra.test_util.check_transform(
+        ops=ops,
+        data=d,
+        expect=expect)

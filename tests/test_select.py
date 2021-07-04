@@ -19,10 +19,12 @@ def test_select_rows_2():
 
     ops = describe_table(d, table_name="d").select_rows("x.sign() == 1")
 
-    d_sel = ops.transform(d)
-
     expect = data_algebra.default_data_model.pd.DataFrame({'x': [3], 'y': [3]})
-    assert data_algebra.test_util.equivalent_frames(d_sel, expect)
+
+    data_algebra.test_util.check_transform(
+        ops=ops,
+        data=d,
+        expect=expect)
 
 
 def test_select_columns_1():

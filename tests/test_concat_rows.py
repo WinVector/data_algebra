@@ -21,10 +21,6 @@ def test_concat_rows():
 
     ops4 = describe_table(d1, "d1").concat_rows(b=describe_table(d2, "d2"))
 
-    assert data_algebra.test_util.formats_to_self(ops4)
-
-    res_pandas = ops4.eval(data_map={"d1": d1, "d2": d2})
-
     expect = data_algebra.default_data_model.pd.DataFrame(
         {
             "x": [-1.0, 0.0, 1.0, None, 0.0, 4.0, None],
@@ -33,15 +29,7 @@ def test_concat_rows():
         }
     )
 
-    assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
-
-    sql = ops4.to_sql(db_model, pretty=True)
-
-    conn = sqlite3.connect(":memory:")
-    db_model.insert_table(conn, d1, "d1")
-    db_model.insert_table(conn, d2, "d2")
-    res_sqlite = db_model.read_query(conn, sql)
-    # neaten up
-    conn.close()
-
-    assert data_algebra.test_util.equivalent_frames(expect, res_sqlite)
+    data_algebra.test_util.check_transform(
+        ops=ops4,
+        data={'d1': d1, 'd2': d2},
+        expect=expect)

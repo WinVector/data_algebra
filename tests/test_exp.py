@@ -24,8 +24,6 @@ def test_exp():
             "d", ["subjectID", "surveyCategory", "assessmentTotal"]
         ).extend({"v": "assessmentTotal.exp()+1"})
 
-    res_local = ops.transform(d_local)
-
     expect = data_algebra.default_data_model.pd.DataFrame(
         {
             "subjectID": [1, 1, 2, 2],
@@ -41,4 +39,7 @@ def test_exp():
     )
     expect.v = expect.v + 1
 
-    assert data_algebra.test_util.equivalent_frames(res_local, expect, float_tol=1e-3)
+    data_algebra.test_util.check_transform(
+        ops=ops,
+        data=d_local,
+        expect=expect)

@@ -12,11 +12,12 @@ def test_agg():
 
     ops = describe_table(d, table_name="d").project({"x": "x.max()"}, group_by=["g"])
 
-    res = ops.transform(d)
-
     expect = data_algebra.default_data_model.pd.DataFrame({"g": [1, 2], "x": [2, 4],})
 
-    assert data_algebra.test_util.equivalent_frames(res, expect)
+    data_algebra.test_util.check_transform(
+        ops=ops,
+        data=d,
+        expect=expect)
 
 
 def test_agg_fn():

@@ -23,8 +23,6 @@ def test_natural_join_columns():
         b=describe_table(d2, "d2"), by=["y"], jointype="LEFT"
     )
 
-    res_pandas = ops4.eval(data_map={"d": d, "d2": d2})
-
     expect = data_algebra.default_data_model.pd.DataFrame(
         {
             "x": [-1.0, 0.0, 1.0, 7.0],
@@ -33,15 +31,7 @@ def test_natural_join_columns():
         }
     )
 
-    assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
-
-    sql = ops4.to_sql(db_model, pretty=True)
-
-    conn = sqlite3.connect(":memory:")
-    db_model.insert_table(conn, d, "d")
-    db_model.insert_table(conn, d2, "d2")
-    res_sqlite = db_model.read_query(conn, sql)
-    # neaten up
-    conn.close()
-
-    assert data_algebra.test_util.equivalent_frames(expect, res_sqlite)
+    data_algebra.test_util.check_transform(
+        ops=ops4,
+        data={"d": d, "d2": d2},
+        expect=expect)

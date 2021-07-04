@@ -181,26 +181,5 @@ def test_convert_records_transform_1():
         }
     )
 
-    res_pandas = ops.transform(iris_small)
-    assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
-
-    db_model = data_algebra.SQLite.SQLiteModel()
-    with pytest.raises(ValueError):
-        ops.to_sql(db_model)
-
-    temp_tables = dict()
-    sql = ops.to_sql(db_model, temp_tables=temp_tables)
-    assert len(temp_tables) == 1
-    k = [k for k in temp_tables.keys()][0]
-    assert isinstance(temp_tables[k], data_algebra.default_data_model.pd.DataFrame)
-
     data_algebra.test_util.check_transform(ops, data, expect)
 
-    with sqlite3.connect(":memory:") as conn:
-        db_model.prepare_connection(conn)
-        db_handle = db_model.db_handle(conn)
-        db_handle.insert_table(d=iris_small, table_name='iris_small')
-        for k, v in temp_tables.items():
-            db_handle.insert_table(d=v, table_name=k)
-        res_db = db_handle.read_query(sql)
-    assert data_algebra.test_util.equivalent_frames(res_db, expect)

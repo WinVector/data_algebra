@@ -15,6 +15,7 @@ def test_ghost_col_issue():
             "shift_v": [None, None, 40.0, None, 70.0, 80.0],
         }
     )
+
     o2 = describe_table(d2).extend(
         {
             "size": "_size()",
@@ -27,7 +28,7 @@ def test_ghost_col_issue():
         },
         partition_by=["g"],
     )
-    res = o2.transform(d2)
+
     expect = data_algebra.default_data_model.pd.DataFrame(
         {
             "x": [1, 4, 5, 7, 8, 9],
@@ -45,4 +46,8 @@ def test_ghost_col_issue():
             "size_v": [1, 2, 2, 3, 3, 3],
         }
     )
-    assert data_algebra.test_util.equivalent_frames(res, expect)
+
+    data_algebra.test_util.check_transform(
+        ops=o2,
+        data=d2,
+        expect=expect)

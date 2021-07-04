@@ -12,7 +12,6 @@ import data_algebra.SQLite
 
 
 def test_math():
-
     d = data_algebra.default_data_model.pd.DataFrame(
         {
             "g": [1, 2, 2, 3, 3, 3],
@@ -25,8 +24,6 @@ def test_math():
     ops = table_desciption.extend(
         {"v_exp": "v.exp()", "v_sin": "v.sin()", "g_plus_x": "g+x",}
     )
-
-    res1 = ops.transform(d)
 
     expect1 = data_algebra.default_data_model.pd.DataFrame(
         {
@@ -53,17 +50,7 @@ def test_math():
         }
     )
 
-    assert data_algebra.test_util.equivalent_frames(res1, expect1)
-
-    conn = sqlite3.connect(":memory:")
-    db_model = data_algebra.SQLite.SQLiteModel()
-    db_model.prepare_connection(conn)
-
-    db_model.insert_table(conn, d, table_desciption.table_name)
-    sql1 = ops.to_sql(db_model)
-    res1_db = db_model.read_query(conn, sql1)
-
-    # clean up
-    conn.close()
-
-    assert data_algebra.test_util.equivalent_frames(res1_db, expect1)
+    data_algebra.test_util.check_transform(
+        ops=ops,
+        data=d,
+        expect=expect1)

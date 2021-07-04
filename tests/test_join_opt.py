@@ -72,21 +72,7 @@ def test_join_opt_1():
     })
 
     for ops in ops_list:
-        res_pandas = ops.eval(tables)
-        assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
-
-    sql_model = data_algebra.SQLite.SQLiteModel()
-
-    # see that we get exactly 2 selects in derived sql
-    for ops in ops_list:
-        sql = ops.to_sql(sql_model, pretty=True)
-        assert sql.count('SELECT') == 2
-
-    with sqlite3.connect(":memory:") as conn:
-        sql_model.prepare_connection(conn)
-        db_handle = data_algebra.db_model.DBHandle(db_model=sql_model, conn=conn)
-        for k, v in tables.items():
-            db_handle.insert_table(v, table_name=k)
-        for ops in ops_list:
-            res_db = db_handle.read_query(ops)
-            assert data_algebra.test_util.equivalent_frames(res_db, expect)
+        data_algebra.test_util.check_transform(
+            ops=ops,
+            data=tables,
+            expect=expect)
