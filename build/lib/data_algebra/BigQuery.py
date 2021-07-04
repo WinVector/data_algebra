@@ -37,12 +37,29 @@ def _bigquery_mean_expr(dbmodel, expression):
 def _bigquery_size_expr(dbmodel, expression):
     return "SUM(1)"
 
+def _bigquery_is_bad_expr(dbmodel, expression):
+    subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    return (
+        "("
+        + subexpr
+        + " IS NULL OR "
+        + "IS_INF(" + subexpr + ")"
+        + " OR ("
+        + subexpr
+        + " != 0 AND "
+        + subexpr
+        + " = -"
+        + subexpr
+        + "))"
+    )
+
 
 BigQuery_formatters = {
     "nunique": _bigquery_nunique_expr,
     "median": _bigquery_median_expr,
     "mean": _bigquery_mean_expr,
     "size": _bigquery_size_expr,
+    "is_bad": _bigquery_is_bad_expr,
 }
 
 
@@ -50,7 +67,7 @@ class BigQueryModel(data_algebra.db_model.DBModel):
     """A model of how SQL should be generated for BigQuery
        connection should be google.cloud.bigquery.client.Client"""
 
-    def __init__(self):
+    def __init__(self, *, table_prefix=None):
         data_algebra.db_model.DBModel.__init__(
             self,
             identifier_quote='`',
@@ -61,6 +78,7 @@ class BigQueryModel(data_algebra.db_model.DBModel):
             on_joiner=' AND ',
             string_type='STRING',
         )
+        self.table_prefix = table_prefix
 
     def quote_identifier(self, identifier):
         if not isinstance(identifier, str):
@@ -69,6 +87,23 @@ class BigQueryModel(data_algebra.db_model.DBModel):
             # TODO: escape quotes
             raise ValueError('did not expect ' + self.identifier_quote + ' in identifier')
         return self.identifier_quote + identifier + self.identifier_quote
+
+    def quote_table_name(self, table_description):
+        if not isinstance(table_description, str):
+            try:
+                if table_description.node_name == "TableDescription":
+                    table_description = table_description.table_name
+                else:
+                    raise TypeError(
+                        "Expected table_description to be a string or data_algebra.data_ops.TableDescription)"
+                    )
+            except KeyError:
+                raise TypeError(
+                    "Expected table_description to be a string or data_algebra.data_ops.TableDescription)"
+                )
+        if self.table_prefix is not None:
+            table_description = self.table_prefix + '.' + table_description
+        return self.quote_identifier(table_description)
 
     # noinspection PyMethodMayBeStatic
     def execute(self, conn, q):
@@ -107,20 +142,23 @@ class BigQueryModel(data_algebra.db_model.DBModel):
     def insert_table(
         self, conn, d, table_name, *, qualifiers=None, allow_overwrite=False
     ):
+        prepped_table_name = table_name
+        if self.table_prefix is not None:
+            prepped_table_name = self.table_prefix + '.' + table_name
         if allow_overwrite:
             self.drop_table(conn, table_name)
         else:
             table_exists = True
             try:
-                self.read_query(conn, "SELECT * FROM " + table_name + " LIMIT 1")
+                self.read_query(conn, "SELECT * FROM " + self.quote_table_name(table_name) + " LIMIT 1")
                 table_exists = True
             except Exception as e:
                 table_exists = False
             if table_exists:
-                raise ValueError("table " + table_name + " already exists")
+                raise ValueError("table " + prepped_table_name + " already exists")
         job = conn.load_table_from_dataframe(
             d,
-            table_name)
+            prepped_table_name)
         job.result()
 
     def db_handle(self, conn):

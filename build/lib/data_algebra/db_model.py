@@ -5,6 +5,8 @@ import io
 from types import SimpleNamespace
 from collections import OrderedDict
 
+import pandas.io.sql
+
 import data_algebra
 
 import data_algebra.near_sql
@@ -297,9 +299,7 @@ class DBModel:
             q = q.to_sql(db_model=self)
         else:
             q = str(q)
-        cur = conn.cursor()
-        cur.execute(q)
-        conn.commit()
+        pandas.io.sql.execute(q, conn)
 
     def drop_table(self, conn, table_name):
         q_table_name = self.quote_table_name(table_name)
@@ -312,7 +312,7 @@ class DBModel:
         if table_exists:
             self.execute(conn, self.drop_text + ' ' + q_table_name)
 
-    # noinspection SqlNoDataSourceInspection
+    # noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection
     def insert_table(
         self, conn, d, table_name, *, qualifiers=None, allow_overwrite=False
     ):
@@ -325,39 +325,23 @@ class DBModel:
         :param allow_overwrite logical, if True drop previous table
         """
 
-        cr = [
-            d.columns[i].lower()
-            + " "
-            + (
-                "double precision"
-                if self.local_data_model.can_convert_col_to_numeric(d[d.columns[i]])
-                else self.string_type
-            )
-            for i in range(d.shape[1])
-        ]
-        q_table_name = self.quote_table_name(
-            table_name
-        )
-        cur = conn.cursor()
+        if qualifiers is not None:
+            raise ValueError("non-empty qualifiers not yet supported on insert")
         # check for table
         table_exists = True
         # noinspection PyBroadException
         try:
-            self.read_query(conn, "SELECT * FROM " + q_table_name + " LIMIT 1")
+            self.read_query(conn, "SELECT * FROM " + table_name + " LIMIT 1")
         except Exception:
             table_exists = False
         if table_exists:
             if not allow_overwrite:
-                raise ValueError("table " + q_table_name + " already exists")
+                raise ValueError("table " + table_name + " already exists")
             else:
-                cur.execute(self.drop_text + ' ' + q_table_name)
-                conn.commit()
-        create_stmt = "CREATE TABLE " + q_table_name + " ( " + ", ".join(cr) + " )"
-        cur.execute(create_stmt)
-        conn.commit()
-        buf = io.StringIO(d.to_csv(index=False, header=False, sep="\t"))
-        cur.copy_from(buf, "d", columns=[c for c in d.columns])
-        conn.commit()
+                conn.execute("DROP TABLE " + table_name)
+        # Note: the Pandas to_sql() method appears to have SQLite hard-wired into it
+        # it refers to sqlite_master
+        d.to_sql(name=table_name, con=conn, index=False)
 
     def read_query(self, conn, q):
         """
@@ -373,11 +357,8 @@ class DBModel:
                 raise ValueError("ops require management of temp tables, please collect them via to_sql(temp_tables)")
         else:
             q = str(q)
-        cur = conn.cursor()
-        cur.execute(q)
-        r = cur.fetchall()
-        colnames = [desc[0] for desc in cur.description]
-        r = self.local_data_model.pd.DataFrame(columns=colnames, data=r)
+        r = pandas.io.sql.read_sql(q, conn)
+        r = self.local_data_model.pd.DataFrame(r)
         r = r.reset_index(drop=True)
         return r
 
@@ -1194,7 +1175,8 @@ class DBModel:
             sql = sql + " " + near_sql.suffix
         return sql
 
-    def nearsqlbinary_to_sql_(self, near_sql, *, columns=None, force_sql=False, constants=None, annotate=False):
+    def nearsqlbinary_to_sql_(self, near_sql, *,
+                              columns=None, force_sql=False, constants=None, annotate=False, quoted_query_name=None):
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLBinaryStep)
         if columns is None:
             columns = [k for k in near_sql.terms.keys()]
@@ -1204,10 +1186,11 @@ class DBModel:
         terms_strs = [self.enc_term_(k, terms=terms) for k in columns]
         if len(terms_strs) < 1:
             terms_strs = [f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}']
+        is_union = 'union' in near_sql.joiner.lower()
         sql = "SELECT "
         if annotate and (near_sql.annotation is not None) and (len(near_sql.annotation) > 0):
             sql = sql + " -- " + _clean_annotation(near_sql.annotation) + "\n "
-        if 'union' in near_sql.joiner.lower():
+        if is_union:
             substr_1 = near_sql.sub_sql1.to_sql(db_model=self, annotate=annotate)
             substr_2 = near_sql.sub_sql2.to_sql(db_model=self, annotate=annotate)
         else:
@@ -1222,6 +1205,8 @@ class DBModel:
         if (near_sql.suffix is not None) and (len(near_sql.suffix) > 0):
             sql = sql + " " + near_sql.suffix
         sql = sql + " ) "
+        if is_union and (quoted_query_name is not None):
+            sql = sql + quoted_query_name + " "
         return sql
 
     def nearsqlq_to_sql_(self, near_sql, *, columns=None, force_sql=False, constants=None, annotate=False):
@@ -1385,13 +1370,12 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         q_table_name = self.db_model.quote_table_name(result_name)
         drop_query = self.db_model.drop_text + ' ' + q_table_name
         create_query = "CREATE TABLE " + q_table_name + " AS " + query
-        cur = self.conn.cursor()
         # noinspection PyBroadException
         try:
-            cur.execute(drop_query)
+            self.db_model.execute(self.conn, drop_query)
         except Exception:
             pass
-        cur.execute(create_query)
+        self.db_model.execute(self.conn, create_query)
         res = self.describe_table(result_name)
         if data_map is not None:
             data_map[result_name] = res
@@ -1413,5 +1397,8 @@ class DBHandle(data_algebra.eval_model.EvalModel):
 
     def close(self):
         if self.conn is not None:
-            self.conn.close()
+            try:
+                self.conn.close()
+            except Exception:
+                pass
             self.conn = None

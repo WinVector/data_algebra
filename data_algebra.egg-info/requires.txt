@@ -7,7 +7,7 @@ google.cloud
 pyarrow
 
 [PostgreSQL]
-psycopg2
+sqlalchemy
 
 [all]
 black

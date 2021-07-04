@@ -226,7 +226,8 @@ class NearSQLBinaryStep(NearSQL):
             columns=columns,
             force_sql=force_sql,
             constants=constants,
-            annotate=annotate
+            annotate=annotate,
+            quoted_query_name=self.quoted_query_name
         )
 
     def to_with_form(self):

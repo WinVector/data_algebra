@@ -67,6 +67,7 @@
 
 <span class="kn">import</span> <span class="nn">sqlite3</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">os</span>
 
 <span class="c1"># noinspection PyUnresolvedReferences</span>
 <span class="kn">import</span> <span class="nn">data_algebra.SQLite</span>
@@ -74,6 +75,26 @@
 <span class="kn">import</span> <span class="nn">data_algebra.PostgreSQL</span>
 <span class="kn">import</span> <span class="nn">data_algebra.SparkSQL</span>
 <span class="kn">from</span> <span class="nn">data_algebra.data_ops</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<span class="n">have_sqlalchemy</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># noinspection PyUnresolvedReferences</span>
+    <span class="kn">import</span> <span class="nn">sqlalchemy</span>
+
+    <span class="n">have_sqlalchemy</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">have_sqlalchemy</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<span class="n">have_bigquery</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># noinspection PyUnresolvedReferences</span>
+    <span class="kn">from</span> <span class="nn">google.cloud</span> <span class="kn">import</span> <span class="n">bigquery</span>
+
+    <span class="n">have_bigquery</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">have_bigquery</span> <span class="o">=</span> <span class="kc">False</span>
 
 
 <span class="k">def</span> <span class="nf">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
@@ -193,6 +214,7 @@
     <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">check_parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">allow_pretty</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
@@ -201,13 +223,14 @@
 <span class="sd">    :param ops: data_algebra.data_ops.ViewRepresentation</span>
 <span class="sd">    :param data: pd.DataFrame or map of strings to pd.DataFrame</span>
 <span class="sd">    :param expect: pd.DataFrame</span>
-<span class="sd">    :param: db_handles  list of database handles to use in testing</span>
-<span class="sd">    :param float_tol passed to equivalent_frames()</span>
-<span class="sd">    :param check_column_order passed to equivalent_frames()</span>
-<span class="sd">    :param cols_case_sensitive passed to equivalent_frames()</span>
-<span class="sd">    :param check_row_order passed to equivalent_frames()</span>
-<span class="sd">    :param check_parse if True check expression parses/formats to self</span>
-<span class="sd">    :param: local_data_model optional alternate evaluation model</span>
+<span class="sd">    :param db_handles:  list of database handles to use in testing</span>
+<span class="sd">    :param float_tol: passed to equivalent_frames()</span>
+<span class="sd">    :param check_column_order: passed to equivalent_frames()</span>
+<span class="sd">    :param cols_case_sensitive: passed to equivalent_frames()</span>
+<span class="sd">    :param check_row_order: passed to equivalent_frames()</span>
+<span class="sd">    :param check_parse: if True check expression parses/formats to self</span>
+<span class="sd">    :param local_data_model: optional alternate evaluation model</span>
+<span class="sd">    :param allow_pretty: if True try pretty printing SQL</span>
 <span class="sd">    :return: None, assert if there is an issue</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -266,8 +289,12 @@
             <span class="n">to_del</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
             <span class="n">temp_tables</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">sql_statements</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">allow_pretty</span><span class="p">:</span>
+                <span class="n">pretty_levels</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pretty_levels</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">annotate</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
-                <span class="k">for</span> <span class="n">pretty</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">pretty</span> <span class="ow">in</span> <span class="n">pretty_levels</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">use_with</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
                         <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
                         <span class="n">sql</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
@@ -333,6 +360,7 @@
     <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">check_parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">allow_pretty</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
@@ -341,11 +369,12 @@
 <span class="sd">    :param ops: data_algebra.data_ops.ViewRepresentation</span>
 <span class="sd">    :param data: pd.DataFrame or map of strings to pd.DataFrame</span>
 <span class="sd">    :param expect: pd.DataFrame</span>
-<span class="sd">    :param float_tol passed to equivalent_frames()</span>
-<span class="sd">    :param check_column_order passed to equivalent_frames()</span>
-<span class="sd">    :param cols_case_sensitive passed to equivalent_frames()</span>
-<span class="sd">    :param check_row_order passed to equivalent_frames()</span>
-<span class="sd">    :param check_parse if True check expression parses/formats to self</span>
+<span class="sd">    :param float_tol: passed to equivalent_frames()</span>
+<span class="sd">    :param check_column_order: passed to equivalent_frames()</span>
+<span class="sd">    :param cols_case_sensitive: passed to equivalent_frames()</span>
+<span class="sd">    :param check_row_order: passed to equivalent_frames()</span>
+<span class="sd">    :param check_parse: if True check expression parses/formats to self</span>
+<span class="sd">    :param allow_pretty: if True try pretty printing SQL</span>
 <span class="sd">    :return: nothing</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -355,31 +384,88 @@
         <span class="n">table_name</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cols_used</span><span class="o">.</span><span class="n">keys</span><span class="p">()][</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">table_name</span><span class="p">:</span> <span class="n">data</span><span class="p">}</span>
 
-    <span class="k">with</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;:memory:&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn_sqlite</span><span class="p">:</span>
-        <span class="n">db_model_sqlite</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span>
-        <span class="n">db_model_sqlite</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">conn_sqlite</span><span class="p">)</span>
-        <span class="n">db_handle_sqlite</span> <span class="o">=</span> <span class="n">db_model_sqlite</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">conn_sqlite</span><span class="p">)</span>
-        <span class="c1"># non-connected handles, lets us test some of the SQL generation path</span>
-        <span class="n">empty_db_handle_sqlite</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-        <span class="n">empty_db_handle_BigQuery</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">BigQueryModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-        <span class="n">empty_db_handle_PosgreSQL</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-        <span class="n">empty_db_handle_Spark</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">SparkSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-        <span class="n">check_transform_on_handles</span><span class="p">(</span>
-            <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span>
-            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-            <span class="n">expect</span><span class="o">=</span><span class="n">expect</span><span class="p">,</span>
-            <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
-            <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
-            <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
-            <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
-            <span class="n">check_parse</span><span class="o">=</span><span class="n">check_parse</span><span class="p">,</span>
-            <span class="n">db_handles</span><span class="o">=</span><span class="p">[</span>
-                <span class="n">db_handle_sqlite</span><span class="p">,</span>
-                <span class="n">empty_db_handle_sqlite</span><span class="p">,</span>
-                <span class="n">empty_db_handle_BigQuery</span><span class="p">,</span>
-                <span class="n">empty_db_handle_PosgreSQL</span><span class="p">,</span>
-                <span class="n">empty_db_handle_Spark</span><span class="p">],</span>
-        <span class="p">)</span>
+    <span class="c1"># non-connected handles, lets us test some of the SQL generation path</span>
+    <span class="n">empty_db_handle_sqlite</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">empty_db_handle_BigQuery</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">BigQueryModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">empty_db_handle_PosgreSQL</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">empty_db_handle_Spark</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">SparkSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="c1"># controls</span>
+    <span class="n">test_sqlite</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">test_BigQuery</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># can&#39;t just add BigQuery until we set a default schema somehow</span>
+
+    <span class="c1"># placeholders</span>
+    <span class="n">db_handle_sqlite</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">db_handle_PosgreSQL</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">db_handle_BigQuery</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">test_sqlite</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">build_sqlite_handle</span><span class="p">():</span>
+            <span class="c1"># sqlite db</span>
+            <span class="n">conn_sqlite</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;:memory:&quot;</span><span class="p">)</span>
+            <span class="n">db_model_sqlite</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span>
+            <span class="n">db_model_sqlite</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">conn_sqlite</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">db_model_sqlite</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">conn_sqlite</span><span class="p">)</span>
+
+        <span class="n">db_handle_sqlite</span> <span class="o">=</span> <span class="n">build_sqlite_handle</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">test_PostgreSQL</span> <span class="ow">and</span> <span class="n">have_sqlalchemy</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">build_PostgreSQL_handle</span><span class="p">():</span>
+            <span class="c1"># PostgreSQL db</span>
+            <span class="n">engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;postgresql://johnmount@localhost/johnmount&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+        <span class="n">db_handle_PosgreSQL</span> <span class="o">=</span> <span class="n">build_PostgreSQL_handle</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">test_BigQuery</span> <span class="ow">and</span> <span class="n">have_bigquery</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">build_BigQuery_handle</span><span class="p">():</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;/Users/johnmount/big_query/big_query_jm.json&quot;</span>
+            <span class="c1"># os.environ[&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;]  # trigger key error if not present</span>
+            <span class="n">bq_client</span> <span class="o">=</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
+
+            <span class="n">bq_handle</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">BigQueryModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">bq_client</span><span class="p">)</span>
+            <span class="n">data_catalog</span> <span class="o">=</span> <span class="s1">&#39;data-algebra-test&#39;</span>
+            <span class="n">data_schema</span> <span class="o">=</span> <span class="s1">&#39;test_1&#39;</span>
+            <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">BigQueryModel</span><span class="p">(</span>
+                <span class="n">table_prefix</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">data_catalog</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">data_schema</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">bq_client</span><span class="p">)</span>
+
+        <span class="n">db_handle_BigQuery</span> <span class="o">=</span> <span class="n">build_BigQuery_handle</span><span class="p">()</span>
+
+    <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">empty_db_handle_sqlite</span><span class="p">,</span>
+        <span class="n">empty_db_handle_BigQuery</span><span class="p">,</span>
+        <span class="n">empty_db_handle_PosgreSQL</span><span class="p">,</span>
+        <span class="n">empty_db_handle_Spark</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">db_handle_sqlite</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_handle_sqlite</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">db_handle_PosgreSQL</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_handle_PosgreSQL</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">db_handle_BigQuery</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_handle_BigQuery</span><span class="p">)</span>
+
+    <span class="n">check_transform_on_handles</span><span class="p">(</span>
+        <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+        <span class="n">expect</span><span class="o">=</span><span class="n">expect</span><span class="p">,</span>
+        <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
+        <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
+        <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
+        <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
+        <span class="n">check_parse</span><span class="o">=</span><span class="n">check_parse</span><span class="p">,</span>
+        <span class="n">db_handles</span><span class="o">=</span><span class="n">db_handles</span><span class="p">,</span>
+        <span class="n">allow_pretty</span><span class="o">=</span><span class="n">allow_pretty</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">db_handle_sqlite</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">db_handle_sqlite</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">db_handle_PosgreSQL</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">db_handle_PosgreSQL</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">db_handle_BigQuery</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">db_handle_BigQuery</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 
         </details>
@@ -554,7 +640,8 @@ Ignores indexing.</p>
     cols_case_sensitive=False,
     check_row_order=False,
     check_parse=True,
-    local_data_model=None
+    local_data_model=None,
+    allow_pretty=False
 )</span>:
     </div>
 
@@ -572,6 +659,7 @@ Ignores indexing.</p>
     <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">check_parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">allow_pretty</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
@@ -580,13 +668,14 @@ Ignores indexing.</p>
 <span class="sd">    :param ops: data_algebra.data_ops.ViewRepresentation</span>
 <span class="sd">    :param data: pd.DataFrame or map of strings to pd.DataFrame</span>
 <span class="sd">    :param expect: pd.DataFrame</span>
-<span class="sd">    :param: db_handles  list of database handles to use in testing</span>
-<span class="sd">    :param float_tol passed to equivalent_frames()</span>
-<span class="sd">    :param check_column_order passed to equivalent_frames()</span>
-<span class="sd">    :param cols_case_sensitive passed to equivalent_frames()</span>
-<span class="sd">    :param check_row_order passed to equivalent_frames()</span>
-<span class="sd">    :param check_parse if True check expression parses/formats to self</span>
-<span class="sd">    :param: local_data_model optional alternate evaluation model</span>
+<span class="sd">    :param db_handles:  list of database handles to use in testing</span>
+<span class="sd">    :param float_tol: passed to equivalent_frames()</span>
+<span class="sd">    :param check_column_order: passed to equivalent_frames()</span>
+<span class="sd">    :param cols_case_sensitive: passed to equivalent_frames()</span>
+<span class="sd">    :param check_row_order: passed to equivalent_frames()</span>
+<span class="sd">    :param check_parse: if True check expression parses/formats to self</span>
+<span class="sd">    :param local_data_model: optional alternate evaluation model</span>
+<span class="sd">    :param allow_pretty: if True try pretty printing SQL</span>
 <span class="sd">    :return: None, assert if there is an issue</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -645,8 +734,12 @@ Ignores indexing.</p>
             <span class="n">to_del</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
             <span class="n">temp_tables</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">sql_statements</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">allow_pretty</span><span class="p">:</span>
+                <span class="n">pretty_levels</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pretty_levels</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">annotate</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
-                <span class="k">for</span> <span class="n">pretty</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">pretty</span> <span class="ow">in</span> <span class="n">pretty_levels</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">use_with</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
                         <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
                         <span class="n">sql</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
@@ -710,13 +803,14 @@ Asserts if there are issues</p>
 <p>:param ops: <a href="data_ops.html#ViewRepresentation">data_algebra.data_ops.ViewRepresentation</a>
 :param data: pd.DataFrame or map of strings to pd.DataFrame
 :param expect: pd.DataFrame
-:param: db_handles  list of database handles to use in testing
-:param float_tol passed to equivalent_frames()
-:param check_column_order passed to equivalent_frames()
-:param cols_case_sensitive passed to equivalent_frames()
-:param check_row_order passed to equivalent_frames()
-:param check_parse if True check expression parses/formats to self
-:param: local_data_model optional alternate evaluation model
+:param db_handles:  list of database handles to use in testing
+:param float_tol: passed to equivalent_frames()
+:param check_column_order: passed to equivalent_frames()
+:param cols_case_sensitive: passed to equivalent_frames()
+:param check_row_order: passed to equivalent_frames()
+:param check_parse: if True check expression parses/formats to self
+:param local_data_model: optional alternate evaluation model
+:param allow_pretty: if True try pretty printing SQL
 :return: None, assert if there is an issue</p>
 </div>
 
@@ -736,7 +830,8 @@ Asserts if there are issues</p>
     check_column_order=False,
     cols_case_sensitive=False,
     check_row_order=False,
-    check_parse=True
+    check_parse=True,
+    allow_pretty=True
 )</span>:
     </div>
 
@@ -752,6 +847,7 @@ Asserts if there are issues</p>
     <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">check_parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">allow_pretty</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
@@ -760,11 +856,12 @@ Asserts if there are issues</p>
 <span class="sd">    :param ops: data_algebra.data_ops.ViewRepresentation</span>
 <span class="sd">    :param data: pd.DataFrame or map of strings to pd.DataFrame</span>
 <span class="sd">    :param expect: pd.DataFrame</span>
-<span class="sd">    :param float_tol passed to equivalent_frames()</span>
-<span class="sd">    :param check_column_order passed to equivalent_frames()</span>
-<span class="sd">    :param cols_case_sensitive passed to equivalent_frames()</span>
-<span class="sd">    :param check_row_order passed to equivalent_frames()</span>
-<span class="sd">    :param check_parse if True check expression parses/formats to self</span>
+<span class="sd">    :param float_tol: passed to equivalent_frames()</span>
+<span class="sd">    :param check_column_order: passed to equivalent_frames()</span>
+<span class="sd">    :param cols_case_sensitive: passed to equivalent_frames()</span>
+<span class="sd">    :param check_row_order: passed to equivalent_frames()</span>
+<span class="sd">    :param check_parse: if True check expression parses/formats to self</span>
+<span class="sd">    :param allow_pretty: if True try pretty printing SQL</span>
 <span class="sd">    :return: nothing</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -774,31 +871,88 @@ Asserts if there are issues</p>
         <span class="n">table_name</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cols_used</span><span class="o">.</span><span class="n">keys</span><span class="p">()][</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">table_name</span><span class="p">:</span> <span class="n">data</span><span class="p">}</span>
 
-    <span class="k">with</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;:memory:&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn_sqlite</span><span class="p">:</span>
-        <span class="n">db_model_sqlite</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span>
-        <span class="n">db_model_sqlite</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">conn_sqlite</span><span class="p">)</span>
-        <span class="n">db_handle_sqlite</span> <span class="o">=</span> <span class="n">db_model_sqlite</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">conn_sqlite</span><span class="p">)</span>
-        <span class="c1"># non-connected handles, lets us test some of the SQL generation path</span>
-        <span class="n">empty_db_handle_sqlite</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-        <span class="n">empty_db_handle_BigQuery</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">BigQueryModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-        <span class="n">empty_db_handle_PosgreSQL</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-        <span class="n">empty_db_handle_Spark</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">SparkSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-        <span class="n">check_transform_on_handles</span><span class="p">(</span>
-            <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span>
-            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-            <span class="n">expect</span><span class="o">=</span><span class="n">expect</span><span class="p">,</span>
-            <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
-            <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
-            <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
-            <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
-            <span class="n">check_parse</span><span class="o">=</span><span class="n">check_parse</span><span class="p">,</span>
-            <span class="n">db_handles</span><span class="o">=</span><span class="p">[</span>
-                <span class="n">db_handle_sqlite</span><span class="p">,</span>
-                <span class="n">empty_db_handle_sqlite</span><span class="p">,</span>
-                <span class="n">empty_db_handle_BigQuery</span><span class="p">,</span>
-                <span class="n">empty_db_handle_PosgreSQL</span><span class="p">,</span>
-                <span class="n">empty_db_handle_Spark</span><span class="p">],</span>
-        <span class="p">)</span>
+    <span class="c1"># non-connected handles, lets us test some of the SQL generation path</span>
+    <span class="n">empty_db_handle_sqlite</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">empty_db_handle_BigQuery</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">BigQueryModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">empty_db_handle_PosgreSQL</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">empty_db_handle_Spark</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">SparkSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="c1"># controls</span>
+    <span class="n">test_sqlite</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">test_BigQuery</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># can&#39;t just add BigQuery until we set a default schema somehow</span>
+
+    <span class="c1"># placeholders</span>
+    <span class="n">db_handle_sqlite</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">db_handle_PosgreSQL</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">db_handle_BigQuery</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">test_sqlite</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">build_sqlite_handle</span><span class="p">():</span>
+            <span class="c1"># sqlite db</span>
+            <span class="n">conn_sqlite</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;:memory:&quot;</span><span class="p">)</span>
+            <span class="n">db_model_sqlite</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span>
+            <span class="n">db_model_sqlite</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">conn_sqlite</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">db_model_sqlite</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">conn_sqlite</span><span class="p">)</span>
+
+        <span class="n">db_handle_sqlite</span> <span class="o">=</span> <span class="n">build_sqlite_handle</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">test_PostgreSQL</span> <span class="ow">and</span> <span class="n">have_sqlalchemy</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">build_PostgreSQL_handle</span><span class="p">():</span>
+            <span class="c1"># PostgreSQL db</span>
+            <span class="n">engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;postgresql://johnmount@localhost/johnmount&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+        <span class="n">db_handle_PosgreSQL</span> <span class="o">=</span> <span class="n">build_PostgreSQL_handle</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">test_BigQuery</span> <span class="ow">and</span> <span class="n">have_bigquery</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">build_BigQuery_handle</span><span class="p">():</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;/Users/johnmount/big_query/big_query_jm.json&quot;</span>
+            <span class="c1"># os.environ[&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;]  # trigger key error if not present</span>
+            <span class="n">bq_client</span> <span class="o">=</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
+
+            <span class="n">bq_handle</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">BigQueryModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">bq_client</span><span class="p">)</span>
+            <span class="n">data_catalog</span> <span class="o">=</span> <span class="s1">&#39;data-algebra-test&#39;</span>
+            <span class="n">data_schema</span> <span class="o">=</span> <span class="s1">&#39;test_1&#39;</span>
+            <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">BigQueryModel</span><span class="p">(</span>
+                <span class="n">table_prefix</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">data_catalog</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">data_schema</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">bq_client</span><span class="p">)</span>
+
+        <span class="n">db_handle_BigQuery</span> <span class="o">=</span> <span class="n">build_BigQuery_handle</span><span class="p">()</span>
+
+    <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">empty_db_handle_sqlite</span><span class="p">,</span>
+        <span class="n">empty_db_handle_BigQuery</span><span class="p">,</span>
+        <span class="n">empty_db_handle_PosgreSQL</span><span class="p">,</span>
+        <span class="n">empty_db_handle_Spark</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">db_handle_sqlite</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_handle_sqlite</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">db_handle_PosgreSQL</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_handle_PosgreSQL</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">db_handle_BigQuery</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_handle_BigQuery</span><span class="p">)</span>
+
+    <span class="n">check_transform_on_handles</span><span class="p">(</span>
+        <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+        <span class="n">expect</span><span class="o">=</span><span class="n">expect</span><span class="p">,</span>
+        <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
+        <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
+        <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
+        <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
+        <span class="n">check_parse</span><span class="o">=</span><span class="n">check_parse</span><span class="p">,</span>
+        <span class="n">db_handles</span><span class="o">=</span><span class="n">db_handles</span><span class="p">,</span>
+        <span class="n">allow_pretty</span><span class="o">=</span><span class="n">allow_pretty</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">db_handle_sqlite</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">db_handle_sqlite</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">db_handle_PosgreSQL</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">db_handle_PosgreSQL</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">db_handle_BigQuery</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">db_handle_BigQuery</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 
         </details>
@@ -809,11 +963,12 @@ Assert if there are issues.</p>
 <p>:param ops: <a href="data_ops.html#ViewRepresentation">data_algebra.data_ops.ViewRepresentation</a>
 :param data: pd.DataFrame or map of strings to pd.DataFrame
 :param expect: pd.DataFrame
-:param float_tol passed to equivalent_frames()
-:param check_column_order passed to equivalent_frames()
-:param cols_case_sensitive passed to equivalent_frames()
-:param check_row_order passed to equivalent_frames()
-:param check_parse if True check expression parses/formats to self
+:param float_tol: passed to equivalent_frames()
+:param check_column_order: passed to equivalent_frames()
+:param cols_case_sensitive: passed to equivalent_frames()
+:param check_row_order: passed to equivalent_frames()
+:param check_parse: if True check expression parses/formats to self
+:param allow_pretty: if True try pretty printing SQL
 :return: nothing</p>
 </div>
 
