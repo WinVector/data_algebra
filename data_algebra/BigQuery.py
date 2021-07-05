@@ -1,5 +1,6 @@
 
 import gzip
+import os
 
 import data_algebra
 import data_algebra.data_ops
@@ -79,14 +80,6 @@ class BigQueryModel(data_algebra.db_model.DBModel):
             string_type='STRING',
         )
         self.table_prefix = table_prefix
-
-    def quote_identifier(self, identifier):
-        if not isinstance(identifier, str):
-            raise TypeError("expected identifier to be a str")
-        if self.identifier_quote in identifier:
-            # TODO: escape quotes
-            raise ValueError('did not expect ' + self.identifier_quote + ' in identifier')
-        return self.identifier_quote + identifier + self.identifier_quote
 
     def quote_table_name(self, table_description):
         if not isinstance(table_description, str):
@@ -216,3 +209,21 @@ class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
             for block in res_iter:
                 block.to_csv(res, index=False, header=is_first)
                 is_first = False
+
+
+def example_handle():
+    """
+    Return an example db handle for testing. Returns None if helper packages not present.
+
+    """
+    # TODO: parameterize this
+    if not _have_bigquery:
+        return None
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/johnmount/big_query/big_query_jm.json"
+    # os.environ["GOOGLE_APPLICATION_CREDENTIALS"]  # trigger key error if not present
+    data_catalog = 'data-algebra-test'
+    data_schema = 'test_1'
+    db_handle = BigQueryModel(
+        table_prefix=f'{data_catalog}.{data_schema}').db_handle(google.cloud.bigquery.Client())
+    db_handle.db_model.prepare_connection(db_handle.conn)
+    return db_handle

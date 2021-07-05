@@ -2,6 +2,16 @@ import data_algebra.data_ops
 import data_algebra.db_model
 
 
+have_sqlalchemy = False
+try:
+    # noinspection PyUnresolvedReferences
+    import sqlalchemy
+
+    have_sqlalchemy = True
+except ImportError:
+    have_sqlalchemy = False
+
+
 def _MySQL_mean_expr(dbmodel, expression):
     return (
         "avg(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ")"
@@ -63,3 +73,18 @@ class MySQLModel(data_algebra.db_model.DBModel):
             # TODO: escape quotes
             raise ValueError('did not expect ' + self.identifier_quote + ' in identifier')
         return self.identifier_quote + identifier + self.identifier_quote
+
+
+def example_handle():
+    """
+    Return an example db handle for testing. Returns None if helper packages not present.
+
+    """
+    # TODO: parameterize this
+    if not have_sqlalchemy:
+        return None
+    db_handle = MySQLModel().db_handle(
+        sqlalchemy.engine.create_engine("mysql+pymysql://jmount@localhost/jmount")
+    )
+    db_handle.db_model.prepare_connection(db_handle.conn)
+    return db_handle

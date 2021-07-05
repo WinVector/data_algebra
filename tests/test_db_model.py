@@ -26,6 +26,6 @@ def test_db_model_base():
 
     assert db_model.quote_identifier("a") == '"a"'
     assert db_model.quote_table_name("a") == '"a"'
-    assert db_model.quote_literal("a") == "'a'"
+    assert db_model.quote_string("a") == "'a'"
 
     conn.close()
