@@ -9,7 +9,7 @@ from data_algebra.data_ops import *
 
 def test_strat_example():
     prepared_stratified = data_algebra.default_data_model.pd.DataFrame(
-        {"y": [1, 0, 0, 1, 0, 0], "g": [0, 0, 0, 1, 1, 1], "x": [1, 2, 3, 4, 5, 6]}
+        {"y": [1., 0., 0., 1., 0., 0.], "g": [0., 0., 0., 1., 1., 1.], "x": [1., 2., 3., 4., 5., 6.]}
     )
 
     ops = describe_table(prepared_stratified).project(

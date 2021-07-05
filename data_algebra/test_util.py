@@ -301,7 +301,8 @@ def check_transform(
     cols_case_sensitive=False,
     check_row_order=False,
     check_parse=True,
-    allow_pretty=True
+    allow_pretty=True,
+    models_to_skip=None,
 ):
     """
     Test an operator dag produces the expected result, and parses correctly.
@@ -316,6 +317,7 @@ def check_transform(
     :param check_row_order: passed to equivalent_frames()
     :param check_parse: if True check expression parses/formats to self
     :param allow_pretty: if True try pretty printing SQL
+    :param models_to_skip: None or set of model names to skip testing
     :return: nothing
     """
 
@@ -329,7 +331,7 @@ def check_transform(
     test_sqlite = True
     test_PostgreSQL = False  # causes an external dependency
     test_BigQuery = False  # causes an external dependency
-    test_MySQL = False  # not ready, and causes an external dependency
+    test_MySQL = False  # causes an external dependency
     # can't just add BigQuery until we set a default schema somehow
 
     # placeholders
@@ -400,6 +402,9 @@ def check_transform(
         db_handles.append(db_handle_BigQuery)
     if db_handle_MySQL is not None:
         db_handles.append(db_handle_MySQL)
+
+    if models_to_skip is not None:
+        db_handles = [h for h in db_handles if str(h.db_model) not in models_to_skip]
 
     check_transform_on_handles(
         ops=ops,

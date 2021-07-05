@@ -1,13 +1,12 @@
+
 import math
 import numpy
-import sqlite3
 
 import data_algebra
 import data_algebra.util
 import data_algebra.test_util
 from data_algebra.data_ops import *
-import data_algebra.SQLite
-import data_algebra.PostgreSQL
+import data_algebra.MySQL
 
 
 def test_null_bad():
@@ -29,8 +28,14 @@ def test_null_bad():
         }
     )
 
+    # can't insert infinity into MySQL
+    models_to_skip = set()
+    models_to_skip.add(str(data_algebra.MySQL.MySQLModel()))
+
     data_algebra.test_util.check_transform(
         ops=ops,
         data=d,
         expect=expect,
-        allow_pretty=False)  # pretty printer was changing capitalization of data to DATA
+        allow_pretty=False,
+        models_to_skip=models_to_skip,
+    )  # pretty printer was changing capitalization of data to DATA
