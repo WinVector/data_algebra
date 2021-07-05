@@ -165,3 +165,12 @@ def test_parse_13():
             "z": "u * v + w"})
     recovered = ops.ops['z']
     assert str(recovered) == '(u * v) + w'
+
+
+def test_parse_14():
+    ops = TableDescription("d", ["x"]). \
+        extend({
+            "z": "(1).sum()"})
+    recovered = ops.ops['z']
+    assert str(recovered) == "(1).sum()"
+

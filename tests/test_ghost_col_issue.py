@@ -50,5 +50,4 @@ def test_ghost_col_issue():
     data_algebra.test_util.check_transform(
         ops=o2,
         data=d2,
-        expect=expect,
-        check_parse=False)  # (1).sum() issue
+        expect=expect)

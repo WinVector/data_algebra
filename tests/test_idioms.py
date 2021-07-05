@@ -293,8 +293,7 @@ def test_ideom_sum_cumsum():
     data_algebra.test_util.check_transform(
         ops=ops,
         data=d,
-        expect=expect,
-        check_parse=False)  # (1).cumsum() still formats to 1.cumsum()  # TODO: work on this
+        expect=expect)
 
 
 def test_ideom_project_sum():
@@ -320,8 +319,7 @@ def test_ideom_project_sum():
     data_algebra.test_util.check_transform(
         ops=ops,
         data=d,
-        expect=expect,
-        check_parse=False)  # (1).sum() still formats to 1.sum()  # TODO: work on this
+        expect=expect)
 
 
 def test_ideom_concat_op():
