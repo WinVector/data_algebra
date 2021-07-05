@@ -67,7 +67,6 @@
 
 <span class="kn">import</span> <span class="nn">sqlite3</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">import</span> <span class="nn">os</span>
 
 <span class="c1"># noinspection PyUnresolvedReferences</span>
 <span class="kn">import</span> <span class="nn">data_algebra.SQLite</span>
@@ -76,26 +75,6 @@
 <span class="kn">import</span> <span class="nn">data_algebra.MySQL</span>
 <span class="kn">import</span> <span class="nn">data_algebra.SparkSQL</span>
 <span class="kn">from</span> <span class="nn">data_algebra.data_ops</span> <span class="kn">import</span> <span class="o">*</span>
-
-
-<span class="n">have_sqlalchemy</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="c1"># noinspection PyUnresolvedReferences</span>
-    <span class="kn">import</span> <span class="nn">sqlalchemy</span>
-
-    <span class="n">have_sqlalchemy</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">have_sqlalchemy</span> <span class="o">=</span> <span class="kc">False</span>
-
-
-<span class="n">have_bigquery</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="c1"># noinspection PyUnresolvedReferences</span>
-    <span class="kn">from</span> <span class="nn">google.cloud</span> <span class="kn">import</span> <span class="n">bigquery</span>
-
-    <span class="n">have_bigquery</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">have_bigquery</span> <span class="o">=</span> <span class="kc">False</span>
 
 
 <span class="k">def</span> <span class="nf">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
@@ -389,63 +368,23 @@
         <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">table_name</span><span class="p">:</span> <span class="n">data</span><span class="p">}</span>
 
     <span class="c1"># controls</span>
-    <span class="n">test_sqlite</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
+    <span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># causes an external dependency</span>
     <span class="n">test_BigQuery</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-    <span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-    <span class="c1"># can&#39;t just add BigQuery until we set a default schema somehow</span>
+    <span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># causes an external dependency</span>
 
     <span class="c1"># placeholders</span>
-    <span class="n">db_handle_sqlite</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">db_handle_PosgreSQL</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">db_handle_BigQuery</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">db_handle_MySQL</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">if</span> <span class="n">test_sqlite</span><span class="p">:</span>
-        <span class="k">def</span> <span class="nf">build_sqlite_handle</span><span class="p">():</span>
-            <span class="c1"># sqlite db</span>
-            <span class="n">db_handle</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span>
-                <span class="n">conn</span><span class="o">=</span><span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;:memory:&#39;</span><span class="p">)</span>
-            <span class="p">)</span>
-            <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">db_handle</span>
+    <span class="k">if</span> <span class="n">test_PostgreSQL</span><span class="p">:</span>
+        <span class="n">db_handle_PosgreSQL</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
 
-        <span class="n">db_handle_sqlite</span> <span class="o">=</span> <span class="n">build_sqlite_handle</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">test_BigQuery</span><span class="p">:</span>
+        <span class="n">db_handle_BigQuery</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="n">test_PostgreSQL</span> <span class="ow">and</span> <span class="n">have_sqlalchemy</span><span class="p">:</span>
-        <span class="k">def</span> <span class="nf">build_PostgreSQL_handle</span><span class="p">():</span>
-            <span class="c1"># PostgreSQL db</span>
-            <span class="n">db_handle</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span>
-                <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;postgresql://johnmount@localhost/johnmount&#39;</span><span class="p">)</span>
-            <span class="p">)</span>
-            <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">db_handle</span>
-
-        <span class="n">db_handle_PosgreSQL</span> <span class="o">=</span> <span class="n">build_PostgreSQL_handle</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">test_BigQuery</span> <span class="ow">and</span> <span class="n">have_bigquery</span><span class="p">:</span>
-        <span class="k">def</span> <span class="nf">build_BigQuery_handle</span><span class="p">():</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;/Users/johnmount/big_query/big_query_jm.json&quot;</span>
-            <span class="c1"># os.environ[&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;]  # trigger key error if not present</span>
-            <span class="n">data_catalog</span> <span class="o">=</span> <span class="s1">&#39;data-algebra-test&#39;</span>
-            <span class="n">data_schema</span> <span class="o">=</span> <span class="s1">&#39;test_1&#39;</span>
-            <span class="n">db_handle</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">BigQueryModel</span><span class="p">(</span>
-                <span class="n">table_prefix</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">data_catalog</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">data_schema</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">())</span>
-            <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">db_handle</span>
-
-        <span class="n">db_handle_BigQuery</span> <span class="o">=</span> <span class="n">build_BigQuery_handle</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">test_MySQL</span> <span class="ow">and</span> <span class="n">have_sqlalchemy</span><span class="p">:</span>
-        <span class="k">def</span> <span class="nf">build_MySQL_handle</span><span class="p">():</span>
-            <span class="c1"># MySQL db</span>
-            <span class="n">db_handle</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span>
-                <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="s2">&quot;mysql+pymysql://jmount@localhost/jmount&quot;</span><span class="p">)</span>
-            <span class="p">)</span>
-            <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">db_handle</span>
-
-        <span class="n">db_handle_MySQL</span> <span class="o">=</span> <span class="n">build_MySQL_handle</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">test_MySQL</span><span class="p">:</span>
+        <span class="n">db_handle_MySQL</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
 
     <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[</span>
         <span class="c1"># non-connected handles, lets us test some of the SQL generation path</span>
@@ -454,9 +393,8 @@
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">SparkSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+        <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">example_handle</span><span class="p">(),</span>
         <span class="p">]</span>
-    <span class="k">if</span> <span class="n">db_handle_sqlite</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_handle_sqlite</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">db_handle_PosgreSQL</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_handle_PosgreSQL</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">db_handle_BigQuery</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -480,14 +418,8 @@
         <span class="n">allow_pretty</span><span class="o">=</span><span class="n">allow_pretty</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">db_handle_sqlite</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">db_handle_sqlite</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">db_handle_PosgreSQL</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">db_handle_PosgreSQL</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">db_handle_BigQuery</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">db_handle_BigQuery</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">handle</span> <span class="ow">in</span> <span class="n">db_handles</span><span class="p">:</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 
         </details>
@@ -898,63 +830,23 @@ Asserts if there are issues</p>
         <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">table_name</span><span class="p">:</span> <span class="n">data</span><span class="p">}</span>
 
     <span class="c1"># controls</span>
-    <span class="n">test_sqlite</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
+    <span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># causes an external dependency</span>
     <span class="n">test_BigQuery</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-    <span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-    <span class="c1"># can&#39;t just add BigQuery until we set a default schema somehow</span>
+    <span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># causes an external dependency</span>
 
     <span class="c1"># placeholders</span>
-    <span class="n">db_handle_sqlite</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">db_handle_PosgreSQL</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">db_handle_BigQuery</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">db_handle_MySQL</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">if</span> <span class="n">test_sqlite</span><span class="p">:</span>
-        <span class="k">def</span> <span class="nf">build_sqlite_handle</span><span class="p">():</span>
-            <span class="c1"># sqlite db</span>
-            <span class="n">db_handle</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span>
-                <span class="n">conn</span><span class="o">=</span><span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;:memory:&#39;</span><span class="p">)</span>
-            <span class="p">)</span>
-            <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">db_handle</span>
+    <span class="k">if</span> <span class="n">test_PostgreSQL</span><span class="p">:</span>
+        <span class="n">db_handle_PosgreSQL</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
 
-        <span class="n">db_handle_sqlite</span> <span class="o">=</span> <span class="n">build_sqlite_handle</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">test_BigQuery</span><span class="p">:</span>
+        <span class="n">db_handle_BigQuery</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="n">test_PostgreSQL</span> <span class="ow">and</span> <span class="n">have_sqlalchemy</span><span class="p">:</span>
-        <span class="k">def</span> <span class="nf">build_PostgreSQL_handle</span><span class="p">():</span>
-            <span class="c1"># PostgreSQL db</span>
-            <span class="n">db_handle</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span>
-                <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;postgresql://johnmount@localhost/johnmount&#39;</span><span class="p">)</span>
-            <span class="p">)</span>
-            <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">db_handle</span>
-
-        <span class="n">db_handle_PosgreSQL</span> <span class="o">=</span> <span class="n">build_PostgreSQL_handle</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">test_BigQuery</span> <span class="ow">and</span> <span class="n">have_bigquery</span><span class="p">:</span>
-        <span class="k">def</span> <span class="nf">build_BigQuery_handle</span><span class="p">():</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;/Users/johnmount/big_query/big_query_jm.json&quot;</span>
-            <span class="c1"># os.environ[&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;]  # trigger key error if not present</span>
-            <span class="n">data_catalog</span> <span class="o">=</span> <span class="s1">&#39;data-algebra-test&#39;</span>
-            <span class="n">data_schema</span> <span class="o">=</span> <span class="s1">&#39;test_1&#39;</span>
-            <span class="n">db_handle</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">BigQueryModel</span><span class="p">(</span>
-                <span class="n">table_prefix</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">data_catalog</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">data_schema</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">())</span>
-            <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">db_handle</span>
-
-        <span class="n">db_handle_BigQuery</span> <span class="o">=</span> <span class="n">build_BigQuery_handle</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">test_MySQL</span> <span class="ow">and</span> <span class="n">have_sqlalchemy</span><span class="p">:</span>
-        <span class="k">def</span> <span class="nf">build_MySQL_handle</span><span class="p">():</span>
-            <span class="c1"># MySQL db</span>
-            <span class="n">db_handle</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span>
-                <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="s2">&quot;mysql+pymysql://jmount@localhost/jmount&quot;</span><span class="p">)</span>
-            <span class="p">)</span>
-            <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">db_handle</span>
-
-        <span class="n">db_handle_MySQL</span> <span class="o">=</span> <span class="n">build_MySQL_handle</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">test_MySQL</span><span class="p">:</span>
+        <span class="n">db_handle_MySQL</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
 
     <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[</span>
         <span class="c1"># non-connected handles, lets us test some of the SQL generation path</span>
@@ -963,9 +855,8 @@ Asserts if there are issues</p>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">SparkSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+        <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">example_handle</span><span class="p">(),</span>
         <span class="p">]</span>
-    <span class="k">if</span> <span class="n">db_handle_sqlite</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_handle_sqlite</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">db_handle_PosgreSQL</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_handle_PosgreSQL</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">db_handle_BigQuery</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -989,14 +880,8 @@ Asserts if there are issues</p>
         <span class="n">allow_pretty</span><span class="o">=</span><span class="n">allow_pretty</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">db_handle_sqlite</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">db_handle_sqlite</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">db_handle_PosgreSQL</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">db_handle_PosgreSQL</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">db_handle_BigQuery</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">db_handle_BigQuery</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">handle</span> <span class="ow">in</span> <span class="n">db_handles</span><span class="p">:</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 
         </details>

@@ -2,9 +2,19 @@ import data_algebra.data_ops
 import data_algebra.db_model
 
 
+have_sqlalchemy = False
+try:
+    # noinspection PyUnresolvedReferences
+    import sqlalchemy
+
+    have_sqlalchemy = True
+except ImportError:
+    have_sqlalchemy = False
+
+
 def _postgresql_mean_expr(dbmodel, expression):
     return (
-        "avg(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ")"
+        "AVG(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ")"
     )
 
 
@@ -19,6 +29,7 @@ PostgreSQL_formatters = {
     "size": _postgresql_size_expr,
 }
 
+
 class PostgreSQLModel(data_algebra.db_model.DBModel):
     """A model of how SQL should be generated for PostgreSQL.
        Assuming we are using a sqlalhemy engine as our connection
@@ -32,10 +43,17 @@ class PostgreSQLModel(data_algebra.db_model.DBModel):
             sql_formatters=PostgreSQL_formatters,
         )
 
-    def quote_identifier(self, identifier):
-        if not isinstance(identifier, str):
-            raise TypeError("expected identifier to be a str")
-        if self.identifier_quote in identifier:
-            # TODO: escape quotes
-            raise ValueError('did not expect ' + self.identifier_quote + ' in identifier')
-        return self.identifier_quote + identifier + self.identifier_quote
+
+def example_handle():
+    """
+    Return an example db handle for testing. Returns None if helper packages not present.
+
+    """
+    # TODO: parameterize this
+    if not have_sqlalchemy:
+        return None
+    db_handle = PostgreSQLModel().db_handle(
+        sqlalchemy.engine.create_engine(r'postgresql://johnmount@localhost/johnmount')
+    )
+    db_handle.db_model.prepare_connection(db_handle.conn)
+    return db_handle

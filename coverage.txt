@@ -74,12 +74,12 @@ tests/test_with.py ..                                                    [100%]
 ---------- coverage: platform darwin, python 3.9.4-final-0 -----------
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
-data_algebra/BigQuery.py                 106     61    42%
-data_algebra/MySQL.py                     21      4    81%
+data_algebra/BigQuery.py                 110     67    39%
+data_algebra/MySQL.py                     33      7    79%
 data_algebra/OrderedSet.py                52      7    87%
-data_algebra/PostgreSQL.py                16      2    88%
-data_algebra/SQLite.py                    82     10    88%
-data_algebra/SparkSQL.py                  12      2    83%
+data_algebra/PostgreSQL.py                22      3    86%
+data_algebra/SQLite.py                    72      6    92%
+data_algebra/SparkSQL.py                  55     33    40%
 data_algebra/__init__.py                   6      0   100%
 data_algebra/arrow.py                    173     39    77%
 data_algebra/bigquery_user_fns.py         83     58    30%
@@ -89,7 +89,7 @@ data_algebra/data_model.py                52     19    63%
 data_algebra/data_ops.py                1121    206    82%
 data_algebra/data_ops_types.py            79     38    52%
 data_algebra/data_ops_utils.py            51      7    86%
-data_algebra/db_model.py                 734    104    86%
+data_algebra/db_model.py                 738     95    87%
 data_algebra/diagram.py                   56     44    21%
 data_algebra/eval_model.py                16      1    94%
 data_algebra/expr_parse.py                38      3    92%
@@ -100,11 +100,11 @@ data_algebra/pandas_base.py              256     24    91%
 data_algebra/pandas_model.py              18      3    83%
 data_algebra/parse_by_lark.py            139     31    78%
 data_algebra/python3_lark.py               1      0   100%
-data_algebra/test_util.py                228     50    78%
+data_algebra/test_util.py                186     25    87%
 data_algebra/user_fn.py                   84     27    68%
 data_algebra/util.py                      28      4    86%
 ----------------------------------------------------------
-TOTAL                                   4445    930    79%
+TOTAL                                   4462    933    79%
 
 
-============================= 161 passed in 27.72s =============================
+============================= 161 passed in 49.31s =============================

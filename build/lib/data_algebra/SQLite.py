@@ -2,6 +2,8 @@ import math
 import numpy
 import numbers
 
+import sqlite3
+
 import data_algebra.util
 import data_algebra.db_model
 import data_algebra.data_ops
@@ -168,25 +170,6 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         # https://docs.python.org/3/library/sqlite3.html
         conn.create_aggregate('median', 1, MedianAgg)
 
-    def quote_identifier(self, identifier):
-        if not isinstance(identifier, str):
-            raise TypeError("expected identifier to be a str")
-        if self.identifier_quote in identifier:
-            raise ValueError('did not expect " in identifier')
-        return self.identifier_quote + identifier + self.identifier_quote
-
-    def quote_table_name(self, table_description):
-        if isinstance(table_description, str):
-            return self.quote_identifier(table_description)
-        if not isinstance(table_description, data_algebra.data_ops.TableDescription):
-            raise TypeError(
-                "Expected table_description to be a data_algebra.data_ops.TableDescription)"
-            )
-        if len(table_description.qualifiers) > 0:
-            raise RuntimeError("SQLite adapter does not currently support qualifiers")
-        qt = self.quote_identifier(table_description.table_name)
-        return qt
-
     # noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection
     def insert_table(
         self, conn, d, table_name, *, qualifiers=None, allow_overwrite=False
@@ -218,3 +201,15 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         # Note: the Pandas to_sql() method appears to have SQLite hard-wired into it
         # it refers to sqlite_master
         d.to_sql(name=table_name, con=conn, index=False)
+
+
+def example_handle():
+    """
+    Return an example db handle for testing. Returns None if helper packages not present.
+
+    """
+    db_handle = SQLiteModel().db_handle(
+        conn=sqlite3.connect(':memory:')
+    )
+    db_handle.db_model.prepare_connection(db_handle.conn)
+    return db_handle

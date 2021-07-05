@@ -14,12 +14,17 @@ pymysql
 sqlalchemy
 psycopg2
 
+[Spark]
+pyspark
+
 [all]
 black
 sqlparse
 graphviz
 BigQuery
 PostgreSQL
+MySQL
+Spark
 
 [diagram]
 graphviz

@@ -76,13 +76,13 @@
                                 <a class="function" href="#DBModel.execute">execute</a>
                         </li>
                         <li>
-                                <a class="function" href="#DBModel.drop_table">drop_table</a>
+                                <a class="function" href="#DBModel.read_query">read_query</a>
                         </li>
                         <li>
                                 <a class="function" href="#DBModel.insert_table">insert_table</a>
                         </li>
                         <li>
-                                <a class="function" href="#DBModel.read_query">read_query</a>
+                                <a class="function" href="#DBModel.drop_table">drop_table</a>
                         </li>
                         <li>
                                 <a class="function" href="#DBModel.read_table">read_table</a>
@@ -490,6 +490,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">local_data_model</span> <span class="o">=</span> <span class="n">local_data_model</span>
         <span class="k">if</span> <span class="n">sql_formatters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sql_formatters</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">assert</span> <span class="n">identifier_quote</span> <span class="o">!=</span> <span class="n">string_quote</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="o">=</span> <span class="n">identifier_quote</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span> <span class="o">=</span> <span class="n">string_quote</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sql_formatters</span> <span class="o">=</span> <span class="n">sql_formatters</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -530,16 +531,24 @@
             <span class="n">q</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
         <span class="n">pandas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">drop_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
-        <span class="n">q_table_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
-        <span class="c1"># noinspection PyBroadException</span>
-        <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">q_table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_text</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">q_table_name</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">read_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param conn: database connection</span>
+<span class="sd">        :param q: sql query</span>
+<span class="sd">        :return: query results as table</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">):</span>
+            <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">temp_tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ops require management of temp tables, please collect them via to_sql(temp_tables)&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r</span>
 
     <span class="c1"># noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection</span>
     <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
@@ -572,24 +581,16 @@
         <span class="c1"># it refers to sqlite_master</span>
         <span class="n">d</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span> <span class="n">con</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">read_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param conn: database connection</span>
-<span class="sd">        :param q: sql query</span>
-<span class="sd">        :return: query results as table</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">):</span>
-            <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">temp_tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ops require management of temp tables, please collect them via to_sql(temp_tables)&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">q</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span>
+    <span class="k">def</span> <span class="nf">drop_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
+        <span class="n">q_table_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="c1"># noinspection PyBroadException</span>
+        <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">q_table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_text</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">q_table_name</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyMethodMayBeStatic,PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">read_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -616,32 +617,36 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected identifier to be a str&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="ow">in</span> <span class="n">identifier</span><span class="p">:</span>
-            <span class="c1"># TODO: escape quote</span>
-            <span class="c1"># TODO: unify with derived PostgreSQL and BigQuery</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;did not expect &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="o">+</span> <span class="s1">&#39; in identifier&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;did not expect &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="o">+</span> <span class="s1">&#39; in identifier&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="o">+</span> <span class="n">identifier</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span>
 
     <span class="k">def</span> <span class="nf">quote_table_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_description</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_description</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">table_description</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">table_description</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;Expected table_description to be a data_algebra.data_ops.TableDescription)&quot;</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">table_description</span><span class="o">.</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_description</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">table_description</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span>
+                    <span class="n">table_description</span> <span class="o">=</span> <span class="n">table_description</span><span class="o">.</span><span class="n">table_name</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                        <span class="s2">&quot;Expected table_description to be a string or data_algebra.data_ops.TableDescription)&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Expected table_description to be a string or data_algebra.data_ops.TableDescription)&quot;</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">table_description</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">quote_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected string to be a str&quot;</span><span class="p">)</span>
-        <span class="c1"># replace all single-quotes with doubled single quotes and return surrounded by single quotes</span>
+        <span class="c1"># replace all string with doubled string quotes</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span>
             <span class="o">+</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
             <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">quote_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">string</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">quote_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">value_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1102,10 +1107,10 @@
         <span class="n">constants_right</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">constants_left</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_literal</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">a_name</span><span class="p">)</span>
+                <span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">a_name</span><span class="p">)</span>
             <span class="p">}</span>
             <span class="n">constants_right</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_literal</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">b_name</span><span class="p">)</span>
+                <span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">b_name</span><span class="p">)</span>
             <span class="p">}</span>
             <span class="n">terms</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
         <span class="n">confused_temps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sql_left</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
@@ -1714,6 +1719,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">local_data_model</span> <span class="o">=</span> <span class="n">local_data_model</span>
         <span class="k">if</span> <span class="n">sql_formatters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sql_formatters</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">assert</span> <span class="n">identifier_quote</span> <span class="o">!=</span> <span class="n">string_quote</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="o">=</span> <span class="n">identifier_quote</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span> <span class="o">=</span> <span class="n">string_quote</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sql_formatters</span> <span class="o">=</span> <span class="n">sql_formatters</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -1754,16 +1760,24 @@
             <span class="n">q</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
         <span class="n">pandas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">drop_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
-        <span class="n">q_table_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
-        <span class="c1"># noinspection PyBroadException</span>
-        <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">q_table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_text</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">q_table_name</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">read_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param conn: database connection</span>
+<span class="sd">        :param q: sql query</span>
+<span class="sd">        :return: query results as table</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">):</span>
+            <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">temp_tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ops require management of temp tables, please collect them via to_sql(temp_tables)&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r</span>
 
     <span class="c1"># noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection</span>
     <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
@@ -1796,24 +1810,16 @@
         <span class="c1"># it refers to sqlite_master</span>
         <span class="n">d</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span> <span class="n">con</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">read_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param conn: database connection</span>
-<span class="sd">        :param q: sql query</span>
-<span class="sd">        :return: query results as table</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">):</span>
-            <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">temp_tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ops require management of temp tables, please collect them via to_sql(temp_tables)&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">q</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span>
+    <span class="k">def</span> <span class="nf">drop_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
+        <span class="n">q_table_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="c1"># noinspection PyBroadException</span>
+        <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">q_table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_text</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">q_table_name</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyMethodMayBeStatic,PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">read_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -1840,32 +1846,36 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected identifier to be a str&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="ow">in</span> <span class="n">identifier</span><span class="p">:</span>
-            <span class="c1"># TODO: escape quote</span>
-            <span class="c1"># TODO: unify with derived PostgreSQL and BigQuery</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;did not expect &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="o">+</span> <span class="s1">&#39; in identifier&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;did not expect &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="o">+</span> <span class="s1">&#39; in identifier&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="o">+</span> <span class="n">identifier</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span>
 
     <span class="k">def</span> <span class="nf">quote_table_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_description</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_description</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">table_description</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">table_description</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;Expected table_description to be a data_algebra.data_ops.TableDescription)&quot;</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">table_description</span><span class="o">.</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_description</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">table_description</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span>
+                    <span class="n">table_description</span> <span class="o">=</span> <span class="n">table_description</span><span class="o">.</span><span class="n">table_name</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                        <span class="s2">&quot;Expected table_description to be a string or data_algebra.data_ops.TableDescription)&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Expected table_description to be a string or data_algebra.data_ops.TableDescription)&quot;</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">table_description</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">quote_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected string to be a str&quot;</span><span class="p">)</span>
-        <span class="c1"># replace all single-quotes with doubled single quotes and return surrounded by single quotes</span>
+        <span class="c1"># replace all string with doubled string quotes</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span>
             <span class="o">+</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
             <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">quote_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">string</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">quote_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">value_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2326,10 +2336,10 @@
         <span class="n">constants_right</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">constants_left</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_literal</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">a_name</span><span class="p">)</span>
+                <span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">a_name</span><span class="p">)</span>
             <span class="p">}</span>
             <span class="n">constants_right</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_literal</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">b_name</span><span class="p">)</span>
+                <span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">b_name</span><span class="p">)</span>
             <span class="p">}</span>
             <span class="n">terms</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
         <span class="n">confused_temps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sql_left</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
@@ -2747,6 +2757,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">local_data_model</span> <span class="o">=</span> <span class="n">local_data_model</span>
         <span class="k">if</span> <span class="n">sql_formatters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sql_formatters</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">assert</span> <span class="n">identifier_quote</span> <span class="o">!=</span> <span class="n">string_quote</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="o">=</span> <span class="n">identifier_quote</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span> <span class="o">=</span> <span class="n">string_quote</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sql_formatters</span> <span class="o">=</span> <span class="n">sql_formatters</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -2922,31 +2933,43 @@
 
 
                             </div>
-                            <div id="DBModel.drop_table" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#DBModel.drop_table">#&nbsp;&nbsp</a>
+                            <div id="DBModel.read_query" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DBModel.read_query">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">drop_table</span><span class="signature">(self, conn, table_name)</span>:
+            <span class="name">read_query</span><span class="signature">(self, conn, q)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">drop_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
-        <span class="n">q_table_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
-        <span class="c1"># noinspection PyBroadException</span>
-        <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">q_table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_text</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">q_table_name</span><span class="p">)</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">read_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param conn: database connection</span>
+<span class="sd">        :param q: sql query</span>
+<span class="sd">        :return: query results as table</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">):</span>
+            <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">temp_tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ops require management of temp tables, please collect them via to_sql(temp_tables)&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>:param conn: database connection
+:param q: sql query
+:return: query results as table</p>
+</div>
+
 
                             </div>
                             <div id="DBModel.insert_table" class="classattr">
@@ -3001,43 +3024,31 @@
 
 
                             </div>
-                            <div id="DBModel.read_query" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#DBModel.read_query">#&nbsp;&nbsp</a>
+                            <div id="DBModel.drop_table" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DBModel.drop_table">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">read_query</span><span class="signature">(self, conn, q)</span>:
+            <span class="name">drop_table</span><span class="signature">(self, conn, table_name)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">read_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param conn: database connection</span>
-<span class="sd">        :param q: sql query</span>
-<span class="sd">        :return: query results as table</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">):</span>
-            <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">temp_tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ops require management of temp tables, please collect them via to_sql(temp_tables)&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">q</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">drop_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
+        <span class="n">q_table_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="c1"># noinspection PyBroadException</span>
+        <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">q_table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_text</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">q_table_name</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>:param conn: database connection
-:param q: sql query
-:return: query results as table</p>
-</div>
-
+    
 
                             </div>
                             <div id="DBModel.read_table" class="classattr">
@@ -3106,9 +3117,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected identifier to be a str&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="ow">in</span> <span class="n">identifier</span><span class="p">:</span>
-            <span class="c1"># TODO: escape quote</span>
-            <span class="c1"># TODO: unify with derived PostgreSQL and BigQuery</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;did not expect &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="o">+</span> <span class="s1">&#39; in identifier&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;did not expect &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="o">+</span> <span class="s1">&#39; in identifier&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="o">+</span> <span class="n">identifier</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span>
 </pre></div>
 
@@ -3128,13 +3137,19 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">quote_table_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_description</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_description</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">table_description</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">table_description</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;Expected table_description to be a data_algebra.data_ops.TableDescription)&quot;</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">table_description</span><span class="o">.</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_description</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">table_description</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span>
+                    <span class="n">table_description</span> <span class="o">=</span> <span class="n">table_description</span><span class="o">.</span><span class="n">table_name</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                        <span class="s2">&quot;Expected table_description to be a string or data_algebra.data_ops.TableDescription)&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Expected table_description to be a string or data_algebra.data_ops.TableDescription)&quot;</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">table_description</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -3155,7 +3170,7 @@
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">quote_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected string to be a str&quot;</span><span class="p">)</span>
-        <span class="c1"># replace all single-quotes with doubled single quotes and return surrounded by single quotes</span>
+        <span class="c1"># replace all string with doubled string quotes</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span>
             <span class="o">+</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
@@ -3173,13 +3188,13 @@
 
         
             <span class="def">def</span>
-            <span class="name">quote_literal</span><span class="signature">(self, string)</span>:
+            <span class="name">quote_literal</span><span class="signature">(self, val)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">quote_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">string</span><span class="p">))</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">quote_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
 </pre></div>
 
         </details>
@@ -3832,10 +3847,10 @@
         <span class="n">constants_right</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">constants_left</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_literal</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">a_name</span><span class="p">)</span>
+                <span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">a_name</span><span class="p">)</span>
             <span class="p">}</span>
             <span class="n">constants_right</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_literal</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">b_name</span><span class="p">)</span>
+                <span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">b_name</span><span class="p">)</span>
             <span class="p">}</span>
             <span class="n">terms</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
         <span class="n">confused_temps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sql_left</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>

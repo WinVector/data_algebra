@@ -6,7 +6,6 @@ import data_algebra
 
 import sqlite3
 import pickle
-import os
 
 # noinspection PyUnresolvedReferences
 import data_algebra.SQLite
@@ -15,26 +14,6 @@ import data_algebra.PostgreSQL
 import data_algebra.MySQL
 import data_algebra.SparkSQL
 from data_algebra.data_ops import *
-
-
-have_sqlalchemy = False
-try:
-    # noinspection PyUnresolvedReferences
-    import sqlalchemy
-
-    have_sqlalchemy = True
-except ImportError:
-    have_sqlalchemy = False
-
-
-have_bigquery = False
-try:
-    # noinspection PyUnresolvedReferences
-    from google.cloud import bigquery
-
-    have_bigquery = True
-except ImportError:
-    have_bigquery = False
 
 
 def formats_to_self(ops):
@@ -328,63 +307,23 @@ def check_transform(
         data = {table_name: data}
 
     # controls
-    test_sqlite = True
-    test_PostgreSQL = False  # causes an external dependency
+    test_PostgreSQL = True  # causes an external dependency
     test_BigQuery = False  # causes an external dependency
-    test_MySQL = False  # causes an external dependency
-    # can't just add BigQuery until we set a default schema somehow
+    test_MySQL = True  # causes an external dependency
 
     # placeholders
-    db_handle_sqlite = None
     db_handle_PosgreSQL = None
     db_handle_BigQuery = None
     db_handle_MySQL = None
 
-    if test_sqlite:
-        def build_sqlite_handle():
-            # sqlite db
-            db_handle = data_algebra.SQLite.SQLiteModel().db_handle(
-                conn=sqlite3.connect(':memory:')
-            )
-            db_handle.db_model.prepare_connection(db_handle.conn)
-            return db_handle
+    if test_PostgreSQL:
+        db_handle_PosgreSQL = data_algebra.PostgreSQL.example_handle()
 
-        db_handle_sqlite = build_sqlite_handle()
+    if test_BigQuery:
+        db_handle_BigQuery = data_algebra.BigQuery.example_handle()
 
-    if test_PostgreSQL and have_sqlalchemy:
-        def build_PostgreSQL_handle():
-            # PostgreSQL db
-            db_handle = data_algebra.PostgreSQL.PostgreSQLModel().db_handle(
-                sqlalchemy.engine.create_engine(r'postgresql://johnmount@localhost/johnmount')
-            )
-            db_handle.db_model.prepare_connection(db_handle.conn)
-            return db_handle
-
-        db_handle_PosgreSQL = build_PostgreSQL_handle()
-
-    if test_BigQuery and have_bigquery:
-        def build_BigQuery_handle():
-            os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/johnmount/big_query/big_query_jm.json"
-            # os.environ["GOOGLE_APPLICATION_CREDENTIALS"]  # trigger key error if not present
-            data_catalog = 'data-algebra-test'
-            data_schema = 'test_1'
-            db_handle = data_algebra.BigQuery.BigQueryModel(
-                table_prefix=f'{data_catalog}.{data_schema}').db_handle(bigquery.Client())
-            db_handle.db_model.prepare_connection(db_handle.conn)
-            return db_handle
-
-        db_handle_BigQuery = build_BigQuery_handle()
-
-    if test_MySQL and have_sqlalchemy:
-        def build_MySQL_handle():
-            # MySQL db
-            db_handle = data_algebra.MySQL.MySQLModel().db_handle(
-                sqlalchemy.engine.create_engine("mysql+pymysql://jmount@localhost/jmount")
-            )
-            db_handle.db_model.prepare_connection(db_handle.conn)
-            return db_handle
-
-        db_handle_MySQL = build_MySQL_handle()
+    if test_MySQL:
+        db_handle_MySQL = data_algebra.MySQL.example_handle()
 
     db_handles = [
         # non-connected handles, lets us test some of the SQL generation path
@@ -393,9 +332,8 @@ def check_transform(
         data_algebra.PostgreSQL.PostgreSQLModel().db_handle(None),
         data_algebra.SparkSQL.SparkSQLModel().db_handle(None),
         data_algebra.MySQL.MySQLModel().db_handle(None),
+        data_algebra.SQLite.example_handle(),
         ]
-    if db_handle_sqlite is not None:
-        db_handles.append(db_handle_sqlite)
     if db_handle_PosgreSQL is not None:
         db_handles.append(db_handle_PosgreSQL)
     if db_handle_BigQuery is not None:
@@ -419,11 +357,5 @@ def check_transform(
         allow_pretty=allow_pretty,
     )
 
-    if db_handle_sqlite is not None:
-        db_handle_sqlite.close()
-
-    if db_handle_PosgreSQL is not None:
-        db_handle_PosgreSQL.close()
-
-    if db_handle_BigQuery is not None:
-        db_handle_BigQuery.close()
+    for handle in db_handles:
+        handle.close()
