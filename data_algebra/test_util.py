@@ -307,9 +307,9 @@ def check_transform(
         data = {table_name: data}
 
     # controls
-    test_PostgreSQL = True  # causes an external dependency
+    test_PostgreSQL = False  # causes an external dependency
     test_BigQuery = False  # causes an external dependency
-    test_MySQL = True  # causes an external dependency
+    test_MySQL = False  # causes an external dependency
 
     # placeholders
     db_handle_PosgreSQL = None
