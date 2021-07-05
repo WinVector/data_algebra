@@ -38,6 +38,7 @@ setuptools.setup(
         'diagram': ['graphviz'],
         'BigQuery': ['google.cloud', 'pyarrow'],
         'PostgreSQL': ['sqlalchemy', 'psycopg2'],
+        'MySQL': ['sqlalchemy', 'pymysql'],
         'all': ['black', 'sqlparse', 'graphviz', 'BigQuery', 'PostgreSQL'],
     },
     platforms=['any'],

@@ -12,6 +12,7 @@ import os
 import data_algebra.SQLite
 import data_algebra.BigQuery
 import data_algebra.PostgreSQL
+import data_algebra.MySQL
 import data_algebra.SparkSQL
 from data_algebra.data_ops import *
 
@@ -324,22 +325,18 @@ def check_transform(
         table_name = [k for k in cols_used.keys()][0]
         data = {table_name: data}
 
-    # non-connected handles, lets us test some of the SQL generation path
-    empty_db_handle_sqlite = data_algebra.SQLite.SQLiteModel().db_handle(None)
-    empty_db_handle_BigQuery = data_algebra.BigQuery.BigQueryModel().db_handle(None)
-    empty_db_handle_PosgreSQL = data_algebra.PostgreSQL.PostgreSQLModel().db_handle(None)
-    empty_db_handle_Spark = data_algebra.SparkSQL.SparkSQLModel().db_handle(None)
-
     # controls
     test_sqlite = True
-    test_PostgreSQL = False  # causes external dependency
-    test_BigQuery = False  # causes external dependency
+    test_PostgreSQL = False  # causes an external dependency
+    test_BigQuery = False  # causes an external dependency
+    test_MySQL = False  # not ready, and causes an external dependency
     # can't just add BigQuery until we set a default schema somehow
 
     # placeholders
     db_handle_sqlite = None
     db_handle_PosgreSQL = None
     db_handle_BigQuery = None
+    db_handle_MySQL = None
 
     if test_sqlite:
         def build_sqlite_handle():
@@ -376,17 +373,33 @@ def check_transform(
 
         db_handle_BigQuery = build_BigQuery_handle()
 
+    if test_MySQL and have_sqlalchemy:
+        def build_MySQL_handle():
+            # MySQL db
+            db_handle = data_algebra.MySQL.MySQLModel().db_handle(
+                sqlalchemy.engine.create_engine("mysql+pymysql://jmount@localhost/jmount")
+            )
+            db_handle.db_model.prepare_connection(db_handle.conn)
+            return db_handle
+
+        db_handle_MySQL = build_MySQL_handle()
+
     db_handles = [
-        empty_db_handle_sqlite,
-        empty_db_handle_BigQuery,
-        empty_db_handle_PosgreSQL,
-        empty_db_handle_Spark]
+        # non-connected handles, lets us test some of the SQL generation path
+        data_algebra.SQLite.SQLiteModel().db_handle(None),
+        data_algebra.BigQuery.BigQueryModel().db_handle(None),
+        data_algebra.PostgreSQL.PostgreSQLModel().db_handle(None),
+        data_algebra.SparkSQL.SparkSQLModel().db_handle(None),
+        data_algebra.MySQL.MySQLModel().db_handle(None),
+        ]
     if db_handle_sqlite is not None:
         db_handles.append(db_handle_sqlite)
     if db_handle_PosgreSQL is not None:
         db_handles.append(db_handle_PosgreSQL)
     if db_handle_BigQuery is not None:
         db_handles.append(db_handle_BigQuery)
+    if db_handle_MySQL is not None:
+        db_handles.append(db_handle_MySQL)
 
     check_transform_on_handles(
         ops=ops,
