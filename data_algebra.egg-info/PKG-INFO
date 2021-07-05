@@ -37,4 +37,5 @@ Provides-Extra: pretty_sql
 Provides-Extra: diagram
 Provides-Extra: BigQuery
 Provides-Extra: PostgreSQL
+Provides-Extra: MySQL
 Provides-Extra: all

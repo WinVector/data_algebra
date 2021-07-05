@@ -6,6 +6,10 @@ lark
 google.cloud
 pyarrow
 
+[MySQL]
+sqlalchemy
+pymysql
+
 [PostgreSQL]
 sqlalchemy
 psycopg2
