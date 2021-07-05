@@ -362,7 +362,8 @@
     <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">check_parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">allow_pretty</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">allow_pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">models_to_skip</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
@@ -377,6 +378,7 @@
 <span class="sd">    :param check_row_order: passed to equivalent_frames()</span>
 <span class="sd">    :param check_parse: if True check expression parses/formats to self</span>
 <span class="sd">    :param allow_pretty: if True try pretty printing SQL</span>
+<span class="sd">    :param models_to_skip: None or set of model names to skip testing</span>
 <span class="sd">    :return: nothing</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -390,7 +392,7 @@
     <span class="n">test_sqlite</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
     <span class="n">test_BigQuery</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-    <span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># not ready, and causes an external dependency</span>
+    <span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
     <span class="c1"># can&#39;t just add BigQuery until we set a default schema somehow</span>
 
     <span class="c1"># placeholders</span>
@@ -461,6 +463,9 @@
         <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_handle_BigQuery</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">db_handle_MySQL</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_handle_MySQL</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">models_to_skip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">db_handles</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">db_model</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">models_to_skip</span><span class="p">]</span>
 
     <span class="n">check_transform_on_handles</span><span class="p">(</span>
         <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span>
@@ -849,7 +854,8 @@ Asserts if there are issues</p>
     cols_case_sensitive=False,
     check_row_order=False,
     check_parse=True,
-    allow_pretty=True
+    allow_pretty=True,
+    models_to_skip=None
 )</span>:
     </div>
 
@@ -865,7 +871,8 @@ Asserts if there are issues</p>
     <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">check_parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">allow_pretty</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">allow_pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">models_to_skip</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
@@ -880,6 +887,7 @@ Asserts if there are issues</p>
 <span class="sd">    :param check_row_order: passed to equivalent_frames()</span>
 <span class="sd">    :param check_parse: if True check expression parses/formats to self</span>
 <span class="sd">    :param allow_pretty: if True try pretty printing SQL</span>
+<span class="sd">    :param models_to_skip: None or set of model names to skip testing</span>
 <span class="sd">    :return: nothing</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -893,7 +901,7 @@ Asserts if there are issues</p>
     <span class="n">test_sqlite</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
     <span class="n">test_BigQuery</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-    <span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># not ready, and causes an external dependency</span>
+    <span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
     <span class="c1"># can&#39;t just add BigQuery until we set a default schema somehow</span>
 
     <span class="c1"># placeholders</span>
@@ -965,6 +973,9 @@ Asserts if there are issues</p>
     <span class="k">if</span> <span class="n">db_handle_MySQL</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_handle_MySQL</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="n">models_to_skip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">db_handles</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">db_model</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">models_to_skip</span><span class="p">]</span>
+
     <span class="n">check_transform_on_handles</span><span class="p">(</span>
         <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span>
         <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
@@ -1002,6 +1013,7 @@ Assert if there are issues.</p>
 :param check_row_order: passed to equivalent_frames()
 :param check_parse: if True check expression parses/formats to self
 :param allow_pretty: if True try pretty printing SQL
+:param models_to_skip: None or set of model names to skip testing
 :return: nothing</p>
 </div>
 

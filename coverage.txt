@@ -75,7 +75,7 @@ tests/test_with.py ..                                                    [100%]
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
 data_algebra/BigQuery.py                 106     61    42%
-data_algebra/MySQL.py                     19      2    89%
+data_algebra/MySQL.py                     21      4    81%
 data_algebra/OrderedSet.py                52      7    87%
 data_algebra/PostgreSQL.py                16      2    88%
 data_algebra/SQLite.py                    82     10    88%
@@ -100,11 +100,11 @@ data_algebra/pandas_base.py              256     24    91%
 data_algebra/pandas_model.py              18      3    83%
 data_algebra/parse_by_lark.py            139     31    78%
 data_algebra/python3_lark.py               1      0   100%
-data_algebra/test_util.py                226     50    78%
+data_algebra/test_util.py                228     50    78%
 data_algebra/user_fn.py                   84     27    68%
 data_algebra/util.py                      28      4    86%
 ----------------------------------------------------------
-TOTAL                                   4441    928    79%
+TOTAL                                   4445    930    79%
 
 
-============================= 161 passed in 26.38s =============================
+============================= 161 passed in 27.72s =============================
