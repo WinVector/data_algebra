@@ -302,16 +302,24 @@ class DBModel:
             q = str(q)
         pandas.io.sql.execute(q, conn)
 
-    def drop_table(self, conn, table_name):
-        q_table_name = self.quote_table_name(table_name)
-        # noinspection PyBroadException
-        table_exists = True
-        try:
-            self.read_query(conn, "SELECT * FROM " + q_table_name + " LIMIT 1")
-        except Exception:
-            table_exists = False
-        if table_exists:
-            self.execute(conn, self.drop_text + ' ' + q_table_name)
+    def read_query(self, conn, q):
+        """
+
+        :param conn: database connection
+        :param q: sql query
+        :return: query results as table
+        """
+        if isinstance(q, data_algebra.data_ops.ViewRepresentation):
+            temp_tables = dict()
+            q = q.to_sql(db_model=self, temp_tables=temp_tables)
+            if len(temp_tables) > 1:
+                raise ValueError("ops require management of temp tables, please collect them via to_sql(temp_tables)")
+        else:
+            q = str(q)
+        r = pandas.io.sql.read_sql(q, conn)
+        r = self.local_data_model.pd.DataFrame(r)
+        r = r.reset_index(drop=True)
+        return r
 
     # noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection
     def insert_table(
@@ -344,24 +352,16 @@ class DBModel:
         # it refers to sqlite_master
         d.to_sql(name=table_name, con=conn, index=False)
 
-    def read_query(self, conn, q):
-        """
-
-        :param conn: database connection
-        :param q: sql query
-        :return: query results as table
-        """
-        if isinstance(q, data_algebra.data_ops.ViewRepresentation):
-            temp_tables = dict()
-            q = q.to_sql(db_model=self, temp_tables=temp_tables)
-            if len(temp_tables) > 1:
-                raise ValueError("ops require management of temp tables, please collect them via to_sql(temp_tables)")
-        else:
-            q = str(q)
-        r = pandas.io.sql.read_sql(q, conn)
-        r = self.local_data_model.pd.DataFrame(r)
-        r = r.reset_index(drop=True)
-        return r
+    def drop_table(self, conn, table_name):
+        q_table_name = self.quote_table_name(table_name)
+        # noinspection PyBroadException
+        table_exists = True
+        try:
+            self.read_query(conn, "SELECT * FROM " + q_table_name + " LIMIT 1")
+        except Exception:
+            table_exists = False
+        if table_exists:
+            self.execute(conn, self.drop_text + ' ' + q_table_name)
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def read_table(self, conn, table_name, *, qualifiers=None, limit=None):
