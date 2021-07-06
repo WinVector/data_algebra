@@ -13,6 +13,7 @@ import data_algebra.BigQuery
 import data_algebra.PostgreSQL
 import data_algebra.MySQL
 import data_algebra.SparkSQL
+import data_algebra.SparkSQL
 from data_algebra.data_ops import *
 
 
@@ -306,25 +307,6 @@ def check_transform(
         table_name = [k for k in cols_used.keys()][0]
         data = {table_name: data}
 
-    # controls
-    test_PostgreSQL = False  # causes an external dependency
-    test_BigQuery = False  # causes an external dependency
-    test_MySQL = False  # causes an external dependency
-
-    # placeholders
-    db_handle_PosgreSQL = None
-    db_handle_BigQuery = None
-    db_handle_MySQL = None
-
-    if test_PostgreSQL:
-        db_handle_PosgreSQL = data_algebra.PostgreSQL.example_handle()
-
-    if test_BigQuery:
-        db_handle_BigQuery = data_algebra.BigQuery.example_handle()
-
-    if test_MySQL:
-        db_handle_MySQL = data_algebra.MySQL.example_handle()
-
     db_handles = [
         # non-connected handles, lets us test some of the SQL generation path
         data_algebra.SQLite.SQLiteModel().db_handle(None),
@@ -332,14 +314,23 @@ def check_transform(
         data_algebra.PostgreSQL.PostgreSQLModel().db_handle(None),
         data_algebra.SparkSQL.SparkSQLModel().db_handle(None),
         data_algebra.MySQL.MySQLModel().db_handle(None),
-        data_algebra.SQLite.example_handle(),
+        data_algebra.SQLite.example_handle(),  # actual database instance, not empty
         ]
-    if db_handle_PosgreSQL is not None:
-        db_handles.append(db_handle_PosgreSQL)
-    if db_handle_BigQuery is not None:
-        db_handles.append(db_handle_BigQuery)
-    if db_handle_MySQL is not None:
-        db_handles.append(db_handle_MySQL)
+
+    # controls
+    test_PostgreSQL = False  # causes an external dependency
+    test_BigQuery = False  # causes an external dependency
+    test_MySQL = False  # causes an external dependency
+    test_Spark = False  # causes an external dependency
+
+    if test_PostgreSQL:
+        db_handles.append(data_algebra.PostgreSQL.example_handle())
+    if test_BigQuery:
+        db_handles.append(data_algebra.BigQuery.example_handle())
+    if test_MySQL:
+        db_handles.append(data_algebra.MySQL.example_handle())
+    if test_Spark:
+        db_handles.append(data_algebra.SparkSQL.example_handle())
 
     if models_to_skip is not None:
         db_handles = [h for h in db_handles if str(h.db_model) not in models_to_skip]

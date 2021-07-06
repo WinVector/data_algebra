@@ -55,7 +55,7 @@ class SparkSQLModel(data_algebra.db_model.DBModel):
     def execute(self, conn, q):
         assert isinstance(conn, SparkConnection)
         assert isinstance(q, str)
-        raise Exception("not implemented yet")
+        conn.spark_session.sql(q)
 
     def read_query(self, conn, q):
         assert isinstance(conn, SparkConnection)
@@ -75,9 +75,19 @@ class SparkSQLModel(data_algebra.db_model.DBModel):
         self, conn, d, table_name, *, qualifiers=None, allow_overwrite=False
     ):
         assert isinstance(conn, SparkConnection)
-        assert allow_overwrite
+        assert isinstance(table_name, str)
+        if qualifiers is not None:
+            raise ValueError("non-empty qualifiers not yet supported on insert")
+        if self.table_exists(conn, table_name):
+            if not allow_overwrite:
+                raise ValueError("table " + table_name + " already exists")
+            else:
+                self.drop_table(conn, table_name, check=False)
         d_spark = conn.spark_session.createDataFrame(d)
         d_spark.createOrReplaceTempView(table_name)  # TODO: non-temps and non allow_overwrite
+
+
+spark_context = None
 
 
 def example_handle():
@@ -87,7 +97,10 @@ def example_handle():
     """
     if not have_Spark:
         return None
+    global spark_context
+    if spark_context is None:
+        spark_context = pyspark.SparkContext()
     return SparkSQLModel().db_handle(
             SparkConnection(
-                spark_context=pyspark.SparkContext(),
+                spark_context=spark_context,
                 spark_session=pyspark.sql.SparkSession.builder.appName('pandasToSparkDF').getOrCreate()))
