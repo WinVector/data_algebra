@@ -141,7 +141,7 @@
     <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;not implemented yet&quot;</span><span class="p">)</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">spark_session</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">read_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
@@ -161,9 +161,19 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">allow_overwrite</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">qualifiers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;non-empty qualifiers not yet supported on insert&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_exists</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_overwrite</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">d_spark</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">spark_session</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
         <span class="n">d_spark</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>  <span class="c1"># TODO: non-temps and non allow_overwrite</span>
+
+
+<span class="n">spark_context</span> <span class="o">=</span> <span class="kc">None</span>
 
 
 <span class="k">def</span> <span class="nf">example_handle</span><span class="p">():</span>
@@ -173,9 +183,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">have_Spark</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">global</span> <span class="n">spark_context</span>
+    <span class="k">if</span> <span class="n">spark_context</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">spark_context</span> <span class="o">=</span> <span class="n">pyspark</span><span class="o">.</span><span class="n">SparkContext</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">SparkSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span>
             <span class="n">SparkConnection</span><span class="p">(</span>
-                <span class="n">spark_context</span><span class="o">=</span><span class="n">pyspark</span><span class="o">.</span><span class="n">SparkContext</span><span class="p">(),</span>
+                <span class="n">spark_context</span><span class="o">=</span><span class="n">spark_context</span><span class="p">,</span>
                 <span class="n">spark_session</span><span class="o">=</span><span class="n">pyspark</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">SparkSession</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">appName</span><span class="p">(</span><span class="s1">&#39;pandasToSparkDF&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getOrCreate</span><span class="p">()))</span>
 </pre></div>
 
@@ -293,7 +306,7 @@
     <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;not implemented yet&quot;</span><span class="p">)</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">spark_session</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">read_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
@@ -313,7 +326,14 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">allow_overwrite</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">qualifiers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;non-empty qualifiers not yet supported on insert&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_exists</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_overwrite</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">d_spark</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">spark_session</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
         <span class="n">d_spark</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>  <span class="c1"># TODO: non-temps and non allow_overwrite</span>
 </pre></div>
@@ -384,7 +404,7 @@
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;not implemented yet&quot;</span><span class="p">)</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">spark_session</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -442,14 +462,23 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">allow_overwrite</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">qualifiers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;non-empty qualifiers not yet supported on insert&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_exists</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_overwrite</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">d_spark</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">spark_session</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
         <span class="n">d_spark</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>  <span class="c1"># TODO: non-temps and non allow_overwrite</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>:param conn: a database connection
+            <div class="docstring"><p>Insert a table.</p>
+
+<p>:param conn: a database connection
 :param d: a Pandas table
 :param table_name: name to give write to
 :param qualifiers: schema and such
@@ -473,6 +502,7 @@
                 <dd id="SparkSQLModel.supports_with" class="variable"><a href="db_model.html#DBModel.supports_with">supports_with</a></dd>
                 <dd id="SparkSQLModel.db_handle" class="function"><a href="db_model.html#DBModel.db_handle">db_handle</a></dd>
                 <dd id="SparkSQLModel.prepare_connection" class="function"><a href="db_model.html#DBModel.prepare_connection">prepare_connection</a></dd>
+                <dd id="SparkSQLModel.table_exists" class="function"><a href="db_model.html#DBModel.table_exists">table_exists</a></dd>
                 <dd id="SparkSQLModel.drop_table" class="function"><a href="db_model.html#DBModel.drop_table">drop_table</a></dd>
                 <dd id="SparkSQLModel.read_table" class="function"><a href="db_model.html#DBModel.read_table">read_table</a></dd>
                 <dd id="SparkSQLModel.read" class="function"><a href="db_model.html#DBModel.read">read</a></dd>
@@ -523,9 +553,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">have_Spark</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">global</span> <span class="n">spark_context</span>
+    <span class="k">if</span> <span class="n">spark_context</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">spark_context</span> <span class="o">=</span> <span class="n">pyspark</span><span class="o">.</span><span class="n">SparkContext</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">SparkSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span>
             <span class="n">SparkConnection</span><span class="p">(</span>
-                <span class="n">spark_context</span><span class="o">=</span><span class="n">pyspark</span><span class="o">.</span><span class="n">SparkContext</span><span class="p">(),</span>
+                <span class="n">spark_context</span><span class="o">=</span><span class="n">spark_context</span><span class="p">,</span>
                 <span class="n">spark_session</span><span class="o">=</span><span class="n">pyspark</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">SparkSession</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">appName</span><span class="p">(</span><span class="s1">&#39;pandasToSparkDF&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getOrCreate</span><span class="p">()))</span>
 </pre></div>
 

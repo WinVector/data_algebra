@@ -321,11 +321,27 @@ class DBModel:
         r = r.reset_index(drop=True)
         return r
 
+    def table_exists(self, conn, table_name):
+        q_table_name = self.quote_table_name(table_name)
+        # noinspection PyBroadException
+        table_exists = True
+        try:
+            self.read_query(conn, "SELECT * FROM " + q_table_name + " LIMIT 1")
+        except Exception:
+            table_exists = False
+        return table_exists
+
+    def drop_table(self, conn, table_name, *, check=True):
+        if (not check) or self.table_exists(conn, table_name):
+            q_table_name = self.quote_table_name(table_name)
+            self.execute(conn, self.drop_text + ' ' + q_table_name)
+
     # noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection
     def insert_table(
         self, conn, d, table_name, *, qualifiers=None, allow_overwrite=False
     ):
         """
+        Insert a table.
 
         :param conn: a database connection
         :param d: a Pandas table
@@ -336,32 +352,14 @@ class DBModel:
 
         if qualifiers is not None:
             raise ValueError("non-empty qualifiers not yet supported on insert")
-        # check for table
-        table_exists = True
-        # noinspection PyBroadException
-        try:
-            self.read_query(conn, "SELECT * FROM " + table_name + " LIMIT 1")
-        except Exception:
-            table_exists = False
-        if table_exists:
+        if self.table_exists(conn, table_name):
             if not allow_overwrite:
                 raise ValueError("table " + table_name + " already exists")
             else:
-                conn.execute("DROP TABLE " + table_name)
+                self.drop_table(conn, table_name, check=False)
         # Note: the Pandas to_sql() method appears to have SQLite hard-wired into it
         # it refers to sqlite_master
         d.to_sql(name=table_name, con=conn, index=False)
-
-    def drop_table(self, conn, table_name):
-        q_table_name = self.quote_table_name(table_name)
-        # noinspection PyBroadException
-        table_exists = True
-        try:
-            self.read_query(conn, "SELECT * FROM " + q_table_name + " LIMIT 1")
-        except Exception:
-            table_exists = False
-        if table_exists:
-            self.execute(conn, self.drop_text + ' ' + q_table_name)
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def read_table(self, conn, table_name, *, qualifiers=None, limit=None):

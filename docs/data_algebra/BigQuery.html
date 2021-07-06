@@ -603,7 +603,9 @@ connection should be google.cloud.bigquery.client.Client</p>
 
         </details>
 
-            <div class="docstring"><p>:param conn: a database connection
+            <div class="docstring"><p>Insert a table.</p>
+
+<p>:param conn: a database connection
 :param d: a Pandas table
 :param table_name: name to give write to
 :param qualifiers: schema and such
@@ -645,6 +647,7 @@ connection should be google.cloud.bigquery.client.Client</p>
                 <dd id="BigQueryModel.join_name_map" class="variable"><a href="db_model.html#DBModel.join_name_map">join_name_map</a></dd>
                 <dd id="BigQueryModel.supports_with" class="variable"><a href="db_model.html#DBModel.supports_with">supports_with</a></dd>
                 <dd id="BigQueryModel.prepare_connection" class="function"><a href="db_model.html#DBModel.prepare_connection">prepare_connection</a></dd>
+                <dd id="BigQueryModel.table_exists" class="function"><a href="db_model.html#DBModel.table_exists">table_exists</a></dd>
                 <dd id="BigQueryModel.drop_table" class="function"><a href="db_model.html#DBModel.drop_table">drop_table</a></dd>
                 <dd id="BigQueryModel.read_table" class="function"><a href="db_model.html#DBModel.read_table">read_table</a></dd>
                 <dd id="BigQueryModel.read" class="function"><a href="db_model.html#DBModel.read">read</a></dd>
@@ -757,7 +760,7 @@ inheritance.</p>
     *,
     db_model=BigQueryModel,
     conn,
-    fns={&#39;as_int64&#39;: &lt;function as_int64 at 0x7ffb98af3700&gt;, &#39;as_str&#39;: &lt;function as_str at 0x7ffb98af3040&gt;, &#39;trimstr&#39;: &lt;function trimstr at 0x7ffb98af30d0&gt;, &#39;coalesce_0&#39;: &lt;function coalesce_0 at 0x7ffb98af3310&gt;, &#39;coalesce&#39;: &lt;function coalesce at 0x7ffb98af3550&gt;, &#39;datetime_to_date&#39;: &lt;function datetime_to_date at 0x7ffb7850f430&gt;, &#39;parse_datetime&#39;: &lt;function parse_datetime at 0x7ffb785160d0&gt;, &#39;parse_date&#39;: &lt;function parse_date at 0x7ffb78516160&gt;, &#39;format_datetime&#39;: &lt;function format_datetime at 0x7ffb785161f0&gt;, &#39;format_date&#39;: &lt;function format_date at 0x7ffb78516280&gt;, &#39;dayofweek&#39;: &lt;function dayofweek at 0x7ffb78516310&gt;, &#39;dayofyear&#39;: &lt;function dayofyear at 0x7ffb785163a0&gt;, &#39;dayofmonth&#39;: &lt;function dayofmonth at 0x7ffb785164c0&gt;, &#39;weekofyear&#39;: &lt;function weekofyear at 0x7ffb78516430&gt;, &#39;month&#39;: &lt;function month at 0x7ffb78516550&gt;, &#39;quarter&#39;: &lt;function quarter at 0x7ffb785165e0&gt;, &#39;year&#39;: &lt;function year at 0x7ffb78516670&gt;, &#39;timestamp_diff&#39;: &lt;function timestamp_diff at 0x7ffb78516700&gt;, &#39;date_diff&#39;: &lt;function date_diff at 0x7ffb78516790&gt;, &#39;base_Sunday&#39;: &lt;function base_Sunday at 0x7ffb78516820&gt;}
+    fns={&#39;as_int64&#39;: &lt;function as_int64 at 0x7fc20913c700&gt;, &#39;as_str&#39;: &lt;function as_str at 0x7fc20913c040&gt;, &#39;trimstr&#39;: &lt;function trimstr at 0x7fc20913c0d0&gt;, &#39;coalesce_0&#39;: &lt;function coalesce_0 at 0x7fc20913c310&gt;, &#39;coalesce&#39;: &lt;function coalesce at 0x7fc20913c550&gt;, &#39;datetime_to_date&#39;: &lt;function datetime_to_date at 0x7fc1b84184c0&gt;, &#39;parse_datetime&#39;: &lt;function parse_datetime at 0x7fc1b841e160&gt;, &#39;parse_date&#39;: &lt;function parse_date at 0x7fc1b841e1f0&gt;, &#39;format_datetime&#39;: &lt;function format_datetime at 0x7fc1b841e280&gt;, &#39;format_date&#39;: &lt;function format_date at 0x7fc1b841e310&gt;, &#39;dayofweek&#39;: &lt;function dayofweek at 0x7fc1b841e3a0&gt;, &#39;dayofyear&#39;: &lt;function dayofyear at 0x7fc1b841e430&gt;, &#39;dayofmonth&#39;: &lt;function dayofmonth at 0x7fc1b841e550&gt;, &#39;weekofyear&#39;: &lt;function weekofyear at 0x7fc1b841e4c0&gt;, &#39;month&#39;: &lt;function month at 0x7fc1b841e5e0&gt;, &#39;quarter&#39;: &lt;function quarter at 0x7fc1b841e670&gt;, &#39;year&#39;: &lt;function year at 0x7fc1b841e700&gt;, &#39;timestamp_diff&#39;: &lt;function timestamp_diff at 0x7fc1b841e790&gt;, &#39;date_diff&#39;: &lt;function date_diff at 0x7fc1b841e820&gt;, &#39;base_Sunday&#39;: &lt;function base_Sunday at 0x7fc1b841e8b0&gt;}
 )</span>
     </div>
 
