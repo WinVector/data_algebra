@@ -34,7 +34,7 @@ def test_if_else():
 
 def test_if_else_2():
     d = data_algebra.default_data_model.pd.DataFrame({
-        'group': ['A', 'B', None, 'A', numpy.NAN, 'C'],
+        'group': ['A', 'B', None, 'A', None, 'C'],
         'c1': [1, 2, 3, 4, 5, 6],
         'c2': [-1, -2, -3, -4, -5, -6],
     })

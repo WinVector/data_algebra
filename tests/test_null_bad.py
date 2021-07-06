@@ -7,6 +7,7 @@ import data_algebra.util
 import data_algebra.test_util
 from data_algebra.data_ops import *
 import data_algebra.MySQL
+import data_algebra.SparkSQL
 
 
 def test_null_bad():
@@ -31,6 +32,7 @@ def test_null_bad():
     # can't insert infinity into MySQL
     models_to_skip = set()
     models_to_skip.add(str(data_algebra.MySQL.MySQLModel()))
+    models_to_skip.add(str(data_algebra.SparkSQL.SparkSQLModel()))  # None/Null/Non handled differently
 
     data_algebra.test_util.check_transform(
         ops=ops,

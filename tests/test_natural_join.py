@@ -5,14 +5,11 @@ import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
 import data_algebra.SQLite
-import sqlite3
 
 
 def test_natural_join_columns():
-    db_model = data_algebra.SQLite.SQLiteModel()
-
     d = data_algebra.default_data_model.pd.DataFrame(
-        {"x": [-1, 0, 1, numpy.nan], "y": [1, 2, numpy.nan, 3]}
+        {"x": [-1, 0, 1, None], "y": [1, 2, None, 3]}
     )
 
     d2 = data_algebra.default_data_model.pd.DataFrame(
@@ -26,8 +23,8 @@ def test_natural_join_columns():
     expect = data_algebra.default_data_model.pd.DataFrame(
         {
             "x": [-1.0, 0.0, 1.0, 7.0],
-            "y": [1.0, 2.0, numpy.nan, 3.0],
-            "qq": [10.0, 20.0, numpy.nan, 30.0],
+            "y": [1.0, 2.0, None, 3.0],
+            "qq": [10.0, 20.0, None, 30.0],
         }
     )
 
