@@ -12,8 +12,24 @@ try:
 except ImportError:
     have_Spark = False
 
+
+def _sparksql_mean_expr(dbmodel, expression):
+    return (
+        "AVG(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ")"
+    )
+
+
+def _sparksql_size_expr(dbmodel, expression):
+    return "SUM(1)"
+
+
+
 # map from op-name to special SQL formatting code
-SparkSQL_formatters = {"___": lambda dbmodel, expression: expression.to_python()}
+SparkSQL_formatters = {
+    "___": lambda dbmodel, expression: expression.to_python(),
+    "mean": _sparksql_mean_expr,
+    "size": _sparksql_size_expr,
+}
 
 
 class SparkConnection:
@@ -42,14 +58,6 @@ class SparkSQLModel(data_algebra.db_model.DBModel):
             string_quote='"',
             sql_formatters=SparkSQL_formatters,
         )
-
-    def quote_identifier(self, identifier):
-        if not isinstance(identifier, str):
-            raise TypeError("expected identifier to be a str")
-        if self.identifier_quote in identifier:
-            raise ValueError('did not expect " in identifier')
-        # TODO: see if we can get rid of the tolower conversion
-        return self.identifier_quote + identifier.lower() + self.identifier_quote
 
     # noinspection PyMethodMayBeStatic
     def execute(self, conn, q):
