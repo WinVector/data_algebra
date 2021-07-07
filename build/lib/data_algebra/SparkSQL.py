@@ -23,10 +23,38 @@ def _sparksql_size_expr(dbmodel, expression):
     return "SUM(1)"
 
 
+def _sparksql_is_null_expr(dbmodel, expression):
+    return (
+        "("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + " IS NULL)"
+    )
+
+
+def _sparksql_is_bad_expr(dbmodel, expression):
+    subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    return (
+        "("
+        + subexpr
+        + " IS NULL OR "
+        + subexpr
+        + " >= "
+        + dbmodel.quote_literal("+infinity")
+        + " OR "
+        + subexpr
+        + " <= "
+        + dbmodel.quote_literal("-infinity")
+        + " OR "
+        + " isNaN(" + subexpr + ")"
+        + ")"
+    )
+
 
 # map from op-name to special SQL formatting code
 SparkSQL_formatters = {
     "___": lambda dbmodel, expression: expression.to_python(),
+    "is_null": _sparksql_is_null_expr,
+    "is_bad": _sparksql_is_bad_expr,
     "mean": _sparksql_mean_expr,
     "size": _sparksql_size_expr,
 }
@@ -49,13 +77,17 @@ class SparkConnection:
 
 
 class SparkSQLModel(data_algebra.db_model.DBModel):
-    """A model of how SQL should be generated for SparkSQL"""
+    """A model of how SQL should be generated for SparkSQL.
+
+    Known issue: doesn't coalesce NaN
+    """
 
     def __init__(self):
         data_algebra.db_model.DBModel.__init__(
             self,
             identifier_quote="`",
             string_quote='"',
+            string_type='STRING',
             sql_formatters=SparkSQL_formatters,
         )
 
@@ -92,7 +124,10 @@ class SparkSQLModel(data_algebra.db_model.DBModel):
             else:
                 self.drop_table(conn, table_name, check=False)
         d_spark = conn.spark_session.createDataFrame(d)
-        d_spark.createOrReplaceTempView(table_name)  # TODO: non-temps and non allow_overwrite
+        # https://stackoverflow.com/a/57292987/6901725
+        d_spark.replace(float('nan'), None)  # to get coalesce effects (didn't work)
+        d_spark.createOrReplaceTempView(table_name)  # TODO: non-temps
+
 
 
 spark_context = None

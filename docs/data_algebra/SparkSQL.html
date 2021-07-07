@@ -106,10 +106,38 @@
     <span class="k">return</span> <span class="s2">&quot;SUM(1)&quot;</span>
 
 
+<span class="k">def</span> <span class="nf">_sparksql_is_null_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;(&quot;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot; IS NULL)&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_sparksql_is_bad_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="n">subexpr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;(&quot;</span>
+        <span class="o">+</span> <span class="n">subexpr</span>
+        <span class="o">+</span> <span class="s2">&quot; IS NULL OR &quot;</span>
+        <span class="o">+</span> <span class="n">subexpr</span>
+        <span class="o">+</span> <span class="s2">&quot; &gt;= &quot;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">quote_literal</span><span class="p">(</span><span class="s2">&quot;+infinity&quot;</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot; OR &quot;</span>
+        <span class="o">+</span> <span class="n">subexpr</span>
+        <span class="o">+</span> <span class="s2">&quot; &lt;= &quot;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">quote_literal</span><span class="p">(</span><span class="s2">&quot;-infinity&quot;</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot; OR &quot;</span>
+        <span class="o">+</span> <span class="s2">&quot; isNaN(&quot;</span> <span class="o">+</span> <span class="n">subexpr</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+    <span class="p">)</span>
+
 
 <span class="c1"># map from op-name to special SQL formatting code</span>
 <span class="n">SparkSQL_formatters</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;___&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">:</span> <span class="n">expression</span><span class="o">.</span><span class="n">to_python</span><span class="p">(),</span>
+    <span class="s2">&quot;is_null&quot;</span><span class="p">:</span> <span class="n">_sparksql_is_null_expr</span><span class="p">,</span>
+    <span class="s2">&quot;is_bad&quot;</span><span class="p">:</span> <span class="n">_sparksql_is_bad_expr</span><span class="p">,</span>
     <span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="n">_sparksql_mean_expr</span><span class="p">,</span>
     <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="n">_sparksql_size_expr</span><span class="p">,</span>
 <span class="p">}</span>
@@ -132,13 +160,17 @@
 
 
 <span class="k">class</span> <span class="nc">SparkSQLModel</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A model of how SQL should be generated for SparkSQL&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;A model of how SQL should be generated for SparkSQL.</span>
+
+<span class="sd">    Known issue: doesn&#39;t coalesce NaN</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">identifier_quote</span><span class="o">=</span><span class="s2">&quot;`&quot;</span><span class="p">,</span>
             <span class="n">string_quote</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
+            <span class="n">string_type</span><span class="o">=</span><span class="s1">&#39;STRING&#39;</span><span class="p">,</span>
             <span class="n">sql_formatters</span><span class="o">=</span><span class="n">SparkSQL_formatters</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -175,7 +207,10 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">d_spark</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">spark_session</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
-        <span class="n">d_spark</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>  <span class="c1"># TODO: non-temps and non allow_overwrite</span>
+        <span class="c1"># https://stackoverflow.com/a/57292987/6901725</span>
+        <span class="n">d_spark</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># to get coalesce effects (didn&#39;t work)</span>
+        <span class="n">d_spark</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>  <span class="c1"># TODO: non-temps</span>
+
 
 
 <span class="n">spark_context</span> <span class="o">=</span> <span class="kc">None</span>
@@ -289,13 +324,17 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">SparkSQLModel</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A model of how SQL should be generated for SparkSQL&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;A model of how SQL should be generated for SparkSQL.</span>
+
+<span class="sd">    Known issue: doesn&#39;t coalesce NaN</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">identifier_quote</span><span class="o">=</span><span class="s2">&quot;`&quot;</span><span class="p">,</span>
             <span class="n">string_quote</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
+            <span class="n">string_type</span><span class="o">=</span><span class="s1">&#39;STRING&#39;</span><span class="p">,</span>
             <span class="n">sql_formatters</span><span class="o">=</span><span class="n">SparkSQL_formatters</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -332,12 +371,16 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">d_spark</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">spark_session</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
-        <span class="n">d_spark</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>  <span class="c1"># TODO: non-temps and non allow_overwrite</span>
+        <span class="c1"># https://stackoverflow.com/a/57292987/6901725</span>
+        <span class="n">d_spark</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># to get coalesce effects (didn&#39;t work)</span>
+        <span class="n">d_spark</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>  <span class="c1"># TODO: non-temps</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>A model of how SQL should be generated for SparkSQL</p>
+            <div class="docstring"><p>A model of how SQL should be generated for SparkSQL.</p>
+
+<p>Known issue: doesn't coalesce NaN</p>
 </div>
 
 
@@ -355,6 +398,7 @@
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">identifier_quote</span><span class="o">=</span><span class="s2">&quot;`&quot;</span><span class="p">,</span>
             <span class="n">string_quote</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
+            <span class="n">string_type</span><span class="o">=</span><span class="s1">&#39;STRING&#39;</span><span class="p">,</span>
             <span class="n">sql_formatters</span><span class="o">=</span><span class="n">SparkSQL_formatters</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
@@ -444,7 +488,9 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">d_spark</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">spark_session</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
-        <span class="n">d_spark</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>  <span class="c1"># TODO: non-temps and non allow_overwrite</span>
+        <span class="c1"># https://stackoverflow.com/a/57292987/6901725</span>
+        <span class="n">d_spark</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># to get coalesce effects (didn&#39;t work)</span>
+        <span class="n">d_spark</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>  <span class="c1"># TODO: non-temps</span>
 </pre></div>
 
         </details>
@@ -473,6 +519,7 @@
                 <dd id="SparkSQLModel.string_type" class="variable"><a href="db_model.html#DBModel.string_type">string_type</a></dd>
                 <dd id="SparkSQLModel.join_name_map" class="variable"><a href="db_model.html#DBModel.join_name_map">join_name_map</a></dd>
                 <dd id="SparkSQLModel.supports_with" class="variable"><a href="db_model.html#DBModel.supports_with">supports_with</a></dd>
+                <dd id="SparkSQLModel.coalesce_string" class="variable"><a href="db_model.html#DBModel.coalesce_string">coalesce_string</a></dd>
                 <dd id="SparkSQLModel.db_handle" class="function"><a href="db_model.html#DBModel.db_handle">db_handle</a></dd>
                 <dd id="SparkSQLModel.prepare_connection" class="function"><a href="db_model.html#DBModel.prepare_connection">prepare_connection</a></dd>
                 <dd id="SparkSQLModel.table_exists" class="function"><a href="db_model.html#DBModel.table_exists">table_exists</a></dd>

@@ -67,6 +67,9 @@
                                 <a class="variable" href="#DBModel.supports_with">supports_with</a>
                         </li>
                         <li>
+                                <a class="variable" href="#DBModel.coalesce_string">coalesce_string</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#DBModel.db_handle">db_handle</a>
                         </li>
                         <li>
@@ -400,7 +403,7 @@
 
 <span class="k">def</span> <span class="nf">_db_coalesce_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span>
-        <span class="s2">&quot;COALESCE(&quot;</span>
+        <span class="n">dbmodel</span><span class="o">.</span><span class="n">coalesce_string</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span>
         <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">ai</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">])</span>
         <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
     <span class="p">)</span>
@@ -471,6 +474,7 @@
     <span class="n">string_type</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">join_name_map</span><span class="p">:</span> <span class="nb">dict</span>
     <span class="n">supports_with</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">coalesce_string</span><span class="p">:</span> <span class="nb">str</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -486,7 +490,8 @@
         <span class="n">drop_text</span><span class="o">=</span><span class="s1">&#39;DROP TABLE&#39;</span><span class="p">,</span>
         <span class="n">string_type</span><span class="o">=</span><span class="s1">&#39;VARCHAR&#39;</span><span class="p">,</span>
         <span class="n">join_name_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">supports_with</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">supports_with</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">coalesce_string</span><span class="o">=</span><span class="s1">&#39;COALESCE&#39;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
@@ -512,6 +517,7 @@
             <span class="n">join_name_map</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">join_name_map</span> <span class="o">=</span> <span class="n">join_name_map</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span> <span class="o">=</span> <span class="n">supports_with</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coalesce_string</span> <span class="o">=</span> <span class="n">coalesce_string</span>
 
     <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DBHandle</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="n">conn</span><span class="p">)</span>
@@ -1019,7 +1025,7 @@
         <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">common</span> <span class="o">=</span> <span class="n">using_left</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">using_right</span><span class="p">)</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">ci</span><span class="p">:</span> <span class="s2">&quot;COALESCE(&quot;</span>
+            <span class="n">ci</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">coalesce_string</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span>
             <span class="o">+</span> <span class="n">sub_view_name_left</span>
             <span class="o">+</span> <span class="s2">&quot;.&quot;</span>
             <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">ci</span><span class="p">)</span>
@@ -1698,6 +1704,7 @@
     <span class="n">string_type</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">join_name_map</span><span class="p">:</span> <span class="nb">dict</span>
     <span class="n">supports_with</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">coalesce_string</span><span class="p">:</span> <span class="nb">str</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1713,7 +1720,8 @@
         <span class="n">drop_text</span><span class="o">=</span><span class="s1">&#39;DROP TABLE&#39;</span><span class="p">,</span>
         <span class="n">string_type</span><span class="o">=</span><span class="s1">&#39;VARCHAR&#39;</span><span class="p">,</span>
         <span class="n">join_name_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">supports_with</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">supports_with</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">coalesce_string</span><span class="o">=</span><span class="s1">&#39;COALESCE&#39;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
@@ -1739,6 +1747,7 @@
             <span class="n">join_name_map</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">join_name_map</span> <span class="o">=</span> <span class="n">join_name_map</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span> <span class="o">=</span> <span class="n">supports_with</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coalesce_string</span> <span class="o">=</span> <span class="n">coalesce_string</span>
 
     <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DBHandle</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="n">conn</span><span class="p">)</span>
@@ -2246,7 +2255,7 @@
         <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">common</span> <span class="o">=</span> <span class="n">using_left</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">using_right</span><span class="p">)</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">ci</span><span class="p">:</span> <span class="s2">&quot;COALESCE(&quot;</span>
+            <span class="n">ci</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">coalesce_string</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span>
             <span class="o">+</span> <span class="n">sub_view_name_left</span>
             <span class="o">+</span> <span class="s2">&quot;.&quot;</span>
             <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">ci</span><span class="p">)</span>
@@ -2729,7 +2738,8 @@
     drop_text=&#39;DROP TABLE&#39;,
     string_type=&#39;VARCHAR&#39;,
     join_name_map=None,
-    supports_with=True
+    supports_with=True,
+    coalesce_string=&#39;COALESCE&#39;
 )</span>
     </div>
 
@@ -2749,7 +2759,8 @@
         <span class="n">drop_text</span><span class="o">=</span><span class="s1">&#39;DROP TABLE&#39;</span><span class="p">,</span>
         <span class="n">string_type</span><span class="o">=</span><span class="s1">&#39;VARCHAR&#39;</span><span class="p">,</span>
         <span class="n">join_name_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">supports_with</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">supports_with</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">coalesce_string</span><span class="o">=</span><span class="s1">&#39;COALESCE&#39;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
@@ -2775,6 +2786,7 @@
             <span class="n">join_name_map</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">join_name_map</span> <span class="o">=</span> <span class="n">join_name_map</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span> <span class="o">=</span> <span class="n">supports_with</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coalesce_string</span> <span class="o">=</span> <span class="n">coalesce_string</span>
 </pre></div>
 
         </details>
@@ -2858,6 +2870,15 @@
                                             <div class="attr variable"><a class="headerlink" href="#DBModel.supports_with">#&nbsp;&nbsp</a>
 
         <span class="name">supports_with</span><span class="annotation">: bool</span>
+    </div>
+
+    
+
+                            </div>
+                            <div id="DBModel.coalesce_string" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#DBModel.coalesce_string">#&nbsp;&nbsp</a>
+
+        <span class="name">coalesce_string</span><span class="annotation">: str</span>
     </div>
 
     
@@ -3757,7 +3778,7 @@
         <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">common</span> <span class="o">=</span> <span class="n">using_left</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">using_right</span><span class="p">)</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">ci</span><span class="p">:</span> <span class="s2">&quot;COALESCE(&quot;</span>
+            <span class="n">ci</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">coalesce_string</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span>
             <span class="o">+</span> <span class="n">sub_view_name_left</span>
             <span class="o">+</span> <span class="s2">&quot;.&quot;</span>
             <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">ci</span><span class="p">)</span>
