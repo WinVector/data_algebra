@@ -168,7 +168,7 @@ def _db_concat_expr(dbmodel, expression):
 
 def _db_coalesce_expr(dbmodel, expression):
     return (
-        "COALESCE("
+        dbmodel.coalesce_string + "("
         + ", ".join([dbmodel.expr_to_sql(ai, want_inline_parens=False) for ai in expression.args])
         + ")"
     )
@@ -239,6 +239,7 @@ class DBModel:
     string_type: str
     join_name_map: dict
     supports_with: bool
+    coalesce_string: str
 
     def __init__(
         self,
@@ -254,7 +255,8 @@ class DBModel:
         drop_text='DROP TABLE',
         string_type='VARCHAR',
         join_name_map=None,
-        supports_with=True
+        supports_with=True,
+        coalesce_string='COALESCE',
     ):
         if local_data_model is None:
             local_data_model = data_algebra.default_data_model
@@ -280,6 +282,7 @@ class DBModel:
             join_name_map = {}
         self.join_name_map = join_name_map.copy()
         self.supports_with = supports_with
+        self.coalesce_string = coalesce_string
 
     def db_handle(self, conn):
         return DBHandle(db_model=self, conn=conn)
@@ -787,7 +790,7 @@ class DBModel:
         temp_id_source[0] = temp_id_source[0] + 1
         common = using_left.intersection(using_right)
         terms = {
-            ci: "COALESCE("
+            ci: self.coalesce_string + "("
             + sub_view_name_left
             + "."
             + self.quote_identifier(ci)

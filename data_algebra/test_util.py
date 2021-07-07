@@ -113,7 +113,7 @@ def equivalent_frames(
                 if local_data_model.can_convert_col_to_numeric(a[c]):
                     ca = numpy.asarray(ca, dtype=float)
                     cb = numpy.asarray(cb, dtype=float)
-                    dif = abs(ca - cb)
+                    dif = numpy.abs(ca - cb) / numpy.maximum(numpy.maximum(ca, cb), 1)
                     if numpy.max(dif) > float_tol:
                         return False
                 else:

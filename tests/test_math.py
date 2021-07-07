@@ -1,4 +1,3 @@
-import sqlite3
 
 import data_algebra
 import data_algebra.test_util

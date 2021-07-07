@@ -56,6 +56,7 @@ class SparkSQLModel(data_algebra.db_model.DBModel):
             self,
             identifier_quote="`",
             string_quote='"',
+            string_type='STRING',
             sql_formatters=SparkSQL_formatters,
         )
 
@@ -92,7 +93,10 @@ class SparkSQLModel(data_algebra.db_model.DBModel):
             else:
                 self.drop_table(conn, table_name, check=False)
         d_spark = conn.spark_session.createDataFrame(d)
-        d_spark.createOrReplaceTempView(table_name)  # TODO: non-temps and non allow_overwrite
+        # https://stackoverflow.com/a/57292987/6901725
+        d_spark.replace(float('nan'), None)  # to get coalesce effects (didn't work)
+        d_spark.createOrReplaceTempView(table_name)  # TODO: non-temps
+
 
 
 spark_context = None
