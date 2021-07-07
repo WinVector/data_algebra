@@ -50,6 +50,17 @@ def _sparksql_is_bad_expr(dbmodel, expression):
     )
 
 
+# treat NaN as NULL, as Pandas has a hard time distinguishing the two
+def _sparksql_coalesce_expr(dbmodel, expression):
+    def coalesce_step(x):
+        return f' WHEN ({x} IS NOT NULL) AND (NOT isNaN({x})) THEN {x} '
+    return (
+        'CASE '
+        + ' '. join([coalesce_step(dbmodel.expr_to_sql(ai, want_inline_parens=False)) for ai in expression.args])
+        + ' ELSE NULL END'
+    )
+
+
 # map from op-name to special SQL formatting code
 SparkSQL_formatters = {
     "___": lambda dbmodel, expression: expression.to_python(),
@@ -57,6 +68,7 @@ SparkSQL_formatters = {
     "is_bad": _sparksql_is_bad_expr,
     "mean": _sparksql_mean_expr,
     "size": _sparksql_size_expr,
+    'coalesce': _sparksql_coalesce_expr,
 }
 
 
