@@ -54,6 +54,7 @@ def _sparksql_is_bad_expr(dbmodel, expression):
 def _sparksql_coalesce_expr(dbmodel, expression):
     def coalesce_step(x):
         return f' WHEN ({x} IS NOT NULL) AND (NOT isNaN({x})) THEN {x} '
+
     return (
         'CASE '
         + ' '. join([coalesce_step(dbmodel.expr_to_sql(ai, want_inline_parens=False)) for ai in expression.args])
