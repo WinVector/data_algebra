@@ -168,7 +168,7 @@ def _db_concat_expr(dbmodel, expression):
 
 def _db_coalesce_expr(dbmodel, expression):
     return (
-        dbmodel.coalesce_string + "("
+        "COALESCE("
         + ", ".join([dbmodel.expr_to_sql(ai, want_inline_parens=False) for ai in expression.args])
         + ")"
     )
@@ -239,7 +239,6 @@ class DBModel:
     string_type: str
     join_name_map: dict
     supports_with: bool
-    coalesce_string: str
 
     def __init__(
         self,
@@ -256,7 +255,6 @@ class DBModel:
         string_type='VARCHAR',
         join_name_map=None,
         supports_with=True,
-        coalesce_string='COALESCE',
     ):
         if local_data_model is None:
             local_data_model = data_algebra.default_data_model
@@ -282,7 +280,6 @@ class DBModel:
             join_name_map = {}
         self.join_name_map = join_name_map.copy()
         self.supports_with = supports_with
-        self.coalesce_string = coalesce_string
 
     def db_handle(self, conn):
         return DBHandle(db_model=self, conn=conn)
@@ -436,7 +433,7 @@ class DBModel:
                 return "FALSE"
         if isinstance(v, float):
             if math.isnan(v):
-                return "NULL"
+                return "NULL"  # Pandas confuses NaN and None, so we use NULL
             return str(v)
         if isinstance(v, int):
             return str(v)
@@ -445,6 +442,8 @@ class DBModel:
         return str(v)
 
     def expr_to_sql(self, expression, *, want_inline_parens=False):
+        if isinstance(expression, str):
+            return expression
         if not isinstance(expression, data_algebra.expr_rep.PreTerm):
             raise TypeError(
                 "expression should be of class data_algebra.table_rep.PreTerm"
@@ -790,7 +789,7 @@ class DBModel:
         temp_id_source[0] = temp_id_source[0] + 1
         common = using_left.intersection(using_right)
         terms = {
-            ci: self.coalesce_string + "("
+            ci: "COALESCE("
             + sub_view_name_left
             + "."
             + self.quote_identifier(ci)
