@@ -4,6 +4,8 @@ import data_algebra.test_util
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 import data_algebra.util
 
+# import data_algebra.SparkSQL
+
 
 def test_coalesce_one():
     d = data_algebra.default_data_model.pd.DataFrame({
@@ -26,6 +28,8 @@ def test_coalesce_one():
         'y': [3, None, 4, None],
         'z': [1, 2, 4, None],
     })
+
+    # sql = data_algebra.SparkSQL.SparkSQLModel().to_sql(ops, pretty=True)
 
     data_algebra.test_util.check_transform(
         ops=ops,
