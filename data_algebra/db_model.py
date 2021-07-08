@@ -948,6 +948,7 @@ class DBModel:
         if use_with and self.supports_with:
             sequence = near_sql.to_with_form()
             len_sequence = len(sequence)
+            # can fall back to the non-with path
             if len(sequence) >= 2:
                 sql_sequence = [None] * (len_sequence - 1)
                 for i in range(len_sequence - 1):
@@ -961,6 +962,17 @@ class DBModel:
             sql_str = near_sql.to_sql(db_model=self, force_sql=True, annotate=annotate)
         if pretty:
             sql_str = pretty_format_sql(sql_str, encoding=encoding, sqlparse_options=sqlparse_options)
+        if annotate:
+            model_descr = re.sub(r'\s+', ' ', str(self))
+            self.string_quote
+            self.identifier_quote
+            sql_str = (
+                f'-- data_algebra SQL https://github.com/WinVector/data_algebra\n'
+                + f'--  dialect: {model_descr}\n'
+                + f'--       string quote: {self.string_quote}\n'
+                + f'--   identifier quote: {self.identifier_quote}\n'
+                + sql_str
+            )
         return sql_str
 
     def row_recs_to_blocks_query(
@@ -1340,7 +1352,7 @@ class DBHandle(data_algebra.eval_model.EvalModel):
                sqlparse_options=None,
                temp_tables=None,
                use_with=False):
-        return ops.to_sql(self.db_model,
+        return self.db_model.to_sql(ops=ops,
                           pretty=pretty,
                           annotate=annotate,
                           encoding=encoding,
