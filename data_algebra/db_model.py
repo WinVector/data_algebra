@@ -759,6 +759,21 @@ class DBModel:
         )
         return near_sql
 
+    def _coalesce_terms(self, *, sub_view_name_left, sub_view_name_right, cols):
+        terms = {
+            ci: "COALESCE("
+            + sub_view_name_left
+            + "."
+            + self.quote_identifier(ci)
+            + ", "
+            + sub_view_name_right
+            + "."
+            + self.quote_identifier(ci)
+            + ")"
+            for ci in cols
+        }
+        return terms
+
     def natural_join_to_sql(self, join_node, *, using=None, temp_id_source=None):
         if join_node.node_name != "NaturalJoinNode":
             raise TypeError(
@@ -788,18 +803,10 @@ class DBModel:
         view_name = "natural_join_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         common = using_left.intersection(using_right)
-        terms = {
-            ci: "COALESCE("
-            + sub_view_name_left
-            + "."
-            + self.quote_identifier(ci)
-            + ", "
-            + sub_view_name_right
-            + "."
-            + self.quote_identifier(ci)
-            + ")"
-            for ci in common if ci in using
-        }
+        terms = self._coalesce_terms(
+            sub_view_name_left=sub_view_name_left,
+            sub_view_name_right=sub_view_name_right,
+            cols=[ci for ci in common if ci in using])
         terms.update({ci: None for ci in using_left - common})
         terms.update({ci: None for ci in using_right - common})
         on_terms = ""
