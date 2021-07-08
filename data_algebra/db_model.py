@@ -760,18 +760,18 @@ class DBModel:
         return near_sql
 
     def _coalesce_terms(self, *, sub_view_name_left, sub_view_name_right, cols):
-        terms = {
-            ci: "COALESCE("
-            + sub_view_name_left
-            + "."
-            + self.quote_identifier(ci)
-            + ", "
-            + sub_view_name_right
-            + "."
-            + self.quote_identifier(ci)
-            + ")"
-            for ci in cols
-        }
+        coalesce_formatter = self.sql_formatters['coalesce']
+
+        class PseudoExpression:
+            def __init__(self, args):
+                self.args = args.copy()
+
+        terms = {ci: coalesce_formatter(
+                        self,
+                        PseudoExpression([
+                            sub_view_name_left + "." + self.quote_identifier(ci),
+                            sub_view_name_right + "." + self.quote_identifier(ci)
+                    ])) for ci in cols}
         return terms
 
     def natural_join_to_sql(self, join_node, *, using=None, temp_id_source=None):
