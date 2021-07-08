@@ -38,6 +38,7 @@ def _bigquery_mean_expr(dbmodel, expression):
 def _bigquery_size_expr(dbmodel, expression):
     return "SUM(1)"
 
+
 def _bigquery_is_bad_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     return (

@@ -90,7 +90,7 @@ data_algebra.__version__
 
 
 
-    '0.7.2'
+    '0.7.3'
 
 
 
@@ -186,15 +186,10 @@ Let's also copy this data to a database.  Normally big data is already in the sy
 use_postgresql = True
 
 if use_postgresql:
-    db_handle = data_algebra.PostgreSQL.PostgreSQLModel().db_handle(
-        sqlalchemy.engine.create_engine(r'postgresql://johnmount@localhost/johnmount')
-    )
+    db_handle = data_algebra.PostgreSQL.example_handle()
 else:
-    db_handle = data_algebra.SQLite.SQLiteModel().db_handle(
-        conn = sqlite3.connect(':memory:')
-    )
+    db_handle = data_algebra.SQLite.example_handle()
 
-db_handle.db_model.prepare_connection(db_handle.conn)  # define any user functions and settings we want/need
 ```
 
 
@@ -294,10 +289,9 @@ ops = data_algebra.data_ops.describe_table(d_local, 'd'). \
     extend({'total': 'probability.sum()'},
            partition_by='subjectID'). \
     extend({'probability': 'probability/total'}). \
-    extend({'sort_key': '-probability'}). \
-    extend({'row_number': '_row_number()'},
+    extend({'row_number': '(1).cumsum()'},
            partition_by=['subjectID'],
-           order_by=['sort_key']). \
+           order_by=['probability'], reverse=['probability']). \
     select_rows('row_number == 1'). \
     select_columns(['subjectID', 'surveyCategory', 'probability']). \
     rename_columns({'diagnosis': 'surveyCategory'})
@@ -327,14 +321,15 @@ print(py_source)
             "irrelevantCol1",
             "irrelevantCol2",
         ],
-    ).extend({"probability": "(assessmentTotal * 0.237).exp()"}).extend(
+    ).extend({"probability": "((assessmentTotal * 0.237)).exp()"}).extend(
         {"total": "probability.sum()"}, partition_by=["subjectID"]
     ).extend(
         {"probability": "probability / total"}
     ).extend(
-        {"sort_key": "-probability"}
-    ).extend(
-        {"row_number": "_row_number()"}, partition_by=["subjectID"], order_by=["sort_key"]
+        {"row_number": "(1).cumsum()"},
+        partition_by=["subjectID"],
+        order_by=["probability"],
+        reverse=["probability"],
     ).select_rows(
         "row_number == 1"
     ).select_columns(
@@ -371,56 +366,54 @@ sql = db_handle.to_sql(ops, pretty=True, use_with=True, annotate=True)
 print(sql)
 ```
 
+    -- data_algebra SQL https://github.com/WinVector/data_algebra
+    --  dialect: PostgreSQLModel
+    --       string quote: '
+    --   identifier quote: "
     WITH "table_reference_0" AS
-      (SELECT "surveyCategory",
-              "subjectID",
+      (SELECT "subjectID",
+              "surveyCategory",
               "assessmentTotal"
        FROM "d"),
          "extend_1" AS
-      (SELECT -- extend({ 'probability': '(assessmentTotal * 0.237).exp()'})
-     "surveyCategory",
+      (SELECT -- extend({ 'probability': '((assessmentTotal * 0.237)).exp()'})
      "subjectID",
+     "surveyCategory",
      EXP(("assessmentTotal" * 0.237)) AS "probability"
        FROM "table_reference_0"),
          "extend_2" AS
       (SELECT -- extend({ 'total': 'probability.sum()'}, partition_by=['subjectID'])
-     "surveyCategory",
      "subjectID",
+     "surveyCategory",
      "probability",
      SUM("probability") OVER (PARTITION BY "subjectID") AS "total"
        FROM "extend_1"),
          "extend_3" AS
       (SELECT -- extend({ 'probability': 'probability / total'})
+     "subjectID",
      "surveyCategory",
-     "probability" / "total" AS "probability",
-     "subjectID"
+     "probability" / "total" AS "probability"
        FROM "extend_2"),
          "extend_4" AS
-      (SELECT -- extend({ 'sort_key': '-probability'})
-     "surveyCategory",
-     "probability",
-     "subjectID", -("probability") AS "sort_key"
-       FROM "extend_3"),
-         "extend_5" AS
-      (SELECT -- extend({ 'row_number': '_row_number()'}, partition_by=['subjectID'], order_by=['sort_key'])
-     "surveyCategory",
-     "probability",
+      (SELECT -- extend({ 'row_number': '(1).cumsum()'}, partition_by=['subjectID'], order_by=['probability'], reverse=['probability'])
      "subjectID",
-     ROW_NUMBER() OVER (PARTITION BY "subjectID"
-                        ORDER BY "sort_key") AS "row_number"
-       FROM "extend_4"),
-         "select_rows_6" AS
-      (SELECT -- select_rows('row_number == 1')
      "surveyCategory",
      "probability",
-     "subjectID"
-       FROM "extend_5"
+     SUM(1) OVER (PARTITION BY "subjectID"
+                  ORDER BY "probability" DESC) AS "row_number"
+       FROM "extend_3"),
+         "select_rows_5" AS
+      (SELECT -- select_rows('row_number == 1')
+     "subjectID",
+     "surveyCategory",
+     "probability"
+       FROM "extend_4"
        WHERE "row_number" = 1 )
     SELECT -- rename_columns({'diagnosis': 'surveyCategory'})
      "surveyCategory" AS "diagnosis",
-     "probability",
-     "subjectID"
-    FROM "select_rows_6"
+     "subjectID",
+     "probability"
+    FROM "select_rows_5"
 
 
 
@@ -456,22 +449,22 @@ db_handle.read_query(sql)
     <tr style="text-align: right;">
       <th></th>
       <th>diagnosis</th>
-      <th>probability</th>
       <th>subjectID</th>
+      <th>probability</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
       <td>withdrawal behavior</td>
-      <td>0.670622</td>
       <td>1</td>
+      <td>0.670622</td>
     </tr>
     <tr>
       <th>1</th>
       <td>positive re-framing</td>
-      <td>0.558974</td>
       <td>2</td>
+      <td>0.558974</td>
     </tr>
   </tbody>
 </table>
