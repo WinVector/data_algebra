@@ -430,6 +430,16 @@
     <span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">_db_pow_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;POWER(&quot;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot;, &quot;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+    <span class="p">)</span>
+
+
 <span class="n">db_expr_formatters</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;is_null&quot;</span><span class="p">:</span> <span class="n">_db_is_null_expr</span><span class="p">,</span>
     <span class="s2">&quot;is_bad&quot;</span><span class="p">:</span> <span class="n">_db_is_bad_expr</span><span class="p">,</span>
@@ -443,6 +453,7 @@
     <span class="s1">&#39;round&#39;</span><span class="p">:</span> <span class="n">_db_round_expr</span><span class="p">,</span>
     <span class="s1">&#39;floor&#39;</span><span class="p">:</span> <span class="n">_db_floor_expr</span><span class="p">,</span>
     <span class="s1">&#39;ceil&#39;</span><span class="p">:</span> <span class="n">_db_ceil_expr</span><span class="p">,</span>
+    <span class="s1">&#39;**&#39;</span><span class="p">:</span> <span class="n">_db_pow_expr</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -502,7 +513,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">sql_formatters</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">db_expr_formatters</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">op_replacements</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">op_replacements</span> <span class="o">=</span> <span class="n">db_default_op_replacements</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">op_replacements</span> <span class="o">=</span> <span class="n">op_replacements</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">op_replacements</span> <span class="o">=</span> <span class="n">op_replacements</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">on_start</span> <span class="o">=</span> <span class="n">on_start</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">on_end</span> <span class="o">=</span> <span class="n">on_end</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">on_joiner</span> <span class="o">=</span> <span class="n">on_joiner</span>
@@ -1750,7 +1761,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">sql_formatters</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">db_expr_formatters</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">op_replacements</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">op_replacements</span> <span class="o">=</span> <span class="n">db_default_op_replacements</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">op_replacements</span> <span class="o">=</span> <span class="n">op_replacements</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">op_replacements</span> <span class="o">=</span> <span class="n">op_replacements</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">on_start</span> <span class="o">=</span> <span class="n">on_start</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">on_end</span> <span class="o">=</span> <span class="n">on_end</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">on_joiner</span> <span class="o">=</span> <span class="n">on_joiner</span>
@@ -2807,7 +2818,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">sql_formatters</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">db_expr_formatters</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">op_replacements</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">op_replacements</span> <span class="o">=</span> <span class="n">db_default_op_replacements</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">op_replacements</span> <span class="o">=</span> <span class="n">op_replacements</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">op_replacements</span> <span class="o">=</span> <span class="n">op_replacements</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">on_start</span> <span class="o">=</span> <span class="n">on_start</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">on_end</span> <span class="o">=</span> <span class="n">on_end</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">on_joiner</span> <span class="o">=</span> <span class="n">on_joiner</span>

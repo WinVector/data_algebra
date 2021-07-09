@@ -198,6 +198,16 @@ def _db_ceil_expr(dbmodel, expression):
     )
 
 
+def _db_pow_expr(dbmodel, expression):
+    return (
+        "POWER("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ", "
+        + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+        + ")"
+    )
+
+
 db_expr_formatters = {
     "is_null": _db_is_null_expr,
     "is_bad": _db_is_bad_expr,
@@ -211,6 +221,7 @@ db_expr_formatters = {
     'round': _db_round_expr,
     'floor': _db_floor_expr,
     'ceil': _db_ceil_expr,
+    '**': _db_pow_expr,
 }
 
 
@@ -270,7 +281,7 @@ class DBModel:
                 self.sql_formatters[k] = db_expr_formatters[k]
         if op_replacements is None:
             op_replacements = db_default_op_replacements
-        self.op_replacements = op_replacements
+        self.op_replacements = op_replacements.copy()
         self.on_start = on_start
         self.on_end = on_end
         self.on_joiner = on_joiner
