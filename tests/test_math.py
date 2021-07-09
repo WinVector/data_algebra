@@ -19,9 +19,12 @@ def test_math():
     )
 
     table_desciption = describe_table(d)
-    ops = table_desciption.extend(
-        {"v_exp": "v.exp()", "v_sin": "v.sin()", "g_plus_x": "g+x",}
-    )
+    ops = table_desciption.extend({
+        "v_exp": "v.exp()",
+        "v_sin": "v.sin()",
+        "g_plus_x": "g+x",
+        "g_pow": 'g**x',
+         })
 
     expect1 = data_algebra.default_data_model.pd.DataFrame(
         {
@@ -45,6 +48,7 @@ def test_math():
                 0.8939966636005579,
             ],
             "g_plus_x": [2, 6, 7, 10, 11, 12],
+            "g_pow": [1, 16, 32, 2187, 6561, 19683]
         }
     )
 
