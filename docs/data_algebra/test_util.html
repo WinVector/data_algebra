@@ -379,10 +379,10 @@
         <span class="p">]</span>
 
     <span class="c1"># controls</span>
-    <span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
+    <span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># causes an external dependency</span>
     <span class="n">test_BigQuery</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-    <span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-    <span class="n">test_Spark</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
+    <span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># causes an external dependency</span>
+    <span class="n">test_Spark</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># causes an external dependency</span>
 
     <span class="k">if</span> <span class="n">test_PostgreSQL</span><span class="p">:</span>
         <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">())</span>
@@ -831,10 +831,10 @@ Asserts if there are issues</p>
         <span class="p">]</span>
 
     <span class="c1"># controls</span>
-    <span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
+    <span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># causes an external dependency</span>
     <span class="n">test_BigQuery</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-    <span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-    <span class="n">test_Spark</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
+    <span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># causes an external dependency</span>
+    <span class="n">test_Spark</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># causes an external dependency</span>
 
     <span class="k">if</span> <span class="n">test_PostgreSQL</span><span class="p">:</span>
         <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">())</span>
