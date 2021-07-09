@@ -6,8 +6,6 @@ import data_algebra
 import data_algebra.util
 import data_algebra.test_util
 from data_algebra.data_ops import *
-import data_algebra.MySQL
-import data_algebra.SparkSQL
 
 
 def test_null_bad():
@@ -29,7 +27,6 @@ def test_null_bad():
         }
     )
 
-
     models_to_skip = set()
     models_to_skip.add(str(data_algebra.MySQL.MySQLModel()))  # can't insert infinity into MySQL
     models_to_skip.add(str(data_algebra.SparkSQL.SparkSQLModel()))  # None/Null/Non handled differently
@@ -38,6 +35,6 @@ def test_null_bad():
         ops=ops,
         data=d,
         expect=expect,
-        allow_pretty=False,
+        allow_pretty=False,  # pretty printer was changing capitalization of data to DATA for BigQuery
         models_to_skip=models_to_skip,
-    )  # pretty printer was changing capitalization of data to DATA
+    )
