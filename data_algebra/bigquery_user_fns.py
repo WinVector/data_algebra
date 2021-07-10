@@ -1,6 +1,8 @@
 
 import datetime
 
+import numpy
+
 import data_algebra
 import data_algebra.data_ops
 
@@ -16,8 +18,8 @@ import data_algebra.user_fn
 def as_int64(col):
     assert isinstance(col, str)
     return data_algebra.user_fn.FnTerm(
-        pandas_fn = lambda x: x.astype('int64'),  # x is a pandas Series
-        sql_fn = lambda subs, db_model: f'CAST({subs[0]} AS INT64)',
+        pandas_fn=lambda x: x.astype('int64').copy(),  # x is a pandas Series
+        sql_fn=lambda subs, db_model: f'CAST({subs[0]} AS INT64)',
         args=[col],
         display_form = f'as_int64({col})',
         name='as_int64',
@@ -27,8 +29,8 @@ def as_int64(col):
 def as_str(col):
     assert isinstance(col, str)
     return data_algebra.user_fn.FnTerm(
-        pandas_fn = lambda x: x.astype('str'),  # x is a pandas Series
-        sql_fn = lambda subs, db_model: f'CAST({subs[0]} AS STRING)',
+        pandas_fn=lambda x: x.astype('str').copy(),  # x is a pandas Series
+        sql_fn=lambda subs, db_model: f'CAST({subs[0]} AS STRING)',
         args=[col],
         display_form = f'as_int64({col})',
         name='as_str',
@@ -41,8 +43,8 @@ def trimstr(col_name, *, start=0, stop):
     assert isinstance(stop, int)
     assert isinstance(col_name, str)
     return data_algebra.user_fn.FnTerm(
-        pandas_fn = lambda x: x.str.slice(start=start, stop=stop),  # x is a pandas Series
-        sql_fn = lambda subs, db_model: f'SUBSTR({subs[0]}, {start+1}, {stop})',
+        pandas_fn=lambda x: x.str.slice(start=start, stop=stop),  # x is a pandas Series
+        sql_fn=lambda subs, db_model: f'SUBSTR({subs[0]}, {start+1}, {stop})',
         args=[col_name],
         display_form = f'trimstr({col_name}, start={start}, stop={stop})',
         name='trimstr',
@@ -53,8 +55,8 @@ def trimstr(col_name, *, start=0, stop):
 def coalesce_0(col):
     assert isinstance(col, str)
     return data_algebra.user_fn.FnTerm(
-        pandas_fn = lambda x: x.fillna(0),   # x is a pandas Series
-        sql_fn = lambda subs, db_model: f'COALESCE({subs[0]}, 0)',
+        pandas_fn=lambda x: x.fillna(0),   # x is a pandas Series
+        sql_fn=lambda subs, db_model: f'COALESCE({subs[0]}, 0)',
         args=[col],
         display_form = f'coalesce_0({col})',
         name='coalesce_0',
@@ -77,7 +79,7 @@ def coalesce(cols):
 
     return data_algebra.user_fn.FnTerm(
         pandas_fn = f,
-        sql_fn = lambda subs, db_model: f'COALESCE({", ".join(subs)})', # TODO: check SQL
+        sql_fn=lambda subs, db_model: f'COALESCE({", ".join(subs)})', # TODO: check SQL
         args=cols,
         display_form = f'coalesce({cols})',
         name='coalesce',
@@ -88,8 +90,8 @@ def coalesce(cols):
 def datetime_to_date(col):
     assert isinstance(col, str)
     return data_algebra.user_fn.FnTerm(
-        pandas_fn = lambda x: x.dt.date.copy(),  # x is a pandas Series
-        sql_fn = lambda subs, db_model: f'DATE({subs[0]})',
+        pandas_fn=lambda x: x.dt.date.copy(),  # x is a pandas Series
+        sql_fn=lambda subs, db_model: f'DATE({subs[0]})',
         args=[col],
         display_form = f'datetime_to_date({col})',
         name='datetime_to_date',
@@ -103,8 +105,8 @@ def parse_datetime(col, *, format="%Y-%m-%d %H:%M:%S"):
     assert isinstance(format, str)
     return data_algebra.user_fn.FnTerm(
         # https://pandas.pydata.org/docs/reference/api/pandas.to_datetime.html
-        pandas_fn = lambda x: data_algebra.default_data_model.pd.to_datetime(x, format=format),  # x is a pandas Series
-        sql_fn = lambda subs, db_model: f'PARSE_DATETIME({db_model.quote_string(format)}, {subs[0]})',
+        pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x, format=format),  # x is a pandas Series
+        sql_fn=lambda subs, db_model: f'PARSE_DATETIME({db_model.quote_string(format)}, {subs[0]})',
         args=[col],
         display_form = f'parse_datetime({col}, format="{format}")',
         name='parse_datetime',
@@ -175,12 +177,45 @@ def dayofyear(col):
     assert isinstance(col, str)
     return data_algebra.user_fn.FnTerm(
         # x is a pandas Series
-        pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.dayofyear.astype('int64'),
+        pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.dayofyear.astype('int64').copy(),
         sql_fn=lambda subs, db_model: f'EXTRACT(DAYOFYEAR FROM {subs[0]})',
         args=[col],
         display_form=f'dayofyear({col})',
         name='dayofyear',
     )
+
+
+def _calc_date_diff(x0, x1):
+    # x is a pandas Series or list of datetime.date compatible types
+    x0 = data_algebra.default_data_model.pd.Series(x0)
+    x1 = data_algebra.default_data_model.pd.Series(x1)
+    x0_dates = data_algebra.default_data_model.pd.to_datetime(x0).dt.date.copy()
+    x1_dates = data_algebra.default_data_model.pd.to_datetime(x1).dt.date.copy()
+    deltas = [(x0_dates[i] - x1_dates[i]).days for i in range(len(x0_dates))]
+    return deltas
+
+
+def _calc_base_Sunday(x):
+    # x is a pandas Series or list of datetime.date compatible types
+    x = data_algebra.default_data_model.pd.Series(x)
+    x_dates = data_algebra.default_data_model.pd.to_datetime(x).dt.date.copy()
+    res = [xi - datetime.timedelta(days=(xi.weekday() + 1) % 7) for xi in x_dates]
+    return res
+
+
+def _calc_week_of_Year(x):
+    # x is a pandas Series or list of datetime.date compatible types
+    # TODO: better impl
+    # Note was getting inconsistent results on vectorized methods
+    x = data_algebra.default_data_model.pd.Series(x)
+    x_dates = data_algebra.default_data_model.pd.to_datetime(x).dt.date.copy()
+    cur_dates = [datetime.date(dti.year, dti.month, dti.day) for dti in x_dates]
+    base_dates = [datetime.date(dti.year, 1, 1) for dti in x_dates]
+    base_dates = _calc_base_Sunday(base_dates)
+    deltas = [(cur_dates[i] - base_dates[i]).days for i in range(len(cur_dates))]
+    res = [di//7 for di in deltas]
+    res = numpy.maximum(res, 1)
+    return res
 
 
 # convert date to week of year
@@ -189,7 +224,8 @@ def weekofyear(col):
     assert isinstance(col, str)
     return data_algebra.user_fn.FnTerm(
         # x is a pandas Series
-        pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.isocalendar().week.astype('int64'),
+        # match DB convention of weeks 1 through 52
+        pandas_fn=_calc_week_of_Year,
         sql_fn=lambda subs, db_model: f'EXTRACT(WEEK FROM {subs[0]})',
         args=[col],
         display_form=f'weekofyear({col})',
@@ -203,7 +239,7 @@ def dayofmonth(col):
     assert isinstance(col, str)
     return data_algebra.user_fn.FnTerm(
         # x is a pandas Series
-        pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.day.astype('int64'),
+        pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.day.astype('int64').copy(),
         sql_fn=lambda subs, db_model: f'EXTRACT(DAY FROM {subs[0]})',
         args=[col],
         display_form=f'dayofmonth({col})',
@@ -217,7 +253,7 @@ def month(col):
     assert isinstance(col, str)
     return data_algebra.user_fn.FnTerm(
         # x is a pandas Series
-        pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.month.astype('int64'),
+        pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.month.astype('int64').copy(),
         sql_fn=lambda subs, db_model: f'EXTRACT(MONTH FROM {subs[0]})',
         args=[col],
         display_form=f'month({col})',
@@ -231,7 +267,7 @@ def quarter(col):
     assert isinstance(col, str)
     return data_algebra.user_fn.FnTerm(
         # x is a pandas Series
-        pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.quarter.astype('int64'),
+        pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.quarter.astype('int64').copy(),
         sql_fn=lambda subs, db_model: f'EXTRACT(QUARTER FROM {subs[0]})',
         args=[col],
         display_form=f'quarter({col})',
@@ -244,8 +280,8 @@ def quarter(col):
 def year(col):
     assert isinstance(col, str)
     return data_algebra.user_fn.FnTerm(
-        pandas_fn = lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.year.astype('int64'),
-        sql_fn = lambda subs, db_model: f'EXTRACT(YEAR FROM {subs[0]})',
+        pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.year.astype('int64').copy(),
+        sql_fn=lambda subs, db_model: f'EXTRACT(YEAR FROM {subs[0]})',
         args=[col],
         display_form = f'year({col})',
         name='year',
@@ -261,9 +297,9 @@ def timestamp_diff(col1, col2):
         # https://stackoverflow.com/a/41340398
         # looks like Timedelta is scalar
         # TODO: find vectorized form
-        pandas_fn = lambda c1, c2: [
+        pandas_fn=lambda c1, c2: [
             data_algebra.default_data_model.pd.Timedelta(c1[i] - c2[i]).total_seconds() for i in range(len(c1))],
-        sql_fn = lambda subs, db_model: f'TIMESTAMP_DIFF({subs[0]}, {subs[1]}, SECOND)',
+        sql_fn=lambda subs, db_model: f'TIMESTAMP_DIFF({subs[0]}, {subs[1]}, SECOND)',
         args=[col1, col2],
         display_form = f'timestamp_diff({col1}, {col2})',
         name='timestamp_diff',
@@ -278,9 +314,8 @@ def date_diff(col1, col2):
         # https://stackoverflow.com/a/41340398
         # looks like Timedelta is scalar
         # TODO: find vectorized form
-        pandas_fn=lambda c1, c2: [
-            data_algebra.default_data_model.pd.Timedelta(c1[i] - c2[i]).days for i in range(len(c1))],
-        sql_fn = lambda subs, db_model: f'TIMESTAMP_DIFF({subs[0]}, {subs[1]}, DAY)',
+        pandas_fn=_calc_date_diff,
+        sql_fn=lambda subs, db_model: f'TIMESTAMP_DIFF({subs[0]}, {subs[1]}, DAY)',
         args=[col1, col2],
         display_form = f'date_diff({col1}, {col2})',
         name='date_diff',
@@ -292,9 +327,8 @@ def base_Sunday(col):
     assert isinstance(col, str)
     return data_algebra.user_fn.FnTerm(
         # x is a pandas Series of datetime.date
-        # TODO: vectorize
-        pandas_fn=lambda x: [x[i] - datetime.timedelta(days=(x[i].weekday() + 1) % 7) for i in range(len(x))],
-        sql_fn = lambda subs, db_model: f'DATE_SUB({subs[0]}, INTERVAL (EXTRACT(DAYOFWEEK FROM {subs[0]}) - 1) DAY)',
+        pandas_fn=_calc_base_Sunday,
+        sql_fn=lambda subs, db_model: f'DATE_SUB({subs[0]}, INTERVAL (EXTRACT(DAYOFWEEK FROM {subs[0]}) - 1) DAY)',
         args=[col],
         display_form = f'base_Sunday({col})',
         name='base_Sunday',

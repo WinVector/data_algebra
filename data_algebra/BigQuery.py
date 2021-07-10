@@ -215,16 +215,21 @@ class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
 def example_handle():
     """
     Return an example db handle for testing. Returns None if helper packages not present.
+    Note: binds in a data_catalog and data schema prefix. So this handle is specific
+    to one database.
 
     """
     # TODO: parameterize this
     if not _have_bigquery:
         return None
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/johnmount/big_query/big_query_jm.json"
-    # os.environ["GOOGLE_APPLICATION_CREDENTIALS"]  # trigger key error if not present
-    data_catalog = 'data-algebra-test'
-    data_schema = 'test_1'
-    db_handle = BigQueryModel(
-        table_prefix=f'{data_catalog}.{data_schema}').db_handle(google.cloud.bigquery.Client())
-    db_handle.db_model.prepare_connection(db_handle.conn)
-    return db_handle
+    try:
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/johnmount/big_query/big_query_jm.json"
+        # os.environ["GOOGLE_APPLICATION_CREDENTIALS"]  # trigger key error if not present
+        data_catalog = 'data-algebra-test'
+        data_schema = 'test_1'
+        db_handle = BigQueryModel(
+            table_prefix=f'{data_catalog}.{data_schema}').db_handle(google.cloud.bigquery.Client())
+        db_handle.db_model.prepare_connection(db_handle.conn)
+        return db_handle
+    except Exception as e:
+        return None
