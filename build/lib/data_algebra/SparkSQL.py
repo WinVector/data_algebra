@@ -142,7 +142,6 @@ class SparkSQLModel(data_algebra.db_model.DBModel):
         d_spark.createOrReplaceTempView(table_name)  # TODO: non-temps
 
 
-
 spark_context = None
 
 

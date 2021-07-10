@@ -306,19 +306,24 @@
 <span class="k">def</span> <span class="nf">example_handle</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return an example db handle for testing. Returns None if helper packages not present.</span>
+<span class="sd">    Note: binds in a data_catalog and data schema prefix. So this handle is specific</span>
+<span class="sd">    to one database.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: parameterize this</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_have_bigquery</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;/Users/johnmount/big_query/big_query_jm.json&quot;</span>
-    <span class="c1"># os.environ[&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;]  # trigger key error if not present</span>
-    <span class="n">data_catalog</span> <span class="o">=</span> <span class="s1">&#39;data-algebra-test&#39;</span>
-    <span class="n">data_schema</span> <span class="o">=</span> <span class="s1">&#39;test_1&#39;</span>
-    <span class="n">db_handle</span> <span class="o">=</span> <span class="n">BigQueryModel</span><span class="p">(</span>
-        <span class="n">table_prefix</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">data_catalog</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">data_schema</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">google</span><span class="o">.</span><span class="n">cloud</span><span class="o">.</span><span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">())</span>
-    <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">db_handle</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;/Users/johnmount/big_query/big_query_jm.json&quot;</span>
+        <span class="c1"># os.environ[&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;]  # trigger key error if not present</span>
+        <span class="n">data_catalog</span> <span class="o">=</span> <span class="s1">&#39;data-algebra-test&#39;</span>
+        <span class="n">data_schema</span> <span class="o">=</span> <span class="s1">&#39;test_1&#39;</span>
+        <span class="n">db_handle</span> <span class="o">=</span> <span class="n">BigQueryModel</span><span class="p">(</span>
+            <span class="n">table_prefix</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">data_catalog</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">data_schema</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">google</span><span class="o">.</span><span class="n">cloud</span><span class="o">.</span><span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">())</span>
+        <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">db_handle</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
 </pre></div>
 
         </details>
@@ -761,7 +766,7 @@ inheritance.</p>
     *,
     db_model=BigQueryModel,
     conn,
-    fns={&#39;as_int64&#39;: &lt;function as_int64 at 0x7fe7702b3700&gt;, &#39;as_str&#39;: &lt;function as_str at 0x7fe7702b3040&gt;, &#39;trimstr&#39;: &lt;function trimstr at 0x7fe7702b30d0&gt;, &#39;coalesce_0&#39;: &lt;function coalesce_0 at 0x7fe7702b3310&gt;, &#39;coalesce&#39;: &lt;function coalesce at 0x7fe7702b3550&gt;, &#39;datetime_to_date&#39;: &lt;function datetime_to_date at 0x7fe7889f9820&gt;, &#39;parse_datetime&#39;: &lt;function parse_datetime at 0x7fe7889ff4c0&gt;, &#39;parse_date&#39;: &lt;function parse_date at 0x7fe7889ff550&gt;, &#39;format_datetime&#39;: &lt;function format_datetime at 0x7fe7889ff5e0&gt;, &#39;format_date&#39;: &lt;function format_date at 0x7fe7889ff670&gt;, &#39;dayofweek&#39;: &lt;function dayofweek at 0x7fe7889ff700&gt;, &#39;dayofyear&#39;: &lt;function dayofyear at 0x7fe7889ff790&gt;, &#39;dayofmonth&#39;: &lt;function dayofmonth at 0x7fe7889ff8b0&gt;, &#39;weekofyear&#39;: &lt;function weekofyear at 0x7fe7889ff820&gt;, &#39;month&#39;: &lt;function month at 0x7fe7889ff940&gt;, &#39;quarter&#39;: &lt;function quarter at 0x7fe7889ff9d0&gt;, &#39;year&#39;: &lt;function year at 0x7fe7889ffa60&gt;, &#39;timestamp_diff&#39;: &lt;function timestamp_diff at 0x7fe7889ffaf0&gt;, &#39;date_diff&#39;: &lt;function date_diff at 0x7fe7889ffb80&gt;, &#39;base_Sunday&#39;: &lt;function base_Sunday at 0x7fe7889ffc10&gt;}
+    fns={&#39;as_int64&#39;: &lt;function as_int64 at 0x7faea8c9b0d0&gt;, &#39;as_str&#39;: &lt;function as_str at 0x7faea8c9b3a0&gt;, &#39;trimstr&#39;: &lt;function trimstr at 0x7faea8c9b550&gt;, &#39;coalesce_0&#39;: &lt;function coalesce_0 at 0x7fae804598b0&gt;, &#39;coalesce&#39;: &lt;function coalesce at 0x7fae80460550&gt;, &#39;datetime_to_date&#39;: &lt;function datetime_to_date at 0x7fae804605e0&gt;, &#39;parse_datetime&#39;: &lt;function parse_datetime at 0x7fae80460670&gt;, &#39;parse_date&#39;: &lt;function parse_date at 0x7fae80460700&gt;, &#39;format_datetime&#39;: &lt;function format_datetime at 0x7fae80460790&gt;, &#39;format_date&#39;: &lt;function format_date at 0x7fae80460820&gt;, &#39;dayofweek&#39;: &lt;function dayofweek at 0x7fae804608b0&gt;, &#39;dayofyear&#39;: &lt;function dayofyear at 0x7fae80460940&gt;, &#39;dayofmonth&#39;: &lt;function dayofmonth at 0x7fae80460c10&gt;, &#39;weekofyear&#39;: &lt;function weekofyear at 0x7fae80460b80&gt;, &#39;month&#39;: &lt;function month at 0x7fae80460ca0&gt;, &#39;quarter&#39;: &lt;function quarter at 0x7fae80460d30&gt;, &#39;year&#39;: &lt;function year at 0x7fae80460dc0&gt;, &#39;timestamp_diff&#39;: &lt;function timestamp_diff at 0x7fae80460e50&gt;, &#39;date_diff&#39;: &lt;function date_diff at 0x7fae80460ee0&gt;, &#39;base_Sunday&#39;: &lt;function base_Sunday at 0x7fae80460f70&gt;}
 )</span>
     </div>
 
@@ -891,24 +896,31 @@ inheritance.</p>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">example_handle</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return an example db handle for testing. Returns None if helper packages not present.</span>
+<span class="sd">    Note: binds in a data_catalog and data schema prefix. So this handle is specific</span>
+<span class="sd">    to one database.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: parameterize this</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_have_bigquery</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;/Users/johnmount/big_query/big_query_jm.json&quot;</span>
-    <span class="c1"># os.environ[&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;]  # trigger key error if not present</span>
-    <span class="n">data_catalog</span> <span class="o">=</span> <span class="s1">&#39;data-algebra-test&#39;</span>
-    <span class="n">data_schema</span> <span class="o">=</span> <span class="s1">&#39;test_1&#39;</span>
-    <span class="n">db_handle</span> <span class="o">=</span> <span class="n">BigQueryModel</span><span class="p">(</span>
-        <span class="n">table_prefix</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">data_catalog</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">data_schema</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">google</span><span class="o">.</span><span class="n">cloud</span><span class="o">.</span><span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">())</span>
-    <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">db_handle</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;/Users/johnmount/big_query/big_query_jm.json&quot;</span>
+        <span class="c1"># os.environ[&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;]  # trigger key error if not present</span>
+        <span class="n">data_catalog</span> <span class="o">=</span> <span class="s1">&#39;data-algebra-test&#39;</span>
+        <span class="n">data_schema</span> <span class="o">=</span> <span class="s1">&#39;test_1&#39;</span>
+        <span class="n">db_handle</span> <span class="o">=</span> <span class="n">BigQueryModel</span><span class="p">(</span>
+            <span class="n">table_prefix</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">data_catalog</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">data_schema</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">google</span><span class="o">.</span><span class="n">cloud</span><span class="o">.</span><span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">())</span>
+        <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">db_handle</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Return an example db handle for testing. Returns None if helper packages not present.</p>
+            <div class="docstring"><p>Return an example db handle for testing. Returns None if helper packages not present.
+Note: binds in a data_catalog and data schema prefix. So this handle is specific
+to one database.</p>
 </div>
 
 
