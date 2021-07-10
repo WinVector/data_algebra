@@ -9,6 +9,9 @@ import data_algebra.BigQuery
 from data_algebra.bigquery_user_fns import *
 
 
+test_bigquery = False
+
+
 def test_bigquery_user_fns():
     pd = data_algebra.default_data_model.pd
     datetime_format = "%Y-%m-%d %H:%M:%S"
@@ -106,11 +109,12 @@ def test_bigquery_user_fns():
 
     assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
 
-    with data_algebra.BigQuery.example_handle() as db_handle:
-        if db_handle is not None:
-            d_remote = db_handle.insert_table(d, table_name='d', allow_overwrite=True)
-            res_db = db_handle.read_query(ops)
-            db_handle.drop_table('d')
-            # times come back with UTC timezone and some other differences
-            # TODO: improve test to check these things
-            # assert data_algebra.test_util.equivalent_frames(expect, res_db)
+    if test_bigquery:
+        with data_algebra.BigQuery.example_handle() as db_handle:
+            if db_handle is not None:
+                d_remote = db_handle.insert_table(d, table_name='d', allow_overwrite=True)
+                res_db = db_handle.read_query(ops)
+                db_handle.drop_table('d')
+                # times come back with UTC timezone and some other differences
+                # TODO: improve test to check these things
+                # assert data_algebra.test_util.equivalent_frames(expect, res_db)
