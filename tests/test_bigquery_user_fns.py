@@ -109,7 +109,11 @@ def test_bigquery_user_fns():
 
     assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
 
-    if test_bigquery:
+    test_handle = data_algebra.BigQuery.BigQueryModel().db_handle(conn=None)
+    test_sql = test_handle.to_sql(ops)
+    assert isinstance(test_sql, str)
+
+    if data_algebra.test_util.test_BigQuery:
         with data_algebra.BigQuery.example_handle() as db_handle:
             if db_handle is not None:
                 d_remote = db_handle.insert_table(d, table_name='d', allow_overwrite=True)
