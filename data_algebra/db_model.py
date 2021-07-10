@@ -1290,6 +1290,8 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         self.conn = conn
         if fns is None:
             fns = {}
+        else:
+            fns = fns.copy()
         self.fns = SimpleNamespace(**fns)
 
     def __enter__(self):

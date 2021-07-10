@@ -61,7 +61,6 @@ def coalesce_0(col):
     )
 
 
-# compute difference in dates in days
 def coalesce(cols):
     if isinstance(cols, str):
         cols = [cols]
