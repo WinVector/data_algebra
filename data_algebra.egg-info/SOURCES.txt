@@ -8,7 +8,6 @@ data_algebra/SQLite.py
 data_algebra/SparkSQL.py
 data_algebra/__init__.py
 data_algebra/arrow.py
-data_algebra/bigquery_user_fns.py
 data_algebra/cdata.py
 data_algebra/connected_components.py
 data_algebra/data_model.py
