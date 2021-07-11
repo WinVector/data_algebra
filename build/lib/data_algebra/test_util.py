@@ -16,6 +16,12 @@ import data_algebra.SparkSQL
 import data_algebra.SparkSQL
 from data_algebra.data_ops import *
 
+# controls
+test_PostgreSQL = False  # causes an external dependency
+test_BigQuery = False  # causes an external dependency
+test_MySQL = False  # causes an external dependency
+test_Spark = False  # causes an external dependency
+
 
 def formats_to_self(ops):
     """
@@ -316,12 +322,6 @@ def check_transform(
         data_algebra.MySQL.MySQLModel().db_handle(None),
         data_algebra.SQLite.example_handle(),  # actual database instance, not empty
         ]
-
-    # controls
-    test_PostgreSQL = False  # causes an external dependency
-    test_BigQuery = False  # causes an external dependency
-    test_MySQL = False  # causes an external dependency
-    test_Spark = False  # causes an external dependency
 
     if test_PostgreSQL:
         db_handles.append(data_algebra.PostgreSQL.example_handle())

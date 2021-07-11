@@ -77,6 +77,12 @@
 <span class="kn">import</span> <span class="nn">data_algebra.SparkSQL</span>
 <span class="kn">from</span> <span class="nn">data_algebra.data_ops</span> <span class="kn">import</span> <span class="o">*</span>
 
+<span class="c1"># controls</span>
+<span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
+<span class="n">test_BigQuery</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
+<span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
+<span class="n">test_Spark</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
+
 
 <span class="k">def</span> <span class="nf">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -377,12 +383,6 @@
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">example_handle</span><span class="p">(),</span>  <span class="c1"># actual database instance, not empty</span>
         <span class="p">]</span>
-
-    <span class="c1"># controls</span>
-    <span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-    <span class="n">test_BigQuery</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-    <span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-    <span class="n">test_Spark</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
 
     <span class="k">if</span> <span class="n">test_PostgreSQL</span><span class="p">:</span>
         <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">())</span>
@@ -829,12 +829,6 @@ Asserts if there are issues</p>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">example_handle</span><span class="p">(),</span>  <span class="c1"># actual database instance, not empty</span>
         <span class="p">]</span>
-
-    <span class="c1"># controls</span>
-    <span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-    <span class="n">test_BigQuery</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-    <span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-    <span class="n">test_Spark</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
 
     <span class="k">if</span> <span class="n">test_PostgreSQL</span><span class="p">:</span>
         <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">())</span>
