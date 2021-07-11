@@ -47,6 +47,19 @@ def _calc_week_of_Year(x):
     return res
 
 
+def _coalesce(a, b):
+    a_is_series = isinstance(a, data_algebra.default_data_model.pd.Series)
+    b_is_series = isinstance(b, data_algebra.default_data_model.pd.Series)
+    if (not a_is_series) and (not b_is_series):
+        raise ValueError("at least one argument must be a Pandas series")
+    if not a_is_series:
+        a = data_algebra.default_data_model.pd.Series(numpy.array([a] * len(b)))
+    if not b_is_series:
+        b = data_algebra.default_data_model.pd.Series(numpy.array([b] * len(a)))
+    res = a.combine_first(b)
+    return res
+
+
 def populate_impl_map(data_model):
     impl_map = {
         '==': numpy.equal,
@@ -81,7 +94,7 @@ def populate_impl_map(data_model):
         'is_in': numpy.isin,
         'concat': lambda a, b: numpy.char.add(numpy.asarray(a, dtype=numpy.str),
                                               numpy.asarray(b, dtype=numpy.str)),
-        'coalesce': lambda a, b: a.combine_first(b),  # assuming Pandas series
+        'coalesce': lambda a, b: _coalesce(a, b),  # assuming Pandas series
         'connected_components': lambda a, b: data_algebra.connected_components.connected_components(a, b),
         'co_equalizer': lambda a, b: data_algebra.connected_components.connected_components(a, b),
         # fns that had been in bigquery_user_fns
