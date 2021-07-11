@@ -12,15 +12,6 @@ except ImportError:
     have_sqlalchemy = False
 
 
-def _MySQL_mean_expr(dbmodel, expression):
-    return (
-        "avg(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ")"
-    )
-
-
-def _MySQL_size_expr(dbmodel, expression):
-    return "SUM(1)"
-
 def _MySQL_is_bad_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     return (
@@ -43,14 +34,14 @@ def _MySQL_concat_expr(dbmodel, expression):
         + ")"
     )
 
+
 # map from op-name to special SQL formatting code
 MySQL_formatters = {
     "___": lambda dbmodel, expression: expression.to_python(),
-    "mean": _MySQL_mean_expr,
-    "size": _MySQL_size_expr,
     "is_bad": _MySQL_is_bad_expr,
     'concat': _MySQL_concat_expr,
 }
+
 
 class MySQLModel(data_algebra.db_model.DBModel):
     """A model of how SQL should be generated for MySQL.
