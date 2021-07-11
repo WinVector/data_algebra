@@ -116,34 +116,17 @@
 <span class="kn">import</span> <span class="nn">data_algebra.data_ops</span>
 
 
-<span class="c1"># TODO: share some common fns such as as_int64 and coalesce_0 to all db_handles</span>
-
-<span class="c1"># TODO: re-eng all userfns to just be SQL constants, without pasting, perhaps pass in db handle</span>
-
-
-<span class="kn">import</span> <span class="nn">data_algebra.user_fn</span>
+<span class="c1"># Legacy to be removed</span>
 
 
 <span class="k">def</span> <span class="nf">as_int64</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>  <span class="c1"># x is a pandas Series</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;CAST(</span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> AS INT64)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;as_int64(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;as_int64&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.as_int64()&#39;</span>
 
 
 <span class="k">def</span> <span class="nf">as_str</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;str&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>  <span class="c1"># x is a pandas Series</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;CAST(</span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> AS STRING)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;as_int64(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;as_str&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.as_str()&#39;</span>
 
 
 <span class="c1"># trim string to date portion</span>
@@ -151,60 +134,26 @@
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stop</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">),</span>  <span class="c1"># x is a pandas Series</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;SUBSTR(</span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">start</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">stop</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col_name</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;trimstr(</span><span class="si">{</span><span class="n">col_name</span><span class="si">}</span><span class="s1">, start=</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s1">, stop=</span><span class="si">{</span><span class="n">stop</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;trimstr&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}</span><span class="s1">.trimstr(</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">stop</span><span class="si">}</span><span class="s1">)&#39;</span>
 
 
 <span class="c1"># replace missing with zeros</span>
 <span class="k">def</span> <span class="nf">coalesce_0</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>   <span class="c1"># x is a pandas Series</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;COALESCE(</span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, 0)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;coalesce_0(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;coalesce_0&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.coalesce(0)&#39;</span>
 
 
 <span class="k">def</span> <span class="nf">coalesce</span><span class="p">(</span><span class="n">cols</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">cols</span><span class="p">]</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
-    <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ci</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">])</span>
-    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">cols</span><span class="p">))</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
-    <span class="n">cols</span> <span class="o">=</span> <span class="n">cols</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)):</span>
-            <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">combine_first</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">res</span>
-
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="n">pandas_fn</span> <span class="o">=</span> <span class="n">f</span><span class="p">,</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;COALESCE(</span><span class="si">{</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="c1"># TODO: check SQL</span>
-        <span class="n">args</span><span class="o">=</span><span class="n">cols</span><span class="p">,</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;coalesce(</span><span class="si">{</span><span class="n">cols</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;coalesce&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="s1">&#39; %?% &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
 
 
 <span class="c1"># convert datetime to date</span>
 <span class="k">def</span> <span class="nf">datetime_to_date</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>  <span class="c1"># x is a pandas Series</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;DATE(</span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;datetime_to_date(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;datetime_to_date&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.datetime_to_date()&#39;</span>
 
 
 <span class="c1"># convert str to datetime</span>
@@ -212,28 +161,14 @@
 <span class="k">def</span> <span class="nf">parse_datetime</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># https://pandas.pydata.org/docs/reference/api/pandas.to_datetime.html</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">),</span>  <span class="c1"># x is a pandas Series</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;PARSE_DATETIME(</span><span class="si">{</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="nb">format</span><span class="p">)</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;parse_datetime(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">, format=&quot;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">&quot;)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;parse_datetime&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.parse_datetime(&quot;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">&quot;)&#39;</span>
 
 
 <span class="c1"># convert str to date</span>
 <span class="k">def</span> <span class="nf">parse_date</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># https://pandas.pydata.org/docs/reference/api/pandas.to_datetime.html</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>  <span class="c1"># x is a pandas Series</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;PARSE_DATE(</span><span class="si">{</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="nb">format</span><span class="p">)</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;parse_date(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">, format=&quot;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">&quot;)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;parse_date&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.parse_date(&quot;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">&quot;)&#39;</span>
 
 
 <span class="c1"># convert datetime to str</span>
@@ -241,160 +176,62 @@
 <span class="k">def</span> <span class="nf">format_datetime</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># x is a pandas Series</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">date_format</span><span class="o">=</span><span class="nb">format</span><span class="p">),</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;FORMAT_DATETIME(</span><span class="si">{</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="nb">format</span><span class="p">)</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;format_datetime(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">, format=&quot;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">&quot;)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;format_datetime&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.format_datetime(&quot;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">&quot;)&#39;</span>
 
 
 <span class="c1"># convert date to str</span>
 <span class="k">def</span> <span class="nf">format_date</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># x is a pandas Series</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">date_format</span><span class="o">=</span><span class="nb">format</span><span class="p">),</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;FORMAT_DATE(</span><span class="si">{</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="nb">format</span><span class="p">)</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;format_date(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">, format=&quot;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">&quot;)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;format_date&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.format_date(&quot;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">&quot;)&#39;</span>
 
 
 <span class="c1"># convert date to dayofweek Sunday=1 through Saturday=7</span>
 <span class="c1"># https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions</span>
 <span class="k">def</span> <span class="nf">dayofweek</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.dt.dayofweek.html#pandas.Series.dt.dayofweek</span>
-        <span class="c1"># https://stackoverflow.com/a/30222759</span>
-        <span class="c1"># x is a pandas Series</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">((</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">dayofweek</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">7</span><span class="p">),</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;EXTRACT(DAYOFWEEK FROM </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;dayofweek(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;dayofweek&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.dayofweek()&#39;</span>
 
 
 <span class="c1"># https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions</span>
 <span class="k">def</span> <span class="nf">dayofyear</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># x is a pandas Series</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">dayofyear</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;EXTRACT(DAYOFYEAR FROM </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;dayofyear(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;dayofyear&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_calc_date_diff</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">):</span>
-    <span class="c1"># x is a pandas Series or list of datetime.date compatible types</span>
-    <span class="n">x0</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
-    <span class="n">x1</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
-    <span class="n">x0_dates</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">x1_dates</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">deltas</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x0_dates</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">x1_dates</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">days</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x0_dates</span><span class="p">))]</span>
-    <span class="k">return</span> <span class="n">deltas</span>
-
-
-<span class="k">def</span> <span class="nf">_calc_base_Sunday</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="c1"># x is a pandas Series or list of datetime.date compatible types</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="n">x_dates</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="n">xi</span> <span class="o">-</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="p">(</span><span class="n">xi</span><span class="o">.</span><span class="n">weekday</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">7</span><span class="p">)</span> <span class="k">for</span> <span class="n">xi</span> <span class="ow">in</span> <span class="n">x_dates</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">res</span>
-
-
-<span class="k">def</span> <span class="nf">_calc_week_of_Year</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="c1"># x is a pandas Series or list of datetime.date compatible types</span>
-    <span class="c1"># TODO: better impl</span>
-    <span class="c1"># Note was getting inconsistent results on vectorized methods</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="n">x_dates</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">cur_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="n">dti</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">dti</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">dti</span><span class="o">.</span><span class="n">day</span><span class="p">)</span> <span class="k">for</span> <span class="n">dti</span> <span class="ow">in</span> <span class="n">x_dates</span><span class="p">]</span>
-    <span class="n">base_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="n">dti</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">dti</span> <span class="ow">in</span> <span class="n">x_dates</span><span class="p">]</span>
-    <span class="n">base_dates</span> <span class="o">=</span> <span class="n">_calc_base_Sunday</span><span class="p">(</span><span class="n">base_dates</span><span class="p">)</span>
-    <span class="n">deltas</span> <span class="o">=</span> <span class="p">[(</span><span class="n">cur_dates</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">base_dates</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">days</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cur_dates</span><span class="p">))]</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="n">di</span><span class="o">//</span><span class="mi">7</span> <span class="k">for</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">deltas</span><span class="p">]</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">res</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.dayofyear()&#39;</span>
 
 
 <span class="c1"># convert date to week of year</span>
 <span class="c1"># https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions</span>
 <span class="k">def</span> <span class="nf">weekofyear</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># x is a pandas Series</span>
-        <span class="c1"># match DB convention of weeks 1 through 52</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="n">_calc_week_of_Year</span><span class="p">,</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;EXTRACT(WEEK FROM </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;weekofyear(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;weekofyear&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.weekofyear()&#39;</span>
 
 
 <span class="c1"># convert date to dayofweek 1 through 7</span>
 <span class="c1"># https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions</span>
 <span class="k">def</span> <span class="nf">dayofmonth</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># x is a pandas Series</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">day</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;EXTRACT(DAY FROM </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;dayofmonth(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;dayofmonth&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.dayofmonth()&#39;</span>
 
 
 <span class="c1"># convert date to month</span>
 <span class="c1"># https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions</span>
 <span class="k">def</span> <span class="nf">month</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># x is a pandas Series</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">month</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;EXTRACT(MONTH FROM </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;month(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;month&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.month()&#39;</span>
 
 
 <span class="c1"># convert date to quarter</span>
 <span class="c1"># https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions</span>
 <span class="k">def</span> <span class="nf">quarter</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># x is a pandas Series</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">quarter</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;EXTRACT(QUARTER FROM </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;quarter(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;quarter&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.quarter()&#39;</span>
 
 
 <span class="c1"># convert date to year</span>
 <span class="c1"># https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions</span>
 <span class="k">def</span> <span class="nf">year</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;EXTRACT(YEAR FROM </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;year(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;year&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.year()&#39;</span>
 
 
 <span class="c1"># compute difference in timestamps in seconds</span>
@@ -402,49 +239,20 @@
 <span class="k">def</span> <span class="nf">timestamp_diff</span><span class="p">(</span><span class="n">col1</span><span class="p">,</span> <span class="n">col2</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col1</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col2</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># https://stackoverflow.com/a/41340398</span>
-        <span class="c1"># looks like Timedelta is scalar</span>
-        <span class="c1"># TODO: find vectorized form</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">:</span> <span class="p">[</span>
-            <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">c1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">c2</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">c1</span><span class="p">))],</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;TIMESTAMP_DIFF(</span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">, SECOND)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col1</span><span class="p">,</span> <span class="n">col2</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;timestamp_diff(</span><span class="si">{</span><span class="n">col1</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">col2</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;timestamp_diff&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col1</span><span class="si">}</span><span class="s1">.timestamp_diff(</span><span class="si">{</span><span class="n">col2</span><span class="si">}</span><span class="s1">)&#39;</span>
 
 
 <span class="c1"># compute difference in dates in days</span>
 <span class="k">def</span> <span class="nf">date_diff</span><span class="p">(</span><span class="n">col1</span><span class="p">,</span> <span class="n">col2</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col1</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col2</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># https://stackoverflow.com/a/41340398</span>
-        <span class="c1"># looks like Timedelta is scalar</span>
-        <span class="c1"># TODO: find vectorized form</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="n">_calc_date_diff</span><span class="p">,</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;TIMESTAMP_DIFF(</span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">, DAY)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col1</span><span class="p">,</span> <span class="n">col2</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;date_diff(</span><span class="si">{</span><span class="n">col1</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">col2</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;date_diff&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col1</span><span class="si">}</span><span class="s1">.date_diff(</span><span class="si">{</span><span class="n">col2</span><span class="si">}</span><span class="s1">)&#39;</span>
 
 
 <span class="c1"># find the nearest Sunday at or before this date</span>
 <span class="k">def</span> <span class="nf">base_Sunday</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># x is a pandas Series of datetime.date</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="n">_calc_base_Sunday</span><span class="p">,</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;DATE_SUB(</span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, INTERVAL (EXTRACT(DAYOFWEEK FROM </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">) - 1) DAY)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;base_Sunday(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;base_Sunday&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
-
-
-<span class="c1"># TODO: documentation page</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.base_Sunday()&#39;</span>
 
 
 <span class="n">fns</span> <span class="o">=</span> <span class="p">{</span>
@@ -486,13 +294,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">as_int64</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>  <span class="c1"># x is a pandas Series</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;CAST(</span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> AS INT64)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;as_int64(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;as_int64&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.as_int64()&#39;</span>
 </pre></div>
 
         </details>
@@ -512,13 +314,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">as_str</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;str&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>  <span class="c1"># x is a pandas Series</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;CAST(</span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> AS STRING)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;as_int64(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;as_str&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.as_str()&#39;</span>
 </pre></div>
 
         </details>
@@ -540,13 +336,7 @@
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stop</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">),</span>  <span class="c1"># x is a pandas Series</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;SUBSTR(</span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">start</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">stop</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col_name</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;trimstr(</span><span class="si">{</span><span class="n">col_name</span><span class="si">}</span><span class="s1">, start=</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s1">, stop=</span><span class="si">{</span><span class="n">stop</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;trimstr&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}</span><span class="s1">.trimstr(</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">stop</span><span class="si">}</span><span class="s1">)&#39;</span>
 </pre></div>
 
         </details>
@@ -566,13 +356,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">coalesce_0</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>   <span class="c1"># x is a pandas Series</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;COALESCE(</span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, 0)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;coalesce_0(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;coalesce_0&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.coalesce(0)&#39;</span>
 </pre></div>
 
         </details>
@@ -594,23 +378,7 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">cols</span><span class="p">]</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
-    <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ci</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">])</span>
-    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">cols</span><span class="p">))</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
-    <span class="n">cols</span> <span class="o">=</span> <span class="n">cols</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)):</span>
-            <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">combine_first</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">res</span>
-
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="n">pandas_fn</span> <span class="o">=</span> <span class="n">f</span><span class="p">,</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;COALESCE(</span><span class="si">{</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="c1"># TODO: check SQL</span>
-        <span class="n">args</span><span class="o">=</span><span class="n">cols</span><span class="p">,</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;coalesce(</span><span class="si">{</span><span class="n">cols</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;coalesce&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="s1">&#39; %?% &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -630,13 +398,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">datetime_to_date</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>  <span class="c1"># x is a pandas Series</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;DATE(</span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;datetime_to_date(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;datetime_to_date&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.datetime_to_date()&#39;</span>
 </pre></div>
 
         </details>
@@ -657,14 +419,7 @@
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">parse_datetime</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># https://pandas.pydata.org/docs/reference/api/pandas.to_datetime.html</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">),</span>  <span class="c1"># x is a pandas Series</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;PARSE_DATETIME(</span><span class="si">{</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="nb">format</span><span class="p">)</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;parse_datetime(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">, format=&quot;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">&quot;)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;parse_datetime&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.parse_datetime(&quot;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">&quot;)&#39;</span>
 </pre></div>
 
         </details>
@@ -685,14 +440,7 @@
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">parse_date</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># https://pandas.pydata.org/docs/reference/api/pandas.to_datetime.html</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>  <span class="c1"># x is a pandas Series</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;PARSE_DATE(</span><span class="si">{</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="nb">format</span><span class="p">)</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;parse_date(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">, format=&quot;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">&quot;)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;parse_date&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.parse_date(&quot;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">&quot;)&#39;</span>
 </pre></div>
 
         </details>
@@ -713,14 +461,7 @@
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">format_datetime</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># x is a pandas Series</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">date_format</span><span class="o">=</span><span class="nb">format</span><span class="p">),</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;FORMAT_DATETIME(</span><span class="si">{</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="nb">format</span><span class="p">)</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;format_datetime(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">, format=&quot;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">&quot;)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;format_datetime&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.format_datetime(&quot;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">&quot;)&#39;</span>
 </pre></div>
 
         </details>
@@ -741,14 +482,7 @@
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">format_date</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># x is a pandas Series</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">date_format</span><span class="o">=</span><span class="nb">format</span><span class="p">),</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;FORMAT_DATE(</span><span class="si">{</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="nb">format</span><span class="p">)</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;format_date(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">, format=&quot;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">&quot;)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;format_date&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.format_date(&quot;</span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">&quot;)&#39;</span>
 </pre></div>
 
         </details>
@@ -768,16 +502,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">dayofweek</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.dt.dayofweek.html#pandas.Series.dt.dayofweek</span>
-        <span class="c1"># https://stackoverflow.com/a/30222759</span>
-        <span class="c1"># x is a pandas Series</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">((</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">dayofweek</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">7</span><span class="p">),</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;EXTRACT(DAYOFWEEK FROM </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;dayofweek(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;dayofweek&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.dayofweek()&#39;</span>
 </pre></div>
 
         </details>
@@ -797,14 +522,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">dayofyear</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># x is a pandas Series</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">dayofyear</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;EXTRACT(DAYOFYEAR FROM </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;dayofyear(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;dayofyear&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.dayofyear()&#39;</span>
 </pre></div>
 
         </details>
@@ -824,15 +542,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">weekofyear</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># x is a pandas Series</span>
-        <span class="c1"># match DB convention of weeks 1 through 52</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="n">_calc_week_of_Year</span><span class="p">,</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;EXTRACT(WEEK FROM </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;weekofyear(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;weekofyear&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.weekofyear()&#39;</span>
 </pre></div>
 
         </details>
@@ -852,14 +562,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">dayofmonth</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># x is a pandas Series</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">day</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;EXTRACT(DAY FROM </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;dayofmonth(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;dayofmonth&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.dayofmonth()&#39;</span>
 </pre></div>
 
         </details>
@@ -879,14 +582,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">month</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># x is a pandas Series</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">month</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;EXTRACT(MONTH FROM </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;month(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;month&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.month()&#39;</span>
 </pre></div>
 
         </details>
@@ -906,14 +602,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">quarter</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># x is a pandas Series</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">quarter</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;EXTRACT(QUARTER FROM </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;quarter(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;quarter&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.quarter()&#39;</span>
 </pre></div>
 
         </details>
@@ -933,13 +622,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">year</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;EXTRACT(YEAR FROM </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;year(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;year&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.year()&#39;</span>
 </pre></div>
 
         </details>
@@ -960,17 +643,7 @@
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">timestamp_diff</span><span class="p">(</span><span class="n">col1</span><span class="p">,</span> <span class="n">col2</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col1</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col2</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># https://stackoverflow.com/a/41340398</span>
-        <span class="c1"># looks like Timedelta is scalar</span>
-        <span class="c1"># TODO: find vectorized form</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">:</span> <span class="p">[</span>
-            <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">c1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">c2</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">c1</span><span class="p">))],</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;TIMESTAMP_DIFF(</span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">, SECOND)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col1</span><span class="p">,</span> <span class="n">col2</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;timestamp_diff(</span><span class="si">{</span><span class="n">col1</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">col2</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;timestamp_diff&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col1</span><span class="si">}</span><span class="s1">.timestamp_diff(</span><span class="si">{</span><span class="n">col2</span><span class="si">}</span><span class="s1">)&#39;</span>
 </pre></div>
 
         </details>
@@ -991,16 +664,7 @@
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">date_diff</span><span class="p">(</span><span class="n">col1</span><span class="p">,</span> <span class="n">col2</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col1</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col2</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># https://stackoverflow.com/a/41340398</span>
-        <span class="c1"># looks like Timedelta is scalar</span>
-        <span class="c1"># TODO: find vectorized form</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="n">_calc_date_diff</span><span class="p">,</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;TIMESTAMP_DIFF(</span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">, DAY)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col1</span><span class="p">,</span> <span class="n">col2</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;date_diff(</span><span class="si">{</span><span class="n">col1</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">col2</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;date_diff&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col1</span><span class="si">}</span><span class="s1">.date_diff(</span><span class="si">{</span><span class="n">col2</span><span class="si">}</span><span class="s1">)&#39;</span>
 </pre></div>
 
         </details>
@@ -1020,14 +684,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">base_Sunday</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">(</span>
-        <span class="c1"># x is a pandas Series of datetime.date</span>
-        <span class="n">pandas_fn</span><span class="o">=</span><span class="n">_calc_base_Sunday</span><span class="p">,</span>
-        <span class="n">sql_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subs</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;DATE_SUB(</span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, INTERVAL (EXTRACT(DAYOFWEEK FROM </span><span class="si">{</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">) - 1) DAY)&#39;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-        <span class="n">display_form</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;base_Sunday(</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;base_Sunday&#39;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">.base_Sunday()&#39;</span>
 </pre></div>
 
         </details>

@@ -507,7 +507,76 @@ class Term(PreTerm, ABC):
     def co_equalizer(self, x):
         return self.__op_expr__("co_equalizer", x, inline=False, method=True)
 
-    # defs that were part of bigquery_user_fns
+    # fns that had been in bigquery_user_fns
+
+    def as_int64(self):
+        return self.__uop_expr__('as_int64')
+
+    def as_str(self):
+        return self.__uop_expr__('as_str')
+
+    def trimstr(self, start, stop):
+        assert isinstance(start, Value)
+        assert isinstance(stop, Value)
+        return self.__triop_expr__('trimstr', x=start, y=stop, inline=False, method=True)
+
+    def coalesce_0(self):
+        return self.coalesce(Value(0))
+
+    def datetime_to_date(self):
+        return self.__uop_expr__('datetime_to_date')
+
+    def parse_datetime(self, format=None):
+        if format is None:
+            format = Value("%Y-%m-%d %H:%M:%S")
+        assert isinstance(format, Value)
+        return self.__op_expr__('parse_datetime', other=format, inline=False, method=True)
+
+    def parse_date(self, format=None):
+        if format is None:
+            format = Value("%Y-%m-%d")
+        return self.__op_expr__('parse_date', other=format, inline=False, method=True)
+
+    def format_datetime(self, format=None):
+        if format is None:
+            format = Value("%Y-%m-%d %H:%M:%S")
+        assert isinstance(format, Value)
+        return self.__op_expr__('format_datetime', other=format, inline=False, method=True)
+
+    def format_date(self, format=None):
+        if format is None:
+            format = Value("%Y-%m-%d")
+        return self.__op_expr__('format_date', other=format, inline=False, method=True)
+
+    def dayofweek(self):
+        return self.__uop_expr__('dayofweek')
+
+    def dayofyear(self):
+        return self.__uop_expr__('dayofyear')
+
+    def dayofmonth(self):
+        return self.__uop_expr__('dayofmonth')
+
+    def weekofyear(self):
+        return self.__uop_expr__('weekofyear')
+
+    def month(self):
+        return self.__uop_expr__('month')
+
+    def quarter(self):
+        return self.__uop_expr__('quarter')
+
+    def year(self):
+        return self.__uop_expr__('year')
+
+    def timestamp_diff(self, other):
+        return self.__op_expr__("timestamp_diff", other, inline=False, method=True)
+
+    def date_diff(self, other):
+        return self.__op_expr__("date_diff", other, inline=False, method=True)
+
+    def base_Sunday(self):
+        return self.__uop_expr__('base_Sunday')
 
 
 class Value(Term):
@@ -730,7 +799,8 @@ class Expression(Term):
         args = [ai.evaluate(data_frame) for ai in self.args]
         # first check chosen mappings
         try:
-            return data_algebra.default_data_model.impl_map[self.op](*args)
+            method_to_call = data_algebra.default_data_model.impl_map[self.op]
+            return method_to_call(*args)
         except KeyError:
             pass
         # now see if argument (usually Pandas) can do this

@@ -5,7 +5,6 @@ import os
 import data_algebra
 import data_algebra.data_ops
 import data_algebra.db_model
-import data_algebra.bigquery_user_fns
 
 _have_bigquery = False
 try:
@@ -160,12 +159,12 @@ class BigQueryModel(data_algebra.db_model.DBModel):
 
 
 class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
-    def __init__(self, *, db_model=BigQueryModel(), conn, fns=data_algebra.bigquery_user_fns.fns):
+    def __init__(self, *, db_model=BigQueryModel(), conn):
         if not isinstance(db_model, BigQueryModel):
             raise TypeError(
                 "expected db_model to be of class data_algebra.BigQuery.BigQueryModel"
             )
-        data_algebra.db_model.DBHandle.__init__(self, db_model=db_model, conn=conn, fns=fns)
+        data_algebra.db_model.DBHandle.__init__(self, db_model=db_model, conn=conn)
 
     def describe_bq_table(self, *, table_catalog, table_schema, table_name, row_limit=7):
         full_name = f'{table_catalog}.{table_schema}.{table_name}'

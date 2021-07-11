@@ -5,10 +5,10 @@ plugins: anyio-2.2.0, cov-2.11.1
 collected 162 items
 
 tests/test_OrderedSet.py .                                               [  0%]
-tests/test_agg.py ..                                                     [  1%]
-tests/test_arith.py .                                                    [  2%]
-tests/test_arrow1.py ...                                                 [  4%]
-tests/test_bigquery_user_fns.py .                                        [  4%]
+tests/test_agg.py .                                                      [  1%]
+tests/test_arith.py .                                                    [  1%]
+tests/test_arrow1.py ...                                                 [  3%]
+tests/test_bigquery_user_fns.py ..                                       [  4%]
 tests/test_calc_warnings_errors.py .                                     [  5%]
 tests/test_cc.py ....                                                    [  8%]
 tests/test_cdata1.py ....                                                [ 10%]
@@ -75,7 +75,7 @@ tests/test_with.py ..                                                    [100%]
 ---------- coverage: platform darwin, python 3.9.4-final-0 -----------
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
-data_algebra/BigQuery.py                 113     70    38%
+data_algebra/BigQuery.py                 112     70    38%
 data_algebra/MySQL.py                     33     11    67%
 data_algebra/OrderedSet.py                52      7    87%
 data_algebra/PostgreSQL.py                22      7    68%
@@ -83,29 +83,28 @@ data_algebra/SQLite.py                    72      6    92%
 data_algebra/SparkSQL.py                  72     42    42%
 data_algebra/__init__.py                   6      0   100%
 data_algebra/arrow.py                    173     39    77%
-data_algebra/bigquery_user_fns.py        106      1    99%
+data_algebra/bigquery_user_fns.py         75      1    99%
 data_algebra/cdata.py                    331     77    77%
 data_algebra/connected_components.py      22      0   100%
-data_algebra/data_model.py                52     19    63%
-data_algebra/data_ops.py                1121    204    82%
+data_algebra/data_model.py                86     21    76%
+data_algebra/data_ops.py                1119    204    82%
 data_algebra/data_ops_types.py            79     38    52%
 data_algebra/data_ops_utils.py            51      7    86%
-data_algebra/db_model.py                 753    101    87%
+data_algebra/db_model.py                 783    101    87%
 data_algebra/diagram.py                   56     44    21%
 data_algebra/eval_model.py                16      1    94%
-data_algebra/expr_parse.py                38      3    92%
-data_algebra/expr_rep.py                 487    108    78%
+data_algebra/expr_parse.py                38      4    89%
+data_algebra/expr_rep.py                 538    116    78%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 136      1    99%
-data_algebra/pandas_base.py              256     24    91%
+data_algebra/pandas_base.py              252     24    90%
 data_algebra/pandas_model.py              18      3    83%
 data_algebra/parse_by_lark.py            139     31    78%
 data_algebra/python3_lark.py               1      0   100%
 data_algebra/test_util.py                181     27    85%
-data_algebra/user_fn.py                   84     27    68%
 data_algebra/util.py                      28      4    86%
 ----------------------------------------------------------
-TOTAL                                   4515    902    80%
+TOTAL                                   4508    886    80%
 
 
-============================= 162 passed in 27.89s =============================
+============================= 162 passed in 27.45s =============================

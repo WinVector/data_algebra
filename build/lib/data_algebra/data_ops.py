@@ -11,7 +11,6 @@ import data_algebra.data_model
 import data_algebra.db_model
 import data_algebra.pandas_model
 import data_algebra.expr_rep
-import data_algebra.user_fn
 from data_algebra.data_ops_types import *
 import data_algebra.data_ops_utils
 import data_algebra.near_sql
@@ -1041,13 +1040,12 @@ class ProjectNode(ViewRepresentation):
                         + "' is not allowed in project"
                     )
             else:
-                if not isinstance(opk, data_algebra.user_fn.FnTerm):
-                    raise ValueError(
-                        "non-aggregated expression in project: "
-                        + str(k)
-                        + ": "
-                        + str(opk)
-                    )
+                raise ValueError(
+                    "non-aggregated expression in project: "
+                    + str(k)
+                    + ": "
+                    + str(opk)
+                )
             # TODO: check op is in list of aggregators
             # Note: non-aggregators making through will be caught by table shape check
 

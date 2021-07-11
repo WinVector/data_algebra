@@ -243,7 +243,6 @@
 
 <span class="kn">import</span> <span class="nn">data_algebra.near_sql</span>
 <span class="kn">import</span> <span class="nn">data_algebra.expr_rep</span>
-<span class="kn">import</span> <span class="nn">data_algebra.user_fn</span>
 <span class="kn">import</span> <span class="nn">data_algebra.util</span>
 <span class="kn">import</span> <span class="nn">data_algebra.data_ops_types</span>
 <span class="kn">import</span> <span class="nn">data_algebra.eval_model</span>
@@ -440,6 +439,158 @@
     <span class="p">)</span>
 
 
+<span class="c1"># fns that had been in bigquery_user_fns</span>
+
+
+<span class="k">def</span> <span class="nf">_as_int64</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s1">&#39;CAST(&#39;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s1">&#39; AS INT64)&#39;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_as_str</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;CAST(&#39;</span>
+            <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39; AS &#39;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">string_type</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_trimstr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;SUBSTR(&#39;</span>
+            <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;, 1 + &#39;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;, &#39;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_datetime_to_date</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;DATE(&#39;</span>
+            <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_datetime</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;PARSE_DATETIME(&#39;</span>
+            <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;, &#39;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_date</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;PARSE_DATE(&#39;</span>
+            <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;, &#39;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_format_datetime</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;FORMAT_DATETIME(&#39;</span>
+            <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;, &#39;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_format_date</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;FORMAT_DATE(&#39;</span>
+            <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;, &#39;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_dayofweek</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;EXTRACT(DAYOFWEEK FROM &#39;</span>
+            <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_dayofyear</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;EXTRACT(DAYOFYEAR FROM &#39;</span>
+            <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_dayofmonth</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;EXTRACT(DAY FROM &#39;</span>
+            <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_weekofyear</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;EXTRACT(WEEK FROM &#39;</span>
+            <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_month</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;EXTRACT(MONTH FROM &#39;</span>
+            <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_quarter</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;EXTRACT(QUARTER FROM &#39;</span>
+            <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_year</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;EXTRACT(YEAR FROM &#39;</span>
+            <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_timestamp_diff</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;TIMESTAMP_DIFF(&#39;</span>
+            <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;, &#39;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;, SECOND)&#39;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_date_diff</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+            <span class="s1">&#39;TIMESTAMP_DIFF(&#39;</span>
+            <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;, &#39;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s1">&#39;, DAY)&#39;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_base_Sunday</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="n">subex</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;DATE_SUB(</span><span class="si">{</span><span class="n">subex</span><span class="si">}</span><span class="s1">, INTERVAL (EXTRACT(DAYOFWEEK FROM </span><span class="si">{</span><span class="n">subex</span><span class="si">}</span><span class="s1">) - 1) DAY)&#39;</span>
+
+
 <span class="n">db_expr_formatters</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;is_null&quot;</span><span class="p">:</span> <span class="n">_db_is_null_expr</span><span class="p">,</span>
     <span class="s2">&quot;is_bad&quot;</span><span class="p">:</span> <span class="n">_db_is_bad_expr</span><span class="p">,</span>
@@ -454,6 +605,25 @@
     <span class="s1">&#39;floor&#39;</span><span class="p">:</span> <span class="n">_db_floor_expr</span><span class="p">,</span>
     <span class="s1">&#39;ceil&#39;</span><span class="p">:</span> <span class="n">_db_ceil_expr</span><span class="p">,</span>
     <span class="s1">&#39;**&#39;</span><span class="p">:</span> <span class="n">_db_pow_expr</span><span class="p">,</span>
+    <span class="c1"># fns that had been in bigquery_user_fns</span>
+    <span class="s1">&#39;as_int64&#39;</span><span class="p">:</span> <span class="n">_as_int64</span><span class="p">,</span>
+    <span class="s1">&#39;as_str&#39;</span><span class="p">:</span> <span class="n">_as_str</span><span class="p">,</span>
+    <span class="s1">&#39;trimstr&#39;</span><span class="p">:</span> <span class="n">_trimstr</span><span class="p">,</span>
+    <span class="s1">&#39;datetime_to_date&#39;</span><span class="p">:</span> <span class="n">_datetime_to_date</span><span class="p">,</span>
+    <span class="s1">&#39;parse_datetime&#39;</span><span class="p">:</span> <span class="n">_parse_datetime</span><span class="p">,</span>
+    <span class="s1">&#39;parse_date&#39;</span><span class="p">:</span> <span class="n">_parse_date</span><span class="p">,</span>
+    <span class="s1">&#39;format_datetime&#39;</span><span class="p">:</span> <span class="n">_format_datetime</span><span class="p">,</span>
+    <span class="s1">&#39;format_date&#39;</span><span class="p">:</span> <span class="n">_format_date</span><span class="p">,</span>
+    <span class="s1">&#39;dayofweek&#39;</span><span class="p">:</span> <span class="n">_dayofweek</span><span class="p">,</span>
+    <span class="s1">&#39;dayofyear&#39;</span><span class="p">:</span> <span class="n">_dayofyear</span><span class="p">,</span>
+    <span class="s1">&#39;dayofmonth&#39;</span><span class="p">:</span> <span class="n">_dayofmonth</span><span class="p">,</span>
+    <span class="s1">&#39;weekofyear&#39;</span><span class="p">:</span> <span class="n">_weekofyear</span><span class="p">,</span>
+    <span class="s1">&#39;month&#39;</span><span class="p">:</span> <span class="n">_month</span><span class="p">,</span>
+    <span class="s1">&#39;quarter&#39;</span><span class="p">:</span> <span class="n">_quarter</span><span class="p">,</span>
+    <span class="s1">&#39;year&#39;</span><span class="p">:</span> <span class="n">_year</span><span class="p">,</span>
+    <span class="s1">&#39;timestamp_diff&#39;</span><span class="p">:</span> <span class="n">_timestamp_diff</span><span class="p">,</span>
+    <span class="s1">&#39;date_diff&#39;</span><span class="p">:</span> <span class="n">_date_diff</span><span class="p">,</span>
+    <span class="s1">&#39;base_Sunday&#39;</span><span class="p">:</span> <span class="n">_base_Sunday</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -713,8 +883,6 @@
             <span class="k">return</span> <span class="n">op</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ListTerm</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">expression</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;unexpected type: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">expression</span><span class="p">)))</span>
 
     <span class="k">def</span> <span class="nf">table_def_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_def</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -1512,7 +1680,7 @@
 
 
 <span class="k">class</span> <span class="nc">DBHandle</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">eval_model</span><span class="o">.</span><span class="n">EvalModel</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">fns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">DBModel</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;expected db_model to be of class data_algebra.db_model.DBHandle&quot;</span>
@@ -1520,11 +1688,6 @@
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">eval_model</span><span class="o">.</span><span class="n">EvalModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span> <span class="o">=</span> <span class="n">db_model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">conn</span>
-        <span class="k">if</span> <span class="n">fns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">fns</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">fns</span> <span class="o">=</span> <span class="n">fns</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fns</span> <span class="o">=</span> <span class="n">SimpleNamespace</span><span class="p">(</span><span class="o">**</span><span class="n">fns</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span>
@@ -1963,8 +2126,6 @@
             <span class="k">return</span> <span class="n">op</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ListTerm</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">expression</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;unexpected type: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">expression</span><span class="p">)))</span>
 
     <span class="k">def</span> <span class="nf">table_def_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_def</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -3351,8 +3512,6 @@
             <span class="k">return</span> <span class="n">op</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ListTerm</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">user_fn</span><span class="o">.</span><span class="n">FnTerm</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">expression</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;unexpected type: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">expression</span><span class="p">)))</span>
 </pre></div>
 
@@ -4523,7 +4682,7 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">DBHandle</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">eval_model</span><span class="o">.</span><span class="n">EvalModel</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">fns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">DBModel</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;expected db_model to be of class data_algebra.db_model.DBHandle&quot;</span>
@@ -4531,11 +4690,6 @@
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">eval_model</span><span class="o">.</span><span class="n">EvalModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span> <span class="o">=</span> <span class="n">db_model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">conn</span>
-        <span class="k">if</span> <span class="n">fns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">fns</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">fns</span> <span class="o">=</span> <span class="n">fns</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fns</span> <span class="o">=</span> <span class="n">SimpleNamespace</span><span class="p">(</span><span class="o">**</span><span class="n">fns</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span>
@@ -4695,12 +4849,12 @@ inheritance.</p>
                                         <div class="attr function"><a class="headerlink" href="#DBHandle.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">DBHandle</span><span class="signature">(*, db_model, conn, fns=None)</span>
+            <span class="name">DBHandle</span><span class="signature">(*, db_model, conn)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">fns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">DBModel</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;expected db_model to be of class data_algebra.db_model.DBHandle&quot;</span>
@@ -4708,11 +4862,6 @@ inheritance.</p>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">eval_model</span><span class="o">.</span><span class="n">EvalModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span> <span class="o">=</span> <span class="n">db_model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">conn</span>
-        <span class="k">if</span> <span class="n">fns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">fns</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">fns</span> <span class="o">=</span> <span class="n">fns</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fns</span> <span class="o">=</span> <span class="n">SimpleNamespace</span><span class="p">(</span><span class="o">**</span><span class="n">fns</span><span class="p">)</span>
 </pre></div>
 
         </details>

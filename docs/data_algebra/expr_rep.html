@@ -276,6 +276,63 @@
                         <li>
                                 <a class="function" href="#Term.co_equalizer">co_equalizer</a>
                         </li>
+                        <li>
+                                <a class="function" href="#Term.as_int64">as_int64</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.as_str">as_str</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.trimstr">trimstr</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.coalesce_0">coalesce_0</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.datetime_to_date">datetime_to_date</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.parse_datetime">parse_datetime</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.parse_date">parse_date</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.format_datetime">format_datetime</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.format_date">format_date</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.dayofweek">dayofweek</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.dayofyear">dayofyear</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.dayofmonth">dayofmonth</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.weekofyear">weekofyear</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.month">month</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.quarter">quarter</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.year">year</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.timestamp_diff">timestamp_diff</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.date_diff">date_diff</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Term.base_Sunday">base_Sunday</a>
+                        </li>
                 </ul>
 
             </li>
@@ -944,7 +1001,76 @@
     <span class="k">def</span> <span class="nf">co_equalizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;co_equalizer&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="c1"># defs that were part of bigquery_user_fns</span>
+    <span class="c1"># fns that had been in bigquery_user_fns</span>
+
+    <span class="k">def</span> <span class="nf">as_int64</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;as_int64&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">as_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;as_str&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">trimstr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stop</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span><span class="s1">&#39;trimstr&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">coalesce_0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Value</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">datetime_to_date</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;datetime_to_date&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">parse_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s1">&#39;parse_datetime&#39;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">parse_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s1">&#39;parse_date&#39;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">format_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s1">&#39;format_datetime&#39;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">format_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s1">&#39;format_date&#39;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">dayofweek</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;dayofweek&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">dayofyear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;dayofyear&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">dayofmonth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;dayofmonth&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">weekofyear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;weekofyear&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">month</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;month&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">quarter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;quarter&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">year</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">timestamp_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;timestamp_diff&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">date_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;date_diff&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">base_Sunday</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;base_Sunday&#39;</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">Value</span><span class="p">(</span><span class="n">Term</span><span class="p">):</span>
@@ -1167,7 +1293,8 @@
         <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">ai</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">data_frame</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
         <span class="c1"># first check chosen mappings</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">impl_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">](</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">method_to_call</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">impl_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">method_to_call</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="c1"># now see if argument (usually Pandas) can do this</span>
@@ -1922,7 +2049,76 @@
     <span class="k">def</span> <span class="nf">co_equalizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;co_equalizer&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="c1"># defs that were part of bigquery_user_fns</span>
+    <span class="c1"># fns that had been in bigquery_user_fns</span>
+
+    <span class="k">def</span> <span class="nf">as_int64</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;as_int64&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">as_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;as_str&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">trimstr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stop</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span><span class="s1">&#39;trimstr&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">coalesce_0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Value</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">datetime_to_date</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;datetime_to_date&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">parse_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s1">&#39;parse_datetime&#39;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">parse_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s1">&#39;parse_date&#39;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">format_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s1">&#39;format_datetime&#39;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">format_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s1">&#39;format_date&#39;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">dayofweek</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;dayofweek&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">dayofyear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;dayofyear&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">dayofmonth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;dayofmonth&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">weekofyear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;weekofyear&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">month</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;month&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">quarter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;quarter&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">year</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">timestamp_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;timestamp_diff&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">date_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;date_diff&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">base_Sunday</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;base_Sunday&#39;</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -3263,6 +3459,379 @@
     
 
                             </div>
+                            <div id="Term.as_int64" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.as_int64">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">as_int64</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">as_int64</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;as_int64&#39;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.as_str" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.as_str">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">as_str</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">as_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;as_str&#39;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.trimstr" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.trimstr">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">trimstr</span><span class="signature">(self, start, stop)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">trimstr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stop</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span><span class="s1">&#39;trimstr&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">stop</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.coalesce_0" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.coalesce_0">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">coalesce_0</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">coalesce_0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="n">Value</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.datetime_to_date" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.datetime_to_date">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">datetime_to_date</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">datetime_to_date</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;datetime_to_date&#39;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.parse_datetime" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.parse_datetime">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">parse_datetime</span><span class="signature">(self, format=None)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">parse_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s1">&#39;parse_datetime&#39;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.parse_date" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.parse_date">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">parse_date</span><span class="signature">(self, format=None)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">parse_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s1">&#39;parse_date&#39;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.format_datetime" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.format_datetime">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">format_datetime</span><span class="signature">(self, format=None)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">format_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s1">&#39;format_datetime&#39;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.format_date" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.format_date">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">format_date</span><span class="signature">(self, format=None)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">format_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s1">&#39;format_date&#39;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.dayofweek" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.dayofweek">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">dayofweek</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">dayofweek</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;dayofweek&#39;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.dayofyear" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.dayofyear">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">dayofyear</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">dayofyear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;dayofyear&#39;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.dayofmonth" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.dayofmonth">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">dayofmonth</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">dayofmonth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;dayofmonth&#39;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.weekofyear" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.weekofyear">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">weekofyear</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">weekofyear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;weekofyear&#39;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.month" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.month">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">month</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">month</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;month&#39;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.quarter" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.quarter">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">quarter</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">quarter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;quarter&#39;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.year" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.year">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">year</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">year</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.timestamp_diff" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.timestamp_diff">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">timestamp_diff</span><span class="signature">(self, other)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">timestamp_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;timestamp_diff&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.date_diff" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.date_diff">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">date_diff</span><span class="signature">(self, other)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">date_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;date_diff&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="Term.base_Sunday" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.base_Sunday">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">base_Sunday</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">base_Sunday</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s1">&#39;base_Sunday&#39;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
@@ -3525,6 +4094,25 @@
                 <dd id="Value.concat" class="function"><a href="#Term.concat">concat</a></dd>
                 <dd id="Value.coalesce" class="function"><a href="#Term.coalesce">coalesce</a></dd>
                 <dd id="Value.co_equalizer" class="function"><a href="#Term.co_equalizer">co_equalizer</a></dd>
+                <dd id="Value.as_int64" class="function"><a href="#Term.as_int64">as_int64</a></dd>
+                <dd id="Value.as_str" class="function"><a href="#Term.as_str">as_str</a></dd>
+                <dd id="Value.trimstr" class="function"><a href="#Term.trimstr">trimstr</a></dd>
+                <dd id="Value.coalesce_0" class="function"><a href="#Term.coalesce_0">coalesce_0</a></dd>
+                <dd id="Value.datetime_to_date" class="function"><a href="#Term.datetime_to_date">datetime_to_date</a></dd>
+                <dd id="Value.parse_datetime" class="function"><a href="#Term.parse_datetime">parse_datetime</a></dd>
+                <dd id="Value.parse_date" class="function"><a href="#Term.parse_date">parse_date</a></dd>
+                <dd id="Value.format_datetime" class="function"><a href="#Term.format_datetime">format_datetime</a></dd>
+                <dd id="Value.format_date" class="function"><a href="#Term.format_date">format_date</a></dd>
+                <dd id="Value.dayofweek" class="function"><a href="#Term.dayofweek">dayofweek</a></dd>
+                <dd id="Value.dayofyear" class="function"><a href="#Term.dayofyear">dayofyear</a></dd>
+                <dd id="Value.dayofmonth" class="function"><a href="#Term.dayofmonth">dayofmonth</a></dd>
+                <dd id="Value.weekofyear" class="function"><a href="#Term.weekofyear">weekofyear</a></dd>
+                <dd id="Value.month" class="function"><a href="#Term.month">month</a></dd>
+                <dd id="Value.quarter" class="function"><a href="#Term.quarter">quarter</a></dd>
+                <dd id="Value.year" class="function"><a href="#Term.year">year</a></dd>
+                <dd id="Value.timestamp_diff" class="function"><a href="#Term.timestamp_diff">timestamp_diff</a></dd>
+                <dd id="Value.date_diff" class="function"><a href="#Term.date_diff">date_diff</a></dd>
+                <dd id="Value.base_Sunday" class="function"><a href="#Term.base_Sunday">base_Sunday</a></dd>
 
             </div>
             <div><dt><a href="#PreTerm">PreTerm</a></dt>
@@ -4230,6 +4818,25 @@ errors defaults to 'strict'.</p>
                 <dd id="ColumnReference.concat" class="function"><a href="#Term.concat">concat</a></dd>
                 <dd id="ColumnReference.coalesce" class="function"><a href="#Term.coalesce">coalesce</a></dd>
                 <dd id="ColumnReference.co_equalizer" class="function"><a href="#Term.co_equalizer">co_equalizer</a></dd>
+                <dd id="ColumnReference.as_int64" class="function"><a href="#Term.as_int64">as_int64</a></dd>
+                <dd id="ColumnReference.as_str" class="function"><a href="#Term.as_str">as_str</a></dd>
+                <dd id="ColumnReference.trimstr" class="function"><a href="#Term.trimstr">trimstr</a></dd>
+                <dd id="ColumnReference.coalesce_0" class="function"><a href="#Term.coalesce_0">coalesce_0</a></dd>
+                <dd id="ColumnReference.datetime_to_date" class="function"><a href="#Term.datetime_to_date">datetime_to_date</a></dd>
+                <dd id="ColumnReference.parse_datetime" class="function"><a href="#Term.parse_datetime">parse_datetime</a></dd>
+                <dd id="ColumnReference.parse_date" class="function"><a href="#Term.parse_date">parse_date</a></dd>
+                <dd id="ColumnReference.format_datetime" class="function"><a href="#Term.format_datetime">format_datetime</a></dd>
+                <dd id="ColumnReference.format_date" class="function"><a href="#Term.format_date">format_date</a></dd>
+                <dd id="ColumnReference.dayofweek" class="function"><a href="#Term.dayofweek">dayofweek</a></dd>
+                <dd id="ColumnReference.dayofyear" class="function"><a href="#Term.dayofyear">dayofyear</a></dd>
+                <dd id="ColumnReference.dayofmonth" class="function"><a href="#Term.dayofmonth">dayofmonth</a></dd>
+                <dd id="ColumnReference.weekofyear" class="function"><a href="#Term.weekofyear">weekofyear</a></dd>
+                <dd id="ColumnReference.month" class="function"><a href="#Term.month">month</a></dd>
+                <dd id="ColumnReference.quarter" class="function"><a href="#Term.quarter">quarter</a></dd>
+                <dd id="ColumnReference.year" class="function"><a href="#Term.year">year</a></dd>
+                <dd id="ColumnReference.timestamp_diff" class="function"><a href="#Term.timestamp_diff">timestamp_diff</a></dd>
+                <dd id="ColumnReference.date_diff" class="function"><a href="#Term.date_diff">date_diff</a></dd>
+                <dd id="ColumnReference.base_Sunday" class="function"><a href="#Term.base_Sunday">base_Sunday</a></dd>
 
             </div>
             <div><dt><a href="#PreTerm">PreTerm</a></dt>
@@ -4316,7 +4923,8 @@ errors defaults to 'strict'.</p>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">ai</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">data_frame</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
         <span class="c1"># first check chosen mappings</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">impl_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">](</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">method_to_call</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">impl_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">method_to_call</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="c1"># now see if argument (usually Pandas) can do this</span>
@@ -4524,7 +5132,8 @@ errors defaults to 'strict'.</p>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">ai</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">data_frame</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
         <span class="c1"># first check chosen mappings</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">impl_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">](</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">method_to_call</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">impl_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">method_to_call</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="c1"># now see if argument (usually Pandas) can do this</span>
@@ -4661,6 +5270,25 @@ errors defaults to 'strict'.</p>
                 <dd id="Expression.concat" class="function"><a href="#Term.concat">concat</a></dd>
                 <dd id="Expression.coalesce" class="function"><a href="#Term.coalesce">coalesce</a></dd>
                 <dd id="Expression.co_equalizer" class="function"><a href="#Term.co_equalizer">co_equalizer</a></dd>
+                <dd id="Expression.as_int64" class="function"><a href="#Term.as_int64">as_int64</a></dd>
+                <dd id="Expression.as_str" class="function"><a href="#Term.as_str">as_str</a></dd>
+                <dd id="Expression.trimstr" class="function"><a href="#Term.trimstr">trimstr</a></dd>
+                <dd id="Expression.coalesce_0" class="function"><a href="#Term.coalesce_0">coalesce_0</a></dd>
+                <dd id="Expression.datetime_to_date" class="function"><a href="#Term.datetime_to_date">datetime_to_date</a></dd>
+                <dd id="Expression.parse_datetime" class="function"><a href="#Term.parse_datetime">parse_datetime</a></dd>
+                <dd id="Expression.parse_date" class="function"><a href="#Term.parse_date">parse_date</a></dd>
+                <dd id="Expression.format_datetime" class="function"><a href="#Term.format_datetime">format_datetime</a></dd>
+                <dd id="Expression.format_date" class="function"><a href="#Term.format_date">format_date</a></dd>
+                <dd id="Expression.dayofweek" class="function"><a href="#Term.dayofweek">dayofweek</a></dd>
+                <dd id="Expression.dayofyear" class="function"><a href="#Term.dayofyear">dayofyear</a></dd>
+                <dd id="Expression.dayofmonth" class="function"><a href="#Term.dayofmonth">dayofmonth</a></dd>
+                <dd id="Expression.weekofyear" class="function"><a href="#Term.weekofyear">weekofyear</a></dd>
+                <dd id="Expression.month" class="function"><a href="#Term.month">month</a></dd>
+                <dd id="Expression.quarter" class="function"><a href="#Term.quarter">quarter</a></dd>
+                <dd id="Expression.year" class="function"><a href="#Term.year">year</a></dd>
+                <dd id="Expression.timestamp_diff" class="function"><a href="#Term.timestamp_diff">timestamp_diff</a></dd>
+                <dd id="Expression.date_diff" class="function"><a href="#Term.date_diff">date_diff</a></dd>
+                <dd id="Expression.base_Sunday" class="function"><a href="#Term.base_Sunday">base_Sunday</a></dd>
 
             </div>
             <div><dt><a href="#PreTerm">PreTerm</a></dt>

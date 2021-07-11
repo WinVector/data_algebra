@@ -11,7 +11,6 @@ import data_algebra
 
 import data_algebra.near_sql
 import data_algebra.expr_rep
-import data_algebra.user_fn
 import data_algebra.util
 import data_algebra.data_ops_types
 import data_algebra.eval_model
@@ -208,6 +207,158 @@ def _db_pow_expr(dbmodel, expression):
     )
 
 
+# fns that had been in bigquery_user_fns
+
+
+def _as_int64(dbmodel, expression):
+    return (
+        'CAST('
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ' AS INT64)'
+    )
+
+
+def _as_str(dbmodel, expression):
+    return (
+            'CAST('
+            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+            + ' AS ' + dbmodel.string_type + ')'
+    )
+
+
+def _trimstr(dbmodel, expression):
+    return (
+            'SUBSTR('
+            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+            + ', 1 + ' + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+            + ', ' + dbmodel.expr_to_sql(expression.args[2], want_inline_parens=False)
+            + ')'
+    )
+
+
+def _datetime_to_date(dbmodel, expression):
+    return (
+            'DATE('
+            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+            + ')'
+    )
+
+
+def _parse_datetime(dbmodel, expression):
+    return (
+            'PARSE_DATETIME('
+            + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+            + ', ' + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+            + ')'
+    )
+
+
+def _parse_date(dbmodel, expression):
+    return (
+            'PARSE_DATE('
+            + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+            + ', ' + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+            + ')'
+    )
+
+
+def _format_datetime(dbmodel, expression):
+    return (
+            'FORMAT_DATETIME('
+            + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+            + ', ' + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+            + ')'
+    )
+
+
+def _format_date(dbmodel, expression):
+    return (
+            'FORMAT_DATE('
+            + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+            + ', ' + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+            + ')'
+    )
+
+
+def _dayofweek(dbmodel, expression):
+    return (
+            'EXTRACT(DAYOFWEEK FROM '
+            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+            + ')'
+    )
+
+
+def _dayofyear(dbmodel, expression):
+    return (
+            'EXTRACT(DAYOFYEAR FROM '
+            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+            + ')'
+    )
+
+
+def _dayofmonth(dbmodel, expression):
+    return (
+            'EXTRACT(DAY FROM '
+            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+            + ')'
+    )
+
+
+def _weekofyear(dbmodel, expression):
+    return (
+            'EXTRACT(WEEK FROM '
+            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+            + ')'
+    )
+
+
+def _month(dbmodel, expression):
+    return (
+            'EXTRACT(MONTH FROM '
+            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+            + ')'
+    )
+
+
+def _quarter(dbmodel, expression):
+    return (
+            'EXTRACT(QUARTER FROM '
+            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+            + ')'
+    )
+
+
+def _year(dbmodel, expression):
+    return (
+            'EXTRACT(YEAR FROM '
+            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+            + ')'
+    )
+
+
+def _timestamp_diff(dbmodel, expression):
+    return (
+            'TIMESTAMP_DIFF('
+            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+            + ', ' + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+            + ', SECOND)'
+    )
+
+
+def _date_diff(dbmodel, expression):
+    return (
+            'TIMESTAMP_DIFF('
+            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+            + ', ' + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+            + ', DAY)'
+    )
+
+
+def _base_Sunday(dbmodel, expression):
+    subex = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+    return f'DATE_SUB({subex}, INTERVAL (EXTRACT(DAYOFWEEK FROM {subex}) - 1) DAY)'
+
+
 db_expr_formatters = {
     "is_null": _db_is_null_expr,
     "is_bad": _db_is_bad_expr,
@@ -222,6 +373,25 @@ db_expr_formatters = {
     'floor': _db_floor_expr,
     'ceil': _db_ceil_expr,
     '**': _db_pow_expr,
+    # fns that had been in bigquery_user_fns
+    'as_int64': _as_int64,
+    'as_str': _as_str,
+    'trimstr': _trimstr,
+    'datetime_to_date': _datetime_to_date,
+    'parse_datetime': _parse_datetime,
+    'parse_date': _parse_date,
+    'format_datetime': _format_datetime,
+    'format_date': _format_date,
+    'dayofweek': _dayofweek,
+    'dayofyear': _dayofyear,
+    'dayofmonth': _dayofmonth,
+    'weekofyear': _weekofyear,
+    'month': _month,
+    'quarter': _quarter,
+    'year': _year,
+    'timestamp_diff': _timestamp_diff,
+    'date_diff': _date_diff,
+    'base_Sunday': _base_Sunday,
 }
 
 
@@ -481,8 +651,6 @@ class DBModel:
             return op.upper() + "(" + ", ".join(subs) + ")"
         if isinstance(expression, data_algebra.expr_rep.ListTerm):
             return self.value_to_sql(expression.value)
-        if isinstance(expression, data_algebra.user_fn.FnTerm):
-            return expression.to_sql(db_model=self)
         raise TypeError("unexpected type: " + str(type(expression)))
 
     def table_def_to_sql(self, table_def, *, using=None, temp_id_source=None):
@@ -1280,7 +1448,7 @@ class DBModel:
 
 
 class DBHandle(data_algebra.eval_model.EvalModel):
-    def __init__(self, *, db_model, conn, fns=None):
+    def __init__(self, *, db_model, conn):
         if not isinstance(db_model, DBModel):
             raise TypeError(
                 "expected db_model to be of class data_algebra.db_model.DBHandle"
@@ -1288,11 +1456,6 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         data_algebra.eval_model.EvalModel.__init__(self)
         self.db_model = db_model
         self.conn = conn
-        if fns is None:
-            fns = {}
-        else:
-            fns = fns.copy()
-        self.fns = SimpleNamespace(**fns)
 
     def __enter__(self):
         return self
