@@ -247,8 +247,8 @@ def _datetime_to_date(dbmodel, expression):
 def _parse_datetime(dbmodel, expression):
     return (
             'PARSE_DATETIME('
-            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ', ' + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+            + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+            + ', ' + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
             + ')'
     )
 
@@ -256,8 +256,8 @@ def _parse_datetime(dbmodel, expression):
 def _parse_date(dbmodel, expression):
     return (
             'PARSE_DATE('
-            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ', ' + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+            + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+            + ', ' + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
             + ')'
     )
 
@@ -265,8 +265,8 @@ def _parse_date(dbmodel, expression):
 def _format_datetime(dbmodel, expression):
     return (
             'FORMAT_DATETIME('
-            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ', ' + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+            + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+            + ', ' + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
             + ')'
     )
 
@@ -274,8 +274,8 @@ def _format_datetime(dbmodel, expression):
 def _format_date(dbmodel, expression):
     return (
             'FORMAT_DATE('
-            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ', ' + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+            + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+            + ', ' + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
             + ')'
     )
 
@@ -290,7 +290,7 @@ def _dayofweek(dbmodel, expression):
 
 def _dayofyear(dbmodel, expression):
     return (
-            'EXTRACT(DAYOFYEAR FROM {'
+            'EXTRACT(DAYOFYEAR FROM '
             + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
             + ')'
     )

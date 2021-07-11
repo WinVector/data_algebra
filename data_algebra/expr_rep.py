@@ -799,7 +799,8 @@ class Expression(Term):
         args = [ai.evaluate(data_frame) for ai in self.args]
         # first check chosen mappings
         try:
-            return data_algebra.default_data_model.impl_map[self.op](*args)
+            method_to_call = data_algebra.default_data_model.impl_map[self.op]
+            return method_to_call(*args)
         except KeyError:
             pass
         # now see if argument (usually Pandas) can do this

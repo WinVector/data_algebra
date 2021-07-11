@@ -49,10 +49,10 @@ def test_bigquery_user_fns():
             'coalesce_0_res': coalesce_0('coalesce_0_col'),
             'coalesce_res': coalesce(['coalesce_col_0', 'coalesce_col_1']),
             'datetime_to_date_res': datetime_to_date('input_datetime_col_0'),
-            # 'parse_datetime_res': parse_datetime('parse_datetime_col'),
-            # 'parse_date_res': parse_date('parse_date_col'),
-            # 'format_datetime_res': format_datetime('input_datetime_col_0'),
-            # 'format_date_res': format_date('input_date_col_0'),
+            'parse_datetime_res': parse_datetime('parse_datetime_col'),
+            'parse_date_res': parse_date('parse_date_col'),
+            'format_datetime_res': format_datetime('input_datetime_col_0'),
+            'format_date_res': format_date('input_date_col_0'),
             'dayofweek_res': dayofweek('input_date_col_0'),
             'dayofyear_res': dayofyear('input_date_col_0'),
             'dayofmonth_res': dayofmonth('input_date_col_0'),
@@ -107,7 +107,7 @@ def test_bigquery_user_fns():
     assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
 
     test_handle = data_algebra.BigQuery.BigQueryModel().db_handle(conn=None)
-    test_sql = test_handle.to_sql(ops)
+    test_sql = test_handle.to_sql(ops, pretty=True)
     assert isinstance(test_sql, str)
 
     if data_algebra.test_util.test_BigQuery:
