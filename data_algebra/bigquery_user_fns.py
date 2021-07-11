@@ -7,34 +7,17 @@ import data_algebra
 import data_algebra.data_ops
 
 
-# TODO: share some common fns such as as_int64 and coalesce_0 to all db_handles
-
-# TODO: re-eng all userfns to just be SQL constants, without pasting, perhaps pass in db handle
-
-
-import data_algebra.user_fn
+# Legacy to be removed
 
 
 def as_int64(col):
     assert isinstance(col, str)
-    return data_algebra.user_fn.FnTerm(
-        pandas_fn=lambda x: x.astype('int64').copy(),  # x is a pandas Series
-        sql_fn=lambda subs, db_model: f'CAST({subs[0]} AS INT64)',
-        args=[col],
-        display_form = f'as_int64({col})',
-        name='as_int64',
-    )
+    return f'{col}.as_int64()'
 
 
 def as_str(col):
     assert isinstance(col, str)
-    return data_algebra.user_fn.FnTerm(
-        pandas_fn=lambda x: x.astype('str').copy(),  # x is a pandas Series
-        sql_fn=lambda subs, db_model: f'CAST({subs[0]} AS STRING)',
-        args=[col],
-        display_form = f'as_int64({col})',
-        name='as_str',
-    )
+    return f'{col}.as_str()'
 
 
 # trim string to date portion
@@ -42,60 +25,26 @@ def trimstr(col_name, *, start=0, stop):
     assert isinstance(start, int)
     assert isinstance(stop, int)
     assert isinstance(col_name, str)
-    return data_algebra.user_fn.FnTerm(
-        pandas_fn=lambda x: x.str.slice(start=start, stop=stop),  # x is a pandas Series
-        sql_fn=lambda subs, db_model: f'SUBSTR({subs[0]}, {start+1}, {stop})',
-        args=[col_name],
-        display_form = f'trimstr({col_name}, start={start}, stop={stop})',
-        name='trimstr',
-    )
+    return f'{col_name}.trimstr({start}, {stop})'
 
 
 # replace missing with zeros
 def coalesce_0(col):
     assert isinstance(col, str)
-    return data_algebra.user_fn.FnTerm(
-        pandas_fn=lambda x: x.fillna(0),   # x is a pandas Series
-        sql_fn=lambda subs, db_model: f'COALESCE({subs[0]}, 0)',
-        args=[col],
-        display_form = f'coalesce_0({col})',
-        name='coalesce_0',
-    )
+    return f'{col}.coalesce(0)'
 
 
 def coalesce(cols):
     if isinstance(cols, str):
         cols = [cols]
     assert len(cols) > 1
-    assert all([isinstance(ci, str) for ci in cols])
-    assert len(set(cols)) == len(cols)
-    cols = cols.copy()
-
-    def f(*args):
-        res = args[0].copy()
-        for i in range(1, len(args)):
-            res = res.combine_first(args[i])
-        return res
-
-    return data_algebra.user_fn.FnTerm(
-        pandas_fn = f,
-        sql_fn=lambda subs, db_model: f'COALESCE({", ".join(subs)})', # TODO: check SQL
-        args=cols,
-        display_form = f'coalesce({cols})',
-        name='coalesce',
-    )
+    return ' %?% '.join(cols)
 
 
 # convert datetime to date
 def datetime_to_date(col):
     assert isinstance(col, str)
-    return data_algebra.user_fn.FnTerm(
-        pandas_fn=lambda x: x.dt.date.copy(),  # x is a pandas Series
-        sql_fn=lambda subs, db_model: f'DATE({subs[0]})',
-        args=[col],
-        display_form = f'datetime_to_date({col})',
-        name='datetime_to_date',
-    )
+    return f'{col}.datetime_to_date()'
 
 
 # convert str to datetime
@@ -103,28 +52,14 @@ def datetime_to_date(col):
 def parse_datetime(col, *, format="%Y-%m-%d %H:%M:%S"):
     assert isinstance(col, str)
     assert isinstance(format, str)
-    return data_algebra.user_fn.FnTerm(
-        # https://pandas.pydata.org/docs/reference/api/pandas.to_datetime.html
-        pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x, format=format),  # x is a pandas Series
-        sql_fn=lambda subs, db_model: f'PARSE_DATETIME({db_model.quote_string(format)}, {subs[0]})',
-        args=[col],
-        display_form = f'parse_datetime({col}, format="{format}")',
-        name='parse_datetime',
-    )
+    return f'{col}.parse_datetime("{format}")'
 
 
 # convert str to date
 def parse_date(col, *, format="%Y-%m-%d"):
     assert isinstance(col, str)
     assert isinstance(format, str)
-    return data_algebra.user_fn.FnTerm(
-        # https://pandas.pydata.org/docs/reference/api/pandas.to_datetime.html
-        pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x, format=format).dt.date.copy(),  # x is a pandas Series
-        sql_fn=lambda subs, db_model: f'PARSE_DATE({db_model.quote_string(format)}, {subs[0]})',
-        args=[col],
-        display_form=f'parse_date({col}, format="{format}")',
-        name='parse_date',
-    )
+    return f'{col}.parse_date("{format}")'
 
 
 # convert datetime to str
@@ -132,160 +67,62 @@ def parse_date(col, *, format="%Y-%m-%d"):
 def format_datetime(col, *, format="%Y-%m-%d %H:%M:%S"):
     assert isinstance(col, str)
     assert isinstance(format, str)
-    return data_algebra.user_fn.FnTerm(
-        # x is a pandas Series
-        pandas_fn=lambda x: x.dt.strftime(date_format=format),
-        sql_fn=lambda subs, db_model: f'FORMAT_DATETIME({db_model.quote_string(format)}, {subs[0]})',
-        args=[col],
-        display_form=f'format_datetime({col}, format="{format}")',
-        name='format_datetime',
-    )
+    return f'{col}.format_datetime("{format}")'
 
 
 # convert date to str
 def format_date(col, *, format="%Y-%m-%d"):
     assert isinstance(col, str)
     assert isinstance(format, str)
-    return data_algebra.user_fn.FnTerm(
-        # x is a pandas Series
-        pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.strftime(date_format=format),
-        sql_fn=lambda subs, db_model: f'FORMAT_DATE({db_model.quote_string(format)}, {subs[0]})',
-        args=[col],
-        display_form=f'format_date({col}, format="{format}")',
-        name='format_date',
-    )
+    return f'{col}.format_date("{format}")'
 
 
 # convert date to dayofweek Sunday=1 through Saturday=7
 # https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
 def dayofweek(col):
     assert isinstance(col, str)
-    return data_algebra.user_fn.FnTerm(
-        # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.dt.dayofweek.html#pandas.Series.dt.dayofweek
-        # https://stackoverflow.com/a/30222759
-        # x is a pandas Series
-        pandas_fn=lambda x: 1 + ((data_algebra.default_data_model.pd.to_datetime(x).dt.dayofweek.astype('int64') + 1) % 7),
-        sql_fn=lambda subs, db_model: f'EXTRACT(DAYOFWEEK FROM {subs[0]})',
-        args=[col],
-        display_form=f'dayofweek({col})',
-        name='dayofweek',
-    )
+    return f'{col}.dayofweek()'
 
 
 # https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
 def dayofyear(col):
     assert isinstance(col, str)
-    return data_algebra.user_fn.FnTerm(
-        # x is a pandas Series
-        pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.dayofyear.astype('int64').copy(),
-        sql_fn=lambda subs, db_model: f'EXTRACT(DAYOFYEAR FROM {subs[0]})',
-        args=[col],
-        display_form=f'dayofyear({col})',
-        name='dayofyear',
-    )
-
-
-def _calc_date_diff(x0, x1):
-    # x is a pandas Series or list of datetime.date compatible types
-    x0 = data_algebra.default_data_model.pd.Series(x0)
-    x1 = data_algebra.default_data_model.pd.Series(x1)
-    x0_dates = data_algebra.default_data_model.pd.to_datetime(x0).dt.date.copy()
-    x1_dates = data_algebra.default_data_model.pd.to_datetime(x1).dt.date.copy()
-    deltas = [(x0_dates[i] - x1_dates[i]).days for i in range(len(x0_dates))]
-    return deltas
-
-
-def _calc_base_Sunday(x):
-    # x is a pandas Series or list of datetime.date compatible types
-    x = data_algebra.default_data_model.pd.Series(x)
-    x_dates = data_algebra.default_data_model.pd.to_datetime(x).dt.date.copy()
-    res = [xi - datetime.timedelta(days=(xi.weekday() + 1) % 7) for xi in x_dates]
-    return res
-
-
-def _calc_week_of_Year(x):
-    # x is a pandas Series or list of datetime.date compatible types
-    # TODO: better impl
-    # Note was getting inconsistent results on vectorized methods
-    x = data_algebra.default_data_model.pd.Series(x)
-    x_dates = data_algebra.default_data_model.pd.to_datetime(x).dt.date.copy()
-    cur_dates = [datetime.date(dti.year, dti.month, dti.day) for dti in x_dates]
-    base_dates = [datetime.date(dti.year, 1, 1) for dti in x_dates]
-    base_dates = _calc_base_Sunday(base_dates)
-    deltas = [(cur_dates[i] - base_dates[i]).days for i in range(len(cur_dates))]
-    res = [di//7 for di in deltas]
-    res = numpy.maximum(res, 1)
-    return res
+    return f'{col}.dayofyear()'
 
 
 # convert date to week of year
 # https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
 def weekofyear(col):
     assert isinstance(col, str)
-    return data_algebra.user_fn.FnTerm(
-        # x is a pandas Series
-        # match DB convention of weeks 1 through 52
-        pandas_fn=_calc_week_of_Year,
-        sql_fn=lambda subs, db_model: f'EXTRACT(WEEK FROM {subs[0]})',
-        args=[col],
-        display_form=f'weekofyear({col})',
-        name='weekofyear',
-    )
+    return f'{col}.weekofyear()'
 
 
 # convert date to dayofweek 1 through 7
 # https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
 def dayofmonth(col):
     assert isinstance(col, str)
-    return data_algebra.user_fn.FnTerm(
-        # x is a pandas Series
-        pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.day.astype('int64').copy(),
-        sql_fn=lambda subs, db_model: f'EXTRACT(DAY FROM {subs[0]})',
-        args=[col],
-        display_form=f'dayofmonth({col})',
-        name='dayofmonth',
-    )
+    return f'{col}.dayofmonth()'
 
 
 # convert date to month
 # https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
 def month(col):
     assert isinstance(col, str)
-    return data_algebra.user_fn.FnTerm(
-        # x is a pandas Series
-        pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.month.astype('int64').copy(),
-        sql_fn=lambda subs, db_model: f'EXTRACT(MONTH FROM {subs[0]})',
-        args=[col],
-        display_form=f'month({col})',
-        name='month',
-    )
+    return f'{col}.month()'
 
 
 # convert date to quarter
 # https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
 def quarter(col):
     assert isinstance(col, str)
-    return data_algebra.user_fn.FnTerm(
-        # x is a pandas Series
-        pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.quarter.astype('int64').copy(),
-        sql_fn=lambda subs, db_model: f'EXTRACT(QUARTER FROM {subs[0]})',
-        args=[col],
-        display_form=f'quarter({col})',
-        name='quarter',
-    )
+    return f'{col}.quarter()'
 
 
 # convert date to year
 # https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
 def year(col):
     assert isinstance(col, str)
-    return data_algebra.user_fn.FnTerm(
-        pandas_fn=lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.year.astype('int64').copy(),
-        sql_fn=lambda subs, db_model: f'EXTRACT(YEAR FROM {subs[0]})',
-        args=[col],
-        display_form = f'year({col})',
-        name='year',
-    )
+    return f'{col}.year()'
 
 
 # compute difference in timestamps in seconds
@@ -293,49 +130,20 @@ def year(col):
 def timestamp_diff(col1, col2):
     assert isinstance(col1, str)
     assert isinstance(col2, str)
-    return data_algebra.user_fn.FnTerm(
-        # https://stackoverflow.com/a/41340398
-        # looks like Timedelta is scalar
-        # TODO: find vectorized form
-        pandas_fn=lambda c1, c2: [
-            data_algebra.default_data_model.pd.Timedelta(c1[i] - c2[i]).total_seconds() for i in range(len(c1))],
-        sql_fn=lambda subs, db_model: f'TIMESTAMP_DIFF({subs[0]}, {subs[1]}, SECOND)',
-        args=[col1, col2],
-        display_form = f'timestamp_diff({col1}, {col2})',
-        name='timestamp_diff',
-    )
+    return f'{col1}.timestamp_diff({col2})'
 
 
 # compute difference in dates in days
 def date_diff(col1, col2):
     assert isinstance(col1, str)
     assert isinstance(col2, str)
-    return data_algebra.user_fn.FnTerm(
-        # https://stackoverflow.com/a/41340398
-        # looks like Timedelta is scalar
-        # TODO: find vectorized form
-        pandas_fn=_calc_date_diff,
-        sql_fn=lambda subs, db_model: f'TIMESTAMP_DIFF({subs[0]}, {subs[1]}, DAY)',
-        args=[col1, col2],
-        display_form = f'date_diff({col1}, {col2})',
-        name='date_diff',
-    )
+    return f'{col1}.date_diff({col2})'
 
 
 # find the nearest Sunday at or before this date
 def base_Sunday(col):
     assert isinstance(col, str)
-    return data_algebra.user_fn.FnTerm(
-        # x is a pandas Series of datetime.date
-        pandas_fn=_calc_base_Sunday,
-        sql_fn=lambda subs, db_model: f'DATE_SUB({subs[0]}, INTERVAL (EXTRACT(DAYOFWEEK FROM {subs[0]}) - 1) DAY)',
-        args=[col],
-        display_form = f'base_Sunday({col})',
-        name='base_Sunday',
-    )
-
-
-# TODO: documentation page
+    return f'{col}.base_Sunday()'
 
 
 fns = {

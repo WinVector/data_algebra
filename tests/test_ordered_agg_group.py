@@ -6,7 +6,6 @@ import data_algebra.test_util
 from data_algebra.cdata import *
 from data_algebra.data_ops import *
 import data_algebra.SQLite
-from data_algebra.user_fn import user_fn
 
 
 def test_ordered_agg_group():
@@ -156,75 +155,5 @@ def test_ordered_agg_group():
     )
 
     assert data_algebra.test_util.equivalent_frames(expect_ag, res_ag)
-
-    # proves we could pass a lambda into agg (need to extend framework to allow this)
-    def sorted_concat(vals):
-        return ", ".join(sorted([str(vi) for vi in set(vals)]))
-
-    ops3 = (
-        describe_table(d, table_name="d")
-        .project({"OP": user_fn(sorted_concat, "OP")}, group_by=["ID", "DATE"])
-        .extend({"rank": "_row_number()"}, partition_by=["ID"], order_by=["DATE"])
-        .convert_records(record_map)
-        .select_columns(["ID", "DATE1", "OP1", "DATE2", "OP2", "DATE3", "OP3"])
-        .order_rows(["ID"])
-    )
-
-    res_ag3 = ops3.transform(d)
-
-    assert data_algebra.test_util.equivalent_frames(expect_ag, res_ag3)
-
-    ops4 = (
-        describe_table(d, table_name="d")
-        .project({"OP": user_fn(sorted_concat, "OP")}, group_by=["ID", "DATE"])
-        .extend({"rank": "_row_number()"}, partition_by=["ID"], order_by=["DATE"])
-        .convert_records(record_map)
-        .select_columns(["ID", "DATE1", "OP1", "DATE2", "OP2", "DATE3", "OP3"])
-        .order_rows(["ID"])
-    )
-
-    res_ag4 = ops4.transform(d)
-
-    assert data_algebra.test_util.equivalent_frames(expect_ag, res_ag4)
-
-    class SortedConcat:
-        def __init__(self):
-            self.accum = set()
-
-        def step(self, value):
-            self.accum.add(str(value))
-
-        def finalize(self):
-            return ", ".join(sorted([v for v in self.accum]))
-
-    # sqlite has group_concat https://pythontic.com/database/sqlite/aggregate%20functions
-    sql4 = ops4.to_sql(db_model)
-    # https://docs.python.org/2/library/sqlite3.html
-    con.create_aggregate("sorted_concat", 1, SortedConcat)
-    res_db4 = data_algebra.default_data_model.pd.read_sql_query(sql4, con)
-    assert data_algebra.test_util.equivalent_frames(
-        expect_ag, res_db4, check_column_order=True, check_row_order=True
-    )
-
-    ops5 = (
-        describe_table(d, table_name="d")
-        .project(
-            {
-                "OP": user_fn(
-                    'lambda vals: ", ".join(sorted([str(vi) for vi in set(vals)]))',
-                    "OP",
-                )
-            },
-            group_by=["ID", "DATE"],
-        )
-        .extend({"rank": "_row_number()"}, partition_by=["ID"], order_by=["DATE"])
-        .convert_records(record_map)
-        .select_columns(["ID", "DATE1", "OP1", "DATE2", "OP2", "DATE3", "OP3"])
-        .order_rows(["ID"])
-    )
-
-    res_ag5 = ops5.transform(d)
-
-    assert data_algebra.test_util.equivalent_frames(expect_ag, res_ag5)
 
     con.close()

@@ -4,7 +4,6 @@ import numbers
 
 import numpy
 
-import data_algebra.user_fn
 import data_algebra.util
 import data_algebra.data_model
 import data_algebra.expr_rep
@@ -238,14 +237,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                     value_name = str(opk.args[0])
                     if isinstance(opk.args[0], data_algebra.expr_rep.Value):
                         value_name = data_algebra_temp_cols[value_name]
-                if isinstance(opk, data_algebra.user_fn.FnTerm):
-                    fn = opk.pandas_fn
-                    vk = res[value_name].agg(fn)
+                if len(opk.args) > 0:
+                    vk = res[value_name].agg(opk.op)
                 else:
-                    if len(opk.args) > 0:
-                        vk = res[value_name].agg(opk.op)
-                    else:
-                        vk = res["_data_table_temp_col"].agg(opk.op)
+                    vk = res["_data_table_temp_col"].agg(opk.op)
                 cols[k] = vk
         else:
             cols = {"_data_table_temp_col": res["_data_table_temp_col"].agg("sum")}
