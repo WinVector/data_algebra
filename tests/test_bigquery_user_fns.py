@@ -9,9 +9,6 @@ import data_algebra.BigQuery
 from data_algebra.bigquery_user_fns import *
 
 
-test_bigquery = False
-
-
 def test_bigquery_user_fns():
     pd = data_algebra.default_data_model.pd
     datetime_format = "%Y-%m-%d %H:%M:%S"
@@ -120,5 +117,21 @@ def test_bigquery_user_fns():
                 res_db = db_handle.read_query(ops)
                 db_handle.drop_table('d')
                 # times come back with UTC timezone and some other differences
-                # TODO: improve test to check these things
-                # assert data_algebra.test_util.equivalent_frames(expect, res_db)
+                # match_cols = (res_db == expect).all(axis=0)
+                # list(match_cols.index[match_cols == False])
+                # convert a few things as we check
+                assert res_db.shape == expect.shape
+                assert set(expect.columns) == set(res_db.columns)
+                res_db_check = res_db.loc[:, list(expect.columns)].copy()
+                expect_types = [str(type(v)) for v in expect.iloc[0, :]]
+                res_db_check['timestamp_diff_res'] = 1.0 * res_db_check['timestamp_diff_res']  # convert to float
+                db_types = [str(type(v)) for v in res_db_check.iloc[0, :]]
+                assert all([a == b for a, b in zip(expect_types, db_types)])
+                assert isinstance(res_db['as_str_res'][0], str)
+                assert all(res_db['as_str_res'].astype(float) == expect['as_str_res'].astype(float))
+                # check all but some input columns and things we have checked
+                expect_check = expect.copy()
+                for c in ['input_datetime_col_0', 'input_datetime_col_1', 'as_str_res']:
+                    del expect_check[c]
+                    del res_db_check[c]
+                assert data_algebra.test_util.equivalent_frames(expect_check, res_db_check)

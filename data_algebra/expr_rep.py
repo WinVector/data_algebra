@@ -497,13 +497,17 @@ class Term(PreTerm, ABC):
         return self.__op_expr__("is_in", x, inline=False, method=True)
 
     def concat(self, x):
+        # TODO: see if we can format back to infix notation
         return self.__op_expr__("concat", x, inline=False, method=True)
 
     def coalesce(self, x):
+        # TODO: see if we can format back to infix notation
         return self.__op_expr__("coalesce", x, inline=False, method=True)
 
     def co_equalizer(self, x):
         return self.__op_expr__("co_equalizer", x, inline=False, method=True)
+
+    # defs that were part of bigquery_user_fns
 
 
 class Value(Term):
