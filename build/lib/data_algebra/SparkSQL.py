@@ -13,26 +13,9 @@ except ImportError:
     have_Spark = False
 
 
-def _sparksql_mean_expr(dbmodel, expression):
-    return (
-        "AVG(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ")"
-    )
-
-
-def _sparksql_size_expr(dbmodel, expression):
-    return "SUM(1)"
-
-
-def _sparksql_is_null_expr(dbmodel, expression):
-    return (
-        "("
-        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-        + " IS NULL)"
-    )
-
-
 def _sparksql_is_bad_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    assert isinstance(subexpr, str)
     return (
         "("
         + subexpr
@@ -53,6 +36,7 @@ def _sparksql_is_bad_expr(dbmodel, expression):
 # treat NaN as NULL, as Pandas has a hard time distinguishing the two
 def _sparksql_coalesce_expr(dbmodel, expression):
     def coalesce_step(x):
+        assert isinstance(x, str)
         return f' WHEN ({x} IS NOT NULL) AND (NOT isNaN({x})) THEN {x} '
 
     return (
@@ -65,10 +49,7 @@ def _sparksql_coalesce_expr(dbmodel, expression):
 # map from op-name to special SQL formatting code
 SparkSQL_formatters = {
     "___": lambda dbmodel, expression: expression.to_python(),
-    "is_null": _sparksql_is_null_expr,
     "is_bad": _sparksql_is_bad_expr,
-    "mean": _sparksql_mean_expr,
-    "size": _sparksql_size_expr,
     'coalesce': _sparksql_coalesce_expr,
 }
 

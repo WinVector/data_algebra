@@ -74,21 +74,9 @@
     <span class="n">have_sqlalchemy</span> <span class="o">=</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">_postgresql_mean_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="s2">&quot;AVG(&quot;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
-    <span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_postgresql_size_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="k">return</span> <span class="s2">&quot;SUM(1)&quot;</span>
-
-
 <span class="c1"># map from op-name to special SQL formatting code</span>
 <span class="n">PostgreSQL_formatters</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;___&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">:</span> <span class="n">expression</span><span class="o">.</span><span class="n">to_python</span><span class="p">(),</span>
-    <span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="n">_postgresql_mean_expr</span><span class="p">,</span>
-    <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="n">_postgresql_size_expr</span><span class="p">,</span>
 <span class="p">}</span>
 
 

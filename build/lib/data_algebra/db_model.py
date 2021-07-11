@@ -57,6 +57,16 @@ def _clean_annotation(annotation):
 # map from op-name to special SQL formatting code
 
 
+def _db_mean_expr(dbmodel, expression):
+    return (
+        "AVG(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ")"
+    )
+
+
+def _db_size_expr(dbmodel, expression):
+    return "SUM(1)"
+
+
 def _db_is_null_expr(dbmodel, expression):
     return (
         "("
@@ -204,6 +214,12 @@ def _db_pow_expr(dbmodel, expression):
         + ", "
         + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
         + ")"
+    )
+
+
+def _db_nunique_expr(dbmodel, expression):
+    return (
+        "COUNT(DISTINCT (" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + "))"
     )
 
 
@@ -362,6 +378,8 @@ def _base_Sunday(dbmodel, expression):
 db_expr_formatters = {
     "is_null": _db_is_null_expr,
     "is_bad": _db_is_bad_expr,
+    "mean": _db_mean_expr,
+    "size": _db_size_expr,
     "if_else": _db_if_else_expr,
     "is_in": _db_is_in_expr,
     "maximum": _db_maximum_expr,
@@ -373,6 +391,7 @@ db_expr_formatters = {
     'floor': _db_floor_expr,
     'ceil': _db_ceil_expr,
     '**': _db_pow_expr,
+    "nunique": _db_nunique_expr,
     # fns that had been in bigquery_user_fns
     'as_int64': _as_int64,
     'as_str': _as_str,

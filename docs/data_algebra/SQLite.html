@@ -106,27 +106,15 @@
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_sqlite_mean_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="s2">&quot;avg(&quot;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
-    <span class="p">)</span>
-
-
 <span class="k">def</span> <span class="nf">_sqlite_lag_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="s2">&quot;LAG(&quot;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_sqlite_size_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="k">return</span> <span class="s2">&quot;SUM(1)&quot;</span>
-
-
 <span class="n">SQLite_formatters</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;is_bad&quot;</span><span class="p">:</span> <span class="n">_sqlite_is_bad_expr</span><span class="p">,</span>
-    <span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="n">_sqlite_mean_expr</span><span class="p">,</span>
     <span class="s2">&quot;shift&quot;</span><span class="p">:</span> <span class="n">_sqlite_lag_expr</span><span class="p">,</span>
-    <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="n">_sqlite_size_expr</span><span class="p">,</span>
 <span class="p">}</span>
 
 

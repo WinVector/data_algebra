@@ -12,21 +12,9 @@ except ImportError:
     have_sqlalchemy = False
 
 
-def _postgresql_mean_expr(dbmodel, expression):
-    return (
-        "AVG(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ")"
-    )
-
-
-def _postgresql_size_expr(dbmodel, expression):
-    return "SUM(1)"
-
-
 # map from op-name to special SQL formatting code
 PostgreSQL_formatters = {
     "___": lambda dbmodel, expression: expression.to_python(),
-    "mean": _postgresql_mean_expr,
-    "size": _postgresql_size_expr,
 }
 
 

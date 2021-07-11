@@ -13,8 +13,9 @@ import data_algebra.BigQuery
 import data_algebra.PostgreSQL
 import data_algebra.MySQL
 import data_algebra.SparkSQL
-import data_algebra.SparkSQL
+
 from data_algebra.data_ops import *
+
 
 # controls
 test_PostgreSQL = False  # causes an external dependency

@@ -96,26 +96,9 @@
     <span class="n">have_Spark</span> <span class="o">=</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">_sparksql_mean_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="s2">&quot;AVG(&quot;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
-    <span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_sparksql_size_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="k">return</span> <span class="s2">&quot;SUM(1)&quot;</span>
-
-
-<span class="k">def</span> <span class="nf">_sparksql_is_null_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="s2">&quot;(&quot;</span>
-        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="o">+</span> <span class="s2">&quot; IS NULL)&quot;</span>
-    <span class="p">)</span>
-
-
 <span class="k">def</span> <span class="nf">_sparksql_is_bad_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="n">subexpr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subexpr</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="s2">&quot;(&quot;</span>
         <span class="o">+</span> <span class="n">subexpr</span>
@@ -136,6 +119,7 @@
 <span class="c1"># treat NaN as NULL, as Pandas has a hard time distinguishing the two</span>
 <span class="k">def</span> <span class="nf">_sparksql_coalesce_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">coalesce_step</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39; WHEN (</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s1"> IS NOT NULL) AND (NOT isNaN(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s1">)) THEN </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s1"> &#39;</span>
 
     <span class="k">return</span> <span class="p">(</span>
@@ -148,10 +132,7 @@
 <span class="c1"># map from op-name to special SQL formatting code</span>
 <span class="n">SparkSQL_formatters</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;___&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">:</span> <span class="n">expression</span><span class="o">.</span><span class="n">to_python</span><span class="p">(),</span>
-    <span class="s2">&quot;is_null&quot;</span><span class="p">:</span> <span class="n">_sparksql_is_null_expr</span><span class="p">,</span>
     <span class="s2">&quot;is_bad&quot;</span><span class="p">:</span> <span class="n">_sparksql_is_bad_expr</span><span class="p">,</span>
-    <span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="n">_sparksql_mean_expr</span><span class="p">,</span>
-    <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="n">_sparksql_size_expr</span><span class="p">,</span>
     <span class="s1">&#39;coalesce&#39;</span><span class="p">:</span> <span class="n">_sparksql_coalesce_expr</span><span class="p">,</span>
 <span class="p">}</span>
 

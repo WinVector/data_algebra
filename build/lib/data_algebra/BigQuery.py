@@ -16,26 +16,10 @@ except ImportError:
     pass
 
 
-def _bigquery_nunique_expr(dbmodel, expression):
-    return (
-        "COUNT(DISTINCT(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + "))"
-    )
-
-
 def _bigquery_median_expr(dbmodel, expression):
     return (
         "PERCENTILE_CONT(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ", 0.5)"
     )
-
-
-def _bigquery_mean_expr(dbmodel, expression):
-    return (
-        "avg(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ")"
-    )
-
-
-def _bigquery_size_expr(dbmodel, expression):
-    return "SUM(1)"
 
 
 def _bigquery_is_bad_expr(dbmodel, expression):
@@ -56,10 +40,7 @@ def _bigquery_is_bad_expr(dbmodel, expression):
 
 
 BigQuery_formatters = {
-    "nunique": _bigquery_nunique_expr,
     "median": _bigquery_median_expr,
-    "mean": _bigquery_mean_expr,
-    "size": _bigquery_size_expr,
     "is_bad": _bigquery_is_bad_expr,
 }
 

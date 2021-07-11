@@ -289,6 +289,16 @@
 <span class="c1"># map from op-name to special SQL formatting code</span>
 
 
+<span class="k">def</span> <span class="nf">_db_mean_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;AVG(&quot;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_db_size_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s2">&quot;SUM(1)&quot;</span>
+
+
 <span class="k">def</span> <span class="nf">_db_is_null_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="s2">&quot;(&quot;</span>
@@ -436,6 +446,12 @@
         <span class="o">+</span> <span class="s2">&quot;, &quot;</span>
         <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_db_nunique_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;COUNT(DISTINCT (&quot;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;))&quot;</span>
     <span class="p">)</span>
 
 
@@ -594,6 +610,8 @@
 <span class="n">db_expr_formatters</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;is_null&quot;</span><span class="p">:</span> <span class="n">_db_is_null_expr</span><span class="p">,</span>
     <span class="s2">&quot;is_bad&quot;</span><span class="p">:</span> <span class="n">_db_is_bad_expr</span><span class="p">,</span>
+    <span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="n">_db_mean_expr</span><span class="p">,</span>
+    <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="n">_db_size_expr</span><span class="p">,</span>
     <span class="s2">&quot;if_else&quot;</span><span class="p">:</span> <span class="n">_db_if_else_expr</span><span class="p">,</span>
     <span class="s2">&quot;is_in&quot;</span><span class="p">:</span> <span class="n">_db_is_in_expr</span><span class="p">,</span>
     <span class="s2">&quot;maximum&quot;</span><span class="p">:</span> <span class="n">_db_maximum_expr</span><span class="p">,</span>
@@ -605,6 +623,7 @@
     <span class="s1">&#39;floor&#39;</span><span class="p">:</span> <span class="n">_db_floor_expr</span><span class="p">,</span>
     <span class="s1">&#39;ceil&#39;</span><span class="p">:</span> <span class="n">_db_ceil_expr</span><span class="p">,</span>
     <span class="s1">&#39;**&#39;</span><span class="p">:</span> <span class="n">_db_pow_expr</span><span class="p">,</span>
+    <span class="s2">&quot;nunique&quot;</span><span class="p">:</span> <span class="n">_db_nunique_expr</span><span class="p">,</span>
     <span class="c1"># fns that had been in bigquery_user_fns</span>
     <span class="s1">&#39;as_int64&#39;</span><span class="p">:</span> <span class="n">_as_int64</span><span class="p">,</span>
     <span class="s1">&#39;as_str&#39;</span><span class="p">:</span> <span class="n">_as_str</span><span class="p">,</span>

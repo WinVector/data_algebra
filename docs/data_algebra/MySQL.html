@@ -77,15 +77,6 @@
     <span class="n">have_sqlalchemy</span> <span class="o">=</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">_MySQL_mean_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="s2">&quot;avg(&quot;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
-    <span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_MySQL_size_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="k">return</span> <span class="s2">&quot;SUM(1)&quot;</span>
-
 <span class="k">def</span> <span class="nf">_MySQL_is_bad_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="n">subexpr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span>
@@ -108,14 +99,14 @@
         <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
     <span class="p">)</span>
 
+
 <span class="c1"># map from op-name to special SQL formatting code</span>
 <span class="n">MySQL_formatters</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;___&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">:</span> <span class="n">expression</span><span class="o">.</span><span class="n">to_python</span><span class="p">(),</span>
-    <span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="n">_MySQL_mean_expr</span><span class="p">,</span>
-    <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="n">_MySQL_size_expr</span><span class="p">,</span>
     <span class="s2">&quot;is_bad&quot;</span><span class="p">:</span> <span class="n">_MySQL_is_bad_expr</span><span class="p">,</span>
     <span class="s1">&#39;concat&#39;</span><span class="p">:</span> <span class="n">_MySQL_concat_expr</span><span class="p">,</span>
 <span class="p">}</span>
+
 
 <span class="k">class</span> <span class="nc">MySQLModel</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A model of how SQL should be generated for MySQL.</span>
