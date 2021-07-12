@@ -49,6 +49,9 @@
                                 <a class="function" href="#OperatorPlatform.__init__">OperatorPlatform</a>
                         </li>
                         <li>
+                                <a class="function" href="#OperatorPlatform.v">v</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#OperatorPlatform.transform">transform</a>
                         </li>
                         <li>
@@ -147,7 +150,10 @@
                 
                         <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">data_algebra.cdata</span>
+            <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">SimpleNamespace</span>
+
+<span class="kn">import</span> <span class="nn">data_algebra.expr_rep</span>
+<span class="kn">import</span> <span class="nn">data_algebra.cdata</span>
 
 
 <span class="k">class</span> <span class="nc">PipeStep</span><span class="p">:</span>
@@ -161,8 +167,15 @@
 <span class="k">class</span> <span class="nc">OperatorPlatform</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Abstract class representing ability to apply data_algebra operations.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">node_name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">node_name</span><span class="p">,</span> <span class="n">column_map</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">node_name</span> <span class="o">=</span> <span class="n">node_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">SimpleNamespace</span><span class="p">(</span><span class="o">**</span><span class="n">column_map</span><span class="p">)</span>  <span class="c1"># allows a dot notation</span>
+
+    <span class="k">def</span> <span class="nf">v</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wrap a value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -410,8 +423,15 @@
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">OperatorPlatform</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Abstract class representing ability to apply data_algebra operations.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">node_name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">node_name</span><span class="p">,</span> <span class="n">column_map</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">node_name</span> <span class="o">=</span> <span class="n">node_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">SimpleNamespace</span><span class="p">(</span><span class="o">**</span><span class="n">column_map</span><span class="p">)</span>  <span class="c1"># allows a dot notation</span>
+
+    <span class="k">def</span> <span class="nf">v</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wrap a value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -591,18 +611,43 @@
                                         <div class="attr function"><a class="headerlink" href="#OperatorPlatform.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">OperatorPlatform</span><span class="signature">(*, node_name)</span>
+            <span class="name">OperatorPlatform</span><span class="signature">(*, node_name, column_map)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">node_name</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">node_name</span><span class="p">,</span> <span class="n">column_map</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">node_name</span> <span class="o">=</span> <span class="n">node_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">SimpleNamespace</span><span class="p">(</span><span class="o">**</span><span class="n">column_map</span><span class="p">)</span>  <span class="c1"># allows a dot notation</span>
 </pre></div>
 
         </details>
 
     
+
+                            </div>
+                            <div id="OperatorPlatform.v" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OperatorPlatform.v">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">v</span><span class="signature">(self, x)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">v</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wrap a value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Wrap a value</p>
+</div>
+
 
                             </div>
                             <div id="OperatorPlatform.transform" class="classattr">

@@ -586,7 +586,7 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">si</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;all sources must be of class ViewRepresentation&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">si</span> <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">]</span>
-        <span class="n">OperatorPlatform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="n">node_name</span><span class="p">)</span>
+        <span class="n">OperatorPlatform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="n">node_name</span><span class="p">,</span> <span class="n">column_map</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_map</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">merged_rep_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;node+ &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
@@ -2411,7 +2411,7 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">si</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;all sources must be of class ViewRepresentation&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">si</span> <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">]</span>
-        <span class="n">OperatorPlatform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="n">node_name</span><span class="p">)</span>
+        <span class="n">OperatorPlatform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="n">node_name</span><span class="p">,</span> <span class="n">column_map</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_map</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">merged_rep_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;node+ &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
@@ -2931,7 +2931,7 @@ Abstract base class.</p>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">si</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;all sources must be of class ViewRepresentation&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">si</span> <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">]</span>
-        <span class="n">OperatorPlatform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="n">node_name</span><span class="p">)</span>
+        <span class="n">OperatorPlatform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="n">node_name</span><span class="p">,</span> <span class="n">column_map</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_map</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -3898,7 +3898,8 @@ with the using columns (None means all).</p>
                                 <h5>Inherited Members</h5>
                                 <dl>
                                     <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
-                                <dd id="ViewRepresentation.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
+                                <dd id="ViewRepresentation.v" class="function"><a href="data_ops_types.html#OperatorPlatform.v">v</a></dd>
+                <dd id="ViewRepresentation.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="ViewRepresentation.apply_to" class="function"><a href="data_ops_types.html#OperatorPlatform.apply_to">apply_to</a></dd>
                 <dd id="ViewRepresentation.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
                 <dd id="ViewRepresentation.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
@@ -4493,7 +4494,8 @@ with the using columns (None means all).</p>
 
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
-                                <dd id="TableDescription.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
+                                <dd id="TableDescription.v" class="function"><a href="data_ops_types.html#OperatorPlatform.v">v</a></dd>
+                <dd id="TableDescription.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="TableDescription.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
                 <dd id="TableDescription.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="TableDescription.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
@@ -5157,7 +5159,8 @@ with the using columns (None means all).</p>
 
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
-                                <dd id="ExtendNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
+                                <dd id="ExtendNode.v" class="function"><a href="data_ops_types.html#OperatorPlatform.v">v</a></dd>
+                <dd id="ExtendNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="ExtendNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
                 <dd id="ExtendNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="ExtendNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
@@ -5607,7 +5610,8 @@ with the using columns (None means all).</p>
 
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
-                                <dd id="ProjectNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
+                                <dd id="ProjectNode.v" class="function"><a href="data_ops_types.html#OperatorPlatform.v">v</a></dd>
+                <dd id="ProjectNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="ProjectNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
                 <dd id="ProjectNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="ProjectNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
@@ -5917,7 +5921,8 @@ with the using columns (None means all).</p>
 
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
-                                <dd id="SelectRowsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
+                                <dd id="SelectRowsNode.v" class="function"><a href="data_ops_types.html#OperatorPlatform.v">v</a></dd>
+                <dd id="SelectRowsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="SelectRowsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
                 <dd id="SelectRowsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="SelectRowsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
@@ -6246,7 +6251,8 @@ with the using columns (None means all).</p>
 
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
-                                <dd id="SelectColumnsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
+                                <dd id="SelectColumnsNode.v" class="function"><a href="data_ops_types.html#OperatorPlatform.v">v</a></dd>
+                <dd id="SelectColumnsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="SelectColumnsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
                 <dd id="SelectColumnsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="SelectColumnsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
@@ -6575,7 +6581,8 @@ with the using columns (None means all).</p>
 
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
-                                <dd id="DropColumnsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
+                                <dd id="DropColumnsNode.v" class="function"><a href="data_ops_types.html#OperatorPlatform.v">v</a></dd>
+                <dd id="DropColumnsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="DropColumnsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
                 <dd id="DropColumnsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="DropColumnsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
@@ -6934,7 +6941,8 @@ with the using columns (None means all).</p>
 
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
-                                <dd id="OrderRowsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
+                                <dd id="OrderRowsNode.v" class="function"><a href="data_ops_types.html#OperatorPlatform.v">v</a></dd>
+                <dd id="OrderRowsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="OrderRowsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
                 <dd id="OrderRowsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="OrderRowsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
@@ -7317,7 +7325,8 @@ with the using columns (None means all).</p>
 
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
-                                <dd id="RenameColumnsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
+                                <dd id="RenameColumnsNode.v" class="function"><a href="data_ops_types.html#OperatorPlatform.v">v</a></dd>
+                <dd id="RenameColumnsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="RenameColumnsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
                 <dd id="RenameColumnsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="RenameColumnsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
@@ -7703,7 +7712,8 @@ with the using columns (None means all).</p>
 
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
-                                <dd id="NaturalJoinNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
+                                <dd id="NaturalJoinNode.v" class="function"><a href="data_ops_types.html#OperatorPlatform.v">v</a></dd>
+                <dd id="NaturalJoinNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="NaturalJoinNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
                 <dd id="NaturalJoinNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="NaturalJoinNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
@@ -8069,7 +8079,8 @@ with the using columns (None means all).</p>
 
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
-                                <dd id="ConcatRowsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
+                                <dd id="ConcatRowsNode.v" class="function"><a href="data_ops_types.html#OperatorPlatform.v">v</a></dd>
+                <dd id="ConcatRowsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="ConcatRowsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
                 <dd id="ConcatRowsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="ConcatRowsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
@@ -8468,7 +8479,8 @@ with the using columns (None means all).</p>
 
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
-                                <dd id="ConvertRecordsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
+                                <dd id="ConvertRecordsNode.v" class="function"><a href="data_ops_types.html#OperatorPlatform.v">v</a></dd>
+                <dd id="ConvertRecordsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="ConvertRecordsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
                 <dd id="ConvertRecordsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="ConvertRecordsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>

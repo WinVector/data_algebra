@@ -77,7 +77,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             if not isinstance(si, ViewRepresentation):
                 raise ValueError("all sources must be of class ViewRepresentation")
         self.sources = [si for si in sources]
-        OperatorPlatform.__init__(self, node_name=node_name)
+        OperatorPlatform.__init__(self, node_name=node_name, column_map=self.column_map)
 
     def merged_rep_id(self):
         return "node+ " + str(id(self))

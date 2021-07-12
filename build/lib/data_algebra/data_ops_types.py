@@ -1,4 +1,7 @@
 
+from types import SimpleNamespace
+
+import data_algebra.expr_rep
 import data_algebra.cdata
 
 
@@ -13,8 +16,15 @@ class PipeStep:
 class OperatorPlatform:
     """Abstract class representing ability to apply data_algebra operations."""
 
-    def __init__(self, *, node_name):
+    def __init__(self, *, node_name, column_map):
         self.node_name = node_name
+        self.c = SimpleNamespace(**column_map)  # allows a dot notation
+
+    def v(self, x):
+        """
+        Wrap a value
+        """
+        return data_algebra.expr_rep.Value(x)
 
     # noinspection PyPep8Naming
     def transform(self, X, *, data_model=None, narrow=True):

@@ -1,8 +1,6 @@
 
 import math
 import re
-import io
-from types import SimpleNamespace
 from collections import OrderedDict
 
 import pandas.io.sql

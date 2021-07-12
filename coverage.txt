@@ -87,9 +87,9 @@ data_algebra/cdata.py                    331     77    77%
 data_algebra/connected_components.py      22      0   100%
 data_algebra/data_model.py                86     21    76%
 data_algebra/data_ops.py                1119    204    82%
-data_algebra/data_ops_types.py            79     38    52%
+data_algebra/data_ops_types.py            84     39    54%
 data_algebra/data_ops_utils.py            51      7    86%
-data_algebra/db_model.py                 789    102    87%
+data_algebra/db_model.py                 787    102    87%
 data_algebra/diagram.py                   56     44    21%
 data_algebra/eval_model.py                16      1    94%
 data_algebra/expr_parse.py                38      4    89%
@@ -103,7 +103,7 @@ data_algebra/python3_lark.py               1      0   100%
 data_algebra/test_util.py                180     27    85%
 data_algebra/util.py                      28      4    86%
 ----------------------------------------------------------
-TOTAL                                   4416    886    80%
+TOTAL                                   4419    887    80%
 
 
-============================= 161 passed in 27.39s =============================
+============================= 161 passed in 26.45s =============================
