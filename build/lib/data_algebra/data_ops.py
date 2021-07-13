@@ -47,7 +47,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     column_names: List[str]
     column_set: data_algebra.OrderedSet.OrderedSet
-    column_map: collections.OrderedDict
     sources: List[
         "ViewRepresentation"
     ]  # https://www.python.org/dev/peps/pep-0484/#forward-references
@@ -70,14 +69,13 @@ class ViewRepresentation(OperatorPlatform, ABC):
             ci: data_algebra.expr_rep.ColumnReference(self, ci)
             for ci in self.column_names
         }
-        self.column_map = collections.OrderedDict(**column_dict)
         if sources is None:
             sources = []
         for si in sources:
             if not isinstance(si, ViewRepresentation):
                 raise ValueError("all sources must be of class ViewRepresentation")
         self.sources = [si for si in sources]
-        OperatorPlatform.__init__(self, node_name=node_name, column_map=self.column_map)
+        OperatorPlatform.__init__(self, node_name=node_name, column_map=collections.OrderedDict(**column_dict))
 
     def merged_rep_id(self):
         return "node+ " + str(id(self))

@@ -1,5 +1,6 @@
 
 from types import SimpleNamespace
+import collections
 
 import data_algebra.expr_rep
 import data_algebra.cdata
@@ -16,9 +17,14 @@ class PipeStep:
 class OperatorPlatform:
     """Abstract class representing ability to apply data_algebra operations."""
 
+    node_name: str
+    column_map: collections.OrderedDict
+    c: SimpleNamespace
+
     def __init__(self, *, node_name, column_map):
         self.node_name = node_name
-        self.c = SimpleNamespace(**column_map)  # allows a dot notation
+        self.column_map = column_map.copy()
+        self.c = SimpleNamespace(**column_map) # allows a dot notation
 
     def v(self, x):
         """
