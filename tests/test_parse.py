@@ -111,6 +111,14 @@ def test_parse_6():
     assert str(recovered) == '((u.sin() + (w ** 2)) / x) + (y / v)'
 
 
+def test_parse_6b():
+    ops = TableDescription("d", ["u", "v", "w", "x", "y"]). \
+        extend({
+            "z": "u.sin()"})
+    recovered = ops.ops['z']
+    assert str(recovered) == 'u.sin()'
+
+
 def test_parse_7():
     ops = TableDescription("d", ["u", "v", "w", "x", "y"]). \
         extend({

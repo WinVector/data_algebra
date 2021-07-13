@@ -70,7 +70,7 @@ logical_remap = {
 
 def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
     """
-    Walk a lark parse tree and return our own reperesentation.
+    Walk a lark parse tree and return our own representation.
 
     :param op: lark parse tree
     :param data_def: dictionary of data_algebra.expr_rep.ColumnReference

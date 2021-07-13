@@ -53,7 +53,7 @@ def try_to_merge_ops(ops1, ops2):
         return None
     # merge the extends
     new_ops = ops1.copy()
-    new_ops2 = ops2
+    new_ops2 = ops2.copy()
     if (len(views1) > 0) and (len(views2) > 0):
         new_ops2 = {k: v.replace_view(views1[0]) for k, v in ops2.items()}
     new_ops.update(new_ops2)
