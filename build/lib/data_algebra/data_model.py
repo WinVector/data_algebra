@@ -126,6 +126,7 @@ class DataModel(ABC):
     def __init__(self, presentation_model_name):
         self.presentation_model_name = presentation_model_name
         self.impl_map = populate_impl_map(data_model=self)
+        self.user_fun_map = dict()
 
     # helper functions
 

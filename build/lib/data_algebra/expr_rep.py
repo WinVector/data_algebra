@@ -166,7 +166,7 @@ class Term(PreTerm, ABC):
         """unary expression"""
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
-        return Expression(op, (self,), params=params, inline=inline)
+        return Expression(op, (self,), params=params, inline=inline, method=not inline)
 
     def __triop_expr__(self, op, x, y, inline=False, method=False):
         """three argument expression"""
@@ -734,10 +734,48 @@ class ColumnReference(Term):
         columns_seen.add(self.column_name)
 
 
+def _can_find_method_by_name(op):
+    assert isinstance(op, str)
+    # from populate_specials
+    if op in {'row_number', '_row_number', '_size', 'size', 'connected_components', '_ngroup', 'ngroup'}:
+        return True
+    # check user fns
+    # first check chosen mappings
+    try:
+        data_algebra.default_data_model.user_fun_map[op]
+        return True
+    except KeyError:
+        pass
+    # check chosen mappings
+    try:
+        data_algebra.default_data_model.impl_map[op]
+        return True
+    except KeyError:
+        pass
+    # now see if argument (usually Pandas) can do this
+    # doubt we hit in this, as most exposed methods are window methods
+    try:
+        method = getattr(Value(0), op)
+        if callable(method):
+            return True
+    except AttributeError:
+        pass
+    # new see if numpy can do this
+    try:
+        fn = numpy.__dict__[op]
+        if callable(fn):
+            return True
+    except KeyError:
+        pass
+    return False
+
+
 class Expression(Term):
     def __init__(self, op, args, *, params=None, inline=False, method=False):
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
+        if not _can_find_method_by_name(op):
+            raise KeyError(f"can't find implementation for function/method {op}")
         if inline:
             if method:
                 raise ValueError("can't set both inline and method")
@@ -788,7 +826,7 @@ class Expression(Term):
     def replace_view(self, view):
         new_args = [oi.replace_view(view) for oi in self.args]
         return Expression(
-            op=self.op, args=new_args, params=self.params, inline=self.inline
+            op=self.op, args=new_args, params=self.params, inline=self.inline, method=self.method,
         )
 
     def get_column_names(self, columns_seen):
@@ -797,7 +835,14 @@ class Expression(Term):
 
     def evaluate(self, data_frame):
         args = [ai.evaluate(data_frame) for ai in self.args]
+        # check user fns
         # first check chosen mappings
+        try:
+            method_to_call = data_algebra.default_data_model.user_fun_map[self.op]
+            return method_to_call(*args)
+        except KeyError:
+            pass
+        # check chosen mappings
         try:
             method_to_call = data_algebra.default_data_model.impl_map[self.op]
             return method_to_call(*args)
@@ -818,6 +863,7 @@ class Expression(Term):
                 return fn(*args)
         except KeyError:
             pass
+        raise KeyError(f'function {self.op} not found')
 
     def to_python(self, *, want_inline_parens=False):
         subs = [ai.to_python(want_inline_parens=True) for ai in self.args]
@@ -826,10 +872,11 @@ class Expression(Term):
         if len(subs) == 1:
             if self.inline:
                 return self.op + self.args[0].to_python(want_inline_parens=True)
-            if isinstance(self.args[0], ColumnReference):
-                return subs[0] + "." + self.op + "()"
-            else:
-                return "(" + subs[0] + ")." + self.op + "()"
+            if self.method:
+                if isinstance(self.args[0], ColumnReference):
+                    return subs[0] + "." + self.op + "()"
+                else:
+                    return "(" + subs[0] + ")." + self.op + "()"
         if len(subs) == 2 and self.inline:
             if want_inline_parens:
                 return "(" + subs[0] + " " + self.op + " " + subs[1] + ")"
@@ -839,7 +886,7 @@ class Expression(Term):
             if isinstance(self.args[0], ColumnReference):
                 return subs[0] + "." + self.op + "(" + ", ".join(subs[1:]) + ")"
             else:
-                return subs[0] + "." + self.op + "(" + ", ".join(subs[1:]) + ")"
+                return "(" + subs[0] + ")." + self.op + "(" + ", ".join(subs[1:]) + ")"
         return self.op + "(" + ", ".join(subs) + ")"
 
 
