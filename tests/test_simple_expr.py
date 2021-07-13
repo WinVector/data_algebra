@@ -8,7 +8,7 @@ import data_algebra.test_util
 
 def test_simple_expr_1():
     d_orig = data_algebra.default_data_model.pd.DataFrame({
-        'x': [1, 2, -3, 4]
+        'x': [1., 2., -3., 4.]
     })
     d = d_orig.copy()
 
@@ -21,7 +21,7 @@ def test_simple_expr_1():
         })
 
     expect = data_algebra.default_data_model.pd.DataFrame({
-        'x': [1, 2, -3, 4]
+        'x': [1., 2., -3., 4.]
     })
     expect['z'] = expect['x'] + 1
     expect['sin_x'] = numpy.sin(expect['x'])

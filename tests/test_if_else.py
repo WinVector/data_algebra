@@ -98,19 +98,19 @@ def test_maximum_1():
 
 def test_if_else_complex():
     d = data_algebra.default_data_model.pd.DataFrame({
-        "a": [-4, 2],
-        "b": [1, 2],
-        "c": [3, 4]}
+        "a": [-4., 2.],
+        "b": [1., 2.],
+        "c": [3., 4.]}
     )
 
     ops = describe_table(d, table_name='d') .\
         extend({"d": "((a + 2).sign() > 0).if_else(b+1, c-2)"})
 
     expect = data_algebra.default_data_model.pd.DataFrame({
-        "a": [-4, 2],
-        "b": [1, 2],
-        "c": [3, 4],
-        "d": [1, 3]}
+        "a": [-4., 2.],
+        "b": [1., 2.],
+        "c": [3., 4.],
+        "d": [1., 3.]}
     )
 
     data_algebra.test_util.check_transform(

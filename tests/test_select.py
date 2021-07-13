@@ -15,11 +15,11 @@ def test_select_rows_1():
 
 
 def test_select_rows_2():
-    d = data_algebra.default_data_model.pd.DataFrame({"x": [-2, 0, 3], "y": [1, 2, 3]})
+    d = data_algebra.default_data_model.pd.DataFrame({"x": [-2., 0., 3.], "y": [1., 2., 3.]})
 
     ops = describe_table(d, table_name="d").select_rows("x.sign() == 1")
 
-    expect = data_algebra.default_data_model.pd.DataFrame({'x': [3], 'y': [3]})
+    expect = data_algebra.default_data_model.pd.DataFrame({'x': [3.], 'y': [3.]})
 
     data_algebra.test_util.check_transform(
         ops=ops,

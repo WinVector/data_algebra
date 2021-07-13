@@ -80,6 +80,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             "atan": math.atan,
             "atanh": math.atanh,
             "ceil": math.ceil,
+            "ceiling": math.ceil,
             "cos": math.cos,
             "cosh": math.cosh,
             "degrees": math.degrees,
@@ -102,6 +103,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             "log2": math.log2,
             "modf": math.modf,
             "radians": math.radians,
+            "sign": numpy.sign,
             "sin": math.sin,
             "sinh": math.sinh,
             "sqrt": math.sqrt,
@@ -122,6 +124,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             "isclose": math.isclose,
             "ldexp": math.ldexp,
             "pow": math.pow,
+            "power": math.pow,
         }
         for k, f in math_fns_2.items():
             if not k in saw:
