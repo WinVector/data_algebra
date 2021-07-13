@@ -797,7 +797,14 @@ class Expression(Term):
 
     def evaluate(self, data_frame):
         args = [ai.evaluate(data_frame) for ai in self.args]
+        # check user fns
         # first check chosen mappings
+        try:
+            method_to_call = data_algebra.default_data_model.user_fun_map[self.op]
+            return method_to_call(*args)
+        except KeyError:
+            pass
+        # check chosen mappings
         try:
             method_to_call = data_algebra.default_data_model.impl_map[self.op]
             return method_to_call(*args)
@@ -818,7 +825,7 @@ class Expression(Term):
                 return fn(*args)
         except KeyError:
             pass
-        raise KeyError(f'funcition {self.op} not found')
+        raise KeyError(f'function {self.op} not found')
 
     def to_python(self, *, want_inline_parens=False):
         subs = [ai.to_python(want_inline_parens=True) for ai in self.args]
