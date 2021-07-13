@@ -734,10 +734,48 @@ class ColumnReference(Term):
         columns_seen.add(self.column_name)
 
 
+def _can_find_method_by_name(op):
+    assert isinstance(op, str)
+    # from populate_specials
+    if op in {'row_number', '_row_number', '_size', 'size', 'connected_components', '_ngroup', 'ngroup'}:
+        return True
+    # check user fns
+    # first check chosen mappings
+    try:
+        data_algebra.default_data_model.user_fun_map[op]
+        return True
+    except KeyError:
+        pass
+    # check chosen mappings
+    try:
+        data_algebra.default_data_model.impl_map[op]
+        return True
+    except KeyError:
+        pass
+    # now see if argument (usually Pandas) can do this
+    # doubt we hit in this, as most exposed methods are window methods
+    try:
+        method = getattr(Value(0), op)
+        if callable(method):
+            return True
+    except AttributeError:
+        pass
+    # new see if numpy can do this
+    try:
+        fn = numpy.__dict__[op]
+        if callable(fn):
+            return True
+    except KeyError:
+        pass
+    return False
+
+
 class Expression(Term):
     def __init__(self, op, args, *, params=None, inline=False, method=False):
         if not isinstance(op, str):
             raise TypeError("op is supposed to be a string")
+        if not _can_find_method_by_name(op):
+            raise KeyError(f"can't find implementation for function/method {op}")
         if inline:
             if method:
                 raise ValueError("can't set both inline and method")
