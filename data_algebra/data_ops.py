@@ -1015,6 +1015,11 @@ class ProjectNode(ViewRepresentation):
                     in data_algebra.expr_rep.fn_names_that_imply_ordered_windowed_situation
                 ):
                     raise ValueError(str(opk) + "' is not allowed in project")
+                if (
+                    opk.op
+                    in data_algebra.expr_rep.fn_names_not_allowed_in_project
+                ):
+                    raise ValueError(str(opk) + "' is not allowed in project")
             else:
                 raise ValueError(
                     "non-aggregated expression in project: " + str(k) + ": " + str(opk)
