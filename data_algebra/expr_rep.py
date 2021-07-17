@@ -14,7 +14,7 @@ import data_algebra.util
 #  http://tomerfiliba.com/blog/Infix-Operators/
 
 
-# list of window/aggregation functons that must be windowed/aggegated
+# list of window/aggregation functions that must be windowed/aggregated
 # (note some other functions work in more than one mode)
 fn_names_that_imply_windowed_situation = {
     "all",
@@ -579,6 +579,7 @@ class Term(PreTerm, ABC):
     def date_diff(self, other):
         return self.__op_expr__("date_diff", other, inline=False, method=True)
 
+    # noinspection PyPep8Naming
     def base_Sunday(self):
         return self.__uop_expr__("base_Sunday")
 
@@ -642,11 +643,12 @@ class ListTerm(PreTerm):
 
     def get_views(self):
         views = list()
-        for ai in self.args:
-            vi = ai.get_views()
-            for vii in vi:
-                if vii not in views:  # expect list to be of size zero or one
-                    views.append(vii)
+        for ai in self.value:
+            if isinstance(ai, PreTerm):
+                vi = ai.get_views()
+                for vii in vi:
+                    if vii not in views:  # expect list to be of size zero or one
+                        views.append(vii)
         return views
 
     def replace_view(self, view):
@@ -663,7 +665,7 @@ class ListTerm(PreTerm):
         return res
 
     def to_python(self, *, want_inline_parens=False):
-        def li_to_python(value, *, want_inline_parens=False):
+        def li_to_python(value):
             try:
                 return value.to_python(want_inline_parens=want_inline_parens)
             except AttributeError:
@@ -673,7 +675,7 @@ class ListTerm(PreTerm):
             "["
             + ", ".join(
                 [
-                    li_to_python(ai, want_inline_parens=want_inline_parens)
+                    li_to_python(ai)
                     for ai in self.value
                 ]
             )
@@ -756,13 +758,15 @@ def _can_find_method_by_name(op):
     # check user fns
     # first check chosen mappings
     try:
-        data_algebra.default_data_model.user_fun_map[op]
+        # noinspection PyUnusedLocal
+        check_val = data_algebra.default_data_model.user_fun_map[op]  # for KeyError
         return True
     except KeyError:
         pass
     # check chosen mappings
     try:
-        data_algebra.default_data_model.impl_map[op]
+        # noinspection PyUnusedLocal
+        check_val = data_algebra.default_data_model.impl_map[op]  # for KeyError
         return True
     except KeyError:
         pass
@@ -916,8 +920,8 @@ def connected_components(f, g):
 def standardize_join_type(join_str):
     assert isinstance(join_str, str)
     join_str = join_str.upper()
-    allowed = set(["INNER", "LEFT", "RIGHT", "OUTER", "FULL", "CROSS"])
-    if not join_str in allowed:  # TOOO put this back in!
+    allowed = {"INNER", "LEFT", "RIGHT", "OUTER", "FULL", "CROSS"}
+    if join_str not in allowed:
         raise KeyError(f"join type {join_str} not supported")
     return join_str
 
