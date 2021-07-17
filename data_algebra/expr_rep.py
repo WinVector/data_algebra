@@ -751,6 +751,8 @@ def _can_find_method_by_name(op):
     assert isinstance(op, str)
     # from populate_specials
     if op in {
+        "_count",
+        "count",
         "row_number",
         "_row_number",
         "_size",

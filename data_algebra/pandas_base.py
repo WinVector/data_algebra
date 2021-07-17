@@ -146,12 +146,13 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             for (k, opk) in op.ops.items():
                 # work on a slice of the data frame
                 # TODO: document exactly which of these are available
+                # TODO: check if need any of these in project
                 if len(opk.args) <= 0:
-                    if opk.op in ["row_number", "count"]:
+                    if opk.op in {"row_number", "_row_number", "count", "_count"}:
                         subframe[k] = opframe.cumcount() + 1
-                    elif opk.op == "ngroup":
+                    elif opk.op in {"ngroup", "_ngroup"}:
                         subframe[k] = opframe.ngroup()
-                    elif opk.op == "size":
+                    elif opk.op in {"size", "_size"}:
                         subframe[k] = opframe[standin_name].transform(
                             opk.op
                         )  # Pandas transform, not data_algebra

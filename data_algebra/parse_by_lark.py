@@ -181,7 +181,7 @@ def _walk_lark_tree(op, *, data_def=None):
                 else:
                     if op_name.startswith(
                         "_"
-                    ):  # TODO: research why we are adding and removing underbar
+                    ):  # TODO: get rid of underbar aliases
                         op_name = op_name[1: len(op_name)]
                     return data_algebra.expr_rep.Expression(op=op_name, args=args)
             if (r_op.data == "or_test") or (r_op.data == "and_test"):
