@@ -193,6 +193,16 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         :return:
         """
         # noinspection PyUnresolvedReferences
+        assert isinstance(cols, dict)
+        # check columns all have the same length
+        if len(cols) > 1:
+            len_0 = None
+            for v in cols.items():
+                len_i = len(v)
+                if len_0 is None:
+                    len_0 = len_i
+                else:
+                    assert len_i == len_0
         return self.pd.DataFrame(cols)
 
     def project_step(self, op, *, data_map, narrow):
