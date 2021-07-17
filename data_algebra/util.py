@@ -8,14 +8,14 @@ def pandas_to_example_str(obj, *, local_data_model=None):
     if not local_data_model.is_appropriate_data_instance(obj):
         raise TypeError("Expect obj to be local_data_model.pd.DataFrame")
     nrow = obj.shape[0]
-    pstr = pd_module_name + ".DataFrame({"
+    pandas_string = pd_module_name + ".DataFrame({"
     for k in obj.columns:
         col = obj[k]
         nulls = local_data_model.bad_column_positions(col)
         cells = ["None" if nulls[i] else col[i].__repr__() for i in range(nrow)]
-        pstr = pstr + "\n    " + k.__repr__() + ": [" + ", ".join(cells) + "],"
-    pstr = pstr + "\n    })"
-    return pstr
+        pandas_string = pandas_string + "\n    " + k.__repr__() + ": [" + ", ".join(cells) + "],"
+    pandas_string = pandas_string + "\n    })"
+    return pandas_string
 
 
 def table_is_keyed_by_columns(table, column_names):

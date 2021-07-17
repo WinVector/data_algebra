@@ -84,76 +84,76 @@ def _walk_lark_tree(op, *, data_def=None):
         except KeyError:
             raise NameError(f"unknown symbol: {key}")
 
-    def _r_walk_lark_tree(op):
-        if isinstance(op, lark.lexer.Token):
-            if op.type == "DEC_NUMBER":
-                return data_algebra.expr_rep.Value(int(op))
-            if op.type == "FLOAT_NUMBER":
-                return data_algebra.expr_rep.Value(float(op))
-            if op.type == "STRING":
+    def _r_walk_lark_tree(r_op):
+        if isinstance(r_op, lark.lexer.Token):
+            if r_op.type == "DEC_NUMBER":
+                return data_algebra.expr_rep.Value(int(r_op))
+            if r_op.type == "FLOAT_NUMBER":
+                return data_algebra.expr_rep.Value(float(r_op))
+            if r_op.type == "STRING":
                 return data_algebra.expr_rep.Value(
-                    ast.literal_eval(str(op))
+                    ast.literal_eval(str(r_op))
                 )  # strip excess quotes
-            if op.type == "NAME":
-                return lookup_symbol(str(op))
-            raise ValueError("unexpected Token type: " + op.type)
-        if isinstance(op, lark.tree.Tree):
-            if op.data == "const_true":
+            if r_op.type == "NAME":
+                return lookup_symbol(str(r_op))
+            raise ValueError("unexpected Token type: " + r_op.type)
+        if isinstance(r_op, lark.tree.Tree):
+            if r_op.data == "const_true":
                 return data_algebra.expr_rep.Value(True)
-            if op.data == "const_false":
+            if r_op.data == "const_false":
                 return data_algebra.expr_rep.Value(False)
-            if op.data == "const_none":
+            if r_op.data == "const_none":
                 return data_algebra.expr_rep.Value(None)
-            if op.data in ["single_input", "number", "string", "var"]:
-                return _r_walk_lark_tree(op.children[0])
-            if op.data in ["arith_expr", "term", "comparison"]:
-                # expect a v (op v)+ pattern
-                nc = len(op.children)
+            if r_op.data in ["single_input", "number", "string", "var"]:
+                return _r_walk_lark_tree(r_op.children[0])
+            if r_op.data in ["arith_expr", "term", "comparison"]:
+                # expect a v (r_op v)+ pattern
+                nc = len(r_op.children)
                 if (nc < 1) or ((nc % 2) != 1):
-                    raise ValueError("unexpected " + op.data + " length")
+                    raise ValueError("unexpected " + r_op.data + " length")
                 # just linear chain them
-                res = _r_walk_lark_tree(op.children[0])
+                res = _r_walk_lark_tree(r_op.children[0])
                 for i in range((nc - 1) // 2):
-                    op_name = str(op.children[2 * i + 1])
+                    op_name = str(r_op.children[2 * i + 1])
                     try:
                         op_name = op_remap[op_name]
                     except KeyError:
                         pass
                     res = getattr(res, op_name)(
-                        _r_walk_lark_tree(op.children[2 * i + 2])
+                        _r_walk_lark_tree(r_op.children[2 * i + 2])
                     )
                 return res
-            if op.data == "power":
-                if len(op.children) != 2:
-                    raise ValueError("unexpected " + op.data + " length")
-                left = _r_walk_lark_tree(op.children[0])
+            if r_op.data == "power":
+                if len(r_op.children) != 2:
+                    raise ValueError("unexpected " + r_op.data + " length")
+                left = _r_walk_lark_tree(r_op.children[0])
                 op_name = "__pow__"
-                right = _r_walk_lark_tree(op.children[1])
+                right = _r_walk_lark_tree(r_op.children[1])
                 return getattr(left, op_name)(right)
-            if op.data == "factor":
-                if len(op.children) != 2:
+            if r_op.data == "factor":
+                if len(r_op.children) != 2:
                     raise ValueError("unexpected arith_expr length")
-                op_name = str(op.children[0])
+                op_name = str(r_op.children[0])
                 try:
                     op_name = factor_remap[op_name]
                 except KeyError:
                     pass
-                right = _r_walk_lark_tree(op.children[1])
+                right = _r_walk_lark_tree(r_op.children[1])
                 return getattr(right, op_name)()
-            if op.data in logical_remap.keys():
-                if len(op.children) < 2:
-                    raise ValueError("unexpected ' + op.data + ' length")
-                op_name = logical_remap[op.data]
-                children = [_r_walk_lark_tree(ci) for ci in op.children]
+            if r_op.data in logical_remap.keys():
+                if len(r_op.children) < 2:
+                    raise ValueError("unexpected ' + r_op.data + ' length")
+                op_name = logical_remap[r_op.data]
+                children = [_r_walk_lark_tree(ci) for ci in r_op.children]
                 # just linear chain them
                 res = children[0]
                 for i in range(1, len(children)):
                     res = getattr(res, op_name)(children[i])
                 return res
-            if op.data == "funccall":
-                if len(op.children) > 2:
+            if r_op.data == "funccall":
+                if len(r_op.children) > 2:
                     raise ValueError("unexpected funccall length")
-                method_carrier = op.children[0]
+                method_carrier = r_op.children[0]
                 if isinstance(method_carrier, lark.tree.Tree) and (
                     method_carrier.data == "getattr"
                 ):
@@ -165,8 +165,8 @@ def _walk_lark_tree(op, *, data_def=None):
                     var = None
                     op_name = str(method_carrier.children[0])
                 args = []
-                if len(op.children) > 1:
-                    raw_args = op.children[1].children
+                if len(r_op.children) > 1:
+                    raw_args = r_op.children[1].children
                     args = [_r_walk_lark_tree(ai) for ai in raw_args]
                 if var is not None:
                     method = getattr(var, op_name)
@@ -175,31 +175,31 @@ def _walk_lark_tree(op, *, data_def=None):
                     if op_name.startswith(
                         "_"
                     ):  # TODO: research why we are adding and removing underbar
-                        op_name = op_name[1 : len(op_name)]
+                        op_name = op_name[1: len(op_name)]
                     return data_algebra.expr_rep.Expression(op=op_name, args=args)
-            if (op.data == "or_test") or (op.data == "and_test"):
-                if len(op.children) != 2:
-                    raise ValueError("unexpected " + op.data + " length")
-                left = _r_walk_lark_tree(op.children[0])
-                if op.data == "or_test":
+            if (r_op.data == "or_test") or (r_op.data == "and_test"):
+                if len(r_op.children) != 2:
+                    raise ValueError("unexpected " + r_op.data + " length")
+                left = _r_walk_lark_tree(r_op.children[0])
+                if r_op.data == "or_test":
                     op_name = "__or__"
                 else:
                     op_name = "__and__"
-                right = _r_walk_lark_tree(op.children[1])
+                right = _r_walk_lark_tree(r_op.children[1])
                 return getattr(left, op_name)(right)
-            if op.data == "not":
-                if len(op.children) != 1:
-                    raise ValueError("unexpected " + op.data + " length")
-                left = _r_walk_lark_tree(op.children[0])
+            if r_op.data == "not":
+                if len(r_op.children) != 1:
+                    raise ValueError("unexpected " + r_op.data + " length")
+                left = _r_walk_lark_tree(r_op.children[0])
                 op_name = "__eq__"
                 return getattr(left, op_name)(data_algebra.expr_rep.Value(False))
-            if op.data in ["list", "tuple"]:
-                vals = [_r_walk_lark_tree(vi) for vi in op.children[0].children]
+            if r_op.data in ["list", "tuple"]:
+                vals = [_r_walk_lark_tree(vi) for vi in r_op.children[0].children]
                 return data_algebra.expr_rep.ListTerm(vals)
-            if op.data == "expr_stmt":
+            if r_op.data == "expr_stmt":
                 raise ValueError("Error must use == for comparison, not =")
-            raise ValueError("unexpected/not-allowed lark Tree kind: " + str(op.data))
-        raise ValueError("unexpected lark parse type: " + str(type(op)))
+            raise ValueError("unexpected/not-allowed lark Tree kind: " + str(r_op.data))
+        raise ValueError("unexpected lark parse type: " + str(type(r_op)))
 
     return _r_walk_lark_tree(op)
 

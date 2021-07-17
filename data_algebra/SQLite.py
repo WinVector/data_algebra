@@ -112,7 +112,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             "trunc": math.trunc,
         }
         for k, f in math_fns.items():
-            if not k in saw:
+            if k not in saw:
                 conn.create_function(k, 1, f)
                 saw.add(k)
         math_fns_2 = {
@@ -127,7 +127,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             "power": math.pow,
         }
         for k, f in math_fns_2.items():
-            if not k in saw:
+            if k not in saw:
                 conn.create_function(k, 2, f)
                 saw.add(k)
         # numpy fns
@@ -154,7 +154,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             "tanh": numpy.tanh,
         }
         for k, f in numpy_fns.items():
-            if not k in saw:
+            if k not in saw:
                 conn.create_function(k, 1, f)
                 saw.add(k)
 

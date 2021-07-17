@@ -120,7 +120,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                             col_set.add(value_name)
                     elif isinstance(opk.args[0], data_algebra.expr_rep.Value):
                         key = str(opk.args[0].value)
-                        if not key in data_algebra_temp_cols.keys():
+                        if key not in data_algebra_temp_cols.keys():
                             value_name = "data_algebra_extend_temp_col_" + str(
                                 len(data_algebra_temp_cols)
                             )
@@ -217,7 +217,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                     pass
                 elif isinstance(opk.args[0], data_algebra.expr_rep.Value):
                     key = str(opk.args[0].value)
-                    if not key in data_algebra_temp_cols.keys():
+                    if key not in data_algebra_temp_cols.keys():
                         value_name = "data_algebra_project_temp_col_" + str(
                             len(data_algebra_temp_cols)
                         )

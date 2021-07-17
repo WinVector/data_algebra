@@ -7,6 +7,7 @@ import collections.abc
 
 class OrderedSet(collections.OrderedDict, collections.abc.MutableSet):
     def __init__(self, v=None):
+        collections.OrderedDict.__init__(self)
         if v is not None:
             for val in v:
                 self.add(val)

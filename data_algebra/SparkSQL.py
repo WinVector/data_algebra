@@ -132,7 +132,7 @@ class SparkSQLModel(data_algebra.db_model.DBModel):
         d_spark.createOrReplaceTempView(table_name)  # TODO: non-temps
 
 
-spark_context = None
+cached_spark_context = None
 
 
 def example_handle():
@@ -142,12 +142,12 @@ def example_handle():
     """
     if not have_Spark:
         return None
-    global spark_context
-    if spark_context is None:
-        spark_context = pyspark.SparkContext()
+    global cached_spark_context
+    if cached_spark_context is None:
+        cached_spark_context = pyspark.SparkContext()
     return SparkSQLModel().db_handle(
         SparkConnection(
-            spark_context=spark_context,
+            spark_context=cached_spark_context,
             spark_session=pyspark.sql.SparkSession.builder.appName(
                 "pandasToSparkDF"
             ).getOrCreate(),
