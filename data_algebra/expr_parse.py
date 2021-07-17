@@ -26,7 +26,6 @@ def parse_assignments_in_context(ops, view):
     columns_used = set()
     newops = collections.OrderedDict()
     mp = column_defs.copy()
-    data_algebra.expr_rep.populate_specials(column_defs=column_defs, destination=mp)
     for k in ops.keys():
         assert isinstance(k, str)
         orig_v = ops[k]  # make debugging easier

@@ -912,36 +912,6 @@ def connected_components(f, g):
     return data_algebra.expr_rep.Expression(op="connected_components", args=[f, g])
 
 
-# TODO: get rid of user_values
-def populate_specials(*, column_defs, destination, user_values=None):
-    """populate a dictionary with special values
-       column_defs is a dictionary,
-         usually formed from a ViewRepresentation.column_map
-       destination is a dictionary,
-         usually formed from a ViewRepresentation.column_map.copy()
-    """
-
-    assert isinstance(column_defs, dict)
-    assert isinstance(destination, dict)
-    if user_values is None:
-        user_values = {}
-    assert isinstance(user_values, dict)
-    nd = column_defs.copy()
-    # more doc!
-    # makes these symbols available for parsing step
-    # need to enter user functions here or as methods on variables
-    # Note: a lot of the re-emitters add back the underbar, allow the non
-    # underbar names we see here.  See expr_rep.py Expression to_python.
-    destination["_row_number"] = lambda: data_algebra.expr_rep.Expression(
-        op="row_number", args=[]
-    )
-    destination["_ngroup"] = lambda: data_algebra.expr_rep.Expression(
-        op="ngroup", args=[]
-    )
-    destination["_size"] = lambda: data_algebra.expr_rep.Expression(op="size", args=[])
-    destination["connected_components"] = connected_components
-
-
 def standardize_join_type(join_str):
     assert isinstance(join_str, str)
     join_str = join_str.upper()
