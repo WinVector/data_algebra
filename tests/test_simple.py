@@ -65,22 +65,21 @@ def test_equiv():
 
 
 def test_simple():
-    q = 4.
-    x = 2.
+    q = 4.0
+    x = 2.0
     var_name = "y"
 
     ops = TableDescription("d", ["x", "y"]).extend({"z": f"1/({q}) + x"})
 
-    d_local = data_algebra.default_data_model.pd.DataFrame({"x": [1., 2.], "y": [3., 4.]})
-
-    expect = data_algebra.default_data_model.pd.DataFrame(
-        {"x": [1., 2.], "y": [3., 4.], "z": [1.25, 2.25]}
+    d_local = data_algebra.default_data_model.pd.DataFrame(
+        {"x": [1.0, 2.0], "y": [3.0, 4.0]}
     )
 
-    data_algebra.test_util.check_transform(
-        ops=ops,
-        data=d_local,
-        expect=expect)
+    expect = data_algebra.default_data_model.pd.DataFrame(
+        {"x": [1.0, 2.0], "y": [3.0, 4.0], "z": [1.25, 2.25]}
+    )
+
+    data_algebra.test_util.check_transform(ops=ops, data=d_local, expect=expect)
 
 
 def test_pandas_to_example():
@@ -101,5 +100,5 @@ def test_pandas_to_example():
         }
     )
     d_str = data_algebra.util.pandas_to_example_str(d)
-    d_back = eval(d_str, globals(), {'pd': data_algebra.default_data_model.pd})
+    d_back = eval(d_str, globals(), {"pd": data_algebra.default_data_model.pd})
     assert data_algebra.test_util.equivalent_frames(d, d_back)

@@ -1,4 +1,3 @@
-
 from abc import ABC
 
 import data_algebra.OrderedSet
@@ -14,7 +13,9 @@ class NearSQL(ABC):
     Represent SQL queries in a mostly string-form
     """
 
-    def __init__(self, *, terms, quoted_query_name, temp_tables, is_table=False, annotation=None):
+    def __init__(
+        self, *, terms, quoted_query_name, temp_tables, is_table=False, annotation=None
+    ):
         assert isinstance(terms, (dict, type(None)))
         assert isinstance(quoted_query_name, str)
         assert isinstance(temp_tables, dict)
@@ -30,12 +31,12 @@ class NearSQL(ABC):
 
     def to_bound_near_sql(self, *, columns=None, force_sql=False, constants=None):
         return NearSQLContainer(
-            near_sql=self,
-            columns=columns,
-            force_sql=force_sql,
-            constants=constants)
+            near_sql=self, columns=columns, force_sql=force_sql, constants=constants
+        )
 
-    def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False):
+    def to_sql(
+        self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False
+    ):
         raise NotImplementedError("base method called")
 
     # return a list where last element is a NearSQL previous elements are (name, NearSQLContainer) pairs
@@ -50,10 +51,11 @@ class NearSQLContainer:
     NearSQL with bound in columns, force_sql, and constants decisions
     """
 
-    def __init__(self, *,
-                 near_sql, columns=None, force_sql=False, constants=None):
+    def __init__(self, *, near_sql, columns=None, force_sql=False, constants=None):
         assert isinstance(near_sql, NearSQL)
-        assert isinstance(columns, (set, data_algebra.OrderedSet.OrderedSet, list, type(None)))
+        assert isinstance(
+            columns, (set, data_algebra.OrderedSet.OrderedSet, list, type(None))
+        )
         assert isinstance(force_sql, bool)
         assert isinstance(constants, (dict, type(None)))
         self.near_sql = near_sql
@@ -72,13 +74,16 @@ class NearSQLContainer:
             force_sql=self.force_sql,
             constants=self.constants,
             db_model=db_model,
-            annotate=annotate)
+            annotate=annotate,
+        )
 
     # assemble sub-sql
     def convert_subsql(self, *, db_model, annotate=False):
         assert isinstance(self, NearSQLContainer)
         assert isinstance(self.near_sql, NearSQL)
-        return db_model.convert_nearsql_container_subsql_(nearsql_container=self, annotate=annotate)
+        return db_model.convert_nearsql_container_subsql_(
+            nearsql_container=self, annotate=annotate
+        )
 
     # sequence: a list where last element is a NearSQLContainer previous elements are (name, NearSQLContainer) pairs
     # stub the replacement common table expression in a NearSQLContainer
@@ -92,15 +97,20 @@ class NearSQLContainer:
             endi = len(sequence) - 1
             last_step = sequence[endi]
             sequence[endi] = NearSQLContainer(
-                near_sql=last_step, columns=self.columns, force_sql=self.force_sql, constants=self.constants)
+                near_sql=last_step,
+                columns=self.columns,
+                force_sql=self.force_sql,
+                constants=self.constants,
+            )
             endi = len(sequence) - 1
             last_step = sequence[endi]
             stub = last_step
             if not stub.near_sql.is_table:
                 stub = NearSQLContainer(
                     near_sql=NearSQLCommonTableExpression(
-                        quoted_query_name=last_step.near_sql.quoted_query_name),
-                        force_sql=self.force_sql
+                        quoted_query_name=last_step.near_sql.quoted_query_name
+                    ),
+                    force_sql=self.force_sql,
                 )
             sequence[endi] = (last_step.near_sql.quoted_query_name, last_step)
         return stub, sequence
@@ -109,15 +119,22 @@ class NearSQLContainer:
 class NearSQLCommonTableExpression(NearSQL):
     def __init__(self, *, quoted_query_name):
         NearSQL.__init__(
-            self, terms=None, quoted_query_name=quoted_query_name, temp_tables=dict(), is_table=True)
+            self,
+            terms=None,
+            quoted_query_name=quoted_query_name,
+            temp_tables=dict(),
+            is_table=True,
+        )
 
-    def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False):
+    def to_sql(
+        self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False
+    ):
         return db_model.nearsqlcte_to_sql_(
             near_sql=self,
             columns=columns,
             force_sql=force_sql,
             constants=constants,
-            annotate=annotate
+            annotate=annotate,
         )
 
 
@@ -125,17 +142,23 @@ class NearSQLTable(NearSQL):
     def __init__(self, *, terms, quoted_query_name, quoted_table_name):
         assert isinstance(terms, dict)
         NearSQL.__init__(
-            self, terms=terms, quoted_query_name=quoted_query_name, temp_tables=dict(), is_table=True
+            self,
+            terms=terms,
+            quoted_query_name=quoted_query_name,
+            temp_tables=dict(),
+            is_table=True,
         )
         self.quoted_table_name = quoted_table_name
 
-    def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False):
+    def to_sql(
+        self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False
+    ):
         return db_model.nearsqltable_to_sql_(
             near_sql=self,
             columns=columns,
             force_sql=force_sql,
             constants=constants,
-            annotate=annotate
+            annotate=annotate,
         )
 
 
@@ -156,20 +179,23 @@ class NearSQLUnaryStep(NearSQL):
             terms=terms,
             quoted_query_name=quoted_query_name,
             temp_tables=temp_tables,
-            annotation=annotation
+            annotation=annotation,
         )
         assert isinstance(sub_sql, NearSQLContainer)
-        assert isinstance(suffix,  (str, type(None)))
+        assert isinstance(suffix, (str, type(None)))
         self.sub_sql = sub_sql
         self.suffix = suffix
 
-    def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False):
+    def to_sql(
+        self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False
+    ):
         return db_model.nearsqlunary_to_sql_(
             near_sql=self,
             columns=columns,
             force_sql=force_sql,
             constants=constants,
-            annotate=annotate)
+            annotate=annotate,
+        )
 
     def to_with_form(self):
         if self.sub_sql.near_sql.is_table:
@@ -185,7 +211,8 @@ class NearSQLUnaryStep(NearSQL):
             sub_sql=stub,
             suffix=self.suffix,
             temp_tables=self.temp_tables,
-            annotation=self.annotation)
+            annotation=self.annotation,
+        )
         sequence.append(stubbed_step)
         return sequence
 
@@ -209,25 +236,27 @@ class NearSQLBinaryStep(NearSQL):
             terms=terms,
             quoted_query_name=quoted_query_name,
             temp_tables=temp_tables,
-            annotation=annotation
+            annotation=annotation,
         )
-        assert isinstance(sub_sql1,  NearSQLContainer)
+        assert isinstance(sub_sql1, NearSQLContainer)
         assert isinstance(sub_sql2, NearSQLContainer)
-        assert isinstance(suffix,  (str, type(None)))
+        assert isinstance(suffix, (str, type(None)))
         assert isinstance(joiner, str)
         self.sub_sql1 = sub_sql1
         self.joiner = joiner
         self.sub_sql2 = sub_sql2
         self.suffix = suffix
 
-    def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False):
+    def to_sql(
+        self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False
+    ):
         return db_model.nearsqlbinary_to_sql_(
             near_sql=self,
             columns=columns,
             force_sql=force_sql,
             constants=constants,
             annotate=annotate,
-            quoted_query_name=self.quoted_query_name
+            quoted_query_name=self.quoted_query_name,
         )
 
     def to_with_form(self):
@@ -259,7 +288,8 @@ class NearSQLBinaryStep(NearSQL):
             sub_sql2=stub2,
             suffix=self.suffix,
             temp_tables=self.temp_tables,
-            annotation=self.annotation)
+            annotation=self.annotation,
+        )
         sequence.append(stubbed_step)
         return sequence
 
@@ -269,8 +299,16 @@ class NearSQLq(NearSQL):
     Adapter to wrap a pre-existing query as a NearSQL
 
     """
+
     def __init__(
-        self, *, quoted_query_name, query, terms, prev_quoted_query_name, temp_tables, annotation=None
+        self,
+        *,
+        quoted_query_name,
+        query,
+        terms,
+        prev_quoted_query_name,
+        temp_tables,
+        annotation=None
     ):
         assert isinstance(terms, dict)
         NearSQL.__init__(
@@ -285,7 +323,9 @@ class NearSQLq(NearSQL):
         self.query = query
         self.prev_quoted_query_name = prev_quoted_query_name
 
-    def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False):
+    def to_sql(
+        self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False
+    ):
         return db_model.nearsqlq_to_sql_(
             near_sql=self,
             columns=columns,

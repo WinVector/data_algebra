@@ -29,6 +29,5 @@ def test_join_warn1():
     )
 
     data_algebra.test_util.check_transform(
-        ops=ops,
-        data={"d_left": d_left, "d_right": d_right},
-        expect=expect)
+        ops=ops, data={"d_left": d_left, "d_right": d_right}, expect=expect
+    )

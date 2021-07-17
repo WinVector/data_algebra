@@ -1,4 +1,3 @@
-
 import data_algebra
 import data_algebra.test_util
 import data_algebra.util
@@ -63,7 +62,9 @@ def test_extend_shrink_1():
     ops = describe_table(d, "d").extend({"c": "y.max()"}).extend({"d": "y.min()"})
 
     assert formats_to_self(ops)
-    assert isinstance(ops.sources[0], TableDescription)  # check does combine nodes in this case
+    assert isinstance(
+        ops.sources[0], TableDescription
+    )  # check does combine nodes in this case
 
     res = ops.transform(d)
     expect = data_algebra.default_data_model.pd.DataFrame(
@@ -101,7 +102,9 @@ def test_extend_shrink_2():
     ops = describe_table(d, "d").extend({"c": "y.max()"}).extend({"d": "c.min()"})
 
     assert formats_to_self(ops)
-    assert isinstance(ops.sources[0], ExtendNode)  # check doesn't combine nodes in this case
+    assert isinstance(
+        ops.sources[0], ExtendNode
+    )  # check doesn't combine nodes in this case
 
     res = ops.transform(d)
     expect = data_algebra.default_data_model.pd.DataFrame(
@@ -121,4 +124,4 @@ def test_extend_catch_nonagg():
     )
 
     with pytest.raises(ValueError):
-        ops = describe_table(d, "d").extend({'y': 'y'}, partition_by=["c", "g"])
+        ops = describe_table(d, "d").extend({"y": "y"}, partition_by=["c", "g"])

@@ -9,7 +9,11 @@ from data_algebra.data_ops import *
 
 def test_strat_example():
     prepared_stratified = data_algebra.default_data_model.pd.DataFrame(
-        {"y": [1., 0., 0., 1., 0., 0.], "g": [0., 0., 0., 1., 1., 1.], "x": [1., 2., 3., 4., 5., 6.]}
+        {
+            "y": [1.0, 0.0, 0.0, 1.0, 0.0, 0.0],
+            "g": [0.0, 0.0, 0.0, 1.0, 1.0, 1.0],
+            "x": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        }
     )
 
     ops = describe_table(prepared_stratified).project(
@@ -26,9 +30,8 @@ def test_strat_example():
     )
 
     data_algebra.test_util.check_transform(
-        ops=ops,
-        data=prepared_stratified,
-        expect=expect)
+        ops=ops, data=prepared_stratified, expect=expect
+    )
 
 
 def test_strat_example_size():
@@ -45,6 +48,5 @@ def test_strat_example_size():
     )
 
     data_algebra.test_util.check_transform(
-        ops=ops,
-        data=prepared_stratified,
-        expect=expect)
+        ops=ops, data=prepared_stratified, expect=expect
+    )

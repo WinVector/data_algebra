@@ -19,8 +19,8 @@ def test_neg():
     )
 
     ops = TableDescription(
-            "d", ["subjectID", "surveyCategory", "assessmentTotal"]
-        ).extend({"v": "-assessmentTotal"})
+        "d", ["subjectID", "surveyCategory", "assessmentTotal"]
+    ).extend({"v": "-assessmentTotal"})
 
     expect = data_algebra.default_data_model.pd.DataFrame(
         {
@@ -36,7 +36,4 @@ def test_neg():
         }
     )
 
-    data_algebra.test_util.check_transform(
-        ops=ops,
-        data=d_local,
-        expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d_local, expect=expect)

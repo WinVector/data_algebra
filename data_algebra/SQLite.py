@@ -159,7 +159,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
                 saw.add(k)
 
         # https://docs.python.org/3/library/sqlite3.html
-        conn.create_aggregate('median', 1, MedianAgg)
+        conn.create_aggregate("median", 1, MedianAgg)
 
     # noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection
     def insert_table(
@@ -199,8 +199,6 @@ def example_handle():
     Return an example db handle for testing. Returns None if helper packages not present.
 
     """
-    db_handle = SQLiteModel().db_handle(
-        conn=sqlite3.connect(':memory:')
-    )
+    db_handle = SQLiteModel().db_handle(conn=sqlite3.connect(":memory:"))
     db_handle.db_model.prepare_connection(db_handle.conn)
     return db_handle

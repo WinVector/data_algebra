@@ -28,6 +28,5 @@ def test_natural_join_columns():
     )
 
     data_algebra.test_util.check_transform(
-        ops=ops4,
-        data={"d": d, "d2": d2},
-        expect=expect)
+        ops=ops4, data={"d": d, "d2": d2}, expect=expect
+    )

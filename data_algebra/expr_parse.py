@@ -1,4 +1,3 @@
-
 import collections
 
 import data_algebra.expr_rep
@@ -36,9 +35,7 @@ def parse_assignments_in_context(ops, view):
         orig_v = ops[k]  # make debugging easier
         v = orig_v
         if not isinstance(v, data_algebra.expr_rep.PreTerm):
-            v = data_algebra.parse_by_lark.parse_by_lark(
-                source_str=str(v), data_def=mp
-            )
+            v = data_algebra.parse_by_lark.parse_by_lark(source_str=str(v), data_def=mp)
         else:
             v = v.replace_view(view)
         newops[k] = v

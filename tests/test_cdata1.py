@@ -391,27 +391,26 @@ def test_cdata_explode():
 
 
 def test_cdata_query_details():
-    d = data_algebra.default_data_model.pd.DataFrame({
-        'measure_1': [1, 2],
-        'measure_2': [3, 4],
-        'rec': ['a', 'b']
-    })
-    td = describe_table(d, table_name='d')
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"measure_1": [1, 2], "measure_2": [3, 4], "rec": ["a", "b"]}
+    )
+    td = describe_table(d, table_name="d")
 
-    ops = td. \
-        convert_records(pivot_rowrecs_to_blocks(
+    ops = td.convert_records(
+        pivot_rowrecs_to_blocks(
             attribute_key_column="measurement",  # output column
             attribute_value_column="value",  # output column
-            record_keys=['rec'],
-            record_value_columns=['measure_1', 'measure_2']))
+            record_keys=["rec"],
+            record_value_columns=["measure_1", "measure_2"],
+        )
+    )
 
-    expect = data_algebra.default_data_model.pd.DataFrame({
-        'rec': ['a', 'a', 'b', 'b'],
-        'measurement': ['measure_1', 'measure_2', 'measure_1', 'measure_2'],
-        'value': [1, 3, 2, 4]
-    })
+    expect = data_algebra.default_data_model.pd.DataFrame(
+        {
+            "rec": ["a", "a", "b", "b"],
+            "measurement": ["measure_1", "measure_2", "measure_1", "measure_2"],
+            "value": [1, 3, 2, 4],
+        }
+    )
 
-    data_algebra.test_util.check_transform(
-        ops=ops,
-        data=d,
-        expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)

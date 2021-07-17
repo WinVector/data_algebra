@@ -30,20 +30,20 @@ def test_scoring_example():
     scale = 0.237
 
     ops = (
-            TableDescription("d", ["subjectID", "surveyCategory", "assessmentTotal"])
-            .extend({"probability": f"(assessmentTotal * {scale}).exp()"})
-            .extend({"total": "probability.sum()"}, partition_by="subjectID")
-            .extend({"probability": "probability/total"})
-            .extend({"sort_key": "-probability"})
-            .extend(
-                {"row_number": "_row_number()"},
-                partition_by=["subjectID"],
-                order_by=["sort_key"],
-            )
-            .select_rows("row_number == 1")
-            .select_columns(["subjectID", "surveyCategory", "probability"])
-            .rename_columns({"diagnosis": "surveyCategory"})
+        TableDescription("d", ["subjectID", "surveyCategory", "assessmentTotal"])
+        .extend({"probability": f"(assessmentTotal * {scale}).exp()"})
+        .extend({"total": "probability.sum()"}, partition_by="subjectID")
+        .extend({"probability": "probability/total"})
+        .extend({"sort_key": "-probability"})
+        .extend(
+            {"row_number": "_row_number()"},
+            partition_by=["subjectID"],
+            order_by=["sort_key"],
         )
+        .select_rows("row_number == 1")
+        .select_columns(["subjectID", "surveyCategory", "probability"])
+        .rename_columns({"diagnosis": "surveyCategory"})
+    )
 
     expect = data_algebra.default_data_model.pd.DataFrame(
         {
@@ -54,10 +54,8 @@ def test_scoring_example():
     )
 
     data_algebra.test_util.check_transform(
-        ops=ops,
-        data=d_local,
-        expect=expect,
-        float_tol=1e-3)
+        ops=ops, data=d_local, expect=expect, float_tol=1e-3
+    )
 
     # test instrumentation
 

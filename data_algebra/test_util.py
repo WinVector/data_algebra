@@ -1,4 +1,3 @@
-
 import numpy
 
 # noinspection PyUnresolvedReferences
@@ -36,10 +35,12 @@ def formats_to_self(ops):
     ops2 = eval(
         str1,
         globals(),
-        {'pd': data_algebra.default_data_model.pd}  # make our definition of pandas available
+        {
+            "pd": data_algebra.default_data_model.pd
+        },  # make our definition of pandas available
     )
     str2 = repr(ops2)
-    strings_match = str1 == str2   # probably too strict
+    strings_match = str1 == str2  # probably too strict
     ops_match = ops == ops2
     if strings_match and (not ops_match):
         raise Exception("strings match, but ops did not")
@@ -202,12 +203,12 @@ def check_transform_on_handles(
     if len(data) == 1:
         res_t = ops.transform(list(data.values())[0])
         if not equivalent_frames(
-                res_t,
-                expect,
-                float_tol=float_tol,
-                check_column_order=check_column_order,
-                cols_case_sensitive=cols_case_sensitive,
-                check_row_order=check_row_order,
+            res_t,
+            expect,
+            float_tol=float_tol,
+            check_column_order=check_column_order,
+            cols_case_sensitive=cols_case_sensitive,
+            check_row_order=check_row_order,
         ):
             raise ValueError("Pandas transform result did not match expect")
     # try any db paths
@@ -229,7 +230,8 @@ def check_transform_on_handles(
                             pretty=pretty,
                             annotate=annotate,
                             use_with=use_with,
-                            temp_tables=temp_tables)
+                            temp_tables=temp_tables,
+                        )
                         assert isinstance(sql, str)
                         sql_statements.append(sql)
                         # print(sql)
@@ -322,7 +324,7 @@ def check_transform(
         data_algebra.SparkSQL.SparkSQLModel().db_handle(None),
         data_algebra.MySQL.MySQLModel().db_handle(None),
         data_algebra.SQLite.example_handle(),  # actual database instance, not empty
-        ]
+    ]
 
     if test_PostgreSQL:
         db_handles.append(data_algebra.PostgreSQL.example_handle())

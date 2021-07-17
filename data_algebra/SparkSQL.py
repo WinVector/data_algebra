@@ -28,7 +28,9 @@ def _sparksql_is_bad_expr(dbmodel, expression):
         + " <= "
         + dbmodel.quote_literal("-infinity")
         + " OR "
-        + " isNaN(" + subexpr + ")"
+        + " isNaN("
+        + subexpr
+        + ")"
         + ")"
     )
 
@@ -37,12 +39,17 @@ def _sparksql_is_bad_expr(dbmodel, expression):
 def _sparksql_coalesce_expr(dbmodel, expression):
     def coalesce_step(x):
         assert isinstance(x, str)
-        return f' WHEN ({x} IS NOT NULL) AND (NOT isNaN({x})) THEN {x} '
+        return f" WHEN ({x} IS NOT NULL) AND (NOT isNaN({x})) THEN {x} "
 
     return (
-        'CASE '
-        + ' '. join([coalesce_step(dbmodel.expr_to_sql(ai, want_inline_parens=False)) for ai in expression.args])
-        + ' ELSE NULL END'
+        "CASE "
+        + " ".join(
+            [
+                coalesce_step(dbmodel.expr_to_sql(ai, want_inline_parens=False))
+                for ai in expression.args
+            ]
+        )
+        + " ELSE NULL END"
     )
 
 
@@ -50,7 +57,7 @@ def _sparksql_coalesce_expr(dbmodel, expression):
 SparkSQL_formatters = {
     "___": lambda dbmodel, expression: expression.to_python(),
     "is_bad": _sparksql_is_bad_expr,
-    'coalesce': _sparksql_coalesce_expr,
+    "coalesce": _sparksql_coalesce_expr,
 }
 
 
@@ -81,7 +88,7 @@ class SparkSQLModel(data_algebra.db_model.DBModel):
             self,
             identifier_quote="`",
             string_quote='"',
-            string_type='STRING',
+            string_type="STRING",
             sql_formatters=SparkSQL_formatters,
         )
 
@@ -97,7 +104,9 @@ class SparkSQLModel(data_algebra.db_model.DBModel):
             temp_tables = dict()
             q = q.to_sql(db_model=self, temp_tables=temp_tables)
             if len(temp_tables) > 1:
-                raise ValueError("ops require management of temp tables, please collect them via to_sql(temp_tables)")
+                raise ValueError(
+                    "ops require management of temp tables, please collect them via to_sql(temp_tables)"
+                )
         else:
             q = str(q)
         res = conn.spark_session.sql(q)
@@ -119,7 +128,7 @@ class SparkSQLModel(data_algebra.db_model.DBModel):
                 self.drop_table(conn, table_name, check=False)
         d_spark = conn.spark_session.createDataFrame(d)
         # https://stackoverflow.com/a/57292987/6901725
-        d_spark.replace(float('nan'), None)  # to get coalesce effects (didn't work)
+        d_spark.replace(float("nan"), None)  # to get coalesce effects (didn't work)
         d_spark.createOrReplaceTempView(table_name)  # TODO: non-temps
 
 
@@ -137,6 +146,10 @@ def example_handle():
     if spark_context is None:
         spark_context = pyspark.SparkContext()
     return SparkSQLModel().db_handle(
-            SparkConnection(
-                spark_context=spark_context,
-                spark_session=pyspark.sql.SparkSession.builder.appName('pandasToSparkDF').getOrCreate()))
+        SparkConnection(
+            spark_context=spark_context,
+            spark_session=pyspark.sql.SparkSession.builder.appName(
+                "pandasToSparkDF"
+            ).getOrCreate(),
+        )
+    )

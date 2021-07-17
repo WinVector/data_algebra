@@ -1,4 +1,3 @@
-
 import data_algebra
 import data_algebra.test_util
 import data_algebra.util
@@ -19,10 +18,7 @@ def test_project0():
         {"c": [1, 1], "g": ["a", "b"]}
     )
 
-    data_algebra.test_util.check_transform(
-        ops=ops,
-        data=d,
-        expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
 
 def test_project_z():
@@ -34,10 +30,7 @@ def test_project_z():
 
     expect = data_algebra.default_data_model.pd.DataFrame({"c": [1]})
 
-    data_algebra.test_util.check_transform(
-        ops=ops,
-        data=d,
-        expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
 
 def test_project_zz():
@@ -62,10 +55,7 @@ def test_project():
         {"c": [1, 1], "g": ["a", "b"], "ymax": [3, 4], "ymin": [1, 2]}
     )
 
-    data_algebra.test_util.check_transform(
-        ops=ops,
-        data=d,
-        expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
 
 def test_project_catch_nonagg():
@@ -74,4 +64,4 @@ def test_project_catch_nonagg():
     )
 
     with pytest.raises(ValueError):
-        ops = describe_table(d, "d").project({'y': 'y'}, group_by=["c", "g"])
+        ops = describe_table(d, "d").project({"y": "y"}, group_by=["c", "g"])

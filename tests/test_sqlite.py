@@ -1,4 +1,3 @@
-
 import re
 import sqlite3
 
@@ -107,9 +106,9 @@ def test_sqllite_g2():
     q = ops.to_sql(db_model=sql_model, pretty=False)
     q_pretty = ops.to_sql(db_model=sql_model, pretty=True)
 
-    pattern_ws = re.compile(r'\s+')
-    q_ns = re.sub(pattern_ws, '', q)
-    q_pretty_ns = re.sub(pattern_ws, '', q_pretty)
+    pattern_ws = re.compile(r"\s+")
+    q_ns = re.sub(pattern_ws, "", q)
+    q_pretty_ns = re.sub(pattern_ws, "", q_pretty)
     assert q_ns == q_pretty_ns
 
     with sqlite3.connect(":memory:") as conn:
@@ -209,7 +208,9 @@ def test_unionall_g2():
         "d2": d2,
     }
 
-    res_name_local = data_algebra.default_data_model.managed_eval(ops, data_map=tbl_map_local)
+    res_name_local = data_algebra.default_data_model.managed_eval(
+        ops, data_map=tbl_map_local
+    )
     res_local2 = tbl_map_local[res_name_local]
     assert data_algebra.test_util.equivalent_frames(
         res_pandas, res_local2, check_row_order=False

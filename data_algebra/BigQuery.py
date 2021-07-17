@@ -1,4 +1,3 @@
-
 import gzip
 import os
 
@@ -18,7 +17,9 @@ except ImportError:
 
 def _bigquery_median_expr(dbmodel, expression):
     return (
-        "PERCENTILE_CONT(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ", 0.5)"
+        "PERCENTILE_CONT("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ", 0.5)"
     )
 
 
@@ -28,7 +29,9 @@ def _bigquery_is_bad_expr(dbmodel, expression):
         "("
         + subexpr
         + " IS NULL OR "
-        + "IS_INF(" + subexpr + ")"
+        + "IS_INF("
+        + subexpr
+        + ")"
         + " OR ("
         + subexpr
         + " != 0 AND "
@@ -52,13 +55,13 @@ class BigQueryModel(data_algebra.db_model.DBModel):
     def __init__(self, *, table_prefix=None):
         data_algebra.db_model.DBModel.__init__(
             self,
-            identifier_quote='`',
+            identifier_quote="`",
             string_quote='"',
             sql_formatters=BigQuery_formatters,
-            on_start='(',
-            on_end=')',
-            on_joiner=' AND ',
-            string_type='STRING',
+            on_start="(",
+            on_end=")",
+            on_joiner=" AND ",
+            string_type="STRING",
         )
         self.table_prefix = table_prefix
 
@@ -76,7 +79,7 @@ class BigQueryModel(data_algebra.db_model.DBModel):
                     "Expected table_description to be a string or data_algebra.data_ops.TableDescription)"
                 )
         if self.table_prefix is not None:
-            table_description = self.table_prefix + '.' + table_description
+            table_description = self.table_prefix + "." + table_description
         return self.quote_identifier(table_description)
 
     # noinspection PyMethodMayBeStatic
@@ -118,21 +121,22 @@ class BigQueryModel(data_algebra.db_model.DBModel):
     ):
         prepped_table_name = table_name
         if self.table_prefix is not None:
-            prepped_table_name = self.table_prefix + '.' + table_name
+            prepped_table_name = self.table_prefix + "." + table_name
         if allow_overwrite:
             self.drop_table(conn, table_name)
         else:
             table_exists = True
             try:
-                self.read_query(conn, "SELECT * FROM " + self.quote_table_name(table_name) + " LIMIT 1")
+                self.read_query(
+                    conn,
+                    "SELECT * FROM " + self.quote_table_name(table_name) + " LIMIT 1",
+                )
                 table_exists = True
             except Exception as e:
                 table_exists = False
             if table_exists:
                 raise ValueError("table " + prepped_table_name + " already exists")
-        job = conn.load_table_from_dataframe(
-            d,
-            prepped_table_name)
+        job = conn.load_table_from_dataframe(d, prepped_table_name)
         job.result()
 
     def db_handle(self, conn):
@@ -147,8 +151,10 @@ class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
             )
         data_algebra.db_model.DBHandle.__init__(self, db_model=db_model, conn=conn)
 
-    def describe_bq_table(self, *, table_catalog, table_schema, table_name, row_limit=7):
-        full_name = f'{table_catalog}.{table_schema}.{table_name}'
+    def describe_bq_table(
+        self, *, table_catalog, table_schema, table_name, row_limit=7
+    ):
+        full_name = f"{table_catalog}.{table_schema}.{table_name}"
         head = self.db_model.read_query(
             conn=self.conn,
             q="SELECT * FROM "
@@ -156,16 +162,17 @@ class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
             + " LIMIT "
             + str(row_limit),
         )
-        cat_name = f'{table_catalog}.{table_schema}.INFORMATION_SCHEMA.COLUMNS'
+        cat_name = f"{table_catalog}.{table_schema}.INFORMATION_SCHEMA.COLUMNS"
         sql_meta = self.db_model.read_query(
             self.conn,
-            f'SELECT * FROM {self.db_model.quote_table_name(cat_name)} ' +
-                f'WHERE table_name={self.db_model.quote_string(table_name)}')
+            f"SELECT * FROM {self.db_model.quote_table_name(cat_name)} "
+            + f"WHERE table_name={self.db_model.quote_string(table_name)}",
+        )
         qualifiers = {
-            'table_catalog': table_catalog,
-            'table_schema': table_schema,
-            'table_name': table_name,
-            'full_name': full_name,
+            "table_catalog": table_catalog,
+            "table_schema": table_schema,
+            "table_name": table_name,
+            "full_name": full_name,
         }
         td = data_algebra.data_ops.describe_table(
             head,
@@ -181,9 +188,9 @@ class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
             q = q.to_sql(self.db_model)
         else:
             q = str(q)
-        op = lambda: open(res_name, 'w')
-        if res_name.endswith('.gz'):
-            op = lambda: gzip.open(res_name, 'w')
+        op = lambda: open(res_name, "w")
+        if res_name.endswith(".gz"):
+            op = lambda: gzip.open(res_name, "w")
         with op() as res:
             res_iter = self.conn.query(q).result().to_dataframe_iterable()
             is_first = True
@@ -203,12 +210,15 @@ def example_handle():
     if not _have_bigquery:
         return None
     try:
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/johnmount/big_query/big_query_jm.json"
+        os.environ[
+            "GOOGLE_APPLICATION_CREDENTIALS"
+        ] = "/Users/johnmount/big_query/big_query_jm.json"
         # os.environ["GOOGLE_APPLICATION_CREDENTIALS"]  # trigger key error if not present
-        data_catalog = 'data-algebra-test'
-        data_schema = 'test_1'
+        data_catalog = "data-algebra-test"
+        data_schema = "test_1"
         db_handle = BigQueryModel(
-            table_prefix=f'{data_catalog}.{data_schema}').db_handle(google.cloud.bigquery.Client())
+            table_prefix=f"{data_catalog}.{data_schema}"
+        ).db_handle(google.cloud.bigquery.Client())
         db_handle.db_model.prepare_connection(db_handle.conn)
         return db_handle
     except Exception as e:

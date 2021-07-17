@@ -182,4 +182,3 @@ def test_convert_records_transform_1():
     )
 
     data_algebra.test_util.check_transform(ops, data, expect)
-

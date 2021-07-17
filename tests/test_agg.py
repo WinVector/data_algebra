@@ -1,4 +1,3 @@
-
 import data_algebra
 from data_algebra.data_ops import *
 import data_algebra.test_util
@@ -13,8 +12,4 @@ def test_agg():
 
     expect = data_algebra.default_data_model.pd.DataFrame({"g": [1, 2], "x": [2, 4],})
 
-    data_algebra.test_util.check_transform(
-        ops=ops,
-        data=d,
-        expect=expect)
-
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
