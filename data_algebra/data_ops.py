@@ -740,6 +740,10 @@ def describe_table(
     )
 
 
+# for use in buidling expressions such as one.sum()
+one = data_algebra.expr_rep.Value(1)
+
+
 class ExtendNode(ViewRepresentation):
     def __init__(
         self, *, source, parsed_ops, partition_by=None, order_by=None, reverse=None
