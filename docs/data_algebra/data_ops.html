@@ -1521,6 +1521,11 @@
                     <span class="ow">in</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">fn_names_that_imply_ordered_windowed_situation</span>
                 <span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39; is not allowed in project&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">opk</span><span class="o">.</span><span class="n">op</span>
+                    <span class="ow">in</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">fn_names_not_allowed_in_project</span>
+                <span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39; is not allowed in project&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">&quot;non-aggregated expression in project: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span>
@@ -5137,6 +5142,11 @@ with the using columns (None means all).</p>
                     <span class="ow">in</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">fn_names_that_imply_ordered_windowed_situation</span>
                 <span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39; is not allowed in project&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">opk</span><span class="o">.</span><span class="n">op</span>
+                    <span class="ow">in</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">fn_names_not_allowed_in_project</span>
+                <span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39; is not allowed in project&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">&quot;non-aggregated expression in project: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span>
@@ -5284,6 +5294,11 @@ Abstract base class.</p>
                 <span class="k">if</span> <span class="p">(</span>
                     <span class="n">opk</span><span class="o">.</span><span class="n">op</span>
                     <span class="ow">in</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">fn_names_that_imply_ordered_windowed_situation</span>
+                <span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39; is not allowed in project&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">opk</span><span class="o">.</span><span class="n">op</span>
+                    <span class="ow">in</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">fn_names_not_allowed_in_project</span>
                 <span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39; is not allowed in project&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>

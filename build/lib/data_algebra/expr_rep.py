@@ -67,6 +67,12 @@ fn_names_that_imply_ordered_windowed_situation = {
 }
 
 
+# noinspection SpellCheckingInspection
+fn_names_not_allowed_in_project = {
+    'ngroup',
+}
+
+
 # a competing idea should be to remove ordering if
 # operator is one of these (instead of forbid)
 # noinspection SpellCheckingInspection

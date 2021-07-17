@@ -259,9 +259,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             return v
 
         cols = {k: promote_scalar(v) for (k, v) in cols.items()}
-        res = self.columns_to_frame(cols).reset_index(
-            drop=len(op.group_by) < 1
-        )  # grouping variables in the index
+        res = self.columns_to_frame(cols)
+        res = res.reset_index(drop=len(op.group_by) < 1)  # grouping variables in the index
+        missing_group_cols = set(op.group_by) - set(res.columns)
+        assert len(missing_group_cols) <= 0
         if "_data_table_temp_col" in res.columns:
             res = res.drop("_data_table_temp_col", 1)
         # double check shape is what we expect
