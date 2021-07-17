@@ -124,14 +124,13 @@ class OperatorPlatform:
         raise NotImplementedError("base class called")
 
     def extend(
-        self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
-    ):
+        self, ops, *, partition_by=None, order_by=None, reverse=None):
         raise NotImplementedError("base class called")
 
     def project_parsed(self, parsed_ops=None, *, group_by=None):
         raise NotImplementedError("base class called")
 
-    def project(self, ops=None, *, group_by=None, parse_env=None):
+    def project(self, ops=None, *, group_by=None):
         raise NotImplementedError("base class called")
 
     def natural_join(self, b, *, by, jointype):
@@ -143,7 +142,7 @@ class OperatorPlatform:
     def select_rows_parsed(self, parsed_expr):
         raise NotImplementedError("base class called")
 
-    def select_rows(self, expr, *, parse_env=None):
+    def select_rows(self, expr):
         raise NotImplementedError("base class called")
 
     def drop_columns(self, column_deletions):

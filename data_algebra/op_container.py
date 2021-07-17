@@ -5,6 +5,7 @@ from types import SimpleNamespace
 import data_algebra.data_ops_types
 import data_algebra.data_ops
 
+
 class OpC(data_algebra.data_ops_types.OperatorPlatform):
     """Container that redirects to another to allow method chaining."""
 
@@ -89,15 +90,12 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         ))
         return self
 
-    def extend(
-        self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
-    ):
+    def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
         self.set(self.nd.extend(
             ops=ops,
             partition_by=partition_by,
             order_by=order_by,
-            reverse=reverse,
-            parse_env=parse_env))
+            reverse=reverse))
         return self
 
     def project_parsed(self, parsed_ops=None, *, group_by=None):
@@ -107,11 +105,10 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         ))
         return self
 
-    def project(self, ops=None, *, group_by=None, parse_env=None):
+    def project(self, ops=None, *, group_by=None):
         self.set(self.nd.project(
             ops=ops,
             group_by=group_by,
-            parse_env=parse_env
         ))
         return self
 
@@ -138,10 +135,9 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         ))
         return self
 
-    def select_rows(self, expr, *, parse_env=None):
+    def select_rows(self, expr):
         self.set(self.nd.select_rows(
             expr=expr,
-            parse_env=parse_env
         ))
         return self
 

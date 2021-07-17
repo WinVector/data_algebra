@@ -68,38 +68,22 @@ logical_remap = {
 }
 
 
-def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
+def _walk_lark_tree(op, *, data_def=None):
     """
     Walk a lark parse tree and return our own representation.
 
     :param op: lark parse tree
     :param data_def: dictionary of data_algebra.expr_rep.ColumnReference
-    :param outer_environment: dictionary of system functions and values
     :return: PreTerm tree.
     """
     if data_def is None:
-        data_def = {}
-    if outer_environment is None:
-        outer_environment = {}
-    else:
-        outer_environment = {
-            k: v for (k, v) in outer_environment.items() if not k.startswith("_")
-        }
-    # don't have to completely kill this environment, as the code is something
-    # the user intends to run (and may have even typed in).
-    # But let's cut down the builtins anyway.
-    outer_environment["__builtins__"] = {
-        k: v for (k, v) in outer_environment.items() if isinstance(v, Exception)
-    }
+        data_def = dict()
 
     def lookup_symbol(key):
         try:
             return data_algebra.expr_rep._enc_value(data_def[key])
         except KeyError:
-            try:
-                return data_algebra.expr_rep._enc_value(outer_environment[key])
-            except KeyError:
-                raise NameError("unknown symbol: " + key)
+            raise NameError(f"unknown symbol: {key}")
 
     def _r_walk_lark_tree(op):
         if isinstance(op, lark.lexer.Token):
@@ -216,13 +200,12 @@ def _walk_lark_tree(op, *, data_def=None, outer_environment=None):
     return _r_walk_lark_tree(op)
 
 
-def parse_by_lark(source_str, *, data_def=None, outer_environment=None):
+def parse_by_lark(source_str, *, data_def=None):
     """
     Parse an expression in terms of data views and values.
 
     :param source_str: string to parse
     :param data_def: dictionary of data_algebra.expr_rep.ColumnReference
-    :param outer_environment: dictionary of system functions and values
     :return:
     """
     assert parser is not None
@@ -230,7 +213,7 @@ def parse_by_lark(source_str, *, data_def=None, outer_environment=None):
         source_str = str(source_str)
     tree = parser.parse(source_str)
     # convert parse tree to our data structures for isolation
-    v = _walk_lark_tree(tree, data_def=data_def, outer_environment=outer_environment)
+    v = _walk_lark_tree(tree, data_def=data_def)
     v.source_string = source_str
     return v
 

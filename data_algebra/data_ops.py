@@ -419,12 +419,12 @@ class ViewRepresentation(OperatorPlatform, ABC):
         )
 
     def extend(
-        self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
+        self, ops, *, partition_by=None, order_by=None, reverse=None
     ):
         if (ops is None) or (len(ops) < 1):
             return self
         parsed_ops = data_algebra.expr_parse.parse_assignments_in_context(
-            ops, self, parse_env=parse_env
+            ops, self
         )
         return self.extend_parsed(
             parsed_ops=parsed_ops,
@@ -445,13 +445,13 @@ class ViewRepresentation(OperatorPlatform, ABC):
             return self.sources[0].project_parsed(parsed_ops, group_by=group_by)
         return ProjectNode(source=self, parsed_ops=parsed_ops, group_by=group_by)
 
-    def project(self, ops=None, *, group_by=None, parse_env=None):
+    def project(self, ops=None, *, group_by=None):
         if group_by is None:
             group_by = []
         if ((ops is None) or (len(ops) < 1)) and (len(group_by) < 1):
             raise ValueError("must have ops or group_by")
         parsed_ops = data_algebra.expr_parse.parse_assignments_in_context(
-            ops, self, parse_env=parse_env
+            ops, self
         )
         return self.project_parsed(parsed_ops=parsed_ops, group_by=group_by)
 
@@ -493,13 +493,13 @@ class ViewRepresentation(OperatorPlatform, ABC):
             return self.sources[0].select_rows_parsed(parsed_expr=parsed_expr)
         return SelectRowsNode(source=self, ops=parsed_expr)
 
-    def select_rows(self, expr, *, parse_env=None):
+    def select_rows(self, expr):
         if expr is None:
             return self
         if self.is_trivial_when_intermediate():
-            return self.sources[0].select_rows(expr, parse_env=parse_env)
+            return self.sources[0].select_rows(expr)
         ops = data_algebra.expr_parse.parse_assignments_in_context(
-            {"expr": expr}, self, parse_env=parse_env
+            {"expr": expr}, self
         )
 
         def r_walk_expr(opv):
