@@ -142,6 +142,10 @@
 <span class="kn">import</span> <span class="nn">data_algebra.data_ops</span>
 
 
+<span class="c1"># for use in building expressions such as one.sum()</span>
+<span class="n">one</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+
 <span class="k">class</span> <span class="nc">OpC</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Container that redirects to another to allow method chaining.&quot;&quot;&quot;</span>
 
@@ -285,23 +289,26 @@
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="o">.</span><span class="n">map_records</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="o">.</span><span class="n">map_records</span><span class="p">(</span>
             <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span>
             <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">,</span>
             <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">,</span>
             <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">,</span>
-        <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
 
     <span class="c1"># sklearn step style interface</span>
 
     <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
 
     <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -468,23 +475,26 @@
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="o">.</span><span class="n">map_records</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="o">.</span><span class="n">map_records</span><span class="p">(</span>
             <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span>
             <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">,</span>
             <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">,</span>
             <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">,</span>
-        <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
 
     <span class="c1"># sklearn step style interface</span>
 
     <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
 
     <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -1017,7 +1027,8 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
 </pre></div>
 
         </details>
@@ -1038,12 +1049,13 @@
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="o">.</span><span class="n">map_records</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="o">.</span><span class="n">map_records</span><span class="p">(</span>
             <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span>
             <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">,</span>
             <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">,</span>
             <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">,</span>
-        <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
 </pre></div>
 
         </details>
@@ -1062,7 +1074,8 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
 </pre></div>
 
         </details>
