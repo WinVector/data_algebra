@@ -1,7 +1,7 @@
 import data_algebra
 
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
-from data_algebra.op_container import OpC
+from data_algebra.op_container import OpC, one
 import data_algebra.BigQuery
 import data_algebra.test_util
 
@@ -30,6 +30,9 @@ def test_container_1():
         .extend({"probability": (_.c.assessmentTotal * scale).exp()})
         .extend({"total": _.c.probability.sum()}, partition_by="subjectID")
         .extend({"probability": _.c.probability / _.c.total})
+        .extend({'ncat': one.sum()},
+                partition_by=["subjectID"],
+                )
         .extend(
             {"row_number": _.v(1).cumsum()},
             partition_by=["subjectID"],
@@ -37,7 +40,7 @@ def test_container_1():
             reverse=["probability"],
         )
         .select_rows(_.c.row_number == 1)
-        .select_columns(["subjectID", "surveyCategory", "probability"])
+        .select_columns(["subjectID", "surveyCategory", "probability", "ncat"])
         .rename_columns({"diagnosis": "surveyCategory"})
         .ops()
     )
@@ -47,6 +50,7 @@ def test_container_1():
             "subjectID": [1, 2],
             "diagnosis": ["withdrawal behavior", "positive re-framing"],
             "probability": [0.670622, 0.558974],
+            'ncat': [2, 2],
         }
     )
 
