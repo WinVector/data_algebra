@@ -1,4 +1,3 @@
-
 import collections
 import collections.abc
 
@@ -8,6 +7,7 @@ import collections.abc
 
 class OrderedSet(collections.OrderedDict, collections.abc.MutableSet):
     def __init__(self, v=None):
+        collections.OrderedDict.__init__(self)
         if v is not None:
             for val in v:
                 self.add(val)
@@ -39,10 +39,10 @@ class OrderedSet(collections.OrderedDict, collections.abc.MutableSet):
         return self >= other and self != other
 
     def __repr__(self):
-        return 'OrderedSet([%s])' % (', '.join(map(repr, self.keys())))
+        return "OrderedSet([%s])" % (", ".join(map(repr, self.keys())))
 
     def __str__(self):
-        return '{%s}' % (', '.join(map(repr, self.keys())))
+        return "{%s}" % (", ".join(map(repr, self.keys())))
 
     difference = property(lambda self: self.__sub__)
     difference_update = property(lambda self: self.__isub__)

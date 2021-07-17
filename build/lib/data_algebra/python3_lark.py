@@ -1,5 +1,3 @@
-
-
 # python3.lark from:
 #    https://github.com/lark-parser/lark/blob/master/examples/advanced/python3.lark
 #    Copyright © 2017 Erez Shinan
@@ -13,7 +11,7 @@
 # redefined as
 # !_mul_op: "*"|"@"|"/"|"%+%"|"%?%"|"%"|"//"
 
-grammar=r"""
+grammar = r"""
 // Python 3 grammar for Lark
 
 // NOTE: Work in progress!!! (XXX TODO)

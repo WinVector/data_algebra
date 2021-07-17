@@ -1,4 +1,3 @@
-
 from types import SimpleNamespace
 import collections
 
@@ -24,7 +23,7 @@ class OperatorPlatform:
     def __init__(self, *, node_name, column_map):
         self.node_name = node_name
         self.column_map = column_map.copy()
-        self.c = SimpleNamespace(**column_map) # allows a dot notation
+        self.c = SimpleNamespace(**column_map)  # allows a dot notation
 
     def v(self, x):
         """
@@ -53,9 +52,7 @@ class OperatorPlatform:
         :param data_model implementation to use
         :return: transformed dataframe
         """
-        return self.transform(
-            X=X, data_model=data_model, narrow=False
-        )
+        return self.transform(X=X, data_model=data_model, narrow=False)
 
     def apply_to(self, a, *, target_table_key=None):
         """
@@ -123,15 +120,13 @@ class OperatorPlatform:
     ):
         raise NotImplementedError("base class called")
 
-    def extend(
-        self, ops, *, partition_by=None, order_by=None, reverse=None, parse_env=None
-    ):
+    def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
         raise NotImplementedError("base class called")
 
     def project_parsed(self, parsed_ops=None, *, group_by=None):
         raise NotImplementedError("base class called")
 
-    def project(self, ops=None, *, group_by=None, parse_env=None):
+    def project(self, ops=None, *, group_by=None):
         raise NotImplementedError("base class called")
 
     def natural_join(self, b, *, by, jointype):
@@ -143,7 +138,7 @@ class OperatorPlatform:
     def select_rows_parsed(self, parsed_expr):
         raise NotImplementedError("base class called")
 
-    def select_rows(self, expr, *, parse_env=None):
+    def select_rows(self, expr):
         raise NotImplementedError("base class called")
 
     def drop_columns(self, column_deletions):
@@ -161,15 +156,17 @@ class OperatorPlatform:
     def convert_records(self, record_map, *, temp_namer=None):
         raise NotImplementedError("base class called")
 
-    def map_records(self, blocks_in=None, blocks_out=None, strict=False, temp_namer=None):
+    def map_records(
+        self, blocks_in=None, blocks_out=None, strict=False, temp_namer=None
+    ):
         if (blocks_in is None) and (blocks_out is None):
             return self  # NO-OP, return source node
         return self.convert_records(
             data_algebra.cdata.RecordMap(
-                blocks_in=blocks_in,
-                blocks_out=blocks_out,
-                strict=strict),
-            temp_namer=temp_namer)
+                blocks_in=blocks_in, blocks_out=blocks_out, strict=strict
+            ),
+            temp_namer=temp_namer,
+        )
 
     # sklearn step style interface
 

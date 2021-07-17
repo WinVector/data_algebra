@@ -79,7 +79,7 @@ Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
 data_algebra/BigQuery.py                 106     69    35%
 data_algebra/MySQL.py                     29     11    62%
-data_algebra/OrderedSet.py                52      7    87%
+data_algebra/OrderedSet.py                53      7    87%
 data_algebra/PostgreSQL.py                18      7    61%
 data_algebra/SQLite.py                    68      6    91%
 data_algebra/SparkSQL.py                  68     43    37%
@@ -94,19 +94,19 @@ data_algebra/data_ops_utils.py            51      7    86%
 data_algebra/db_model.py                 787    102    87%
 data_algebra/diagram.py                   56     44    21%
 data_algebra/eval_model.py                16      1    94%
-data_algebra/expr_parse.py                38      3    92%
-data_algebra/expr_rep.py                 574    115    80%
+data_algebra/expr_parse.py                36      3    92%
+data_algebra/expr_rep.py                 574    114    80%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 136      1    99%
 data_algebra/op_container.py              86     34    60%
 data_algebra/pandas_base.py              252     24    90%
 data_algebra/pandas_model.py              18      3    83%
-data_algebra/parse_by_lark.py            139     31    78%
+data_algebra/parse_by_lark.py            132     31    77%
 data_algebra/python3_lark.py               1      0   100%
-data_algebra/test_util.py                180     27    85%
+data_algebra/test_util.py                181     28    85%
 data_algebra/util.py                      28      4    86%
 ----------------------------------------------------------
-TOTAL                                   4545    918    80%
+TOTAL                                   4538    918    80%
 
 
-============================= 164 passed in 28.77s =============================
+============================= 164 passed in 28.33s =============================

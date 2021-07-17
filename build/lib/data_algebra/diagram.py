@@ -1,4 +1,3 @@
-
 have_graphviz = False
 try:
     # noinspection PyUnresolvedReferences

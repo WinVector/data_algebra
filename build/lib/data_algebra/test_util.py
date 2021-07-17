@@ -1,10 +1,8 @@
-
 import numpy
 
 # noinspection PyUnresolvedReferences
 import data_algebra
 
-import sqlite3
 import pickle
 
 # noinspection PyUnresolvedReferences
@@ -36,10 +34,12 @@ def formats_to_self(ops):
     ops2 = eval(
         str1,
         globals(),
-        {'pd': data_algebra.default_data_model.pd}  # make our definition of pandas available
+        {
+            "pd": data_algebra.default_data_model.pd
+        },  # make our definition of pandas available
     )
     str2 = repr(ops2)
-    strings_match = str1 == str2   # probably too strict
+    strings_match = str1 == str2  # probably too strict
     ops_match = ops == ops2
     if strings_match and (not ops_match):
         raise Exception("strings match, but ops did not")
@@ -79,18 +79,18 @@ def equivalent_frames(
         a = a.reset_index(drop=True)
         b.columns = [c.lower() for c in b.columns]
         b = b.reset_index(drop=True)
-    acols = [c for c in a.columns]
-    bcols = [c for c in b.columns]
-    if set(acols) != set(bcols):
+    a_columns = [c for c in a.columns]
+    b_columns = [c for c in b.columns]
+    if set(a_columns) != set(b_columns):
         return False
     if check_column_order:
         if not all([a.columns[i] == b.columns[i] for i in range(a.shape[0])]):
             return False
     else:
         # re-order b into a's column order
-        b = b[acols]
+        b = b[a_columns]
         b = b.reset_index(drop=True)
-    for c in acols:
+    for c in a_columns:
         if local_data_model.can_convert_col_to_numeric(
             a[c]
         ) != local_data_model.can_convert_col_to_numeric(b[c]):
@@ -98,16 +98,18 @@ def equivalent_frames(
     if a.shape[0] < 1:
         return True
     if not check_row_order:
-        a = a.sort_values(by=acols)
+        a = a.sort_values(by=a_columns)
         a = a.reset_index(drop=True)
-        b = b.sort_values(by=acols)
+        b = b.sort_values(by=a_columns)
         b = b.reset_index(drop=True)
-    for c in acols:
+    for c in a_columns:
         ca = a[c]
         cb = b[c]
         if (ca is None) != (cb is None):
             return False
         if ca is not None:
+            if len(ca) != len(cb):
+                return False
             ca_null = ca.isnull()
             cb_null = cb.isnull()
             if (ca_null is None) != (cb_null is None):
@@ -202,12 +204,12 @@ def check_transform_on_handles(
     if len(data) == 1:
         res_t = ops.transform(list(data.values())[0])
         if not equivalent_frames(
-                res_t,
-                expect,
-                float_tol=float_tol,
-                check_column_order=check_column_order,
-                cols_case_sensitive=cols_case_sensitive,
-                check_row_order=check_row_order,
+            res_t,
+            expect,
+            float_tol=float_tol,
+            check_column_order=check_column_order,
+            cols_case_sensitive=cols_case_sensitive,
+            check_row_order=check_row_order,
         ):
             raise ValueError("Pandas transform result did not match expect")
     # try any db paths
@@ -229,7 +231,8 @@ def check_transform_on_handles(
                             pretty=pretty,
                             annotate=annotate,
                             use_with=use_with,
-                            temp_tables=temp_tables)
+                            temp_tables=temp_tables,
+                        )
                         assert isinstance(sql, str)
                         sql_statements.append(sql)
                         # print(sql)
@@ -322,7 +325,7 @@ def check_transform(
         data_algebra.SparkSQL.SparkSQLModel().db_handle(None),
         data_algebra.MySQL.MySQLModel().db_handle(None),
         data_algebra.SQLite.example_handle(),  # actual database instance, not empty
-        ]
+    ]
 
     if test_PostgreSQL:
         db_handles.append(data_algebra.PostgreSQL.example_handle())

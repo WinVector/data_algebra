@@ -112,7 +112,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             "trunc": math.trunc,
         }
         for k, f in math_fns.items():
-            if not k in saw:
+            if k not in saw:
                 conn.create_function(k, 1, f)
                 saw.add(k)
         math_fns_2 = {
@@ -127,7 +127,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             "power": math.pow,
         }
         for k, f in math_fns_2.items():
-            if not k in saw:
+            if k not in saw:
                 conn.create_function(k, 2, f)
                 saw.add(k)
         # numpy fns
@@ -154,12 +154,12 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             "tanh": numpy.tanh,
         }
         for k, f in numpy_fns.items():
-            if not k in saw:
+            if k not in saw:
                 conn.create_function(k, 1, f)
                 saw.add(k)
 
         # https://docs.python.org/3/library/sqlite3.html
-        conn.create_aggregate('median', 1, MedianAgg)
+        conn.create_aggregate("median", 1, MedianAgg)
 
     # noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection
     def insert_table(
@@ -199,8 +199,6 @@ def example_handle():
     Return an example db handle for testing. Returns None if helper packages not present.
 
     """
-    db_handle = SQLiteModel().db_handle(
-        conn=sqlite3.connect(':memory:')
-    )
+    db_handle = SQLiteModel().db_handle(conn=sqlite3.connect(":memory:"))
     db_handle.db_model.prepare_connection(db_handle.conn)
     return db_handle

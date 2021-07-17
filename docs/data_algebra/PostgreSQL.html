@@ -103,7 +103,7 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">have_sqlalchemy</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="n">db_handle</span> <span class="o">=</span> <span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span>
-        <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;postgresql://johnmount@localhost/johnmount&#39;</span><span class="p">)</span>
+        <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;postgresql://johnmount@localhost/johnmount&quot;</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">db_handle</span>
@@ -239,7 +239,7 @@ Assuming we are using a sqlalhemy engine as our connection</p>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">have_sqlalchemy</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="n">db_handle</span> <span class="o">=</span> <span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span>
-        <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;postgresql://johnmount@localhost/johnmount&#39;</span><span class="p">)</span>
+        <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;postgresql://johnmount@localhost/johnmount&quot;</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">db_handle</span>

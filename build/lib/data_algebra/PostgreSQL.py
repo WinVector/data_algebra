@@ -41,7 +41,7 @@ def example_handle():
     if not have_sqlalchemy:
         return None
     db_handle = PostgreSQLModel().db_handle(
-        sqlalchemy.engine.create_engine(r'postgresql://johnmount@localhost/johnmount')
+        sqlalchemy.engine.create_engine(r"postgresql://johnmount@localhost/johnmount")
     )
     db_handle.db_model.prepare_connection(db_handle.conn)
     return db_handle

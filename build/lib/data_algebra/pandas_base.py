@@ -111,7 +111,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
 
             for (k, opk) in op.ops.items():
                 # assumes all args are column names or values, enforce this earlier
-                if (len(opk.args) > 0):
+                if len(opk.args) > 0:
                     assert len(opk.args) == 1
                     if isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
                         value_name = opk.args[0].column_name
@@ -120,8 +120,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                             col_set.add(value_name)
                     elif isinstance(opk.args[0], data_algebra.expr_rep.Value):
                         key = str(opk.args[0].value)
-                        if not key in data_algebra_temp_cols.keys():
-                            value_name = 'data_algebra_extend_temp_col_' + str(len(data_algebra_temp_cols))
+                        if key not in data_algebra_temp_cols.keys():
+                            value_name = "data_algebra_extend_temp_col_" + str(
+                                len(data_algebra_temp_cols)
+                            )
                             data_algebra_temp_cols[key] = value_name
                             col_list.append(value_name)
                             res[value_name] = opk.args[0].value
@@ -215,8 +217,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                     pass
                 elif isinstance(opk.args[0], data_algebra.expr_rep.Value):
                     key = str(opk.args[0].value)
-                    if not key in data_algebra_temp_cols.keys():
-                        value_name = 'data_algebra_project_temp_col_' + str(len(data_algebra_temp_cols))
+                    if key not in data_algebra_temp_cols.keys():
+                        value_name = "data_algebra_project_temp_col_" + str(
+                            len(data_algebra_temp_cols)
+                        )
                         data_algebra_temp_cols[key] = value_name
                         res[value_name] = opk.args[0].value
                 else:
@@ -331,7 +335,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         jointype = jointype.lower()
         mp = {
             "full": "outer",
-            "cross": "outer"  # cross new to Pandas 1.2.0 December 2020
+            "cross": "outer",  # cross new to Pandas 1.2.0 December 2020
         }
         try:
             return mp[jointype]
@@ -358,7 +362,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             by = []
         scratch_col = None  # extra column to prevent empty-by issues
         if len(by) <= 0:
-            scratch_col = 'data_algebra_temp_merge_col'
+            scratch_col = "data_algebra_temp_merge_col"
             by = [scratch_col]
             left[scratch_col] = 1
             right[scratch_col] = 1

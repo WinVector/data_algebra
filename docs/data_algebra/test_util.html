@@ -65,7 +65,6 @@
 <span class="c1"># noinspection PyUnresolvedReferences</span>
 <span class="kn">import</span> <span class="nn">data_algebra</span>
 
-<span class="kn">import</span> <span class="nn">sqlite3</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
 
 <span class="c1"># noinspection PyUnresolvedReferences</span>
@@ -97,10 +96,12 @@
     <span class="n">ops2</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span>
         <span class="n">str1</span><span class="p">,</span>
         <span class="nb">globals</span><span class="p">(),</span>
-        <span class="p">{</span><span class="s1">&#39;pd&#39;</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="p">}</span>  <span class="c1"># make our definition of pandas available</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;pd&quot;</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span>
+        <span class="p">},</span>  <span class="c1"># make our definition of pandas available</span>
     <span class="p">)</span>
     <span class="n">str2</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">ops2</span><span class="p">)</span>
-    <span class="n">strings_match</span> <span class="o">=</span> <span class="n">str1</span> <span class="o">==</span> <span class="n">str2</span>   <span class="c1"># probably too strict</span>
+    <span class="n">strings_match</span> <span class="o">=</span> <span class="n">str1</span> <span class="o">==</span> <span class="n">str2</span>  <span class="c1"># probably too strict</span>
     <span class="n">ops_match</span> <span class="o">=</span> <span class="n">ops</span> <span class="o">==</span> <span class="n">ops2</span>
     <span class="k">if</span> <span class="n">strings_match</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">ops_match</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;strings match, but ops did not&quot;</span><span class="p">)</span>
@@ -140,18 +141,18 @@
         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">b</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
         <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">acols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
-    <span class="n">bcols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
-    <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">acols</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">bcols</span><span class="p">):</span>
+    <span class="n">a_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="n">b_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">a_columns</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">b_columns</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">check_column_order</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]):</span>
             <span class="k">return</span> <span class="kc">False</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># re-order b into a&#39;s column order</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="n">acols</span><span class="p">]</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="n">a_columns</span><span class="p">]</span>
         <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">acols</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">a_columns</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span>
             <span class="n">a</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
         <span class="p">)</span> <span class="o">!=</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">c</span><span class="p">]):</span>
@@ -159,16 +160,18 @@
     <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">check_row_order</span><span class="p">:</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">acols</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">a_columns</span><span class="p">)</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">acols</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">a_columns</span><span class="p">)</span>
         <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">acols</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">a_columns</span><span class="p">:</span>
         <span class="n">ca</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
         <span class="n">cb</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">ca</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">cb</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">ca</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ca</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cb</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
             <span class="n">ca_null</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span>
             <span class="n">cb_null</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">ca_null</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">cb_null</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
@@ -263,12 +266,12 @@
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">res_t</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
-                <span class="n">res_t</span><span class="p">,</span>
-                <span class="n">expect</span><span class="p">,</span>
-                <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
-                <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
-                <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
-                <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
+            <span class="n">res_t</span><span class="p">,</span>
+            <span class="n">expect</span><span class="p">,</span>
+            <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
+            <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
+            <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
+            <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
         <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pandas transform result did not match expect&quot;</span><span class="p">)</span>
     <span class="c1"># try any db paths</span>
@@ -290,7 +293,8 @@
                             <span class="n">pretty</span><span class="o">=</span><span class="n">pretty</span><span class="p">,</span>
                             <span class="n">annotate</span><span class="o">=</span><span class="n">annotate</span><span class="p">,</span>
                             <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span><span class="p">,</span>
-                            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
+                            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
+                        <span class="p">)</span>
                         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
                         <span class="n">sql_statements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
                         <span class="c1"># print(sql)</span>
@@ -383,7 +387,7 @@
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">SparkSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">example_handle</span><span class="p">(),</span>  <span class="c1"># actual database instance, not empty</span>
-        <span class="p">]</span>
+    <span class="p">]</span>
 
     <span class="k">if</span> <span class="n">test_PostgreSQL</span><span class="p">:</span>
         <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">())</span>
@@ -439,10 +443,12 @@
     <span class="n">ops2</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span>
         <span class="n">str1</span><span class="p">,</span>
         <span class="nb">globals</span><span class="p">(),</span>
-        <span class="p">{</span><span class="s1">&#39;pd&#39;</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="p">}</span>  <span class="c1"># make our definition of pandas available</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;pd&quot;</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span>
+        <span class="p">},</span>  <span class="c1"># make our definition of pandas available</span>
     <span class="p">)</span>
     <span class="n">str2</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">ops2</span><span class="p">)</span>
-    <span class="n">strings_match</span> <span class="o">=</span> <span class="n">str1</span> <span class="o">==</span> <span class="n">str2</span>   <span class="c1"># probably too strict</span>
+    <span class="n">strings_match</span> <span class="o">=</span> <span class="n">str1</span> <span class="o">==</span> <span class="n">str2</span>  <span class="c1"># probably too strict</span>
     <span class="n">ops_match</span> <span class="o">=</span> <span class="n">ops</span> <span class="o">==</span> <span class="n">ops2</span>
     <span class="k">if</span> <span class="n">strings_match</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">ops_match</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;strings match, but ops did not&quot;</span><span class="p">)</span>
@@ -512,18 +518,18 @@ Can raise exceptions. Also checks pickling.</p>
         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">b</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
         <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">acols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
-    <span class="n">bcols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
-    <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">acols</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">bcols</span><span class="p">):</span>
+    <span class="n">a_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="n">b_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">a_columns</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">b_columns</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">check_column_order</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]):</span>
             <span class="k">return</span> <span class="kc">False</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># re-order b into a&#39;s column order</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="n">acols</span><span class="p">]</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="n">a_columns</span><span class="p">]</span>
         <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">acols</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">a_columns</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span>
             <span class="n">a</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
         <span class="p">)</span> <span class="o">!=</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">c</span><span class="p">]):</span>
@@ -531,16 +537,18 @@ Can raise exceptions. Also checks pickling.</p>
     <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">check_row_order</span><span class="p">:</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">acols</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">a_columns</span><span class="p">)</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">acols</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">a_columns</span><span class="p">)</span>
         <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">acols</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">a_columns</span><span class="p">:</span>
         <span class="n">ca</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
         <span class="n">cb</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">ca</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">cb</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">ca</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ca</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cb</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
             <span class="n">ca_null</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span>
             <span class="n">cb_null</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">ca_null</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">cb_null</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
@@ -666,12 +674,12 @@ Ignores indexing.</p>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">res_t</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
-                <span class="n">res_t</span><span class="p">,</span>
-                <span class="n">expect</span><span class="p">,</span>
-                <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
-                <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
-                <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
-                <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
+            <span class="n">res_t</span><span class="p">,</span>
+            <span class="n">expect</span><span class="p">,</span>
+            <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
+            <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
+            <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
+            <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
         <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pandas transform result did not match expect&quot;</span><span class="p">)</span>
     <span class="c1"># try any db paths</span>
@@ -693,7 +701,8 @@ Ignores indexing.</p>
                             <span class="n">pretty</span><span class="o">=</span><span class="n">pretty</span><span class="p">,</span>
                             <span class="n">annotate</span><span class="o">=</span><span class="n">annotate</span><span class="p">,</span>
                             <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span><span class="p">,</span>
-                            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
+                            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
+                        <span class="p">)</span>
                         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
                         <span class="n">sql_statements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
                         <span class="c1"># print(sql)</span>
@@ -829,7 +838,7 @@ Asserts if there are issues</p>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">SparkSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">example_handle</span><span class="p">(),</span>  <span class="c1"># actual database instance, not empty</span>
-        <span class="p">]</span>
+    <span class="p">]</span>
 
     <span class="k">if</span> <span class="n">test_PostgreSQL</span><span class="p">:</span>
         <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">())</span>

@@ -42,7 +42,7 @@ def _calc_week_of_Year(x):
     base_dates = [datetime.date(dti.year, 1, 1) for dti in x_dates]
     base_dates = _calc_base_Sunday(base_dates)
     deltas = [(cur_dates[i] - base_dates[i]).days for i in range(len(cur_dates))]
-    res = [di//7 for di in deltas]
+    res = [di // 7 for di in deltas]
     res = numpy.maximum(res, 1)
     return res
 
@@ -62,62 +62,94 @@ def _coalesce(a, b):
 
 def populate_impl_map(data_model):
     impl_map = {
-        '==': numpy.equal,
-        '=': numpy.equal,
-        '!=': numpy.not_equal,
-        '<>': numpy.not_equal,
-        '<': numpy.less,
-        '<=': numpy.less_equal,
-        '>': numpy.greater,
-        '>=': numpy.greater_equal,
-        '+': numpy.add,
-        '-': negate_or_subtract,
-        'neg': numpy.negative,
-        '*': numpy.multiply,
-        '/': numpy.divide,
-        '//': numpy.floor_divide,
-        '%': numpy.mod,
-        '**': numpy.power,
-        'and': numpy.logical_and,
-        '&': numpy.logical_and,
-        '&&': numpy.logical_and,
-        'or': numpy.logical_or,
-        '|': numpy.logical_or,
-        '||': numpy.logical_or,
-        'xor': numpy.logical_xor,
-        '^': numpy.logical_xor,
-        'not': numpy.logical_not,
-        '!': numpy.logical_not,
-        'if_else': numpy.where,
-        'is_null': data_model.isnull,
-        'is_bad': data_model.bad_column_positions,
-        'is_in': numpy.isin,
-        'concat': lambda a, b: numpy.char.add(numpy.asarray(a, dtype=numpy.str),
-                                              numpy.asarray(b, dtype=numpy.str)),
-        'coalesce': lambda a, b: _coalesce(a, b),  # assuming Pandas series
-        'connected_components': lambda a, b: data_algebra.connected_components.connected_components(a, b),
-        'co_equalizer': lambda a, b: data_algebra.connected_components.connected_components(a, b),
+        "==": numpy.equal,
+        "=": numpy.equal,
+        "!=": numpy.not_equal,
+        "<>": numpy.not_equal,
+        "<": numpy.less,
+        "<=": numpy.less_equal,
+        ">": numpy.greater,
+        ">=": numpy.greater_equal,
+        "+": numpy.add,
+        "-": negate_or_subtract,
+        "neg": numpy.negative,
+        "*": numpy.multiply,
+        "/": numpy.divide,
+        "//": numpy.floor_divide,
+        "%": numpy.mod,
+        "**": numpy.power,
+        "and": numpy.logical_and,
+        "&": numpy.logical_and,
+        "&&": numpy.logical_and,
+        "or": numpy.logical_or,
+        "|": numpy.logical_or,
+        "||": numpy.logical_or,
+        "xor": numpy.logical_xor,
+        "^": numpy.logical_xor,
+        "not": numpy.logical_not,
+        "!": numpy.logical_not,
+        "if_else": numpy.where,
+        "is_null": data_model.isnull,
+        "is_bad": data_model.bad_column_positions,
+        "is_in": numpy.isin,
+        "concat": lambda a, b: numpy.char.add(
+            numpy.asarray(a, dtype=numpy.str), numpy.asarray(b, dtype=numpy.str)
+        ),
+        "coalesce": lambda a, b: _coalesce(a, b),  # assuming Pandas series
+        "connected_components": lambda a, b: data_algebra.connected_components.connected_components(
+            a, b
+        ),
+        "co_equalizer": lambda a, b: data_algebra.connected_components.connected_components(
+            a, b
+        ),
         # fns that had been in bigquery_user_fns
         # x is a pandas Series
-        'as_int64': lambda x: x.astype('int64').copy(),
-        'as_str': lambda x: x.astype('str').copy(),
-        'trimstr': lambda x, start, stop: x.str.slice(start=start, stop=stop),
-        'datetime_to_date': lambda x: x.dt.date.copy(),
-        'parse_datetime': lambda x, format: data_algebra.default_data_model.pd.to_datetime(x, format=format),
-        'parse_date': lambda x, format: data_algebra.default_data_model.pd.to_datetime(x, format=format).dt.date.copy(),
-        'format_datetime': lambda x, format: x.dt.strftime(date_format=format),
-        'format_date': lambda x, format: data_algebra.default_data_model.pd.to_datetime(x).dt.strftime(date_format=format),
-        'dayofweek': lambda x: 1 + ((data_algebra.default_data_model.pd.to_datetime(x).dt.dayofweek.astype('int64') + 1) % 7),
-        'dayofyear': lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.dayofyear.astype('int64').copy(),
-        'weekofyear': _calc_week_of_Year,
-        'dayofmonth': lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.day.astype('int64').copy(),
-        'month': lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.month.astype('int64').copy(),
-        'quarter': lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.quarter.astype('int64').copy(),
-        'year': lambda x: data_algebra.default_data_model.pd.to_datetime(x).dt.year.astype('int64').copy(),
-        'timestamp_diff': lambda c1, c2: [
-            data_algebra.default_data_model.pd.Timedelta(c1[i] - c2[i]).total_seconds() for i in range(len(c1))],
-        'date_diff': _calc_date_diff,
-        'base_Sunday': _calc_base_Sunday,
+        "as_int64": lambda x: x.astype("int64").copy(),
+        "as_str": lambda x: x.astype("str").copy(),
+        "trimstr": lambda x, start, stop: x.str.slice(start=start, stop=stop),
+        "datetime_to_date": lambda x: x.dt.date.copy(),
+        "parse_datetime": lambda x, format: data_algebra.default_data_model.pd.to_datetime(
+            x, format=format
+        ),
+        "parse_date": lambda x, format: data_algebra.default_data_model.pd.to_datetime(
+            x, format=format
+        ).dt.date.copy(),
+        "format_datetime": lambda x, format: x.dt.strftime(date_format=format),
+        "format_date": lambda x, format: data_algebra.default_data_model.pd.to_datetime(
+            x
+        ).dt.strftime(date_format=format),
+        "dayofweek": lambda x: 1
+        + (
+            (
+                data_algebra.default_data_model.pd.to_datetime(x).dt.dayofweek.astype(
+                    "int64"
+                )
+                + 1
+            )
+            % 7
+        ),
+        "dayofyear": lambda x: data_algebra.default_data_model.pd.to_datetime(x)
+        .dt.dayofyear.astype("int64")
+        .copy(),
+        "weekofyear": _calc_week_of_Year,
+        "dayofmonth": lambda x: data_algebra.default_data_model.pd.to_datetime(x)
+        .dt.day.astype("int64")
+        .copy(),
+        "month": lambda x: data_algebra.default_data_model.pd.to_datetime(x)
+        .dt.month.astype("int64")
+        .copy(),
+        "quarter": lambda x: data_algebra.default_data_model.pd.to_datetime(x)
+        .dt.quarter.astype("int64")
+        .copy(),
+        "year": lambda x: data_algebra.default_data_model.pd.to_datetime(x)
+        .dt.year.astype("int64")
+        .copy(),
+        "timestamp_diff": lambda c1, c2: [
+            data_algebra.default_data_model.pd.Timedelta(c1[i] - c2[i]).total_seconds()
+            for i in range(len(c1))
+        ],
+        "date_diff": _calc_date_diff,
+        "base_Sunday": _calc_base_Sunday,
     }
     return impl_map
 

@@ -17,7 +17,7 @@ def _MySQL_is_bad_expr(dbmodel, expression):
     return (
         "("
         + subexpr
-        + " IS NULL "   # TODO get infinity checks here
+        + " IS NULL "  # TODO get infinity checks here
         + " OR ("
         + subexpr
         + " != 0 AND "
@@ -27,10 +27,16 @@ def _MySQL_is_bad_expr(dbmodel, expression):
         + "))"
     )
 
+
 def _MySQL_concat_expr(dbmodel, expression):
     return (
         "CONCAT("  # TODO: cast each to char on way in
-        + ", ".join([dbmodel.expr_to_sql(ai, want_inline_parens=False) for ai in expression.args])
+        + ", ".join(
+            [
+                dbmodel.expr_to_sql(ai, want_inline_parens=False)
+                for ai in expression.args
+            ]
+        )
         + ")"
     )
 
@@ -39,7 +45,7 @@ def _MySQL_concat_expr(dbmodel, expression):
 MySQL_formatters = {
     "___": lambda dbmodel, expression: expression.to_python(),
     "is_bad": _MySQL_is_bad_expr,
-    'concat': _MySQL_concat_expr,
+    "concat": _MySQL_concat_expr,
 }
 
 
@@ -51,8 +57,8 @@ class MySQLModel(data_algebra.db_model.DBModel):
     def __init__(self):
         data_algebra.db_model.DBModel.__init__(
             self,
-            string_type='CHAR',
-            identifier_quote='`',
+            string_type="CHAR",
+            identifier_quote="`",
             string_quote="'",
             sql_formatters=MySQL_formatters,
         )
@@ -62,7 +68,9 @@ class MySQLModel(data_algebra.db_model.DBModel):
             raise TypeError("expected identifier to be a str")
         if self.identifier_quote in identifier:
             # TODO: escape quotes
-            raise ValueError('did not expect ' + self.identifier_quote + ' in identifier')
+            raise ValueError(
+                "did not expect " + self.identifier_quote + " in identifier"
+            )
         return self.identifier_quote + identifier + self.identifier_quote
 
 

@@ -1,4 +1,3 @@
-
 import math
 import re
 from collections import OrderedDict
@@ -35,9 +34,7 @@ def pretty_format_sql(sql, *, encoding=None, sqlparse_options=None):
     formatted_sql = sql
     if _have_sqlparse:
         try:
-            formatted_sql = sqlparse.format(
-                sql, encoding=encoding, **sqlparse_options
-            )
+            formatted_sql = sqlparse.format(sql, encoding=encoding, **sqlparse_options)
         except Exception:
             pass
     return formatted_sql
@@ -48,7 +45,7 @@ def _clean_annotation(annotation):
     if annotation is None:
         return annotation
     annotation = annotation.strip()
-    annotation = re.sub(r'\s+', ' ', annotation)
+    annotation = re.sub(r"\s+", " ", annotation)
     return annotation
 
 
@@ -120,11 +117,19 @@ def _db_maximum_expr(dbmodel, expression):
     return (
         "CASE"
         + " WHEN "
-        + "(" + x_expr + ") >= (" + y_expr + ")"
+        + "("
+        + x_expr
+        + ") >= ("
+        + y_expr
+        + ")"
         + " THEN "
         + x_expr
         + " WHEN NOT "
-        + "(" + x_expr + ") >= (" + y_expr + ")"
+        + "("
+        + x_expr
+        + ") >= ("
+        + y_expr
+        + ")"
         + " THEN "
         + y_expr
         + " ELSE NULL END"
@@ -137,11 +142,19 @@ def _db_minimum_expr(dbmodel, expression):
     return (
         "CASE"
         + " WHEN "
-        + "(" + x_expr + ") <= (" + y_expr + ")"
+        + "("
+        + x_expr
+        + ") <= ("
+        + y_expr
+        + ")"
         + " THEN "
         + x_expr
         + " WHEN NOT "
-        + "(" + x_expr + ") <= (" + y_expr + ")"
+        + "("
+        + x_expr
+        + ") <= ("
+        + y_expr
+        + ")"
         + " THEN "
         + y_expr
         + " ELSE NULL END"
@@ -151,24 +164,20 @@ def _db_minimum_expr(dbmodel, expression):
 def _db_is_in_expr(dbmodel, expression):
     is_in_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     x_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
-    return (
-        "("
-        + is_in_expr
-        + " IN ("
-        + ', '.join([repr(v) for v in x_expr])
-        + "))"
-    )
+    return "(" + is_in_expr + " IN (" + ", ".join([repr(v) for v in x_expr]) + "))"
 
 
 # noinspection PyUnusedLocal
 def _db_count_expr(dbmodel, expression):
-    return 'SUM(1)'
+    return "SUM(1)"
 
 
 def _db_concat_expr(dbmodel, expression):
     return (
         "("  # TODO: cast each to char on way in
-        + " || ".join([dbmodel.expr_to_sql(ai, want_inline_parens=True) for ai in expression.args])
+        + " || ".join(
+            [dbmodel.expr_to_sql(ai, want_inline_parens=True) for ai in expression.args]
+        )
         + ")"
     )
 
@@ -176,7 +185,12 @@ def _db_concat_expr(dbmodel, expression):
 def _db_coalesce_expr(dbmodel, expression):
     return (
         "COALESCE("
-        + ", ".join([dbmodel.expr_to_sql(ai, want_inline_parens=False) for ai in expression.args])
+        + ", ".join(
+            [
+                dbmodel.expr_to_sql(ai, want_inline_parens=False)
+                for ai in expression.args
+            ]
+        )
         + ")"
     )
 
@@ -217,7 +231,9 @@ def _db_pow_expr(dbmodel, expression):
 
 def _db_nunique_expr(dbmodel, expression):
     return (
-        "COUNT(DISTINCT (" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + "))"
+        "COUNT(DISTINCT ("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + "))"
     )
 
 
@@ -226,151 +242,161 @@ def _db_nunique_expr(dbmodel, expression):
 
 def _as_int64(dbmodel, expression):
     return (
-        'CAST('
+        "CAST("
         + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-        + ' AS INT64)'
+        + " AS INT64)"
     )
 
 
 def _as_str(dbmodel, expression):
     return (
-            'CAST('
-            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ' AS ' + dbmodel.string_type + ')'
+        "CAST("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + " AS "
+        + dbmodel.string_type
+        + ")"
     )
 
 
 def _trimstr(dbmodel, expression):
     return (
-            'SUBSTR('
-            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ', 1 + ' + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
-            + ', ' + dbmodel.expr_to_sql(expression.args[2], want_inline_parens=False)
-            + ')'
+        "SUBSTR("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ", 1 + "
+        + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+        + ", "
+        + dbmodel.expr_to_sql(expression.args[2], want_inline_parens=False)
+        + ")"
     )
 
 
 def _datetime_to_date(dbmodel, expression):
     return (
-            'DATE('
-            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ')'
+        "DATE("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
     )
 
 
 def _parse_datetime(dbmodel, expression):
     return (
-            'PARSE_DATETIME('
-            + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
-            + ', ' + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ')'
+        "PARSE_DATETIME("
+        + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+        + ", "
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
     )
 
 
 def _parse_date(dbmodel, expression):
     return (
-            'PARSE_DATE('
-            + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
-            + ', ' + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ')'
+        "PARSE_DATE("
+        + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+        + ", "
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
     )
 
 
 def _format_datetime(dbmodel, expression):
     return (
-            'FORMAT_DATETIME('
-            + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
-            + ', ' + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ')'
+        "FORMAT_DATETIME("
+        + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+        + ", "
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
     )
 
 
 def _format_date(dbmodel, expression):
     return (
-            'FORMAT_DATE('
-            + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
-            + ', ' + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ')'
+        "FORMAT_DATE("
+        + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+        + ", "
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
     )
 
 
 def _dayofweek(dbmodel, expression):
     return (
-            'EXTRACT(DAYOFWEEK FROM '
-            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ')'
+        "EXTRACT(DAYOFWEEK FROM "
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
     )
 
 
 def _dayofyear(dbmodel, expression):
     return (
-            'EXTRACT(DAYOFYEAR FROM '
-            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ')'
+        "EXTRACT(DAYOFYEAR FROM "
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
     )
 
 
 def _dayofmonth(dbmodel, expression):
     return (
-            'EXTRACT(DAY FROM '
-            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ')'
+        "EXTRACT(DAY FROM "
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
     )
 
 
 def _weekofyear(dbmodel, expression):
     return (
-            'EXTRACT(WEEK FROM '
-            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ')'
+        "EXTRACT(WEEK FROM "
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
     )
 
 
 def _month(dbmodel, expression):
     return (
-            'EXTRACT(MONTH FROM '
-            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ')'
+        "EXTRACT(MONTH FROM "
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
     )
 
 
 def _quarter(dbmodel, expression):
     return (
-            'EXTRACT(QUARTER FROM '
-            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ')'
+        "EXTRACT(QUARTER FROM "
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
     )
 
 
 def _year(dbmodel, expression):
     return (
-            'EXTRACT(YEAR FROM '
-            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ')'
+        "EXTRACT(YEAR FROM "
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
     )
 
 
 def _timestamp_diff(dbmodel, expression):
     return (
-            'TIMESTAMP_DIFF('
-            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ', ' + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
-            + ', SECOND)'
+        "TIMESTAMP_DIFF("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ", "
+        + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+        + ", SECOND)"
     )
 
 
 def _date_diff(dbmodel, expression):
     return (
-            'TIMESTAMP_DIFF('
-            + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-            + ', ' + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
-            + ', DAY)'
+        "TIMESTAMP_DIFF("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ", "
+        + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+        + ", DAY)"
     )
 
 
 def _base_Sunday(dbmodel, expression):
     subex = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-    return f'DATE_SUB({subex}, INTERVAL (EXTRACT(DAYOFWEEK FROM {subex}) - 1) DAY)'
+    return f"DATE_SUB({subex}, INTERVAL (EXTRACT(DAYOFWEEK FROM {subex}) - 1) DAY)"
 
 
 db_expr_formatters = {
@@ -382,33 +408,33 @@ db_expr_formatters = {
     "is_in": _db_is_in_expr,
     "maximum": _db_maximum_expr,
     "minimum": _db_minimum_expr,
-    'count': _db_count_expr,
-    'concat': _db_concat_expr,
-    'coalesce': _db_coalesce_expr,
-    'round': _db_round_expr,
-    'floor': _db_floor_expr,
-    'ceil': _db_ceil_expr,
-    '**': _db_pow_expr,
+    "count": _db_count_expr,
+    "concat": _db_concat_expr,
+    "coalesce": _db_coalesce_expr,
+    "round": _db_round_expr,
+    "floor": _db_floor_expr,
+    "ceil": _db_ceil_expr,
+    "**": _db_pow_expr,
     "nunique": _db_nunique_expr,
     # fns that had been in bigquery_user_fns
-    'as_int64': _as_int64,
-    'as_str': _as_str,
-    'trimstr': _trimstr,
-    'datetime_to_date': _datetime_to_date,
-    'parse_datetime': _parse_datetime,
-    'parse_date': _parse_date,
-    'format_datetime': _format_datetime,
-    'format_date': _format_date,
-    'dayofweek': _dayofweek,
-    'dayofyear': _dayofyear,
-    'dayofmonth': _dayofmonth,
-    'weekofyear': _weekofyear,
-    'month': _month,
-    'quarter': _quarter,
-    'year': _year,
-    'timestamp_diff': _timestamp_diff,
-    'date_diff': _date_diff,
-    'base_Sunday': _base_Sunday,
+    "as_int64": _as_int64,
+    "as_str": _as_str,
+    "trimstr": _trimstr,
+    "datetime_to_date": _datetime_to_date,
+    "parse_datetime": _parse_datetime,
+    "parse_date": _parse_date,
+    "format_datetime": _format_datetime,
+    "format_date": _format_date,
+    "dayofweek": _dayofweek,
+    "dayofyear": _dayofyear,
+    "dayofmonth": _dayofmonth,
+    "weekofyear": _weekofyear,
+    "month": _month,
+    "quarter": _quarter,
+    "year": _year,
+    "timestamp_diff": _timestamp_diff,
+    "date_diff": _date_diff,
+    "base_Sunday": _base_Sunday,
 }
 
 
@@ -421,7 +447,7 @@ db_default_op_replacements = {
     "||": "OR",
     "!": "NOT",
     "~": "NOT",
-    }
+}
 
 
 class DBModel:
@@ -446,11 +472,11 @@ class DBModel:
         sql_formatters=None,
         op_replacements=None,
         local_data_model=None,
-        on_start='',
-        on_end='',
-        on_joiner=', ',
-        drop_text='DROP TABLE',
-        string_type='VARCHAR',
+        on_start="",
+        on_end="",
+        on_joiner=", ",
+        drop_text="DROP TABLE",
+        string_type="VARCHAR",
         join_name_map=None,
         supports_with=True,
     ):
@@ -511,7 +537,9 @@ class DBModel:
             temp_tables = dict()
             q = q.to_sql(db_model=self, temp_tables=temp_tables)
             if len(temp_tables) > 1:
-                raise ValueError("ops require management of temp tables, please collect them via to_sql(temp_tables)")
+                raise ValueError(
+                    "ops require management of temp tables, please collect them via to_sql(temp_tables)"
+                )
         else:
             q = str(q)
         r = pandas.io.sql.read_sql(q, conn)
@@ -532,7 +560,7 @@ class DBModel:
     def drop_table(self, conn, table_name, *, check=True):
         if (not check) or self.table_exists(conn, table_name):
             q_table_name = self.quote_table_name(table_name)
-            self.execute(conn, self.drop_text + ' ' + q_table_name)
+            self.execute(conn, self.drop_text + " " + q_table_name)
 
     # noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection
     def insert_table(
@@ -563,9 +591,7 @@ class DBModel:
     def read_table(self, conn, table_name, *, qualifiers=None, limit=None):
         if not isinstance(table_name, str):
             raise TypeError("Expect table_name to be a str")
-        q_table_name = self.quote_table_name(
-            table_name
-        )
+        q_table_name = self.quote_table_name(table_name)
         sql = "SELECT * FROM " + q_table_name
         if limit is not None:
             sql = sql + " LIMIT " + limit.__repr__()
@@ -584,7 +610,9 @@ class DBModel:
         if not isinstance(identifier, str):
             raise TypeError("expected identifier to be a str")
         if self.identifier_quote in identifier:
-            raise ValueError('did not expect ' + self.identifier_quote + ' in identifier')
+            raise ValueError(
+                "did not expect " + self.identifier_quote + " in identifier"
+            )
         return self.identifier_quote + identifier + self.identifier_quote
 
     def quote_table_name(self, table_description):
@@ -690,7 +718,9 @@ class DBModel:
             quoted_table_name=self.quote_table_name(table_def),
         )
         near_sql = subsql
-        if (len(using) > 0) and (not (set([k for k in using]) == set([k for k in table_def.column_names]))):
+        if (len(using) > 0) and (
+            not (set([k for k in using]) == set([k for k in table_def.column_names]))
+        ):
             # need a non-trivial select here
             terms = OrderedDict()
             for k in using:
@@ -767,7 +797,9 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             temp_tables=subsql.temp_tables.copy(),
-            annotation=extend_node.to_python_implementation(print_sources=False, indent=-1)
+            annotation=extend_node.to_python_implementation(
+                print_sources=False, indent=-1
+            ),
         )
         return near_sql
 
@@ -799,7 +831,9 @@ class DBModel:
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
             temp_tables=subsql.temp_tables.copy(),
-            annotation=project_node.to_python_implementation(print_sources=False, indent=-1)
+            annotation=project_node.to_python_implementation(
+                print_sources=False, indent=-1
+            ),
         )
         return near_sql
 
@@ -826,7 +860,9 @@ class DBModel:
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
             temp_tables=subsql.temp_tables.copy(),
-            annotation=select_rows_node.to_python_implementation(print_sources=False, indent=-1)
+            annotation=select_rows_node.to_python_implementation(
+                print_sources=False, indent=-1
+            ),
         )
         return near_sql
 
@@ -873,7 +909,9 @@ class DBModel:
         )
         # /limit columns
         subsql.terms = {
-            k: v for k, v in subsql.terms.items() if k not in drop_columns_node.column_deletions
+            k: v
+            for k, v in subsql.terms.items()
+            if k not in drop_columns_node.column_deletions
         }
         return subsql
 
@@ -919,7 +957,9 @@ class DBModel:
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
             temp_tables=subsql.temp_tables.copy(),
-            annotation=order_node.to_python_implementation(print_sources=False, indent=-1)
+            annotation=order_node.to_python_implementation(
+                print_sources=False, indent=-1
+            ),
         )
         return near_sql
 
@@ -951,23 +991,31 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             temp_tables=subsql.temp_tables.copy(),
-            annotation=rename_node.to_python_implementation(print_sources=False, indent=-1)
+            annotation=rename_node.to_python_implementation(
+                print_sources=False, indent=-1
+            ),
         )
         return near_sql
 
     def _coalesce_terms(self, *, sub_view_name_left, sub_view_name_right, cols):
-        coalesce_formatter = self.sql_formatters['coalesce']
+        coalesce_formatter = self.sql_formatters["coalesce"]
 
         class PseudoExpression:
             def __init__(self, args):
                 self.args = args.copy()
 
-        terms = {ci: coalesce_formatter(
-                        self,
-                        PseudoExpression([
-                            sub_view_name_left + "." + self.quote_identifier(ci),
-                            sub_view_name_right + "." + self.quote_identifier(ci)
-                    ])) for ci in cols}
+        terms = {
+            ci: coalesce_formatter(
+                self,
+                PseudoExpression(
+                    [
+                        sub_view_name_left + "." + self.quote_identifier(ci),
+                        sub_view_name_right + "." + self.quote_identifier(ci),
+                    ]
+                ),
+            )
+            for ci in cols
+        }
         return terms
 
     def natural_join_to_sql(self, join_node, *, using=None, temp_id_source=None):
@@ -1002,7 +1050,8 @@ class DBModel:
         terms = self._coalesce_terms(
             sub_view_name_left=sub_view_name_left,
             sub_view_name_right=sub_view_name_right,
-            cols=[ci for ci in common if ci in using])
+            cols=[ci for ci in common if ci in using],
+        )
         terms.update({ci: None for ci in using_left - common})
         terms.update({ci: None for ci in using_right - common})
         on_terms = ""
@@ -1034,7 +1083,9 @@ class DBModel:
         temp_tables.update(sql_right.temp_tables)
         jointype = join_node.jointype
         try:
-            jointype = self.join_name_map[jointype]  # TODO: maybe move this mapping earlier
+            jointype = self.join_name_map[
+                jointype
+            ]  # TODO: maybe move this mapping earlier
         except KeyError:
             pass
         near_sql = data_algebra.near_sql.NearSQLBinaryStep(
@@ -1045,7 +1096,9 @@ class DBModel:
             sub_sql2=sql_right.to_bound_near_sql(columns=using_right, force_sql=False),
             suffix=on_terms,
             temp_tables=temp_tables,
-            annotation=join_node.to_python_implementation(print_sources=False, indent=-1)
+            annotation=join_node.to_python_implementation(
+                print_sources=False, indent=-1
+            ),
         )
         return near_sql
 
@@ -1098,18 +1151,16 @@ class DBModel:
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql1=sql_left.to_bound_near_sql(
-                columns=using_left,
-                force_sql=True,
-                constants=constants_left,
+                columns=using_left, force_sql=True, constants=constants_left,
             ),
             joiner="UNION ALL",
             sub_sql2=sql_right.to_bound_near_sql(
-                columns=using_right,
-                force_sql=True,
-                constants=constants_right,
+                columns=using_right, force_sql=True, constants=constants_right,
             ),
             temp_tables=temp_tables,
-            annotation=concat_node.to_python_implementation(print_sources=False, indent=-1)
+            annotation=concat_node.to_python_implementation(
+                print_sources=False, indent=-1
+            ),
         )
         return near_sql
 
@@ -1122,7 +1173,7 @@ class DBModel:
         encoding=None,
         sqlparse_options=None,
         temp_tables=None,
-        use_with=False
+        use_with=False,
     ):
         assert isinstance(self, DBModel)
         assert isinstance(ops, data_algebra.data_ops.ViewRepresentation)
@@ -1150,23 +1201,27 @@ class DBModel:
                 for i in range(len_sequence - 1):
                     nmi = sequence[i][0]  # already quoted
                     sqli = sequence[i][1].to_sql(db_model=self, annotate=annotate)
-                    sql_sequence[i] = f' {nmi} AS (\n {sqli} \n)'
-                sql_last = sequence[len_sequence - 1].to_sql(db_model=self, force_sql=True, annotate=annotate)
-                sql_str = 'WITH\n' + ',\n'.join(sql_sequence) + '\n' + sql_last
+                    sql_sequence[i] = f" {nmi} AS (\n {sqli} \n)"
+                sql_last = sequence[len_sequence - 1].to_sql(
+                    db_model=self, force_sql=True, annotate=annotate
+                )
+                sql_str = "WITH\n" + ",\n".join(sql_sequence) + "\n" + sql_last
         if sql_str is None:
             # non-with path
             sql_str = near_sql.to_sql(db_model=self, force_sql=True, annotate=annotate)
         if pretty:
-            sql_str = pretty_format_sql(sql_str, encoding=encoding, sqlparse_options=sqlparse_options)
+            sql_str = pretty_format_sql(
+                sql_str, encoding=encoding, sqlparse_options=sqlparse_options
+            )
         if annotate:
-            model_descr = re.sub(r'\s+', ' ', str(self))
+            model_descr = re.sub(r"\s+", " ", str(self))
             self.string_quote
             self.identifier_quote
             sql_str = (
-                f'-- data_algebra SQL https://github.com/WinVector/data_algebra\n'
-                + f'--  dialect: {model_descr}\n'
-                + f'--       string quote: {self.string_quote}\n'
-                + f'--   identifier quote: {self.identifier_quote}\n'
+                f"-- data_algebra SQL https://github.com/WinVector/data_algebra\n"
+                + f"--  dialect: {model_descr}\n"
+                + f"--       string quote: {self.string_quote}\n"
+                + f"--   identifier quote: {self.identifier_quote}\n"
                 + sql_str
             )
         return sql_str
@@ -1221,7 +1276,9 @@ class DBModel:
                     col_sql = (
                         "  WHEN CAST(b."
                         + self.quote_identifier(result_col)
-                        + " AS " + self.string_type + ") = "
+                        + " AS "
+                        + self.string_type
+                        + ") = "
                         + self.quote_string(str(source_col))
                         + " THEN a."
                         + self.quote_identifier(source_col)
@@ -1278,7 +1335,9 @@ class DBModel:
                         clauses.append(
                             " ( CAST("
                             + self.quote_identifier(cc)
-                            + " AS " + self.string_type + ") = "
+                            + " AS "
+                            + self.string_type
+                            + ") = "
                             + self.quote_string(str(record_spec.control_table[cc][i]))
                             + " ) "
                         )
@@ -1321,39 +1380,38 @@ class DBModel:
     def convert_nearsql_container_subsql_(self, nearsql_container, *, annotate=False):
         assert isinstance(nearsql_container, data_algebra.near_sql.NearSQLContainer)
         if isinstance(nearsql_container.near_sql, data_algebra.near_sql.NearSQLTable):
-            sql = (
-                    " "
-                    + nearsql_container.to_sql(self, annotate=annotate)
-                    + " "
-            )
-            if nearsql_container.near_sql.quoted_query_name != nearsql_container.near_sql.quoted_table_name:
-                sql = sql + (
-                        nearsql_container.near_sql.quoted_query_name
-                        + " "
-                )
-        elif isinstance(nearsql_container.near_sql, data_algebra.near_sql.NearSQLCommonTableExpression):
-            sql = (
-                    " "
-                    + nearsql_container.to_sql(self, annotate=annotate)
-                    + " "
-            )
+            sql = " " + nearsql_container.to_sql(self, annotate=annotate) + " "
+            if (
+                nearsql_container.near_sql.quoted_query_name
+                != nearsql_container.near_sql.quoted_table_name
+            ):
+                sql = sql + (nearsql_container.near_sql.quoted_query_name + " ")
+        elif isinstance(
+            nearsql_container.near_sql,
+            data_algebra.near_sql.NearSQLCommonTableExpression,
+        ):
+            sql = " " + nearsql_container.to_sql(self, annotate=annotate) + " "
         else:
             sql = (
-                    " ( "
-                    + nearsql_container.to_sql(self, annotate=annotate)
-                    + " ) "
-                    + nearsql_container.near_sql.quoted_query_name
-                    + " "
+                " ( "
+                + nearsql_container.to_sql(self, annotate=annotate)
+                + " ) "
+                + nearsql_container.near_sql.quoted_query_name
+                + " "
             )
         return sql
 
-    def nearsqlcte_to_sql_(self, near_sql, *, columns=None, force_sql=False, constants=None, annotate=False):
+    def nearsqlcte_to_sql_(
+        self, near_sql, *, columns=None, force_sql=False, constants=None, annotate=False
+    ):
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLCommonTableExpression)
         if force_sql:
             return "SELECT * FROM " + near_sql.quoted_query_name
         return near_sql.quoted_query_name
 
-    def nearsqltable_to_sql_(self, near_sql, *, columns=None, force_sql=False, constants=None, annotate=False):
+    def nearsqltable_to_sql_(
+        self, near_sql, *, columns=None, force_sql=False, constants=None, annotate=False
+    ):
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLTable)
         if columns is None:
             columns = [k for k in near_sql.terms.keys()]
@@ -1368,13 +1426,22 @@ class DBModel:
                     for (k, v) in constants.items()
                 ]
             if len(terms_strs) < 1:
-                terms_strs = [f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}']
-            return "SELECT " + ", ".join(terms_strs) + " FROM " + near_sql.quoted_table_name
+                terms_strs = [
+                    f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}'
+                ]
+            return (
+                "SELECT "
+                + ", ".join(terms_strs)
+                + " FROM "
+                + near_sql.quoted_table_name
+            )
         return near_sql.quoted_table_name
 
-    def nearsqlunary_to_sql_(self, near_sql, *, columns=None, force_sql=False, constants=None, annotate=False):
+    def nearsqlunary_to_sql_(
+        self, near_sql, *, columns=None, force_sql=False, constants=None, annotate=False
+    ):
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLUnaryStep)
-        terms_strs = ['*']  # allow * notation if nothing is specified
+        terms_strs = ["*"]  # allow * notation if nothing is specified
         terms = near_sql.terms
         if terms is not None:
             if columns is None:
@@ -1386,17 +1453,36 @@ class DBModel:
                     for (k, v) in constants.items()
                 ]
             if len(terms_strs) < 1:
-                terms_strs = [f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}']
+                terms_strs = [
+                    f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}'
+                ]
         sql = "SELECT "
-        if annotate and (near_sql.annotation is not None) and (len(near_sql.annotation) > 0):
+        if (
+            annotate
+            and (near_sql.annotation is not None)
+            and (len(near_sql.annotation) > 0)
+        ):
             sql = sql + " -- " + _clean_annotation(near_sql.annotation) + "\n "
-        sql = sql + ", ".join(terms_strs) + " FROM " + near_sql.sub_sql.convert_subsql(db_model=self, annotate=annotate)
+        sql = (
+            sql
+            + ", ".join(terms_strs)
+            + " FROM "
+            + near_sql.sub_sql.convert_subsql(db_model=self, annotate=annotate)
+        )
         if (near_sql.suffix is not None) and (len(near_sql.suffix) > 0):
             sql = sql + " " + near_sql.suffix
         return sql
 
-    def nearsqlbinary_to_sql_(self, near_sql, *,
-                              columns=None, force_sql=False, constants=None, annotate=False, quoted_query_name=None):
+    def nearsqlbinary_to_sql_(
+        self,
+        near_sql,
+        *,
+        columns=None,
+        force_sql=False,
+        constants=None,
+        annotate=False,
+        quoted_query_name=None,
+    ):
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLBinaryStep)
         if columns is None:
             columns = [k for k in near_sql.terms.keys()]
@@ -1405,23 +1491,37 @@ class DBModel:
             terms.update(constants)
         terms_strs = [self.enc_term_(k, terms=terms) for k in columns]
         if len(terms_strs) < 1:
-            terms_strs = [f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}']
-        is_union = 'union' in near_sql.joiner.lower()
+            terms_strs = [
+                f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}'
+            ]
+        is_union = "union" in near_sql.joiner.lower()
         sql = "SELECT "
-        if annotate and (near_sql.annotation is not None) and (len(near_sql.annotation) > 0):
+        if (
+            annotate
+            and (near_sql.annotation is not None)
+            and (len(near_sql.annotation) > 0)
+        ):
             sql = sql + " -- " + _clean_annotation(near_sql.annotation) + "\n "
         if is_union:
             substr_1 = near_sql.sub_sql1.to_sql(db_model=self, annotate=annotate)
             substr_2 = near_sql.sub_sql2.to_sql(db_model=self, annotate=annotate)
         else:
-            substr_1 = near_sql.sub_sql1.convert_subsql(db_model=self, annotate=annotate)
-            substr_2 = near_sql.sub_sql2.convert_subsql(db_model=self, annotate=annotate)
+            substr_1 = near_sql.sub_sql1.convert_subsql(
+                db_model=self, annotate=annotate
+            )
+            substr_2 = near_sql.sub_sql2.convert_subsql(
+                db_model=self, annotate=annotate
+            )
         sql = sql + (
-                ", ".join(terms_strs) + " FROM " + " ( "
-                + substr_1
-                + " " + near_sql.joiner + " "
-                + substr_2
-                )
+            ", ".join(terms_strs)
+            + " FROM "
+            + " ( "
+            + substr_1
+            + " "
+            + near_sql.joiner
+            + " "
+            + substr_2
+        )
         if (near_sql.suffix is not None) and (len(near_sql.suffix) > 0):
             sql = sql + " " + near_sql.suffix
         sql = sql + " ) "
@@ -1429,7 +1529,9 @@ class DBModel:
             sql = sql + quoted_query_name + " "
         return sql
 
-    def nearsqlq_to_sql_(self, near_sql, *, columns=None, force_sql=False, constants=None, annotate=False):
+    def nearsqlq_to_sql_(
+        self, near_sql, *, columns=None, force_sql=False, constants=None, annotate=False
+    ):
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLq)
         if columns is None:
             columns = [k for k in near_sql.terms.keys()]
@@ -1445,9 +1547,15 @@ class DBModel:
 
         terms_strs = [enc_term(k) for k in columns]
         if len(terms_strs) < 1:
-            terms_strs = [f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}']
+            terms_strs = [
+                f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}'
+            ]
         sql = "SELECT "
-        if annotate and (near_sql.annotation is not None) and (len(near_sql.annotation) > 0):
+        if (
+            annotate
+            and (near_sql.annotation is not None)
+            and (len(near_sql.annotation) > 0)
+        ):
             sql = sql + " -- " + _clean_annotation(near_sql.annotation) + "\n "
         return sql + (
             ", ".join(terms_strs)
@@ -1487,15 +1595,12 @@ class DBHandle(data_algebra.eval_model.EvalModel):
     def describe_table(self, table_name, *, qualifiers=None, row_limit=7):
         head = self.read_query(
             q="SELECT * FROM "
-              + self.db_model.quote_table_name(table_name)
-              + " LIMIT "
-              + str(row_limit),
+            + self.db_model.quote_table_name(table_name)
+            + " LIMIT "
+            + str(row_limit),
         )
         return data_algebra.data_ops.describe_table(
-            head,
-            table_name=table_name,
-            qualifiers=qualifiers,
-            row_limit=row_limit
+            head, table_name=table_name, qualifiers=qualifiers, row_limit=row_limit
         )
 
     def to_pandas(self, handle, *, data_map=None):
@@ -1537,21 +1642,26 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         )
         return self.describe_table(table_name)
 
-    def to_sql(self, ops,
-               *,
-               pretty=False,
-               annotate=False,
-               encoding=None,
-               sqlparse_options=None,
-               temp_tables=None,
-               use_with=False):
-        return self.db_model.to_sql(ops=ops,
-                          pretty=pretty,
-                          annotate=annotate,
-                          encoding=encoding,
-                          sqlparse_options=sqlparse_options,
-                          temp_tables=temp_tables,
-                          use_with=use_with)
+    def to_sql(
+        self,
+        ops,
+        *,
+        pretty=False,
+        annotate=False,
+        encoding=None,
+        sqlparse_options=None,
+        temp_tables=None,
+        use_with=False,
+    ):
+        return self.db_model.to_sql(
+            ops=ops,
+            pretty=pretty,
+            annotate=annotate,
+            encoding=encoding,
+            sqlparse_options=sqlparse_options,
+            temp_tables=temp_tables,
+            use_with=use_with,
+        )
 
     def query_to_csv(self, q, *, res_name):
         d = self.read_query(q)
@@ -1585,7 +1695,7 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         if result_name in tables_needed:
             raise ValueError("Can not write over an input table")
         q_table_name = self.db_model.quote_table_name(result_name)
-        drop_query = self.db_model.drop_text + ' ' + q_table_name
+        drop_query = self.db_model.drop_text + " " + q_table_name
         create_query = "CREATE TABLE " + q_table_name + " AS " + query
         # noinspection PyBroadException
         try:
@@ -1600,8 +1710,8 @@ class DBHandle(data_algebra.eval_model.EvalModel):
 
     def __str__(self):
         return (
-            str(type(self).__name__) +
-            "("
+            str(type(self).__name__)
+            + "("
             + "db_model="
             + str(self.db_model)
             + ", conn="

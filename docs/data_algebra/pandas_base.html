@@ -227,7 +227,7 @@
 
             <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">opk</span><span class="p">)</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="c1"># assumes all args are column names or values, enforce this earlier</span>
-                <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ColumnReference</span><span class="p">):</span>
                         <span class="n">value_name</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_name</span>
@@ -236,8 +236,10 @@
                             <span class="n">col_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">value_name</span><span class="p">)</span>
                     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">):</span>
                         <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data_algebra_temp_cols</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                            <span class="n">value_name</span> <span class="o">=</span> <span class="s1">&#39;data_algebra_extend_temp_col_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_algebra_temp_cols</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data_algebra_temp_cols</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="n">value_name</span> <span class="o">=</span> <span class="s2">&quot;data_algebra_extend_temp_col_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                                <span class="nb">len</span><span class="p">(</span><span class="n">data_algebra_temp_cols</span><span class="p">)</span>
+                            <span class="p">)</span>
                             <span class="n">data_algebra_temp_cols</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value_name</span>
                             <span class="n">col_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value_name</span><span class="p">)</span>
                             <span class="n">res</span><span class="p">[</span><span class="n">value_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
@@ -331,8 +333,10 @@
                     <span class="k">pass</span>
                 <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">):</span>
                     <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data_algebra_temp_cols</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                        <span class="n">value_name</span> <span class="o">=</span> <span class="s1">&#39;data_algebra_project_temp_col_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_algebra_temp_cols</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data_algebra_temp_cols</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="n">value_name</span> <span class="o">=</span> <span class="s2">&quot;data_algebra_project_temp_col_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                            <span class="nb">len</span><span class="p">(</span><span class="n">data_algebra_temp_cols</span><span class="p">)</span>
+                        <span class="p">)</span>
                         <span class="n">data_algebra_temp_cols</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value_name</span>
                         <span class="n">res</span><span class="p">[</span><span class="n">value_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -447,7 +451,7 @@
         <span class="n">jointype</span> <span class="o">=</span> <span class="n">jointype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="n">mp</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;full&quot;</span><span class="p">:</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;cross&quot;</span><span class="p">:</span> <span class="s2">&quot;outer&quot;</span>  <span class="c1"># cross new to Pandas 1.2.0 December 2020</span>
+            <span class="s2">&quot;cross&quot;</span><span class="p">:</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>  <span class="c1"># cross new to Pandas 1.2.0 December 2020</span>
         <span class="p">}</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">mp</span><span class="p">[</span><span class="n">jointype</span><span class="p">]</span>
@@ -474,7 +478,7 @@
             <span class="n">by</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">scratch_col</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># extra column to prevent empty-by issues</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">by</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">scratch_col</span> <span class="o">=</span> <span class="s1">&#39;data_algebra_temp_merge_col&#39;</span>
+            <span class="n">scratch_col</span> <span class="o">=</span> <span class="s2">&quot;data_algebra_temp_merge_col&quot;</span>
             <span class="n">by</span> <span class="o">=</span> <span class="p">[</span><span class="n">scratch_col</span><span class="p">]</span>
             <span class="n">left</span><span class="p">[</span><span class="n">scratch_col</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="n">right</span><span class="p">[</span><span class="n">scratch_col</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
@@ -639,7 +643,7 @@
 
             <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">opk</span><span class="p">)</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="c1"># assumes all args are column names or values, enforce this earlier</span>
-                <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ColumnReference</span><span class="p">):</span>
                         <span class="n">value_name</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_name</span>
@@ -648,8 +652,10 @@
                             <span class="n">col_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">value_name</span><span class="p">)</span>
                     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">):</span>
                         <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data_algebra_temp_cols</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                            <span class="n">value_name</span> <span class="o">=</span> <span class="s1">&#39;data_algebra_extend_temp_col_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_algebra_temp_cols</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data_algebra_temp_cols</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="n">value_name</span> <span class="o">=</span> <span class="s2">&quot;data_algebra_extend_temp_col_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                                <span class="nb">len</span><span class="p">(</span><span class="n">data_algebra_temp_cols</span><span class="p">)</span>
+                            <span class="p">)</span>
                             <span class="n">data_algebra_temp_cols</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value_name</span>
                             <span class="n">col_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value_name</span><span class="p">)</span>
                             <span class="n">res</span><span class="p">[</span><span class="n">value_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
@@ -743,8 +749,10 @@
                     <span class="k">pass</span>
                 <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">):</span>
                     <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data_algebra_temp_cols</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                        <span class="n">value_name</span> <span class="o">=</span> <span class="s1">&#39;data_algebra_project_temp_col_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_algebra_temp_cols</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data_algebra_temp_cols</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="n">value_name</span> <span class="o">=</span> <span class="s2">&quot;data_algebra_project_temp_col_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                            <span class="nb">len</span><span class="p">(</span><span class="n">data_algebra_temp_cols</span><span class="p">)</span>
+                        <span class="p">)</span>
                         <span class="n">data_algebra_temp_cols</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value_name</span>
                         <span class="n">res</span><span class="p">[</span><span class="n">value_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -859,7 +867,7 @@
         <span class="n">jointype</span> <span class="o">=</span> <span class="n">jointype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="n">mp</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;full&quot;</span><span class="p">:</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;cross&quot;</span><span class="p">:</span> <span class="s2">&quot;outer&quot;</span>  <span class="c1"># cross new to Pandas 1.2.0 December 2020</span>
+            <span class="s2">&quot;cross&quot;</span><span class="p">:</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>  <span class="c1"># cross new to Pandas 1.2.0 December 2020</span>
         <span class="p">}</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">mp</span><span class="p">[</span><span class="n">jointype</span><span class="p">]</span>
@@ -886,7 +894,7 @@
             <span class="n">by</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">scratch_col</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># extra column to prevent empty-by issues</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">by</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">scratch_col</span> <span class="o">=</span> <span class="s1">&#39;data_algebra_temp_merge_col&#39;</span>
+            <span class="n">scratch_col</span> <span class="o">=</span> <span class="s2">&quot;data_algebra_temp_merge_col&quot;</span>
             <span class="n">by</span> <span class="o">=</span> <span class="p">[</span><span class="n">scratch_col</span><span class="p">]</span>
             <span class="n">left</span><span class="p">[</span><span class="n">scratch_col</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="n">right</span><span class="p">[</span><span class="n">scratch_col</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
@@ -1186,7 +1194,7 @@ inheritance.</p>
 
             <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">opk</span><span class="p">)</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="c1"># assumes all args are column names or values, enforce this earlier</span>
-                <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ColumnReference</span><span class="p">):</span>
                         <span class="n">value_name</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_name</span>
@@ -1195,8 +1203,10 @@ inheritance.</p>
                             <span class="n">col_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">value_name</span><span class="p">)</span>
                     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">):</span>
                         <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data_algebra_temp_cols</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                            <span class="n">value_name</span> <span class="o">=</span> <span class="s1">&#39;data_algebra_extend_temp_col_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_algebra_temp_cols</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data_algebra_temp_cols</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="n">value_name</span> <span class="o">=</span> <span class="s2">&quot;data_algebra_extend_temp_col_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                                <span class="nb">len</span><span class="p">(</span><span class="n">data_algebra_temp_cols</span><span class="p">)</span>
+                            <span class="p">)</span>
                             <span class="n">data_algebra_temp_cols</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value_name</span>
                             <span class="n">col_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value_name</span><span class="p">)</span>
                             <span class="n">res</span><span class="p">[</span><span class="n">value_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
@@ -1325,8 +1335,10 @@ inheritance.</p>
                     <span class="k">pass</span>
                 <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">):</span>
                     <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data_algebra_temp_cols</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                        <span class="n">value_name</span> <span class="o">=</span> <span class="s1">&#39;data_algebra_project_temp_col_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_algebra_temp_cols</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data_algebra_temp_cols</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="n">value_name</span> <span class="o">=</span> <span class="s2">&quot;data_algebra_project_temp_col_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                            <span class="nb">len</span><span class="p">(</span><span class="n">data_algebra_temp_cols</span><span class="p">)</span>
+                        <span class="p">)</span>
                         <span class="n">data_algebra_temp_cols</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value_name</span>
                         <span class="n">res</span><span class="p">[</span><span class="n">value_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -1536,7 +1548,7 @@ inheritance.</p>
         <span class="n">jointype</span> <span class="o">=</span> <span class="n">jointype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="n">mp</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;full&quot;</span><span class="p">:</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;cross&quot;</span><span class="p">:</span> <span class="s2">&quot;outer&quot;</span>  <span class="c1"># cross new to Pandas 1.2.0 December 2020</span>
+            <span class="s2">&quot;cross&quot;</span><span class="p">:</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>  <span class="c1"># cross new to Pandas 1.2.0 December 2020</span>
         <span class="p">}</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">mp</span><span class="p">[</span><span class="n">jointype</span><span class="p">]</span>
@@ -1579,7 +1591,7 @@ inheritance.</p>
             <span class="n">by</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">scratch_col</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># extra column to prevent empty-by issues</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">by</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">scratch_col</span> <span class="o">=</span> <span class="s1">&#39;data_algebra_temp_merge_col&#39;</span>
+            <span class="n">scratch_col</span> <span class="o">=</span> <span class="s2">&quot;data_algebra_temp_merge_col&quot;</span>
             <span class="n">by</span> <span class="o">=</span> <span class="p">[</span><span class="n">scratch_col</span><span class="p">]</span>
             <span class="n">left</span><span class="p">[</span><span class="n">scratch_col</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="n">right</span><span class="p">[</span><span class="n">scratch_col</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>

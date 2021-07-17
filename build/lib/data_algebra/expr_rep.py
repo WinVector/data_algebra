@@ -119,7 +119,9 @@ class PreTerm(ABC):
     # emitters
 
     def to_python(self, *, want_inline_parens=False):
-        raise NotImplementedError("base class method called")  # https://docs.python.org/3/library/exceptions.html
+        raise NotImplementedError(
+            "base class method called"
+        )  # https://docs.python.org/3/library/exceptions.html
 
     def to_source(self, *, want_inline_parens=False, dialect="Python"):
         if dialect == "Python":
@@ -510,64 +512,70 @@ class Term(PreTerm, ABC):
     # fns that had been in bigquery_user_fns
 
     def as_int64(self):
-        return self.__uop_expr__('as_int64')
+        return self.__uop_expr__("as_int64")
 
     def as_str(self):
-        return self.__uop_expr__('as_str')
+        return self.__uop_expr__("as_str")
 
     def trimstr(self, start, stop):
         assert isinstance(start, Value)
         assert isinstance(stop, Value)
-        return self.__triop_expr__('trimstr', x=start, y=stop, inline=False, method=True)
+        return self.__triop_expr__(
+            "trimstr", x=start, y=stop, inline=False, method=True
+        )
 
     def coalesce_0(self):
         return self.coalesce(Value(0))
 
     def datetime_to_date(self):
-        return self.__uop_expr__('datetime_to_date')
+        return self.__uop_expr__("datetime_to_date")
 
     def parse_datetime(self, format=None):
         if format is None:
             format = Value("%Y-%m-%d %H:%M:%S")
         assert isinstance(format, Value)
-        return self.__op_expr__('parse_datetime', other=format, inline=False, method=True)
+        return self.__op_expr__(
+            "parse_datetime", other=format, inline=False, method=True
+        )
 
     def parse_date(self, format=None):
         if format is None:
             format = Value("%Y-%m-%d")
-        return self.__op_expr__('parse_date', other=format, inline=False, method=True)
+        return self.__op_expr__("parse_date", other=format, inline=False, method=True)
 
     def format_datetime(self, format=None):
         if format is None:
             format = Value("%Y-%m-%d %H:%M:%S")
         assert isinstance(format, Value)
-        return self.__op_expr__('format_datetime', other=format, inline=False, method=True)
+        return self.__op_expr__(
+            "format_datetime", other=format, inline=False, method=True
+        )
 
     def format_date(self, format=None):
         if format is None:
             format = Value("%Y-%m-%d")
-        return self.__op_expr__('format_date', other=format, inline=False, method=True)
+        return self.__op_expr__("format_date", other=format, inline=False, method=True)
 
     def dayofweek(self):
-        return self.__uop_expr__('dayofweek')
+        return self.__uop_expr__("dayofweek")
 
     def dayofyear(self):
-        return self.__uop_expr__('dayofyear')
+        return self.__uop_expr__("dayofyear")
 
     def dayofmonth(self):
-        return self.__uop_expr__('dayofmonth')
+        return self.__uop_expr__("dayofmonth")
 
     def weekofyear(self):
-        return self.__uop_expr__('weekofyear')
+        return self.__uop_expr__("weekofyear")
 
     def month(self):
-        return self.__uop_expr__('month')
+        return self.__uop_expr__("month")
 
     def quarter(self):
-        return self.__uop_expr__('quarter')
+        return self.__uop_expr__("quarter")
 
     def year(self):
-        return self.__uop_expr__('year')
+        return self.__uop_expr__("year")
 
     def timestamp_diff(self, other):
         return self.__op_expr__("timestamp_diff", other, inline=False, method=True)
@@ -576,7 +584,7 @@ class Term(PreTerm, ABC):
         return self.__op_expr__("date_diff", other, inline=False, method=True)
 
     def base_Sunday(self):
-        return self.__uop_expr__('base_Sunday')
+        return self.__uop_expr__("base_Sunday")
 
 
 class Value(Term):
@@ -705,7 +713,11 @@ class ColumnReference(Term):
             raise TypeError("column_name must be a string")
         if view is not None:
             if column_name not in view.column_set:
-                raise KeyError("column_name '" + str(column_name) + "' must be a column of the given view")
+                raise KeyError(
+                    "column_name '"
+                    + str(column_name)
+                    + "' must be a column of the given view"
+                )
         Term.__init__(self)
 
     def evaluate(self, data_frame):
@@ -737,7 +749,15 @@ class ColumnReference(Term):
 def _can_find_method_by_name(op):
     assert isinstance(op, str)
     # from populate_specials
-    if op in {'row_number', '_row_number', '_size', 'size', 'connected_components', '_ngroup', 'ngroup'}:
+    if op in {
+        "row_number",
+        "_row_number",
+        "_size",
+        "size",
+        "connected_components",
+        "_ngroup",
+        "ngroup",
+    }:
         return True
     # check user fns
     # first check chosen mappings
@@ -826,7 +846,11 @@ class Expression(Term):
     def replace_view(self, view):
         new_args = [oi.replace_view(view) for oi in self.args]
         return Expression(
-            op=self.op, args=new_args, params=self.params, inline=self.inline, method=self.method,
+            op=self.op,
+            args=new_args,
+            params=self.params,
+            inline=self.inline,
+            method=self.method,
         )
 
     def get_column_names(self, columns_seen):
@@ -853,7 +877,7 @@ class Expression(Term):
         try:
             method = getattr(args[0], self.op)
             if callable(method):
-                return method(*args[1: ])
+                return method(*args[1:])
         except AttributeError:
             pass
         # new see if numpy can do this
@@ -863,7 +887,7 @@ class Expression(Term):
                 return fn(*args)
         except KeyError:
             pass
-        raise KeyError(f'function {self.op} not found')
+        raise KeyError(f"function {self.op} not found")
 
     def to_python(self, *, want_inline_parens=False):
         subs = [ai.to_python(want_inline_parens=True) for ai in self.args]
@@ -932,7 +956,7 @@ def standardize_join_type(join_str):
     if not isinstance(join_str, str):
         raise TypeError("Expected join_str to be a string")
     join_str = join_str.upper()
-    allowed = set(['INNER', 'LEFT', 'RIGHT', 'OUTER', 'FULL', 'CROSS'])
+    allowed = set(["INNER", "LEFT", "RIGHT", "OUTER", "FULL", "CROSS"])
     if not join_str in allowed:  # TOOO put this back in!
         raise KeyError(f"join type {join_str} not supported")
     return join_str

@@ -195,7 +195,7 @@
             <span class="s2">&quot;trunc&quot;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">trunc</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">math_fns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">saw</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">saw</span><span class="p">:</span>
                 <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
                 <span class="n">saw</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
         <span class="n">math_fns_2</span> <span class="o">=</span> <span class="p">{</span>
@@ -210,7 +210,7 @@
             <span class="s2">&quot;power&quot;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">math_fns_2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">saw</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">saw</span><span class="p">:</span>
                 <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
                 <span class="n">saw</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
         <span class="c1"># numpy fns</span>
@@ -237,12 +237,12 @@
             <span class="s2">&quot;tanh&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">tanh</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">numpy_fns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">saw</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">saw</span><span class="p">:</span>
                 <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
                 <span class="n">saw</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
 
         <span class="c1"># https://docs.python.org/3/library/sqlite3.html</span>
-        <span class="n">conn</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MedianAgg</span><span class="p">)</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MedianAgg</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection</span>
     <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
@@ -282,9 +282,7 @@
 <span class="sd">    Return an example db handle for testing. Returns None if helper packages not present.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">db_handle</span> <span class="o">=</span> <span class="n">SQLiteModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span>
-        <span class="n">conn</span><span class="o">=</span><span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;:memory:&#39;</span><span class="p">)</span>
-    <span class="p">)</span>
+    <span class="n">db_handle</span> <span class="o">=</span> <span class="n">SQLiteModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">conn</span><span class="o">=</span><span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;:memory:&quot;</span><span class="p">))</span>
     <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">db_handle</span>
 </pre></div>
@@ -442,7 +440,7 @@
             <span class="s2">&quot;trunc&quot;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">trunc</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">math_fns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">saw</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">saw</span><span class="p">:</span>
                 <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
                 <span class="n">saw</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
         <span class="n">math_fns_2</span> <span class="o">=</span> <span class="p">{</span>
@@ -457,7 +455,7 @@
             <span class="s2">&quot;power&quot;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">math_fns_2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">saw</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">saw</span><span class="p">:</span>
                 <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
                 <span class="n">saw</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
         <span class="c1"># numpy fns</span>
@@ -484,12 +482,12 @@
             <span class="s2">&quot;tanh&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">tanh</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">numpy_fns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">saw</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">saw</span><span class="p">:</span>
                 <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
                 <span class="n">saw</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
 
         <span class="c1"># https://docs.python.org/3/library/sqlite3.html</span>
-        <span class="n">conn</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MedianAgg</span><span class="p">)</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MedianAgg</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection</span>
     <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
@@ -608,7 +606,7 @@
             <span class="s2">&quot;trunc&quot;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">trunc</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">math_fns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">saw</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">saw</span><span class="p">:</span>
                 <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
                 <span class="n">saw</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
         <span class="n">math_fns_2</span> <span class="o">=</span> <span class="p">{</span>
@@ -623,7 +621,7 @@
             <span class="s2">&quot;power&quot;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">math_fns_2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">saw</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">saw</span><span class="p">:</span>
                 <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
                 <span class="n">saw</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
         <span class="c1"># numpy fns</span>
@@ -650,12 +648,12 @@
             <span class="s2">&quot;tanh&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">tanh</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">numpy_fns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">saw</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">saw</span><span class="p">:</span>
                 <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
                 <span class="n">saw</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
 
         <span class="c1"># https://docs.python.org/3/library/sqlite3.html</span>
-        <span class="n">conn</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MedianAgg</span><span class="p">)</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MedianAgg</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -782,9 +780,7 @@
 <span class="sd">    Return an example db handle for testing. Returns None if helper packages not present.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">db_handle</span> <span class="o">=</span> <span class="n">SQLiteModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span>
-        <span class="n">conn</span><span class="o">=</span><span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;:memory:&#39;</span><span class="p">)</span>
-    <span class="p">)</span>
+    <span class="n">db_handle</span> <span class="o">=</span> <span class="n">SQLiteModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">conn</span><span class="o">=</span><span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;:memory:&quot;</span><span class="p">))</span>
     <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">db_handle</span>
 </pre></div>
