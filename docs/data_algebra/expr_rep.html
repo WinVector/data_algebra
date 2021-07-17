@@ -400,6 +400,9 @@
 
             </li>
             <li>
+                    <a class="function" href="#enc_value">enc_value</a>
+            </li>
+            <li>
                     <a class="class" href="#ColumnReference">ColumnReference</a>
                             <ul class="memberlist">
                         <li>
@@ -505,8 +508,9 @@
 <span class="c1">#  http://tomerfiliba.com/blog/Infix-Operators/</span>
 
 
-<span class="c1"># list of window/aggregation functons that must be windowed/aggegated</span>
+<span class="c1"># list of window/aggregation functions that must be windowed/aggregated</span>
 <span class="c1"># (note some other functions work in more than one mode)</span>
+<span class="c1"># noinspection SpellCheckingInspection</span>
 <span class="n">fn_names_that_imply_windowed_situation</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;all&quot;</span><span class="p">,</span>
     <span class="s2">&quot;any&quot;</span><span class="p">,</span>
@@ -546,6 +550,7 @@
 <span class="p">}</span>
 
 
+<span class="c1"># noinspection SpellCheckingInspection</span>
 <span class="n">fn_names_that_imply_ordered_windowed_situation</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;cumcount&quot;</span><span class="p">,</span>
     <span class="s2">&quot;cummax&quot;</span><span class="p">,</span>
@@ -556,8 +561,9 @@
 <span class="p">}</span>
 
 
-<span class="c1"># a competing idea sould be to remove ordering if</span>
+<span class="c1"># a competing idea should be to remove ordering if</span>
 <span class="c1"># operator is one of these (instead of forbid)</span>
+<span class="c1"># noinspection SpellCheckingInspection</span>
 <span class="n">fn_names_that_contradict_ordered_windowed_situation</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;count&quot;</span><span class="p">,</span>
     <span class="s2">&quot;max&quot;</span><span class="p">,</span>
@@ -629,6 +635,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 
+<span class="c1"># noinspection SpellCheckingInspection</span>
 <span class="k">class</span> <span class="nc">Term</span><span class="p">(</span><span class="n">PreTerm</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Abstract intermediate class with combination ability</span>
@@ -643,14 +650,14 @@
         <span class="sd">&quot;&quot;&quot;binary expression&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
-            <span class="n">other</span> <span class="o">=</span> <span class="n">_enc_value</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__rop_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;reversed binary expression&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
-            <span class="n">other</span> <span class="o">=</span> <span class="n">_enc_value</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__uop_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -662,9 +669,9 @@
         <span class="sd">&quot;&quot;&quot;three argument expression&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">_enc_value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="n">_enc_value</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
 
     <span class="c1"># try to get at == and other comparison operators</span>
@@ -1070,6 +1077,7 @@
     <span class="k">def</span> <span class="nf">date_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;date_diff&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+    <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">base_Sunday</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;base_Sunday&quot;</span><span class="p">)</span>
 
@@ -1133,11 +1141,12 @@
 
     <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">views</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
-            <span class="n">vi</span> <span class="o">=</span> <span class="n">ai</span><span class="o">.</span><span class="n">get_views</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">vii</span> <span class="ow">in</span> <span class="n">vi</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">vii</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">views</span><span class="p">:</span>  <span class="c1"># expect list to be of size zero or one</span>
-                    <span class="n">views</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vii</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ai</span><span class="p">,</span> <span class="n">PreTerm</span><span class="p">):</span>
+                <span class="n">vi</span> <span class="o">=</span> <span class="n">ai</span><span class="o">.</span><span class="n">get_views</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">vii</span> <span class="ow">in</span> <span class="n">vi</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">vii</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">views</span><span class="p">:</span>  <span class="c1"># expect list to be of size zero or one</span>
+                        <span class="n">views</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vii</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">views</span>
 
     <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
@@ -1154,7 +1163,7 @@
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">li_to_python</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">li_to_python</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="n">want_inline_parens</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
@@ -1164,7 +1173,7 @@
             <span class="s2">&quot;[&quot;</span>
             <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                 <span class="p">[</span>
-                    <span class="n">li_to_python</span><span class="p">(</span><span class="n">ai</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="n">want_inline_parens</span><span class="p">)</span>
+                    <span class="n">li_to_python</span><span class="p">(</span><span class="n">ai</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
                 <span class="p">]</span>
             <span class="p">)</span>
@@ -1176,7 +1185,7 @@
             <span class="n">ti</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">(</span><span class="n">columns_seen</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_enc_value</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">enc_value</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">PreTerm</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">value</span>
     <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
@@ -1231,10 +1240,13 @@
         <span class="n">columns_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_name</span><span class="p">)</span>
 
 
+<span class="c1"># noinspection SpellCheckingInspection</span>
 <span class="k">def</span> <span class="nf">_can_find_method_by_name</span><span class="p">(</span><span class="n">op</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="c1"># from populate_specials</span>
     <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">{</span>
+        <span class="s2">&quot;_count&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;count&quot;</span><span class="p">,</span>
         <span class="s2">&quot;row_number&quot;</span><span class="p">,</span>
         <span class="s2">&quot;_row_number&quot;</span><span class="p">,</span>
         <span class="s2">&quot;_size&quot;</span><span class="p">,</span>
@@ -1247,13 +1259,15 @@
     <span class="c1"># check user fns</span>
     <span class="c1"># first check chosen mappings</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">user_fun_map</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
+        <span class="c1"># noinspection PyUnusedLocal</span>
+        <span class="n">check_val</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">user_fun_map</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>  <span class="c1"># for KeyError</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
         <span class="k">pass</span>
     <span class="c1"># check chosen mappings</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">impl_map</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
+        <span class="c1"># noinspection PyUnusedLocal</span>
+        <span class="n">check_val</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">impl_map</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>  <span class="c1"># for KeyError</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
         <span class="k">pass</span>
@@ -1288,7 +1302,7 @@
                     <span class="s2">&quot;must have no more than two arguments if inline is True&quot;</span>
                 <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">=</span> <span class="n">op</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">_enc_value</span><span class="p">(</span><span class="n">ai</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">enc_value</span><span class="p">(</span><span class="n">ai</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">inline</span> <span class="o">=</span> <span class="n">inline</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
@@ -1376,7 +1390,7 @@
     <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ai</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inline</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1406,12 +1420,13 @@
 <span class="k">def</span> <span class="nf">standardize_join_type</span><span class="p">(</span><span class="n">join_str</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">join_str</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="n">join_str</span> <span class="o">=</span> <span class="n">join_str</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-    <span class="n">allowed</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s2">&quot;INNER&quot;</span><span class="p">,</span> <span class="s2">&quot;LEFT&quot;</span><span class="p">,</span> <span class="s2">&quot;RIGHT&quot;</span><span class="p">,</span> <span class="s2">&quot;OUTER&quot;</span><span class="p">,</span> <span class="s2">&quot;FULL&quot;</span><span class="p">,</span> <span class="s2">&quot;CROSS&quot;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">join_str</span> <span class="ow">in</span> <span class="n">allowed</span><span class="p">:</span>  <span class="c1"># TOOO put this back in!</span>
+    <span class="n">allowed</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;INNER&quot;</span><span class="p">,</span> <span class="s2">&quot;LEFT&quot;</span><span class="p">,</span> <span class="s2">&quot;RIGHT&quot;</span><span class="p">,</span> <span class="s2">&quot;OUTER&quot;</span><span class="p">,</span> <span class="s2">&quot;FULL&quot;</span><span class="p">,</span> <span class="s2">&quot;CROSS&quot;</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">join_str</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;join type </span><span class="si">{</span><span class="n">join_str</span><span class="si">}</span><span class="s2"> not supported&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">join_str</span>
 
 
+<span class="c1"># noinspection SpellCheckingInspection</span>
 <span class="k">def</span> <span class="nf">get_columns_used</span><span class="p">(</span><span class="n">parsed_exprs</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parsed_exprs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
     <span class="n">columns_seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -1420,6 +1435,7 @@
     <span class="k">return</span> <span class="n">columns_seen</span>
 
 
+<span class="c1"># noinspection SpellCheckingInspection</span>
 <span class="k">def</span> <span class="nf">implies_windowed</span><span class="p">(</span><span class="n">parsed_exprs</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parsed_exprs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">opk</span> <span class="ow">in</span> <span class="n">parsed_exprs</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>  <span class="c1"># look for aggregation functions</span>
@@ -1717,14 +1733,14 @@
         <span class="sd">&quot;&quot;&quot;binary expression&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
-            <span class="n">other</span> <span class="o">=</span> <span class="n">_enc_value</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__rop_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;reversed binary expression&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
-            <span class="n">other</span> <span class="o">=</span> <span class="n">_enc_value</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__uop_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -1736,9 +1752,9 @@
         <span class="sd">&quot;&quot;&quot;three argument expression&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">_enc_value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="n">_enc_value</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
 
     <span class="c1"># try to get at == and other comparison operators</span>
@@ -2144,6 +2160,7 @@
     <span class="k">def</span> <span class="nf">date_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;date_diff&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+    <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">base_Sunday</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;base_Sunday&quot;</span><span class="p">)</span>
 </pre></div>
@@ -4315,11 +4332,12 @@ errors defaults to 'strict'.</p>
 
     <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">views</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
-            <span class="n">vi</span> <span class="o">=</span> <span class="n">ai</span><span class="o">.</span><span class="n">get_views</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">vii</span> <span class="ow">in</span> <span class="n">vi</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">vii</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">views</span><span class="p">:</span>  <span class="c1"># expect list to be of size zero or one</span>
-                    <span class="n">views</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vii</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ai</span><span class="p">,</span> <span class="n">PreTerm</span><span class="p">):</span>
+                <span class="n">vi</span> <span class="o">=</span> <span class="n">ai</span><span class="o">.</span><span class="n">get_views</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">vii</span> <span class="ow">in</span> <span class="n">vi</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">vii</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">views</span><span class="p">:</span>  <span class="c1"># expect list to be of size zero or one</span>
+                        <span class="n">views</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vii</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">views</span>
 
     <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
@@ -4336,7 +4354,7 @@ errors defaults to 'strict'.</p>
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">li_to_python</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">li_to_python</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="n">want_inline_parens</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
@@ -4346,7 +4364,7 @@ errors defaults to 'strict'.</p>
             <span class="s2">&quot;[&quot;</span>
             <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                 <span class="p">[</span>
-                    <span class="n">li_to_python</span><span class="p">(</span><span class="n">ai</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="n">want_inline_parens</span><span class="p">)</span>
+                    <span class="n">li_to_python</span><span class="p">(</span><span class="n">ai</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
                 <span class="p">]</span>
             <span class="p">)</span>
@@ -4418,11 +4436,12 @@ errors defaults to 'strict'.</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">views</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
-            <span class="n">vi</span> <span class="o">=</span> <span class="n">ai</span><span class="o">.</span><span class="n">get_views</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">vii</span> <span class="ow">in</span> <span class="n">vi</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">vii</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">views</span><span class="p">:</span>  <span class="c1"># expect list to be of size zero or one</span>
-                    <span class="n">views</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vii</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ai</span><span class="p">,</span> <span class="n">PreTerm</span><span class="p">):</span>
+                <span class="n">vi</span> <span class="o">=</span> <span class="n">ai</span><span class="o">.</span><span class="n">get_views</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">vii</span> <span class="ow">in</span> <span class="n">vi</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">vii</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">views</span><span class="p">:</span>  <span class="c1"># expect list to be of size zero or one</span>
+                        <span class="n">views</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vii</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">views</span>
 </pre></div>
 
@@ -4489,7 +4508,7 @@ errors defaults to 'strict'.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">li_to_python</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">li_to_python</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="n">want_inline_parens</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
@@ -4499,7 +4518,7 @@ errors defaults to 'strict'.</p>
             <span class="s2">&quot;[&quot;</span>
             <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                 <span class="p">[</span>
-                    <span class="n">li_to_python</span><span class="p">(</span><span class="n">ai</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="n">want_inline_parens</span><span class="p">)</span>
+                    <span class="n">li_to_python</span><span class="p">(</span><span class="n">ai</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
                 <span class="p">]</span>
             <span class="p">)</span>
@@ -4546,6 +4565,31 @@ errors defaults to 'strict'.</p>
             </div>
                                 </dl>
                             </div>
+                </section>
+                <section id="enc_value">
+                            <div class="attr function"><a class="headerlink" href="#enc_value">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">enc_value</span><span class="signature">(value)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">enc_value</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">PreTerm</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">value</span>
+    <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;callable as an argument&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ListTerm</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
                 </section>
                 <section id="ColumnReference">
                                 <div class="attr class">
@@ -4908,7 +4952,7 @@ errors defaults to 'strict'.</p>
                     <span class="s2">&quot;must have no more than two arguments if inline is True&quot;</span>
                 <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">=</span> <span class="n">op</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">_enc_value</span><span class="p">(</span><span class="n">ai</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">enc_value</span><span class="p">(</span><span class="n">ai</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">inline</span> <span class="o">=</span> <span class="n">inline</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
@@ -4996,7 +5040,7 @@ errors defaults to 'strict'.</p>
     <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ai</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inline</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -5045,7 +5089,7 @@ errors defaults to 'strict'.</p>
                     <span class="s2">&quot;must have no more than two arguments if inline is True&quot;</span>
                 <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">=</span> <span class="n">op</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">_enc_value</span><span class="p">(</span><span class="n">ai</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">enc_value</span><span class="p">(</span><span class="n">ai</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">inline</span> <span class="o">=</span> <span class="n">inline</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
@@ -5235,7 +5279,7 @@ errors defaults to 'strict'.</p>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ai</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inline</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -5396,8 +5440,8 @@ errors defaults to 'strict'.</p>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">standardize_join_type</span><span class="p">(</span><span class="n">join_str</span><span class="p">):</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">join_str</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="n">join_str</span> <span class="o">=</span> <span class="n">join_str</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-    <span class="n">allowed</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s2">&quot;INNER&quot;</span><span class="p">,</span> <span class="s2">&quot;LEFT&quot;</span><span class="p">,</span> <span class="s2">&quot;RIGHT&quot;</span><span class="p">,</span> <span class="s2">&quot;OUTER&quot;</span><span class="p">,</span> <span class="s2">&quot;FULL&quot;</span><span class="p">,</span> <span class="s2">&quot;CROSS&quot;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">join_str</span> <span class="ow">in</span> <span class="n">allowed</span><span class="p">:</span>  <span class="c1"># TOOO put this back in!</span>
+    <span class="n">allowed</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;INNER&quot;</span><span class="p">,</span> <span class="s2">&quot;LEFT&quot;</span><span class="p">,</span> <span class="s2">&quot;RIGHT&quot;</span><span class="p">,</span> <span class="s2">&quot;OUTER&quot;</span><span class="p">,</span> <span class="s2">&quot;FULL&quot;</span><span class="p">,</span> <span class="s2">&quot;CROSS&quot;</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">join_str</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;join type </span><span class="si">{</span><span class="n">join_str</span><span class="si">}</span><span class="s2"> not supported&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">join_str</span>
 </pre></div>

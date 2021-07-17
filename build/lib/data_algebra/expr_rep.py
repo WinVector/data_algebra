@@ -14,8 +14,9 @@ import data_algebra.util
 #  http://tomerfiliba.com/blog/Infix-Operators/
 
 
-# list of window/aggregation functons that must be windowed/aggegated
+# list of window/aggregation functions that must be windowed/aggregated
 # (note some other functions work in more than one mode)
+# noinspection SpellCheckingInspection
 fn_names_that_imply_windowed_situation = {
     "all",
     "any",
@@ -55,6 +56,7 @@ fn_names_that_imply_windowed_situation = {
 }
 
 
+# noinspection SpellCheckingInspection
 fn_names_that_imply_ordered_windowed_situation = {
     "cumcount",
     "cummax",
@@ -65,8 +67,9 @@ fn_names_that_imply_ordered_windowed_situation = {
 }
 
 
-# a competing idea sould be to remove ordering if
+# a competing idea should be to remove ordering if
 # operator is one of these (instead of forbid)
+# noinspection SpellCheckingInspection
 fn_names_that_contradict_ordered_windowed_situation = {
     "count",
     "max",
@@ -138,6 +141,7 @@ class PreTerm(ABC):
         return self.to_python(want_inline_parens=False)
 
 
+# noinspection SpellCheckingInspection
 class Term(PreTerm, ABC):
     """
     Abstract intermediate class with combination ability
@@ -152,14 +156,14 @@ class Term(PreTerm, ABC):
         """binary expression"""
         assert isinstance(op, str)
         if not isinstance(other, Term):
-            other = _enc_value(other)
+            other = enc_value(other)
         return Expression(op, (self, other), inline=inline, method=method)
 
     def __rop_expr__(self, op, other):
         """reversed binary expression"""
         assert isinstance(op, str)
         if not isinstance(other, Term):
-            other = _enc_value(other)
+            other = enc_value(other)
         return Expression(op, (other, self), inline=True)
 
     def __uop_expr__(self, op, *, params=None, inline=False):
@@ -171,9 +175,9 @@ class Term(PreTerm, ABC):
         """three argument expression"""
         assert isinstance(op, str)
         if not isinstance(x, Term):
-            x = _enc_value(x)
+            x = enc_value(x)
         if not isinstance(y, Term):
-            y = _enc_value(y)
+            y = enc_value(y)
         return Expression(op, (self, x, y), inline=inline, method=method)
 
     # try to get at == and other comparison operators
@@ -579,6 +583,7 @@ class Term(PreTerm, ABC):
     def date_diff(self, other):
         return self.__op_expr__("date_diff", other, inline=False, method=True)
 
+    # noinspection PyPep8Naming
     def base_Sunday(self):
         return self.__uop_expr__("base_Sunday")
 
@@ -642,11 +647,12 @@ class ListTerm(PreTerm):
 
     def get_views(self):
         views = list()
-        for ai in self.args:
-            vi = ai.get_views()
-            for vii in vi:
-                if vii not in views:  # expect list to be of size zero or one
-                    views.append(vii)
+        for ai in self.value:
+            if isinstance(ai, PreTerm):
+                vi = ai.get_views()
+                for vii in vi:
+                    if vii not in views:  # expect list to be of size zero or one
+                        views.append(vii)
         return views
 
     def replace_view(self, view):
@@ -663,7 +669,7 @@ class ListTerm(PreTerm):
         return res
 
     def to_python(self, *, want_inline_parens=False):
-        def li_to_python(value, *, want_inline_parens=False):
+        def li_to_python(value):
             try:
                 return value.to_python(want_inline_parens=want_inline_parens)
             except AttributeError:
@@ -673,7 +679,7 @@ class ListTerm(PreTerm):
             "["
             + ", ".join(
                 [
-                    li_to_python(ai, want_inline_parens=want_inline_parens)
+                    li_to_python(ai)
                     for ai in self.value
                 ]
             )
@@ -685,7 +691,7 @@ class ListTerm(PreTerm):
             ti.get_column_names(columns_seen)
 
 
-def _enc_value(value):
+def enc_value(value):
     if isinstance(value, PreTerm):
         return value
     if callable(value):
@@ -740,10 +746,13 @@ class ColumnReference(Term):
         columns_seen.add(self.column_name)
 
 
+# noinspection SpellCheckingInspection
 def _can_find_method_by_name(op):
     assert isinstance(op, str)
     # from populate_specials
     if op in {
+        "_count",
+        "count",
         "row_number",
         "_row_number",
         "_size",
@@ -756,13 +765,15 @@ def _can_find_method_by_name(op):
     # check user fns
     # first check chosen mappings
     try:
-        data_algebra.default_data_model.user_fun_map[op]
+        # noinspection PyUnusedLocal
+        check_val = data_algebra.default_data_model.user_fun_map[op]  # for KeyError
         return True
     except KeyError:
         pass
     # check chosen mappings
     try:
-        data_algebra.default_data_model.impl_map[op]
+        # noinspection PyUnusedLocal
+        check_val = data_algebra.default_data_model.impl_map[op]  # for KeyError
         return True
     except KeyError:
         pass
@@ -797,7 +808,7 @@ class Expression(Term):
                     "must have no more than two arguments if inline is True"
                 )
         self.op = op
-        self.args = [_enc_value(ai) for ai in args]
+        self.args = [enc_value(ai) for ai in args]
         self.params = params
         self.inline = inline
         self.method = method
@@ -885,7 +896,7 @@ class Expression(Term):
     def to_python(self, *, want_inline_parens=False):
         subs = [ai.to_python(want_inline_parens=True) for ai in self.args]
         if len(subs) <= 0:
-            return "_" + self.op + "()"
+            return self.op + "()"
         if len(subs) == 1:
             if self.inline:
                 return self.op + self.args[0].to_python(want_inline_parens=True)
@@ -915,12 +926,13 @@ def connected_components(f, g):
 def standardize_join_type(join_str):
     assert isinstance(join_str, str)
     join_str = join_str.upper()
-    allowed = set(["INNER", "LEFT", "RIGHT", "OUTER", "FULL", "CROSS"])
-    if not join_str in allowed:  # TOOO put this back in!
+    allowed = {"INNER", "LEFT", "RIGHT", "OUTER", "FULL", "CROSS"}
+    if join_str not in allowed:
         raise KeyError(f"join type {join_str} not supported")
     return join_str
 
 
+# noinspection SpellCheckingInspection
 def get_columns_used(parsed_exprs):
     assert isinstance(parsed_exprs, dict)
     columns_seen = set()
@@ -929,6 +941,7 @@ def get_columns_used(parsed_exprs):
     return columns_seen
 
 
+# noinspection SpellCheckingInspection
 def implies_windowed(parsed_exprs):
     assert isinstance(parsed_exprs, dict)
     for opk in parsed_exprs.values():  # look for aggregation functions
