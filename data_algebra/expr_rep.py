@@ -16,6 +16,7 @@ import data_algebra.util
 
 # list of window/aggregation functions that must be windowed/aggregated
 # (note some other functions work in more than one mode)
+# noinspection SpellCheckingInspection
 fn_names_that_imply_windowed_situation = {
     "all",
     "any",
@@ -55,6 +56,7 @@ fn_names_that_imply_windowed_situation = {
 }
 
 
+# noinspection SpellCheckingInspection
 fn_names_that_imply_ordered_windowed_situation = {
     "cumcount",
     "cummax",
@@ -65,8 +67,9 @@ fn_names_that_imply_ordered_windowed_situation = {
 }
 
 
-# a competing idea sould be to remove ordering if
+# a competing idea should be to remove ordering if
 # operator is one of these (instead of forbid)
+# noinspection SpellCheckingInspection
 fn_names_that_contradict_ordered_windowed_situation = {
     "count",
     "max",
@@ -138,6 +141,7 @@ class PreTerm(ABC):
         return self.to_python(want_inline_parens=False)
 
 
+# noinspection SpellCheckingInspection
 class Term(PreTerm, ABC):
     """
     Abstract intermediate class with combination ability
@@ -152,14 +156,14 @@ class Term(PreTerm, ABC):
         """binary expression"""
         assert isinstance(op, str)
         if not isinstance(other, Term):
-            other = _enc_value(other)
+            other = enc_value(other)
         return Expression(op, (self, other), inline=inline, method=method)
 
     def __rop_expr__(self, op, other):
         """reversed binary expression"""
         assert isinstance(op, str)
         if not isinstance(other, Term):
-            other = _enc_value(other)
+            other = enc_value(other)
         return Expression(op, (other, self), inline=True)
 
     def __uop_expr__(self, op, *, params=None, inline=False):
@@ -171,9 +175,9 @@ class Term(PreTerm, ABC):
         """three argument expression"""
         assert isinstance(op, str)
         if not isinstance(x, Term):
-            x = _enc_value(x)
+            x = enc_value(x)
         if not isinstance(y, Term):
-            y = _enc_value(y)
+            y = enc_value(y)
         return Expression(op, (self, x, y), inline=inline, method=method)
 
     # try to get at == and other comparison operators
@@ -687,7 +691,7 @@ class ListTerm(PreTerm):
             ti.get_column_names(columns_seen)
 
 
-def _enc_value(value):
+def enc_value(value):
     if isinstance(value, PreTerm):
         return value
     if callable(value):
@@ -742,6 +746,7 @@ class ColumnReference(Term):
         columns_seen.add(self.column_name)
 
 
+# noinspection SpellCheckingInspection
 def _can_find_method_by_name(op):
     assert isinstance(op, str)
     # from populate_specials
@@ -801,7 +806,7 @@ class Expression(Term):
                     "must have no more than two arguments if inline is True"
                 )
         self.op = op
-        self.args = [_enc_value(ai) for ai in args]
+        self.args = [enc_value(ai) for ai in args]
         self.params = params
         self.inline = inline
         self.method = method
@@ -926,6 +931,7 @@ def standardize_join_type(join_str):
     return join_str
 
 
+# noinspection SpellCheckingInspection
 def get_columns_used(parsed_exprs):
     assert isinstance(parsed_exprs, dict)
     columns_seen = set()
@@ -934,6 +940,7 @@ def get_columns_used(parsed_exprs):
     return columns_seen
 
 
+# noinspection SpellCheckingInspection
 def implies_windowed(parsed_exprs):
     assert isinstance(parsed_exprs, dict)
     for opk in parsed_exprs.values():  # look for aggregation functions

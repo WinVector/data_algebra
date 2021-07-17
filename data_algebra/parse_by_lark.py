@@ -80,10 +80,11 @@ def _walk_lark_tree(op, *, data_def=None):
 
     def lookup_symbol(key):
         try:
-            return data_algebra.expr_rep._enc_value(data_def[key])
+            return data_algebra.expr_rep.enc_value(data_def[key])
         except KeyError:
             raise NameError(f"unknown symbol: {key}")
 
+    # noinspection SpellCheckingInspection
     def _r_walk_lark_tree(r_op):
         if isinstance(r_op, lark.lexer.Token):
             if r_op.type == "DEC_NUMBER":
@@ -153,17 +154,23 @@ def _walk_lark_tree(op, *, data_def=None):
             if r_op.data == "funccall":
                 if len(r_op.children) > 2:
                     raise ValueError("unexpected funccall length")
+                var = None
+                op_name = None
                 method_carrier = r_op.children[0]
-                if isinstance(method_carrier, lark.tree.Tree) and (
-                    method_carrier.data == "getattr"
-                ):
-                    # method invoke
-                    var = _r_walk_lark_tree(method_carrier.children[0])
-                    op_name = str(method_carrier.children[1])
+                if isinstance(method_carrier, lark.tree.Tree):
+                    if method_carrier.data == "getattr":
+                        # method invoke
+                        var = _r_walk_lark_tree(method_carrier.children[0])
+                        op_name = str(method_carrier.children[1])
+                    else:
+                        # function invoke
+                        var = None
+                        op_name = str(method_carrier.children[0])
                 else:
-                    # function invoke
-                    var = None
-                    op_name = str(method_carrier.children[0])
+                    if isinstance(method_carrier, str):
+                        op_name = method_carrier
+                if op_name is None:
+                    raise ValueError("couldn't work out method name")
                 args = []
                 if len(r_op.children) > 1:
                     raw_args = r_op.children[1].children
@@ -194,8 +201,8 @@ def _walk_lark_tree(op, *, data_def=None):
                 op_name = "__eq__"
                 return getattr(left, op_name)(data_algebra.expr_rep.Value(False))
             if r_op.data in ["list", "tuple"]:
-                vals = [_r_walk_lark_tree(vi) for vi in r_op.children[0].children]
-                return data_algebra.expr_rep.ListTerm(vals)
+                op_values = [_r_walk_lark_tree(vi) for vi in r_op.children[0].children]
+                return data_algebra.expr_rep.ListTerm(op_values)
             if r_op.data == "expr_stmt":
                 raise ValueError("Error must use == for comparison, not =")
             raise ValueError("unexpected/not-allowed lark Tree kind: " + str(r_op.data))
