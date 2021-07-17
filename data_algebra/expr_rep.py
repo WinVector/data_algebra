@@ -894,8 +894,7 @@ class Expression(Term):
     def to_python(self, *, want_inline_parens=False):
         subs = [ai.to_python(want_inline_parens=True) for ai in self.args]
         if len(subs) <= 0:
-            # TODO: research why we are adding and removing underbar
-            return "_" + self.op + "()"
+            return self.op + "()"
         if len(subs) == 1:
             if self.inline:
                 return self.op + self.args[0].to_python(want_inline_parens=True)
