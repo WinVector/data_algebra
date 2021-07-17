@@ -150,30 +150,26 @@ class Term(PreTerm, ABC):
 
     def __op_expr__(self, op, other, *, inline=True, method=False):
         """binary expression"""
-        if not isinstance(op, str):
-            raise TypeError("op is supposed to be a string")
+        assert isinstance(op, str)
         if not isinstance(other, Term):
             other = _enc_value(other)
         return Expression(op, (self, other), inline=inline, method=method)
 
     def __rop_expr__(self, op, other):
         """reversed binary expression"""
-        if not isinstance(op, str):
-            raise TypeError("op is supposed to be a string")
+        assert isinstance(op, str)
         if not isinstance(other, Term):
             other = _enc_value(other)
         return Expression(op, (other, self), inline=True)
 
     def __uop_expr__(self, op, *, params=None, inline=False):
         """unary expression"""
-        if not isinstance(op, str):
-            raise TypeError("op is supposed to be a string")
+        assert isinstance(op, str)
         return Expression(op, (self,), params=params, inline=inline, method=not inline)
 
     def __triop_expr__(self, op, x, y, inline=False, method=False):
         """three argument expression"""
-        if not isinstance(op, str):
-            raise TypeError("op is supposed to be a string")
+        assert isinstance(op, str)
         if not isinstance(x, Term):
             x = _enc_value(x)
         if not isinstance(y, Term):
@@ -634,8 +630,7 @@ class UnQuotedStr(str):
 class ListTerm(PreTerm):
     # derived from PreTerm as this is not combinable
     def __init__(self, value):
-        if not isinstance(value, (list, tuple)):
-            raise TypeError("value type must be a list or tuple")
+        assert isinstance(value, (list, tuple))
         self.value = [v for v in value]  # copy and standardize to a list
         PreTerm.__init__(self)
 
@@ -709,8 +704,7 @@ class ColumnReference(Term):
     def __init__(self, view, column_name):
         self.view = view
         self.column_name = column_name
-        if not isinstance(column_name, str):
-            raise TypeError("column_name must be a string")
+        assert isinstance(column_name, str)
         if view is not None:
             if column_name not in view.column_set:
                 raise KeyError(
@@ -792,8 +786,7 @@ def _can_find_method_by_name(op):
 
 class Expression(Term):
     def __init__(self, op, args, *, params=None, inline=False, method=False):
-        if not isinstance(op, str):
-            raise TypeError("op is supposed to be a string")
+        assert isinstance(op, str)
         if not _can_find_method_by_name(op):
             raise KeyError(f"can't find implementation for function/method {op}")
         if inline:
@@ -928,14 +921,11 @@ def populate_specials(*, column_defs, destination, user_values=None):
          usually formed from a ViewRepresentation.column_map.copy()
     """
 
-    if not isinstance(column_defs, dict):
-        raise TypeError("column_defs should be a dictionary")
-    if not isinstance(destination, dict):
-        raise TypeError("destination should be a dictionary")
+    assert isinstance(column_defs, dict)
+    assert isinstance(destination, dict)
     if user_values is None:
         user_values = {}
-    if not isinstance(user_values, dict):
-        raise TypeError("user_values should be a dictionary")
+    assert isinstance(user_values, dict)
     nd = column_defs.copy()
     # more doc!
     # makes these symbols available for parsing step
@@ -953,8 +943,7 @@ def populate_specials(*, column_defs, destination, user_values=None):
 
 
 def standardize_join_type(join_str):
-    if not isinstance(join_str, str):
-        raise TypeError("Expected join_str to be a string")
+    assert isinstance(join_str, str)
     join_str = join_str.upper()
     allowed = set(["INNER", "LEFT", "RIGHT", "OUTER", "FULL", "CROSS"])
     if not join_str in allowed:  # TOOO put this back in!
@@ -963,10 +952,7 @@ def standardize_join_type(join_str):
 
 
 def get_columns_used(parsed_exprs):
-    if not isinstance(parsed_exprs, dict):
-        raise TypeError(
-            "expected parsed_exprs to be a dictionary of data_algebra.expr_rep.Term(s)"
-        )
+    assert isinstance(parsed_exprs, dict)
     columns_seen = set()
     for node in parsed_exprs.values():
         node.get_column_names(columns_seen)
@@ -974,10 +960,7 @@ def get_columns_used(parsed_exprs):
 
 
 def implies_windowed(parsed_exprs):
-    if not isinstance(parsed_exprs, dict):
-        raise TypeError(
-            "expected parsed_exprs to be a dictionary of data_algebra.expr_rep.Term(s)"
-        )
+    assert isinstance(parsed_exprs, dict)
     for opk in parsed_exprs.values():  # look for aggregation functions
         if isinstance(opk, data_algebra.expr_rep.Expression):
             if opk.op in data_algebra.expr_rep.fn_names_that_imply_windowed_situation:

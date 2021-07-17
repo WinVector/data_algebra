@@ -159,8 +159,7 @@ class RecordSpecification:
 
 
 def blocks_to_rowrecs(data, *, blocks_in, local_data_model=None):
-    if not isinstance(blocks_in, data_algebra.cdata.RecordSpecification):
-        raise TypeError("blocks_in should be a data_algebra.cdata.RecordSpecification")
+    assert isinstance(blocks_in, data_algebra.cdata.RecordSpecification)
     ck = [k for k in blocks_in.content_keys if k is not None]
     if len(ck) != len(set(ck)):
         raise ValueError("blocks_in can not have duplicate content keys")
@@ -234,8 +233,7 @@ def blocks_to_rowrecs(data, *, blocks_in, local_data_model=None):
 def rowrecs_to_blocks(
     data, *, blocks_out, check_blocks_out_keying=False, local_data_model=None
 ):
-    if not isinstance(blocks_out, data_algebra.cdata.RecordSpecification):
-        raise TypeError("blocks_out should be a data_algebra.cdata.RecordSpecification")
+    assert isinstance(blocks_out, data_algebra.cdata.RecordSpecification)
     if local_data_model is None:
         local_data_model = data_algebra.default_data_model
     data = data.reset_index(drop=True)
@@ -301,18 +299,12 @@ def rowrecs_to_blocks(
 class RecordMap:
     def __init__(self, *, blocks_in=None, blocks_out=None, strict=False):
         if blocks_in is not None:
-            if not isinstance(blocks_in, data_algebra.cdata.RecordSpecification):
-                raise TypeError(
-                    "blocks_in should be a data_algebra.cdata.RecordSpecification"
-                )
+            assert isinstance(blocks_in, data_algebra.cdata.RecordSpecification)
             ck = [k for k in blocks_in.content_keys if k is not None]
             if len(ck) != len(set(ck)):
                 raise ValueError("blocks_in can not have duplicate content keys")
         if blocks_out is not None:
-            if not isinstance(blocks_out, data_algebra.cdata.RecordSpecification):
-                raise TypeError(
-                    "blocks_out should be a data_algebra.cdata.RecordSpecification"
-                )
+            assert isinstance(blocks_out, data_algebra.cdata.RecordSpecification)
         if (blocks_in is None) and (blocks_out is None):
             raise ValueError(
                 "At least one of blocks_in or blocks_out should not be None"
@@ -413,8 +405,7 @@ class RecordMap:
         :return:
         """
 
-        if not isinstance(other, RecordMap):
-            raise TypeError("expected other to be data_algebra.cdata.RecordMap")
+        assert isinstance(other, RecordMap)
         # (s2.compose(s1)).transform(data) == s2.transform(s1.transform(data))
         s1 = other
         s2 = self
