@@ -1,8 +1,13 @@
+
 import collections
 from types import SimpleNamespace
 
 import data_algebra.data_ops_types
 import data_algebra.data_ops
+
+
+# for use in building expressions such as one.sum()
+one = data_algebra.expr_rep.Value(1)
 
 
 class OpC(data_algebra.data_ops_types.OperatorPlatform):
@@ -148,23 +153,26 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         return self
 
     def convert_records(self, record_map, *, temp_namer=None):
-        return self.nd.convert_records(record_map=record_map, temp_namer=temp_namer)
+        self.nd.convert_records(record_map=record_map, temp_namer=temp_namer)
+        return self
 
     def map_records(
         self, blocks_in=None, blocks_out=None, strict=False, temp_namer=None
     ):
-        return self.nd.map_records(
+        self.nd.map_records(
             blocks_in=blocks_in,
             blocks_out=blocks_out,
             strict=strict,
             temp_namer=temp_namer,
-        )
+            )
+        return self
 
     # sklearn step style interface
 
     # noinspection PyPep8Naming, PyUnusedLocal
     def fit(self, X, y=None):
-        return self.nd.fit(X=X, y=y)
+        self.nd.fit(X=X, y=y)
+        return self
 
     # noinspection PyPep8Naming, PyUnusedLocal
     def fit_transform(self, X, y=None):
