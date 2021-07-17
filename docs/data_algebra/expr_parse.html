@@ -79,7 +79,6 @@
     <span class="n">columns_used</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">newops</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
     <span class="n">mp</span> <span class="o">=</span> <span class="n">column_defs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">populate_specials</span><span class="p">(</span><span class="n">column_defs</span><span class="o">=</span><span class="n">column_defs</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="n">mp</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ops</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">orig_v</span> <span class="o">=</span> <span class="n">ops</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>  <span class="c1"># make debugging easier</span>
@@ -137,7 +136,6 @@
     <span class="n">columns_used</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">newops</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
     <span class="n">mp</span> <span class="o">=</span> <span class="n">column_defs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">populate_specials</span><span class="p">(</span><span class="n">column_defs</span><span class="o">=</span><span class="n">column_defs</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="n">mp</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ops</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">orig_v</span> <span class="o">=</span> <span class="n">ops</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>  <span class="c1"># make debugging easier</span>

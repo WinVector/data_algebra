@@ -463,9 +463,6 @@
                     <a class="function" href="#connected_components">connected_components</a>
             </li>
             <li>
-                    <a class="function" href="#populate_specials">populate_specials</a>
-            </li>
-            <li>
                     <a class="function" href="#standardize_join_type">standardize_join_type</a>
             </li>
             <li>
@@ -1404,36 +1401,6 @@
 <span class="c1"># define with def so function has usable __name__</span>
 <span class="k">def</span> <span class="nf">connected_components</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="s2">&quot;connected_components&quot;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">])</span>
-
-
-<span class="c1"># TODO: get rid of user_values</span>
-<span class="k">def</span> <span class="nf">populate_specials</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">column_defs</span><span class="p">,</span> <span class="n">destination</span><span class="p">,</span> <span class="n">user_values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;populate a dictionary with special values</span>
-<span class="sd">       column_defs is a dictionary,</span>
-<span class="sd">         usually formed from a ViewRepresentation.column_map</span>
-<span class="sd">       destination is a dictionary,</span>
-<span class="sd">         usually formed from a ViewRepresentation.column_map.copy()</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_defs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">user_values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">user_values</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">user_values</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-    <span class="n">nd</span> <span class="o">=</span> <span class="n">column_defs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="c1"># more doc!</span>
-    <span class="c1"># makes these symbols available for parsing step</span>
-    <span class="c1"># need to enter user functions here or as methods on variables</span>
-    <span class="c1"># Note: a lot of the re-emitters add back the underbar, allow the non</span>
-    <span class="c1"># underbar names we see here.  See expr_rep.py Expression to_python.</span>
-    <span class="n">destination</span><span class="p">[</span><span class="s2">&quot;_row_number&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span>
-        <span class="n">op</span><span class="o">=</span><span class="s2">&quot;row_number&quot;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[]</span>
-    <span class="p">)</span>
-    <span class="n">destination</span><span class="p">[</span><span class="s2">&quot;_ngroup&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span>
-        <span class="n">op</span><span class="o">=</span><span class="s2">&quot;ngroup&quot;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[]</span>
-    <span class="p">)</span>
-    <span class="n">destination</span><span class="p">[</span><span class="s2">&quot;_size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="s2">&quot;size&quot;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[])</span>
-    <span class="n">destination</span><span class="p">[</span><span class="s2">&quot;connected_components&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">connected_components</span>
 
 
 <span class="k">def</span> <span class="nf">standardize_join_type</span><span class="p">(</span><span class="n">join_str</span><span class="p">):</span>
@@ -5414,56 +5381,6 @@ errors defaults to 'strict'.</p>
         </details>
 
     
-
-                </section>
-                <section id="populate_specials">
-                            <div class="attr function"><a class="headerlink" href="#populate_specials">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">populate_specials</span><span class="signature">(*, column_defs, destination, user_values=None)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">populate_specials</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">column_defs</span><span class="p">,</span> <span class="n">destination</span><span class="p">,</span> <span class="n">user_values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;populate a dictionary with special values</span>
-<span class="sd">       column_defs is a dictionary,</span>
-<span class="sd">         usually formed from a ViewRepresentation.column_map</span>
-<span class="sd">       destination is a dictionary,</span>
-<span class="sd">         usually formed from a ViewRepresentation.column_map.copy()</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_defs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">user_values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">user_values</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">user_values</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-    <span class="n">nd</span> <span class="o">=</span> <span class="n">column_defs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="c1"># more doc!</span>
-    <span class="c1"># makes these symbols available for parsing step</span>
-    <span class="c1"># need to enter user functions here or as methods on variables</span>
-    <span class="c1"># Note: a lot of the re-emitters add back the underbar, allow the non</span>
-    <span class="c1"># underbar names we see here.  See expr_rep.py Expression to_python.</span>
-    <span class="n">destination</span><span class="p">[</span><span class="s2">&quot;_row_number&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span>
-        <span class="n">op</span><span class="o">=</span><span class="s2">&quot;row_number&quot;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[]</span>
-    <span class="p">)</span>
-    <span class="n">destination</span><span class="p">[</span><span class="s2">&quot;_ngroup&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span>
-        <span class="n">op</span><span class="o">=</span><span class="s2">&quot;ngroup&quot;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[]</span>
-    <span class="p">)</span>
-    <span class="n">destination</span><span class="p">[</span><span class="s2">&quot;_size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="s2">&quot;size&quot;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[])</span>
-    <span class="n">destination</span><span class="p">[</span><span class="s2">&quot;connected_components&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">connected_components</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>populate a dictionary with special values
-column_defs is a dictionary,
-  usually formed from a ViewRepresentation.column_map
-destination is a dictionary,
-  usually formed from a ViewRepresentation.column_map.copy()</p>
-</div>
-
 
                 </section>
                 <section id="standardize_join_type">
