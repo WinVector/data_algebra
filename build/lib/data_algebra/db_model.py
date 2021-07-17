@@ -589,8 +589,7 @@ class DBModel:
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def read_table(self, conn, table_name, *, qualifiers=None, limit=None):
-        if not isinstance(table_name, str):
-            raise TypeError("Expect table_name to be a str")
+        assert isinstance(table_name, str)
         q_table_name = self.quote_table_name(table_name)
         sql = "SELECT * FROM " + q_table_name
         if limit is not None:
@@ -607,8 +606,7 @@ class DBModel:
         )
 
     def quote_identifier(self, identifier):
-        if not isinstance(identifier, str):
-            raise TypeError("expected identifier to be a str")
+        assert isinstance(identifier, str)
         if self.identifier_quote in identifier:
             raise ValueError(
                 "did not expect " + self.identifier_quote + " in identifier"
@@ -631,8 +629,7 @@ class DBModel:
         return self.quote_identifier(table_description)
 
     def quote_string(self, string):
-        if not isinstance(string, str):
-            raise TypeError("expected string to be a str")
+        assert isinstance(string, str)
         # replace all string with doubled string quotes
         return (
             self.string_quote
@@ -670,10 +667,7 @@ class DBModel:
     def expr_to_sql(self, expression, *, want_inline_parens=False):
         if isinstance(expression, str):
             return expression
-        if not isinstance(expression, data_algebra.expr_rep.PreTerm):
-            raise TypeError(
-                "expression should be of class data_algebra.table_rep.PreTerm"
-            )
+        assert isinstance(expression, data_algebra.expr_rep.PreTerm)
         if isinstance(expression, data_algebra.expr_rep.Value):
             return self.value_to_sql(expression.value)
         if isinstance(expression, data_algebra.expr_rep.ColumnReference):
@@ -1235,10 +1229,7 @@ class DBModel:
         #     raise TypeError(
         #         "record_spec should be a data_algebra.cdata.RecordSpecification"
         #     )
-        if not isinstance(control_view, data_algebra.data_ops_types.OperatorPlatform):
-            raise TypeError(
-                "control_view should be a data_algebra.data_ops_types.OperatorPlatform"
-            )
+        assert isinstance(control_view, data_algebra.data_ops_types.OperatorPlatform)
         control_value_cols = [
             c
             for c in record_spec.control_table.columns
@@ -1574,10 +1565,7 @@ class DBModel:
 
 class DBHandle(data_algebra.eval_model.EvalModel):
     def __init__(self, *, db_model, conn):
-        if not isinstance(db_model, DBModel):
-            raise TypeError(
-                "expected db_model to be of class data_algebra.db_model.DBHandle"
-            )
+        assert isinstance(db_model, DBModel)
         data_algebra.eval_model.EvalModel.__init__(self)
         self.db_model = db_model
         self.conn = conn
@@ -1606,19 +1594,11 @@ class DBHandle(data_algebra.eval_model.EvalModel):
     def to_pandas(self, handle, *, data_map=None):
         if isinstance(handle, data_algebra.data_ops.TableDescription):
             handle = handle.table_name
-        if not isinstance(handle, str):
-            raise TypeError(
-                "Expect handle to be a data_algebra.data_ops.TableDescription or str"
-            )
+        assert isinstance(handle, str)
         if data_map is not None:
             if handle not in data_map:
                 return ValueError("Expected handle to be a data_map key " + handle)
-            if not isinstance(data_map[handle], data_algebra.data_ops.TableDescription):
-                raise ValueError(
-                    "Expect data_map["
-                    + handle
-                    + "] to be class data_algebra.data_ops.TableDescription"
-                )
+            assert isinstance(data_map[handle], data_algebra.data_ops.TableDescription)
             if data_map[handle].table_name != handle:
                 raise ValueError(
                     "data_map["
@@ -1677,12 +1657,7 @@ class DBHandle(data_algebra.eval_model.EvalModel):
             if len(missing_tables) > 0:
                 raise ValueError("missing required tables: " + str(missing_tables))
             for k in tables_needed:
-                if not isinstance(data_map[k], data_algebra.data_ops.TableDescription):
-                    raise ValueError(
-                        "Expect data_map["
-                        + k
-                        + "] to be class data_algebra.data_ops.TableDescription"
-                    )
+                assert isinstance(data_map[k], data_algebra.data_ops.TableDescription)
                 if data_map[k].table_name != k:
                     raise ValueError(
                         "data_map["

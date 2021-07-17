@@ -145,10 +145,7 @@ class BigQueryModel(data_algebra.db_model.DBModel):
 
 class BigQuery_DBHandle(data_algebra.db_model.DBHandle):
     def __init__(self, *, db_model=BigQueryModel(), conn):
-        if not isinstance(db_model, BigQueryModel):
-            raise TypeError(
-                "expected db_model to be of class data_algebra.BigQuery.BigQueryModel"
-            )
+        assert isinstance(db_model, BigQueryModel)
         data_algebra.db_model.DBHandle.__init__(self, db_model=db_model, conn=conn)
 
     def describe_bq_table(

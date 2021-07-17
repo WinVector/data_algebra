@@ -19,19 +19,16 @@ def parse_assignments_in_context(ops, view):
         ops = {k: v for (k, v) in ops}
         if opslen != len(ops):
             raise ValueError("ops keys must be unique")
-    if not isinstance(ops, dict):
-        raise TypeError("ops should be a dictionary")
+    assert isinstance(ops, dict)
     column_defs = view.column_map
-    if not isinstance(column_defs, dict):
-        raise TypeError("column_defs should be a dictionary")
+    assert isinstance(column_defs, dict)
     # first: make sure all entries are parsed
     columns_used = set()
     newops = collections.OrderedDict()
     mp = column_defs.copy()
     data_algebra.expr_rep.populate_specials(column_defs=column_defs, destination=mp)
     for k in ops.keys():
-        if not isinstance(k, str):
-            raise TypeError("ops keys should be strings")
+        assert isinstance(k, str)
         orig_v = ops[k]  # make debugging easier
         v = orig_v
         if not isinstance(v, data_algebra.expr_rep.PreTerm):

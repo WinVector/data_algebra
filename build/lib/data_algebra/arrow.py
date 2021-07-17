@@ -75,8 +75,7 @@ class DataOpArrow(Arrow):
     def __init__(
         self, pipeline, *, free_table_key=None, strict=False, forbidden_to_produce=None
     ):
-        if not isinstance(pipeline, data_algebra.data_ops.ViewRepresentation):
-            raise TypeError("expected pipeline to be data_algebra.data_ops")
+        assert isinstance(pipeline, data_algebra.data_ops.ViewRepresentation)
         self.pipeline = pipeline
         self.strict = strict
         t_used = pipeline.get_tables()
@@ -122,8 +121,7 @@ class DataOpArrow(Arrow):
         """replace self input table with b"""
         if isinstance(b, data_algebra.data_ops.ViewRepresentation):
             b = DataOpArrow(b)
-        if not isinstance(b, DataOpArrow):
-            raise TypeError("unexpected type: " + str(type(b)))
+        assert isinstance(b, DataOpArrow)
         # check categorical arrow composition conditions
         missing = set(self.incoming_columns) - set(b.outgoing_columns)
         if len(missing) > 0:
@@ -131,7 +129,7 @@ class DataOpArrow(Arrow):
         problem_production = set(self.forbidden_columns()) - set(b.forbidden_to_produce)
         if len(problem_production) > 0:
             raise ValueError(
-                "did not document non-produciton of columns: " + str(problem_production)
+                "did not document non-production of columns: " + str(problem_production)
             )
         excess = set(b.outgoing_columns) - set(self.incoming_columns)
         if len(excess) > 0:
@@ -293,8 +291,7 @@ class DataOpArrow(Arrow):
         )
 
     def __eq__(self, other):
-        if not isinstance(other, DataOpArrow):
-            return False
+        assert isinstance(other, DataOpArrow)
         if self.free_table_key != other.free_table_key:
             return False
         if self.incoming_columns != other.incoming_columns:

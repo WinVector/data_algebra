@@ -129,8 +129,7 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">quote_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected identifier to be a str&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="ow">in</span> <span class="n">identifier</span><span class="p">:</span>
             <span class="c1"># TODO: escape quotes</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -183,8 +182,7 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">quote_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected identifier to be a str&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="ow">in</span> <span class="n">identifier</span><span class="p">:</span>
             <span class="c1"># TODO: escape quotes</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -235,8 +233,7 @@ Assuming we are using a sqlalhemy engine as our connection</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">quote_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;expected identifier to be a str&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="ow">in</span> <span class="n">identifier</span><span class="p">:</span>
             <span class="c1"># TODO: escape quotes</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>

@@ -56,8 +56,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             column_names = [column_names]
         self.column_names = [c for c in column_names]
         for ci in self.column_names:
-            if not isinstance(ci, str):
-                raise ValueError("non-string column name(s)")
+            assert isinstance(ci, str)
         if len(self.column_names) < 1:
             raise ValueError("no column names")
         self.column_set = data_algebra.OrderedSet.OrderedSet()
@@ -72,8 +71,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         if sources is None:
             sources = []
         for si in sources:
-            if not isinstance(si, ViewRepresentation):
-                raise ValueError("all sources must be of class ViewRepresentation")
+            assert isinstance(si, ViewRepresentation)
         self.sources = [si for si in sources]
         OperatorPlatform.__init__(
             self, node_name=node_name, column_map=collections.OrderedDict(**column_dict)
@@ -92,10 +90,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             s = self.sources[i]
             ti = s.get_tables()
             for (k, v) in ti.items():
-                if not isinstance(v, TableDescription):
-                    raise TypeError(
-                        "Expected v to be data_algebra.data_ops.TableDescription"
-                    )
+                assert isinstance(v, TableDescription)
                 if k in tables.keys():
                     if not v.same_table(tables[k]):
                         raise ValueError(
@@ -291,16 +286,12 @@ class ViewRepresentation(OperatorPlatform, ABC):
          :return:
          """
 
-        if not isinstance(data_map, dict):
-            raise TypeError("data_map should be a dictionary")
+        assert isinstance(data_map, dict)
         if len(data_map) < 1:
             raise ValueError("Expected data_map to be non-empty")
         if data_model is None:
             data_model = data_algebra.default_data_model
-        if not isinstance(data_model, data_algebra.data_model.DataModel):
-            raise TypeError(
-                "Expected data_model to be derived from data_algebra.data_model.DataModel"
-            )
+        assert isinstance(data_model, data_algebra.data_model.DataModel)
         self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
         self.check_constraints(
@@ -320,15 +311,12 @@ class ViewRepresentation(OperatorPlatform, ABC):
     def transform(self, X, *, data_model=None, narrow=True):
         if data_model is None:
             data_model = data_algebra.default_data_model
-        if not isinstance(data_model, data_algebra.data_model.DataModel):
-            raise TypeError(
-                "Expected data_model to be derived from data_algebra.data_model.DataModel"
-            )
+        assert isinstance(data_model, data_algebra.data_model.DataModel)
         self.columns_used()  # for table consistency check/raise
         tables = self.get_tables()
         if len(tables) != 1:
             raise ValueError(
-                "transfrom(DataFrame) can only be applied to ops-dags with only one table def"
+                "transform(DataFrame) can only be applied to ops-dags with only one table def"
             )
         k = [k for k in tables.keys()][0]
         # noinspection PyUnresolvedReferences
@@ -455,10 +443,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         :param jointype: one of 'INNER', 'LEFT', 'RIGHT', 'OUTER', 'FULL', 'CROSS' (case insensitive)
         :return: ops describing join
         """
-        if not isinstance(b, ViewRepresentation):
-            raise TypeError(
-                "expected b to be a data_algebra.dat_ops.ViewRepresentation"
-            )
+        assert isinstance(b, ViewRepresentation)
         if self.is_trivial_when_intermediate():
             return self.sources[0].natural_join(b, by=by, jointype=jointype)
         return NaturalJoinNode(a=self, b=b, by=by, jointype=jointype)
@@ -466,10 +451,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
     def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):
         if b is None:
             return self
-        if not isinstance(b, ViewRepresentation):
-            raise TypeError(
-                "expected b to be a data_algebra.dat_ops.ViewRepresentation"
-            )
+        assert isinstance(b, ViewRepresentation)
         if self.is_trivial_when_intermediate():
             return self.sources[0].concat_rows(
                 b, id_column=id_column, a_name=a_name, b_name=b_name
@@ -580,8 +562,8 @@ class TableDescription(ViewRepresentation):
         )
         if table_name is None:
             table_name = ""
-        if (table_name is not None) and (not isinstance(table_name, str)):
-            raise TypeError("table_name must be a string")
+        if table_name is not None:
+            assert isinstance(table_name, str)
         if head is not None:
             if set([c for c in head.columns]) != set(column_names):
                 raise ValueError("head.columns != column_names")
@@ -597,8 +579,7 @@ class TableDescription(ViewRepresentation):
             self.column_types = column_types.copy()
         if qualifiers is None:
             qualifiers = {}
-        if not isinstance(qualifiers, dict):
-            raise TypeError("qualifiers must be a dictionary")
+        assert isinstance(qualifiers, dict)
         self.qualifiers = qualifiers.copy()
         self.key = ""
         if self.table_name is not None:

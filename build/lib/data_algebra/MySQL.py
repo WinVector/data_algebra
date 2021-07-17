@@ -64,8 +64,7 @@ class MySQLModel(data_algebra.db_model.DBModel):
         )
 
     def quote_identifier(self, identifier):
-        if not isinstance(identifier, str):
-            raise TypeError("expected identifier to be a str")
+        assert isinstance(identifier, str)
         if self.identifier_quote in identifier:
             # TODO: escape quotes
             raise ValueError(

@@ -19,8 +19,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         data_algebra.data_model.DataModel.__init__(
             self, presentation_model_name=presentation_model_name
         )
-        if not isinstance(pd, types.ModuleType):
-            raise TypeError("Expected pd to be a module")
+        assert isinstance(pd, types.ModuleType)
         self.pd = pd
 
     # utils
@@ -330,8 +329,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
 
     # noinspection PyMethodMayBeStatic
     def standardize_join_code(self, jointype):
-        if not isinstance(jointype, str):
-            raise TypeError("expected jointype to be a string")
+        assert isinstance(jointype, str)
         jointype = jointype.lower()
         mp = {
             "full": "outer",

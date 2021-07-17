@@ -64,10 +64,8 @@ def equivalent_frames(
     # leave in extra checks as this is usually used by test code
     if local_data_model is None:
         local_data_model = data_algebra.default_data_model
-    if not isinstance(a, local_data_model.pd.DataFrame):
-        raise TypeError("Expect a to be local_data_model.pd.DataFrame")
-    if not isinstance(b, local_data_model.pd.DataFrame):
-        raise TypeError("Expect b to be local_data_model.pd.DataFrame")
+    assert isinstance(a, local_data_model.pd.DataFrame)
+    assert isinstance(b, local_data_model.pd.DataFrame)
     if a.shape != b.shape:
         return False
     if a.shape[1] < 1:
@@ -172,8 +170,7 @@ def check_transform_on_handles(
     assert isinstance(data, dict)
     if local_data_model is None:
         local_data_model = data_algebra.default_data_model
-    if not isinstance(ops, ViewRepresentation):
-        raise TypeError("expected ops to be a data_algebra.data_ops.ViewRepresentation")
+    assert isinstance(ops, ViewRepresentation)
     if not local_data_model.is_appropriate_data_instance(expect):
         raise TypeError("expected expect to be a local_data_model.pd.DataFrame")
     cols_used = ops.columns_used()
