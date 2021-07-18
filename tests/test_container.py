@@ -24,25 +24,26 @@ def test_container_1():
 
     scale = 0.237
 
-    _ = OpC()
+    op_container = OpC()
+    _ = op_container.column_namespace
     ops2 = (
-        _.describe_table(d, "d")
-        .extend({"probability": (_.c.assessmentTotal * scale).exp()})
-        .extend({"total": _.c.probability.sum()}, partition_by="subjectID")
-        .extend({"probability": _.c.probability / _.c.total})
-        .extend({'ncat': one.sum()},
+        op_container.describe_table(d, "d")
+            .extend({"probability": (_.assessmentTotal * scale).exp()})
+            .extend({"total": _.probability.sum()}, partition_by="subjectID")
+            .extend({"probability": _.probability / _.total})
+            .extend({'ncat': one.sum()},
+                    partition_by=["subjectID"],
+                    )
+            .extend(
+                {"row_number": one.cumsum()},
                 partition_by=["subjectID"],
-                )
-        .extend(
-            {"row_number": _.v(1).cumsum()},
-            partition_by=["subjectID"],
-            order_by=["probability"],
-            reverse=["probability"],
-        )
-        .select_rows(_.c.row_number == 1)
-        .select_columns(["subjectID", "surveyCategory", "probability", "ncat"])
-        .rename_columns({"diagnosis": "surveyCategory"})
-        .ops()
+                order_by=["probability"],
+                reverse=["probability"],
+            )
+            .select_rows(_.row_number == 1)
+            .select_columns(["subjectID", "surveyCategory", "probability", "ncat"])
+            .rename_columns({"diagnosis": "surveyCategory"})
+            .ops()
     )
 
     expect = data_algebra.default_data_model.pd.DataFrame(
