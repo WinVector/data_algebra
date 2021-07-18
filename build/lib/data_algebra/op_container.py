@@ -15,6 +15,7 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
 
     def __init__(self):
         self.nd = None
+        self.one = data_algebra.expr_rep.Value(1)
         data_algebra.data_ops_types.OperatorPlatform.__init__(
             self, node_name="container", column_map=collections.OrderedDict()
         )
