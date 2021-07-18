@@ -2,8 +2,9 @@ import data_algebra
 
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 from data_algebra.op_container import OpC, one
-import data_algebra.BigQuery
 import data_algebra.test_util
+
+import data_algebra.MySQL
 
 
 def test_container_1():
@@ -45,6 +46,9 @@ def test_container_1():
             .rename_columns({"diagnosis": "surveyCategory"})
             .ops()
     )
+
+    db_handle = data_algebra.MySQL.MySQLModel().db_handle(conn=None)
+    print(db_handle.to_sql(ops2, pretty=True))
 
     expect = data_algebra.default_data_model.pd.DataFrame(
         {

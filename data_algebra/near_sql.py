@@ -172,8 +172,11 @@ class NearSQLUnaryStep(NearSQL):
         sub_sql,
         suffix="",
         temp_tables,
-        annotation=None
+        annotation=None,
+        mergeable=False,
+        declared_term_dependencies=None,
     ):
+        assert isinstance(mergeable, bool)
         assert isinstance(sub_sql, NearSQLContainer)
         assert isinstance(suffix, (str, type(None)))
         NearSQL.__init__(
@@ -185,6 +188,13 @@ class NearSQLUnaryStep(NearSQL):
         )
         self.sub_sql = sub_sql
         self.suffix = suffix
+        self.mergeable = mergeable
+        self.declared_term_dependencies = None
+        if declared_term_dependencies is not None:
+            assert isinstance(declared_term_dependencies, dict)
+            self.declared_term_dependencies = declared_term_dependencies.copy()
+        else:
+            self.mergeable = False
 
     def to_sql(
         self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False
