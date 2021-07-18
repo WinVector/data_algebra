@@ -18,18 +18,10 @@ class OperatorPlatform:
 
     node_name: str
     column_map: collections.OrderedDict
-    c: SimpleNamespace
 
     def __init__(self, *, node_name, column_map):
         self.node_name = node_name
         self.column_map = column_map.copy()
-        self.c = SimpleNamespace(**column_map)  # allows a dot notation
-
-    def v(self, x):
-        """
-        Wrap a value
-        """
-        return data_algebra.expr_rep.Value(x)
 
     # noinspection PyPep8Naming
     def transform(self, X, *, data_model=None, narrow=True):
