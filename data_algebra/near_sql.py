@@ -22,9 +22,10 @@ class NearSQL(ABC):
         assert isinstance(is_table, bool)
         assert isinstance(annotation, (str, type(None)))
         self.terms = None
-        if (terms is not None) and (len(terms) > 0):
+        if terms is not None:
             assert isinstance(terms, dict)
-            self.terms = terms.copy()
+            if len(terms) > 0:
+                self.terms = terms.copy()
         self.quoted_query_name = quoted_query_name
         self.is_table = is_table
         self.temp_tables = temp_tables.copy()
