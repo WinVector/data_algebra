@@ -3,7 +3,7 @@ from data_algebra.data_ops import *
 import data_algebra.test_util
 
 
-def test_mimimum_1():
+def test_minimum_1():
     d = data_algebra.default_data_model.pd.DataFrame(
         {"x": [1, 2, 3, 4, 5, 6], "g": [1, 1, 1, 2, 2, 2],}
     )

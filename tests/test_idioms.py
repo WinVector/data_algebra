@@ -7,7 +7,7 @@ import data_algebra.SQLite
 import pytest
 
 
-def test_ideom_extend_one_count():
+def test_idiom_extend_one_count():
     d = data_algebra.default_data_model.pd.DataFrame(
         {"group": ["a", "a", "b", "b"], "val": [1, 2, 3, 4],}
     )
@@ -24,7 +24,7 @@ def test_ideom_extend_one_count():
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
 
-def test_ideom_extend_special_count():
+def test_idiom_extend_special_count():
     d = data_algebra.default_data_model.pd.DataFrame(
         {"group": ["a", "a", "b", "b"], "val": [1, 2, 3, 4],}
     )
@@ -38,7 +38,7 @@ def test_ideom_extend_special_count():
 
 
 # previously forbidden
-def test_ideom_forbidden_extend_test_trinary():
+def test_idiom_forbidden_extend_test_trinary():
     d = data_algebra.default_data_model.pd.DataFrame(
         {"group": ["a", "a", "b", "b"], "val": [1, 2, 3, 4],}
     )
@@ -61,7 +61,7 @@ def test_ideom_forbidden_extend_test_trinary():
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
 
-def test_ideom_extend_test_trinary():
+def test_idiom_extend_test_trinary():
     d = data_algebra.default_data_model.pd.DataFrame(
         {"group": ["a", "a", "b", "b"], "val": [1, 2, 3, 4],}
     )
@@ -88,7 +88,7 @@ def test_ideom_extend_test_trinary():
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
 
-def test_ideom_simulate_cross_join():
+def test_idiom_simulate_cross_join():
     d = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2, 3, 4],})
     table_name_d = "pytest_temp_d"
 
@@ -126,7 +126,7 @@ def test_ideom_simulate_cross_join():
     )
 
 
-def test_ideom_simulate_cross_join_select():
+def test_idiom_simulate_cross_join_select():
     d = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2, 3, 4],})
     table_name_d = "pytest_temp_d"
 
@@ -164,7 +164,7 @@ def test_ideom_simulate_cross_join_select():
     )
 
 
-def test_ideom_cross_join():
+def test_idiom_cross_join():
     d = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2, 3, 4],})
     table_name_d = "pytest_temp_d"
 
@@ -188,7 +188,7 @@ def test_ideom_cross_join():
 
 
 # Note: switching from _row_number to _count
-def test_ideom_row_number():
+def test_idiom_row_number():
     d = data_algebra.default_data_model.pd.DataFrame(
         {"i": [1, 3, 2, 4, 5], "g": [1, 2, 2, 1, 1],}
     )
@@ -209,7 +209,7 @@ def test_ideom_row_number():
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
 
-def test_ideom_sum_cumsum():
+def test_idiom_sum_cumsum():
     d = data_algebra.default_data_model.pd.DataFrame(
         {"i": [1, 2, 3, 4, 5], "o": [1, 1, 1, 1, 1], "g": [1, 2, 2, 1, 1],}
     )
@@ -252,7 +252,7 @@ def test_ideom_sum_cumsum():
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
 
-def test_ideom_project_sum():
+def test_idiom_project_sum():
     d = data_algebra.default_data_model.pd.DataFrame(
         {"i": [1, 2, 3, 4, 5], "g": [1, 2, 2, 1, 1],}
     )
@@ -269,7 +269,7 @@ def test_ideom_project_sum():
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
 
-def test_ideom_concat_op():
+def test_idiom_concat_op():
     d = data_algebra.default_data_model.pd.DataFrame(
         {"x": ["a", "b", "c"], "y": ["1", "2", "3"],}
     )
@@ -284,7 +284,7 @@ def test_ideom_concat_op():
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
 
-def test_ideom_coalesce_op():
+def test_idiom_coalesce_op():
     d = data_algebra.default_data_model.pd.DataFrame(
         {"x": ["a", "b", None, None], "y": ["1", None, "3", None],}
     )
