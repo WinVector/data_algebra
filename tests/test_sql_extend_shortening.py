@@ -47,3 +47,19 @@ def test_sql_extend_shortening_1():
     data_algebra.test_util.check_transform(
         ops=ops, data=d, expect=expect, float_tol=1e-4
     )
+
+    # check again after passing through string form, this is check partition=1 notation isn't hurting things
+
+    ops_2 = eval(str(ops))
+
+    assert isinstance(ops_2, data_algebra.data_ops.ExtendNode)
+    assert isinstance(ops_2.sources[0], data_algebra.data_ops.ExtendNode)
+    assert isinstance(ops_2.sources[0].sources[0], data_algebra.data_ops.ExtendNode)
+
+    sql_2 = db_handle.to_sql(ops_2, pretty=True, use_with=False, annotate=True)
+    assert isinstance(sql_2, str)
+    assert sql_2.lower().count('select') == 1
+
+    data_algebra.test_util.check_transform(
+        ops=ops_2, data=d, expect=expect, float_tol=1e-4
+    )
