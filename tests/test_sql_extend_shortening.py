@@ -63,3 +63,35 @@ def test_sql_extend_shortening_1():
     data_algebra.test_util.check_transform(
         ops=ops_2, data=d, expect=expect, float_tol=1e-4
     )
+
+
+def test_ops_extend_shortening_1():
+    d = data_algebra.default_data_model.pd.DataFrame({
+        'x': [1, 2, 3, 4, 5],
+        'g': ['a', 'b', 'b', 'a', 'a'],
+        'o': [5, 4, 3, 2, 1],
+    })
+
+    ops = (
+        describe_table(d, table_name='d')
+            .extend({'sx': 'x.sum()'})
+            .extend({'og1': '(1).sum()'})
+            .extend({'og2': '(1).sum()'})
+    )
+
+    # show op-chain is shortened
+    assert isinstance(ops, data_algebra.data_ops.ExtendNode)
+    assert isinstance(ops.sources[0], data_algebra.data_ops.TableDescription)
+
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        'x': [1, 2, 3, 4, 5],
+        'g': ['a', 'b', 'b', 'a', 'a'],
+        'o': [5, 4, 3, 2, 1],
+        'sx': [15, 15, 15, 15, 15],
+        'og1': [5, 5, 5, 5, 5],
+        'og2': [5, 5, 5, 5, 5],
+        })
+
+    data_algebra.test_util.check_transform(
+        ops=ops, data=d, expect=expect, float_tol=1e-4
+    )

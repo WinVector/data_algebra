@@ -20,8 +20,10 @@ def test_window_fns():
     )
 
     table_desciption = describe_table(d)
-    ops = table_desciption.extend(
-        {"row_number": "_row_number()", "shift_v": "v.shift()",},
+    ops = table_desciption.extend({
+            "row_number": "_row_number()",
+            # "shift_v": "v.shift()",
+        },
         order_by=["x"],
         partition_by=["g"],
     ).extend(
@@ -52,7 +54,7 @@ def test_window_fns():
             "min_v": [10, 40, 40, 70, 70, 70],
             "sum_v": [10, 90, 90, 240, 240, 240],
             "mean_v": [10, 45, 45, 80, 80, 80],
-            "shift_v": [None, None, 40.0, None, 70.0, 80.0],
+            # "shift_v": [None, None, 40.0, None, 70.0, 80.0],
             "count_v": [1, 2, 2, 3, 3, 3],
             "size_v": [1, 2, 2, 3, 3, 3],
         }
@@ -71,8 +73,10 @@ def test_window_fns_pandas_only():
     )
 
     table_desciption = describe_table(d)
-    ops = table_desciption.extend(
-        {"row_number": "_row_number()", "shift_v": "v.shift()",},
+    ops = table_desciption.extend({
+            "row_number": "_row_number()",
+            "shift_v": "v.shift()",
+        },
         order_by=["x"],
         partition_by=["g"],
     ).extend(
