@@ -463,6 +463,7 @@ class DBModel:
     string_type: str
     join_name_map: dict
     supports_with: bool
+    allow_extend_merges: bool
 
     def __init__(
         self,
@@ -479,6 +480,7 @@ class DBModel:
         string_type="VARCHAR",
         join_name_map=None,
         supports_with=True,
+        allow_extend_merges=True,
     ):
         if local_data_model is None:
             local_data_model = data_algebra.default_data_model
@@ -504,6 +506,7 @@ class DBModel:
             join_name_map = {}
         self.join_name_map = join_name_map.copy()
         self.supports_with = supports_with
+        self.allow_extend_merges = allow_extend_merges
 
     def db_handle(self, conn):
         return DBHandle(db_model=self, conn=conn)
@@ -761,6 +764,7 @@ class DBModel:
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
         window_term = ""
+        window_vars = set()
         if (
             extend_node.windowed_situation
             or (len(extend_node.partition_by) > 0)
@@ -770,6 +774,7 @@ class DBModel:
             if len(extend_node.partition_by) > 0:
                 pt = [self.quote_identifier(ci) for ci in extend_node.partition_by]
                 window_term = window_term + "PARTITION BY " + ", ".join(pt) + " "
+                window_vars.update(extend_node.partition_by)
             if len(extend_node.order_by) > 0:
                 revs = set(extend_node.reverse)
                 rt = [
@@ -777,13 +782,59 @@ class DBModel:
                     for ci in extend_node.order_by
                 ]
                 window_term = window_term + "ORDER BY " + ", ".join(rt) + " "
+                window_vars.update(extend_node.order_by)
             window_term = window_term + " ) "
         terms = OrderedDict()
+        declared_term_dependencies = OrderedDict()
         origcols = [k for k in using if k not in subops.keys()]
         for k in origcols:
             terms[k] = None
+            declared_term_dependencies[k] = set([k])
         for (ci, oi) in subops.items():
             terms[ci] = self.expr_to_sql(oi) + window_term
+            cols_used_in_term = set()
+            oi.get_column_names(cols_used_in_term)
+            cols_used_in_term.update(window_vars)
+            declared_term_dependencies[ci] = cols_used_in_term
+        annotation = extend_node.to_python_implementation(
+            print_sources=False, indent=-1
+        )
+        # TODO: see if we can merge with subsql instead of building a new one
+        if (self.allow_extend_merges
+            and isinstance(subsql, data_algebra.near_sql.NearSQLUnaryStep)
+            and subsql.mergeable
+            and (subsql.declared_term_dependencies is not None)
+            and ((subsql.suffix is None) or (len(subsql.suffix) == 0))):
+            # check detailed merge conditions
+            def non_trivial_terms(*, dep_dict, term_dict):
+                return [k for k, v in dep_dict.items() if (len(v - set([k])) > 0) or (k not in v) or
+                        ((term_dict[k] is not None) and (term_dict[k] != k))]
+            our_non_trivial_terms = non_trivial_terms(
+                dep_dict=declared_term_dependencies,
+                term_dict=terms)
+            our_needs = set().union(*[declared_term_dependencies[k] for k in our_non_trivial_terms])
+            sub_non_trivial_terms = non_trivial_terms(
+                dep_dict=subsql.declared_term_dependencies,
+                term_dict=subsql.terms)
+            sub_needs = set().union(*[subsql.declared_term_dependencies[k] for k in sub_non_trivial_terms])
+            contention = set().union(
+                set(our_non_trivial_terms).intersection(sub_non_trivial_terms),
+                set(our_non_trivial_terms).intersection(sub_needs),
+                set(sub_non_trivial_terms).intersection(our_needs))
+            if len(contention) == 0:
+                # merge our stuff into subsql
+                subsql.annotation = subsql.annotation + "." + annotation
+                for k in our_non_trivial_terms:
+                    subsql.terms[k] = terms[k]
+                    subsql.declared_term_dependencies[k] = declared_term_dependencies[k]
+                we_use = set.union(set(terms.keys()), set(declared_term_dependencies.keys()))
+                excess_sub_term_keys = set(subsql.terms.keys()) - we_use
+                for k in excess_sub_term_keys:
+                    del subsql.terms[k]
+                excess_sub_declared_keys = set(subsql.declared_term_dependencies.keys()) - we_use
+                for k in excess_sub_declared_keys:
+                    del subsql.declared_term_dependencies[k]
+                return subsql
         view_name = "extend_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         near_sql = data_algebra.near_sql.NearSQLUnaryStep(
@@ -791,9 +842,9 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             temp_tables=subsql.temp_tables.copy(),
-            annotation=extend_node.to_python_implementation(
-                print_sources=False, indent=-1
-            ),
+            annotation=annotation,
+            mergeable=True,
+            declared_term_dependencies=declared_term_dependencies,
         )
         return near_sql
 

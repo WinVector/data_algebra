@@ -23,7 +23,9 @@ class NearSQL(ABC):
         assert isinstance(annotation, (str, type(None)))
         self.terms = None
         if terms is not None:
-            self.terms = terms.copy()
+            assert isinstance(terms, dict)
+            if len(terms) > 0:
+                self.terms = terms.copy()
         self.quoted_query_name = quoted_query_name
         self.is_table = is_table
         self.temp_tables = temp_tables.copy()
@@ -140,7 +142,6 @@ class NearSQLCommonTableExpression(NearSQL):
 
 class NearSQLTable(NearSQL):
     def __init__(self, *, terms, quoted_query_name, quoted_table_name):
-        assert isinstance(terms, dict)
         NearSQL.__init__(
             self,
             terms=terms,
@@ -171,9 +172,13 @@ class NearSQLUnaryStep(NearSQL):
         sub_sql,
         suffix="",
         temp_tables,
-        annotation=None
+        annotation=None,
+        mergeable=False,
+        declared_term_dependencies=None,
     ):
-        # assert isinstance(terms, dict)
+        assert isinstance(mergeable, bool)
+        assert isinstance(sub_sql, NearSQLContainer)
+        assert isinstance(suffix, (str, type(None)))
         NearSQL.__init__(
             self,
             terms=terms,
@@ -181,10 +186,15 @@ class NearSQLUnaryStep(NearSQL):
             temp_tables=temp_tables,
             annotation=annotation,
         )
-        assert isinstance(sub_sql, NearSQLContainer)
-        assert isinstance(suffix, (str, type(None)))
         self.sub_sql = sub_sql
         self.suffix = suffix
+        self.mergeable = mergeable
+        self.declared_term_dependencies = None
+        if declared_term_dependencies is not None:
+            assert isinstance(declared_term_dependencies, dict)
+            self.declared_term_dependencies = declared_term_dependencies.copy()
+        else:
+            self.mergeable = False
 
     def to_sql(
         self, *, columns=None, force_sql=False, constants=None, db_model, annotate=False
@@ -230,7 +240,10 @@ class NearSQLBinaryStep(NearSQL):
         temp_tables,
         annotation=None
     ):
-        assert isinstance(terms, dict)
+        assert isinstance(sub_sql1, NearSQLContainer)
+        assert isinstance(sub_sql2, NearSQLContainer)
+        assert isinstance(suffix, (str, type(None)))
+        assert isinstance(joiner, str)
         NearSQL.__init__(
             self,
             terms=terms,
@@ -238,10 +251,6 @@ class NearSQLBinaryStep(NearSQL):
             temp_tables=temp_tables,
             annotation=annotation,
         )
-        assert isinstance(sub_sql1, NearSQLContainer)
-        assert isinstance(sub_sql2, NearSQLContainer)
-        assert isinstance(suffix, (str, type(None)))
-        assert isinstance(joiner, str)
         self.sub_sql1 = sub_sql1
         self.joiner = joiner
         self.sub_sql2 = sub_sql2
@@ -310,7 +319,8 @@ class NearSQLq(NearSQL):
         temp_tables,
         annotation=None
     ):
-        assert isinstance(terms, dict)
+        assert isinstance(query, str)
+        assert isinstance(prev_quoted_query_name, str)
         NearSQL.__init__(
             self,
             terms=terms,
@@ -318,8 +328,6 @@ class NearSQLq(NearSQL):
             temp_tables=temp_tables,
             annotation=annotation,
         )
-        assert isinstance(query, str)
-        assert isinstance(prev_quoted_query_name, str)
         self.query = query
         self.prev_quoted_query_name = prev_quoted_query_name
 
