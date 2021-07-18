@@ -3,6 +3,7 @@ import data_algebra.test_util
 from data_algebra.data_ops import *
 import data_algebra.BigQuery
 import data_algebra.SQLite
+import data_algebra.MySQL
 
 import pytest
 
@@ -70,12 +71,46 @@ def test_idiom_extend_test_trinary():
     ops = (
         describe_table(d, table_name=table_name)
         .extend(
-            {  # {'select': '(val > 2.5).if_else("high", "low")' } # doesn't work in Pandas
+            {
                 "select": "(val > 2.5)"
             }
         )
         .extend({"select": 'select.if_else("high", "low")'})
     )
+
+    db_handle = data_algebra.MySQL.MySQLModel().db_handle(conn=None)
+    sql = db_handle.to_sql(ops, pretty=True)
+    assert isinstance(sql, str)
+    # print(sql)
+
+    expect = data_algebra.default_data_model.pd.DataFrame(
+        {
+            "group": ["a", "a", "b", "b"],
+            "val": [1, 2, 3, 4],
+            "select": ["low", "low", "high", "high"],
+        }
+    )
+
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+
+
+def test_idiom_extend_test_trinary_2():
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"group": ["a", "a", "b", "b"], "val": [1, 2, 3, 4], }
+    )
+    table_name = "pytest_temp_d"
+
+    ops = (
+        describe_table(d, table_name=table_name)
+            .extend(
+            {'select': '(val > 2.5).if_else("high", "low")' }
+        )
+    )
+
+    db_handle = data_algebra.MySQL.MySQLModel().db_handle(conn=None)
+    sql = db_handle.to_sql(ops, pretty=True)
+    assert isinstance(sql, str)
+    # print(sql)
 
     expect = data_algebra.default_data_model.pd.DataFrame(
         {
@@ -187,7 +222,7 @@ def test_idiom_cross_join():
     )
 
 
-# Note: switching from _row_number to _count
+# Note: switching away from _row_number and _count
 def test_idiom_row_number():
     d = data_algebra.default_data_model.pd.DataFrame(
         {"i": [1, 3, 2, 4, 5], "g": [1, 2, 2, 1, 1],}
@@ -207,6 +242,47 @@ def test_idiom_row_number():
     )
 
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+
+
+# Note: switching away from _row_number and _count
+def test_idiom_row_number_2():
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"i": [1, 3, 2, 4, 5], "g": [1, 2, 2, 1, 1],}
+    )
+    table_name_d = "pytest_temp_d"
+
+    ops = (
+        describe_table(d, table_name=table_name_d)
+        .extend({"n": "(1).cumsum()"}, partition_by=["g"], order_by=["i"],)
+        .order_rows(["i"])
+    )
+
+    expect = data_algebra.default_data_model.pd.DataFrame(
+        {"i": [1, 2, 3, 4, 5], "g": [1, 2, 2, 1, 1], "n": [1, 1, 2, 2, 3],}
+    )
+
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+
+
+# Note: switching away from _row_number and _count
+def test_idiom_row_number_3():
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"i": [1, 3, 2, 4, 5], "g": [1, 2, 2, 1, 1],}
+    )
+    table_name_d = "pytest_temp_d"
+
+    ops = (
+        describe_table(d, table_name=table_name_d)
+        .extend({"n": "_row_number()"}, partition_by=["g"], order_by=["i"],)
+        .order_rows(["i"])
+    )
+
+    expect = data_algebra.default_data_model.pd.DataFrame(
+        {"i": [1, 2, 3, 4, 5], "g": [1, 2, 2, 1, 1], "n": [1, 1, 2, 2, 3],}
+    )
+
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+
 
 
 def test_idiom_sum_cumsum():

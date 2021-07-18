@@ -806,17 +806,35 @@ class DBModel:
             and (subsql.declared_term_dependencies is not None)
             and ((subsql.suffix is None) or (len(subsql.suffix) == 0))):
             # check detailed merge conditions
-            our_non_trivial_terms = [k for k, v in declared_term_dependencies.items() if len(v - set([k])) > 0]
+            def non_trivial_terms(*, dep_dict, term_dict):
+                return [k for k, v in dep_dict.items() if (len(v - set([k])) > 0) or (k not in v) or
+                        ((term_dict[k] is not None) and (term_dict[k] != k))]
+            our_non_trivial_terms = non_trivial_terms(
+                dep_dict=declared_term_dependencies,
+                term_dict=terms)
             our_needs = set().union(*[declared_term_dependencies[k] for k in our_non_trivial_terms])
-            sub_non_trivial_terms = [k for k, v in subsql.declared_term_dependencies.items() if len(v - set([k])) > 0]
+            sub_non_trivial_terms = non_trivial_terms(
+                dep_dict=subsql.declared_term_dependencies,
+                term_dict=subsql.terms)
             sub_needs = set().union(*[subsql.declared_term_dependencies[k] for k in sub_non_trivial_terms])
             contention = set().union(
                 set(our_non_trivial_terms).intersection(sub_non_trivial_terms),
                 set(our_non_trivial_terms).intersection(sub_needs),
                 set(sub_non_trivial_terms).intersection(our_needs))
             if len(contention) == 0:
-                pass
-                # print("maybe merge")  # TODO: implement
+                # merge our stuff into subsql
+                subsql.annotation = subsql.annotation + "." + annotation
+                for k in our_non_trivial_terms:
+                    subsql.terms[k] = terms[k]
+                    subsql.declared_term_dependencies[k] = declared_term_dependencies[k]
+                we_use = set.union(set(terms.keys()), set(declared_term_dependencies.keys()))
+                excess_sub_term_keys = set(subsql.terms.keys()) - we_use
+                for k in excess_sub_term_keys:
+                    del subsql.terms[k]
+                excess_sub_declared_keys = set(subsql.declared_term_dependencies.keys()) - we_use
+                for k in excess_sub_declared_keys:
+                    del subsql.declared_term_dependencies[k]
+                return subsql
         view_name = "extend_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         near_sql = data_algebra.near_sql.NearSQLUnaryStep(

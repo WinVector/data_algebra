@@ -1,0 +1,49 @@
+
+from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
+from data_algebra.op_container import OpC, one
+import data_algebra.test_util
+
+import data_algebra.MySQL
+
+
+def test_sql_extend_shortening_1():
+    d = data_algebra.default_data_model.pd.DataFrame({
+        'x': [1, 2, 3, 4, 5],
+        'g': ['a', 'b', 'b', 'a', 'a'],
+        'o': [5, 4, 3, 2, 1],
+    })
+
+    ops = (
+        describe_table(d, table_name='d')
+            .extend({'sx': 'x.sum()'})
+            .extend({'og1': '(1).cumsum()'},
+                    partition_by=['g'],
+                    order_by=['x'])
+            .extend({'og2': '(1).cumsum()'},
+                    partition_by=['g'],
+                    order_by=['x'], reverse=['x'])
+    )
+
+    # show op-chain is non shortened, as we don't do that in for the Pandas path
+    assert isinstance(ops, data_algebra.data_ops.ExtendNode)
+    assert isinstance(ops.sources[0], data_algebra.data_ops.ExtendNode)
+    assert isinstance(ops.sources[0].sources[0], data_algebra.data_ops.ExtendNode)
+
+    # show the SQL is shortened
+    db_handle = data_algebra.MySQL.MySQLModel().db_handle(conn=None)
+    sql = db_handle.to_sql(ops, pretty=True, use_with=False, annotate=True)
+    assert isinstance(sql, str)
+    assert sql.lower().count('select') == 1
+
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        'x': [1, 2, 3, 4, 5],
+        'g': ['a', 'b', 'b', 'a', 'a'],
+        'o': [5, 4, 3, 2, 1],
+        'sx': [15, 15, 15, 15, 15],
+        'og1': [1, 1, 2, 2, 3],
+        'og2': [3, 2, 1, 2, 1],
+        })
+
+    data_algebra.test_util.check_transform(
+        ops=ops, data=d, expect=expect, float_tol=1e-4
+    )

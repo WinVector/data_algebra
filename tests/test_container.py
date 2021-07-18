@@ -48,7 +48,9 @@ def test_container_1():
     )
 
     db_handle = data_algebra.MySQL.MySQLModel().db_handle(conn=None)
-    print(db_handle.to_sql(ops2, pretty=True))
+    sql = db_handle.to_sql(ops2, pretty=True)
+    assert isinstance(sql, str)
+    # print(sql)
 
     expect = data_algebra.default_data_model.pd.DataFrame(
         {
