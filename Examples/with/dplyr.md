@@ -41,14 +41,29 @@ d = data.frame(
 )
 
 d_db = copy_to(connection, d)
+```
 
+``` r
+ops <- d_db %>%
+  mutate(z = x + 1) %>%
+  mutate(q = x + 3) %>%
+  mutate(h = x + 6)
+
+ops %>% show_query()
+```
+
+    ## <SQL>
+    ## SELECT `x`, `z`, `q`, `x` + 6.0 AS `h`
+    ## FROM (SELECT `x`, `z`, `x` + 3.0 AS `q`
+    ## FROM (SELECT `x`, `x` + 1.0 AS `z`
+    ## FROM `d`))
+
+``` r
 ops <- d_db %>%
   mutate(z = x + 1) %>%
   mutate(q = z + 2) %>%
   mutate(h = q + 3)
-```
 
-``` r
 ops %>% show_query()
 ```
 
