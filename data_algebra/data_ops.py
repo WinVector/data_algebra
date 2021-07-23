@@ -717,20 +717,22 @@ def describe_table(
     qualifiers=None,
     sql_meta=None,
     column_types=None,
-    row_limit=7
+    row_limit=7,
+    keep_sample=True
 ):
-    # Expect a pandas.DataFrame style object
     assert d is not None
     assert not isinstance(d, OperatorPlatform)
     assert not isinstance(d, ViewRepresentation)
     column_names = [c for c in d.columns]
     if column_types is None:
         column_types = data_algebra.util.guess_column_types(d)
-    if d.shape[0] > row_limit:
-        head = d.iloc[range(row_limit), :].copy()
-    else:
-        head = d.copy()
-    head.reset_index(drop=True, inplace=True)
+    head = None
+    if keep_sample:
+        if d.shape[0] > row_limit:
+            head = d.iloc[range(row_limit), :].copy()
+        else:
+            head = d.copy()
+        head.reset_index(drop=True, inplace=True)
     return TableDescription(
         table_name=table_name,
         column_names=column_names,
