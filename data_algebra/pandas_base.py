@@ -411,6 +411,11 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             left[op.id_column] = op.a_name
             right[op.id_column] = op.b_name
         # noinspection PyUnresolvedReferences
+        left_types = data_algebra.util.guess_column_types(left)
+        right_types = data_algebra.util.guess_column_types(right)
+        assert set(left.columns) == set(right.columns)
+        for c in left.columns:
+            assert len(({left_types[c]}.union({right_types[c]})) - {type(None)}) <= 1
         res = self.pd.concat([left, right], axis=0, ignore_index=True)
         res = res.reset_index(drop=True)
         return res

@@ -15,6 +15,7 @@ from data_algebra.data_ops_types import *
 import data_algebra.data_ops_utils
 import data_algebra.near_sql
 import data_algebra.OrderedSet
+import data_algebra.util
 
 
 _have_black = False
@@ -555,7 +556,8 @@ class TableDescription(ViewRepresentation):
         sql_meta=None,
         column_types=None,
         head=None,
-        limit_was=None
+        limit_was=None,
+        nrows=None
     ):
         ViewRepresentation.__init__(
             self, column_names=column_names, node_name="TableDescription"
@@ -571,6 +573,7 @@ class TableDescription(ViewRepresentation):
         self.limit_was = limit_was
         self.sql_meta = sql_meta
         self.table_name = table_name
+        self.nrows = nrows
         if isinstance(column_names, str):
             column_names = [column_names]
         self.column_names = [c for c in column_names]
@@ -722,8 +725,7 @@ def describe_table(
     assert not isinstance(d, ViewRepresentation)
     column_names = [c for c in d.columns]
     if column_types is None:
-        if d.shape[0] > 0:
-            column_types = {k: type(d.loc[0, k]) for k in column_names}
+        column_types = data_algebra.util.guess_column_types(d)
     if d.shape[0] > row_limit:
         head = d.iloc[range(row_limit), :].copy()
     else:
