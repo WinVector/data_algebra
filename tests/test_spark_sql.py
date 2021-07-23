@@ -6,7 +6,7 @@ import data_algebra.util
 
 def test_spark_sql():
     ops = TableDescription(
-        "stocks", ["date", "trans", "symbol", "qty", "price"]
+        table_name="stocks", column_names=["date", "trans", "symbol", "qty", "price"]
     ).extend({"cost": "qty * price"})
 
     ops.to_python(pretty=True)

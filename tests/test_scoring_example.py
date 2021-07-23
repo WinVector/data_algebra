@@ -30,7 +30,7 @@ def test_scoring_example():
     scale = 0.237
 
     ops = (
-        TableDescription("d", ["subjectID", "surveyCategory", "assessmentTotal"])
+        TableDescription(table_name="d", column_names=["subjectID", "surveyCategory", "assessmentTotal"])
         .extend({"probability": f"(assessmentTotal * {scale}).exp()"})
         .extend({"total": "probability.sum()"}, partition_by="subjectID")
         .extend({"probability": "probability/total"})

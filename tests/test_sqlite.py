@@ -33,7 +33,7 @@ def test_sqlite():
     # work a simple example
 
     ops = TableDescription(
-        "stocks", ["date", "trans", "symbol", "qty", "price"]
+        table_name="stocks", column_names=["date", "trans", "symbol", "qty", "price"]
     ).extend({"cost": "qty * price"})
 
     pp = ops.to_python(pretty=True)

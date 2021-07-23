@@ -4,7 +4,7 @@ from data_algebra.data_ops import *
 
 
 def test_cols_used():
-    table = TableDescription("d", ["a", "b", "c", "d"])
+    table = TableDescription(table_name="d", column_names=["a", "b", "c", "d"])
 
     ops = table.select_columns(["a", "b"]).natural_join(
         b=table.select_columns(["a", "c"]), by=["a"], jointype="INNER"

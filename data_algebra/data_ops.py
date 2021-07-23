@@ -538,7 +538,7 @@ class TableDescription(ViewRepresentation):
 
        Example:
            from data_algebra.data_ops import *
-           d = TableDescription('d', ['x', 'y'])
+           d = TableDescription(table_name='d', column_names=['x', 'y'])
            print(d)
     """
 
@@ -549,9 +549,9 @@ class TableDescription(ViewRepresentation):
 
     def __init__(
         self,
+        *,
         table_name,
         column_names,
-        *,
         qualifiers=None,
         sql_meta=None,
         column_types=None,
@@ -732,8 +732,8 @@ def describe_table(
         head = d.copy()
     head.reset_index(drop=True, inplace=True)
     return TableDescription(
-        table_name,
-        column_names,
+        table_name=table_name,
+        column_names=column_names,
         column_types=column_types,
         qualifiers=qualifiers,
         sql_meta=sql_meta,
@@ -1602,7 +1602,12 @@ class ConcatRowsNode(ViewRepresentation):
         if id_column is not None and id_column in sources[0].column_names:
             raise ValueError("id_column should not be an input table column name")
         column_names = sources[0].column_names.copy()
+        if (isinstance(a, TableDescription) and (a.column_types is not None) and (len(a.column_types) > 0)
+            and isinstance(b, TableDescription) and (b.column_types is not None) and (len(b.column_types) > 0)):
+            for c in column_names:
+                assert len({a.column_types[c]}.union({b.column_types[c]}) - {type(None)}) <= 1
         if id_column is not None:
+            assert id_column not in column_names
             column_names.append(id_column)
         ViewRepresentation.__init__(
             self, column_names=column_names, sources=sources, node_name="ConcatRowsNode"

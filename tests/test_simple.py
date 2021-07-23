@@ -69,7 +69,7 @@ def test_simple():
     x = 2.0
     var_name = "y"
 
-    ops = TableDescription("d", ["x", "y"]).extend({"z": f"1/({q}) + x"})
+    ops = TableDescription(table_name="d", column_names=["x", "y"]).extend({"z": f"1/({q}) + x"})
 
     d_local = data_algebra.default_data_model.pd.DataFrame(
         {"x": [1.0, 2.0], "y": [3.0, 4.0]}

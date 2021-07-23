@@ -7,7 +7,7 @@ def test_ops_eq():
     scale = 0.237
 
     ops_1 = (
-        TableDescription("d", ["subjectID", "surveyCategory", "assessmentTotal"])
+        TableDescription(table_name="d", column_names=["subjectID", "surveyCategory", "assessmentTotal"])
         .extend({"probability": f"(assessmentTotal * {scale}).exp()"})
         .extend({"total": "probability.sum()"}, partition_by="subjectID")
         .extend({"probability": "probability/total"})
@@ -23,7 +23,7 @@ def test_ops_eq():
     )
 
     ops_2 = (
-        TableDescription("d", ["subjectID", "surveyCategory", "assessmentTotal"])
+        TableDescription(table_name="d", column_names=["subjectID", "surveyCategory", "assessmentTotal"])
         .extend({"probability": "(assessmentTotal * 0.237).exp()"})
         .extend({"total": "probability.sum()"}, partition_by="subjectID")
         .extend({"probability": "probability/total"})
@@ -41,7 +41,7 @@ def test_ops_eq():
     assert ops_1 == ops_2
 
     ops_3 = (
-        TableDescription("d", ["subjectID", "surveyCategory", "assessmentTotal"])
+        TableDescription(table_name="d", column_names=["subjectID", "surveyCategory", "assessmentTotal"])
         .extend({"probability": "(assessmentTotal * 0.5).exp()"})
         .extend({"total": "probability.sum()"}, partition_by="subjectID")
         .extend({"probability": "probability/total"})
@@ -59,7 +59,7 @@ def test_ops_eq():
     assert ops_1 != ops_3
 
     ops_4 = (
-        TableDescription("d", ["subjectID", "surveyCategory", "assessmentTotal"])
+        TableDescription(table_name="d", column_names=["subjectID", "surveyCategory", "assessmentTotal"])
         .extend({"probability": "(assessmentTotal * 0.237).exp()"})
         .extend({"total": "probability.sum()"}, partition_by="subjectID")
         .extend({"probability": "probability/total"})

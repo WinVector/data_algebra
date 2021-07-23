@@ -9,7 +9,7 @@ from data_algebra.data_ops import *
 
 def test_null_bad():
     ops = (
-        TableDescription("d", ["x"])
+        TableDescription(table_name="d", column_names=["x"])
         .extend({"x_is_null": "x.is_null()", "x_is_bad": "x.is_bad()"})
         .drop_columns(["x"])
     )

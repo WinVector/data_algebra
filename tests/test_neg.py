@@ -19,7 +19,7 @@ def test_neg():
     )
 
     ops = TableDescription(
-        "d", ["subjectID", "surveyCategory", "assessmentTotal"]
+        table_name="d", column_names=["subjectID", "surveyCategory", "assessmentTotal"]
     ).extend({"v": "-assessmentTotal"})
 
     expect = data_algebra.default_data_model.pd.DataFrame(

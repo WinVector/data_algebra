@@ -36,27 +36,18 @@ def test_types_concat_good():
 
 
 def test_types_concat_bad_1():
-    d1d = data_algebra.default_data_model.pd.DataFrame({
-        'x': [1.0],
-        'y': ['b'],
-    })
     d1 = data_algebra.default_data_model.pd.DataFrame({
         'x': [None, 1.0],
         'y': ['a', 'b'],
-    })
-    d2d = data_algebra.default_data_model.pd.DataFrame({
-        'x': [1.0],
-        'y': [1],
     })
     d2 = data_algebra.default_data_model.pd.DataFrame({
         'x': [None, 1.0],
         'y': [0, 1],
     })
     ops = (
-        describe_table(d1d, table_name='d1')
-            .concat_rows(b=describe_table(d2d, table_name='d2'))
+        TableDescription(table_name='d1', column_names=d1.columns)
+            .concat_rows(TableDescription(table_name='d2', column_names=d2.columns))
     )
-
     with pytest.raises(AssertionError):
         ops.eval({'d1': d1, 'd2': d2})
 

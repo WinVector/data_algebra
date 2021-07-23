@@ -21,7 +21,7 @@ def test_exp():
     )
 
     ops = TableDescription(
-        "d", ["subjectID", "surveyCategory", "assessmentTotal"]
+        table_name="d", column_names=["subjectID", "surveyCategory", "assessmentTotal"]
     ).extend({"v": "assessmentTotal.exp()+1"})
 
     expect = data_algebra.default_data_model.pd.DataFrame(

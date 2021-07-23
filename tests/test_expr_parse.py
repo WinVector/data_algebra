@@ -12,7 +12,7 @@ def test_expr_parse():
         {"a": [True, False], "b": [1, 2], "c": [3, 4]}
     )
 
-    ops0 = TableDescription("d", ["a", "b", "c"]).extend({"d": "a + 1"})
+    ops0 = TableDescription(table_name="d", column_names=["a", "b", "c"]).extend({"d": "a + 1"})
 
     assert formats_to_self(ops0)
 
@@ -22,7 +22,7 @@ def test_expr_parse():
     )
     assert data_algebra.test_util.equivalent_frames(res0, expect0)
 
-    ops1 = TableDescription("d", ["a", "b", "c"]).extend({"d": "a.if_else(1, c)"})
+    ops1 = TableDescription(table_name="d", column_names=["a", "b", "c"]).extend({"d": "a.if_else(1, c)"})
 
     assert formats_to_self(ops1)
 

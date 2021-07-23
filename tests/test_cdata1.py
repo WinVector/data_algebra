@@ -153,12 +153,12 @@ def test_cdata1():
     db_model = data_algebra.SQLite.SQLiteModel()
 
     source_table = data_algebra.data_ops.TableDescription(
-        "iris",
-        ["id", "Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width", "Species"],
+        table_name="iris",
+        column_names=["id", "Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width", "Species"],
     )
 
     temp_table = data_algebra.data_ops.TableDescription(
-        "control_table", record_spec.control_table.columns
+        table_name="control_table", column_names=record_spec.control_table.columns
     )
 
     conn = sqlite3.connect(":memory:")
@@ -181,7 +181,7 @@ def test_cdata1():
 
     db_model.insert_table(conn, res_blocks, "res_blocks")
     source_table2 = data_algebra.data_ops.TableDescription(
-        "res_blocks", ["id", "Species", "Part", "Measure", "Value"]
+        table_name="res_blocks", column_names=["id", "Species", "Part", "Measure", "Value"]
     )
 
     sql_back = db_model.blocks_to_row_recs_query(

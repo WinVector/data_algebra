@@ -4,7 +4,7 @@ from data_algebra.data_ops import *
 
 def test_select_stacking():
     ops1 = (
-        TableDescription("d", ["a", "b", "c"])
+        TableDescription(table_name="d", column_names=["a", "b", "c"])
         .select_columns(["a", "b"])
         .select_columns(["a", "b"])
     )
@@ -12,7 +12,7 @@ def test_select_stacking():
     assert ops1_str.count("select_columns") == 1
 
     ops2 = (
-        TableDescription("d", ["a", "b", "c"])
+        TableDescription(table_name="d", column_names=["a", "b", "c"])
         .select_columns(["a", "b"])
         .select_columns(["a"])
     )
