@@ -35,7 +35,33 @@ def test_types_concat_good():
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
 
-def test_types_concat_bad():
+def test_types_concat_bad_1():
+    d1d = data_algebra.default_data_model.pd.DataFrame({
+        'x': [1.0],
+        'y': ['b'],
+    })
+    d1 = data_algebra.default_data_model.pd.DataFrame({
+        'x': [None, 1.0],
+        'y': ['a', 'b'],
+    })
+    d2d = data_algebra.default_data_model.pd.DataFrame({
+        'x': [1.0],
+        'y': [1],
+    })
+    d2 = data_algebra.default_data_model.pd.DataFrame({
+        'x': [None, 1.0],
+        'y': [0, 1],
+    })
+    ops = (
+        describe_table(d1d, table_name='d1')
+            .concat_rows(b=describe_table(d2d, table_name='d2'))
+    )
+
+    with pytest.raises(AssertionError):
+        ops.eval({'d1': d1, 'd2': d2})
+
+
+def test_types_concat_bad_2():
     d1 = data_algebra.default_data_model.pd.DataFrame({
         'x': [None, 1.0],
         'y': ['a', 'b'],
@@ -44,11 +70,23 @@ def test_types_concat_bad():
         'x': [None, 1.0],
         'y': [0, 1],
     })
-    # TODO: get it to raise here
-    ops = (
-        describe_table(d1, table_name='d1')
-            .concat_rows(b=describe_table(d2, table_name='d2'))
-    )
-
     with pytest.raises(AssertionError):
-        ops.eval({'d1': d1, 'd2': d2})
+        ops = (
+            describe_table(d1, table_name='d1')
+                .concat_rows(b=describe_table(d2, table_name='d2'))
+        )
+
+
+def test_types_describe_bad_2():
+    d1d = data_algebra.default_data_model.pd.DataFrame({
+        'x': [None, 1.0],
+        'y': ['a', 'b'],
+    })
+    d1 = data_algebra.default_data_model.pd.DataFrame({
+        'x': [None, 1.0],
+        'y': [1, 2],
+    })
+
+    ops = describe_table(d1d, table_name='d1')
+    with pytest.raises(AssertionError):
+        ops.transform(d1)
