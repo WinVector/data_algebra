@@ -38,3 +38,26 @@ def table_is_keyed_by_columns(table, column_names):
         return False
     counts = table.groupby(column_names).size()
     return max(counts) <= 1
+
+
+def guess_column_types(d):
+    """
+    Guess column types as type of first non-missing value
+
+    :param d: pandas.DataFrame
+    :return: map of column names to guessed types
+    """
+    if d.shape[1] <= 0:
+        return dict()
+    if d.shape[0] <= 0:
+        return {c: type(None) for c in d.columns}
+    res = dict()
+    for c in d.columns:
+        col = d[c]
+        idx = col.notna().idxmax()
+        if idx is None:
+            res[c] = type(col[0])
+        else:
+            res[c] = type(col[idx])
+    return res
+

@@ -15,6 +15,7 @@ from data_algebra.data_ops_types import *
 import data_algebra.data_ops_utils
 import data_algebra.near_sql
 import data_algebra.OrderedSet
+import data_algebra.util
 
 
 _have_black = False
@@ -537,7 +538,7 @@ class TableDescription(ViewRepresentation):
 
        Example:
            from data_algebra.data_ops import *
-           d = TableDescription('d', ['x', 'y'])
+           d = TableDescription(table_name='d', column_names=['x', 'y'])
            print(d)
     """
 
@@ -548,14 +549,15 @@ class TableDescription(ViewRepresentation):
 
     def __init__(
         self,
+        *,
         table_name,
         column_names,
-        *,
         qualifiers=None,
         sql_meta=None,
         column_types=None,
         head=None,
-        limit_was=None
+        limit_was=None,
+        nrows=None
     ):
         ViewRepresentation.__init__(
             self, column_names=column_names, node_name="TableDescription"
@@ -571,6 +573,7 @@ class TableDescription(ViewRepresentation):
         self.limit_was = limit_was
         self.sql_meta = sql_meta
         self.table_name = table_name
+        self.nrows = nrows
         if isinstance(column_names, str):
             column_names = [column_names]
         self.column_names = [c for c in column_names]
@@ -714,29 +717,42 @@ def describe_table(
     qualifiers=None,
     sql_meta=None,
     column_types=None,
-    row_limit=7
+    row_limit=7,
+    keep_sample=True
 ):
-    # Expect a pandas.DataFrame style object
+    """
+    :param d: pandas table to describe
+    :param table_name: name of table
+    :param qualifiers: optional able qualifiers
+    :param sql_meta: optional sql meta information map
+    :param row_limit: how many rows to sampe
+    :param keep_sample: logical, if True retain head of table
+    :return: TableDescription
+    """
     assert d is not None
     assert not isinstance(d, OperatorPlatform)
     assert not isinstance(d, ViewRepresentation)
     column_names = [c for c in d.columns]
     if column_types is None:
-        if d.shape[0] > 0:
-            column_types = {k: type(d.loc[0, k]) for k in column_names}
-    if d.shape[0] > row_limit:
-        head = d.iloc[range(row_limit), :].copy()
-    else:
-        head = d.copy()
-    head.reset_index(drop=True, inplace=True)
+        column_types = data_algebra.util.guess_column_types(d)
+    head = None
+    nrows = None
+    if keep_sample:
+        nrows = d.shape[0]
+        if nrows > row_limit:
+            head = d.iloc[range(row_limit), :].copy()
+        else:
+            head = d.copy()
+        head.reset_index(drop=True, inplace=True)
     return TableDescription(
-        table_name,
-        column_names,
+        table_name=table_name,
+        column_names=column_names,
         column_types=column_types,
         qualifiers=qualifiers,
         sql_meta=sql_meta,
         head=head,
         limit_was=row_limit,
+        nrows=nrows,
     )
 
 
@@ -1600,7 +1616,12 @@ class ConcatRowsNode(ViewRepresentation):
         if id_column is not None and id_column in sources[0].column_names:
             raise ValueError("id_column should not be an input table column name")
         column_names = sources[0].column_names.copy()
+        if (isinstance(a, TableDescription) and (a.column_types is not None) and (len(a.column_types) > 0)
+            and isinstance(b, TableDescription) and (b.column_types is not None) and (len(b.column_types) > 0)):
+            for c in column_names:
+                assert len({a.column_types[c]}.union({b.column_types[c]}) - {type(None)}) <= 1
         if id_column is not None:
+            assert id_column not in column_names
             column_names.append(id_column)
         ViewRepresentation.__init__(
             self, column_names=column_names, sources=sources, node_name="ConcatRowsNode"

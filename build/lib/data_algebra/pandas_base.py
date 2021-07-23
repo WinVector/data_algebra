@@ -69,14 +69,19 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise ValueError("data_map[" + op.table_name + "] was not the right type")
         # check all columns we expect are present
         columns_using = op.column_names
+        if not narrow:
+            columns_using = [c for c in df.columns]
         missing = set(columns_using) - set([c for c in df.columns])
         if len(missing) > 0:
             raise ValueError("missing required columns: " + str(missing))
         # make an index-free copy of the data to isolate side-effects and not deal with indices
-        if not narrow:
-            columns_using = [c for c in df.columns]
         res = df.loc[:, columns_using]
         res = res.reset_index(drop=True)
+        # check type compatibility
+        if (op.column_types is not None) and (len(op.column_types) > 0):
+            types_seen = data_algebra.util.guess_column_types(res)
+            for c in columns_using:
+                assert len({types_seen[c]}.union({op.column_types[c]}) - {type(None)}) <= 1
         return res
 
     def extend_step(self, op, *, data_map, narrow):
@@ -411,6 +416,11 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             left[op.id_column] = op.a_name
             right[op.id_column] = op.b_name
         # noinspection PyUnresolvedReferences
+        left_types = data_algebra.util.guess_column_types(left)
+        right_types = data_algebra.util.guess_column_types(right)
+        assert set(left.columns) == set(right.columns)
+        for c in left.columns:
+            assert len(({left_types[c]}.union({right_types[c]})) - {type(None)}) <= 1
         res = self.pd.concat([left, right], axis=0, ignore_index=True)
         res = res.reset_index(drop=True)
         return res

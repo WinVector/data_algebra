@@ -36,6 +36,9 @@
             <li>
                     <a class="function" href="#table_is_keyed_by_columns">table_is_keyed_by_columns</a>
             </li>
+            <li>
+                    <a class="function" href="#guess_column_types">guess_column_types</a>
+            </li>
     </ul>
 
 
@@ -94,6 +97,28 @@
         <span class="k">return</span> <span class="kc">False</span>
     <span class="n">counts</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
     <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span>
+
+
+<span class="k">def</span> <span class="nf">guess_column_types</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Guess column types as type of first non-missing value</span>
+
+<span class="sd">    :param d: pandas.DataFrame</span>
+<span class="sd">    :return: map of column names to guessed types</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">columns</span><span class="p">}</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">notna</span><span class="p">()</span><span class="o">.</span><span class="n">idxmax</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">col</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">col</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">res</span>
 </pre></div>
 
         </details>
@@ -168,6 +193,48 @@
             <div class="docstring"><p>:param table: pandas DataFrame
 :param column_names: list of column names
 :return: True if rows are uniquely keyed by values in named columns</p>
+</div>
+
+
+                </section>
+                <section id="guess_column_types">
+                            <div class="attr function"><a class="headerlink" href="#guess_column_types">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">guess_column_types</span><span class="signature">(d)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">guess_column_types</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Guess column types as type of first non-missing value</span>
+
+<span class="sd">    :param d: pandas.DataFrame</span>
+<span class="sd">    :return: map of column names to guessed types</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">columns</span><span class="p">}</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">notna</span><span class="p">()</span><span class="o">.</span><span class="n">idxmax</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">col</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">col</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">res</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Guess column types as type of first non-missing value</p>
+
+<p>:param d: pandas.DataFrame
+:return: map of column names to guessed types</p>
 </div>
 
 

@@ -521,6 +521,7 @@
 <span class="kn">import</span> <span class="nn">data_algebra.data_ops_utils</span>
 <span class="kn">import</span> <span class="nn">data_algebra.near_sql</span>
 <span class="kn">import</span> <span class="nn">data_algebra.OrderedSet</span>
+<span class="kn">import</span> <span class="nn">data_algebra.util</span>
 
 
 <span class="n">_have_black</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1043,7 +1044,7 @@
 
 <span class="sd">       Example:</span>
 <span class="sd">           from data_algebra.data_ops import *</span>
-<span class="sd">           d = TableDescription(&#39;d&#39;, [&#39;x&#39;, &#39;y&#39;])</span>
+<span class="sd">           d = TableDescription(table_name=&#39;d&#39;, column_names=[&#39;x&#39;, &#39;y&#39;])</span>
 <span class="sd">           print(d)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1054,14 +1055,15 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
         <span class="n">table_name</span><span class="p">,</span>
         <span class="n">column_names</span><span class="p">,</span>
-        <span class="o">*</span><span class="p">,</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">column_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">head</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">limit_was</span><span class="o">=</span><span class="kc">None</span>
+        <span class="n">limit_was</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">nrows</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;TableDescription&quot;</span>
@@ -1077,6 +1079,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">limit_was</span> <span class="o">=</span> <span class="n">limit_was</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sql_meta</span> <span class="o">=</span> <span class="n">sql_meta</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">table_name</span> <span class="o">=</span> <span class="n">table_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nrows</span> <span class="o">=</span> <span class="n">nrows</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">column_names</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">]</span>
@@ -1220,29 +1223,42 @@
     <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">column_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">row_limit</span><span class="o">=</span><span class="mi">7</span>
+    <span class="n">row_limit</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+    <span class="n">keep_sample</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">):</span>
-    <span class="c1"># Expect a pandas.DataFrame style object</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param d: pandas table to describe</span>
+<span class="sd">    :param table_name: name of table</span>
+<span class="sd">    :param qualifiers: optional able qualifiers</span>
+<span class="sd">    :param sql_meta: optional sql meta information map</span>
+<span class="sd">    :param row_limit: how many rows to sampe</span>
+<span class="sd">    :param keep_sample: logical, if True retain head of table</span>
+<span class="sd">    :return: TableDescription</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">OperatorPlatform</span><span class="p">)</span>
     <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
     <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">column_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">column_types</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">}</span>
-    <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">row_limit</span><span class="p">:</span>
-        <span class="n">head</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">row_limit</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">head</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">head</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">column_types</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_column_types</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="n">head</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">nrows</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">keep_sample</span><span class="p">:</span>
+        <span class="n">nrows</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">nrows</span> <span class="o">&gt;</span> <span class="n">row_limit</span><span class="p">:</span>
+            <span class="n">head</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">row_limit</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">head</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">head</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">TableDescription</span><span class="p">(</span>
-        <span class="n">table_name</span><span class="p">,</span>
-        <span class="n">column_names</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span>
+        <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span>
         <span class="n">column_types</span><span class="o">=</span><span class="n">column_types</span><span class="p">,</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="n">qualifiers</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="n">sql_meta</span><span class="p">,</span>
         <span class="n">head</span><span class="o">=</span><span class="n">head</span><span class="p">,</span>
         <span class="n">limit_was</span><span class="o">=</span><span class="n">row_limit</span><span class="p">,</span>
+        <span class="n">nrows</span><span class="o">=</span><span class="n">nrows</span><span class="p">,</span>
     <span class="p">)</span>
 
 
@@ -2106,7 +2122,12 @@
         <span class="k">if</span> <span class="n">id_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">id_column</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;id_column should not be an input table column name&quot;</span><span class="p">)</span>
         <span class="n">column_names</span> <span class="o">=</span> <span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">({</span><span class="n">a</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]}</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">b</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]})</span> <span class="o">-</span> <span class="p">{</span><span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)})</span> <span class="o">&lt;=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">id_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">id_column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">column_names</span>
             <span class="n">column_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">id_column</span><span class="p">)</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="n">sources</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;ConcatRowsNode&quot;</span>
@@ -3825,7 +3846,7 @@ with the using columns (None means all).</p>
 
 <span class="sd">       Example:</span>
 <span class="sd">           from data_algebra.data_ops import *</span>
-<span class="sd">           d = TableDescription(&#39;d&#39;, [&#39;x&#39;, &#39;y&#39;])</span>
+<span class="sd">           d = TableDescription(table_name=&#39;d&#39;, column_names=[&#39;x&#39;, &#39;y&#39;])</span>
 <span class="sd">           print(d)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -3836,14 +3857,15 @@ with the using columns (None means all).</p>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
         <span class="n">table_name</span><span class="p">,</span>
         <span class="n">column_names</span><span class="p">,</span>
-        <span class="o">*</span><span class="p">,</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">column_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">head</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">limit_was</span><span class="o">=</span><span class="kc">None</span>
+        <span class="n">limit_was</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">nrows</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;TableDescription&quot;</span>
@@ -3859,6 +3881,7 @@ with the using columns (None means all).</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">limit_was</span> <span class="o">=</span> <span class="n">limit_was</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sql_meta</span> <span class="o">=</span> <span class="n">sql_meta</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">table_name</span> <span class="o">=</span> <span class="n">table_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nrows</span> <span class="o">=</span> <span class="n">nrows</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">column_names</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">]</span>
@@ -4001,7 +4024,7 @@ with the using columns (None means all).</p>
 
 <p>Example:
     from <a href="">data_algebra.data_ops</a> import *
-    d = TableDescription('d', ['x', 'y'])
+    d = TableDescription(table_name='d', column_names=['x', 'y'])
     print(d)</p>
 </div>
 
@@ -4011,14 +4034,15 @@ with the using columns (None means all).</p>
 
         
             <span class="name">TableDescription</span><span class="signature">(
+    *,
     table_name,
     column_names,
-    *,
     qualifiers=None,
     sql_meta=None,
     column_types=None,
     head=None,
-    limit_was=None
+    limit_was=None,
+    nrows=None
 )</span>
     </div>
 
@@ -4026,14 +4050,15 @@ with the using columns (None means all).</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
         <span class="n">table_name</span><span class="p">,</span>
         <span class="n">column_names</span><span class="p">,</span>
-        <span class="o">*</span><span class="p">,</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">column_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">head</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">limit_was</span><span class="o">=</span><span class="kc">None</span>
+        <span class="n">limit_was</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">nrows</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;TableDescription&quot;</span>
@@ -4049,6 +4074,7 @@ with the using columns (None means all).</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">limit_was</span> <span class="o">=</span> <span class="n">limit_was</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sql_meta</span> <span class="o">=</span> <span class="n">sql_meta</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">table_name</span> <span class="o">=</span> <span class="n">table_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nrows</span> <span class="o">=</span> <span class="n">nrows</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">column_names</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">]</span>
@@ -4410,7 +4436,8 @@ with the using columns (None means all).</p>
     qualifiers=None,
     sql_meta=None,
     column_types=None,
-    row_limit=7
+    row_limit=7,
+    keep_sample=True
 )</span>:
     </div>
 
@@ -4423,35 +4450,56 @@ with the using columns (None means all).</p>
     <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">column_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">row_limit</span><span class="o">=</span><span class="mi">7</span>
+    <span class="n">row_limit</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+    <span class="n">keep_sample</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">):</span>
-    <span class="c1"># Expect a pandas.DataFrame style object</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param d: pandas table to describe</span>
+<span class="sd">    :param table_name: name of table</span>
+<span class="sd">    :param qualifiers: optional able qualifiers</span>
+<span class="sd">    :param sql_meta: optional sql meta information map</span>
+<span class="sd">    :param row_limit: how many rows to sampe</span>
+<span class="sd">    :param keep_sample: logical, if True retain head of table</span>
+<span class="sd">    :return: TableDescription</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">OperatorPlatform</span><span class="p">)</span>
     <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
     <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">column_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">column_types</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">}</span>
-    <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">row_limit</span><span class="p">:</span>
-        <span class="n">head</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">row_limit</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">head</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">head</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">column_types</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_column_types</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="n">head</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">nrows</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">keep_sample</span><span class="p">:</span>
+        <span class="n">nrows</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">nrows</span> <span class="o">&gt;</span> <span class="n">row_limit</span><span class="p">:</span>
+            <span class="n">head</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">row_limit</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">head</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">head</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">TableDescription</span><span class="p">(</span>
-        <span class="n">table_name</span><span class="p">,</span>
-        <span class="n">column_names</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span>
+        <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span>
         <span class="n">column_types</span><span class="o">=</span><span class="n">column_types</span><span class="p">,</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="n">qualifiers</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="n">sql_meta</span><span class="p">,</span>
         <span class="n">head</span><span class="o">=</span><span class="n">head</span><span class="p">,</span>
         <span class="n">limit_was</span><span class="o">=</span><span class="n">row_limit</span><span class="p">,</span>
+        <span class="n">nrows</span><span class="o">=</span><span class="n">nrows</span><span class="p">,</span>
     <span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>:param d: pandas table to describe
+:param table_name: name of table
+:param qualifiers: optional able qualifiers
+:param sql_meta: optional sql meta information map
+:param row_limit: how many rows to sampe
+:param keep_sample: logical, if True retain head of table
+:return: TableDescription</p>
+</div>
+
 
                 </section>
                 <section id="ExtendNode">
@@ -7638,7 +7686,12 @@ with the using columns (None means all).</p>
         <span class="k">if</span> <span class="n">id_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">id_column</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;id_column should not be an input table column name&quot;</span><span class="p">)</span>
         <span class="n">column_names</span> <span class="o">=</span> <span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">({</span><span class="n">a</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]}</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">b</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]})</span> <span class="o">-</span> <span class="p">{</span><span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)})</span> <span class="o">&lt;=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">id_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">id_column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">column_names</span>
             <span class="n">column_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">id_column</span><span class="p">)</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="n">sources</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;ConcatRowsNode&quot;</span>
@@ -7749,7 +7802,12 @@ Abstract base class.</p>
         <span class="k">if</span> <span class="n">id_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">id_column</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;id_column should not be an input table column name&quot;</span><span class="p">)</span>
         <span class="n">column_names</span> <span class="o">=</span> <span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">({</span><span class="n">a</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]}</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">b</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]})</span> <span class="o">-</span> <span class="p">{</span><span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)})</span> <span class="o">&lt;=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">id_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">id_column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">column_names</span>
             <span class="n">column_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">id_column</span><span class="p">)</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="n">sources</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;ConcatRowsNode&quot;</span>

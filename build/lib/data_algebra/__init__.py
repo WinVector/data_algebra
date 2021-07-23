@@ -1,5 +1,5 @@
 __docformat__ = "restructuredtext"
-__version__ = "0.7.4"
+__version__ = "0.7.5"
 
 __doc__ = """
 `data_algebra`<https://github.com/WinVector/data_algebra> is a piped data wrangling system
