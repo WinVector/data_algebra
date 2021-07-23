@@ -720,6 +720,15 @@ def describe_table(
     row_limit=7,
     keep_sample=True
 ):
+    """
+    :param d: pandas table to describe
+    :param table_name: name of table
+    :param qualifiers: optional able qualifiers
+    :param sql_meta: optional sql meta information map
+    :param row_limit: how many rows to sampe
+    :param keep_sample: logical, if True retain head of table
+    :return: TableDescription
+    """
     assert d is not None
     assert not isinstance(d, OperatorPlatform)
     assert not isinstance(d, ViewRepresentation)
@@ -727,8 +736,10 @@ def describe_table(
     if column_types is None:
         column_types = data_algebra.util.guess_column_types(d)
     head = None
+    nrows = None
     if keep_sample:
-        if d.shape[0] > row_limit:
+        nrows = d.shape[0]
+        if nrows > row_limit:
             head = d.iloc[range(row_limit), :].copy()
         else:
             head = d.copy()
@@ -741,6 +752,7 @@ def describe_table(
         sql_meta=sql_meta,
         head=head,
         limit_was=row_limit,
+        nrows=nrows,
     )
 
 
