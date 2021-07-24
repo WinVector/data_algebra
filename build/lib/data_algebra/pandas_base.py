@@ -117,7 +117,6 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             for (k, opk) in op.ops.items():
                 # assumes all args are column names or values, enforce this earlier
                 if len(opk.args) > 0:
-                    assert len(opk.args) == 1
                     if isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
                         value_name = opk.args[0].column_name
                         if value_name not in col_set:
@@ -165,19 +164,22 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                     else:
                         raise KeyError("not implemented: " + str(k) + ": " + str(opk))
                 else:
-                    # len(opk.args) == 1
-                    assert len(opk.args) == 1
+                    transform_args = []
+                    if len(opk.args) > 1:
+                        for i in range(1, len(opk.args)):
+                            assert isinstance(opk.args[i], data_algebra.expr_rep.Value)
+                        transform_args = [opk.args[i].value for i in range(1, len(opk.args))]
                     if isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
                         value_name = opk.args[0].column_name
                         if value_name not in set(col_list):
                             col_list = col_list + [value_name]
                         subframe[k] = opframe[value_name].transform(
-                            opk.op
+                            opk.op, *transform_args
                         )  # Pandas transform, not data_algegra
                     elif isinstance(opk.args[0], data_algebra.expr_rep.Value):
                         value_name = data_algebra_temp_cols[str(opk.args[0].value)]
                         subframe[k] = opframe[value_name].transform(
-                            opk.op
+                            opk.op, *transform_args
                         )  # Pandas transform, not data_algegra
                     else:
                         raise ValueError("opk must be a ColumnReference or Value")

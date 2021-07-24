@@ -833,14 +833,16 @@ class ExtendNode(ViewRepresentation):
                         + "'"
                     )
                 if len(opk.args) > 1:
-                    raise ValueError(
-                        "in windowed situations only simple operators are allowed, "
-                        + "'"
-                        + k
-                        + "': '"
-                        + str(opk)
-                        + "' term is too complex an expression"
-                    )
+                    for i in range(1, len(opk.args)):
+                        if not isinstance(opk.args[i], data_algebra.expr_rep.Value):
+                            raise ValueError(
+                                "in windowed situations only simple operators are allowed, "
+                                + "'"
+                                + k
+                                + "': '"
+                                + str(opk)
+                                + "' term is too complex an expression"
+                            )
                 if len(opk.args) > 0:
                     if isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
                         value_name = opk.args[0].column_name
@@ -910,7 +912,9 @@ class ExtendNode(ViewRepresentation):
             for (k, opk) in self.ops.items():
                 if len(opk.args) > 0:
                     if len(opk.args) > 1:
-                        raise ValueError("window function with more than one argument")
+                        for i in range(1, len(opk.args)):
+                            if not isinstance(opk.args[i], data_algebra.expr_rep.Value):
+                                raise ValueError("window function with more than one non-value argument")
                     for i in range(len(opk.args)):
                         if not (
                             isinstance(

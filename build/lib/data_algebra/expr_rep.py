@@ -487,8 +487,11 @@ class Term(PreTerm, ABC):
 
     # pandas shift
 
-    def shift(self):
-        return self.__uop_expr__("shift")
+    def shift(self, periods=None):
+        if periods is None:
+            periods = Value(1)
+        assert isinstance(periods, Value)  # digits control
+        return self.__op_expr__("shift", periods, inline=False, method=True)
 
     # our ad-hoc definitions
 
