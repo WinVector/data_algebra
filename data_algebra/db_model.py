@@ -57,9 +57,15 @@ def _db_lag_expr(dbmodel, expression):
     if len(expression.args) == 1:
         return f'LAG({arg_0})'
     elif len(expression.args) == 2:
-        return f'LAG({arg_0}, {expression.args[1].value})'
+        periods = expression.args[1].value
+        if periods > 0:
+            return f'LAG({arg_0}, {periods})'
+        elif periods < 0:
+            return f'LEAD({arg_0}, {periods})'
+        else:
+            return f'{arg_0}'
     else:
-        raise ValueError("too many arguments to SQL LAG")
+        raise ValueError("too many arguments to SQL LAG/LEAD")
 
 
 def _db_mean_expr(dbmodel, expression):
