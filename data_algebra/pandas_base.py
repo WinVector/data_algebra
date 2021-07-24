@@ -372,6 +372,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         common_cols = set([c for c in left.columns]).intersection(
             [c for c in right.columns]
         )
+        type_checks = data_algebra.util.check_columns_appear_compatible(left, right, columns=common_cols)
+        if type_checks is not None:
+            raise ValueError(f"join: incompatible column types: {type_checks}")
         by = op.by
         if by is None:
             by = []
@@ -417,7 +420,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             right[op.id_column] = op.b_name
         type_checks = data_algebra.util.check_columns_appear_compatible(left, right)
         if type_checks is not None:
-            raise ValueError(f"incompatible column types: {type_checks}")
+            raise ValueError(f"concat: incompatible column types: {type_checks}")
         # noinspection PyUnresolvedReferences
         res = self.pd.concat([left, right], axis=0, ignore_index=True)
         res = res.reset_index(drop=True)

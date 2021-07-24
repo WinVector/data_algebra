@@ -1,3 +1,6 @@
+
+import numpy
+
 import data_algebra
 
 
@@ -84,8 +87,8 @@ def check_columns_appear_compatible(d_left, d_right, *, columns=None):
     right_types = data_algebra.util.guess_column_types(d_right, columns=columns)
     mismatches = dict()
     for c in columns:
-        # TODO: remap int to float?
-        if len(({left_types[c]}.union({right_types[c]})) - {type(None)}) > 1:
+        comparison = ({left_types[c]}.union({right_types[c]})) - {type(None)}
+        if (len(comparison) > 1) and (comparison != {numpy.float64, numpy.int64}):
             mismatches[c] = (left_types[c], right_types[c])
     if len(mismatches) > 0:
         return mismatches

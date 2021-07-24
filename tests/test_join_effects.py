@@ -12,7 +12,7 @@ def test_join_warn1():
     )
 
     d_right = data_algebra.default_data_model.pd.DataFrame(
-        {"k": ["a", "b", "q"], "y": [10, 20, 30],}
+        {"k": ["a", "b", "q"], "y": [10.0, 20.0, 30.0],}
     )
 
     ops = describe_table(d_left, table_name="d_left").natural_join(
