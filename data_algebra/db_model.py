@@ -52,6 +52,16 @@ def _clean_annotation(annotation):
 # map from op-name to special SQL formatting code
 
 
+def _db_lag_expr(dbmodel, expression):
+    arg_0 = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+    if len(expression.args) == 1:
+        return f'LAG({arg_0})'
+    elif len(expression.args) == 2:
+        return f'LAG({arg_0}, {expression.args[1].value})'
+    else:
+        raise ValueError("too many arguments to SQL LAG")
+
+
 def _db_mean_expr(dbmodel, expression):
     return (
         "AVG(" + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False) + ")"
@@ -400,6 +410,7 @@ def _base_Sunday(dbmodel, expression):
 
 
 db_expr_formatters = {
+    "shift": _db_lag_expr,
     "is_null": _db_is_null_expr,
     "is_bad": _db_is_bad_expr,
     "mean": _db_mean_expr,

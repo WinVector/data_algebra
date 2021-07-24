@@ -19,8 +19,10 @@ def test_window2():
 
     table_desciption = describe_table(d)
 
-    ops = table_desciption.extend(
-        {"row_number": "_row_number()", "shift_v": "v.shift()",},
+    ops = table_desciption.extend({
+            "row_number": "_row_number()",
+            "shift_v": "v.shift()",
+        },
         order_by=["x"],
         partition_by=["g"],
     ).extend(
@@ -63,8 +65,10 @@ def test_window2():
     db_model = data_algebra.SQLite.SQLiteModel()
     db_model.prepare_connection(conn)
 
-    ops_db = table_desciption.extend(
-        {"row_number": "_row_number()", "shift_v": "v.shift()",},
+    ops_db = table_desciption.extend({
+            "row_number": "_row_number()",
+            "shift_v": "v.shift()",
+        },
         order_by=["x"],
         partition_by=["g"],
     ).extend(
