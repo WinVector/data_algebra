@@ -81,7 +81,8 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         if (op.column_types is not None) and (len(op.column_types) > 0):
             types_seen = data_algebra.util.guess_column_types(res)
             for c in columns_using:
-                assert len({types_seen[c]}.union({op.column_types[c]}) - {type(None)}) <= 1
+                type_check_c = {types_seen[c]}.union({op.column_types[c]}) - {type(None)}
+                assert (len(type_check_c) <= 1) or (type_check_c == {numpy.int64, numpy.float64})
         return res
 
     def extend_step(self, op, *, data_map, narrow):
@@ -372,6 +373,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         common_cols = set([c for c in left.columns]).intersection(
             [c for c in right.columns]
         )
+        type_checks = data_algebra.util.check_columns_appear_compatible(left, right, columns=common_cols)
+        if type_checks is not None:
+            raise ValueError(f"join: incompatible column types: {type_checks}")
         by = op.by
         if by is None:
             by = []
@@ -415,12 +419,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         if op.id_column is not None:
             left[op.id_column] = op.a_name
             right[op.id_column] = op.b_name
+        type_checks = data_algebra.util.check_columns_appear_compatible(left, right)
+        if type_checks is not None:
+            raise ValueError(f"concat: incompatible column types: {type_checks}")
         # noinspection PyUnresolvedReferences
-        left_types = data_algebra.util.guess_column_types(left)
-        right_types = data_algebra.util.guess_column_types(right)
-        assert set(left.columns) == set(right.columns)
-        for c in left.columns:
-            assert len(({left_types[c]}.union({right_types[c]})) - {type(None)}) <= 1
         res = self.pd.concat([left, right], axis=0, ignore_index=True)
         res = res.reset_index(drop=True)
         return res

@@ -1,7 +1,7 @@
 ============================= test session starts ==============================
-platform darwin -- Python 3.9.4, pytest-6.2.3, py-1.10.0, pluggy-0.13.1
+platform darwin -- Python 3.8.8, pytest-6.2.2, py-1.10.0, pluggy-0.13.1
 rootdir: /Users/johnmount/Documents/work/data_algebra
-plugins: anyio-2.2.0, cov-2.11.1
+plugins: cov-2.12.1
 collected 179 items
 
 tests/test_OrderedSet.py .                                               [  0%]
@@ -77,10 +77,10 @@ tests/test_window2.py .                                                  [ 96%]
 tests/test_window_fns.py .....                                           [ 98%]
 tests/test_with.py ..                                                    [100%]
 
----------- coverage: platform darwin, python 3.9.4-final-0 -----------
+---------- coverage: platform darwin, python 3.8.8-final-0 -----------
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
-data_algebra/BigQuery.py                 105     68    35%
+data_algebra/BigQuery.py                 105     67    36%
 data_algebra/MySQL.py                     28     10    64%
 data_algebra/OrderedSet.py                53      7    87%
 data_algebra/PostgreSQL.py                18      7    61%
@@ -102,14 +102,14 @@ data_algebra/expr_rep.py                 552    102    82%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 142      1    99%
 data_algebra/op_container.py              96     37    61%
-data_algebra/pandas_base.py              270     22    92%
+data_algebra/pandas_base.py              272     23    92%
 data_algebra/pandas_model.py              18      3    83%
 data_algebra/parse_by_lark.py            139     34    76%
 data_algebra/python3_lark.py               1      0   100%
 data_algebra/test_util.py                178     25    86%
-data_algebra/util.py                      41      7    83%
+data_algebra/util.py                      61      7    89%
 ----------------------------------------------------------
-TOTAL                                   4575    878    81%
+TOTAL                                   4597    878    81%
 
 
-============================= 179 passed in 33.04s =============================
+============================= 179 passed in 36.78s =============================

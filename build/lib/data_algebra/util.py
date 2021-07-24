@@ -1,3 +1,6 @@
+
+import numpy
+
 import data_algebra
 
 
@@ -40,19 +43,23 @@ def table_is_keyed_by_columns(table, column_names):
     return max(counts) <= 1
 
 
-def guess_column_types(d):
+def guess_column_types(d, *, columns=None):
     """
     Guess column types as type of first non-missing value
 
     :param d: pandas.DataFrame
+    :param columns: list of columns to check, if None all columns are checked
     :return: map of column names to guessed types
     """
     if d.shape[1] <= 0:
         return dict()
+    if columns is None:
+        columns = d.columns
+    assert len(set(columns) - set(d.columns)) == 0
     if d.shape[0] <= 0:
-        return {c: type(None) for c in d.columns}
+        return {c: type(None) for c in columns}
     res = dict()
-    for c in d.columns:
+    for c in columns:
         col = d[c]
         idx = col.notna().idxmax()
         if idx is None:
@@ -61,3 +68,28 @@ def guess_column_types(d):
             res[c] = type(col[idx])
     return res
 
+
+def check_columns_appear_compatible(d_left, d_right, *, columns=None):
+    """
+    Check if columns have compatible types
+
+    :param d_left: pandas dataframe to check
+    :param d_right: pandas dataframe to check
+    :param columns: columns to check, None means check all columns
+    :return: None if compatible, else dictionary of mismatches
+    """
+    if columns is None:
+        columns = d_left.columns
+        assert set(d_left.columns) == set(d_right.columns)
+    assert len(set(columns) - set(d_left.columns)) == 0
+    assert len(set(columns) - set(d_right.columns)) == 0
+    left_types = data_algebra.util.guess_column_types(d_left, columns=columns)
+    right_types = data_algebra.util.guess_column_types(d_right, columns=columns)
+    mismatches = dict()
+    for c in columns:
+        comparison = ({left_types[c]}.union({right_types[c]})) - {type(None)}
+        if (len(comparison) > 1) and (comparison != {numpy.float64, numpy.int64}):
+            mismatches[c] = (left_types[c], right_types[c])
+    if len(mismatches) > 0:
+        return mismatches
+    return None
