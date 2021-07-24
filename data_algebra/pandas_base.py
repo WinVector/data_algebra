@@ -415,12 +415,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         if op.id_column is not None:
             left[op.id_column] = op.a_name
             right[op.id_column] = op.b_name
+        type_checks = data_algebra.util.check_columns_appear_compatible(left, right)
+        if type_checks is not None:
+            raise ValueError(f"incompatible column types: {type_checks}")
         # noinspection PyUnresolvedReferences
-        left_types = data_algebra.util.guess_column_types(left)
-        right_types = data_algebra.util.guess_column_types(right)
-        assert set(left.columns) == set(right.columns)
-        for c in left.columns:
-            assert len(({left_types[c]}.union({right_types[c]})) - {type(None)}) <= 1
         res = self.pd.concat([left, right], axis=0, ignore_index=True)
         res = res.reset_index(drop=True)
         return res

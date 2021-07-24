@@ -48,7 +48,7 @@ def test_types_concat_bad_1():
         TableDescription(table_name='d1', column_names=d1.columns)
             .concat_rows(TableDescription(table_name='d2', column_names=d2.columns))
     )
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         ops.eval({'d1': d1, 'd2': d2})
 
 
