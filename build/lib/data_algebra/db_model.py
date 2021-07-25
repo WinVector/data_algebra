@@ -61,7 +61,7 @@ def _db_lag_expr(dbmodel, expression):
         if periods > 0:
             return f'LAG({arg_0}, {periods})'
         elif periods < 0:
-            return f'LEAD({arg_0}, {periods})'
+            return f'LEAD({arg_0}, {-periods})'
         else:
             return f'{arg_0}'
     else:
