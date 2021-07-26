@@ -173,8 +173,10 @@ class ViewRepresentation(OperatorPlatform, ABC):
         self.columns_used()  # for table consistency check/raise
         if pretty:
             strict = True
-        python_str = self.to_python_implementation(
-            indent=indent, strict=strict, print_sources=True
+        python_str = (
+            "(\n"
+            + self.to_python_implementation(indent=indent, strict=strict, print_sources=True)
+            + "\n)\n"
         )
         if pretty:
             python_str = pretty_format_python(python_str, black_mode=black_mode)
@@ -225,9 +227,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
         self,
         db_model,
         *,
-        annotate=False,
+        annotate=True,
         temp_tables=None,
-        use_with=False
+        use_with=True,
     ):
         if isinstance(db_model, data_algebra.db_model.DBHandle):
             db_model = db_model.db_model

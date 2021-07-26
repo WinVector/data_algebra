@@ -1215,9 +1215,9 @@ class DBModel:
         self,
         ops,
         *,
-        annotate=False,
+        annotate=True,
         temp_tables=None,
-        use_with=False,
+        use_with=True,
     ):
         assert isinstance(self, DBModel)
         assert isinstance(ops, data_algebra.data_ops.ViewRepresentation)
@@ -1266,12 +1266,14 @@ class DBModel:
         if annotate:
             model_descr = re.sub(r"\s+", " ", str(self))
             sql_str_list = (
-                [f"-- data_algebra SQL https://github.com/WinVector/data_algebra",
-                 f"--  dialect: {model_descr}"
-                 f"--       string quote: {self.string_quote}"
-                 f"--   identifier quote: {self.identifier_quote}"]
-                + sql_str_list
-            )
+                    [
+                        f"-- data_algebra SQL https://github.com/WinVector/data_algebra",
+                        f"--  dialect: {model_descr}",
+                        f"--       string quote: {self.string_quote}",
+                        f"--   identifier quote: {self.identifier_quote}",
+                    ]
+                    + sql_str_list
+                )
         return '\n'.join(sql_str_list) + '\n'
 
     def row_recs_to_blocks_query(
@@ -1699,9 +1701,9 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         self,
         ops,
         *,
-        annotate=False,
+        annotate=True,
         temp_tables=None,
-        use_with=False,
+        use_with=True,
     ):
         return self.db_model.to_sql(
             ops=ops,
