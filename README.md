@@ -6,11 +6,9 @@ The primary purpose of the package is to support an easy to
 compose and maintain grammar of data processing steps that in turn can be used to generate
 database specific SQL. The package also implements the same transforms for Pandas DataFrames.
 
-Currently the system is primarily adapted and testing for Pandas, Google BigQuery, PostgreSQL, and
-SQLite. Extension to other data processing systems such as Spark and MariaDB is possible, but
-not currently supported/tested.
+Currently the system is primarily adapted and testing for Pandas, Google BigQuery, PostgreSQL, SQLite, and Spark. Porting and extension is designed to be easy.
 
-[This](https://github.com/WinVector/data_algebra) is to be the [`Python`](https://www.python.org) equivalent of the [`R`](https://www.r-project.org) packages [`rquery`](https://github.com/WinVector/rquery/), [`rqdatatable`](https://github.com/WinVector/rqdatatable), and [`cdata`](https://CRAN.R-project.org/package=cdata).  This package will supply piped Codd-transform style notation that can perform data engineering in [`Pandas`](https://pandas.pydata.org) and generate [`SQL`](https://en.wikipedia.org/wiki/SQL) queries from the same specification.
+[This](https://github.com/WinVector/data_algebra) is to be the [`Python`](https://www.python.org) equivalent of the [`R`](https://www.r-project.org) packages [`rquery`](https://github.com/WinVector/rquery/), [`rqdatatable`](https://github.com/WinVector/rqdatatable), and [`cdata`](https://CRAN.R-project.org/package=cdata).  This package supplies piped Codd-transform style notation that can perform data engineering in [`Pandas`](https://pandas.pydata.org) and generate [`SQL`](https://en.wikipedia.org/wiki/SQL) queries from the same specification.
 
 # Installing
 
@@ -90,7 +88,7 @@ data_algebra.__version__
 
 
 
-    '0.7.3'
+    '0.7.5'
 
 
 
@@ -114,7 +112,19 @@ d_local
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -184,7 +194,10 @@ else:
 
 
 ```python
-remote_table_desciption = db_handle.insert_table(d_local, table_name='d', allow_overwrite=True)
+remote_table_desciption = db_handle.insert_table(
+    d_local, 
+    table_name='d', 
+    allow_overwrite=True)
 
 remote_table_desciption.head
 
@@ -194,7 +207,19 @@ remote_table_desciption.head
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -288,30 +313,29 @@ py_source = ops.to_python(pretty=True)
 print(py_source)
 ```
 
-    TableDescription(
-        table_name="d",
-        column_names=[
-            "subjectID",
-            "surveyCategory",
-            "assessmentTotal",
-            "irrelevantCol1",
-            "irrelevantCol2",
-        ],
-    ).extend({"probability": "((assessmentTotal * 0.237)).exp()"}).extend(
-        {"total": "probability.sum()"}, partition_by=["subjectID"]
-    ).extend(
-        {"probability": "probability / total"}
-    ).extend(
-        {"row_number": "(1).cumsum()"},
-        partition_by=["subjectID"],
-        order_by=["probability"],
-        reverse=["probability"],
-    ).select_rows(
-        "row_number == 1"
-    ).select_columns(
-        ["subjectID", "surveyCategory", "probability"]
-    ).rename_columns(
-        {"diagnosis": "surveyCategory"}
+    (
+        TableDescription(
+            table_name="d",
+            column_names=[
+                "subjectID",
+                "surveyCategory",
+                "assessmentTotal",
+                "irrelevantCol1",
+                "irrelevantCol2",
+            ],
+        )
+        .extend({"probability": "((assessmentTotal * 0.237)).exp()"})
+        .extend({"total": "probability.sum()"}, partition_by=["subjectID"])
+        .extend({"probability": "probability / total"})
+        .extend(
+            {"row_number": "(1).cumsum()"},
+            partition_by=["subjectID"],
+            order_by=["probability"],
+            reverse=["probability"],
+        )
+        .select_rows("row_number == 1")
+        .select_columns(["subjectID", "surveyCategory", "probability"])
+        .rename_columns({"diagnosis": "surveyCategory"})
     )
     
 
@@ -337,7 +361,7 @@ Once we have the `ops` object we can do quite a lot with it. We have already exh
 
 
 ```python
-sql = db_handle.to_sql(ops, pretty=True, use_with=True, annotate=True)
+sql = db_handle.to_sql(ops)
 
 print(sql)
 ```
@@ -346,50 +370,65 @@ print(sql)
     --  dialect: PostgreSQLModel
     --       string quote: '
     --   identifier quote: "
-    WITH "table_reference_0" AS
-      (SELECT "subjectID",
-              "surveyCategory",
-              "assessmentTotal"
-       FROM "d"),
-         "extend_1" AS
-      (SELECT -- extend({ 'probability': '((assessmentTotal * 0.237)).exp()'})
-     "subjectID",
-     "surveyCategory",
-     EXP(("assessmentTotal" * 0.237)) AS "probability"
-       FROM "table_reference_0"),
-         "extend_2" AS
-      (SELECT -- extend({ 'total': 'probability.sum()'}, partition_by=['subjectID'])
-     "subjectID",
-     "surveyCategory",
-     "probability",
-     SUM("probability") OVER (PARTITION BY "subjectID") AS "total"
-       FROM "extend_1"),
-         "extend_3" AS
-      (SELECT -- extend({ 'probability': 'probability / total'})
-     "subjectID",
-     "surveyCategory",
-     "probability" / "total" AS "probability"
-       FROM "extend_2"),
-         "extend_4" AS
-      (SELECT -- extend({ 'row_number': '(1).cumsum()'}, partition_by=['subjectID'], order_by=['probability'], reverse=['probability'])
-     "subjectID",
-     "surveyCategory",
-     "probability",
-     SUM(1) OVER (PARTITION BY "subjectID"
-                  ORDER BY "probability" DESC) AS "row_number"
-       FROM "extend_3"),
-         "select_rows_5" AS
-      (SELECT -- select_rows('row_number == 1')
-     "subjectID",
-     "surveyCategory",
+    WITH
+     "table_reference_0" AS (
+      SELECT
+       "surveyCategory" ,
+       "subjectID" ,
+       "assessmentTotal"
+      FROM
+       "d"
+     ),
+     "extend_1" AS (
+      SELECT  -- extend({ 'probability': '((assessmentTotal * 0.237)).exp()'})
+       "surveyCategory" ,
+       "subjectID" ,
+       EXP(("assessmentTotal" * 0.237)) AS "probability"
+      FROM
+       "table_reference_0"
+     ),
+     "extend_2" AS (
+      SELECT  -- extend({ 'total': 'probability.sum()'}, partition_by=['subjectID'])
+       "surveyCategory" ,
+       "subjectID" ,
+       "probability" ,
+       SUM("probability") OVER ( PARTITION BY "subjectID"  )  AS "total"
+      FROM
+       "extend_1"
+     ),
+     "extend_3" AS (
+      SELECT  -- extend({ 'probability': 'probability / total'})
+       "probability" / "total" AS "probability" ,
+       "surveyCategory" ,
+       "subjectID"
+      FROM
+       "extend_2"
+     ),
+     "extend_4" AS (
+      SELECT  -- extend({ 'row_number': '(1).cumsum()'}, partition_by=['subjectID'], order_by=['probability'], reverse=['probability'])
+       "probability" ,
+       "surveyCategory" ,
+       "subjectID" ,
+       SUM(1) OVER ( PARTITION BY "subjectID" ORDER BY "probability" DESC  )  AS "row_number"
+      FROM
+       "extend_3"
+     ),
+     "select_rows_5" AS (
+      SELECT  -- select_rows('row_number == 1')
+       "probability" ,
+       "surveyCategory" ,
+       "subjectID"
+      FROM
+       "extend_4"
+       WHERE "row_number" = 1
+     )
+    SELECT  -- rename_columns({'diagnosis': 'surveyCategory'})
+     "surveyCategory" AS "diagnosis" ,
+     "subjectID" ,
      "probability"
-       FROM "extend_4"
-       WHERE "row_number" = 1 )
-    SELECT -- rename_columns({'diagnosis': 'surveyCategory'})
-     "surveyCategory" AS "diagnosis",
-     "subjectID",
-     "probability"
-    FROM "select_rows_5"
+    FROM
+     "select_rows_5"
+    
 
 
 
@@ -407,7 +446,19 @@ db_handle.read_query(sql)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -456,7 +507,19 @@ ops.eval({'d': d_local})
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -499,7 +562,19 @@ ops.transform(d_local)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -580,8 +655,6 @@ ops.columns_used()
 
 
 
-
-
 ```python
 # what columns does this operation produce?
 ops.column_names
@@ -611,3 +684,7 @@ db_handle.close()
 Note: as with `SQL` the `data_algebra` assumes the processing pipeline is a [`DAG`](https://en.wikipedia.org/wiki/Directed_acyclic_graph) with only table-nodes used more than once.
 
 
+
+```python
+
+```

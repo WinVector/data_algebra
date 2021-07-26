@@ -1,7 +1,6 @@
 import numpy
 
 import pytest
-import sqlite3
 
 import data_algebra
 from data_algebra.data_ops import *
@@ -26,40 +25,7 @@ def test_with_query_example_1():
 
     assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
 
-    db_model = data_algebra.SQLite.SQLiteModel()
-    db_handle = db_model.db_handle(conn=None)
-    example_sql = db_handle.to_sql(ops, use_with=True)
-    assert isinstance(example_sql, str)
-
-    with sqlite3.connect(":memory:") as conn:
-        db_model.prepare_connection(conn)
-        db_handle = db_model.db_handle(conn)
-        db_handle.insert_table(d, table_name="d")
-        sql_regular = db_handle.to_sql(
-            ops, use_with=False, annotate=False
-        )
-        res_regular = db_handle.read_query(sql_regular)
-        sql_regular_a = db_handle.to_sql(
-            ops, use_with=False, annotate=True
-        )
-        res_regular_a = db_handle.read_query(sql_regular_a)
-        sql_with = db_handle.to_sql(
-            ops, use_with=True, annotate=False
-        )
-        res_with = db_handle.read_query(sql_with)
-        sql_with_a = db_handle.to_sql(
-            ops, use_with=True, annotate=True
-        )
-        res_with_a = db_handle.read_query(sql_with_a)
-
-    assert data_algebra.test_util.equivalent_frames(res_regular, expect)
-    assert data_algebra.test_util.equivalent_frames(res_with, expect)
-    assert data_algebra.test_util.equivalent_frames(res_regular_a, expect)
-    assert data_algebra.test_util.equivalent_frames(res_with_a, expect)
-    assert "--" in sql_regular_a
-    assert "--" in sql_with_a
-    assert "--" not in sql_regular
-    assert "--" not in sql_with
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
 
 def test_with_query_example_2():
@@ -97,35 +63,4 @@ def test_with_query_example_2():
 
     assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
 
-    db_model = data_algebra.SQLite.SQLiteModel()
-
-    with sqlite3.connect(":memory:") as conn:
-        db_model.prepare_connection(conn)
-        db_handle = db_model.db_handle(conn)
-        db_handle.insert_table(d1, table_name="d1")
-        db_handle.insert_table(d2, table_name="d2")
-        sql_regular = db_handle.to_sql(
-            ops, use_with=False, annotate=False
-        )
-        res_regular = db_handle.read_query(sql_regular)
-        sql_regular_a = db_handle.to_sql(
-            ops, use_with=False, annotate=True
-        )
-        res_regular_a = db_handle.read_query(sql_regular_a)
-        sql_with = db_handle.to_sql(
-            ops, use_with=True, annotate=False
-        )
-        res_with = db_handle.read_query(sql_with)
-        sql_with_a = db_handle.to_sql(
-            ops, use_with=True, annotate=True
-        )
-        res_with_a = db_handle.read_query(sql_with_a)
-
-    assert data_algebra.test_util.equivalent_frames(res_regular, expect)
-    assert data_algebra.test_util.equivalent_frames(res_with, expect)
-    assert data_algebra.test_util.equivalent_frames(res_regular_a, expect)
-    assert data_algebra.test_util.equivalent_frames(res_with_a, expect)
-    assert "--" in sql_regular_a
-    assert "--" in sql_with_a
-    assert "--" not in sql_regular
-    assert "--" not in sql_with
+    data_algebra.test_util.check_transform(ops=ops, data={"d1": d1, "d2": d2}, expect=expect)

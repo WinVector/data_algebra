@@ -31,7 +31,7 @@ def test_sql_extend_shortening_1():
 
     # show the SQL is shortened
     db_handle = data_algebra.MySQL.MySQLModel().db_handle(conn=None)
-    sql = db_handle.to_sql(ops, use_with=False, annotate=True)
+    sql = db_handle.to_sql(ops)
     assert isinstance(sql, str)
     assert sql.lower().count('select') == 1
 
@@ -56,7 +56,7 @@ def test_sql_extend_shortening_1():
     assert isinstance(ops_2.sources[0], data_algebra.data_ops.ExtendNode)
     assert isinstance(ops_2.sources[0].sources[0], data_algebra.data_ops.ExtendNode)
 
-    sql_2 = db_handle.to_sql(ops_2, use_with=False, annotate=True)
+    sql_2 = db_handle.to_sql(ops_2)
     assert isinstance(sql_2, str)
     assert sql_2.lower().count('select') == 1
 

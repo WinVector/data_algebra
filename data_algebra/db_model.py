@@ -1,6 +1,8 @@
 import math
 import re
 from collections import OrderedDict
+from collections import namedtuple
+from types import SimpleNamespace
 
 import pandas.io.sql
 
@@ -12,6 +14,21 @@ import data_algebra.util
 import data_algebra.data_ops_types
 import data_algebra.eval_model
 import data_algebra.data_ops
+
+
+class SQL_Format_Options(SimpleNamespace):
+    def __init__(self,
+                 use_with=True,
+                 annotate=True,
+                 sql_indent=' ',
+                 initial_commas=False,
+                 ):
+        SimpleNamespace.__init__(
+            self,
+            use_with=use_with,
+            annotate=annotate,
+            sql_indent=sql_indent,
+            initial_commas=initial_commas)
 
 
 def _str_join_expecting_list(joiner, str_list):
@@ -462,8 +479,7 @@ class DBModel:
     join_name_map: dict
     supports_with: bool
     allow_extend_merges: bool
-    sql_indent: str
-    initial_commas: bool
+    default_SQL_format_options:SQL_Format_Options
 
     def __init__(
         self,
@@ -481,6 +497,7 @@ class DBModel:
         join_name_map=None,
         supports_with=True,
         allow_extend_merges=True,
+        default_SQL_format_options=None,
     ):
         if local_data_model is None:
             local_data_model = data_algebra.default_data_model
@@ -505,10 +522,16 @@ class DBModel:
         if join_name_map is None:
             join_name_map = {}
         self.join_name_map = join_name_map.copy()
+        if default_SQL_format_options is None:
+            default_SQL_format_options = SQL_Format_Options(
+                use_with=True,
+                annotate=True,
+                sql_indent=' ',
+                initial_commas=False)
+        assert isinstance(default_SQL_format_options, SQL_Format_Options)
+        self.default_SQL_format_options = default_SQL_format_options
         self.supports_with = supports_with
         self.allow_extend_merges = allow_extend_merges
-        self.sql_indent = ' '
-        self.initial_commas = False
 
     def db_handle(self, conn):
         return DBHandle(db_model=self, conn=conn)
@@ -1215,12 +1238,14 @@ class DBModel:
         self,
         ops,
         *,
-        annotate=True,
         temp_tables=None,
-        use_with=True,
+        sql_format_options=None,
     ):
         assert isinstance(self, DBModel)
         assert isinstance(ops, data_algebra.data_ops.ViewRepresentation)
+        if sql_format_options is None:
+            sql_format_options = self.default_SQL_format_options
+        assert isinstance(sql_format_options, SQL_Format_Options)
         ops.columns_used()  # for table consistency check/raise
         temp_id_source = [0]
         near_sql = ops.to_near_sql_implementation(
@@ -1234,7 +1259,7 @@ class DBModel:
                 )
             temp_tables.update(near_sql.temp_tables)
         sql_str_list = None
-        if use_with and self.supports_with:
+        if sql_format_options.use_with and self.supports_with:
             sequence = near_sql.to_with_form()
             len_sequence = len(sequence)
             # can fall back to the non-with path
@@ -1242,18 +1267,19 @@ class DBModel:
                 sql_sequence = []
                 for i in range(len_sequence - 1):
                     nmi = sequence[i][0]  # already quoted
-                    sqli = sequence[i][1].to_sql(db_model=self, annotate=annotate)
+                    sqli = sequence[i][1].to_sql(db_model=self, sql_format_options=sql_format_options)
                     sql_sequence = (
                         sql_sequence +
-                        [f"{self.sql_indent}{nmi} AS ("] +
-                        [self.sql_indent + self.sql_indent + s for s in sqli]
+                        [f"{self.default_SQL_format_options.sql_indent}{nmi} AS ("] +
+                        [self.default_SQL_format_options.sql_indent + self.default_SQL_format_options.sql_indent +
+                         s for s in sqli]
                     )
                     if i < (len_sequence - 2):
-                        sql_sequence = sql_sequence + [self.sql_indent + '),']
+                        sql_sequence = sql_sequence + [self.default_SQL_format_options.sql_indent + '),']
                     else:
-                        sql_sequence = sql_sequence + [self.sql_indent + ')']
+                        sql_sequence = sql_sequence + [self.default_SQL_format_options.sql_indent + ')']
                 sql_last = sequence[len_sequence - 1].to_sql(
-                    db_model=self, force_sql=True, annotate=annotate
+                    db_model=self, force_sql=True, sql_format_options=sql_format_options
                 )
                 sql_str_list = (
                         ["WITH"] +
@@ -1262,8 +1288,8 @@ class DBModel:
                 )
         if sql_str_list is None:
             # non-with path
-            sql_str_list = near_sql.to_sql(db_model=self, force_sql=True, annotate=annotate)
-        if annotate:
+            sql_str_list = near_sql.to_sql(db_model=self, force_sql=True, sql_format_options=sql_format_options)
+        if sql_format_options.annotate:
             model_descr = re.sub(r"\s+", " ", str(self))
             sql_str_list = (
                     [
@@ -1432,13 +1458,13 @@ class DBModel:
     def _indent_and_comma_terms(self, terms):
         n = len(terms)
         assert n >= 1
-        if self.initial_commas:
-            return [self.sql_indent + ('  ' if i==0 else ', ') + terms[i] for i in range(n)]
-        return [self.sql_indent + terms[i] + (' ,' if i < (n - 1) else '') for i in range(n)]
+        if self.default_SQL_format_options.initial_commas:
+            return [self.default_SQL_format_options.sql_indent + ('  ' if i==0 else ', ') + terms[i] for i in range(n)]
+        return [self.default_SQL_format_options.sql_indent + terms[i] + (' ,' if i < (n - 1) else '') for i in range(n)]
 
-    def convert_nearsql_container_subsql_(self, nearsql_container, *, annotate=False):
+    def convert_nearsql_container_subsql_(self, nearsql_container, *, sql_format_options):
         assert isinstance(nearsql_container, data_algebra.near_sql.NearSQLContainer)
-        sub_sql = nearsql_container.to_sql(self, annotate=annotate)
+        sub_sql = nearsql_container.to_sql(self, sql_format_options=sql_format_options)
         assert isinstance(sub_sql, list)
         if isinstance(nearsql_container.near_sql, data_algebra.near_sql.NearSQLTable):
             sql = sub_sql
@@ -1461,20 +1487,20 @@ class DBModel:
         return sql
 
     def nearsqlcte_to_sql_(
-        self, near_sql, *, columns=None, force_sql=False, constants=None, annotate=False
+        self, near_sql, *, columns=None, force_sql=False, constants=None, sql_format_options
     ):
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLCommonTableExpression)
         if force_sql:
             return [
                 'SELECT',
-                self.sql_indent + '*',
+                self.default_SQL_format_options.sql_indent + '*',
                 'FROM ',
-                self.sql_indent + near_sql.quoted_query_name
+                self.default_SQL_format_options.sql_indent + near_sql.quoted_query_name
             ]
         return [near_sql.quoted_query_name]
 
     def nearsqltable_to_sql_(
-        self, near_sql, *, columns=None, force_sql=False, constants=None, annotate=False
+        self, near_sql, *, columns=None, force_sql=False, constants=None, sql_format_options
     ):
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLTable)
         if columns is None:
@@ -1497,14 +1523,17 @@ class DBModel:
                 ["SELECT"]
                 + self._indent_and_comma_terms(terms_strs)
                 + ["FROM"]
-                + [self.sql_indent + near_sql.quoted_table_name]
+                + [self.default_SQL_format_options.sql_indent + near_sql.quoted_table_name]
             )
         return [near_sql.quoted_table_name]
 
     def nearsqlunary_to_sql_(
-        self, near_sql, *, columns=None, force_sql=False, constants=None, annotate=False
+        self, near_sql, *, columns=None, force_sql=False, constants=None, sql_format_options=None
     ):
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLUnaryStep)
+        if sql_format_options is None:
+            sql_format_options = self.default_SQL_format_options
+        assert isinstance(sql_format_options, SQL_Format_Options)
         terms_strs = ["*"]  # allow * notation if nothing is specified
         terms = near_sql.terms
         if terms is not None:
@@ -1522,7 +1551,7 @@ class DBModel:
                 ]
         sql_start = "SELECT"
         if (
-            annotate
+            sql_format_options.annotate
             and (near_sql.annotation is not None)
             and (len(near_sql.annotation) > 0)
         ):
@@ -1531,8 +1560,8 @@ class DBModel:
             [sql_start] +
             self._indent_and_comma_terms(terms_strs) +
             ['FROM'] +
-            [self.sql_indent + si for si in
-             near_sql.sub_sql.convert_subsql(db_model=self, annotate=annotate)]
+            [self.default_SQL_format_options.sql_indent + si for si in
+             near_sql.sub_sql.convert_subsql(db_model=self, sql_format_options=sql_format_options)]
         )
         if (near_sql.suffix is not None) and (len(near_sql.suffix) > 0):
             sql = sql + [near_sql.suffix]   # TODO: make suffix a list
@@ -1545,10 +1574,13 @@ class DBModel:
         columns=None,
         force_sql=False,
         constants=None,
-        annotate=False,
+        sql_format_options=None,
         quoted_query_name=None,
     ):
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLBinaryStep)
+        if sql_format_options is None:
+            sql_format_options = self.default_SQL_format_options
+        assert isinstance(sql_format_options, SQL_Format_Options)
         if columns is None:
             columns = [k for k in near_sql.terms.keys()]
         terms = near_sql.terms
@@ -1562,29 +1594,29 @@ class DBModel:
         is_union = "union" in near_sql.joiner.lower()
         sql_start = "SELECT"
         if (
-            annotate
+            sql_format_options.annotate
             and (near_sql.annotation is not None)
             and (len(near_sql.annotation) > 0)
         ):
             sql_start = "SELECT  -- " + _clean_annotation(near_sql.annotation)
         if is_union:
-            substr_1 = near_sql.sub_sql1.to_sql(db_model=self, annotate=annotate)
-            substr_2 = near_sql.sub_sql2.to_sql(db_model=self, annotate=annotate)
+            substr_1 = near_sql.sub_sql1.to_sql(db_model=self, sql_format_options=sql_format_options)
+            substr_2 = near_sql.sub_sql2.to_sql(db_model=self, sql_format_options=sql_format_options)
         else:
             substr_1 = near_sql.sub_sql1.convert_subsql(
-                db_model=self, annotate=annotate
+                db_model=self, sql_format_options=sql_format_options
             )
             substr_2 = near_sql.sub_sql2.convert_subsql(
-                db_model=self, annotate=annotate
+                db_model=self, sql_format_options=sql_format_options
             )
         sql = (
             [sql_start] +
             self._indent_and_comma_terms(terms_strs)
             + ["FROM"]
             + ["("]
-            + [self.sql_indent + si for si in substr_1]
+            + [self.default_SQL_format_options.sql_indent + si for si in substr_1]
             + [near_sql.joiner]
-            + [self.sql_indent + si for si in substr_2]
+            + [self.default_SQL_format_options.sql_indent + si for si in substr_2]
         )
         if (near_sql.suffix is not None) and (len(near_sql.suffix) > 0):
             sql = sql + [near_sql.suffix]  # TODO make suffix an array
@@ -1595,9 +1627,12 @@ class DBModel:
         return sql
 
     def nearsqlq_to_sql_(
-        self, near_sql, *, columns=None, constants=None, annotate=False
+        self, near_sql, *, columns=None, constants=None, sql_format_options=None
     ):
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLq)
+        if sql_format_options is None:
+            sql_format_options = self.default_SQL_format_options
+        assert isinstance(sql_format_options, SQL_Format_Options)
         if columns is None:
             columns = [k for k in near_sql.terms.keys()]
         terms = near_sql.terms
@@ -1617,7 +1652,7 @@ class DBModel:
             ]
         sql_start = "SELECT"
         if (
-            annotate
+            sql_format_options.annotate
             and (near_sql.annotation is not None)
             and (len(near_sql.annotation) > 0)
         ):
@@ -1701,15 +1736,13 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         self,
         ops,
         *,
-        annotate=True,
         temp_tables=None,
-        use_with=True,
+        sql_format_options=None,
     ):
         return self.db_model.to_sql(
             ops=ops,
-            annotate=annotate,
             temp_tables=temp_tables,
-            use_with=use_with,
+            sql_format_options=sql_format_options,
         )
 
     def query_to_csv(self, q, *, res_name):

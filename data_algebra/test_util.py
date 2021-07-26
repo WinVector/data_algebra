@@ -16,9 +16,9 @@ from data_algebra.data_ops import *
 
 
 # controls
-test_PostgreSQL = True  # causes an external dependency
+test_PostgreSQL = False  # causes an external dependency
 test_BigQuery = False  # causes an external dependency
-test_MySQL = True  # causes an external dependency
+test_MySQL = False  # causes an external dependency
 test_Spark = False  # causes an external dependency
 
 
@@ -213,14 +213,18 @@ def check_transform_on_handles(
             to_del = set()
             temp_tables = None
             sql_statements = []
-            for annotate in [True, False]:
+            for initial_commas in [True, False]:
                 for use_with in [True, False]:
+                    sql_format_options = data_algebra.db_model.SQL_Format_Options(
+                        use_with=use_with,
+                        annotate=True,
+                        sql_indent=' ',
+                        initial_commas=initial_commas)
                     temp_tables = dict()
                     sql = db_handle.to_sql(
                         ops,
-                        annotate=annotate,
-                        use_with=use_with,
                         temp_tables=temp_tables,
+                        sql_format_options=sql_format_options,
                     )
                     assert isinstance(sql, str)
                     sql_statements.append(sql)

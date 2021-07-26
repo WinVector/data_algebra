@@ -227,18 +227,18 @@ class ViewRepresentation(OperatorPlatform, ABC):
         self,
         db_model,
         *,
-        annotate=True,
         temp_tables=None,
-        use_with=True,
+        sql_format_options=None,
     ):
         if isinstance(db_model, data_algebra.db_model.DBHandle):
             db_model = db_model.db_model
         assert isinstance(db_model, data_algebra.db_model.DBModel)
+        if sql_format_options is None:
+            sql_format_options = db_model.default_SQL_format_options
         return db_model.to_sql(
             ops=self,
-            annotate=annotate,
             temp_tables=temp_tables,
-            use_with=use_with,
+            sql_format_options=sql_format_options,
         )
 
     # Pandas realization

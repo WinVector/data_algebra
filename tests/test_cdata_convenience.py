@@ -1,6 +1,5 @@
 import re
 import io
-import sqlite3
 
 import data_algebra
 import data_algebra.test_util
@@ -65,51 +64,9 @@ def test_cdata_convenience_1():
     d3 = mpi.transform(d2)
     assert data_algebra.test_util.equivalent_frames(d3, expect_3)
 
-    db_model = data_algebra.SQLite.SQLiteModel()
-
     ops1 = describe_table(d, table_name="d").convert_records(mp)
     d2p = ops1.transform(d)
     assert data_algebra.test_util.equivalent_frames(d2p, expect_2)
 
-    with sqlite3.connect(":memory:") as conn:
-        db_model.prepare_connection(conn)
-        db_handle = db_model.db_handle(conn)
-        db_handle.insert_table(d, table_name="d", allow_overwrite=True)
-        db_handle.insert_table(d, table_name="d2", allow_overwrite=True)
-
-        temp_tables1 = dict()
-        sql_regular = db_handle.to_sql(
-            ops1, use_with=False, annotate=False, temp_tables=temp_tables1
-        )
-        for k, v in temp_tables1.items():
-            db_handle.insert_table(v, table_name=k, allow_overwrite=True)
-        res_regular = db_handle.read_query(sql_regular)
-
-        temp_tables1 = dict()
-        sql_regular_a = db_handle.to_sql(
-            ops1, use_with=False, annotate=True, temp_tables=temp_tables1
-        )
-        for k, v in temp_tables1.items():
-            db_handle.insert_table(v, table_name=k, allow_overwrite=True)
-        res_regular_a = db_handle.read_query(sql_regular_a)
-
-        temp_tables1 = dict()
-        sql_with = db_handle.to_sql(
-            ops1, use_with=True, annotate=False, temp_tables=temp_tables1
-        )
-        for k, v in temp_tables1.items():
-            db_handle.insert_table(v, table_name=k, allow_overwrite=True)
-        res_with = db_handle.read_query(sql_with)
-
-        temp_tables1 = dict()
-        sql_with_a = db_handle.to_sql(
-            ops1, use_with=True, annotate=True, temp_tables=temp_tables1
-        )
-        for k, v in temp_tables1.items():
-            db_handle.insert_table(v, table_name=k, allow_overwrite=True)
-        res_with_a = db_handle.read_query(sql_with_a)
-
-    assert data_algebra.test_util.equivalent_frames(res_regular, expect_2)
-    assert data_algebra.test_util.equivalent_frames(res_regular_a, expect_2)
-    assert data_algebra.test_util.equivalent_frames(res_with, expect_2)
-    assert data_algebra.test_util.equivalent_frames(res_with_a, expect_2)
+    data_algebra.test_util.check_transform(
+        ops=ops1, data={'d': d, 'd2': d2}, expect=expect_2)
