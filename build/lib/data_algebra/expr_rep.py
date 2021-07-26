@@ -64,6 +64,9 @@ fn_names_that_imply_ordered_windowed_situation = {
     "cumprod",
     "cumsum",
     "row_number",
+    "shift",
+    "lag",
+    "lead",
 }
 
 
