@@ -830,6 +830,7 @@ class DBModel:
             and subsql.mergeable
             and (subsql.declared_term_dependencies is not None)
             and ((subsql.suffix is None) or (len(subsql.suffix) == 0))):
+            # TODO: check our own suffix is also empty
             # check detailed merge conditions
             def non_trivial_terms(*, dep_dict, term_dict):
                 return [k for k, v in dep_dict.items() if (len(v - set([k])) > 0) or (k not in v) or
