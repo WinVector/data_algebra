@@ -215,7 +215,7 @@ def check_transform_on_handles(
             sql_statements = []
             for initial_commas in [True, False]:
                 for use_with in [True, False]:
-                    sql_format_options = data_algebra.db_model.SQL_Format_Options(
+                    sql_format_options = data_algebra.db_model.SQLFormatOptions(
                         use_with=use_with,
                         annotate=True,
                         sql_indent=' ',
