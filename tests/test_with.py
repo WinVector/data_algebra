@@ -31,36 +31,35 @@ def test_with_query_example_1():
     example_sql = db_handle.to_sql(ops, use_with=True)
     assert isinstance(example_sql, str)
 
-    for pretty in (False, True):
-        with sqlite3.connect(":memory:") as conn:
-            db_model.prepare_connection(conn)
-            db_handle = db_model.db_handle(conn)
-            db_handle.insert_table(d, table_name="d")
-            sql_regular = db_handle.to_sql(
-                ops, pretty=pretty, use_with=False, annotate=False
-            )
-            res_regular = db_handle.read_query(sql_regular)
-            sql_regular_a = db_handle.to_sql(
-                ops, pretty=pretty, use_with=False, annotate=True
-            )
-            res_regular_a = db_handle.read_query(sql_regular_a)
-            sql_with = db_handle.to_sql(
-                ops, pretty=pretty, use_with=True, annotate=False
-            )
-            res_with = db_handle.read_query(sql_with)
-            sql_with_a = db_handle.to_sql(
-                ops, pretty=pretty, use_with=True, annotate=True
-            )
-            res_with_a = db_handle.read_query(sql_with_a)
+    with sqlite3.connect(":memory:") as conn:
+        db_model.prepare_connection(conn)
+        db_handle = db_model.db_handle(conn)
+        db_handle.insert_table(d, table_name="d")
+        sql_regular = db_handle.to_sql(
+            ops, use_with=False, annotate=False
+        )
+        res_regular = db_handle.read_query(sql_regular)
+        sql_regular_a = db_handle.to_sql(
+            ops, use_with=False, annotate=True
+        )
+        res_regular_a = db_handle.read_query(sql_regular_a)
+        sql_with = db_handle.to_sql(
+            ops, use_with=True, annotate=False
+        )
+        res_with = db_handle.read_query(sql_with)
+        sql_with_a = db_handle.to_sql(
+            ops, use_with=True, annotate=True
+        )
+        res_with_a = db_handle.read_query(sql_with_a)
 
-        assert data_algebra.test_util.equivalent_frames(res_regular, expect)
-        assert data_algebra.test_util.equivalent_frames(res_with, expect)
-        assert data_algebra.test_util.equivalent_frames(res_regular_a, expect)
-        assert data_algebra.test_util.equivalent_frames(res_with_a, expect)
-        assert "--" in sql_regular_a
-        assert "--" in sql_with_a
-        assert "--" not in sql_regular
-        assert "--" not in sql_with
+    assert data_algebra.test_util.equivalent_frames(res_regular, expect)
+    assert data_algebra.test_util.equivalent_frames(res_with, expect)
+    assert data_algebra.test_util.equivalent_frames(res_regular_a, expect)
+    assert data_algebra.test_util.equivalent_frames(res_with_a, expect)
+    assert "--" in sql_regular_a
+    assert "--" in sql_with_a
+    assert "--" not in sql_regular
+    assert "--" not in sql_with
 
 
 def test_with_query_example_2():
@@ -100,34 +99,33 @@ def test_with_query_example_2():
 
     db_model = data_algebra.SQLite.SQLiteModel()
 
-    for pretty in (False, True):
-        with sqlite3.connect(":memory:") as conn:
-            db_model.prepare_connection(conn)
-            db_handle = db_model.db_handle(conn)
-            db_handle.insert_table(d1, table_name="d1")
-            db_handle.insert_table(d2, table_name="d2")
-            sql_regular = db_handle.to_sql(
-                ops, pretty=pretty, use_with=False, annotate=False
-            )
-            res_regular = db_handle.read_query(sql_regular)
-            sql_regular_a = db_handle.to_sql(
-                ops, pretty=pretty, use_with=False, annotate=True
-            )
-            res_regular_a = db_handle.read_query(sql_regular_a)
-            sql_with = db_handle.to_sql(
-                ops, pretty=pretty, use_with=True, annotate=False
-            )
-            res_with = db_handle.read_query(sql_with)
-            sql_with_a = db_handle.to_sql(
-                ops, pretty=pretty, use_with=True, annotate=True
-            )
-            res_with_a = db_handle.read_query(sql_with_a)
+    with sqlite3.connect(":memory:") as conn:
+        db_model.prepare_connection(conn)
+        db_handle = db_model.db_handle(conn)
+        db_handle.insert_table(d1, table_name="d1")
+        db_handle.insert_table(d2, table_name="d2")
+        sql_regular = db_handle.to_sql(
+            ops, use_with=False, annotate=False
+        )
+        res_regular = db_handle.read_query(sql_regular)
+        sql_regular_a = db_handle.to_sql(
+            ops, use_with=False, annotate=True
+        )
+        res_regular_a = db_handle.read_query(sql_regular_a)
+        sql_with = db_handle.to_sql(
+            ops, use_with=True, annotate=False
+        )
+        res_with = db_handle.read_query(sql_with)
+        sql_with_a = db_handle.to_sql(
+            ops, use_with=True, annotate=True
+        )
+        res_with_a = db_handle.read_query(sql_with_a)
 
-        assert data_algebra.test_util.equivalent_frames(res_regular, expect)
-        assert data_algebra.test_util.equivalent_frames(res_with, expect)
-        assert data_algebra.test_util.equivalent_frames(res_regular_a, expect)
-        assert data_algebra.test_util.equivalent_frames(res_with_a, expect)
-        assert "--" in sql_regular_a
-        assert "--" in sql_with_a
-        assert "--" not in sql_regular
-        assert "--" not in sql_with
+    assert data_algebra.test_util.equivalent_frames(res_regular, expect)
+    assert data_algebra.test_util.equivalent_frames(res_with, expect)
+    assert data_algebra.test_util.equivalent_frames(res_regular_a, expect)
+    assert data_algebra.test_util.equivalent_frames(res_with_a, expect)
+    assert "--" in sql_regular_a
+    assert "--" in sql_with_a
+    assert "--" not in sql_regular
+    assert "--" not in sql_with

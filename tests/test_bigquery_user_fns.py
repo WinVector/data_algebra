@@ -120,7 +120,7 @@ def test_bigquery_user_fns_integrated():
     assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
 
     test_handle = data_algebra.BigQuery.BigQueryModel().db_handle(conn=None)
-    test_sql = test_handle.to_sql(ops, pretty=True)
+    test_sql = test_handle.to_sql(ops)
     assert isinstance(test_sql, str)
 
     if data_algebra.test_util.test_BigQuery:

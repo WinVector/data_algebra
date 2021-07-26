@@ -23,7 +23,7 @@ def test_extend_order_1():
     with sqlite3.connect(":memory:") as sqllite_conn:
         sqllite_model.prepare_connection(sqllite_conn)
         sqllite_model.insert_table(sqllite_conn, d, "d")
-        sqllite_sql = ops.to_sql(sqllite_model, pretty=True)
+        sqllite_sql = ops.to_sql(sqllite_model)
         res_sqlite = sqllite_model.read_query(sqllite_conn, sqllite_sql)
 
     cols_sql = [c for c in res_sqlite.columns if c != "z"]

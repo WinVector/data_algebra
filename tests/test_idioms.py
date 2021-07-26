@@ -79,7 +79,7 @@ def test_idiom_extend_test_trinary():
     )
 
     db_handle = data_algebra.MySQL.MySQLModel().db_handle(conn=None)
-    sql = db_handle.to_sql(ops, pretty=True)
+    sql = db_handle.to_sql(ops)
     assert isinstance(sql, str)
     # print(sql)
 
@@ -108,7 +108,7 @@ def test_idiom_extend_test_trinary_2():
     )
 
     db_handle = data_algebra.MySQL.MySQLModel().db_handle(conn=None)
-    sql = db_handle.to_sql(ops, pretty=True)
+    sql = db_handle.to_sql(ops)
     assert isinstance(sql, str)
     # print(sql)
 

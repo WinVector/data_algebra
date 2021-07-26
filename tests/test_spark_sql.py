@@ -13,4 +13,4 @@ def test_spark_sql():
 
     db_model = data_algebra.SparkSQL.SparkSQLModel()
 
-    ops.to_sql(db_model, pretty=True)
+    ops.to_sql(db_model)

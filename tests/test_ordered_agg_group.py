@@ -95,7 +95,7 @@ def test_ordered_agg_group():
 
     db_model = data_algebra.SQLite.SQLiteModel()
 
-    sql = ops.to_sql(db_model, pretty=True)
+    sql = ops.to_sql(db_model)
 
     # print(sql)
 

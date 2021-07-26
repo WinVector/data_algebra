@@ -79,7 +79,7 @@ def test_cdata_convenience_1():
 
         temp_tables1 = dict()
         sql_regular = db_handle.to_sql(
-            ops1, pretty=True, use_with=False, annotate=False, temp_tables=temp_tables1
+            ops1, use_with=False, annotate=False, temp_tables=temp_tables1
         )
         for k, v in temp_tables1.items():
             db_handle.insert_table(v, table_name=k, allow_overwrite=True)
@@ -87,7 +87,7 @@ def test_cdata_convenience_1():
 
         temp_tables1 = dict()
         sql_regular_a = db_handle.to_sql(
-            ops1, pretty=True, use_with=False, annotate=True, temp_tables=temp_tables1
+            ops1, use_with=False, annotate=True, temp_tables=temp_tables1
         )
         for k, v in temp_tables1.items():
             db_handle.insert_table(v, table_name=k, allow_overwrite=True)
@@ -95,7 +95,7 @@ def test_cdata_convenience_1():
 
         temp_tables1 = dict()
         sql_with = db_handle.to_sql(
-            ops1, pretty=True, use_with=True, annotate=False, temp_tables=temp_tables1
+            ops1, use_with=True, annotate=False, temp_tables=temp_tables1
         )
         for k, v in temp_tables1.items():
             db_handle.insert_table(v, table_name=k, allow_overwrite=True)
@@ -103,7 +103,7 @@ def test_cdata_convenience_1():
 
         temp_tables1 = dict()
         sql_with_a = db_handle.to_sql(
-            ops1, pretty=True, use_with=True, annotate=True, temp_tables=temp_tables1
+            ops1, use_with=True, annotate=True, temp_tables=temp_tables1
         )
         for k, v in temp_tables1.items():
             db_handle.insert_table(v, table_name=k, allow_overwrite=True)

@@ -38,7 +38,7 @@ def test_sqlite():
 
     pp = ops.to_python(pretty=True)
 
-    sql = ops.to_sql(db_model, pretty=True)
+    sql = ops.to_sql(db_model)
 
     res = db_model.read_query(conn, sql)
 
@@ -103,13 +103,7 @@ def test_sqllite_g2():
 
     sql_model = data_algebra.SQLite.SQLiteModel()
 
-    q = ops.to_sql(db_model=sql_model, pretty=False)
-    q_pretty = ops.to_sql(db_model=sql_model, pretty=True)
-
-    pattern_ws = re.compile(r"\s+")
-    q_ns = re.sub(pattern_ws, "", q)
-    q_pretty_ns = re.sub(pattern_ws, "", q_pretty)
-    assert q_ns == q_pretty_ns
+    q = ops.to_sql(db_model=sql_model)
 
     with sqlite3.connect(":memory:") as conn:
         sql_model.prepare_connection(conn)
@@ -119,14 +113,9 @@ def test_sqllite_g2():
         # conn.execute('CREATE TABLE res AS ' + q)
         # res_sql = sql_model.read_table(conn, 'res')
         res_sql = db_handle.read_query(q)
-        res_sql_pretty = db_handle.read_query(q_pretty)
 
     assert data_algebra.test_util.equivalent_frames(
         res_pandas, res_sql, check_row_order=True
-    )
-
-    assert data_algebra.test_util.equivalent_frames(
-        res_pandas, res_sql_pretty, check_row_order=True
     )
 
 

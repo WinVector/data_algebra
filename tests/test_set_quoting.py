@@ -11,7 +11,7 @@ def test_set_quoting_1():
 
     ops = describe_table(d, table_name="d").extend({"select": f"x.is_in({targets})"})
 
-    sql = bq_handle.to_sql(ops, pretty=True, annotate=False)
+    sql = bq_handle.to_sql(ops, annotate=False)
     assert "'" not in sql
     assert '"' not in sql
 
@@ -23,7 +23,7 @@ def test_set_quoting_2():
 
     ops = describe_table(d, table_name="d").extend({"select": f"x.is_in({-5, 1+2})"})
 
-    sql = bq_handle.to_sql(ops, pretty=True, annotate=False)
+    sql = bq_handle.to_sql(ops, annotate=False)
     assert "'" not in sql
     assert '"' not in sql
     assert "3" in sql

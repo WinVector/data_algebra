@@ -75,7 +75,7 @@ def test_calc_interface():
 
     db_model.insert_table(conn, d_extra, table_name="d")
 
-    sql = ops.to_sql(db_model, pretty=True)
+    sql = ops.to_sql(db_model)
     # Note: extra columns during execution is not an error.
     res_db_bad = db_model.read_query(conn, sql)
     data_model = {"d": [c for c in db_model.read_table(conn, "d", limit=1).columns]}

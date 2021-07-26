@@ -1215,9 +1215,7 @@ class DBModel:
         self,
         ops,
         *,
-        pretty=False,
         annotate=False,
-        encoding=None,
         temp_tables=None,
         use_with=False,
     ):
@@ -1701,17 +1699,13 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         self,
         ops,
         *,
-        pretty=False,
         annotate=False,
-        encoding=None,
         temp_tables=None,
         use_with=False,
     ):
         return self.db_model.to_sql(
             ops=ops,
-            pretty=pretty,
             annotate=annotate,
-            encoding=encoding,
             temp_tables=temp_tables,
             use_with=use_with,
         )

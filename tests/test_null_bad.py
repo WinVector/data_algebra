@@ -37,6 +37,5 @@ def test_null_bad():
         ops=ops,
         data=d,
         expect=expect,
-        allow_pretty=False,  # pretty printer was changing capitalization of data to DATA for BigQuery
         models_to_skip=models_to_skip,
     )

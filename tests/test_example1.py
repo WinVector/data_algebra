@@ -46,7 +46,7 @@ def test_example1_1():
     )
     assert data_algebra.test_util.equivalent_frames(res1, expect1)
 
-    sql1 = ops1.to_sql(db_model, pretty=True)
+    sql1 = ops1.to_sql(db_model)
     res1db = db_model.read_query(conn, sql1)
     assert data_algebra.test_util.equivalent_frames(res1db, expect1)
 
@@ -74,7 +74,7 @@ def test_example1_1():
     )
     assert data_algebra.test_util.equivalent_frames(res2, expect2)
 
-    sql2 = ops2.to_sql(db_model, pretty=True)
+    sql2 = ops2.to_sql(db_model)
     res2db = db_model.read_query(conn, sql2)
     assert data_algebra.test_util.equivalent_frames(res2db, expect2)
 

@@ -48,7 +48,7 @@ def test_container_1():
     )
 
     db_handle = data_algebra.MySQL.MySQLModel().db_handle(conn=None)
-    sql = db_handle.to_sql(ops2, pretty=True)
+    sql = db_handle.to_sql(ops2)
     assert isinstance(sql, str)
     # print(sql)
 

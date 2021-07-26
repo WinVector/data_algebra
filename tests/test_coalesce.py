@@ -29,6 +29,6 @@ def test_coalesce_one():
         }
     )
 
-    # sql = data_algebra.SparkSQL.SparkSQLModel().to_sql(ops, pretty=True)
+    # sql = data_algebra.SparkSQL.SparkSQLModel().to_sql(ops)
 
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
