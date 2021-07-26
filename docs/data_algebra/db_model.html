@@ -31,10 +31,10 @@
                     <h2>API Documentation</h2>
                         <ul class="memberlist">
             <li>
-                    <a class="class" href="#SQL_Format_Options">SQL_Format_Options</a>
+                    <a class="class" href="#SQLFormatOptions">SQLFormatOptions</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="function" href="#SQL_Format_Options.__init__">SQL_Format_Options</a>
+                                <a class="function" href="#SQLFormatOptions.__init__">SQLFormatOptions</a>
                         </li>
                 </ul>
 
@@ -261,7 +261,7 @@
 <span class="kn">import</span> <span class="nn">data_algebra.data_ops</span>
 
 
-<span class="k">class</span> <span class="nc">SQL_Format_Options</span><span class="p">(</span><span class="n">SimpleNamespace</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">SQLFormatOptions</span><span class="p">(</span><span class="n">SimpleNamespace</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">use_with</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">annotate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -724,7 +724,7 @@
     <span class="n">join_name_map</span><span class="p">:</span> <span class="nb">dict</span>
     <span class="n">supports_with</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">allow_extend_merges</span><span class="p">:</span> <span class="nb">bool</span>
-    <span class="n">default_SQL_format_options</span><span class="p">:</span><span class="n">SQL_Format_Options</span>
+    <span class="n">default_SQL_format_options</span><span class="p">:</span><span class="n">SQLFormatOptions</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -768,12 +768,12 @@
             <span class="n">join_name_map</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">join_name_map</span> <span class="o">=</span> <span class="n">join_name_map</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">default_SQL_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">default_SQL_format_options</span> <span class="o">=</span> <span class="n">SQL_Format_Options</span><span class="p">(</span>
+            <span class="n">default_SQL_format_options</span> <span class="o">=</span> <span class="n">SQLFormatOptions</span><span class="p">(</span>
                 <span class="n">use_with</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">annotate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">sql_indent</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span>
                 <span class="n">initial_commas</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_SQL_format_options</span><span class="p">,</span> <span class="n">SQL_Format_Options</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_SQL_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span> <span class="o">=</span> <span class="n">default_SQL_format_options</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span> <span class="o">=</span> <span class="n">supports_with</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">allow_extend_merges</span> <span class="o">=</span> <span class="n">allow_extend_merges</span>
@@ -1075,6 +1075,7 @@
             <span class="ow">and</span> <span class="n">subsql</span><span class="o">.</span><span class="n">mergeable</span>
             <span class="ow">and</span> <span class="p">(</span><span class="n">subsql</span><span class="o">.</span><span class="n">declared_term_dependencies</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
             <span class="ow">and</span> <span class="p">((</span><span class="n">subsql</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">subsql</span><span class="o">.</span><span class="n">suffix</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))):</span>
+            <span class="c1"># TODO: check our own suffix is also empty</span>
             <span class="c1"># check detailed merge conditions</span>
             <span class="k">def</span> <span class="nf">non_trivial_terms</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">dep_dict</span><span class="p">,</span> <span class="n">term_dict</span><span class="p">):</span>
                 <span class="k">return</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dep_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span> <span class="o">-</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span><span class="p">]))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">v</span><span class="p">)</span> <span class="ow">or</span>
@@ -1490,7 +1491,7 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sql_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQL_Format_Options</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="n">ops</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>  <span class="c1"># for table consistency check/raise</span>
         <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
@@ -1704,7 +1705,7 @@
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span><span class="o">.</span><span class="n">initial_commas</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span><span class="o">.</span><span class="n">sql_indent</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;  &#39;</span> <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;, &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">terms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span><span class="o">.</span><span class="n">sql_indent</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;  &#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;, &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">terms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span><span class="o">.</span><span class="n">sql_indent</span> <span class="o">+</span> <span class="n">terms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39; ,&#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
 
     <span class="k">def</span> <span class="nf">convert_nearsql_container_subsql_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nearsql_container</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="p">):</span>
@@ -1778,7 +1779,7 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sql_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQL_Format_Options</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="n">terms_strs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">]</span>  <span class="c1"># allow * notation if nothing is specified</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span>
         <span class="k">if</span> <span class="n">terms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1825,7 +1826,7 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLBinaryStep</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sql_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQL_Format_Options</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span>
@@ -1877,7 +1878,7 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLq</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sql_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQL_Format_Options</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span>
@@ -2056,18 +2057,18 @@
         </details>
 
             </section>
-                <section id="SQL_Format_Options">
+                <section id="SQLFormatOptions">
                                 <div class="attr class">
-        <a class="headerlink" href="#SQL_Format_Options">#&nbsp;&nbsp</a>
+        <a class="headerlink" href="#SQLFormatOptions">#&nbsp;&nbsp</a>
 
         
         <span class="def">class</span>
-        <span class="name">SQL_Format_Options</span><wbr>(<span class="base">types.SimpleNamespace</span>):
+        <span class="name">SQLFormatOptions</span><wbr>(<span class="base">types.SimpleNamespace</span>):
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">SQL_Format_Options</span><span class="p">(</span><span class="n">SimpleNamespace</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">SQLFormatOptions</span><span class="p">(</span><span class="n">SimpleNamespace</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">use_with</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">annotate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -2090,11 +2091,11 @@
 </div>
 
 
-                            <div id="SQL_Format_Options.__init__" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#SQL_Format_Options.__init__">#&nbsp;&nbsp</a>
+                            <div id="SQLFormatOptions.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SQLFormatOptions.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">SQL_Format_Options</span><span class="signature">(use_with=True, annotate=True, sql_indent=&#39; &#39;, initial_commas=False)</span>
+            <span class="name">SQLFormatOptions</span><span class="signature">(use_with=True, annotate=True, sql_indent=&#39; &#39;, initial_commas=False)</span>
     </div>
 
                 <details>
@@ -2144,7 +2145,7 @@
     <span class="n">join_name_map</span><span class="p">:</span> <span class="nb">dict</span>
     <span class="n">supports_with</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">allow_extend_merges</span><span class="p">:</span> <span class="nb">bool</span>
-    <span class="n">default_SQL_format_options</span><span class="p">:</span><span class="n">SQL_Format_Options</span>
+    <span class="n">default_SQL_format_options</span><span class="p">:</span><span class="n">SQLFormatOptions</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -2188,12 +2189,12 @@
             <span class="n">join_name_map</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">join_name_map</span> <span class="o">=</span> <span class="n">join_name_map</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">default_SQL_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">default_SQL_format_options</span> <span class="o">=</span> <span class="n">SQL_Format_Options</span><span class="p">(</span>
+            <span class="n">default_SQL_format_options</span> <span class="o">=</span> <span class="n">SQLFormatOptions</span><span class="p">(</span>
                 <span class="n">use_with</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">annotate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">sql_indent</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span>
                 <span class="n">initial_commas</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_SQL_format_options</span><span class="p">,</span> <span class="n">SQL_Format_Options</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_SQL_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span> <span class="o">=</span> <span class="n">default_SQL_format_options</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span> <span class="o">=</span> <span class="n">supports_with</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">allow_extend_merges</span> <span class="o">=</span> <span class="n">allow_extend_merges</span>
@@ -2495,6 +2496,7 @@
             <span class="ow">and</span> <span class="n">subsql</span><span class="o">.</span><span class="n">mergeable</span>
             <span class="ow">and</span> <span class="p">(</span><span class="n">subsql</span><span class="o">.</span><span class="n">declared_term_dependencies</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
             <span class="ow">and</span> <span class="p">((</span><span class="n">subsql</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">subsql</span><span class="o">.</span><span class="n">suffix</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))):</span>
+            <span class="c1"># TODO: check our own suffix is also empty</span>
             <span class="c1"># check detailed merge conditions</span>
             <span class="k">def</span> <span class="nf">non_trivial_terms</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">dep_dict</span><span class="p">,</span> <span class="n">term_dict</span><span class="p">):</span>
                 <span class="k">return</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dep_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span> <span class="o">-</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span><span class="p">]))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">v</span><span class="p">)</span> <span class="ow">or</span>
@@ -2910,7 +2912,7 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sql_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQL_Format_Options</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="n">ops</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>  <span class="c1"># for table consistency check/raise</span>
         <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
@@ -3124,7 +3126,7 @@
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span><span class="o">.</span><span class="n">initial_commas</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span><span class="o">.</span><span class="n">sql_indent</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;  &#39;</span> <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;, &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">terms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span><span class="o">.</span><span class="n">sql_indent</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;  &#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;, &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">terms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span><span class="o">.</span><span class="n">sql_indent</span> <span class="o">+</span> <span class="n">terms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39; ,&#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
 
     <span class="k">def</span> <span class="nf">convert_nearsql_container_subsql_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nearsql_container</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="p">):</span>
@@ -3198,7 +3200,7 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sql_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQL_Format_Options</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="n">terms_strs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">]</span>  <span class="c1"># allow * notation if nothing is specified</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span>
         <span class="k">if</span> <span class="n">terms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -3245,7 +3247,7 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLBinaryStep</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sql_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQL_Format_Options</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span>
@@ -3297,7 +3299,7 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLq</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sql_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQL_Format_Options</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span>
@@ -3411,12 +3413,12 @@
             <span class="n">join_name_map</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">join_name_map</span> <span class="o">=</span> <span class="n">join_name_map</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">default_SQL_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">default_SQL_format_options</span> <span class="o">=</span> <span class="n">SQL_Format_Options</span><span class="p">(</span>
+            <span class="n">default_SQL_format_options</span> <span class="o">=</span> <span class="n">SQLFormatOptions</span><span class="p">(</span>
                 <span class="n">use_with</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">annotate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">sql_indent</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span>
                 <span class="n">initial_commas</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_SQL_format_options</span><span class="p">,</span> <span class="n">SQL_Format_Options</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_SQL_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span> <span class="o">=</span> <span class="n">default_SQL_format_options</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span> <span class="o">=</span> <span class="n">supports_with</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">allow_extend_merges</span> <span class="o">=</span> <span class="n">allow_extend_merges</span>
@@ -3520,7 +3522,7 @@
                             <div id="DBModel.default_SQL_format_options" class="classattr">
                                             <div class="attr variable"><a class="headerlink" href="#DBModel.default_SQL_format_options">#&nbsp;&nbsp</a>
 
-        <span class="name">default_SQL_format_options</span><span class="annotation">: <a href="#SQL_Format_Options">data_algebra.db_model.SQL_Format_Options</a></span>
+        <span class="name">default_SQL_format_options</span><span class="annotation">: <a href="#SQLFormatOptions">data_algebra.db_model.SQLFormatOptions</a></span>
     </div>
 
     
@@ -4099,6 +4101,7 @@
             <span class="ow">and</span> <span class="n">subsql</span><span class="o">.</span><span class="n">mergeable</span>
             <span class="ow">and</span> <span class="p">(</span><span class="n">subsql</span><span class="o">.</span><span class="n">declared_term_dependencies</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
             <span class="ow">and</span> <span class="p">((</span><span class="n">subsql</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">subsql</span><span class="o">.</span><span class="n">suffix</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))):</span>
+            <span class="c1"># TODO: check our own suffix is also empty</span>
             <span class="c1"># check detailed merge conditions</span>
             <span class="k">def</span> <span class="nf">non_trivial_terms</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">dep_dict</span><span class="p">,</span> <span class="n">term_dict</span><span class="p">):</span>
                 <span class="k">return</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dep_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span> <span class="o">-</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span><span class="p">]))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">v</span><span class="p">)</span> <span class="ow">or</span>
@@ -4637,7 +4640,7 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sql_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQL_Format_Options</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="n">ops</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>  <span class="c1"># for table consistency check/raise</span>
         <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
@@ -5060,7 +5063,7 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sql_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQL_Format_Options</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="n">terms_strs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">]</span>  <span class="c1"># allow * notation if nothing is specified</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span>
         <span class="k">if</span> <span class="n">terms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -5132,7 +5135,7 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLBinaryStep</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sql_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQL_Format_Options</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span>
@@ -5207,7 +5210,7 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLq</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sql_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQL_Format_Options</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span>

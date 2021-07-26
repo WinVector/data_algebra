@@ -16,7 +16,7 @@ import data_algebra.eval_model
 import data_algebra.data_ops
 
 
-class SQL_Format_Options(SimpleNamespace):
+class SQLFormatOptions(SimpleNamespace):
     def __init__(self,
                  use_with=True,
                  annotate=True,
@@ -479,7 +479,7 @@ class DBModel:
     join_name_map: dict
     supports_with: bool
     allow_extend_merges: bool
-    default_SQL_format_options:SQL_Format_Options
+    default_SQL_format_options:SQLFormatOptions
 
     def __init__(
         self,
@@ -523,12 +523,12 @@ class DBModel:
             join_name_map = {}
         self.join_name_map = join_name_map.copy()
         if default_SQL_format_options is None:
-            default_SQL_format_options = SQL_Format_Options(
+            default_SQL_format_options = SQLFormatOptions(
                 use_with=True,
                 annotate=True,
                 sql_indent=' ',
                 initial_commas=False)
-        assert isinstance(default_SQL_format_options, SQL_Format_Options)
+        assert isinstance(default_SQL_format_options, SQLFormatOptions)
         self.default_SQL_format_options = default_SQL_format_options
         self.supports_with = supports_with
         self.allow_extend_merges = allow_extend_merges
@@ -830,6 +830,7 @@ class DBModel:
             and subsql.mergeable
             and (subsql.declared_term_dependencies is not None)
             and ((subsql.suffix is None) or (len(subsql.suffix) == 0))):
+            # TODO: check our own suffix is also empty
             # check detailed merge conditions
             def non_trivial_terms(*, dep_dict, term_dict):
                 return [k for k, v in dep_dict.items() if (len(v - set([k])) > 0) or (k not in v) or
@@ -1245,7 +1246,7 @@ class DBModel:
         assert isinstance(ops, data_algebra.data_ops.ViewRepresentation)
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
-        assert isinstance(sql_format_options, SQL_Format_Options)
+        assert isinstance(sql_format_options, SQLFormatOptions)
         ops.columns_used()  # for table consistency check/raise
         temp_id_source = [0]
         near_sql = ops.to_near_sql_implementation(
@@ -1459,7 +1460,7 @@ class DBModel:
         n = len(terms)
         assert n >= 1
         if self.default_SQL_format_options.initial_commas:
-            return [self.default_SQL_format_options.sql_indent + ('  ' if i==0 else ', ') + terms[i] for i in range(n)]
+            return [self.default_SQL_format_options.sql_indent + ('  ' if i == 0 else ', ') + terms[i] for i in range(n)]
         return [self.default_SQL_format_options.sql_indent + terms[i] + (' ,' if i < (n - 1) else '') for i in range(n)]
 
     def convert_nearsql_container_subsql_(self, nearsql_container, *, sql_format_options):
@@ -1533,7 +1534,7 @@ class DBModel:
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLUnaryStep)
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
-        assert isinstance(sql_format_options, SQL_Format_Options)
+        assert isinstance(sql_format_options, SQLFormatOptions)
         terms_strs = ["*"]  # allow * notation if nothing is specified
         terms = near_sql.terms
         if terms is not None:
@@ -1580,7 +1581,7 @@ class DBModel:
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLBinaryStep)
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
-        assert isinstance(sql_format_options, SQL_Format_Options)
+        assert isinstance(sql_format_options, SQLFormatOptions)
         if columns is None:
             columns = [k for k in near_sql.terms.keys()]
         terms = near_sql.terms
@@ -1632,7 +1633,7 @@ class DBModel:
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLq)
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
-        assert isinstance(sql_format_options, SQL_Format_Options)
+        assert isinstance(sql_format_options, SQLFormatOptions)
         if columns is None:
             columns = [k for k in near_sql.terms.keys()]
         terms = near_sql.terms
