@@ -225,10 +225,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         self,
         db_model,
         *,
-        pretty=False,
         annotate=False,
-        encoding=None,
-        sqlparse_options=None,
         temp_tables=None,
         use_with=False
     ):
@@ -237,10 +234,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         assert isinstance(db_model, data_algebra.db_model.DBModel)
         return db_model.to_sql(
             ops=self,
-            pretty=pretty,
             annotate=annotate,
-            encoding=encoding,
-            sqlparse_options=sqlparse_options,
             temp_tables=temp_tables,
             use_with=use_with,
         )

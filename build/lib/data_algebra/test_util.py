@@ -141,7 +141,6 @@ def check_transform_on_handles(
     check_row_order=False,
     check_parse=True,
     local_data_model=None,
-    allow_pretty=False,
 ):
     """
     Test an operator dag produces the expected result, and parses correctly.
@@ -157,7 +156,6 @@ def check_transform_on_handles(
     :param check_row_order: passed to equivalent_frames()
     :param check_parse: if True check expression parses/formats to self
     :param local_data_model: optional alternate evaluation model
-    :param allow_pretty: if True try pretty printing SQL
     :return: None, assert if there is an issue
     """
 
@@ -215,24 +213,18 @@ def check_transform_on_handles(
             to_del = set()
             temp_tables = None
             sql_statements = []
-            if allow_pretty:
-                pretty_levels = [True, False]
-            else:
-                pretty_levels = [False]
             for annotate in [True, False]:
-                for pretty in pretty_levels:
-                    for use_with in [True, False]:
-                        temp_tables = dict()
-                        sql = db_handle.to_sql(
-                            ops,
-                            pretty=pretty,
-                            annotate=annotate,
-                            use_with=use_with,
-                            temp_tables=temp_tables,
-                        )
-                        assert isinstance(sql, str)
-                        sql_statements.append(sql)
-                        # print(sql)
+                for use_with in [True, False]:
+                    temp_tables = dict()
+                    sql = db_handle.to_sql(
+                        ops,
+                        annotate=annotate,
+                        use_with=use_with,
+                        temp_tables=temp_tables,
+                    )
+                    assert isinstance(sql, str)
+                    sql_statements.append(sql)
+                    # print(sql)
             if db_handle.conn is not None:
                 for (k, v) in data.items():
                     db_handle.insert_table(v, table_name=k, allow_overwrite=True)
@@ -288,7 +280,6 @@ def check_transform(
     cols_case_sensitive=False,
     check_row_order=False,
     check_parse=True,
-    allow_pretty=True,
     models_to_skip=None,
 ):
     """
@@ -303,7 +294,6 @@ def check_transform(
     :param cols_case_sensitive: passed to equivalent_frames()
     :param check_row_order: passed to equivalent_frames()
     :param check_parse: if True check expression parses/formats to self
-    :param allow_pretty: if True try pretty printing SQL
     :param models_to_skip: None or set of model names to skip testing
     :return: nothing
     """
@@ -346,7 +336,6 @@ def check_transform(
         check_row_order=check_row_order,
         check_parse=check_parse,
         db_handles=db_handles,
-        allow_pretty=allow_pretty,
     )
 
     for handle in db_handles:

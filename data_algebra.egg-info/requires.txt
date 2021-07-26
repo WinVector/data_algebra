@@ -19,7 +19,6 @@ pyspark
 
 [all]
 black
-sqlparse
 graphviz
 BigQuery
 PostgreSQL
@@ -31,6 +30,3 @@ graphviz
 
 [pretty_python]
 black
-
-[pretty_sql]
-sqlparse
