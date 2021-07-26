@@ -27,6 +27,9 @@ def test_with_query_example_1():
     assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
 
     db_model = data_algebra.SQLite.SQLiteModel()
+    db_handle = db_model.db_handle(conn=None)
+    example_sql = db_handle.to_sql(ops, use_with=True)
+    assert isinstance(example_sql, str)
 
     for pretty in (False, True):
         with sqlite3.connect(":memory:") as conn:

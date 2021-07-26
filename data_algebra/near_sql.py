@@ -202,7 +202,6 @@ class NearSQLUnaryStep(NearSQL):
         return db_model.nearsqlunary_to_sql_(
             near_sql=self,
             columns=columns,
-            force_sql=force_sql,
             constants=constants,
             annotate=annotate,
         )
@@ -337,7 +336,6 @@ class NearSQLq(NearSQL):
         return db_model.nearsqlq_to_sql_(
             near_sql=self,
             columns=columns,
-            force_sql=force_sql,
             constants=constants,
             annotate=annotate,
         )

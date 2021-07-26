@@ -228,7 +228,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
         pretty=False,
         annotate=False,
         encoding=None,
-        sqlparse_options=None,
         temp_tables=None,
         use_with=False
     ):
@@ -240,7 +239,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
             pretty=pretty,
             annotate=annotate,
             encoding=encoding,
-            sqlparse_options=sqlparse_options,
             temp_tables=temp_tables,
             use_with=use_with,
         )
