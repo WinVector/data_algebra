@@ -1,7 +1,6 @@
 import math
 import re
 from collections import OrderedDict
-from collections import namedtuple
 from types import SimpleNamespace
 
 import pandas.io.sql
@@ -830,7 +829,6 @@ class DBModel:
             and subsql.mergeable
             and (subsql.declared_term_dependencies is not None)
             and ((subsql.suffix is None) or (len(subsql.suffix) == 0))):
-            # TODO: check our own suffix is also empty
             # check detailed merge conditions
             def non_trivial_terms(*, dep_dict, term_dict):
                 return [k for k, v in dep_dict.items() if (len(v - set([k])) > 0) or (k not in v) or
@@ -892,10 +890,13 @@ class DBModel:
         )
         view_name = "project_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
-        suffix = None
+        suffix = []
         if len(project_node.group_by) > 0:
             group_terms = [self.quote_identifier(c) for c in project_node.group_by]
-            suffix = "GROUP BY " + ", ".join(group_terms)
+            suffix = (
+                    ["GROUP BY"]
+                    + self._indent_and_sep_terms(group_terms)
+            )
         near_sql = data_algebra.near_sql.NearSQLUnaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
@@ -924,7 +925,10 @@ class DBModel:
         view_name = "select_rows_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         terms = {ci: None for ci in using}
-        suffix = " WHERE " + self.expr_to_sql(select_rows_node.expr)
+        suffix = (
+                ["WHERE"]
+                + [self.default_SQL_format_options.sql_indent + self.expr_to_sql(select_rows_node.expr)]
+        )
         near_sql = data_algebra.near_sql.NearSQLUnaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
@@ -1007,12 +1011,12 @@ class DBModel:
         terms = None
         if not using_was_None:
             terms = {ci: None for ci in subusing}
-        suffix = ""
+        suffix = []
         if len(order_node.order_columns) > 0:
             suffix = (
                 suffix
-                + " ORDER BY "
-                + ", ".join(
+                + ["ORDER BY"]
+                + self._indent_and_sep_terms(
                     [
                         self.quote_identifier(ci)
                         + (" DESC" if ci in set(order_node.reverse) else "")
@@ -1021,7 +1025,10 @@ class DBModel:
                 )
             )
         if order_node.limit is not None:
-            suffix = suffix + " LIMIT " + order_node.limit.__repr__()
+            suffix = (
+                    suffix
+                    + ["LIMIT " + order_node.limit.__repr__()]
+            )
         near_sql = data_algebra.near_sql.NearSQLUnaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
@@ -1125,12 +1132,11 @@ class DBModel:
         )
         terms.update({ci: None for ci in using_left - common})
         terms.update({ci: None for ci in using_right - common})
-        on_terms = ""
+        on_terms = []
         if len(join_node.by) > 0:
             on_terms = (
-                " ON "
-                + self.on_start
-                + self.on_joiner.join(
+                ["ON " + self.on_start]
+                + self._indent_and_sep_terms(
                     [
                         sub_view_name_left
                         + "."
@@ -1140,11 +1146,12 @@ class DBModel:
                         + "."
                         + self.quote_identifier(c)
                         for c in join_node.by
-                    ]
+                    ],
+                    sep=self.on_joiner
                 )
-                + self.on_end
-                + " "
             )
+            if (self.on_end is not None) and (len(self.on_end) > 0):
+                on_terms = on_terms + [self.on_end]
         confused_temps = set(sql_left.temp_tables.keys()).intersection(
             sql_right.temp_tables.keys()
         )
@@ -1456,12 +1463,15 @@ class DBModel:
             return self.quote_identifier(k)
         return v + " AS " + self.quote_identifier(k)
 
-    def _indent_and_comma_terms(self, terms):
+    def _indent_and_sep_terms(self, terms, sep=','):
         n = len(terms)
         assert n >= 1
+        comma_spacer = ' ' * len(sep)
         if self.default_SQL_format_options.initial_commas:
-            return [self.default_SQL_format_options.sql_indent + ('  ' if i == 0 else ', ') + terms[i] for i in range(n)]
-        return [self.default_SQL_format_options.sql_indent + terms[i] + (' ,' if i < (n - 1) else '') for i in range(n)]
+            return [self.default_SQL_format_options.sql_indent + (comma_spacer if i == 0 else sep) + ' ' + terms[i]
+                    for i in range(n)]
+        return [self.default_SQL_format_options.sql_indent + terms[i] + ((' ' + sep) if i < (n - 1) else '')
+                for i in range(n)]
 
     def convert_nearsql_container_subsql_(self, nearsql_container, *, sql_format_options):
         assert isinstance(nearsql_container, data_algebra.near_sql.NearSQLContainer)
@@ -1522,7 +1532,7 @@ class DBModel:
                 ]
             return (
                 ["SELECT"]
-                + self._indent_and_comma_terms(terms_strs)
+                + self._indent_and_sep_terms(terms_strs)
                 + ["FROM"]
                 + [self.default_SQL_format_options.sql_indent + near_sql.quoted_table_name]
             )
@@ -1559,13 +1569,13 @@ class DBModel:
             sql_start = "SELECT  -- " + _clean_annotation(near_sql.annotation)
         sql = (
             [sql_start] +
-            self._indent_and_comma_terms(terms_strs) +
+            self._indent_and_sep_terms(terms_strs) +
             ['FROM'] +
             [self.default_SQL_format_options.sql_indent + si for si in
              near_sql.sub_sql.convert_subsql(db_model=self, sql_format_options=sql_format_options)]
         )
         if (near_sql.suffix is not None) and (len(near_sql.suffix) > 0):
-            sql = sql + [near_sql.suffix]   # TODO: make suffix a list
+            sql = sql + near_sql.suffix
         return sql
 
     def nearsqlbinary_to_sql_(
@@ -1612,7 +1622,7 @@ class DBModel:
             )
         sql = (
             [sql_start] +
-            self._indent_and_comma_terms(terms_strs)
+            self._indent_and_sep_terms(terms_strs)
             + ["FROM"]
             + ["("]
             + [self.default_SQL_format_options.sql_indent + si for si in substr_1]
@@ -1620,7 +1630,7 @@ class DBModel:
             + [self.default_SQL_format_options.sql_indent + si for si in substr_2]
         )
         if (near_sql.suffix is not None) and (len(near_sql.suffix) > 0):
-            sql = sql + [near_sql.suffix]  # TODO make suffix an array
+            sql = sql + near_sql.suffix
         if is_union and (quoted_query_name is not None) and (len(quoted_query_name)>0):
             sql = sql + [") " + quoted_query_name]
         else:
@@ -1660,7 +1670,7 @@ class DBModel:
             sql_start = "SELECT  -- " + _clean_annotation(near_sql.annotation) + "\n "
         return (
             [sql_start] +
-            self._indent_and_comma_terms(terms_strs)
+            self._indent_and_sep_terms(terms_strs)
             + ["FROM"]
             + ["("]
             + [near_sql.query]  # TODO: see if we can vectorized
