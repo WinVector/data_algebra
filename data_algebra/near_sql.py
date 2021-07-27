@@ -170,7 +170,7 @@ class NearSQLUnaryStep(NearSQL):
         terms,
         quoted_query_name,
         sub_sql,
-        suffix="",
+        suffix=None,
         temp_tables,
         annotation=None,
         mergeable=False,
@@ -178,7 +178,9 @@ class NearSQLUnaryStep(NearSQL):
     ):
         assert isinstance(mergeable, bool)
         assert isinstance(sub_sql, NearSQLContainer)
-        assert isinstance(suffix, (str, type(None)))
+        assert isinstance(suffix, (list, type(None)))
+        if not suffix is None:
+            assert all([isinstance(v, str) for v in suffix])
         NearSQL.__init__(
             self,
             terms=terms,
@@ -235,13 +237,15 @@ class NearSQLBinaryStep(NearSQL):
         sub_sql1,
         joiner,
         sub_sql2,
-        suffix="",
+        suffix=None,
         temp_tables,
         annotation=None
     ):
         assert isinstance(sub_sql1, NearSQLContainer)
         assert isinstance(sub_sql2, NearSQLContainer)
-        assert isinstance(suffix, (str, type(None)))
+        assert isinstance(suffix, (list, type(None)))
+        if not suffix is None:
+            assert all([isinstance(v, str) for v in suffix])
         assert isinstance(joiner, str)
         NearSQL.__init__(
             self,
