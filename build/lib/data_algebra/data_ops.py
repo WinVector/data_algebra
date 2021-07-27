@@ -220,7 +220,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     # query generation
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
         raise NotImplementedError("base method called")
 
     def to_sql(
@@ -680,9 +680,9 @@ class TableDescription(ViewRepresentation):
     def columns_used_from_sources(self, using=None):
         return []  # no inputs to table description
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
         return db_model.table_def_to_sql(
-            self, using=using, temp_id_source=temp_id_source
+            self, using=using, temp_id_source=temp_id_source, sql_format_options=sql_format_options
         )
 
     def __str__(self):
@@ -967,8 +967,9 @@ class ExtendNode(ViewRepresentation):
         s = s + ")"
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
-        return db_model.extend_to_sql(self, using=using, temp_id_source=temp_id_source)
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
+        return db_model.extend_to_sql(self, using=using, temp_id_source=temp_id_source,
+                                      sql_format_options=sql_format_options)
 
     def eval_implementation(self, *, data_map, data_model, narrow):
         if data_model is None:
@@ -1107,8 +1108,9 @@ class ProjectNode(ViewRepresentation):
         s = s + ")"
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
-        return db_model.project_to_sql(self, using=using, temp_id_source=temp_id_source)
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
+        return db_model.project_to_sql(self, using=using, temp_id_source=temp_id_source,
+                                       sql_format_options=sql_format_options)
 
     def eval_implementation(self, *, data_map, data_model, narrow):
         if data_model is None:
@@ -1170,9 +1172,9 @@ class SelectRowsNode(ViewRepresentation):
         s = s + ("select_rows(" + self.expr.to_python().__repr__() + ")")
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
         return db_model.select_rows_to_sql(
-            self, using=using, temp_id_source=temp_id_source
+            self, using=using, temp_id_source=temp_id_source, sql_format_options=sql_format_options
         )
 
     def eval_implementation(self, *, data_map, data_model, narrow):
@@ -1239,9 +1241,9 @@ class SelectColumnsNode(ViewRepresentation):
         s = s + ("select_columns(" + self.column_selection.__repr__() + ")")
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
         return db_model.select_columns_to_sql(
-            self, using=using, temp_id_source=temp_id_source
+            self, using=using, temp_id_source=temp_id_source, sql_format_options=sql_format_options
         )
 
     def eval_implementation(self, *, data_map, data_model, narrow):
@@ -1308,9 +1310,9 @@ class DropColumnsNode(ViewRepresentation):
         s = s + ("drop_columns(" + self.column_deletions.__repr__() + ")")
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
         return db_model.drop_columns_to_sql(
-            self, using=using, temp_id_source=temp_id_source
+            self, using=using, temp_id_source=temp_id_source, sql_format_options=sql_format_options
         )
 
     def eval_implementation(self, *, data_map, data_model, narrow):
@@ -1389,8 +1391,9 @@ class OrderRowsNode(ViewRepresentation):
         s = s + ")"
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
-        return db_model.order_to_sql(self, using=using, temp_id_source=temp_id_source)
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
+        return db_model.order_to_sql(self, using=using, temp_id_source=temp_id_source,
+                                     sql_format_options=sql_format_options)
 
     def eval_implementation(self, *, data_map, data_model, narrow):
         if data_model is None:
@@ -1482,8 +1485,9 @@ class RenameColumnsNode(ViewRepresentation):
         s = s + ("rename_columns(" + self.column_remapping.__repr__() + ")")
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
-        return db_model.rename_to_sql(self, using=using, temp_id_source=temp_id_source)
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
+        return db_model.rename_to_sql(self, using=using, temp_id_source=temp_id_source,
+                                      sql_format_options=sql_format_options)
 
     def eval_implementation(self, *, data_map, data_model, narrow):
         if data_model is None:
@@ -1585,9 +1589,9 @@ class NaturalJoinNode(ViewRepresentation):
         )
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
         return db_model.natural_join_to_sql(
-            self, using=using, temp_id_source=temp_id_source
+            self, using=using, temp_id_source=temp_id_source, sql_format_options=sql_format_options
         )
 
     def eval_implementation(self, *, data_map, data_model, narrow):
@@ -1688,9 +1692,9 @@ class ConcatRowsNode(ViewRepresentation):
         )
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
         return db_model.concat_rows_to_sql(
-            self, using=using, temp_id_source=temp_id_source
+            self, using=using, temp_id_source=temp_id_source, sql_format_options=sql_format_options
         )
 
     def eval_implementation(self, *, data_map, data_model, narrow):
@@ -1756,12 +1760,12 @@ class ConvertRecordsNode(ViewRepresentation):
         s = s + ")"
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
         if temp_id_source is None:
             temp_id_source = [0]
         # TODO: narrow to what we are using
         sub_query = self.sources[0].to_near_sql_implementation(
-            db_model=db_model, using=None, temp_id_source=temp_id_source
+            db_model=db_model, using=None, temp_id_source=temp_id_source, sql_format_options=sql_format_options
         )
         # claims to use all columns
         query = sub_query.to_sql(
