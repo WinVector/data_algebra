@@ -1,3 +1,4 @@
+
 import data_algebra
 import data_algebra.db_model
 from data_algebra.data_ops import *
@@ -29,7 +30,7 @@ def test_set_quoting_2():
 
     bq_handle = data_algebra.BigQuery.BigQueryModel().db_handle(None)
 
-    ops = describe_table(d, table_name="d").extend({"select": f"x.is_in({-5, 1+2})"})
+    ops = describe_table(d, table_name="d").extend({"select": "x.is_in({-5, 3})"})
 
     sql_format_options = data_algebra.db_model.SQLFormatOptions(
         use_with=True,
@@ -44,9 +45,24 @@ def test_set_quoting_2():
 
 def test_set_quoting_inhom():
     d = data_algebra.default_data_model.pd.DataFrame({"x": [1, -2, 3, -4]})
-
-    bq_handle = data_algebra.BigQuery.BigQueryModel().db_handle(None)
-
     with pytest.raises(AssertionError):
-        describe_table(d, table_name="d").extend({"select": f"x.is_in({-5, 'a'})"})
+        describe_table(d, table_name="d").extend({"select": "x.is_in({-5, 'a'})"})
 
+
+def test_set_quoting_flex():
+    d = data_algebra.default_data_model.pd.DataFrame({"x": ['a', None]})
+    ops = describe_table(d, table_name="d").extend({"select": "x.is_in({'a'})"})
+    ops.transform(d)
+
+
+def test_set_quoting_mismatch():
+    d = data_algebra.default_data_model.pd.DataFrame({"x": ['a', 'b']})
+    ops = describe_table(d, table_name="d").extend({"select": "x.is_in({-5, -2})"})
+    with pytest.raises(TypeError):
+        ops.transform(d)
+
+
+def test_set_quoting_exclude_none():
+    d = data_algebra.default_data_model.pd.DataFrame({"x": ['a', 'b']})
+    with pytest.raises(TypeError):
+        describe_table(d, table_name="d").extend({"select": "x.is_in({-5, None})"})

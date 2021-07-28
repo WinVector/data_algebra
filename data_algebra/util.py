@@ -43,6 +43,21 @@ def table_is_keyed_by_columns(table, column_names):
     return max(counts) <= 1
 
 
+type_conversions = {
+    numpy.bool_: bool,
+    numpy.int64: int,
+    numpy.float64: float,
+    numpy.bool_: bool}
+
+
+def map_type_to_canonical(v):
+    try:
+        return type_conversions[v]
+    except KeyError:
+        pass
+    return v
+
+
 def guess_carried_scalar_type(col):
     """
     Guess the type of a column or scalar.
@@ -50,15 +65,15 @@ def guess_carried_scalar_type(col):
     :param col: column or scalar to inspect
     :return: type of first non-None entry, if any , else type(None)
     """
-    ct = type(col)
+    ct = map_type_to_canonical(type(col))
     if ct in {str, int, float, bool, type(None), numpy.int64, numpy.float64}:
         return ct
     if len(col) < 1:
         return type(None)
     idx = col.notna().idxmax()
     if idx is None:
-        return type(col[0])
-    return type(col[idx])
+        return map_type_to_canonical(type(col[0]))
+    return map_type_to_canonical(type(col[idx]))
 
 
 def guess_column_types(d, *, columns=None):
@@ -82,26 +97,8 @@ def guess_column_types(d, *, columns=None):
     return res
 
 
-def map_types_to_cannonical(types):
-    type_conversions = {
-        numpy.bool_: bool,
-        numpy.int64: int,
-        numpy.float64: float,
-        numpy.bool_: bool}
-
-    def mp(v):
-        try:
-            return type_conversions[v]
-        except KeyError:
-            pass
-        return v
-
-    return {mp(v) for v in types}
-
-
-def compatible_types(type_a, type_b):
-    comparison = ({type_a}.union({type_b})) - {type(None)}
-    mapped_comparison = map_types_to_cannonical(comparison)
+def compatible_types(types_seen):
+    mapped_comparison = {map_type_to_canonical(t) for t in types_seen} - {type(None)}
     if (len(mapped_comparison) > 1) and (mapped_comparison != {int, float}):
         return False
     return True
@@ -125,7 +122,7 @@ def check_columns_appear_compatible(d_left, d_right, *, columns=None):
     right_types = data_algebra.util.guess_column_types(d_right, columns=columns)
     mismatches = dict()
     for c in columns:
-        if not compatible_types(left_types[c], right_types[c]):
+        if not compatible_types([left_types[c], right_types[c]]):
             mismatches[c] = (left_types[c], right_types[c])
     if len(mismatches) > 0:
         return mismatches

@@ -2,6 +2,7 @@
 import numpy
 
 from data_algebra.data_ops import *
+import data_algebra.util
 import data_algebra.test_util
 
 import pytest
@@ -13,8 +14,8 @@ def test_types_table_types():
         'y': ['a', 'b'],
     })
     descr = describe_table(d, table_name='d')
-    assert descr.column_types['x'] == numpy.float64
-    assert descr.column_types['y'] == type('a')
+    assert descr.column_types['x'] == data_algebra.util.map_type_to_canonical(numpy.float64)
+    assert descr.column_types['y'] == data_algebra.util.map_type_to_canonical(type('a'))
 
 
 def test_types_concat_good():

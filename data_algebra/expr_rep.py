@@ -602,9 +602,10 @@ class Term(PreTerm, ABC):
 
 class Value(Term):
     def __init__(self, value):
-        allowed = [int, float, str, bool]
-        if not any([isinstance(value, tp) for tp in allowed]):
-            raise TypeError("value type must be one of: " + str(allowed))
+        allowed = {data_algebra.util.map_type_to_canonical(t) for t in [int, float, str, bool]}
+        disaallowed = {data_algebra.util.map_type_to_canonical(type(value))} - allowed
+        if len(disaallowed) != 0:
+            raise TypeError("value type must be one of: " + str(allowed) + ', saw ' + str(list(disaallowed)[0]))
         self.value = value
         Term.__init__(self)
 

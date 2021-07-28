@@ -200,13 +200,13 @@ def _walk_lark_tree(op, *, data_def=None):
                 left = _r_walk_lark_tree(r_op.children[0])
                 op_name = "__eq__"
                 return getattr(left, op_name)(data_algebra.expr_rep.Value(False))
-            if r_op.data in ["list", "tuple"]:
+            if r_op.data in ["list", "tuple", "set"]:
                 op_values = [_r_walk_lark_tree(vi) for vi in r_op.children[0].children]
                 # check all args are values, not None, same type
                 assert all([isinstance(vi, data_algebra.expr_rep.Value) for vi in op_values])
                 assert all([vi.value is not None for vi in op_values])
                 observed_types = {type(vi.value) for vi in op_values}
-                observed_types = data_algebra.util.map_types_to_cannonical(observed_types)
+                observed_types = [data_algebra.util.map_type_to_canonical(v) for v in observed_types]
                 assert len(observed_types) == 1
                 return data_algebra.expr_rep.ListTerm(op_values)
             if r_op.data == "expr_stmt":

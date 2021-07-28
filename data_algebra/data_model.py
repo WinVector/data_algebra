@@ -66,7 +66,7 @@ def _type_safe_equal(a, b):
     # However, None >= None throws
     type_a = data_algebra.util.guess_carried_scalar_type(a)
     type_b = data_algebra.util.guess_carried_scalar_type(b)
-    if not data_algebra.util.compatible_types(type_a, type_b):
+    if not data_algebra.util.compatible_types([type_a, type_b]):
         raise TypeError(f"can't compare {type_a} to {type_b}")
     return numpy.equal(a, b)
 
@@ -76,9 +76,21 @@ def _type_safe_not_equal(a, b):
     # However, None > None throws
     type_a = data_algebra.util.guess_carried_scalar_type(a)
     type_b = data_algebra.util.guess_carried_scalar_type(b)
-    if not data_algebra.util.compatible_types(type_a, type_b):
+    if not data_algebra.util.compatible_types([type_a, type_b]):
         raise TypeError(f"can't compare {type_a} to {type_b}")
     return numpy.not_equal(a, b)
+
+
+def _type_safe_is_in(a, b):
+    if len(b) > 0:
+        type_a = data_algebra.util.guess_carried_scalar_type(a)
+        type_b = {data_algebra.util.map_type_to_canonical(type(v)) for v in b}
+        if len(type_b) > 1:
+            raise TypeError(f'multiple types in set: {type_b}')
+        type_b = list(type_b)[0]
+        if not data_algebra.util.compatible_types([type_a, type_b]):
+            raise TypeError(f"can't check for an {type_a} in a set of {type_b}'s")
+    return numpy.isin(a, b)
 
 
 def populate_impl_map(data_model):
@@ -112,7 +124,7 @@ def populate_impl_map(data_model):
         "if_else": numpy.where,
         "is_null": data_model.isnull,
         "is_bad": data_model.bad_column_positions,
-        "is_in": numpy.isin,
+        "is_in": _type_safe_is_in,
         "concat": lambda a, b: numpy.char.add(
             numpy.asarray(a, dtype=numpy.str), numpy.asarray(b, dtype=numpy.str)
         ),
