@@ -82,8 +82,7 @@ def guess_column_types(d, *, columns=None):
     return res
 
 
-def compatible_types(type_a, type_b):
-    comparison = ({type_a}.union({type_b})) - {type(None)}
+def map_types_to_cannonical(types):
     type_conversions = {
         numpy.bool_: bool,
         numpy.int64: int,
@@ -97,8 +96,12 @@ def compatible_types(type_a, type_b):
             pass
         return v
 
-    mapped_comparison = {mp(v) for v in comparison}
+    return {mp(v) for v in types}
 
+
+def compatible_types(type_a, type_b):
+    comparison = ({type_a}.union({type_b})) - {type(None)}
+    mapped_comparison = map_types_to_cannonical(comparison)
     if (len(mapped_comparison) > 1) and (mapped_comparison != {int, float}):
         return False
     return True

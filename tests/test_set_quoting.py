@@ -3,6 +3,8 @@ import data_algebra.db_model
 from data_algebra.data_ops import *
 import data_algebra.BigQuery
 
+import pytest
+
 
 def test_set_quoting_1():
     d = data_algebra.default_data_model.pd.DataFrame({"x": [1, -2, 3, -4]})
@@ -38,3 +40,13 @@ def test_set_quoting_2():
     assert "'" not in sql
     assert '"' not in sql
     assert "3" in sql
+
+
+def test_set_quoting_inhom():
+    d = data_algebra.default_data_model.pd.DataFrame({"x": [1, -2, 3, -4]})
+
+    bq_handle = data_algebra.BigQuery.BigQueryModel().db_handle(None)
+
+    with pytest.raises(AssertionError):
+        describe_table(d, table_name="d").extend({"select": f"x.is_in({-5, 'a'})"})
+
