@@ -3,6 +3,7 @@ import datetime
 
 import numpy
 
+import data_algebra.util
 import data_algebra.connected_components
 
 
@@ -60,16 +61,36 @@ def _coalesce(a, b):
     return res
 
 
+def _type_safe_equal(a, b):
+    # Could try numpy.logical_and(numpy.greater_equal(a, b), numpy.less_equal(a, b)).
+    # However, None >= None throws
+    type_a = data_algebra.util.guess_carried_scalar_type(a)
+    type_b = data_algebra.util.guess_carried_scalar_type(b)
+    if not data_algebra.util.compatible_types(type_a, type_b):
+        raise TypeError(f"can't compare {type_a} to {type_b}")
+    return numpy.equal(a, b)
+
+
+def _type_safe_not_equal(a, b):
+    # Could try numpy.logical_or(numpy.greater(a, b), numpy.less(a, b)).
+    # However, None > None throws
+    type_a = data_algebra.util.guess_carried_scalar_type(a)
+    type_b = data_algebra.util.guess_carried_scalar_type(b)
+    if not data_algebra.util.compatible_types(type_a, type_b):
+        raise TypeError(f"can't compare {type_a} to {type_b}")
+    return numpy.not_equal(a, b)
+
+
 def populate_impl_map(data_model):
     impl_map = {
-        "==": numpy.equal,
-        "=": numpy.equal,
-        "!=": numpy.not_equal,
-        "<>": numpy.not_equal,
-        "<": numpy.less,
-        "<=": numpy.less_equal,
-        ">": numpy.greater,
-        ">=": numpy.greater_equal,
+        "==": _type_safe_equal,
+        "=": _type_safe_equal,
+        "!=": _type_safe_not_equal,
+        "<>": _type_safe_not_equal,
+        "<": numpy.less,  # already checks types
+        "<=": numpy.less_equal,  # already checks types
+        ">": numpy.greater,  # already checks types
+        ">=": numpy.greater_equal,  # already checks types
         "+": numpy.add,
         "-": negate_or_subtract,
         "neg": numpy.negative,

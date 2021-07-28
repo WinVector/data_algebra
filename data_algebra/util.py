@@ -43,6 +43,24 @@ def table_is_keyed_by_columns(table, column_names):
     return max(counts) <= 1
 
 
+def guess_carried_scalar_type(col):
+    """
+    Guess the type of a column or scalar.
+
+    :param col: column or scalar to inspect
+    :return: type of first non-None entry, if any , else type(None)
+    """
+    ct = type(col)
+    if ct in {str, int, float, bool, type(None), numpy.int64, numpy.float64}:
+        return ct
+    if len(col) < 1:
+        return type(None)
+    idx = col.notna().idxmax()
+    if idx is None:
+        return type(col[0])
+    return type(col[idx])
+
+
 def guess_column_types(d, *, columns=None):
     """
     Guess column types as type of first non-missing value
@@ -60,13 +78,30 @@ def guess_column_types(d, *, columns=None):
         return {c: type(None) for c in columns}
     res = dict()
     for c in columns:
-        col = d[c]
-        idx = col.notna().idxmax()
-        if idx is None:
-            res[c] = type(col[0])
-        else:
-            res[c] = type(col[idx])
+        res[c] = guess_carried_scalar_type(d[c])
     return res
+
+
+def compatible_types(type_a, type_b):
+    comparison = ({type_a}.union({type_b})) - {type(None)}
+    type_conversions = {
+        numpy.bool_: bool,
+        numpy.int64: int,
+        numpy.float64: float,
+        numpy.bool_: bool}
+
+    def mp(v):
+        try:
+            return type_conversions[v]
+        except KeyError:
+            pass
+        return v
+
+    mapped_comparison = {mp(v) for v in comparison}
+
+    if (len(mapped_comparison) > 1) and (mapped_comparison != {int, float}):
+        return False
+    return True
 
 
 def check_columns_appear_compatible(d_left, d_right, *, columns=None):
@@ -87,8 +122,7 @@ def check_columns_appear_compatible(d_left, d_right, *, columns=None):
     right_types = data_algebra.util.guess_column_types(d_right, columns=columns)
     mismatches = dict()
     for c in columns:
-        comparison = ({left_types[c]}.union({right_types[c]})) - {type(None)}
-        if (len(comparison) > 1) and (comparison != {numpy.float64, numpy.int64}):
+        if not compatible_types(left_types[c], right_types[c]):
             mismatches[c] = (left_types[c], right_types[c])
     if len(mismatches) > 0:
         return mismatches
