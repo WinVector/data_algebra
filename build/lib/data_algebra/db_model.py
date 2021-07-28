@@ -490,7 +490,7 @@ class DBModel:
         local_data_model=None,
         on_start="",
         on_end="",
-        on_joiner=", ",
+        on_joiner="AND",
         drop_text="DROP TABLE",
         string_type="VARCHAR",
         join_name_map=None,

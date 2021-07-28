@@ -81,8 +81,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         if (op.column_types is not None) and (len(op.column_types) > 0):
             types_seen = data_algebra.util.guess_column_types(res)
             for c in columns_using:
-                type_check_c = {types_seen[c]}.union({op.column_types[c]}) - {type(None)}
-                assert (len(type_check_c) <= 1) or (type_check_c == {numpy.int64, numpy.float64})
+                assert data_algebra.util.compatible_types({types_seen[c]}.union({op.column_types[c]}))
         return res
 
     def extend_step(self, op, *, data_map, narrow):
