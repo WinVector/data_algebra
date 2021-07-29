@@ -600,6 +600,13 @@ class Term(PreTerm, ABC):
         return self.__uop_expr__("base_Sunday")
 
 
+def kop_expr(op, args, inline=False, method=False):
+    """three argument expression"""
+    assert isinstance(op, str)
+    args = [(ai if isinstance(ai, Term) else enc_value(ai)) for ai in args]
+    return Expression(op, args, inline=inline, method=method)
+
+
 class Value(Term):
     def __init__(self, value):
         allowed = {data_algebra.util.map_type_to_canonical(t) for t in [int, float, str, bool]}

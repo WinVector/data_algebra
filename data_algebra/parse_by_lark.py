@@ -60,12 +60,6 @@ factor_remap = {
     "not": "not",  # unary! # TODO: implement
 }
 
-logical_remap = {
-    "expr": "__or__",
-    "and_expr": "__and__",
-    "xor_expr": "__xor__",
-}
-
 
 def _walk_lark_tree(op, *, data_def=None):
     """
@@ -141,16 +135,6 @@ def _walk_lark_tree(op, *, data_def=None):
                     pass
                 right = _r_walk_lark_tree(r_op.children[1])
                 return getattr(right, op_name)()
-            if r_op.data in logical_remap.keys():
-                if len(r_op.children) < 2:
-                    raise ValueError("unexpected ' + r_op.data + ' length")
-                op_name = logical_remap[r_op.data]
-                children = [_r_walk_lark_tree(ci) for ci in r_op.children]
-                # just linear chain them
-                res = children[0]
-                for i in range(1, len(children)):
-                    res = getattr(res, op_name)(children[i])
-                return res
             if r_op.data == "funccall":
                 if len(r_op.children) > 2:
                     raise ValueError("unexpected funccall length")
@@ -194,10 +178,7 @@ def _walk_lark_tree(op, *, data_def=None):
                 else:
                     raise ValueError(f"unexpected test: {r_op.data}")
                 children = [_r_walk_lark_tree(ci) for ci in r_op.children]
-                # just linear chain them
-                res = children[0]
-                for i in range(1, len(children)):
-                    res = getattr(res, op_name)(children[i])
+                res = data_algebra.expr_rep.kop_expr(op_name, children)
                 return res
             if r_op.data == "not":
                 if len(r_op.children) != 1:
