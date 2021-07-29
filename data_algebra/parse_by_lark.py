@@ -172,13 +172,13 @@ def _walk_lark_tree(op, *, data_def=None):
                 if len(r_op.children) < 2:
                     raise ValueError("unexpected " + r_op.data + " length")
                 if r_op.data in {"or_test", "or_test_sym"}:
-                    op_name = "__or__"
+                    op_name = "or"
                 elif r_op.data in {"and_test", "and_test_sym"}:
-                    op_name = "__and__"
+                    op_name = "and"
                 else:
                     raise ValueError(f"unexpected test: {r_op.data}")
                 children = [_r_walk_lark_tree(ci) for ci in r_op.children]
-                res = data_algebra.expr_rep.kop_expr(op_name, children)
+                res = data_algebra.expr_rep.kop_expr(op_name, children, inline=True, method=False)
                 return res
             if r_op.data == "not":
                 if len(r_op.children) != 1:

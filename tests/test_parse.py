@@ -93,7 +93,7 @@ def test_parse_6b():
 def test_parse_7():
     ops = TableDescription(table_name="d", column_names=["u", "v", "w", "x", "y"]).extend({"z": "u & v & w"})
     recovered = ops.ops["z"]
-    assert str(recovered) == "(u & v) & w"
+    assert str(recovered) == "u and v and w"
 
 
 def test_parse_8():

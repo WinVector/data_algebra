@@ -455,8 +455,10 @@ db_expr_formatters = {
 db_default_op_replacements = {
     "==": "=",
     "cumsum": "sum",
+    'and': "AND",
     "&": "AND",
     "&&": "AND",
+    'or': 'OR',
     "|": "OR",
     "||": "OR",
     "!": "NOT",
@@ -704,12 +706,18 @@ class DBModel:
             subs = [
                 self.expr_to_sql(ai, want_inline_parens=True) for ai in expression.args
             ]
-            if len(subs) == 2 and expression.inline:
+            if expression.inline:
+                res = ''
                 if want_inline_parens:
-                    return "(" + subs[0] + " " + op.upper() + " " + subs[1] + ")"
+                    res = res + '('
+                assert len(subs) > 0
+                if len(subs) == 1:
+                    res = op.upper() + subs[0]
                 else:
-                    # SQL window functions don't like parens
-                    return subs[0] + " " + op.upper() + " " + subs[1]
+                    res = res + (' ' + op.upper() + ' ').join(subs)
+                if want_inline_parens:
+                    res = res + ')'
+                return res
             return op.upper() + "(" + ", ".join(subs) + ")"
         if isinstance(expression, data_algebra.expr_rep.ListTerm):
             return self.value_to_sql(expression.value)

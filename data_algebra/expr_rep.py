@@ -823,10 +823,6 @@ class Expression(Term):
         if inline:
             if method:
                 raise ValueError("can't set both inline and method")
-            if len(args) > 2:
-                raise ValueError(
-                    "must have no more than two arguments if inline is True"
-                )
         self.op = op
         self.args = [enc_value(ai) for ai in args]
         self.params = params
@@ -925,11 +921,14 @@ class Expression(Term):
                     return subs[0] + "." + self.op + "()"
                 else:
                     return "(" + subs[0] + ")." + self.op + "()"
-        if len(subs) == 2 and self.inline:
+        if self.inline:
+            result = ''
             if want_inline_parens:
-                return "(" + subs[0] + " " + self.op + " " + subs[1] + ")"
-            else:
-                return subs[0] + " " + self.op + " " + subs[1]
+                result = result + '('
+            result = result + (' ' + self.op + ' ').join(subs)
+            if want_inline_parens:
+                result = result + ')'
+            return result
         if self.method:
             if isinstance(self.args[0], ColumnReference):
                 return subs[0] + "." + self.op + "(" + ", ".join(subs[1:]) + ")"
