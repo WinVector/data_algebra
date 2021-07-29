@@ -184,16 +184,21 @@ def _walk_lark_tree(op, *, data_def=None):
                     ):  # TODO: get rid of underbar aliases
                         op_name = op_name[1: len(op_name)]
                     return data_algebra.expr_rep.Expression(op=op_name, args=args)
-            if (r_op.data == "or_test") or (r_op.data == "and_test"):
-                if len(r_op.children) != 2:
+            if r_op.data in  {"or_test", "or_test_sym", "and_test", "and_test_sym"}:
+                if len(r_op.children) < 2:
                     raise ValueError("unexpected " + r_op.data + " length")
-                left = _r_walk_lark_tree(r_op.children[0])
-                if r_op.data == "or_test":
+                if r_op.data in {"or_test", "or_test_sym"}:
                     op_name = "__or__"
-                else:
+                elif r_op.data in {"and_test", "and_test_sym"}:
                     op_name = "__and__"
-                right = _r_walk_lark_tree(r_op.children[1])
-                return getattr(left, op_name)(right)
+                else:
+                    raise ValueError(f"unexpected test: {r_op.data}")
+                children = [_r_walk_lark_tree(ci) for ci in r_op.children]
+                # just linear chain them
+                res = children[0]
+                for i in range(1, len(children)):
+                    res = getattr(res, op_name)(children[i])
+                return res
             if r_op.data == "not":
                 if len(r_op.children) != 1:
                     raise ValueError("unexpected " + r_op.data + " length")
