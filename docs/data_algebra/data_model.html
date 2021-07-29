@@ -212,6 +212,20 @@
     <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">_k_and</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)):</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">res</span>
+
+
+<span class="k">def</span> <span class="nf">_k_or</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)):</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">res</span>
+
+
 <span class="k">def</span> <span class="nf">populate_impl_map</span><span class="p">(</span><span class="n">data_model</span><span class="p">):</span>
     <span class="n">impl_map</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;==&quot;</span><span class="p">:</span> <span class="n">_type_safe_equal</span><span class="p">,</span>
@@ -230,12 +244,12 @@
         <span class="s2">&quot;//&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">,</span>
         <span class="s2">&quot;%&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mod</span><span class="p">,</span>
         <span class="s2">&quot;**&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">power</span><span class="p">,</span>
-        <span class="s2">&quot;and&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_and</span><span class="p">,</span>
-        <span class="s2">&quot;&amp;&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_and</span><span class="p">,</span>
-        <span class="s2">&quot;&amp;&amp;&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_and</span><span class="p">,</span>
-        <span class="s2">&quot;or&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">,</span>
-        <span class="s2">&quot;|&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">,</span>
-        <span class="s2">&quot;||&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">,</span>
+        <span class="s2">&quot;and&quot;</span><span class="p">:</span> <span class="n">_k_and</span><span class="p">,</span>
+        <span class="s2">&quot;&amp;&quot;</span><span class="p">:</span> <span class="n">_k_and</span><span class="p">,</span>
+        <span class="s2">&quot;&amp;&amp;&quot;</span><span class="p">:</span> <span class="n">_k_and</span><span class="p">,</span>
+        <span class="s2">&quot;or&quot;</span><span class="p">:</span> <span class="n">_k_or</span><span class="p">,</span>
+        <span class="s2">&quot;|&quot;</span><span class="p">:</span> <span class="n">_k_or</span><span class="p">,</span>
+        <span class="s2">&quot;||&quot;</span><span class="p">:</span> <span class="n">_k_or</span><span class="p">,</span>
         <span class="s2">&quot;xor&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_xor</span><span class="p">,</span>
         <span class="s2">&quot;^&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_xor</span><span class="p">,</span>
         <span class="s2">&quot;not&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">,</span>
@@ -440,12 +454,12 @@
         <span class="s2">&quot;//&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">,</span>
         <span class="s2">&quot;%&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mod</span><span class="p">,</span>
         <span class="s2">&quot;**&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">power</span><span class="p">,</span>
-        <span class="s2">&quot;and&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_and</span><span class="p">,</span>
-        <span class="s2">&quot;&amp;&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_and</span><span class="p">,</span>
-        <span class="s2">&quot;&amp;&amp;&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_and</span><span class="p">,</span>
-        <span class="s2">&quot;or&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">,</span>
-        <span class="s2">&quot;|&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">,</span>
-        <span class="s2">&quot;||&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">,</span>
+        <span class="s2">&quot;and&quot;</span><span class="p">:</span> <span class="n">_k_and</span><span class="p">,</span>
+        <span class="s2">&quot;&amp;&quot;</span><span class="p">:</span> <span class="n">_k_and</span><span class="p">,</span>
+        <span class="s2">&quot;&amp;&amp;&quot;</span><span class="p">:</span> <span class="n">_k_and</span><span class="p">,</span>
+        <span class="s2">&quot;or&quot;</span><span class="p">:</span> <span class="n">_k_or</span><span class="p">,</span>
+        <span class="s2">&quot;|&quot;</span><span class="p">:</span> <span class="n">_k_or</span><span class="p">,</span>
+        <span class="s2">&quot;||&quot;</span><span class="p">:</span> <span class="n">_k_or</span><span class="p">,</span>
         <span class="s2">&quot;xor&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_xor</span><span class="p">,</span>
         <span class="s2">&quot;^&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_xor</span><span class="p">,</span>
         <span class="s2">&quot;not&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">,</span>

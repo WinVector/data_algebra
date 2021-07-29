@@ -93,26 +93,26 @@ data_algebra/__init__.py                   6      0   100%
 data_algebra/arrow.py                    170     36    79%
 data_algebra/cdata.py                    326     72    78%
 data_algebra/connected_components.py      22      0   100%
-data_algebra/data_model.py               110     23    79%
+data_algebra/data_model.py               120     23    81%
 data_algebra/data_ops.py                1125    193    83%
 data_algebra/data_ops_types.py            85     38    55%
 data_algebra/data_ops_utils.py            51      7    86%
-data_algebra/db_model.py                 860     96    89%
+data_algebra/db_model.py                 867     96    89%
 data_algebra/diagram.py                   56     44    21%
 data_algebra/eval_model.py                16      1    94%
 data_algebra/expr_parse.py                32      0   100%
-data_algebra/expr_rep.py                 556    101    82%
+data_algebra/expr_rep.py                 562    102    82%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 146      1    99%
 data_algebra/op_container.py              96     37    61%
 data_algebra/pandas_base.py              274     23    92%
 data_algebra/pandas_model.py              18      3    83%
-data_algebra/parse_by_lark.py            148     34    77%
+data_algebra/parse_by_lark.py            136     26    81%
 data_algebra/python3_lark.py               1      0   100%
 data_algebra/test_util.py                175     25    86%
 data_algebra/util.py                      78      8    90%
 ----------------------------------------------------------
-TOTAL                                   4706    885    81%
+TOTAL                                   4717    878    81%
 
 
-============================= 190 passed in 17.00s =============================
+============================= 190 passed in 16.37s =============================

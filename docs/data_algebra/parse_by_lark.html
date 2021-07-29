@@ -113,12 +113,6 @@
     <span class="s2">&quot;not&quot;</span><span class="p">:</span> <span class="s2">&quot;not&quot;</span><span class="p">,</span>  <span class="c1"># unary! # TODO: implement</span>
 <span class="p">}</span>
 
-<span class="n">logical_remap</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;expr&quot;</span><span class="p">:</span> <span class="s2">&quot;__or__&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;and_expr&quot;</span><span class="p">:</span> <span class="s2">&quot;__and__&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;xor_expr&quot;</span><span class="p">:</span> <span class="s2">&quot;__xor__&quot;</span><span class="p">,</span>
-<span class="p">}</span>
-
 
 <span class="k">def</span> <span class="nf">_walk_lark_tree</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_def</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -194,16 +188,6 @@
                     <span class="k">pass</span>
                 <span class="n">right</span> <span class="o">=</span> <span class="n">_r_walk_lark_tree</span><span class="p">(</span><span class="n">r_op</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                 <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">right</span><span class="p">,</span> <span class="n">op_name</span><span class="p">)()</span>
-            <span class="k">if</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="ow">in</span> <span class="n">logical_remap</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r_op</span><span class="o">.</span><span class="n">children</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unexpected &#39; + r_op.data + &#39; length&quot;</span><span class="p">)</span>
-                <span class="n">op_name</span> <span class="o">=</span> <span class="n">logical_remap</span><span class="p">[</span><span class="n">r_op</span><span class="o">.</span><span class="n">data</span><span class="p">]</span>
-                <span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="n">_r_walk_lark_tree</span><span class="p">(</span><span class="n">ci</span><span class="p">)</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">r_op</span><span class="o">.</span><span class="n">children</span><span class="p">]</span>
-                <span class="c1"># just linear chain them</span>
-                <span class="n">res</span> <span class="o">=</span> <span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">children</span><span class="p">)):</span>
-                    <span class="n">res</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">op_name</span><span class="p">)(</span><span class="n">children</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-                <span class="k">return</span> <span class="n">res</span>
             <span class="k">if</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="s2">&quot;funccall&quot;</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r_op</span><span class="o">.</span><span class="n">children</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unexpected funccall length&quot;</span><span class="p">)</span>
@@ -241,16 +225,13 @@
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r_op</span><span class="o">.</span><span class="n">children</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unexpected &quot;</span> <span class="o">+</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="o">+</span> <span class="s2">&quot; length&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;or_test&quot;</span><span class="p">,</span> <span class="s2">&quot;or_test_sym&quot;</span><span class="p">}:</span>
-                    <span class="n">op_name</span> <span class="o">=</span> <span class="s2">&quot;__or__&quot;</span>
+                    <span class="n">op_name</span> <span class="o">=</span> <span class="s2">&quot;or&quot;</span>
                 <span class="k">elif</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;and_test&quot;</span><span class="p">,</span> <span class="s2">&quot;and_test_sym&quot;</span><span class="p">}:</span>
-                    <span class="n">op_name</span> <span class="o">=</span> <span class="s2">&quot;__and__&quot;</span>
+                    <span class="n">op_name</span> <span class="o">=</span> <span class="s2">&quot;and&quot;</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unexpected test: </span><span class="si">{</span><span class="n">r_op</span><span class="o">.</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="n">_r_walk_lark_tree</span><span class="p">(</span><span class="n">ci</span><span class="p">)</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">r_op</span><span class="o">.</span><span class="n">children</span><span class="p">]</span>
-                <span class="c1"># just linear chain them</span>
-                <span class="n">res</span> <span class="o">=</span> <span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">children</span><span class="p">)):</span>
-                    <span class="n">res</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">op_name</span><span class="p">)(</span><span class="n">children</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">kop_expr</span><span class="p">(</span><span class="n">op_name</span><span class="p">,</span> <span class="n">children</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">res</span>
             <span class="k">if</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="s2">&quot;not&quot;</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r_op</span><span class="o">.</span><span class="n">children</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>

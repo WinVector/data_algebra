@@ -93,6 +93,20 @@ def _type_safe_is_in(a, b):
     return numpy.isin(a, b)
 
 
+def _k_and(*args):
+    res = args[0]
+    for i in range(1, len(args)):
+        res = numpy.logical_and(res, args[i])
+    return res
+
+
+def _k_or(*args):
+    res = args[0]
+    for i in range(1, len(args)):
+        res = numpy.logical_or(res, args[i])
+    return res
+
+
 def populate_impl_map(data_model):
     impl_map = {
         "==": _type_safe_equal,
@@ -111,12 +125,12 @@ def populate_impl_map(data_model):
         "//": numpy.floor_divide,
         "%": numpy.mod,
         "**": numpy.power,
-        "and": numpy.logical_and,
-        "&": numpy.logical_and,
-        "&&": numpy.logical_and,
-        "or": numpy.logical_or,
-        "|": numpy.logical_or,
-        "||": numpy.logical_or,
+        "and": _k_and,
+        "&": _k_and,
+        "&&": _k_and,
+        "or": _k_or,
+        "|": _k_or,
+        "||": _k_or,
         "xor": numpy.logical_xor,
         "^": numpy.logical_xor,
         "not": numpy.logical_not,

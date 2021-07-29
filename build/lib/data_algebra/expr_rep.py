@@ -600,6 +600,13 @@ class Term(PreTerm, ABC):
         return self.__uop_expr__("base_Sunday")
 
 
+def kop_expr(op, args, inline=False, method=False):
+    """three argument expression"""
+    assert isinstance(op, str)
+    args = [(ai if isinstance(ai, Term) else enc_value(ai)) for ai in args]
+    return Expression(op, args, inline=inline, method=method)
+
+
 class Value(Term):
     def __init__(self, value):
         allowed = {data_algebra.util.map_type_to_canonical(t) for t in [int, float, str, bool]}
@@ -816,10 +823,6 @@ class Expression(Term):
         if inline:
             if method:
                 raise ValueError("can't set both inline and method")
-            if len(args) > 2:
-                raise ValueError(
-                    "must have no more than two arguments if inline is True"
-                )
         self.op = op
         self.args = [enc_value(ai) for ai in args]
         self.params = params
@@ -918,11 +921,14 @@ class Expression(Term):
                     return subs[0] + "." + self.op + "()"
                 else:
                     return "(" + subs[0] + ")." + self.op + "()"
-        if len(subs) == 2 and self.inline:
+        if self.inline:
+            result = ''
             if want_inline_parens:
-                return "(" + subs[0] + " " + self.op + " " + subs[1] + ")"
-            else:
-                return subs[0] + " " + self.op + " " + subs[1]
+                result = result + '('
+            result = result + (' ' + self.op + ' ').join(subs)
+            if want_inline_parens:
+                result = result + ')'
+            return result
         if self.method:
             if isinstance(self.args[0], ColumnReference):
                 return subs[0] + "." + self.op + "(" + ", ".join(subs[1:]) + ")"
