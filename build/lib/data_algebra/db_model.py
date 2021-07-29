@@ -703,10 +703,10 @@ class DBModel:
                 op = self.op_replacements[op]
             if op in self.sql_formatters.keys():
                 return self.sql_formatters[op](self, expression)
-            subs = [
-                self.expr_to_sql(ai, want_inline_parens=True) for ai in expression.args
-            ]
-            if expression.inline:
+            if (len(expression.args) > 1) and expression.inline:
+                subs = [
+                    self.expr_to_sql(ai, want_inline_parens=True) for ai in expression.args
+                ]
                 res = ''
                 if want_inline_parens:
                     res = res + '('
@@ -718,6 +718,9 @@ class DBModel:
                 if want_inline_parens:
                     res = res + ')'
                 return res
+            subs = [
+                self.expr_to_sql(ai, want_inline_parens=False) for ai in expression.args
+            ]
             return op.upper() + "(" + ", ".join(subs) + ")"
         if isinstance(expression, data_algebra.expr_rep.ListTerm):
             return self.value_to_sql(expression.value)
