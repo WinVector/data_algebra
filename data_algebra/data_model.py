@@ -140,7 +140,7 @@ def populate_impl_map(data_model):
         "is_bad": data_model.bad_column_positions,
         "is_in": _type_safe_is_in,
         "concat": lambda a, b: numpy.char.add(
-            numpy.asarray(a, dtype=numpy.str), numpy.asarray(b, dtype=numpy.str)
+            numpy.asarray(a, dtype=str), numpy.asarray(b, dtype=str)
         ),
         "coalesce": lambda a, b: _coalesce(a, b),  # assuming Pandas series
         "connected_components": lambda a, b: data_algebra.connected_components.connected_components(
