@@ -281,7 +281,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         missing_group_cols = set(op.group_by) - set(res.columns)
         assert len(missing_group_cols) <= 0
         if "_data_table_temp_col" in res.columns:
-            res = res.drop("_data_table_temp_col", 1)
+            res = res.drop("_data_table_temp_col", axis=1, inplace=False)
         # double check shape is what we expect
         if not data_algebra.util.table_is_keyed_by_columns(res, op.group_by):
             raise ValueError("result wasn't keyed by group_by columns")
@@ -402,7 +402,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             if c not in op.by:
                 is_null = res[c].isnull()
                 res.loc[is_null, c] = res.loc[is_null, c + "_tmp_right_col"]
-                res = res.drop(c + "_tmp_right_col", axis=1)
+                res = res.drop(c + "_tmp_right_col", axis=1, inplace=False)
         res = res.reset_index(drop=True)
         return res
 
