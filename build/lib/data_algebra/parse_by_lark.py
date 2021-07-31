@@ -104,9 +104,18 @@ def _walk_lark_tree(op, *, data_def=None):
             if r_op.data in ["arith_expr", "term", "comparison"]:
                 # expect a v (r_op v)+ pattern
                 nc = len(r_op.children)
-                if (nc < 1) or ((nc % 2) != 1):
+                # check we have 3 or more pieces (and an odd number of such)
+                if (nc < 3) or ((nc % 2) != 1):
                     raise ValueError("unexpected " + r_op.data + " length")
-                # just linear chain them
+                # check ops are all the same
+                ops_seen = [str(r_op.children[i]) for i in range(nc) if (i % 2) == 1]
+                if (len(set(ops_seen)) == 1) and (r_op.data in ["arith_expr", "term"]):
+                    op_name = ops_seen[0]
+                    if op_name in {'+', '*'}:
+                        children = [_r_walk_lark_tree(r_op.children[i]) for i in range(nc) if (i % 2) == 0]
+                        res = data_algebra.expr_rep.kop_expr(op_name, children, inline=True, method=False)
+                        return res
+                # just linear chain ops
                 res = _r_walk_lark_tree(r_op.children[0])
                 for i in range((nc - 1) // 2):
                     op_name = str(r_op.children[2 * i + 1])
