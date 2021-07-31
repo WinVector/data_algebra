@@ -121,7 +121,7 @@ class OperatorPlatform:
     def project(self, ops=None, *, group_by=None):
         raise NotImplementedError("base class called")
 
-    def natural_join(self, b, *, by, jointype):
+    def natural_join(self, b, *, by, jointype, check_all_common_keys_in_by=False):
         raise NotImplementedError("base class called")
 
     def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):

@@ -125,8 +125,12 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         self.set(self.node.project(ops=ops, group_by=group_by,))
         return self
 
-    def natural_join(self, b, *, by, jointype):
-        self.set(self.node.natural_join(b=b, by=by, jointype=jointype))
+    def natural_join(self, b, *, by, jointype, check_all_common_keys_in_by=False):
+        self.set(self.node.natural_join(
+            b=b,
+            by=by,
+            jointype=jointype,
+            check_all_common_keys_in_by=check_all_common_keys_in_by))
         return self
 
     def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):

@@ -45,3 +45,6 @@ def test_logistic_example_one():
             "probability": [0.670622, 0.558974],
         }
     )
+
+    data_algebra.test_util.check_transform(
+        ops=ops, data=d_local, expect=expect, float_tol=1.e-3)

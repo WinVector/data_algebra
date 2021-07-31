@@ -432,7 +432,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         parsed_ops = data_algebra.expr_parse.parse_assignments_in_context(ops, self)
         return self.project_parsed(parsed_ops=parsed_ops, group_by=group_by)
 
-    def natural_join(self, b, *, by, jointype):
+    def natural_join(self, b, *, by, jointype, check_all_common_keys_in_by=False):
         """
 
         :param b: right table
@@ -443,7 +443,12 @@ class ViewRepresentation(OperatorPlatform, ABC):
         assert isinstance(b, ViewRepresentation)
         if self.is_trivial_when_intermediate():
             return self.sources[0].natural_join(b, by=by, jointype=jointype)
-        return NaturalJoinNode(a=self, b=b, by=by, jointype=jointype)
+        return NaturalJoinNode(
+            a=self,
+            b=b,
+            by=by,
+            jointype=jointype,
+            check_all_common_keys_in_by=check_all_common_keys_in_by)
 
     def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):
         if b is None:
@@ -467,6 +472,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
     def select_rows(self, expr):
         if expr is None:
             return self
+        assert isinstance(expr, (str, data_algebra.expr_rep.PreTerm))
         if self.is_trivial_when_intermediate():
             return self.sources[0].select_rows(expr)
         ops = data_algebra.expr_parse.parse_assignments_in_context({"expr": expr}, self)
@@ -1499,7 +1505,7 @@ class NaturalJoinNode(ViewRepresentation):
     by: List[str]
     jointype: str
 
-    def __init__(self, a, b, *, by, jointype):
+    def __init__(self, a, b, *, by, jointype, check_all_common_keys_in_by=False):
         # check set of tables is consistent in both sub-dags
         a_tables = a.get_tables()
         b_tables = b.get_tables()
@@ -1507,8 +1513,8 @@ class NaturalJoinNode(ViewRepresentation):
             raise ValueError(
                 "Must specify by in natural joins ([] for empty conditions)"
             )
-        common_keys = set(a_tables.keys()).intersection(b_tables.keys())
-        for k in common_keys:
+        common_table_keys = set(a_tables.keys()).intersection(b_tables.keys())
+        for k in common_table_keys:
             if not a_tables[k].same_table(b_tables[k]):
                 raise ValueError(
                     "Different definition of table object on a/b for: " + k
@@ -1530,6 +1536,12 @@ class NaturalJoinNode(ViewRepresentation):
         missing_right = by_set - b.column_set
         if len(missing_right) > 0:
             raise KeyError("right table missing join keys: " + str(missing_right))
+        if check_all_common_keys_in_by:
+            missing_common = a.column_set.intersection(b.column_set) - by_set
+            if len(missing_common) > 0:
+                raise KeyError(
+                    "check_all_common_keys_in_by set, and the following common keys are are not in the by-clause: "
+                    + str(missing_common))
         ViewRepresentation.__init__(
             self,
             column_names=column_names,
