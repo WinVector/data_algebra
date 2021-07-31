@@ -204,8 +204,7 @@ def example_handle():
 
     """
     # TODO: parameterize this
-    if not _have_bigquery:
-        return None
+    assert _have_bigquery
     try:
         os.environ[
             "GOOGLE_APPLICATION_CREDENTIALS"

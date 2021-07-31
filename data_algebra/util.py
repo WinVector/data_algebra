@@ -44,10 +44,16 @@ def table_is_keyed_by_columns(table, column_names):
 
 
 type_conversions = {
+    # DeprecationWarning: `np.bool` is a deprecated alias for the builtin `bool`.
+    # To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe.
+    # If you specifically wanted the numpy scalar type, use `np.bool_` here.
+    #   Deprecated in NumPy 1.20; for more details and guidance:
+    #   https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
+    # (note even numpy.bool_ triggers the above, or the triggering it is in pyspark right now
     numpy.bool_: bool,
     numpy.int64: int,
-    numpy.float64: float,
-    numpy.bool_: bool}
+    numpy.float64: float
+}
 
 
 def map_type_to_canonical(v):

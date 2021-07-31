@@ -34,7 +34,7 @@ setuptools.setup(
     extras_require={
         'pretty_python': ['black'],
         'diagram': ['graphviz'],
-        'BigQuery': ['google.cloud', 'pyarrow'],
+        'BigQuery': ['google.cloud', 'pyarrow', 'google-cloud-bigquery'],
         'PostgreSQL': ['sqlalchemy', 'psycopg2'],
         'MySQL': ['sqlalchemy', 'pymysql'],
         'Spark': ['pyspark'],
