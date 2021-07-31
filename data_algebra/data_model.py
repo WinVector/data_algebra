@@ -107,6 +107,20 @@ def _k_or(*args):
     return res
 
 
+def _k_add(*args):
+    res = args[0]
+    for i in range(1, len(args)):
+        res = numpy.add(res, args[i])
+    return res
+
+
+def _k_mul(*args):
+    res = args[0]
+    for i in range(1, len(args)):
+        res = numpy.multiply(res, args[i])
+    return res
+
+
 def populate_impl_map(data_model):
     impl_map = {
         "==": _type_safe_equal,
@@ -117,10 +131,10 @@ def populate_impl_map(data_model):
         "<=": numpy.less_equal,  # already checks types
         ">": numpy.greater,  # already checks types
         ">=": numpy.greater_equal,  # already checks types
-        "+": numpy.add,
+        "+": _k_add,
         "-": negate_or_subtract,
         "neg": numpy.negative,
-        "*": numpy.multiply,
+        "*": _k_mul,
         "/": numpy.divide,
         "//": numpy.floor_divide,
         "%": numpy.mod,
