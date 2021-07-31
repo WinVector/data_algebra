@@ -104,7 +104,6 @@ def _walk_lark_tree(op, *, data_def=None):
             if r_op.data in ["arith_expr", "term", "comparison"]:
                 # expect a v (r_op v)+ pattern
                 nc = len(r_op.children)
-                assert nc >= 2
                 # check we have 3 or more pieces (and an odd number of such)
                 if (nc < 3) or ((nc % 2) != 1):
                     raise ValueError("unexpected " + r_op.data + " length")
