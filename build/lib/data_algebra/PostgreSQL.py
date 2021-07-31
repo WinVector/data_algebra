@@ -38,8 +38,7 @@ def example_handle():
 
     """
     # TODO: parameterize this
-    if not have_sqlalchemy:
-        return None
+    assert have_sqlalchemy
     db_handle = PostgreSQLModel().db_handle(
         sqlalchemy.engine.create_engine(r"postgresql://johnmount@localhost/johnmount")
     )

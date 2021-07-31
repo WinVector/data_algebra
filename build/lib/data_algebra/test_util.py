@@ -319,13 +319,25 @@ def check_transform(
     ]
 
     if test_PostgreSQL:
-        db_handles.append(data_algebra.PostgreSQL.example_handle())
+        hdl = data_algebra.PostgreSQL.example_handle()
+        assert hdl is not None
+        assert hdl.conn is not None
+        db_handles.append(hdl)
     if test_BigQuery:
-        db_handles.append(data_algebra.BigQuery.example_handle())
+        hdl = data_algebra.BigQuery.example_handle()
+        assert hdl is not None
+        assert hdl.conn is not None
+        db_handles.append(hdl)
     if test_MySQL:
-        db_handles.append(data_algebra.MySQL.example_handle())
+        hdl = data_algebra.MySQL.example_handle()
+        assert hdl is not None
+        assert hdl.conn is not None
+        db_handles.append(hdl)
     if test_Spark:
-        db_handles.append(data_algebra.SparkSQL.example_handle())
+        hdl = data_algebra.SparkSQL.example_handle()
+        assert hdl is not None
+        assert hdl.conn is not None
+        db_handles.append(hdl)
 
     if models_to_skip is not None:
         db_handles = [h for h in db_handles if str(h.db_model) not in models_to_skip]

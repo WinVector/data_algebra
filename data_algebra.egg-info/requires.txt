@@ -5,6 +5,7 @@ lark
 [BigQuery]
 google.cloud
 pyarrow
+google-cloud-bigquery
 
 [MySQL]
 sqlalchemy

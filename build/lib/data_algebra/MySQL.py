@@ -79,8 +79,7 @@ def example_handle():
 
     """
     # TODO: parameterize this
-    if not have_sqlalchemy:
-        return None
+    assert have_sqlalchemy
     db_handle = MySQLModel().db_handle(
         sqlalchemy.engine.create_engine("mysql+pymysql://jmount@localhost/jmount")
     )
