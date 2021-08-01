@@ -83,24 +83,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     # characterization
 
-    def get_tables(self):
-        """Get a dictionary of all tables used in an operator DAG,
-        raise an exception if the values are not consistent."""
-        tables = {}
-        for i in range(len(self.sources)):
-            s = self.sources[i]
-            ti = s.get_tables()
-            for (k, v) in ti.items():
-                assert isinstance(v, TableDescription)
-                if k in tables.keys():
-                    if not v.same_table(tables[k]):
-                        raise ValueError(
-                            "Table " + k + " has two different representation objects"
-                        )
-                else:
-                    tables[k] = v
-        return tables
-
     def columns_used_from_sources(self, using=None):
         """Get column names used from direct source nodes when this node is exececuted
         with the using columns (None means all)."""
@@ -277,10 +259,11 @@ class ViewRepresentation(OperatorPlatform, ABC):
     def eval(self, data_map, *, data_model=None, narrow=True):
         """
          Evaluate operators with respect to Pandas data frames.
+
          :param data_map: map from table names to data frames
          :param data_model: adaptor to data dialect (Pandas for now)
          :param narrow logical, if True don't copy unexpected columns
-         :return:
+         :return: table result
          """
 
         assert isinstance(data_map, dict)
@@ -306,6 +289,13 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     # noinspection PyPep8Naming
     def transform(self, X, *, data_model=None, narrow=True):
+        """
+        Apply data transfrom to a table
+
+        :param X: tale to apply to
+        :param data_model: data model for Pandas execution
+        :param narrow: logical, if True narrow number of result columns to specification
+        """
         if data_model is None:
             data_model = data_algebra.default_data_model
         assert isinstance(data_model, data_algebra.data_model.DataModel)
@@ -720,15 +710,17 @@ def describe_table(
     sql_meta=None,
     column_types=None,
     row_limit=7,
-    keep_sample=True
+    keep_sample=True,
+    keep_all=False
 ):
     """
     :param d: pandas table to describe
     :param table_name: name of table
     :param qualifiers: optional able qualifiers
     :param sql_meta: optional sql meta information map
-    :param row_limit: how many rows to sampe
+    :param row_limit: how many rows to sample
     :param keep_sample: logical, if True retain head of table
+    :param keep_all: logical, if True retain all of table
     :return: TableDescription
     """
     assert d is not None
@@ -738,9 +730,12 @@ def describe_table(
     if column_types is None:
         column_types = data_algebra.util.guess_column_types(d)
     head = None
-    nrows = None
-    if keep_sample:
-        nrows = d.shape[0]
+    nrows = d.shape[0]
+    if keep_all:
+        row_limit = None
+        head = d.copy()
+        head.reset_index(drop=True, inplace=True)
+    elif keep_sample:
         if nrows > row_limit:
             head = d.iloc[range(row_limit), :].copy()
         else:
