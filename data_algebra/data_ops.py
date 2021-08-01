@@ -770,7 +770,7 @@ def table(d, table_name):
         qualifiers=None,
         sql_meta=None,
         column_types=None,
-        row_limit=7,
+        row_limit=None,
         keep_sample=True,
         keep_all=True,
     )
