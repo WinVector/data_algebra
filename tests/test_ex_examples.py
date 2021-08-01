@@ -101,8 +101,20 @@ def test_ex_examples_join_catch_partial():
                 jointype='inner')
     )
 
+    # failed to explicitly capture all rows
     with pytest.raises(AssertionError):
         ops.ex()
+
+    res = ops.ex(allow_limited_tables=True)
+
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        'x': [1, 2, 2],
+        'y': [3, 3, 4],
+        'z': [6, 7, 8],
+        'q': ['a', 'b', 'c'],
+    })
+
+    assert data_algebra.test_util.equivalent_frames(expect, res)
 
 
 def test_ex_examples_join_catch_unnamed_1():
@@ -117,13 +129,14 @@ def test_ex_examples_join_catch_unnamed_1():
         'q': ['a', 'b', 'c'],
     })
 
+    # failed to explicitly name a table
     with pytest.raises(ValueError):
         (
             describe_table(d1)
                 .natural_join(
-                b=describe_table(d2),
-                by=['x', 'y'],
-                jointype='inner')
+                    b=describe_table(d2),
+                    by=['x', 'y'],
+                    jointype='inner')
         )
 
 
