@@ -23,6 +23,17 @@ class OperatorPlatform:
         self.node_name = node_name
         self.column_map = column_map.copy()
 
+    def eval(self, data_map, *, data_model=None, narrow=True):
+        """
+        Evaluate operators with respect to Pandas data frames.
+
+        :param data_map: map from table names to data frames
+        :param data_model: adaptor to data dialect (Pandas for now)
+        :param narrow: logical, if True don't copy unexpected columns
+        :return: table result
+        """
+        raise NotImplementedError("base class called")
+
     # noinspection PyPep8Naming
     def transform(self, X, *, data_model=None, narrow=True):
         """
@@ -94,6 +105,49 @@ class OperatorPlatform:
         :return:
         """
         return other.apply_to(self)
+
+    # characterization
+
+    def get_tables(self):
+        """Get a dictionary of all tables used in an operator DAG,
+        raise an exception if the values are not consistent."""
+        tables = {}
+        for i in range(len(self.sources)):
+            s = self.sources[i]
+            ti = s.get_tables()
+            for (k, v) in ti.items():
+                assert isinstance(v, OperatorPlatform)
+                assert v.node_name == "TableDescription"
+                if k in tables.keys():
+                    if not v.same_table(tables[k]):
+                        raise ValueError(
+                            "Table " + k + " has two different representation objects"
+                        )
+                else:
+                    tables[k] = v
+        return tables
+
+    # convenience
+
+    def ex(self, *, data_model=None, narrow=True, allow_limited_tables=False):
+        """
+        Evaluate operators with respect to Pandas data frames already stored in the operator chain.
+
+        :param data_model: adaptor to data dialect (Pandas for now)
+        :param narrow: logical, if True don't copy unexpected columns
+        :param allow_limited_tables: logical, if True allow execution on non-complete tables
+        :return: table result
+        """
+        tables = self.get_tables()
+        for t in tables.values():
+            assert t.head is not None
+            if len(tables) > 1:
+                assert t.table_name_was_set_by_user
+            if not allow_limited_tables:
+                assert t.limit_was is None
+                assert t.nrows == t.head.shape[0]
+        data_map = {k: v.head for k, v in tables.items()}
+        return self.eval(data_map = data_map, data_model=data_model, narrow=narrow)
 
     # info
 

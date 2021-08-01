@@ -49,6 +49,9 @@
                                 <a class="function" href="#OperatorPlatform.__init__">OperatorPlatform</a>
                         </li>
                         <li>
+                                <a class="function" href="#OperatorPlatform.eval">eval</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#OperatorPlatform.transform">transform</a>
                         </li>
                         <li>
@@ -59,6 +62,12 @@
                         </li>
                         <li>
                                 <a class="function" href="#OperatorPlatform.add">add</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#OperatorPlatform.get_tables">get_tables</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#OperatorPlatform.ex">ex</a>
                         </li>
                         <li>
                                 <a class="function" href="#OperatorPlatform.columns_produced">columns_produced</a>
@@ -172,6 +181,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">node_name</span> <span class="o">=</span> <span class="n">node_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">column_map</span> <span class="o">=</span> <span class="n">column_map</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate operators with respect to Pandas data frames.</span>
+
+<span class="sd">        :param data_map: map from table names to data frames</span>
+<span class="sd">        :param data_model: adaptor to data dialect (Pandas for now)</span>
+<span class="sd">        :param narrow: logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">        :return: table result</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -243,6 +263,49 @@
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="c1"># characterization</span>
+
+    <span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a dictionary of all tables used in an operator DAG,</span>
+<span class="sd">        raise an exception if the values are not consistent.&quot;&quot;&quot;</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">)):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">ti</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ti</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">OperatorPlatform</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="n">v</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;TableDescription&quot;</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">same_table</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="n">k</span><span class="p">]):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="s2">&quot;Table &quot;</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot; has two different representation objects&quot;</span>
+                        <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tables</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">tables</span>
+
+    <span class="c1"># convenience</span>
+
+    <span class="k">def</span> <span class="nf">ex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">allow_limited_tables</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate operators with respect to Pandas data frames already stored in the operator chain.</span>
+
+<span class="sd">        :param data_model: adaptor to data dialect (Pandas for now)</span>
+<span class="sd">        :param narrow: logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">        :param allow_limited_tables: logical, if True allow execution on non-complete tables</span>
+<span class="sd">        :return: table result</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">table_name_was_set_by_user</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_limited_tables</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">limit_was</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">nrows</span> <span class="o">==</span> <span class="n">t</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">data_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">head</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span> <span class="o">=</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 
     <span class="c1"># info</span>
 
@@ -423,6 +486,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">node_name</span> <span class="o">=</span> <span class="n">node_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">column_map</span> <span class="o">=</span> <span class="n">column_map</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate operators with respect to Pandas data frames.</span>
+
+<span class="sd">        :param data_map: map from table names to data frames</span>
+<span class="sd">        :param data_model: adaptor to data dialect (Pandas for now)</span>
+<span class="sd">        :param narrow: logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">        :return: table result</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -494,6 +568,49 @@
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="c1"># characterization</span>
+
+    <span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a dictionary of all tables used in an operator DAG,</span>
+<span class="sd">        raise an exception if the values are not consistent.&quot;&quot;&quot;</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">)):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">ti</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ti</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">OperatorPlatform</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="n">v</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;TableDescription&quot;</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">same_table</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="n">k</span><span class="p">]):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="s2">&quot;Table &quot;</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot; has two different representation objects&quot;</span>
+                        <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tables</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">tables</span>
+
+    <span class="c1"># convenience</span>
+
+    <span class="k">def</span> <span class="nf">ex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">allow_limited_tables</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate operators with respect to Pandas data frames already stored in the operator chain.</span>
+
+<span class="sd">        :param data_model: adaptor to data dialect (Pandas for now)</span>
+<span class="sd">        :param narrow: logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">        :param allow_limited_tables: logical, if True allow execution on non-complete tables</span>
+<span class="sd">        :return: table result</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">table_name_was_set_by_user</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_limited_tables</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">limit_was</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">nrows</span> <span class="o">==</span> <span class="n">t</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">data_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">head</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span> <span class="o">=</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 
     <span class="c1"># info</span>
 
@@ -612,6 +729,40 @@
         </details>
 
     
+
+                            </div>
+                            <div id="OperatorPlatform.eval" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OperatorPlatform.eval">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">eval</span><span class="signature">(self, data_map, *, data_model=None, narrow=True)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate operators with respect to Pandas data frames.</span>
+
+<span class="sd">        :param data_map: map from table names to data frames</span>
+<span class="sd">        :param data_model: adaptor to data dialect (Pandas for now)</span>
+<span class="sd">        :param narrow: logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">        :return: table result</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Evaluate operators with respect to Pandas data frames.</p>
+
+<p>:param data_map: map from table names to data frames
+:param data_model: adaptor to data dialect (Pandas for now)
+:param narrow: logical, if True don't copy unexpected columns
+:return: table result</p>
+</div>
+
 
                             </div>
                             <div id="OperatorPlatform.transform" class="classattr">
@@ -738,6 +889,87 @@
 
 <p>:param other:
 :return:</p>
+</div>
+
+
+                            </div>
+                            <div id="OperatorPlatform.get_tables" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OperatorPlatform.get_tables">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">get_tables</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a dictionary of all tables used in an operator DAG,</span>
+<span class="sd">        raise an exception if the values are not consistent.&quot;&quot;&quot;</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">)):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">ti</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ti</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">OperatorPlatform</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="n">v</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;TableDescription&quot;</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">same_table</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="n">k</span><span class="p">]):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="s2">&quot;Table &quot;</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot; has two different representation objects&quot;</span>
+                        <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tables</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">tables</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Get a dictionary of all tables used in an operator DAG,
+raise an exception if the values are not consistent.</p>
+</div>
+
+
+                            </div>
+                            <div id="OperatorPlatform.ex" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OperatorPlatform.ex">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">ex</span><span class="signature">(self, *, data_model=None, narrow=True, allow_limited_tables=False)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">ex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">allow_limited_tables</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate operators with respect to Pandas data frames already stored in the operator chain.</span>
+
+<span class="sd">        :param data_model: adaptor to data dialect (Pandas for now)</span>
+<span class="sd">        :param narrow: logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">        :param allow_limited_tables: logical, if True allow execution on non-complete tables</span>
+<span class="sd">        :return: table result</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">table_name_was_set_by_user</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_limited_tables</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">limit_was</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">nrows</span> <span class="o">==</span> <span class="n">t</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">data_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">head</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span> <span class="o">=</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Evaluate operators with respect to Pandas data frames already stored in the operator chain.</p>
+
+<p>:param data_model: adaptor to data dialect (Pandas for now)
+:param narrow: logical, if True don't copy unexpected columns
+:param allow_limited_tables: logical, if True allow execution on non-complete tables
+:return: table result</p>
 </div>
 
 

@@ -43,9 +43,6 @@
                                 <a class="function" href="#ViewRepresentation.merged_rep_id">merged_rep_id</a>
                         </li>
                         <li>
-                                <a class="function" href="#ViewRepresentation.get_tables">get_tables</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#ViewRepresentation.columns_used_from_sources">columns_used_from_sources</a>
                         </li>
                         <li>
@@ -532,24 +529,6 @@
 
     <span class="c1"># characterization</span>
 
-    <span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get a dictionary of all tables used in an operator DAG,</span>
-<span class="sd">        raise an exception if the values are not consistent.&quot;&quot;&quot;</span>
-        <span class="n">tables</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">)):</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="n">ti</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
-            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ti</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">same_table</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="n">k</span><span class="p">]):</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                            <span class="s2">&quot;Table &quot;</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot; has two different representation objects&quot;</span>
-                        <span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">tables</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
-        <span class="k">return</span> <span class="n">tables</span>
-
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get column names used from direct source nodes when this node is exececuted</span>
 <span class="sd">        with the using columns (None means all).&quot;&quot;&quot;</span>
@@ -726,10 +705,11 @@
     <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">         Evaluate operators with respect to Pandas data frames.</span>
+
 <span class="sd">         :param data_map: map from table names to data frames</span>
 <span class="sd">         :param data_model: adaptor to data dialect (Pandas for now)</span>
 <span class="sd">         :param narrow logical, if True don&#39;t copy unexpected columns</span>
-<span class="sd">         :return:</span>
+<span class="sd">         :return: table result</span>
 <span class="sd">         &quot;&quot;&quot;</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_map</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
@@ -755,6 +735,13 @@
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply data transfrom to a table</span>
+
+<span class="sd">        :param X: tale to apply to</span>
+<span class="sd">        :param data_model: data model for Pandas execution</span>
+<span class="sd">        :param narrow: logical, if True narrow number of result columns to specification</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
@@ -997,11 +984,12 @@
     <span class="n">column_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="n">qualifiers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
     <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">table_name_was_set_by_user</span><span class="p">:</span> <span class="nb">bool</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">table_name</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">column_names</span><span class="p">,</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1014,9 +1002,11 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;TableDescription&quot;</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">table_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">table_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">table_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table_name_was_set_by_user</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">table_name</span> <span class="o">=</span> <span class="s2">&quot;data_frame&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table_name_was_set_by_user</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">set</span><span class="p">([</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">head</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;head.columns != column_names&quot;</span><span class="p">)</span>
@@ -1163,21 +1153,23 @@
 
 <span class="k">def</span> <span class="nf">describe_table</span><span class="p">(</span>
     <span class="n">d</span><span class="p">,</span>
-    <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;data_frame&quot;</span><span class="p">,</span>
+    <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">column_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">row_limit</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
-    <span class="n">keep_sample</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">keep_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">keep_all</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param d: pandas table to describe</span>
 <span class="sd">    :param table_name: name of table</span>
 <span class="sd">    :param qualifiers: optional able qualifiers</span>
 <span class="sd">    :param sql_meta: optional sql meta information map</span>
-<span class="sd">    :param row_limit: how many rows to sampe</span>
+<span class="sd">    :param row_limit: how many rows to sample</span>
 <span class="sd">    :param keep_sample: logical, if True retain head of table</span>
+<span class="sd">    :param keep_all: logical, if True retain all of table</span>
 <span class="sd">    :return: TableDescription</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -1187,9 +1179,12 @@
     <span class="k">if</span> <span class="n">column_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">column_types</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_column_types</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
     <span class="n">head</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">nrows</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">keep_sample</span><span class="p">:</span>
-        <span class="n">nrows</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">nrows</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">keep_all</span><span class="p">:</span>
+        <span class="n">row_limit</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">head</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">keep_sample</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">nrows</span> <span class="o">&gt;</span> <span class="n">row_limit</span><span class="p">:</span>
             <span class="n">head</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">row_limit</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
@@ -2362,24 +2357,6 @@
 
     <span class="c1"># characterization</span>
 
-    <span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get a dictionary of all tables used in an operator DAG,</span>
-<span class="sd">        raise an exception if the values are not consistent.&quot;&quot;&quot;</span>
-        <span class="n">tables</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">)):</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="n">ti</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
-            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ti</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">same_table</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="n">k</span><span class="p">]):</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                            <span class="s2">&quot;Table &quot;</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot; has two different representation objects&quot;</span>
-                        <span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">tables</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
-        <span class="k">return</span> <span class="n">tables</span>
-
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get column names used from direct source nodes when this node is exececuted</span>
 <span class="sd">        with the using columns (None means all).&quot;&quot;&quot;</span>
@@ -2556,10 +2533,11 @@
     <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">         Evaluate operators with respect to Pandas data frames.</span>
+
 <span class="sd">         :param data_map: map from table names to data frames</span>
 <span class="sd">         :param data_model: adaptor to data dialect (Pandas for now)</span>
 <span class="sd">         :param narrow logical, if True don&#39;t copy unexpected columns</span>
-<span class="sd">         :return:</span>
+<span class="sd">         :return: table result</span>
 <span class="sd">         &quot;&quot;&quot;</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_map</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
@@ -2585,6 +2563,13 @@
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply data transfrom to a table</span>
+
+<span class="sd">        :param X: tale to apply to</span>
+<span class="sd">        :param data_model: data model for Pandas execution</span>
+<span class="sd">        :param narrow: logical, if True narrow number of result columns to specification</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
@@ -2875,43 +2860,6 @@ Abstract base class.</p>
         </details>
 
     
-
-                            </div>
-                            <div id="ViewRepresentation.get_tables" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ViewRepresentation.get_tables">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">get_tables</span><span class="signature">(self)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get a dictionary of all tables used in an operator DAG,</span>
-<span class="sd">        raise an exception if the values are not consistent.&quot;&quot;&quot;</span>
-        <span class="n">tables</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">)):</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="n">ti</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
-            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ti</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">same_table</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="n">k</span><span class="p">]):</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                            <span class="s2">&quot;Table &quot;</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot; has two different representation objects&quot;</span>
-                        <span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">tables</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
-        <span class="k">return</span> <span class="n">tables</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Get a dictionary of all tables used in an operator DAG,
-raise an exception if the values are not consistent.</p>
-</div>
-
 
                             </div>
                             <div id="ViewRepresentation.columns_used_from_sources" class="classattr">
@@ -3207,10 +3155,11 @@ with the using columns (None means all).</p>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">         Evaluate operators with respect to Pandas data frames.</span>
+
 <span class="sd">         :param data_map: map from table names to data frames</span>
 <span class="sd">         :param data_model: adaptor to data dialect (Pandas for now)</span>
 <span class="sd">         :param narrow logical, if True don&#39;t copy unexpected columns</span>
-<span class="sd">         :return:</span>
+<span class="sd">         :return: table result</span>
 <span class="sd">         &quot;&quot;&quot;</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_map</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
@@ -3237,11 +3186,12 @@ with the using columns (None means all).</p>
 
         </details>
 
-            <div class="docstring"><p>Evaluate operators with respect to Pandas data frames.
-:param data_map: map from table names to data frames
+            <div class="docstring"><p>Evaluate operators with respect to Pandas data frames.</p>
+
+<p>:param data_map: map from table names to data frames
 :param data_model: adaptor to data dialect (Pandas for now)
 :param narrow logical, if True don't copy unexpected columns
-:return:</p>
+:return: table result</p>
 </div>
 
 
@@ -3257,6 +3207,13 @@ with the using columns (None means all).</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply data transfrom to a table</span>
+
+<span class="sd">        :param X: tale to apply to</span>
+<span class="sd">        :param data_model: data model for Pandas execution</span>
+<span class="sd">        :param narrow: logical, if True narrow number of result columns to specification</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
@@ -3276,12 +3233,11 @@ with the using columns (None means all).</p>
 
         </details>
 
-            <div class="docstring"><p>apply self to data frame X, may or may not commute with composition</p>
+            <div class="docstring"><p>Apply data transfrom to a table</p>
 
-<p>:param X: input data frame
-:param data_model implementation to use
-:param narrow logical, if True don't copy unexpected columns
-:return: transformed dataframe</p>
+<p>:param X: tale to apply to
+:param data_model: data model for Pandas execution
+:param narrow: logical, if True narrow number of result columns to specification</p>
 </div>
 
 
@@ -3742,6 +3698,8 @@ with the using columns (None means all).</p>
                                 <dd id="ViewRepresentation.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="ViewRepresentation.apply_to" class="function"><a href="data_ops_types.html#OperatorPlatform.apply_to">apply_to</a></dd>
                 <dd id="ViewRepresentation.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="ViewRepresentation.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
+                <dd id="ViewRepresentation.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="ViewRepresentation.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="ViewRepresentation.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="ViewRepresentation.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -3778,11 +3736,12 @@ with the using columns (None means all).</p>
     <span class="n">column_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="n">qualifiers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
     <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">table_name_was_set_by_user</span><span class="p">:</span> <span class="nb">bool</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">table_name</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">column_names</span><span class="p">,</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -3795,9 +3754,11 @@ with the using columns (None means all).</p>
             <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;TableDescription&quot;</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">table_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">table_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">table_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table_name_was_set_by_user</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">table_name</span> <span class="o">=</span> <span class="s2">&quot;data_frame&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table_name_was_set_by_user</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">set</span><span class="p">([</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">head</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;head.columns != column_names&quot;</span><span class="p">)</span>
@@ -3959,7 +3920,7 @@ with the using columns (None means all).</p>
         
             <span class="name">TableDescription</span><span class="signature">(
     *,
-    table_name,
+    table_name=None,
     column_names,
     qualifiers=None,
     sql_meta=None,
@@ -3975,7 +3936,7 @@ with the using columns (None means all).</p>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">table_name</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">column_names</span><span class="p">,</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -3988,9 +3949,11 @@ with the using columns (None means all).</p>
             <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;TableDescription&quot;</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">table_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">table_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">table_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table_name_was_set_by_user</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">table_name</span> <span class="o">=</span> <span class="s2">&quot;data_frame&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table_name_was_set_by_user</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">set</span><span class="p">([</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">head</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;head.columns != column_names&quot;</span><span class="p">)</span>
@@ -4296,6 +4259,7 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="TableDescription.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="TableDescription.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="TableDescription.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="TableDescription.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="TableDescription.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="TableDescription.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -4315,13 +4279,14 @@ with the using columns (None means all).</p>
             <span class="def">def</span>
             <span class="name">describe_table</span><span class="signature">(
     d,
-    table_name=&#39;data_frame&#39;,
+    table_name=None,
     *,
     qualifiers=None,
     sql_meta=None,
     column_types=None,
     row_limit=7,
-    keep_sample=True
+    keep_sample=True,
+    keep_all=False
 )</span>:
     </div>
 
@@ -4329,21 +4294,23 @@ with the using columns (None means all).</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">describe_table</span><span class="p">(</span>
     <span class="n">d</span><span class="p">,</span>
-    <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;data_frame&quot;</span><span class="p">,</span>
+    <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">column_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">row_limit</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
-    <span class="n">keep_sample</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">keep_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">keep_all</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param d: pandas table to describe</span>
 <span class="sd">    :param table_name: name of table</span>
 <span class="sd">    :param qualifiers: optional able qualifiers</span>
 <span class="sd">    :param sql_meta: optional sql meta information map</span>
-<span class="sd">    :param row_limit: how many rows to sampe</span>
+<span class="sd">    :param row_limit: how many rows to sample</span>
 <span class="sd">    :param keep_sample: logical, if True retain head of table</span>
+<span class="sd">    :param keep_all: logical, if True retain all of table</span>
 <span class="sd">    :return: TableDescription</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -4353,9 +4320,12 @@ with the using columns (None means all).</p>
     <span class="k">if</span> <span class="n">column_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">column_types</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_column_types</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
     <span class="n">head</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">nrows</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">keep_sample</span><span class="p">:</span>
-        <span class="n">nrows</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">nrows</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">keep_all</span><span class="p">:</span>
+        <span class="n">row_limit</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">head</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">keep_sample</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">nrows</span> <span class="o">&gt;</span> <span class="n">row_limit</span><span class="p">:</span>
             <span class="n">head</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">row_limit</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
@@ -4379,8 +4349,9 @@ with the using columns (None means all).</p>
 :param table_name: name of table
 :param qualifiers: optional able qualifiers
 :param sql_meta: optional sql meta information map
-:param row_limit: how many rows to sampe
+:param row_limit: how many rows to sample
 :param keep_sample: logical, if True retain head of table
+:param keep_all: logical, if True retain all of table
 :return: TableDescription</p>
 </div>
 
@@ -4966,7 +4937,6 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="ExtendNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
-                <dd id="ExtendNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="ExtendNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="ExtendNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="ExtendNode.forbidden_columns" class="function"><a href="#ViewRepresentation.forbidden_columns">forbidden_columns</a></dd>
@@ -4995,6 +4965,8 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="ExtendNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="ExtendNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="ExtendNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
+                <dd id="ExtendNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="ExtendNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="ExtendNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="ExtendNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -5419,7 +5391,6 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="ProjectNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
-                <dd id="ProjectNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="ProjectNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="ProjectNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="ProjectNode.to_python" class="function"><a href="#ViewRepresentation.to_python">to_python</a></dd>
@@ -5447,6 +5418,8 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="ProjectNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="ProjectNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="ProjectNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
+                <dd id="ProjectNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="ProjectNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="ProjectNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="ProjectNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -5702,7 +5675,6 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="SelectRowsNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
-                <dd id="SelectRowsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="SelectRowsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="SelectRowsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="SelectRowsNode.forbidden_columns" class="function"><a href="#ViewRepresentation.forbidden_columns">forbidden_columns</a></dd>
@@ -5731,6 +5703,8 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="SelectRowsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="SelectRowsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="SelectRowsNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
+                <dd id="SelectRowsNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="SelectRowsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="SelectRowsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="SelectRowsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -6015,7 +5989,6 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="SelectColumnsNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
-                <dd id="SelectColumnsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="SelectColumnsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="SelectColumnsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="SelectColumnsNode.to_python" class="function"><a href="#ViewRepresentation.to_python">to_python</a></dd>
@@ -6043,6 +6016,8 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="SelectColumnsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="SelectColumnsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="SelectColumnsNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
+                <dd id="SelectColumnsNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="SelectColumnsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="SelectColumnsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="SelectColumnsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -6327,7 +6302,6 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="DropColumnsNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
-                <dd id="DropColumnsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="DropColumnsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="DropColumnsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="DropColumnsNode.to_python" class="function"><a href="#ViewRepresentation.to_python">to_python</a></dd>
@@ -6355,6 +6329,8 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="DropColumnsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="DropColumnsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="DropColumnsNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
+                <dd id="DropColumnsNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="DropColumnsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="DropColumnsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="DropColumnsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -6662,7 +6638,6 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="OrderRowsNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
-                <dd id="OrderRowsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="OrderRowsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="OrderRowsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="OrderRowsNode.forbidden_columns" class="function"><a href="#ViewRepresentation.forbidden_columns">forbidden_columns</a></dd>
@@ -6690,6 +6665,8 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="OrderRowsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="OrderRowsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="OrderRowsNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
+                <dd id="OrderRowsNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="OrderRowsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="OrderRowsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="OrderRowsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -7012,7 +6989,6 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="RenameColumnsNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
-                <dd id="RenameColumnsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="RenameColumnsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="RenameColumnsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="RenameColumnsNode.to_python" class="function"><a href="#ViewRepresentation.to_python">to_python</a></dd>
@@ -7040,6 +7016,8 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="RenameColumnsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="RenameColumnsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="RenameColumnsNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
+                <dd id="RenameColumnsNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="RenameColumnsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="RenameColumnsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="RenameColumnsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -7387,7 +7365,6 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="NaturalJoinNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
-                <dd id="NaturalJoinNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="NaturalJoinNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="NaturalJoinNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="NaturalJoinNode.forbidden_columns" class="function"><a href="#ViewRepresentation.forbidden_columns">forbidden_columns</a></dd>
@@ -7416,6 +7393,8 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="NaturalJoinNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="NaturalJoinNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="NaturalJoinNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
+                <dd id="NaturalJoinNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="NaturalJoinNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="NaturalJoinNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="NaturalJoinNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -7746,7 +7725,6 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="ConcatRowsNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
-                <dd id="ConcatRowsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="ConcatRowsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="ConcatRowsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="ConcatRowsNode.forbidden_columns" class="function"><a href="#ViewRepresentation.forbidden_columns">forbidden_columns</a></dd>
@@ -7775,6 +7753,8 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="ConcatRowsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="ConcatRowsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="ConcatRowsNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
+                <dd id="ConcatRowsNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="ConcatRowsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="ConcatRowsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="ConcatRowsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -8151,7 +8131,6 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="ConvertRecordsNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
-                <dd id="ConvertRecordsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="ConvertRecordsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="ConvertRecordsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="ConvertRecordsNode.forbidden_columns" class="function"><a href="#ViewRepresentation.forbidden_columns">forbidden_columns</a></dd>
@@ -8180,6 +8159,8 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="ConvertRecordsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="ConvertRecordsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="ConvertRecordsNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
+                <dd id="ConvertRecordsNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="ConvertRecordsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="ConvertRecordsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="ConvertRecordsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
