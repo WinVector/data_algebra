@@ -58,9 +58,9 @@ def test_ex_examples_join():
     })
 
     ops = (
-        describe_table(d1, table_name='d1', keep_all=True)
+        table(d1, table_name='d1')
             .natural_join(
-                b=describe_table(d2, table_name='d2', keep_all=True),
+                b=table(d2, table_name='d2'),
                 by=['x', 'y'],
                 jointype='inner')
     )
