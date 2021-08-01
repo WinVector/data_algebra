@@ -141,6 +141,8 @@ class OperatorPlatform:
         tables = self.get_tables()
         for t in tables.values():
             assert t.head is not None
+            if len(tables) > 1:
+                assert t.table_name_was_set_by_user
             if not allow_limited_tables:
                 assert t.limit_was is None
                 assert t.nrows == t.head.shape[0]

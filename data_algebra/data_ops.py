@@ -538,11 +538,12 @@ class TableDescription(ViewRepresentation):
     column_names: List[str]
     qualifiers: Dict[str, str]
     key: str
+    table_name_was_set_by_user: bool
 
     def __init__(
         self,
         *,
-        table_name,
+        table_name=None,
         column_names,
         qualifiers=None,
         sql_meta=None,
@@ -555,9 +556,11 @@ class TableDescription(ViewRepresentation):
             self, column_names=column_names, node_name="TableDescription"
         )
         if table_name is None:
-            table_name = ""
-        if table_name is not None:
-            assert isinstance(table_name, str)
+            self.table_name_was_set_by_user = True
+            table_name = "data_frame"
+        else:
+            self.table_name_was_set_by_user = False
+        assert isinstance(table_name, str)
         if head is not None:
             if set([c for c in head.columns]) != set(column_names):
                 raise ValueError("head.columns != column_names")
@@ -704,7 +707,7 @@ class TableDescription(ViewRepresentation):
 
 def describe_table(
     d,
-    table_name="data_frame",
+    table_name=None,
     *,
     qualifiers=None,
     sql_meta=None,
