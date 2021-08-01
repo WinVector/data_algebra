@@ -79,12 +79,53 @@ class ViewRepresentation(OperatorPlatform, ABC):
         )
 
     def merged_rep_id(self):
-        return "node+ " + str(id(self))
+        return "ops+ " + str(id(self))
+
+    # convenience
+
+    def ex(self, *, data_model=None, narrow=True, allow_limited_tables=False):
+        """
+        Evaluate operators with respect to Pandas data frames already stored in the operator chain.
+
+        :param data_model: adaptor to data dialect (Pandas for now)
+        :param narrow: logical, if True don't copy unexpected columns
+        :param allow_limited_tables: logical, if True allow execution on non-complete tables
+        :return: table result
+        """
+        tables = self.get_tables()
+        for t in tables.values():
+            assert t.head is not None
+            if len(tables) > 1:
+                assert t.table_name_was_set_by_user
+            if not allow_limited_tables:
+                assert t.limit_was is None
+                assert t.nrows == t.head.shape[0]
+        data_map = {k: v.head for k, v in tables.items()}
+        return self.eval(data_map = data_map, data_model=data_model, narrow=narrow)
 
     # characterization
 
+    def get_tables(self):
+        """Get a dictionary of all tables used in an operator DAG,
+        raise an exception if the values are not consistent."""
+        tables = {}
+        for i in range(len(self.sources)):
+            s = self.sources[i]
+            ti = s.get_tables()
+            for (k, v) in ti.items():
+                assert isinstance(v, OperatorPlatform)
+                assert v.node_name == "TableDescription"
+                if k in tables.keys():
+                    if not v.same_table(tables[k]):
+                        raise ValueError(
+                            "Table " + k + " has two different representation objects"
+                        )
+                else:
+                    tables[k] = v
+        return tables
+
     def columns_used_from_sources(self, using=None):
-        """Get column names used from direct source nodes when this node is exececuted
+        """Get column names used from direct source nodes when this ops is exececuted
         with the using columns (None means all)."""
         raise NotImplementedError("base method called")
 
@@ -172,7 +213,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def _equiv_nodes(self, other):
-        """Check if immediate node structure is equivalent, does not check child nodes"""
+        """Check if immediate ops structure is equivalent, does not check child nodes"""
         raise NotImplementedError("base method called")
 
     def __eq__(self, other):
@@ -328,7 +369,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             column_types=column_types,
         )
 
-    # implement builders for all non-initial node types on base class
+    # implement builders for all non-initial ops types on base class
     def extend_parsed(
         self, parsed_ops, *, partition_by=None, order_by=None, reverse=None
     ):
@@ -382,7 +423,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
                         order_by=order_by,
                         reverse=reverse,
                     )
-        # new node
+        # new ops
         return ExtendNode(
             source=self,
             parsed_ops=parsed_ops,
@@ -521,7 +562,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         )
 
 
-# Could also have general query as starting node, but don't see a lot of point to
+# Could also have general query as starting ops, but don't see a lot of point to
 # it until somebody needs it.
 
 

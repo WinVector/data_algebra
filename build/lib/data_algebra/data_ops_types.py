@@ -106,27 +106,6 @@ class OperatorPlatform:
         """
         return other.apply_to(self)
 
-    # characterization
-
-    def get_tables(self):
-        """Get a dictionary of all tables used in an operator DAG,
-        raise an exception if the values are not consistent."""
-        tables = {}
-        for i in range(len(self.sources)):
-            s = self.sources[i]
-            ti = s.get_tables()
-            for (k, v) in ti.items():
-                assert isinstance(v, OperatorPlatform)
-                assert v.node_name == "TableDescription"
-                if k in tables.keys():
-                    if not v.same_table(tables[k]):
-                        raise ValueError(
-                            "Table " + k + " has two different representation objects"
-                        )
-                else:
-                    tables[k] = v
-        return tables
-
     # convenience
 
     def ex(self, *, data_model=None, narrow=True, allow_limited_tables=False):
@@ -138,16 +117,14 @@ class OperatorPlatform:
         :param allow_limited_tables: logical, if True allow execution on non-complete tables
         :return: table result
         """
-        tables = self.get_tables()
-        for t in tables.values():
-            assert t.head is not None
-            if len(tables) > 1:
-                assert t.table_name_was_set_by_user
-            if not allow_limited_tables:
-                assert t.limit_was is None
-                assert t.nrows == t.head.shape[0]
-        data_map = {k: v.head for k, v in tables.items()}
-        return self.eval(data_map = data_map, data_model=data_model, narrow=narrow)
+        raise NotImplementedError("base class called")
+
+    # characterization
+
+    def get_tables(self):
+        """Get a dictionary of all tables used in an operator DAG,
+        raise an exception if the values are not consistent."""
+        raise NotImplementedError("base class called")
 
     # info
 
@@ -159,7 +136,7 @@ class OperatorPlatform:
     def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
         raise NotImplementedError("base method called")
 
-    # define builders for all non-initial node types on base class
+    # define builders for all non-initial ops types on base class
 
     def extend_parsed(
         self, parsed_ops, *, partition_by=None, order_by=None, reverse=None
@@ -206,7 +183,7 @@ class OperatorPlatform:
         self, blocks_in=None, blocks_out=None, strict=False, temp_namer=None
     ):
         if (blocks_in is None) and (blocks_out is None):
-            return self  # NO-OP, return source node
+            return self  # NO-OP, return source ops
         return self.convert_records(
             data_algebra.cdata.RecordMap(
                 blocks_in=blocks_in, blocks_out=blocks_out, strict=strict

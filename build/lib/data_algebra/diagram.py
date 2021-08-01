@@ -41,8 +41,8 @@ def _to_digraph_r_nodes(ops, dot, table_keys, nextid, edges):
             node_id = nextid[0]
             table_keys[ops.key] = node_id
             nextid[0] = node_id + 1
-            dot.attr("node", shape="folder", color="blue")
-            dot.node(str(node_id), _get_op_str(ops))
+            dot.attr("ops", shape="folder", color="blue")
+            dot.ops(str(node_id), _get_op_str(ops))
             return node_id
     source_ids = [
         _to_digraph_r_nodes(
@@ -59,8 +59,8 @@ def _to_digraph_r_nodes(ops, dot, table_keys, nextid, edges):
     else:
         for sub_id in source_ids:
             edges.append((str(sub_id), str(node_id), None))
-    dot.attr("node", shape="note", color="darkgreen")
-    dot.node(str(node_id), _get_op_str(ops))
+    dot.attr("ops", shape="note", color="darkgreen")
+    dot.ops(str(node_id), _get_op_str(ops))
     return node_id
 
 

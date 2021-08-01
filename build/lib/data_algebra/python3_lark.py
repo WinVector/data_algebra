@@ -184,7 +184,7 @@ async_for: "async" "for" exprlist "in" or_test [comp_iter]
 comp_for: "for" exprlist "in" or_test [comp_iter]
 comp_if: "if" test_nocond [comp_iter]
 
-// not used in grammar, but may appear in "node" passed from Parser to Compiler
+// not used in grammar, but may appear in "ops" passed from Parser to Compiler
 encoding_decl: NAME
 
 yield_expr: "yield" [yield_arg]

@@ -43,6 +43,12 @@
                                 <a class="function" href="#ViewRepresentation.merged_rep_id">merged_rep_id</a>
                         </li>
                         <li>
+                                <a class="function" href="#ViewRepresentation.ex">ex</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#ViewRepresentation.get_tables">get_tables</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#ViewRepresentation.columns_used_from_sources">columns_used_from_sources</a>
                         </li>
                         <li>
@@ -528,12 +534,53 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">merged_rep_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;node+ &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s2">&quot;ops+ &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+    <span class="c1"># convenience</span>
+
+    <span class="k">def</span> <span class="nf">ex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">allow_limited_tables</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate operators with respect to Pandas data frames already stored in the operator chain.</span>
+
+<span class="sd">        :param data_model: adaptor to data dialect (Pandas for now)</span>
+<span class="sd">        :param narrow: logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">        :param allow_limited_tables: logical, if True allow execution on non-complete tables</span>
+<span class="sd">        :return: table result</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">table_name_was_set_by_user</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_limited_tables</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">limit_was</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">nrows</span> <span class="o">==</span> <span class="n">t</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">data_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">head</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span> <span class="o">=</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 
     <span class="c1"># characterization</span>
 
+    <span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a dictionary of all tables used in an operator DAG,</span>
+<span class="sd">        raise an exception if the values are not consistent.&quot;&quot;&quot;</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">)):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">ti</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ti</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">OperatorPlatform</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="n">v</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;TableDescription&quot;</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">same_table</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="n">k</span><span class="p">]):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="s2">&quot;Table &quot;</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot; has two different representation objects&quot;</span>
+                        <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tables</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">tables</span>
+
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get column names used from direct source nodes when this node is exececuted</span>
+        <span class="sd">&quot;&quot;&quot;Get column names used from direct source nodes when this ops is exececuted</span>
 <span class="sd">        with the using columns (None means all).&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
@@ -621,7 +668,7 @@
 
     <span class="c1"># noinspection PyMethodMayBeStatic,PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">_equiv_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Check if immediate node structure is equivalent, does not check child nodes&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Check if immediate ops structure is equivalent, does not check child nodes&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -777,7 +824,7 @@
             <span class="n">column_types</span><span class="o">=</span><span class="n">column_types</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="c1"># implement builders for all non-initial node types on base class</span>
+    <span class="c1"># implement builders for all non-initial ops types on base class</span>
     <span class="k">def</span> <span class="nf">extend_parsed</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">partition_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
@@ -831,7 +878,7 @@
                         <span class="n">order_by</span><span class="o">=</span><span class="n">order_by</span><span class="p">,</span>
                         <span class="n">reverse</span><span class="o">=</span><span class="n">reverse</span><span class="p">,</span>
                     <span class="p">)</span>
-        <span class="c1"># new node</span>
+        <span class="c1"># new ops</span>
         <span class="k">return</span> <span class="n">ExtendNode</span><span class="p">(</span>
             <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span>
@@ -970,7 +1017,7 @@
         <span class="p">)</span>
 
 
-<span class="c1"># Could also have general query as starting node, but don&#39;t see a lot of point to</span>
+<span class="c1"># Could also have general query as starting ops, but don&#39;t see a lot of point to</span>
 <span class="c1"># it until somebody needs it.</span>
 
 
@@ -2376,12 +2423,53 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">merged_rep_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;node+ &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s2">&quot;ops+ &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+    <span class="c1"># convenience</span>
+
+    <span class="k">def</span> <span class="nf">ex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">allow_limited_tables</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate operators with respect to Pandas data frames already stored in the operator chain.</span>
+
+<span class="sd">        :param data_model: adaptor to data dialect (Pandas for now)</span>
+<span class="sd">        :param narrow: logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">        :param allow_limited_tables: logical, if True allow execution on non-complete tables</span>
+<span class="sd">        :return: table result</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">table_name_was_set_by_user</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_limited_tables</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">limit_was</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">nrows</span> <span class="o">==</span> <span class="n">t</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">data_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">head</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span> <span class="o">=</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 
     <span class="c1"># characterization</span>
 
+    <span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a dictionary of all tables used in an operator DAG,</span>
+<span class="sd">        raise an exception if the values are not consistent.&quot;&quot;&quot;</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">)):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">ti</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ti</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">OperatorPlatform</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="n">v</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;TableDescription&quot;</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">same_table</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="n">k</span><span class="p">]):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="s2">&quot;Table &quot;</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot; has two different representation objects&quot;</span>
+                        <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tables</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">tables</span>
+
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get column names used from direct source nodes when this node is exececuted</span>
+        <span class="sd">&quot;&quot;&quot;Get column names used from direct source nodes when this ops is exececuted</span>
 <span class="sd">        with the using columns (None means all).&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
@@ -2469,7 +2557,7 @@
 
     <span class="c1"># noinspection PyMethodMayBeStatic,PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">_equiv_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Check if immediate node structure is equivalent, does not check child nodes&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Check if immediate ops structure is equivalent, does not check child nodes&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -2625,7 +2713,7 @@
             <span class="n">column_types</span><span class="o">=</span><span class="n">column_types</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="c1"># implement builders for all non-initial node types on base class</span>
+    <span class="c1"># implement builders for all non-initial ops types on base class</span>
     <span class="k">def</span> <span class="nf">extend_parsed</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">partition_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
@@ -2679,7 +2767,7 @@
                         <span class="n">order_by</span><span class="o">=</span><span class="n">order_by</span><span class="p">,</span>
                         <span class="n">reverse</span><span class="o">=</span><span class="n">reverse</span><span class="p">,</span>
                     <span class="p">)</span>
-        <span class="c1"># new node</span>
+        <span class="c1"># new ops</span>
         <span class="k">return</span> <span class="n">ExtendNode</span><span class="p">(</span>
             <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span>
@@ -2877,12 +2965,93 @@ Abstract base class.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">merged_rep_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;node+ &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s2">&quot;ops+ &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 </pre></div>
 
         </details>
 
     
+
+                            </div>
+                            <div id="ViewRepresentation.ex" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#ViewRepresentation.ex">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">ex</span><span class="signature">(self, *, data_model=None, narrow=True, allow_limited_tables=False)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">ex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">allow_limited_tables</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate operators with respect to Pandas data frames already stored in the operator chain.</span>
+
+<span class="sd">        :param data_model: adaptor to data dialect (Pandas for now)</span>
+<span class="sd">        :param narrow: logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">        :param allow_limited_tables: logical, if True allow execution on non-complete tables</span>
+<span class="sd">        :return: table result</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">table_name_was_set_by_user</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_limited_tables</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">limit_was</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">nrows</span> <span class="o">==</span> <span class="n">t</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">data_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">head</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span> <span class="o">=</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Evaluate operators with respect to Pandas data frames already stored in the operator chain.</p>
+
+<p>:param data_model: adaptor to data dialect (Pandas for now)
+:param narrow: logical, if True don't copy unexpected columns
+:param allow_limited_tables: logical, if True allow execution on non-complete tables
+:return: table result</p>
+</div>
+
+
+                            </div>
+                            <div id="ViewRepresentation.get_tables" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#ViewRepresentation.get_tables">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">get_tables</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a dictionary of all tables used in an operator DAG,</span>
+<span class="sd">        raise an exception if the values are not consistent.&quot;&quot;&quot;</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">)):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">ti</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ti</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">OperatorPlatform</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="n">v</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;TableDescription&quot;</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">same_table</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="n">k</span><span class="p">]):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="s2">&quot;Table &quot;</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot; has two different representation objects&quot;</span>
+                        <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tables</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">tables</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Get a dictionary of all tables used in an operator DAG,
+raise an exception if the values are not consistent.</p>
+</div>
+
 
                             </div>
                             <div id="ViewRepresentation.columns_used_from_sources" class="classattr">
@@ -2896,14 +3065,14 @@ Abstract base class.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get column names used from direct source nodes when this node is exececuted</span>
+        <span class="sd">&quot;&quot;&quot;Get column names used from direct source nodes when this ops is exececuted</span>
 <span class="sd">        with the using columns (None means all).&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Get column names used from direct source nodes when this node is exececuted
+            <div class="docstring"><p>Get column names used from direct source nodes when this ops is exececuted
 with the using columns (None means all).</p>
 </div>
 
@@ -3373,7 +3542,7 @@ with the using columns (None means all).</p>
                         <span class="n">order_by</span><span class="o">=</span><span class="n">order_by</span><span class="p">,</span>
                         <span class="n">reverse</span><span class="o">=</span><span class="n">reverse</span><span class="p">,</span>
                     <span class="p">)</span>
-        <span class="c1"># new node</span>
+        <span class="c1"># new ops</span>
         <span class="k">return</span> <span class="n">ExtendNode</span><span class="p">(</span>
             <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span>
@@ -3721,8 +3890,6 @@ with the using columns (None means all).</p>
                                 <dd id="ViewRepresentation.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="ViewRepresentation.apply_to" class="function"><a href="data_ops_types.html#OperatorPlatform.apply_to">apply_to</a></dd>
                 <dd id="ViewRepresentation.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
-                <dd id="ViewRepresentation.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
-                <dd id="ViewRepresentation.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="ViewRepresentation.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="ViewRepresentation.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="ViewRepresentation.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -4224,7 +4391,7 @@ raise an exception if the values are not consistent</p>
 
         </details>
 
-            <div class="docstring"><p>Get column names used from direct source nodes when this node is exececuted
+            <div class="docstring"><p>Get column names used from direct source nodes when this ops is exececuted
 with the using columns (None means all).</p>
 </div>
 
@@ -4255,7 +4422,8 @@ with the using columns (None means all).</p>
                                 <h5>Inherited Members</h5>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
-                                <dd id="TableDescription.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
+                                <dd id="TableDescription.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
+                <dd id="TableDescription.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="TableDescription.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="TableDescription.to_python" class="function"><a href="#ViewRepresentation.to_python">to_python</a></dd>
                 <dd id="TableDescription.to_sql" class="function"><a href="#ViewRepresentation.to_sql">to_sql</a></dd>
@@ -4282,7 +4450,6 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="TableDescription.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="TableDescription.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
-                <dd id="TableDescription.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="TableDescription.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="TableDescription.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="TableDescription.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -4904,7 +5071,7 @@ Abstract base class.</p>
 
         </details>
 
-            <div class="docstring"><p>Get column names used from direct source nodes when this node is exececuted
+            <div class="docstring"><p>Get column names used from direct source nodes when this ops is exececuted
 with the using columns (None means all).</p>
 </div>
 
@@ -5001,6 +5168,8 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="ExtendNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
+                <dd id="ExtendNode.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
+                <dd id="ExtendNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="ExtendNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="ExtendNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="ExtendNode.forbidden_columns" class="function"><a href="#ViewRepresentation.forbidden_columns">forbidden_columns</a></dd>
@@ -5029,8 +5198,6 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="ExtendNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="ExtendNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
-                <dd id="ExtendNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
-                <dd id="ExtendNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="ExtendNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="ExtendNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="ExtendNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -5359,7 +5526,7 @@ Abstract base class.</p>
 
         </details>
 
-            <div class="docstring"><p>Get column names used from direct source nodes when this node is exececuted
+            <div class="docstring"><p>Get column names used from direct source nodes when this ops is exececuted
 with the using columns (None means all).</p>
 </div>
 
@@ -5455,6 +5622,8 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="ProjectNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
+                <dd id="ProjectNode.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
+                <dd id="ProjectNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="ProjectNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="ProjectNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="ProjectNode.to_python" class="function"><a href="#ViewRepresentation.to_python">to_python</a></dd>
@@ -5482,8 +5651,6 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="ProjectNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="ProjectNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
-                <dd id="ProjectNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
-                <dd id="ProjectNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="ProjectNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="ProjectNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="ProjectNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -5659,7 +5826,7 @@ Abstract base class.</p>
 
         </details>
 
-            <div class="docstring"><p>Get column names used from direct source nodes when this node is exececuted
+            <div class="docstring"><p>Get column names used from direct source nodes when this ops is exececuted
 with the using columns (None means all).</p>
 </div>
 
@@ -5739,6 +5906,8 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="SelectRowsNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
+                <dd id="SelectRowsNode.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
+                <dd id="SelectRowsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="SelectRowsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="SelectRowsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="SelectRowsNode.forbidden_columns" class="function"><a href="#ViewRepresentation.forbidden_columns">forbidden_columns</a></dd>
@@ -5767,8 +5936,6 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="SelectRowsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="SelectRowsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
-                <dd id="SelectRowsNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
-                <dd id="SelectRowsNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="SelectRowsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="SelectRowsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="SelectRowsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -5973,7 +6140,7 @@ Abstract base class.</p>
 
         </details>
 
-            <div class="docstring"><p>Get column names used from direct source nodes when this node is exececuted
+            <div class="docstring"><p>Get column names used from direct source nodes when this ops is exececuted
 with the using columns (None means all).</p>
 </div>
 
@@ -6053,6 +6220,8 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="SelectColumnsNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
+                <dd id="SelectColumnsNode.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
+                <dd id="SelectColumnsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="SelectColumnsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="SelectColumnsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="SelectColumnsNode.to_python" class="function"><a href="#ViewRepresentation.to_python">to_python</a></dd>
@@ -6080,8 +6249,6 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="SelectColumnsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="SelectColumnsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
-                <dd id="SelectColumnsNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
-                <dd id="SelectColumnsNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="SelectColumnsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="SelectColumnsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="SelectColumnsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -6286,7 +6453,7 @@ Abstract base class.</p>
 
         </details>
 
-            <div class="docstring"><p>Get column names used from direct source nodes when this node is exececuted
+            <div class="docstring"><p>Get column names used from direct source nodes when this ops is exececuted
 with the using columns (None means all).</p>
 </div>
 
@@ -6366,6 +6533,8 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="DropColumnsNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
+                <dd id="DropColumnsNode.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
+                <dd id="DropColumnsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="DropColumnsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="DropColumnsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="DropColumnsNode.to_python" class="function"><a href="#ViewRepresentation.to_python">to_python</a></dd>
@@ -6393,8 +6562,6 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="DropColumnsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="DropColumnsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
-                <dd id="DropColumnsNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
-                <dd id="DropColumnsNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="DropColumnsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="DropColumnsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="DropColumnsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -6599,7 +6766,7 @@ Abstract base class.</p>
 
         </details>
 
-            <div class="docstring"><p>Get column names used from direct source nodes when this node is exececuted
+            <div class="docstring"><p>Get column names used from direct source nodes when this ops is exececuted
 with the using columns (None means all).</p>
 </div>
 
@@ -6702,6 +6869,8 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="OrderRowsNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
+                <dd id="OrderRowsNode.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
+                <dd id="OrderRowsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="OrderRowsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="OrderRowsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="OrderRowsNode.forbidden_columns" class="function"><a href="#ViewRepresentation.forbidden_columns">forbidden_columns</a></dd>
@@ -6729,8 +6898,6 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="OrderRowsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="OrderRowsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
-                <dd id="OrderRowsNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
-                <dd id="OrderRowsNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="OrderRowsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="OrderRowsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="OrderRowsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -6974,7 +7141,7 @@ Abstract base class.</p>
 
         </details>
 
-            <div class="docstring"><p>Get column names used from direct source nodes when this node is exececuted
+            <div class="docstring"><p>Get column names used from direct source nodes when this ops is exececuted
 with the using columns (None means all).</p>
 </div>
 
@@ -7053,6 +7220,8 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="RenameColumnsNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
+                <dd id="RenameColumnsNode.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
+                <dd id="RenameColumnsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="RenameColumnsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="RenameColumnsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="RenameColumnsNode.to_python" class="function"><a href="#ViewRepresentation.to_python">to_python</a></dd>
@@ -7080,8 +7249,6 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="RenameColumnsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="RenameColumnsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
-                <dd id="RenameColumnsNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
-                <dd id="RenameColumnsNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="RenameColumnsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="RenameColumnsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="RenameColumnsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -7336,7 +7503,7 @@ Abstract base class.</p>
 
         </details>
 
-            <div class="docstring"><p>Get column names used from direct source nodes when this node is exececuted
+            <div class="docstring"><p>Get column names used from direct source nodes when this ops is exececuted
 with the using columns (None means all).</p>
 </div>
 
@@ -7429,6 +7596,8 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="NaturalJoinNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
+                <dd id="NaturalJoinNode.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
+                <dd id="NaturalJoinNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="NaturalJoinNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="NaturalJoinNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="NaturalJoinNode.forbidden_columns" class="function"><a href="#ViewRepresentation.forbidden_columns">forbidden_columns</a></dd>
@@ -7457,8 +7626,6 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="NaturalJoinNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="NaturalJoinNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
-                <dd id="NaturalJoinNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
-                <dd id="NaturalJoinNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="NaturalJoinNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="NaturalJoinNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="NaturalJoinNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -7690,7 +7857,7 @@ Abstract base class.</p>
 
         </details>
 
-            <div class="docstring"><p>Get column names used from direct source nodes when this node is exececuted
+            <div class="docstring"><p>Get column names used from direct source nodes when this ops is exececuted
 with the using columns (None means all).</p>
 </div>
 
@@ -7789,6 +7956,8 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="ConcatRowsNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
+                <dd id="ConcatRowsNode.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
+                <dd id="ConcatRowsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="ConcatRowsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="ConcatRowsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="ConcatRowsNode.forbidden_columns" class="function"><a href="#ViewRepresentation.forbidden_columns">forbidden_columns</a></dd>
@@ -7817,8 +7986,6 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="ConcatRowsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="ConcatRowsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
-                <dd id="ConcatRowsNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
-                <dd id="ConcatRowsNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="ConcatRowsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="ConcatRowsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="ConcatRowsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -8065,7 +8232,7 @@ Abstract base class.</p>
 
         </details>
 
-            <div class="docstring"><p>Get column names used from direct source nodes when this node is exececuted
+            <div class="docstring"><p>Get column names used from direct source nodes when this ops is exececuted
 with the using columns (None means all).</p>
 </div>
 
@@ -8195,6 +8362,8 @@ with the using columns (None means all).</p>
                                 <dl>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="ConvertRecordsNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
+                <dd id="ConvertRecordsNode.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
+                <dd id="ConvertRecordsNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="ConvertRecordsNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="ConvertRecordsNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="ConvertRecordsNode.forbidden_columns" class="function"><a href="#ViewRepresentation.forbidden_columns">forbidden_columns</a></dd>
@@ -8223,8 +8392,6 @@ with the using columns (None means all).</p>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="ConvertRecordsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="ConvertRecordsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
-                <dd id="ConvertRecordsNode.get_tables" class="function"><a href="data_ops_types.html#OperatorPlatform.get_tables">get_tables</a></dd>
-                <dd id="ConvertRecordsNode.ex" class="function"><a href="data_ops_types.html#OperatorPlatform.ex">ex</a></dd>
                 <dd id="ConvertRecordsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="ConvertRecordsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="ConvertRecordsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
