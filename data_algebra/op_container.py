@@ -11,13 +11,13 @@ one = data_algebra.expr_rep.Value(1)
 
 
 class OpC(data_algebra.data_ops_types.OperatorPlatform):
-    """Container that redirects to another to allow method chaining."""
+    """Container that redirects to another to non-quoted notation."""
 
-    node: data_algebra.data_ops_types.OperatorPlatform
+    ops: data_algebra.data_ops_types.OperatorPlatform
     column_namespace: SimpleNamespace
 
     def __init__(self):
-        self.node = None
+        self.ops = None
         self.column_namespace = SimpleNamespace()  # allows a dot notation
         data_algebra.data_ops_types.OperatorPlatform.__init__(
             self, node_name="container", column_map=collections.OrderedDict()
@@ -26,81 +26,69 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
     def set(self, other):
         assert isinstance(other, data_algebra.data_ops_types.OperatorPlatform)
         assert not isinstance(other, OpC)  # don't allow deep nesting for now
-        self.node = other
+        self.ops = other
         self.column_namespace.__dict__.clear()
-        self.column_namespace.__dict__.update(self.node.column_map)
+        self.column_namespace.__dict__.update(self.ops.column_map)
         self.column_map.clear()
-        self.column_map.update(self.node.column_map)
+        self.column_map.update(self.ops.column_map)
         return self
 
-    def describe_table(
-        self,
-        d,
-        table_name="data_frame",
-        *,
-        qualifiers=None,
-        sql_meta=None,
-        column_types=None,
-        row_limit=7
-    ):
-        td = data_algebra.data_ops.describe_table(
-            d=d,
-            table_name=table_name,
-            qualifiers=qualifiers,
-            sql_meta=sql_meta,
-            column_types=column_types,
-            row_limit=row_limit,
-        )
-        return self.set(td)
+    def ex(self, *, data_model=None, narrow=True, allow_limited_tables=False):
+        """
+        Evaluate operators with respect to Pandas data frames already stored in the operator chain.
 
-    def ops(self):
-        return self.node
+        :param data_model: adaptor to data dialect (Pandas for now)
+        :param narrow: logical, if True don't copy unexpected columns
+        :param allow_limited_tables: logical, if True allow execution on non-complete tables
+        :return: table result
+        """
+        return self.ops.transform(data_model=data_model, narrow=narrow, allow_limited_tables=allow_limited_tables)
 
     # noinspection PyPep8Naming
     def transform(self, X, *, data_model=None, narrow=True):
-        return self.node.transform(X=X, data_model=data_model, narrow=narrow)
+        return self.ops.transform(X=X, data_model=data_model, narrow=narrow)
 
     # noinspection PyPep8Naming
     def act_on(self, X, *, data_model=None):
-        self.set(self.node.act_on(X=X, data_model=data_model))
+        self.set(self.ops.act_on(X=X, data_model=data_model))
         return self
 
     def apply_to(self, a, *, target_table_key=None):
-        self.set(self.node.apply_to(a=a, target_table_key=target_table_key))
+        self.set(self.ops.apply_to(a=a, target_table_key=target_table_key))
         return self
 
     def __rrshift__(self, other):  # override other >> self
-        self.set(self.node.__rrshift__(other))
+        self.set(self.ops.__rrshift__(other))
         return self
 
     def __rshift__(self, other):  # override self >> other
-        self.set(self.node.__rshift__(other))
+        self.set(self.ops.__rshift__(other))
         return self
 
     # composition
     def add(self, other):
-        self.set(self.node.add(other))
+        self.set(self.ops.add(other))
         return self
 
     # info
 
     def columns_produced(self):
-        return self.node.columns_produced()
+        return self.ops.columns_produced()
 
     # query generation
 
     def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
-        return self.node.to_near_sql_implementation(
+        return self.ops.to_near_sql_implementation(
             db_model=db_model, using=using, temp_id_source=temp_id_source
         )
 
-    # define builders for all non-initial node types on base class
+    # define builders for all non-initial ops types on base class
 
     def extend_parsed(
         self, parsed_ops, *, partition_by=None, order_by=None, reverse=None
     ):
         self.set(
-            self.node.extend_parsed(
+            self.ops.extend_parsed(
                 parsed_ops=parsed_ops,
                 partition_by=partition_by,
                 order_by=order_by,
@@ -111,22 +99,22 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
 
     def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
         self.set(
-            self.node.extend(
+            self.ops.extend(
                 ops=ops, partition_by=partition_by, order_by=order_by, reverse=reverse
             )
         )
         return self
 
     def project_parsed(self, parsed_ops=None, *, group_by=None):
-        self.set(self.node.project_parsed(parsed_ops=parsed_ops, group_by=group_by))
+        self.set(self.ops.project_parsed(parsed_ops=parsed_ops, group_by=group_by))
         return self
 
     def project(self, ops=None, *, group_by=None):
-        self.set(self.node.project(ops=ops, group_by=group_by,))
+        self.set(self.ops.project(ops=ops, group_by=group_by, ))
         return self
 
     def natural_join(self, b, *, by, jointype, check_all_common_keys_in_by=False):
-        self.set(self.node.natural_join(
+        self.set(self.ops.natural_join(
             b=b,
             by=by,
             jointype=jointype,
@@ -135,42 +123,42 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
 
     def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):
         self.set(
-            self.node.concat_rows(b=b, id_column=id_column, a_name=a_name, b_name=b_name)
+            self.ops.concat_rows(b=b, id_column=id_column, a_name=a_name, b_name=b_name)
         )
         return self
 
     def select_rows_parsed(self, parsed_expr):
-        self.set(self.node.select_rows_parsed(parsed_expr=parsed_expr))
+        self.set(self.ops.select_rows_parsed(parsed_expr=parsed_expr))
         return self
 
     def select_rows(self, expr):
-        self.set(self.node.select_rows(expr=expr,))
+        self.set(self.ops.select_rows(expr=expr, ))
         return self
 
     def drop_columns(self, column_deletions):
-        self.set(self.node.drop_columns(column_deletions=column_deletions))
+        self.set(self.ops.drop_columns(column_deletions=column_deletions))
         return self
 
     def select_columns(self, columns):
-        self.set(self.node.select_columns(columns=columns))
+        self.set(self.ops.select_columns(columns=columns))
         return self
 
     def rename_columns(self, column_remapping):
-        self.set(self.node.rename_columns(column_remapping=column_remapping))
+        self.set(self.ops.rename_columns(column_remapping=column_remapping))
         return self
 
     def order_rows(self, columns, *, reverse=None, limit=None):
-        self.set(self.node.order_rows(columns=columns, reverse=reverse, limit=limit))
+        self.set(self.ops.order_rows(columns=columns, reverse=reverse, limit=limit))
         return self
 
     def convert_records(self, record_map, *, temp_namer=None):
-        self.node.convert_records(record_map=record_map, temp_namer=temp_namer)
+        self.ops.convert_records(record_map=record_map, temp_namer=temp_namer)
         return self
 
     def map_records(
         self, blocks_in=None, blocks_out=None, strict=False, temp_namer=None
     ):
-        self.node.map_records(
+        self.ops.map_records(
             blocks_in=blocks_in,
             blocks_out=blocks_out,
             strict=strict,
@@ -182,12 +170,12 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
 
     # noinspection PyPep8Naming, PyUnusedLocal
     def fit(self, X, y=None):
-        self.node.fit(X=X, y=y)
+        self.ops.fit(X=X, y=y)
         return self
 
     # noinspection PyPep8Naming, PyUnusedLocal
     def fit_transform(self, X, y=None):
-        return self.node.fit_transform(X=X, y=y)
+        return self.ops.fit_transform(X=X, y=y)
 
     def get_feature_names(self, input_features=None):
-        return self.node.get_feature_names(input_features=input_features)
+        return self.ops.get_feature_names(input_features=input_features)

@@ -28,7 +28,7 @@ def test_container_1():
     op_container = OpC()
     _ = op_container.column_namespace
     ops2 = (
-        op_container.describe_table(d, "d")
+        op_container.set(describe_table(d, "d"))
             .extend({"probability": (_.assessmentTotal * scale).exp()})
             .extend({"total": _.probability.sum()}, partition_by="subjectID")
             .extend({"probability": _.probability / _.total})
@@ -44,7 +44,7 @@ def test_container_1():
             .select_rows(_.row_number == 1)
             .select_columns(["subjectID", "surveyCategory", "probability", "ncat"])
             .rename_columns({"diagnosis": "surveyCategory"})
-            .ops()
+            .ops
     )
 
     db_handle = data_algebra.MySQL.MySQLModel().db_handle(conn=None)

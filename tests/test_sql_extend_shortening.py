@@ -1,6 +1,5 @@
 
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
-from data_algebra.op_container import OpC, one
 import data_algebra.test_util
 
 import data_algebra.MySQL
