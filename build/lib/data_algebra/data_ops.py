@@ -556,10 +556,10 @@ class TableDescription(ViewRepresentation):
             self, column_names=column_names, node_name="TableDescription"
         )
         if table_name is None:
-            self.table_name_was_set_by_user = True
+            self.table_name_was_set_by_user = False
             table_name = "data_frame"
         else:
-            self.table_name_was_set_by_user = False
+            self.table_name_was_set_by_user = True
         assert isinstance(table_name, str)
         if head is not None:
             if set([c for c in head.columns]) != set(column_names):
