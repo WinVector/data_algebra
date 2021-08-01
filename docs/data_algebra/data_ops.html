@@ -166,6 +166,9 @@
                     <a class="function" href="#describe_table">describe_table</a>
             </li>
             <li>
+                    <a class="function" href="#table">table</a>
+            </li>
+            <li>
                     <a class="class" href="#ExtendNode">ExtendNode</a>
                             <ul class="memberlist">
                         <li>
@@ -1199,6 +1202,26 @@
         <span class="n">head</span><span class="o">=</span><span class="n">head</span><span class="p">,</span>
         <span class="n">limit_was</span><span class="o">=</span><span class="n">row_limit</span><span class="p">,</span>
         <span class="n">nrows</span><span class="o">=</span><span class="n">nrows</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">table</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Capture a table for later use</span>
+
+<span class="sd">    :param d: Pandas data frame to capture</span>
+<span class="sd">    :param table_name: name for this table</span>
+<span class="sd">    :return: a table description</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">describe_table</span><span class="p">(</span>
+        <span class="n">d</span><span class="o">=</span><span class="n">d</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span>
+        <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">column_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">row_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">keep_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">keep_all</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
 
 
@@ -4353,6 +4376,47 @@ with the using columns (None means all).</p>
 :param keep_sample: logical, if True retain head of table
 :param keep_all: logical, if True retain all of table
 :return: TableDescription</p>
+</div>
+
+
+                </section>
+                <section id="table">
+                            <div class="attr function"><a class="headerlink" href="#table">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">table</span><span class="signature">(d, table_name)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">table</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Capture a table for later use</span>
+
+<span class="sd">    :param d: Pandas data frame to capture</span>
+<span class="sd">    :param table_name: name for this table</span>
+<span class="sd">    :return: a table description</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">describe_table</span><span class="p">(</span>
+        <span class="n">d</span><span class="o">=</span><span class="n">d</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span>
+        <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">column_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">row_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">keep_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">keep_all</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Capture a table for later use</p>
+
+<p>:param d: Pandas data frame to capture
+:param table_name: name for this table
+:return: a table description</p>
 </div>
 
 

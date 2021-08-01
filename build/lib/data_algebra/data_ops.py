@@ -756,6 +756,26 @@ def describe_table(
     )
 
 
+def table(d, table_name):
+    """
+    Capture a table for later use
+
+    :param d: Pandas data frame to capture
+    :param table_name: name for this table
+    :return: a table description
+    """
+    return describe_table(
+        d=d,
+        table_name=table_name,
+        qualifiers=None,
+        sql_meta=None,
+        column_types=None,
+        row_limit=None,
+        keep_sample=True,
+        keep_all=True,
+    )
+
+
 class ExtendNode(ViewRepresentation):
     def __init__(
         self, *, source, parsed_ops, partition_by=None, order_by=None, reverse=None
