@@ -15,10 +15,12 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
 
     ops: data_algebra.data_ops_types.OperatorPlatform
     column_namespace: SimpleNamespace
+    used_result: bool
 
     def __init__(self):
         self.ops = None
         self.column_namespace = SimpleNamespace()  # allows a dot notation
+        self.used_result = False
         data_algebra.data_ops_types.OperatorPlatform.__init__(
             self, node_name="container", column_map=collections.OrderedDict()
         )
@@ -33,6 +35,14 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         self.column_map.update(self.ops.column_map)
         return self
 
+    def start(self, other):
+        assert self.ops is None
+        return self.set(other)
+
+    def get_ops(self):
+        self.used_result = True
+        return self.ops
+
     def ex(self, *, data_model=None, narrow=True, allow_limited_tables=False):
         """
         Evaluate operators with respect to Pandas data frames already stored in the operator chain.
@@ -42,7 +52,8 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         :param allow_limited_tables: logical, if True allow execution on non-complete tables
         :return: table result
         """
-        return self.ops.transform(data_model=data_model, narrow=narrow, allow_limited_tables=allow_limited_tables)
+        self.used_result = True
+        return self.ops.ex(data_model=data_model, narrow=narrow, allow_limited_tables=allow_limited_tables)
 
     # noinspection PyPep8Naming
     def transform(self, X, *, data_model=None, narrow=True):
@@ -179,3 +190,18 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
 
     def get_feature_names(self, input_features=None):
         return self.ops.get_feature_names(input_features=input_features)
+
+
+# pop 0343 context manager
+# https://www.python.org/dev/peps/pep-0343/#use-cases
+class Pipeline:
+    def __init__(self):
+        self.container = OpC()
+
+    def __enter__(self):
+        return self.container, self.container.column_namespace
+
+    def __exit__(self, *args):
+        assert self.container is not None
+        assert self.container.used_result
+        self.container = None
