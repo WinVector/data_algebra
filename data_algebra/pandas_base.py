@@ -123,12 +123,16 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         return self.pd.DataFrame(cols)
 
     def add_data_frame_columns_to_data_frame_(self, res, transient_new_frame):
+        if (2 * transient_new_frame.shape[1]) > res.shape[1]:
+            # lots of columns path
+            # https://win-vector.com/2021/08/03/i-think-pandas-may-have-lost-the-plot/
+            for c in set(res.columns).intersection(set(transient_new_frame.columns)):
+                del res[c]
+            return self.pd.concat([res, transient_new_frame], axis=1)
+        # normal path
         for c in transient_new_frame.columns:
            res[c] = transient_new_frame[c]
         return res
-        # TODO: want to switch to this to avoid Pandas ick
-        # https://win-vector.com/2021/08/03/i-think-pandas-may-have-lost-the-plot/
-        #return self.pd.concat([res, transient_new_frame], axis=1)
 
     def extend_step(self, op, *, data_map, narrow):
         if op.node_name != "ExtendNode":
