@@ -84,30 +84,51 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                 assert data_algebra.util.compatible_types({types_seen[c]}.union({op.column_types[c]}))
         return res
 
-    def columns_to_frame_(self, cols):
+    def columns_to_frame_(self, cols, *, target_rows=0):
         """
-        Convert a dictionary of column names to series-like objects into a Pandas data frame.
+        Convert a dictionary of column names to series-like objects and scalars into a Pandas data frame.
 
         :param cols: dictionary mapping column names to columns
         :return: Pandas data frame.
         """
         # noinspection PyUnresolvedReferences
         assert isinstance(cols, dict)
-        # check columns all have the same length
-        if len(cols) > 1:
-            len_0 = None
-            for v in cols.items():
-                len_i = len(v)
-                if len_0 is None:
-                    len_0 = len_i
-                else:
-                    assert len_i == len_0
+        if len(cols) < 1:
+            return self.pd.DataFrame(cols)
+        for k, v in cols.items():
+            try:
+                target_rows = max(target_rows, len(v))
+            except TypeError:
+                target_rows = max(target_rows, 1)  # scalar
+        if target_rows < 1:
+            return self.pd.DataFrame(cols)
+
+        # agg can return scalars, which then can't be made into a self.pd.DataFrame
+        def promote_scalar(v, *, target_len):
+            # noinspection PyBroadException
+            try:
+                len_v = len(v)
+                if len_v != target_len:
+                    if len_v == 0:
+                        return [None] * target_len
+                    elif len_v == 1:
+                        return [v[0]] * target_len
+                    else:
+                        raise ValueError("incompatible column lengths")
+            except Exception:
+                return [v] * target_len  # scalar
+            return v
+
+        cols = {k: promote_scalar(v, target_len=target_rows) for (k, v) in cols.items()}
         return self.pd.DataFrame(cols)
 
     def add_data_frame_columns_to_data_frame_(self, res, transient_new_frame):
         for c in transient_new_frame.columns:
-            res[c] = transient_new_frame[c]
+           res[c] = transient_new_frame[c]
         return res
+        # TODO: want to switch to this to avoid Pandas ick
+        # https://win-vector.com/2021/08/03/i-think-pandas-may-have-lost-the-plot/
+        #return self.pd.concat([res, transient_new_frame], axis=1)
 
     def extend_step(self, op, *, data_map, narrow):
         if op.node_name != "ExtendNode":
@@ -124,10 +145,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         )
         if not window_situation:
             new_cols = {k: opk.evaluate(res) for k, opk in op.ops.items()}
-            for k, v in new_cols.items():
-                res[k] = v
-            # new_frame = self.columns_to_frame_(new_cols)
-            # res = self.add_data_frame_columns_to_data_frame_(res, new_frame)
+            # for k, v in new_cols.items():
+            #     res[k] = v
+            new_frame = self.columns_to_frame_(new_cols, target_rows=res.shape[0])
+            res = self.add_data_frame_columns_to_data_frame_(res, new_frame)
         else:
             data_algebra_temp_cols = {}
             standin_name = "_data_algebra_temp_g"  # name of an arbitrary input variable
@@ -273,25 +294,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                 cols[k] = vk
         else:
             cols = {"_data_table_temp_col": res["_data_table_temp_col"].agg("sum")}
-
-        target_rows = 1
-        for k, v in cols.items():
-            try:
-                target_rows = max(target_rows, len(v))
-            except Exception:
-                pass
-
         # agg can return scalars, which then can't be made into a self.pd.DataFrame
-        # TODO: move this into columns_to_frame_()
-        def promote_scalar(v, *, target_len):
-            # noinspection PyBroadException
-            try:
-                len(v)
-            except Exception:
-                return [v] * target_len
-            return v
-
-        cols = {k: promote_scalar(v, target_len=target_rows) for (k, v) in cols.items()}
         res = self.columns_to_frame_(cols)
         res = res.reset_index(drop=len(op.group_by) < 1)  # grouping variables in the index
         missing_group_cols = set(op.group_by) - set(res.columns)
