@@ -242,12 +242,16 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">add_data_frame_columns_to_data_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">transient_new_frame</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="c1"># lots of columns path</span>
+            <span class="c1"># https://win-vector.com/2021/08/03/i-think-pandas-may-have-lost-the-plot/</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">transient_new_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">)):</span>
+                <span class="k">del</span> <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">res</span><span class="p">,</span> <span class="n">transient_new_frame</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># normal path</span>
         <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
            <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">res</span>
-        <span class="c1"># TODO: want to switch to this to avoid Pandas ick</span>
-        <span class="c1"># https://win-vector.com/2021/08/03/i-think-pandas-may-have-lost-the-plot/</span>
-        <span class="c1">#return self.pd.concat([res, transient_new_frame], axis=1)</span>
 
     <span class="k">def</span> <span class="nf">extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ExtendNode&quot;</span><span class="p">:</span>
@@ -700,12 +704,16 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">add_data_frame_columns_to_data_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">transient_new_frame</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="c1"># lots of columns path</span>
+            <span class="c1"># https://win-vector.com/2021/08/03/i-think-pandas-may-have-lost-the-plot/</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">transient_new_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">)):</span>
+                <span class="k">del</span> <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">res</span><span class="p">,</span> <span class="n">transient_new_frame</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># normal path</span>
         <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
            <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">res</span>
-        <span class="c1"># TODO: want to switch to this to avoid Pandas ick</span>
-        <span class="c1"># https://win-vector.com/2021/08/03/i-think-pandas-may-have-lost-the-plot/</span>
-        <span class="c1">#return self.pd.concat([res, transient_new_frame], axis=1)</span>
 
     <span class="k">def</span> <span class="nf">extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ExtendNode&quot;</span><span class="p">:</span>
@@ -1314,12 +1322,16 @@ inheritance.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">add_data_frame_columns_to_data_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">transient_new_frame</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="c1"># lots of columns path</span>
+            <span class="c1"># https://win-vector.com/2021/08/03/i-think-pandas-may-have-lost-the-plot/</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">transient_new_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">)):</span>
+                <span class="k">del</span> <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">res</span><span class="p">,</span> <span class="n">transient_new_frame</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># normal path</span>
         <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
            <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">res</span>
-        <span class="c1"># TODO: want to switch to this to avoid Pandas ick</span>
-        <span class="c1"># https://win-vector.com/2021/08/03/i-think-pandas-may-have-lost-the-plot/</span>
-        <span class="c1">#return self.pd.concat([res, transient_new_frame], axis=1)</span>
 </pre></div>
 
         </details>
