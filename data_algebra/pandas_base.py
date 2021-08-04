@@ -282,6 +282,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                 pass
 
         # agg can return scalars, which then can't be made into a self.pd.DataFrame
+        # TODO: move this into columns_to_frame_()
         def promote_scalar(v, *, target_len):
             # noinspection PyBroadException
             try:
