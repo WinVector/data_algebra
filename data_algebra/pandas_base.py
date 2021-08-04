@@ -84,6 +84,31 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                 assert data_algebra.util.compatible_types({types_seen[c]}.union({op.column_types[c]}))
         return res
 
+    def columns_to_frame_(self, cols):
+        """
+        Convert a dictionary of column names to series-like objects into a Pandas data frame.
+
+        :param cols: dictionary mapping column names to columns
+        :return: Pandas data frame.
+        """
+        # noinspection PyUnresolvedReferences
+        assert isinstance(cols, dict)
+        # check columns all have the same length
+        if len(cols) > 1:
+            len_0 = None
+            for v in cols.items():
+                len_i = len(v)
+                if len_0 is None:
+                    len_0 = len_i
+                else:
+                    assert len_i == len_0
+        return self.pd.DataFrame(cols)
+
+    def add_data_frame_columns_to_data_frame_(self, res, transient_new_frame):
+        for c in transient_new_frame.columns:
+            res[c] = transient_new_frame[c]
+        return res
+
     def extend_step(self, op, *, data_map, narrow):
         if op.node_name != "ExtendNode":
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
@@ -97,12 +122,14 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = op.sources[0].eval_implementation(
             data_map=data_map, data_model=self, narrow=narrow
         )
-        data_algebra_temp_cols = {}
         if not window_situation:
-            for (k, opk) in op.ops.items():
-                res_k = opk.evaluate(res)  # makes debugging easier
-                res[k] = res_k
+            new_cols = {k: opk.evaluate(res) for k, opk in op.ops.items()}
+            for k, v in new_cols.items():
+                res[k] = v
+            # new_frame = self.columns_to_frame_(new_cols)
+            # res = self.add_data_frame_columns_to_data_frame_(res, new_frame)
         else:
+            data_algebra_temp_cols = {}
             standin_name = "_data_algebra_temp_g"  # name of an arbitrary input variable
             # build up a sub-frame to work on
             col_list = [c for c in set(op.partition_by)]
@@ -193,25 +220,6 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                 res[k] = subframe[k]
         return res
 
-    def columns_to_frame(self, cols):
-        """
-
-        :param cols: dictionary mapping column names to columns
-        :return:
-        """
-        # noinspection PyUnresolvedReferences
-        assert isinstance(cols, dict)
-        # check columns all have the same length
-        if len(cols) > 1:
-            len_0 = None
-            for v in cols.items():
-                len_i = len(v)
-                if len_0 is None:
-                    len_0 = len_i
-                else:
-                    assert len_i == len_0
-        return self.pd.DataFrame(cols)
-
     def project_step(self, op, *, data_map, narrow):
         if op.node_name != "ProjectNode":
             raise TypeError("op was supposed to be a data_algebra.data_ops.ProjectNode")
@@ -266,17 +274,24 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         else:
             cols = {"_data_table_temp_col": res["_data_table_temp_col"].agg("sum")}
 
+        target_rows = 1
+        for k, v in cols.items():
+            try:
+                target_rows = max(target_rows, len(v))
+            except Exception:
+                pass
+
         # agg can return scalars, which then can't be made into a self.pd.DataFrame
-        def promote_scalar(v):
+        def promote_scalar(v, *, target_len):
             # noinspection PyBroadException
             try:
                 len(v)
             except Exception:
-                return [v]
+                return [v] * target_len
             return v
 
-        cols = {k: promote_scalar(v) for (k, v) in cols.items()}
-        res = self.columns_to_frame(cols)
+        cols = {k: promote_scalar(v, target_len=target_rows) for (k, v) in cols.items()}
+        res = self.columns_to_frame_(cols)
         res = res.reset_index(drop=len(op.group_by) < 1)  # grouping variables in the index
         missing_group_cols = set(op.group_by) - set(res.columns)
         assert len(missing_group_cols) <= 0
