@@ -58,10 +58,13 @@
                                 <a class="function" href="#PandasModelBase.table_step">table_step</a>
                         </li>
                         <li>
-                                <a class="function" href="#PandasModelBase.extend_step">extend_step</a>
+                                <a class="function" href="#PandasModelBase.columns_to_frame_">columns_to_frame_</a>
                         </li>
                         <li>
-                                <a class="function" href="#PandasModelBase.columns_to_frame">columns_to_frame</a>
+                                <a class="function" href="#PandasModelBase.add_data_frame_columns_to_data_frame_">add_data_frame_columns_to_data_frame_</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#PandasModelBase.extend_step">extend_step</a>
                         </li>
                         <li>
                                 <a class="function" href="#PandasModelBase.project_step">project_step</a>
@@ -200,6 +203,52 @@
                 <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">({</span><span class="n">types_seen</span><span class="p">[</span><span class="n">c</span><span class="p">]}</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">op</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]}))</span>
         <span class="k">return</span> <span class="n">res</span>
 
+    <span class="k">def</span> <span class="nf">columns_to_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_rows</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert a dictionary of column names to series-like objects and scalars into a Pandas data frame.</span>
+
+<span class="sd">        :param cols: dictionary mapping column names to columns</span>
+<span class="sd">        :return: Pandas data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># noinspection PyUnresolvedReferences</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cols</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">target_rows</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">target_rows</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="n">target_rows</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">target_rows</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># scalar</span>
+        <span class="k">if</span> <span class="n">target_rows</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+
+        <span class="c1"># agg can return scalars, which then can&#39;t be made into a self.pd.DataFrame</span>
+        <span class="k">def</span> <span class="nf">promote_scalar</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_len</span><span class="p">):</span>
+            <span class="c1"># noinspection PyBroadException</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">len_v</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">len_v</span> <span class="o">!=</span> <span class="n">target_len</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">len_v</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">target_len</span>
+                    <span class="k">elif</span> <span class="n">len_v</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="n">target_len</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;incompatible column lengths&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">*</span> <span class="n">target_len</span>  <span class="c1"># scalar</span>
+            <span class="k">return</span> <span class="n">v</span>
+
+        <span class="n">cols</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">promote_scalar</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">target_len</span><span class="o">=</span><span class="n">target_rows</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">cols</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_data_frame_columns_to_data_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">transient_new_frame</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+           <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">res</span>
+        <span class="c1"># TODO: want to switch to this to avoid Pandas ick</span>
+        <span class="c1"># https://win-vector.com/2021/08/03/i-think-pandas-may-have-lost-the-plot/</span>
+        <span class="c1">#return self.pd.concat([res, transient_new_frame], axis=1)</span>
+
     <span class="k">def</span> <span class="nf">extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ExtendNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ExtendNode&quot;</span><span class="p">)</span>
@@ -213,12 +262,14 @@
         <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation</span><span class="p">(</span>
             <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
         <span class="p">)</span>
-        <span class="n">data_algebra_temp_cols</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">window_situation</span><span class="p">:</span>
-            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">opk</span><span class="p">)</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">res_k</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>  <span class="c1"># makes debugging easier</span>
-                <span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">res_k</span>
+            <span class="n">new_cols</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">opk</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">opk</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="c1"># for k, v in new_cols.items():</span>
+            <span class="c1">#     res[k] = v</span>
+            <span class="n">new_frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_to_frame_</span><span class="p">(</span><span class="n">new_cols</span><span class="p">,</span> <span class="n">target_rows</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_data_frame_columns_to_data_frame_</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">new_frame</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="n">data_algebra_temp_cols</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="n">standin_name</span> <span class="o">=</span> <span class="s2">&quot;_data_algebra_temp_g&quot;</span>  <span class="c1"># name of an arbitrary input variable</span>
             <span class="c1"># build up a sub-frame to work on</span>
             <span class="n">col_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">partition_by</span><span class="p">)]</span>
@@ -309,25 +360,6 @@
                 <span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">subframe</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">res</span>
 
-    <span class="k">def</span> <span class="nf">columns_to_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param cols: dictionary mapping column names to columns</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># noinspection PyUnresolvedReferences</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-        <span class="c1"># check columns all have the same length</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">len_0</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cols</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">len_i</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">len_0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">len_0</span> <span class="o">=</span> <span class="n">len_i</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">assert</span> <span class="n">len_i</span> <span class="o">==</span> <span class="n">len_0</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">project_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ProjectNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ProjectNode&quot;</span><span class="p">)</span>
@@ -381,18 +413,8 @@
                 <span class="n">cols</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">vk</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">cols</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;_data_table_temp_col&quot;</span><span class="p">:</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;_data_table_temp_col&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="s2">&quot;sum&quot;</span><span class="p">)}</span>
-
         <span class="c1"># agg can return scalars, which then can&#39;t be made into a self.pd.DataFrame</span>
-        <span class="k">def</span> <span class="nf">promote_scalar</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
-            <span class="c1"># noinspection PyBroadException</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="p">]</span>
-            <span class="k">return</span> <span class="n">v</span>
-
-        <span class="n">cols</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">promote_scalar</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">cols</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_to_frame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_to_frame_</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">group_by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># grouping variables in the index</span>
         <span class="n">missing_group_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">group_by</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_group_cols</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span>
@@ -639,6 +661,52 @@
                 <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">({</span><span class="n">types_seen</span><span class="p">[</span><span class="n">c</span><span class="p">]}</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">op</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]}))</span>
         <span class="k">return</span> <span class="n">res</span>
 
+    <span class="k">def</span> <span class="nf">columns_to_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_rows</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert a dictionary of column names to series-like objects and scalars into a Pandas data frame.</span>
+
+<span class="sd">        :param cols: dictionary mapping column names to columns</span>
+<span class="sd">        :return: Pandas data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># noinspection PyUnresolvedReferences</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cols</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">target_rows</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">target_rows</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="n">target_rows</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">target_rows</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># scalar</span>
+        <span class="k">if</span> <span class="n">target_rows</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+
+        <span class="c1"># agg can return scalars, which then can&#39;t be made into a self.pd.DataFrame</span>
+        <span class="k">def</span> <span class="nf">promote_scalar</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_len</span><span class="p">):</span>
+            <span class="c1"># noinspection PyBroadException</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">len_v</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">len_v</span> <span class="o">!=</span> <span class="n">target_len</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">len_v</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">target_len</span>
+                    <span class="k">elif</span> <span class="n">len_v</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="n">target_len</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;incompatible column lengths&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">*</span> <span class="n">target_len</span>  <span class="c1"># scalar</span>
+            <span class="k">return</span> <span class="n">v</span>
+
+        <span class="n">cols</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">promote_scalar</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">target_len</span><span class="o">=</span><span class="n">target_rows</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">cols</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_data_frame_columns_to_data_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">transient_new_frame</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+           <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">res</span>
+        <span class="c1"># TODO: want to switch to this to avoid Pandas ick</span>
+        <span class="c1"># https://win-vector.com/2021/08/03/i-think-pandas-may-have-lost-the-plot/</span>
+        <span class="c1">#return self.pd.concat([res, transient_new_frame], axis=1)</span>
+
     <span class="k">def</span> <span class="nf">extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ExtendNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ExtendNode&quot;</span><span class="p">)</span>
@@ -652,12 +720,14 @@
         <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation</span><span class="p">(</span>
             <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
         <span class="p">)</span>
-        <span class="n">data_algebra_temp_cols</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">window_situation</span><span class="p">:</span>
-            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">opk</span><span class="p">)</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">res_k</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>  <span class="c1"># makes debugging easier</span>
-                <span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">res_k</span>
+            <span class="n">new_cols</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">opk</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">opk</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="c1"># for k, v in new_cols.items():</span>
+            <span class="c1">#     res[k] = v</span>
+            <span class="n">new_frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_to_frame_</span><span class="p">(</span><span class="n">new_cols</span><span class="p">,</span> <span class="n">target_rows</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_data_frame_columns_to_data_frame_</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">new_frame</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="n">data_algebra_temp_cols</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="n">standin_name</span> <span class="o">=</span> <span class="s2">&quot;_data_algebra_temp_g&quot;</span>  <span class="c1"># name of an arbitrary input variable</span>
             <span class="c1"># build up a sub-frame to work on</span>
             <span class="n">col_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">partition_by</span><span class="p">)]</span>
@@ -748,25 +818,6 @@
                 <span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">subframe</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">res</span>
 
-    <span class="k">def</span> <span class="nf">columns_to_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param cols: dictionary mapping column names to columns</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># noinspection PyUnresolvedReferences</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-        <span class="c1"># check columns all have the same length</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">len_0</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cols</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">len_i</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">len_0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">len_0</span> <span class="o">=</span> <span class="n">len_i</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">assert</span> <span class="n">len_i</span> <span class="o">==</span> <span class="n">len_0</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">project_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ProjectNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ProjectNode&quot;</span><span class="p">)</span>
@@ -820,18 +871,8 @@
                 <span class="n">cols</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">vk</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">cols</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;_data_table_temp_col&quot;</span><span class="p">:</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;_data_table_temp_col&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="s2">&quot;sum&quot;</span><span class="p">)}</span>
-
         <span class="c1"># agg can return scalars, which then can&#39;t be made into a self.pd.DataFrame</span>
-        <span class="k">def</span> <span class="nf">promote_scalar</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
-            <span class="c1"># noinspection PyBroadException</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="p">]</span>
-            <span class="k">return</span> <span class="n">v</span>
-
-        <span class="n">cols</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">promote_scalar</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">cols</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_to_frame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_to_frame_</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">group_by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># grouping variables in the index</span>
         <span class="n">missing_group_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">group_by</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_group_cols</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span>
@@ -1203,6 +1244,89 @@ inheritance.</p>
 
 
                             </div>
+                            <div id="PandasModelBase.columns_to_frame_" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#PandasModelBase.columns_to_frame_">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">columns_to_frame_</span><span class="signature">(self, cols, *, target_rows=0)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">columns_to_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_rows</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert a dictionary of column names to series-like objects and scalars into a Pandas data frame.</span>
+
+<span class="sd">        :param cols: dictionary mapping column names to columns</span>
+<span class="sd">        :return: Pandas data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># noinspection PyUnresolvedReferences</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cols</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">target_rows</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">target_rows</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="n">target_rows</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">target_rows</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># scalar</span>
+        <span class="k">if</span> <span class="n">target_rows</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+
+        <span class="c1"># agg can return scalars, which then can&#39;t be made into a self.pd.DataFrame</span>
+        <span class="k">def</span> <span class="nf">promote_scalar</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_len</span><span class="p">):</span>
+            <span class="c1"># noinspection PyBroadException</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">len_v</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">len_v</span> <span class="o">!=</span> <span class="n">target_len</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">len_v</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">target_len</span>
+                    <span class="k">elif</span> <span class="n">len_v</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="n">target_len</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;incompatible column lengths&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">*</span> <span class="n">target_len</span>  <span class="c1"># scalar</span>
+            <span class="k">return</span> <span class="n">v</span>
+
+        <span class="n">cols</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">promote_scalar</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">target_len</span><span class="o">=</span><span class="n">target_rows</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">cols</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Convert a dictionary of column names to series-like objects and scalars into a Pandas data frame.</p>
+
+<p>:param cols: dictionary mapping column names to columns
+:return: Pandas data frame.</p>
+</div>
+
+
+                            </div>
+                            <div id="PandasModelBase.add_data_frame_columns_to_data_frame_" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#PandasModelBase.add_data_frame_columns_to_data_frame_">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">add_data_frame_columns_to_data_frame_</span><span class="signature">(self, res, transient_new_frame)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">add_data_frame_columns_to_data_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">transient_new_frame</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+           <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">res</span>
+        <span class="c1"># TODO: want to switch to this to avoid Pandas ick</span>
+        <span class="c1"># https://win-vector.com/2021/08/03/i-think-pandas-may-have-lost-the-plot/</span>
+        <span class="c1">#return self.pd.concat([res, transient_new_frame], axis=1)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
                             <div id="PandasModelBase.extend_step" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#PandasModelBase.extend_step">#&nbsp;&nbsp</a>
 
@@ -1226,12 +1350,14 @@ inheritance.</p>
         <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation</span><span class="p">(</span>
             <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
         <span class="p">)</span>
-        <span class="n">data_algebra_temp_cols</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">window_situation</span><span class="p">:</span>
-            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">opk</span><span class="p">)</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">res_k</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>  <span class="c1"># makes debugging easier</span>
-                <span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">res_k</span>
+            <span class="n">new_cols</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">opk</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">opk</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="c1"># for k, v in new_cols.items():</span>
+            <span class="c1">#     res[k] = v</span>
+            <span class="n">new_frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_to_frame_</span><span class="p">(</span><span class="n">new_cols</span><span class="p">,</span> <span class="n">target_rows</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_data_frame_columns_to_data_frame_</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">new_frame</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="n">data_algebra_temp_cols</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="n">standin_name</span> <span class="o">=</span> <span class="s2">&quot;_data_algebra_temp_g&quot;</span>  <span class="c1"># name of an arbitrary input variable</span>
             <span class="c1"># build up a sub-frame to work on</span>
             <span class="n">col_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">partition_by</span><span class="p">)]</span>
@@ -1328,44 +1454,6 @@ inheritance.</p>
     
 
                             </div>
-                            <div id="PandasModelBase.columns_to_frame" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#PandasModelBase.columns_to_frame">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">columns_to_frame</span><span class="signature">(self, cols)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">columns_to_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param cols: dictionary mapping column names to columns</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># noinspection PyUnresolvedReferences</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-        <span class="c1"># check columns all have the same length</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">len_0</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cols</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">len_i</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">len_0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">len_0</span> <span class="o">=</span> <span class="n">len_i</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">assert</span> <span class="n">len_i</span> <span class="o">==</span> <span class="n">len_0</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>:param cols: dictionary mapping column names to columns
-:return:</p>
-</div>
-
-
-                            </div>
                             <div id="PandasModelBase.project_step" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#PandasModelBase.project_step">#&nbsp;&nbsp</a>
 
@@ -1429,18 +1517,8 @@ inheritance.</p>
                 <span class="n">cols</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">vk</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">cols</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;_data_table_temp_col&quot;</span><span class="p">:</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;_data_table_temp_col&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="s2">&quot;sum&quot;</span><span class="p">)}</span>
-
         <span class="c1"># agg can return scalars, which then can&#39;t be made into a self.pd.DataFrame</span>
-        <span class="k">def</span> <span class="nf">promote_scalar</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
-            <span class="c1"># noinspection PyBroadException</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="p">]</span>
-            <span class="k">return</span> <span class="n">v</span>
-
-        <span class="n">cols</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">promote_scalar</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">cols</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_to_frame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_to_frame_</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">group_by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># grouping variables in the index</span>
         <span class="n">missing_group_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">group_by</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_group_cols</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span>

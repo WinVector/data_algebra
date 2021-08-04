@@ -259,14 +259,6 @@ class DataModel(ABC):
     def extend_step(self, op, *, data_map, narrow):
         raise NotImplementedError("base method called")
 
-    def columns_to_frame(self, cols):
-        """
-
-        :param cols: dictionary mapping column names to columns
-        :return:
-        """
-        raise NotImplementedError("base method called")
-
     def project_step(self, op, *, data_map, narrow):
         raise NotImplementedError("base method called")
 
