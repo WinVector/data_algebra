@@ -447,7 +447,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         if type_checks is not None:
             raise ValueError(f"concat: incompatible column types: {type_checks}")
         # noinspection PyUnresolvedReferences
-        res = self.pd.concat([left, right], axis=0, ignore_index=True)
+        res = self.pd.concat([left, right], axis=0, ignore_index=True, sort=False)
         res = res.reset_index(drop=True)
         return res
 
