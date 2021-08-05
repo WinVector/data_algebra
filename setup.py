@@ -21,7 +21,7 @@ the [rquery](https://github.com/WinVector/rquery) and
 
 setuptools.setup(
     name='data_algebra',
-    version='0.7.7',
+    version='0.7.8',
     author='John Mount',
     author_email='jmount@win-vector.com',
     url='https://github.com/WinVector/data_algebra',
