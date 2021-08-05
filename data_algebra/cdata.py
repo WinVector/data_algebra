@@ -285,7 +285,9 @@ def rowrecs_to_blocks(
             for vk in value_keys:
                 dcol = ctemp[vk][i]
                 if dcol in donor_cols:
-                    res.loc[want, vk] = numpy.asarray(dtemp[dcol])
+                    nvals = numpy.asarray(dtemp[dcol])
+                    if len(nvals) > 0:
+                        res.loc[want, vk] = nvals
     # see about promoting composite columns to numeric
     for vk in set(value_keys):
         converted = local_data_model.to_numeric(res[vk], errors="coerce")
@@ -293,6 +295,9 @@ def rowrecs_to_blocks(
             local_data_model.isnull(converted) == local_data_model.isnull(res[vk])
         ):
             res[vk] = converted
+    if data.shape[0] < 1:
+        # empty input produces emtpy output (with different column structure)
+        res = res.iloc[range(0), :].reset_index(drop=True)
     return res
 
 
