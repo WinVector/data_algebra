@@ -141,6 +141,7 @@ def check_transform_on_handles(
     check_row_order=False,
     check_parse=True,
     local_data_model=None,
+    empty_produces_empty=True,
 ):
     """
     Test an operator dag produces the expected result, and parses correctly.
@@ -156,6 +157,7 @@ def check_transform_on_handles(
     :param check_row_order: passed to equivalent_frames()
     :param check_parse: if True check expression parses/formats to self
     :param local_data_model: optional alternate evaluation model
+    :param empty_produces_empty: logical, if true assume emtpy inputs should produce empty output
     :return: None, assert if there is an issue
     """
 
@@ -207,6 +209,15 @@ def check_transform_on_handles(
             check_row_order=check_row_order,
         ):
             raise ValueError("Pandas transform result did not match expect")
+    # try on empty inputs
+    empty_map = {k: v.iloc[range(0), :].reset_index(drop=True) for k, v in data.items()}
+    empty_res = ops.eval(empty_map)
+    assert local_data_model.is_appropriate_data_instance(empty_res)
+    assert set(empty_res.columns) == set(res.columns)
+    if empty_produces_empty:
+        assert empty_res.shape[0] == 0
+    else:
+        assert empty_res.shape[0] > 0
     # try any db paths
     if db_handles is not None:
         for db_handle in db_handles:
@@ -285,6 +296,7 @@ def check_transform(
     check_row_order=False,
     check_parse=True,
     models_to_skip=None,
+    empty_produces_empty=True,
 ):
     """
     Test an operator dag produces the expected result, and parses correctly.
@@ -299,6 +311,7 @@ def check_transform(
     :param check_row_order: passed to equivalent_frames()
     :param check_parse: if True check expression parses/formats to self
     :param models_to_skip: None or set of model names to skip testing
+    :param empty_produces_empty: logical, if true assume emtpy inputs should produce empty output
     :return: nothing
     """
 
@@ -352,6 +365,7 @@ def check_transform(
         check_row_order=check_row_order,
         check_parse=check_parse,
         db_handles=db_handles,
+        empty_produces_empty=empty_produces_empty,
     )
 
     for handle in db_handles:

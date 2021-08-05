@@ -8,6 +8,47 @@ import data_algebra.MySQL
 import pytest
 
 
+def test_idiom_count_empty_frame_a():
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"group": [], "val": [],}
+    )
+    table_name = "pytest_temp_d"
+
+    ops = (
+        describe_table(d, table_name=table_name)
+        .project({"count": "(1).sum()"})
+    )
+
+    res = ops.transform(d)
+
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        'count': [0],
+        })
+
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+
+
+def test_idiom_count_empty_frame_b():
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"group": [], "val": [],}
+    )
+    table_name = "pytest_temp_d"
+
+    ops = (
+        describe_table(d, table_name=table_name)
+        .extend({"one": 1})
+        .project({"count": "one.sum()"})
+    )
+
+    res = ops.transform(d)
+
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        'count': [0],
+        })
+
+    assert data_algebra.test_util.equivalent_frames(res, expect)
+
+
 def test_idiom_extend_one_count():
     d = data_algebra.default_data_model.pd.DataFrame(
         {"group": ["a", "a", "b", "b"], "val": [1, 2, 3, 4],}
@@ -22,7 +63,7 @@ def test_idiom_extend_one_count():
 
     expect = data_algebra.default_data_model.pd.DataFrame({"count": [4]})
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect, empty_produces_empty=False)
 
 
 def test_idiom_extend_special_count():
@@ -35,7 +76,7 @@ def test_idiom_extend_special_count():
 
     expect = data_algebra.default_data_model.pd.DataFrame({"count": [4]})
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect, empty_produces_empty=False)
 
 
 # previously forbidden

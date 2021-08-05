@@ -125,6 +125,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
     def add_data_frame_columns_to_data_frame_(self, res, transient_new_frame):
         if transient_new_frame.shape[1] < 1:
             return res
+        if (res.shape[0] == 0) and (transient_new_frame.shape[0] > 0):
+            # scalars get interpreted as single row items, instead of zero row items
+            # growing the extension frame
+            transient_new_frame = transient_new_frame.iloc[range(0), :].reset_index(drop=True)
         if res.shape[1] < 1:
             return transient_new_frame
         if (2 * transient_new_frame.shape[1]) > res.shape[1]:
