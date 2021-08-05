@@ -123,6 +123,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         return self.pd.DataFrame(cols)
 
     def add_data_frame_columns_to_data_frame_(self, res, transient_new_frame):
+        if transient_new_frame.shape[1] < 1:
+            return res
+        if res.shape[1] < 1:
+            return transient_new_frame
         if (2 * transient_new_frame.shape[1]) > res.shape[1]:
             # lots of columns path
             # https://win-vector.com/2021/08/03/i-think-pandas-may-have-lost-the-plot/
@@ -318,6 +322,8 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = op.sources[0].eval_implementation(
             data_map=data_map, data_model=self, narrow=narrow
         )
+        if res.shape[0] < 1:
+            return res
         selection = op.expr.evaluate(res)
         res = res.loc[selection, :].reset_index(drop=True, inplace=False)
         return res
@@ -351,12 +357,15 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = op.sources[0].eval_implementation(
             data_map=data_map, data_model=self, narrow=narrow
         )
-        ascending = [
-            False if ci in set(op.reverse) else True for ci in op.order_columns
-        ]
-        res = res.sort_values(by=op.order_columns, ascending=ascending).reset_index(
-            drop=True
-        )
+        if res.shape[0] > 1:
+            ascending = [
+                False if ci in set(op.reverse) else True for ci in op.order_columns
+            ]
+            res = res.sort_values(by=op.order_columns, ascending=ascending).reset_index(
+                drop=True
+            )
+        if (op.limit is not None) and (res.shape[0] > op.limit):
+            res = res.iloc[range(op.limit), :].reset_index(drop=True)
         return res
 
     def rename_columns_step(self, op, *, data_map, narrow):
@@ -446,6 +455,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         type_checks = data_algebra.util.check_columns_appear_compatible(left, right)
         if type_checks is not None:
             raise ValueError(f"concat: incompatible column types: {type_checks}")
+        if left.shape[0] < 1:
+            return right
+        if right.shape[0] < 1:
+            return left
         # noinspection PyUnresolvedReferences
         res = self.pd.concat([left, right], axis=0, ignore_index=True, sort=False)
         res = res.reset_index(drop=True)
