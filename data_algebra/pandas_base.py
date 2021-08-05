@@ -123,14 +123,15 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         return self.pd.DataFrame(cols)
 
     def add_data_frame_columns_to_data_frame_(self, res, transient_new_frame):
-        if transient_new_frame.shape[1] < 1:
-            return res
         if (res.shape[0] == 0) and (transient_new_frame.shape[0] > 0):
             # scalars get interpreted as single row items, instead of zero row items
             # growing the extension frame
             transient_new_frame = transient_new_frame.iloc[range(0), :].reset_index(drop=True)
-        if res.shape[1] < 1:
-            return transient_new_frame
+        if res.shape[0] == transient_new_frame.shape[0]:
+            if res.shape[1] < 1:
+                return transient_new_frame
+            if transient_new_frame.shape[1] < 1:
+                return res
         if (2 * transient_new_frame.shape[1]) > res.shape[1]:
             # lots of columns path
             # https://win-vector.com/2021/08/03/i-think-pandas-may-have-lost-the-plot/
@@ -246,11 +247,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             for value_name in data_algebra_temp_cols.values():
                 del res[value_name]
             # copy out results
-            subframe = subframe.reset_index(drop=True)
             subframe = subframe.sort_values(by=["_data_algebra_orig_index"])
+            subframe = subframe.loc[:, list(op.ops.keys())]
             subframe = subframe.reset_index(drop=True)
-            for (k, opk) in op.ops.items():
-                res[k] = subframe[k]
+            res = self.add_data_frame_columns_to_data_frame_(res, subframe)
         return res
 
     def project_step(self, op, *, data_map, narrow):
