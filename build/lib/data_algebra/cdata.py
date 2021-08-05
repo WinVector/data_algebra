@@ -286,8 +286,9 @@ def rowrecs_to_blocks(
                 dcol = ctemp[vk][i]
                 if dcol in donor_cols:
                     nvals = numpy.asarray(dtemp[dcol])
-                    if len(nvals) > 0:
-                        res.loc[want, vk] = nvals
+                    if len(nvals) < 1:
+                        nvals = [None] * numpy.sum(want)
+                    res.loc[want, vk] = nvals
     # see about promoting composite columns to numeric
     for vk in set(value_keys):
         converted = local_data_model.to_numeric(res[vk], errors="coerce")
