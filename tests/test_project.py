@@ -18,7 +18,7 @@ def test_project0():
         {"c": [1, 1], "g": ["a", "b"]}
     )
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect, empty_produces_empty=False)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
 
 def test_project_z():
@@ -55,7 +55,7 @@ def test_project():
         {"c": [1, 1], "g": ["a", "b"], "ymax": [3, 4], "ymin": [1, 2]}
     )
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect, empty_produces_empty=False)
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
 
 def test_project_catch_nonagg():
