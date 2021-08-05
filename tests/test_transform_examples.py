@@ -27,7 +27,7 @@ def test_project_transform_2():
     d = data_algebra.default_data_model.pd.DataFrame({"x": [1, 2]})
     ops = describe_table(d, table_name="d").project({"y": "x.max()"})
     expect = data_algebra.default_data_model.pd.DataFrame({"y": [2],})
-    data_algebra.test_util.check_transform(ops, d, expect)
+    data_algebra.test_util.check_transform(ops, d, expect, empty_produces_empty=False)
 
 
 def test_natural_join_transform_1():
