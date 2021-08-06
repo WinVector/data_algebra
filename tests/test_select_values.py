@@ -18,7 +18,7 @@ def select_values_direct():
      (VALUES 
        ('A', 'B'), 
        ('C', 'D'), 
-       ('E', 'F')) v1
+       ('E', 'F'))
    """
    res = db_handle.read_query(sql)
 
@@ -28,3 +28,17 @@ def select_values_direct():
     })
 
    assert data_algebra.test_util.equivalent_frames(res, expect)
+
+
+def select_values_db_sqlite():
+   db_handle = data_algebra.SQLite.example_handle()
+
+   d = data_algebra.default_data_model.pd.DataFrame({
+    'c1': ['A', 'C', 'E'],
+    'c2': ['B', 'D', 'F'],
+    })
+
+   sql = db_handle.table_values_to_sql(d)
+   res = db_handle.read_query(sql)
+
+   assert data_algebra.test_util.equivalent_frames(res, d)
