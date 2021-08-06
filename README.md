@@ -75,12 +75,10 @@ Let's start our `Python` example.  First we import the packages we are going to 
 
 
 ```python
-import sqlite3
-import sqlalchemy
 import pandas
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
-import data_algebra.PostgreSQL
-import data_algebra.SQLite
+import data_algebra.BigQuery
+
 
 data_algebra.__version__
 ```
@@ -88,7 +86,7 @@ data_algebra.__version__
 
 
 
-    '0.7.5'
+    '0.7.8'
 
 
 
@@ -169,14 +167,13 @@ Let's also copy this data to a database.  Normally big data is already in the sy
 
 
 ```python
-use_postgresql = True
+db_handle = data_algebra.BigQuery.example_handle()
 
-if use_postgresql:
-    db_handle = data_algebra.PostgreSQL.example_handle()
-else:
-    db_handle = data_algebra.SQLite.example_handle()
-
+print(db_handle)
 ```
+
+    BigQuery_DBHandle(db_model=BigQueryModel, conn=<google.cloud.bigquery.client.Client object at 0x7fabcb5fd700>)
+
 
 
 
@@ -343,72 +340,73 @@ print(sql)
 ```
 
     -- data_algebra SQL https://github.com/WinVector/data_algebra
-    --  dialect: PostgreSQLModel
-    --       string quote: '
-    --   identifier quote: "
+    --  dialect: BigQueryModel
+    --       string quote: "
+    --   identifier quote: `
     WITH
-     "table_reference_0" AS (
+     `table_reference_0` AS (
       SELECT
-       "surveyCategory" ,
-       "subjectID" ,
-       "assessmentTotal"
+       `surveyCategory` ,
+       `subjectID` ,
+       `assessmentTotal`
       FROM
-       "d"
+       `data-algebra-test.test_1.d`
      ),
-     "extend_1" AS (
+     `extend_1` AS (
       SELECT  -- extend({ 'probability': '((assessmentTotal * 0.237)).exp()'})
-       "surveyCategory" ,
-       "subjectID" ,
-       EXP(("assessmentTotal" * 0.237)) AS "probability"
+       `surveyCategory` ,
+       `subjectID` ,
+       EXP(`assessmentTotal` * 0.237) AS `probability`
       FROM
-       "table_reference_0"
+       `table_reference_0`
      ),
-     "extend_2" AS (
+     `extend_2` AS (
       SELECT  -- extend({ 'total': 'probability.sum()'}, partition_by=['subjectID'])
-       "surveyCategory" ,
-       "subjectID" ,
-       "probability" ,
-       SUM("probability") OVER ( PARTITION BY "subjectID"  )  AS "total"
+       `surveyCategory` ,
+       `subjectID` ,
+       `probability` ,
+       SUM(`probability`) OVER ( PARTITION BY `subjectID`  )  AS `total`
       FROM
-       "extend_1"
+       `extend_1`
      ),
-     "extend_3" AS (
+     `extend_3` AS (
       SELECT  -- extend({ 'probability': 'probability / total'})
-       "probability" / "total" AS "probability" ,
-       "surveyCategory" ,
-       "subjectID"
+       `probability` / `total` AS `probability` ,
+       `surveyCategory` ,
+       `subjectID`
       FROM
-       "extend_2"
+       `extend_2`
      ),
-     "extend_4" AS (
+     `extend_4` AS (
       SELECT  -- extend({ 'row_number': '(1).cumsum()'}, partition_by=['subjectID'], order_by=['probability'], reverse=['probability'])
-       "probability" ,
-       "surveyCategory" ,
-       "subjectID" ,
-       SUM(1) OVER ( PARTITION BY "subjectID" ORDER BY "probability" DESC  )  AS "row_number"
+       `probability` ,
+       `surveyCategory` ,
+       `subjectID` ,
+       SUM(1) OVER ( PARTITION BY `subjectID` ORDER BY `probability` DESC  )  AS `row_number`
       FROM
-       "extend_3"
+       `extend_3`
      ),
-     "select_rows_5" AS (
+     `select_rows_5` AS (
       SELECT  -- select_rows('row_number == 1')
-       "probability" ,
-       "surveyCategory" ,
-       "subjectID"
+       `probability` ,
+       `surveyCategory` ,
+       `subjectID`
       FROM
-       "extend_4"
-       WHERE "row_number" = 1
+       `extend_4`
+      WHERE
+       `row_number` = 1
      )
     SELECT  -- rename_columns({'diagnosis': 'surveyCategory'})
-     "surveyCategory" AS "diagnosis" ,
-     "subjectID" ,
-     "probability"
+     `surveyCategory` AS `diagnosis` ,
+     `probability` ,
+     `subjectID`
     FROM
-     "select_rows_5"
+     `select_rows_5`
     
 
 
 
-Older `SQL` can be hard to read, as `SQL` expresses composition by inner-nesting (inside `SELECT` statements happen first).  The operator pipeline expresses composition by sequencing or method-chaining, which can be a lot more legible.  In this example we use the SQL-99 common table expression (`WITH`) notation to manage the composition in a more legible manner. A huge advantage of the `SQL` is: we can send it to the database for execution, as we do now.
+Older `SQL` (with use of with or common table expressions) can be hard to read, as `SQL` expresses composition by inner-nesting (inside `SELECT` statements happen first).  The operator pipeline expresses composition by sequencing or method-chaining, which can be a lot more legible.  In this example we use the SQL-99 common table expression (`WITH`) notation to manage the composition in a more legible manner. A huge advantage of the `SQL` is: we can send it to the database for execution, as we do now.
 
 Also notice the generated `SQL` has applied query narrowing: columns not used in the outer queries are removed from the inner queries. The "irrelevant" columns are not carried into the calculation as they would be with a `SELECT *`.  This early optimization comes in quite handy.
 
@@ -428,22 +426,22 @@ db_handle.read_query(sql)
     <tr style="text-align: right;">
       <th></th>
       <th>diagnosis</th>
-      <th>subjectID</th>
       <th>probability</th>
+      <th>subjectID</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
       <td>withdrawal behavior</td>
-      <td>1</td>
       <td>0.670622</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>1</th>
       <td>positive re-framing</td>
-      <td>2</td>
       <td>0.558974</td>
+      <td>2</td>
     </tr>
   </tbody>
 </table>
@@ -550,28 +548,6 @@ ops.transform(d_local)
 ## Export/Import
 
 Because our operator pipeline is a `Python` object with no references to external objects (such as the database connection), it can be saved through standard methods such as "[pickling](https://docs.python.org/3/library/pickle.html)."
-
-We can also diagram the pipeline using graphviz.
-
-
-
-```python
-import graphviz
-
-import data_algebra.diagram
-
-dot = data_algebra.diagram.to_digraph(ops)
-dot
-```
-
-
-
-
-    
-![svg](output_21_0.svg)
-    
-
-
 
 
 ## Advantages of `data_algebra`

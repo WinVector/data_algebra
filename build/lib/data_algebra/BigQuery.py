@@ -1,5 +1,6 @@
 import gzip
 import os
+import os.path
 
 import data_algebra
 import data_algebra.data_ops
@@ -205,11 +206,13 @@ def example_handle():
     """
     # TODO: parameterize this
     assert _have_bigquery
+    credential_file = "/Users/johnmount/big_query/big_query_jm.json"
+    # assert os.path.isfile(credential_file)
+    os.environ[
+        "GOOGLE_APPLICATION_CREDENTIALS"
+    ] = credential_file
+    # os.environ["GOOGLE_APPLICATION_CREDENTIALS"]  # trigger key error if not present
     try:
-        os.environ[
-            "GOOGLE_APPLICATION_CREDENTIALS"
-        ] = "/Users/johnmount/big_query/big_query_jm.json"
-        # os.environ["GOOGLE_APPLICATION_CREDENTIALS"]  # trigger key error if not present
         data_catalog = "data-algebra-test"
         data_schema = "test_1"
         db_handle = BigQueryModel(

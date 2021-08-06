@@ -26,8 +26,5 @@ PostgreSQL
 MySQL
 Spark
 
-[diagram]
-graphviz
-
 [pretty_python]
 black

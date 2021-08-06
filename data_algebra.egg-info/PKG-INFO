@@ -32,7 +32,6 @@ Classifier: Programming Language :: Python :: 3.9
 Classifier: License :: OSI Approved :: BSD License
 Description-Content-Type: text/markdown
 Provides-Extra: pretty_python
-Provides-Extra: diagram
 Provides-Extra: BigQuery
 Provides-Extra: PostgreSQL
 Provides-Extra: MySQL

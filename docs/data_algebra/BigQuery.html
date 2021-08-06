@@ -92,6 +92,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">gzip</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
 
 <span class="kn">import</span> <span class="nn">data_algebra</span>
 <span class="kn">import</span> <span class="nn">data_algebra.data_ops</span>
@@ -297,11 +298,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: parameterize this</span>
     <span class="k">assert</span> <span class="n">_have_bigquery</span>
+    <span class="n">credential_file</span> <span class="o">=</span> <span class="s2">&quot;/Users/johnmount/big_query/big_query_jm.json&quot;</span>
+    <span class="c1"># assert os.path.isfile(credential_file)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span>
+        <span class="s2">&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">credential_file</span>
+    <span class="c1"># os.environ[&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;]  # trigger key error if not present</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span>
-            <span class="s2">&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;</span>
-        <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;/Users/johnmount/big_query/big_query_jm.json&quot;</span>
-        <span class="c1"># os.environ[&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;]  # trigger key error if not present</span>
         <span class="n">data_catalog</span> <span class="o">=</span> <span class="s2">&quot;data-algebra-test&quot;</span>
         <span class="n">data_schema</span> <span class="o">=</span> <span class="s2">&quot;test_1&quot;</span>
         <span class="n">db_handle</span> <span class="o">=</span> <span class="n">BigQueryModel</span><span class="p">(</span>
@@ -877,11 +880,13 @@ inheritance.</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: parameterize this</span>
     <span class="k">assert</span> <span class="n">_have_bigquery</span>
+    <span class="n">credential_file</span> <span class="o">=</span> <span class="s2">&quot;/Users/johnmount/big_query/big_query_jm.json&quot;</span>
+    <span class="c1"># assert os.path.isfile(credential_file)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span>
+        <span class="s2">&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">credential_file</span>
+    <span class="c1"># os.environ[&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;]  # trigger key error if not present</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span>
-            <span class="s2">&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;</span>
-        <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;/Users/johnmount/big_query/big_query_jm.json&quot;</span>
-        <span class="c1"># os.environ[&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;]  # trigger key error if not present</span>
         <span class="n">data_catalog</span> <span class="o">=</span> <span class="s2">&quot;data-algebra-test&quot;</span>
         <span class="n">data_schema</span> <span class="o">=</span> <span class="s2">&quot;test_1&quot;</span>
         <span class="n">db_handle</span> <span class="o">=</span> <span class="n">BigQueryModel</span><span class="p">(</span>
