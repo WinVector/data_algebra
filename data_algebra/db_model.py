@@ -671,7 +671,7 @@ class DBModel:
         if isinstance(v, data_algebra.expr_rep.ListTerm):
             return [self.value_to_sql(vi) for vi in v.value]
         if isinstance(v, data_algebra.expr_rep.Value):
-            return v.value
+            return self.value_to_sql(v.value)
         if isinstance(v, str):
             return self.quote_string(v)
         if isinstance(v, bool):
