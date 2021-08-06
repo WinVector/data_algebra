@@ -51,8 +51,9 @@ def test_cdata_example():
         })
 
     res_pandas = ops.transform(iris)
-
     assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
+
+    data_algebra.test_util.check_transform(ops=ops, data=iris, expect=expect)
 
 
 def test_cdata_block():
