@@ -1,7 +1,6 @@
 import pytest
 
 import data_algebra
-import data_algebra.diagram
 import data_algebra.test_util
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
 from data_algebra.arrow import *
