@@ -177,7 +177,7 @@ def _db_minimum_expr(dbmodel, expression):
 def _db_is_in_expr(dbmodel, expression):
     is_in_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     x_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
-    return "(" + is_in_expr + " IN (" + ", ".join([repr(v) for v in x_expr]) + "))"
+    return "(" + is_in_expr + " IN " + x_expr + ")"
 
 
 # noinspection PyUnusedLocal
@@ -669,7 +669,7 @@ class DBModel:
         if v is None:
             return "NULL"
         if isinstance(v, data_algebra.expr_rep.ListTerm):
-            return [self.value_to_sql(vi) for vi in v.value]
+            return '(' + ', '.join([self.value_to_sql(vi) for vi in v.value]) + ')'
         if isinstance(v, data_algebra.expr_rep.Value):
             return self.value_to_sql(v.value)
         if isinstance(v, str):
@@ -686,7 +686,7 @@ class DBModel:
         if isinstance(v, int):
             return str(v)
         if isinstance(v, list) or isinstance(v, tuple):
-            return [vi for vi in v]
+            return '(' + ', '.join([self.value_to_sql(vi) for vi in v]) + ')'
         return str(v)
 
     def expr_to_sql(self, expression, *, want_inline_parens=False):
