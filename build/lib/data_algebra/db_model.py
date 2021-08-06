@@ -177,7 +177,7 @@ def _db_minimum_expr(dbmodel, expression):
 def _db_is_in_expr(dbmodel, expression):
     is_in_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     x_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
-    return "(" + is_in_expr + " IN (" + ", ".join([repr(v) for v in x_expr]) + "))"
+    return "(" + is_in_expr + " IN " + x_expr + ")"
 
 
 # noinspection PyUnusedLocal
@@ -669,9 +669,9 @@ class DBModel:
         if v is None:
             return "NULL"
         if isinstance(v, data_algebra.expr_rep.ListTerm):
-            return [self.value_to_sql(vi) for vi in v.value]
+            return '(' + ', '.join([self.value_to_sql(vi) for vi in v.value]) + ')'
         if isinstance(v, data_algebra.expr_rep.Value):
-            return v.value
+            return self.value_to_sql(v.value)
         if isinstance(v, str):
             return self.quote_string(v)
         if isinstance(v, bool):
@@ -686,8 +686,11 @@ class DBModel:
         if isinstance(v, int):
             return str(v)
         if isinstance(v, list) or isinstance(v, tuple):
-            return [vi for vi in v]
+            return '(' + ', '.join([self.value_to_sql(vi) for vi in v]) + ')'
         return str(v)
+
+    def table_values_to_sql(self, v):
+        raise TypeError("table_to_sql not implemented for this class")
 
     def expr_to_sql(self, expression, *, want_inline_parens=False):
         if isinstance(expression, str):
@@ -1788,6 +1791,9 @@ class DBHandle(data_algebra.eval_model.EvalModel):
     def query_to_csv(self, q, *, res_name):
         d = self.read_query(q)
         d.to_csv(res_name, index=False)
+
+    def table_values_to_sql(self, v):
+        return self.db_model.table_values_to_sql(v)
 
     def managed_eval(self, ops, *, data_map=None, result_name=None, narrow=True):
         query = ops.to_sql(self.db_model)

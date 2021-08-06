@@ -1,5 +1,5 @@
 ============================= test session starts ==============================
-platform darwin -- Python 3.9.6, pytest-6.2.4, py-1.10.0, pluggy-0.13.1
+platform darwin -- Python 3.9.5, pytest-6.2.4, py-1.10.0, pluggy-0.13.1
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.12.1, anyio-2.2.0
 collected 205 items
@@ -84,14 +84,14 @@ tests/test_window2.py ...                                                [ 96%]
 tests/test_window_fns.py .....                                           [ 99%]
 tests/test_with.py ..                                                    [100%]
 
----------- coverage: platform darwin, python 3.9.6-final-0 -----------
+---------- coverage: platform darwin, python 3.9.5-final-0 -----------
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
 data_algebra/BigQuery.py                 106     68    36%
 data_algebra/MySQL.py                     27      9    67%
 data_algebra/OrderedSet.py                53      7    87%
 data_algebra/PostgreSQL.py                17      6    65%
-data_algebra/SQLite.py                    66      8    88%
+data_algebra/SQLite.py                    76     17    78%
 data_algebra/SparkSQL.py                  68     43    37%
 data_algebra/__init__.py                   6      0   100%
 data_algebra/arrow.py                    170     36    79%
@@ -101,10 +101,10 @@ data_algebra/data_model.py               128     22    83%
 data_algebra/data_ops.py                1149    192    83%
 data_algebra/data_ops_types.py            91     41    55%
 data_algebra/data_ops_utils.py            51      7    86%
-data_algebra/db_model.py                 868     96    89%
+data_algebra/db_model.py                 872     97    89%
 data_algebra/eval_model.py                16      1    94%
 data_algebra/expr_parse.py                32      0   100%
-data_algebra/expr_rep.py                 562    102    82%
+data_algebra/expr_rep.py                 562    103    82%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 146      1    99%
 data_algebra/op_container.py             111     39    65%
@@ -115,7 +115,7 @@ data_algebra/python3_lark.py               1      0   100%
 data_algebra/test_util.py                194     37    81%
 data_algebra/util.py                      78      6    92%
 ----------------------------------------------------------
-TOTAL                                   4776    854    82%
+TOTAL                                   4790    865    82%
 
 
-============================= 205 passed in 22.27s =============================
+============================= 205 passed in 15.59s =============================
