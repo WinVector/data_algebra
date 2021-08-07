@@ -559,12 +559,7 @@ class DBModel:
         :return: query results as table
         """
         if isinstance(q, data_algebra.data_ops.ViewRepresentation):
-            temp_tables = dict()
-            q = q.to_sql(db_model=self, temp_tables=temp_tables)
-            if len(temp_tables) > 1:
-                raise ValueError(
-                    "ops require management of temp tables, please collect them via to_sql(temp_tables)"
-                )
+            q = q.to_sql(db_model=self)
         else:
             q = str(q)
         r = pandas.io.sql.read_sql(q, conn)
@@ -800,7 +795,6 @@ class DBModel:
                 terms=terms,  # TODO: implement pruning
                 quoted_query_name=self.quote_identifier(view_name),
                 sub_sql=subsql.to_bound_near_sql(columns=using),
-                temp_tables=subsql.temp_tables.copy(),
             )
         return near_sql
 
@@ -913,7 +907,6 @@ class DBModel:
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
-            temp_tables=subsql.temp_tables.copy(),
             annotation=annotation,
             mergeable=True,
             declared_term_dependencies=declared_term_dependencies,
@@ -950,7 +943,6 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
-            temp_tables=subsql.temp_tables.copy(),
             annotation=project_node.to_python_implementation(
                 print_sources=False, indent=-1
             ),
@@ -985,7 +977,6 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
-            temp_tables=subsql.temp_tables.copy(),
             annotation=select_rows_node.to_python_implementation(
                 print_sources=False, indent=-1
             ),
@@ -1086,7 +1077,6 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
-            temp_tables=subsql.temp_tables.copy(),
             annotation=order_node.to_python_implementation(
                 print_sources=False, indent=-1
             ),
@@ -1120,7 +1110,6 @@ class DBModel:
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
-            temp_tables=subsql.temp_tables.copy(),
             annotation=rename_node.to_python_implementation(
                 print_sources=False, indent=-1
             ),
@@ -1205,13 +1194,6 @@ class DBModel:
             )
             if (self.on_end is not None) and (len(self.on_end) > 0):
                 on_terms = on_terms + [self.on_end]
-        confused_temps = set(sql_left.temp_tables.keys()).intersection(
-            sql_right.temp_tables.keys()
-        )
-        if len(confused_temps) > 0:
-            raise ValueError("name collisions on temp_tables: " + str(confused_temps))
-        temp_tables = sql_left.temp_tables.copy()
-        temp_tables.update(sql_right.temp_tables)
         jointype = join_node.jointype
         try:
             jointype = self.join_name_map[
@@ -1226,7 +1208,6 @@ class DBModel:
             joiner=jointype + " JOIN",
             sub_sql2=sql_right.to_bound_near_sql(columns=using_right, force_sql=False),
             suffix=on_terms,
-            temp_tables=temp_tables,
             annotation=join_node.to_python_implementation(
                 print_sources=False, indent=-1
             ),
@@ -1271,13 +1252,6 @@ class DBModel:
                 concat_node.id_column: self.quote_string(concat_node.b_name)
             }
             terms.update({concat_node.id_column: None})
-        confused_temps = set(sql_left.temp_tables.keys()).intersection(
-            sql_right.temp_tables.keys()
-        )
-        if len(confused_temps) > 0:
-            raise ValueError("name collisions on temp_tables: " + str(confused_temps))
-        temp_tables = sql_left.temp_tables.copy()
-        temp_tables.update(sql_right.temp_tables)
         near_sql = data_algebra.near_sql.NearSQLBinaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
@@ -1288,7 +1262,6 @@ class DBModel:
             sub_sql2=sql_right.to_bound_near_sql(
                 columns=using_right, force_sql=True, constants=constants_right,
             ),
-            temp_tables=temp_tables,
             annotation=concat_node.to_python_implementation(
                 print_sources=False, indent=-1
             ),
@@ -1299,7 +1272,6 @@ class DBModel:
         self,
         ops,
         *,
-        temp_tables=None,
         sql_format_options=None,
     ):
         assert isinstance(self, DBModel)
@@ -1313,12 +1285,6 @@ class DBModel:
             db_model=self, using=None, temp_id_source=temp_id_source
         )
         assert isinstance(near_sql, data_algebra.near_sql.NearSQL)
-        if (near_sql.temp_tables is not None) and (len(near_sql.temp_tables) > 0):
-            if temp_tables is None:
-                raise ValueError(
-                    "need temp_tables to be a dictionary to copy back found temporary table values"
-                )
-            temp_tables.update(near_sql.temp_tables)
         sql_str_list = None
         if sql_format_options.use_with and self.supports_with:
             sequence = near_sql.to_with_form()
@@ -1364,7 +1330,7 @@ class DBModel:
         return '\n'.join(sql_str_list) + '\n'
 
     def row_recs_to_blocks_query(
-        self, source_sql, record_spec, control_view, *, using=None, temp_id_source=None
+        self, source_sql, record_spec, *, using=None, temp_id_source=None
     ):
         if temp_id_source is None:
             temp_id_source = [0]
@@ -1374,7 +1340,6 @@ class DBModel:
         #     raise TypeError(
         #         "record_spec should be a data_algebra.cdata.RecordSpecification"
         #     )
-        assert isinstance(control_view, data_algebra.data_ops_types.OperatorPlatform)
         control_value_cols = [
             c
             for c in record_spec.control_table.columns
@@ -1800,12 +1765,10 @@ class DBHandle(data_algebra.eval_model.EvalModel):
         self,
         ops,
         *,
-        temp_tables=None,
         sql_format_options=None,
     ):
         return self.db_model.to_sql(
             ops=ops,
-            temp_tables=temp_tables,
             sql_format_options=sql_format_options,
         )
 

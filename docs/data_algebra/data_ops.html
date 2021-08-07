@@ -415,9 +415,6 @@
                                 <a class="function" href="#ConvertRecordsNode.__init__">ConvertRecordsNode</a>
                         </li>
                         <li>
-                                <a class="function" href="#ConvertRecordsNode.control_out_table">control_out_table</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#ConvertRecordsNode.apply_to">apply_to</a>
                         </li>
                         <li>
@@ -705,7 +702,6 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">temp_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBHandle</span><span class="p">):</span>
@@ -715,7 +711,6 @@
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
         <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
             <span class="n">ops</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -2244,18 +2239,6 @@
             <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;ConvertRecordsNode&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">control_out_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_namer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;cdata_temp_record_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">view_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_namer</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">TableDescription</span><span class="p">(</span>
-            <span class="n">table_name</span><span class="o">=</span><span class="n">view_name</span><span class="p">,</span>
-            <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">res</span>
-
     <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">new_sources</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">s</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="n">target_table_key</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span>
@@ -2299,39 +2282,25 @@
             <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span>
             <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">control_out_table</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">query</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">blocks_to_row_recs_query</span><span class="p">(</span>
                 <span class="n">query</span><span class="p">,</span> <span class="n">record_spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_in</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">control_out_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_out_table</span><span class="p">(</span><span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">)</span>
             <span class="n">query</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">row_recs_to_blocks_query</span><span class="p">(</span>
                 <span class="n">query</span><span class="p">,</span>
                 <span class="n">record_spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span><span class="p">,</span>
-                <span class="n">control_view</span><span class="o">=</span><span class="n">control_out_table</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;convert_records_in_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">prev_view_name</span> <span class="o">=</span> <span class="s2">&quot;convert_records_out_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">columns_produced</span><span class="p">}</span>
-        <span class="n">temp_tables</span> <span class="o">=</span> <span class="n">sub_query</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">control_out_table</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">control_out_table</span><span class="o">.</span><span class="n">key</span> <span class="ow">in</span> <span class="n">temp_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;key collision in temp_tables construction: &quot;</span>
-                    <span class="o">+</span> <span class="n">control_out_table</span><span class="o">.</span><span class="n">key</span>
-                <span class="p">)</span>
-            <span class="n">temp_tables</span><span class="p">[</span>
-                <span class="n">control_out_table</span><span class="o">.</span><span class="n">key</span>
-            <span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">control_table</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLq</span><span class="p">(</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">prev_quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">prev_view_name</span><span class="p">),</span>
             <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
             <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;convert records&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
@@ -2594,7 +2563,6 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">temp_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBHandle</span><span class="p">):</span>
@@ -2604,7 +2572,6 @@
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
         <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
             <span class="n">ops</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -3238,7 +3205,7 @@ with the using columns (None means all).</p>
 
         
             <span class="def">def</span>
-            <span class="name">to_sql</span><span class="signature">(self, db_model, *, temp_tables=None, sql_format_options=None)</span>:
+            <span class="name">to_sql</span><span class="signature">(self, db_model, *, sql_format_options=None)</span>:
     </div>
 
                 <details>
@@ -3247,7 +3214,6 @@ with the using columns (None means all).</p>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">temp_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBHandle</span><span class="p">):</span>
@@ -3257,7 +3223,6 @@ with the using columns (None means all).</p>
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
         <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
             <span class="n">ops</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
@@ -8024,18 +7989,6 @@ with the using columns (None means all).</p>
             <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;ConvertRecordsNode&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">control_out_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_namer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;cdata_temp_record_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">view_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_namer</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">TableDescription</span><span class="p">(</span>
-            <span class="n">table_name</span><span class="o">=</span><span class="n">view_name</span><span class="p">,</span>
-            <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">res</span>
-
     <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">new_sources</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">s</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="n">target_table_key</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span>
@@ -8079,39 +8032,25 @@ with the using columns (None means all).</p>
             <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span>
             <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">control_out_table</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">query</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">blocks_to_row_recs_query</span><span class="p">(</span>
                 <span class="n">query</span><span class="p">,</span> <span class="n">record_spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_in</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">control_out_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_out_table</span><span class="p">(</span><span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">)</span>
             <span class="n">query</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">row_recs_to_blocks_query</span><span class="p">(</span>
                 <span class="n">query</span><span class="p">,</span>
                 <span class="n">record_spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span><span class="p">,</span>
-                <span class="n">control_view</span><span class="o">=</span><span class="n">control_out_table</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;convert_records_in_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">prev_view_name</span> <span class="o">=</span> <span class="s2">&quot;convert_records_out_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">columns_produced</span><span class="p">}</span>
-        <span class="n">temp_tables</span> <span class="o">=</span> <span class="n">sub_query</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">control_out_table</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">control_out_table</span><span class="o">.</span><span class="n">key</span> <span class="ow">in</span> <span class="n">temp_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;key collision in temp_tables construction: &quot;</span>
-                    <span class="o">+</span> <span class="n">control_out_table</span><span class="o">.</span><span class="n">key</span>
-                <span class="p">)</span>
-            <span class="n">temp_tables</span><span class="p">[</span>
-                <span class="n">control_out_table</span><span class="o">.</span><span class="n">key</span>
-            <span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">control_table</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLq</span><span class="p">(</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">prev_quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">prev_view_name</span><span class="p">),</span>
             <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
             <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;convert records&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
@@ -8153,34 +8092,6 @@ Abstract base class.</p>
             <span class="n">sources</span><span class="o">=</span><span class="n">sources</span><span class="p">,</span>
             <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;ConvertRecordsNode&quot;</span><span class="p">,</span>
         <span class="p">)</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            </div>
-                            <div id="ConvertRecordsNode.control_out_table" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ConvertRecordsNode.control_out_table">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">control_out_table</span><span class="signature">(self, *, temp_id_source)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">control_out_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_namer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;cdata_temp_record_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">view_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_namer</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">TableDescription</span><span class="p">(</span>
-            <span class="n">table_name</span><span class="o">=</span><span class="n">view_name</span><span class="p">,</span>
-            <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">res</span>
 </pre></div>
 
         </details>
@@ -8291,39 +8202,25 @@ with the using columns (None means all).</p>
             <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span>
             <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">control_out_table</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">query</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">blocks_to_row_recs_query</span><span class="p">(</span>
                 <span class="n">query</span><span class="p">,</span> <span class="n">record_spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_in</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">control_out_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_out_table</span><span class="p">(</span><span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">)</span>
             <span class="n">query</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">row_recs_to_blocks_query</span><span class="p">(</span>
                 <span class="n">query</span><span class="p">,</span>
                 <span class="n">record_spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span><span class="p">,</span>
-                <span class="n">control_view</span><span class="o">=</span><span class="n">control_out_table</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;convert_records_in_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">prev_view_name</span> <span class="o">=</span> <span class="s2">&quot;convert_records_out_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">columns_produced</span><span class="p">}</span>
-        <span class="n">temp_tables</span> <span class="o">=</span> <span class="n">sub_query</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">control_out_table</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">control_out_table</span><span class="o">.</span><span class="n">key</span> <span class="ow">in</span> <span class="n">temp_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;key collision in temp_tables construction: &quot;</span>
-                    <span class="o">+</span> <span class="n">control_out_table</span><span class="o">.</span><span class="n">key</span>
-                <span class="p">)</span>
-            <span class="n">temp_tables</span><span class="p">[</span>
-                <span class="n">control_out_table</span><span class="o">.</span><span class="n">key</span>
-            <span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">control_table</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLq</span><span class="p">(</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">prev_quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">prev_view_name</span><span class="p">),</span>
             <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
             <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;convert records&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>

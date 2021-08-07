@@ -777,12 +777,7 @@
 <span class="sd">        :return: query results as table</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">):</span>
-            <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">temp_tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;ops require management of temp tables, please collect them via to_sql(temp_tables)&quot;</span>
-                <span class="p">)</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">q</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
@@ -1018,7 +1013,6 @@
                 <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>  <span class="c1"># TODO: implement pruning</span>
                 <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using</span><span class="p">),</span>
-                <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
@@ -1131,7 +1125,6 @@
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">annotation</span><span class="p">,</span>
             <span class="n">mergeable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">declared_term_dependencies</span><span class="o">=</span><span class="n">declared_term_dependencies</span><span class="p">,</span>
@@ -1168,7 +1161,6 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
             <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">project_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span>
                 <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
             <span class="p">),</span>
@@ -1203,7 +1195,6 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
             <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">select_rows_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span>
                 <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
             <span class="p">),</span>
@@ -1304,7 +1295,6 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
             <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">order_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span>
                 <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
             <span class="p">),</span>
@@ -1338,7 +1328,6 @@
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">rename_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span>
                 <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
             <span class="p">),</span>
@@ -1423,13 +1412,6 @@
             <span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_end</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
                 <span class="n">on_terms</span> <span class="o">=</span> <span class="n">on_terms</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">on_end</span><span class="p">]</span>
-        <span class="n">confused_temps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sql_left</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
-            <span class="n">sql_right</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">confused_temps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;name collisions on temp_tables: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">confused_temps</span><span class="p">))</span>
-        <span class="n">temp_tables</span> <span class="o">=</span> <span class="n">sql_left</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">temp_tables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sql_right</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span>
         <span class="n">jointype</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">jointype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">join_name_map</span><span class="p">[</span>
@@ -1444,7 +1426,6 @@
             <span class="n">joiner</span><span class="o">=</span><span class="n">jointype</span> <span class="o">+</span> <span class="s2">&quot; JOIN&quot;</span><span class="p">,</span>
             <span class="n">sub_sql2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using_right</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="n">suffix</span><span class="o">=</span><span class="n">on_terms</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">join_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span>
                 <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
             <span class="p">),</span>
@@ -1489,13 +1470,6 @@
                 <span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">b_name</span><span class="p">)</span>
             <span class="p">}</span>
             <span class="n">terms</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
-        <span class="n">confused_temps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sql_left</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
-            <span class="n">sql_right</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">confused_temps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;name collisions on temp_tables: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">confused_temps</span><span class="p">))</span>
-        <span class="n">temp_tables</span> <span class="o">=</span> <span class="n">sql_left</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">temp_tables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sql_right</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLBinaryStep</span><span class="p">(</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
@@ -1506,7 +1480,6 @@
             <span class="n">sub_sql2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span>
                 <span class="n">columns</span><span class="o">=</span><span class="n">using_right</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">constants</span><span class="o">=</span><span class="n">constants_right</span><span class="p">,</span>
             <span class="p">),</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">concat_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span>
                 <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
             <span class="p">),</span>
@@ -1517,7 +1490,6 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">ops</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">temp_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DBModel</span><span class="p">)</span>
@@ -1531,12 +1503,6 @@
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">temp_tables</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">temp_tables</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;need temp_tables to be a dictionary to copy back found temporary table values&quot;</span>
-                <span class="p">)</span>
-            <span class="n">temp_tables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span>
         <span class="n">sql_str_list</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">use_with</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span><span class="p">:</span>
             <span class="n">sequence</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">to_with_form</span><span class="p">()</span>
@@ -1582,7 +1548,7 @@
         <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sql_str_list</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
 
     <span class="k">def</span> <span class="nf">row_recs_to_blocks_query</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">source_sql</span><span class="p">,</span> <span class="n">record_spec</span><span class="p">,</span> <span class="n">control_view</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">source_sql</span><span class="p">,</span> <span class="n">record_spec</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1592,7 +1558,6 @@
         <span class="c1">#     raise TypeError(</span>
         <span class="c1">#         &quot;record_spec should be a data_algebra.cdata.RecordSpecification&quot;</span>
         <span class="c1">#     )</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">control_view</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">)</span>
         <span class="n">control_value_cols</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">c</span>
             <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">record_spec</span><span class="o">.</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span>
@@ -2018,12 +1983,10 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">ops</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">temp_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
             <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -2263,12 +2226,7 @@
 <span class="sd">        :return: query results as table</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">):</span>
-            <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">temp_tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;ops require management of temp tables, please collect them via to_sql(temp_tables)&quot;</span>
-                <span class="p">)</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">q</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
@@ -2504,7 +2462,6 @@
                 <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>  <span class="c1"># TODO: implement pruning</span>
                 <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using</span><span class="p">),</span>
-                <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
@@ -2617,7 +2574,6 @@
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">annotation</span><span class="p">,</span>
             <span class="n">mergeable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">declared_term_dependencies</span><span class="o">=</span><span class="n">declared_term_dependencies</span><span class="p">,</span>
@@ -2654,7 +2610,6 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
             <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">project_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span>
                 <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
             <span class="p">),</span>
@@ -2689,7 +2644,6 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
             <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">select_rows_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span>
                 <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
             <span class="p">),</span>
@@ -2790,7 +2744,6 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
             <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">order_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span>
                 <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
             <span class="p">),</span>
@@ -2824,7 +2777,6 @@
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">rename_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span>
                 <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
             <span class="p">),</span>
@@ -2909,13 +2861,6 @@
             <span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_end</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
                 <span class="n">on_terms</span> <span class="o">=</span> <span class="n">on_terms</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">on_end</span><span class="p">]</span>
-        <span class="n">confused_temps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sql_left</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
-            <span class="n">sql_right</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">confused_temps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;name collisions on temp_tables: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">confused_temps</span><span class="p">))</span>
-        <span class="n">temp_tables</span> <span class="o">=</span> <span class="n">sql_left</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">temp_tables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sql_right</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span>
         <span class="n">jointype</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">jointype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">join_name_map</span><span class="p">[</span>
@@ -2930,7 +2875,6 @@
             <span class="n">joiner</span><span class="o">=</span><span class="n">jointype</span> <span class="o">+</span> <span class="s2">&quot; JOIN&quot;</span><span class="p">,</span>
             <span class="n">sub_sql2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using_right</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="n">suffix</span><span class="o">=</span><span class="n">on_terms</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">join_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span>
                 <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
             <span class="p">),</span>
@@ -2975,13 +2919,6 @@
                 <span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">b_name</span><span class="p">)</span>
             <span class="p">}</span>
             <span class="n">terms</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
-        <span class="n">confused_temps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sql_left</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
-            <span class="n">sql_right</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">confused_temps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;name collisions on temp_tables: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">confused_temps</span><span class="p">))</span>
-        <span class="n">temp_tables</span> <span class="o">=</span> <span class="n">sql_left</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">temp_tables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sql_right</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLBinaryStep</span><span class="p">(</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
@@ -2992,7 +2929,6 @@
             <span class="n">sub_sql2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span>
                 <span class="n">columns</span><span class="o">=</span><span class="n">using_right</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">constants</span><span class="o">=</span><span class="n">constants_right</span><span class="p">,</span>
             <span class="p">),</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">concat_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span>
                 <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
             <span class="p">),</span>
@@ -3003,7 +2939,6 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">ops</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">temp_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DBModel</span><span class="p">)</span>
@@ -3017,12 +2952,6 @@
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">temp_tables</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">temp_tables</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;need temp_tables to be a dictionary to copy back found temporary table values&quot;</span>
-                <span class="p">)</span>
-            <span class="n">temp_tables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span>
         <span class="n">sql_str_list</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">use_with</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span><span class="p">:</span>
             <span class="n">sequence</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">to_with_form</span><span class="p">()</span>
@@ -3068,7 +2997,7 @@
         <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sql_str_list</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
 
     <span class="k">def</span> <span class="nf">row_recs_to_blocks_query</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">source_sql</span><span class="p">,</span> <span class="n">record_spec</span><span class="p">,</span> <span class="n">control_view</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">source_sql</span><span class="p">,</span> <span class="n">record_spec</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -3078,7 +3007,6 @@
         <span class="c1">#     raise TypeError(</span>
         <span class="c1">#         &quot;record_spec should be a data_algebra.cdata.RecordSpecification&quot;</span>
         <span class="c1">#     )</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">control_view</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">)</span>
         <span class="n">control_value_cols</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">c</span>
             <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">record_spec</span><span class="o">.</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span>
@@ -3613,12 +3541,7 @@
 <span class="sd">        :return: query results as table</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">):</span>
-            <span class="n">temp_tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">temp_tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;ops require management of temp tables, please collect them via to_sql(temp_tables)&quot;</span>
-                <span class="p">)</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">q</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
@@ -4065,7 +3988,6 @@
                 <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>  <span class="c1"># TODO: implement pruning</span>
                 <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using</span><span class="p">),</span>
-                <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 </pre></div>
@@ -4201,7 +4123,6 @@
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">annotation</span><span class="p">,</span>
             <span class="n">mergeable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">declared_term_dependencies</span><span class="o">=</span><span class="n">declared_term_dependencies</span><span class="p">,</span>
@@ -4261,7 +4182,6 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
             <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">project_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span>
                 <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
             <span class="p">),</span>
@@ -4319,7 +4239,6 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
             <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">select_rows_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span>
                 <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
             <span class="p">),</span>
@@ -4489,7 +4408,6 @@
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
             <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">order_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span>
                 <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
             <span class="p">),</span>
@@ -4546,7 +4464,6 @@
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">subusing</span><span class="p">),</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">rename_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span>
                 <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
             <span class="p">),</span>
@@ -4633,13 +4550,6 @@
             <span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_end</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
                 <span class="n">on_terms</span> <span class="o">=</span> <span class="n">on_terms</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">on_end</span><span class="p">]</span>
-        <span class="n">confused_temps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sql_left</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
-            <span class="n">sql_right</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">confused_temps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;name collisions on temp_tables: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">confused_temps</span><span class="p">))</span>
-        <span class="n">temp_tables</span> <span class="o">=</span> <span class="n">sql_left</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">temp_tables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sql_right</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span>
         <span class="n">jointype</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">jointype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">join_name_map</span><span class="p">[</span>
@@ -4654,7 +4564,6 @@
             <span class="n">joiner</span><span class="o">=</span><span class="n">jointype</span> <span class="o">+</span> <span class="s2">&quot; JOIN&quot;</span><span class="p">,</span>
             <span class="n">sub_sql2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using_right</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="n">suffix</span><span class="o">=</span><span class="n">on_terms</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">join_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span>
                 <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
             <span class="p">),</span>
@@ -4722,13 +4631,6 @@
                 <span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">b_name</span><span class="p">)</span>
             <span class="p">}</span>
             <span class="n">terms</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">concat_node</span><span class="o">.</span><span class="n">id_column</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
-        <span class="n">confused_temps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sql_left</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
-            <span class="n">sql_right</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">confused_temps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;name collisions on temp_tables: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">confused_temps</span><span class="p">))</span>
-        <span class="n">temp_tables</span> <span class="o">=</span> <span class="n">sql_left</span><span class="o">.</span><span class="n">temp_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">temp_tables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sql_right</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLBinaryStep</span><span class="p">(</span>
             <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
@@ -4739,7 +4641,6 @@
             <span class="n">sub_sql2</span><span class="o">=</span><span class="n">sql_right</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span>
                 <span class="n">columns</span><span class="o">=</span><span class="n">using_right</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">constants</span><span class="o">=</span><span class="n">constants_right</span><span class="p">,</span>
             <span class="p">),</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
             <span class="n">annotation</span><span class="o">=</span><span class="n">concat_node</span><span class="o">.</span><span class="n">to_python_implementation</span><span class="p">(</span>
                 <span class="n">print_sources</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=-</span><span class="mi">1</span>
             <span class="p">),</span>
@@ -4757,7 +4658,7 @@
 
         
             <span class="def">def</span>
-            <span class="name">to_sql</span><span class="signature">(self, ops, *, temp_tables=None, sql_format_options=None)</span>:
+            <span class="name">to_sql</span><span class="signature">(self, ops, *, sql_format_options=None)</span>:
     </div>
 
                 <details>
@@ -4766,7 +4667,6 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">ops</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">temp_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DBModel</span><span class="p">)</span>
@@ -4780,12 +4680,6 @@
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">temp_tables</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">temp_tables</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;need temp_tables to be a dictionary to copy back found temporary table values&quot;</span>
-                <span class="p">)</span>
-            <span class="n">temp_tables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">temp_tables</span><span class="p">)</span>
         <span class="n">sql_str_list</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">use_with</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span><span class="p">:</span>
             <span class="n">sequence</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">to_with_form</span><span class="p">()</span>
@@ -4841,21 +4735,13 @@
 
         
             <span class="def">def</span>
-            <span class="name">row_recs_to_blocks_query</span><span class="signature">(
-    self,
-    source_sql,
-    record_spec,
-    control_view,
-    *,
-    using=None,
-    temp_id_source=None
-)</span>:
+            <span class="name">row_recs_to_blocks_query</span><span class="signature">(self, source_sql, record_spec, *, using=None, temp_id_source=None)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">row_recs_to_blocks_query</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">source_sql</span><span class="p">,</span> <span class="n">record_spec</span><span class="p">,</span> <span class="n">control_view</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">source_sql</span><span class="p">,</span> <span class="n">record_spec</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -4865,7 +4751,6 @@
         <span class="c1">#     raise TypeError(</span>
         <span class="c1">#         &quot;record_spec should be a data_algebra.cdata.RecordSpecification&quot;</span>
         <span class="c1">#     )</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">control_view</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">)</span>
         <span class="n">control_value_cols</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">c</span>
             <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">record_spec</span><span class="o">.</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span>
@@ -5476,12 +5361,10 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">ops</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">temp_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
             <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -5725,7 +5608,7 @@ inheritance.</p>
 
         
             <span class="def">def</span>
-            <span class="name">to_sql</span><span class="signature">(self, ops, *, temp_tables=None, sql_format_options=None)</span>:
+            <span class="name">to_sql</span><span class="signature">(self, ops, *, sql_format_options=None)</span>:
     </div>
 
                 <details>
@@ -5734,12 +5617,10 @@ inheritance.</p>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">ops</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">temp_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
             <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span>
-            <span class="n">temp_tables</span><span class="o">=</span><span class="n">temp_tables</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>

@@ -101,12 +101,7 @@ class SparkSQLModel(data_algebra.db_model.DBModel):
     def read_query(self, conn, q):
         assert isinstance(conn, SparkConnection)
         if isinstance(q, data_algebra.data_ops.ViewRepresentation):
-            temp_tables = dict()
-            q = q.to_sql(db_model=self, temp_tables=temp_tables)
-            if len(temp_tables) > 1:
-                raise ValueError(
-                    "ops require management of temp tables, please collect them via to_sql(temp_tables)"
-                )
+            q = q.to_sql(db_model=self)
         else:
             q = str(q)
         res = conn.spark_session.sql(q)

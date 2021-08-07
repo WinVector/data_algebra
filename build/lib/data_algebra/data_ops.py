@@ -250,7 +250,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
         self,
         db_model,
         *,
-        temp_tables=None,
         sql_format_options=None,
     ):
         if isinstance(db_model, data_algebra.db_model.DBHandle):
@@ -260,7 +259,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
             sql_format_options = db_model.default_SQL_format_options
         return db_model.to_sql(
             ops=self,
-            temp_tables=temp_tables,
             sql_format_options=sql_format_options,
         )
 
@@ -1789,18 +1787,6 @@ class ConvertRecordsNode(ViewRepresentation):
             node_name="ConvertRecordsNode",
         )
 
-    def control_out_table(self, *, temp_id_source):
-        if self.temp_namer is None:
-            view_name = "cdata_temp_record_" + str(temp_id_source[0])
-        else:
-            view_name = self.temp_namer(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
-        res = TableDescription(
-            table_name=view_name,
-            column_names=self.record_map.blocks_out.control_table.columns,
-        )
-        return res
-
     def apply_to(self, a, *, target_table_key=None):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
@@ -1844,39 +1830,25 @@ class ConvertRecordsNode(ViewRepresentation):
             db_model=db_model,
             force_sql=True,
         )
-        control_out_table = None
         if self.record_map.blocks_in is not None:
             query = db_model.blocks_to_row_recs_query(
                 query, record_spec=self.record_map.blocks_in
             )
         if self.record_map.blocks_out is not None:
-            control_out_table = self.control_out_table(temp_id_source=temp_id_source)
             query = db_model.row_recs_to_blocks_query(
                 query,
                 record_spec=self.record_map.blocks_out,
-                control_view=control_out_table,
             )
         view_name = "convert_records_in_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         prev_view_name = "convert_records_out_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         terms = {k: None for k in self.record_map.columns_produced}
-        temp_tables = sub_query.temp_tables.copy()
-        if control_out_table is not None:
-            if control_out_table.key in temp_tables.keys():
-                raise ValueError(
-                    "key collision in temp_tables construction: "
-                    + control_out_table.key
-                )
-            temp_tables[
-                control_out_table.key
-            ] = self.record_map.blocks_out.control_table
         near_sql = data_algebra.near_sql.NearSQLq(
             quoted_query_name=db_model.quote_identifier(view_name),
             prev_quoted_query_name=db_model.quote_identifier(prev_view_name),
             query=query,
             terms=terms,
-            temp_tables=temp_tables,
             annotation="convert records",
         )
         return near_sql
