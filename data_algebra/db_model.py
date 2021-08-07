@@ -1495,7 +1495,6 @@ class DBModel:
             return self.quote_identifier(k)
         return v + " AS " + self.quote_identifier(k)
 
-
     def convert_nearsql_container_subsql_(self, nearsql_container, *, sql_format_options=None):
         assert isinstance(nearsql_container, data_algebra.near_sql.NearSQLContainer)
         if sql_format_options is None:
