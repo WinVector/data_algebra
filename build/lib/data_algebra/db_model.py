@@ -1399,9 +1399,17 @@ class DBModel:
                     cstmt = cstmt + col_sql
             cstmt = cstmt + "  ELSE NULL END AS " + self.quote_identifier(result_col)
             col_stmts.append(cstmt)
-        ctab_sql = control_view.to_near_sql_implementation(
-                    self, using=using, temp_id_source=temp_id_source
-                    ).to_sql(db_model=self, columns=using, force_sql=True)
+        ctab_sql = None
+        # # TODO: wire this in, and don't land the table this avoids
+        # # see if we can join on values instead of an actual table
+        # try:
+        #     ctab_sql = [self.table_values_to_sql(record_spec.control_table)]
+        # except TypeError:
+        #     pass
+        if ctab_sql is None:
+            ctab_sql = control_view.to_near_sql_implementation(
+                        self, using=using, temp_id_source=temp_id_source
+                        ).to_sql(db_model=self, columns=using, force_sql=True)
         sql = (
             "SELECT\n"
             + _str_join_expecting_list(",\n", col_stmts)
