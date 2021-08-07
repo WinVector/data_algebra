@@ -222,7 +222,6 @@ def check_transform_on_handles(
     if db_handles is not None:
         for db_handle in db_handles:
             to_del = set()
-            temp_tables = None
             sql_statements = []
             for initial_commas in [True, False]:
                 for use_with in [True, False]:
@@ -231,10 +230,8 @@ def check_transform_on_handles(
                         annotate=True,
                         sql_indent=' ',
                         initial_commas=initial_commas)
-                    temp_tables = dict()
                     sql = db_handle.to_sql(
                         ops,
-                        temp_tables=temp_tables,
                         sql_format_options=sql_format_options,
                     )
                     assert isinstance(sql, str)
@@ -244,19 +241,14 @@ def check_transform_on_handles(
                 for (k, v) in data.items():
                     db_handle.insert_table(v, table_name=k, allow_overwrite=True)
                     to_del.add(k)
-                for (k, v) in temp_tables.items():
-                    db_handle.insert_table(v, table_name=k, allow_overwrite=True)
-                    to_del.add(k)
                 caught = None
                 res_db_sql = []
                 res_db_ops = None
-                run_ops_version = len(temp_tables) <= 0
                 try:
                     for sql in sql_statements:
                         res_db_sql_i = db_handle.read_query(sql)
                         res_db_sql.append(res_db_sql_i)
-                    if run_ops_version:
-                        res_db_ops = db_handle.read_query(ops)
+                    res_db_ops = db_handle.read_query(ops)
                 except Exception as e:
                     caught = e
                 for k in to_del:
@@ -273,16 +265,15 @@ def check_transform_on_handles(
                         check_row_order=check_row_order,
                     ):
                         raise ValueError(f"{db_handle} SQL result did not match expect")
-                if run_ops_version:
-                    if not equivalent_frames(
-                        res_db_ops,
-                        expect,
-                        float_tol=float_tol,
-                        check_column_order=check_column_order,
-                        cols_case_sensitive=cols_case_sensitive,
-                        check_row_order=check_row_order,
-                    ):
-                        raise ValueError(f"{db_handle} ops result did not match expect")
+                if not equivalent_frames(
+                    res_db_ops,
+                    expect,
+                    float_tol=float_tol,
+                    check_column_order=check_column_order,
+                    cols_case_sensitive=cols_case_sensitive,
+                    check_row_order=check_row_order,
+                ):
+                    raise ValueError(f"{db_handle} ops result did not match expect")
 
 
 def get_test_dbs():

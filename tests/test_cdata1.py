@@ -157,21 +157,16 @@ def test_cdata1():
         column_names=["id", "Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width", "Species"],
     )
 
-    temp_table = data_algebra.data_ops.TableDescription(
-        table_name="control_table", column_names=record_spec.control_table.columns
-    )
-
     conn = sqlite3.connect(":memory:")
 
     sql = db_model.row_recs_to_blocks_query(
-        source_table.to_sql(db_model), record_spec, temp_table
+        source_table.to_sql(db_model), record_spec
     )
     waste_str = str(sql)
 
     # %%
 
     db_model.insert_table(conn, iris, "iris")
-    db_model.insert_table(conn, record_spec.control_table, temp_table.table_name)
 
     res_blocks = db_model.read_query(conn, sql)
     assert data_algebra.test_util.equivalent_frames(res_blocks, iris_blocks_orig)
