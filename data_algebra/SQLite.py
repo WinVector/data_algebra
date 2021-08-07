@@ -58,7 +58,9 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             identifier_quote='"',
             string_quote="'",
             sql_formatters=SQLite_formatters,
-            on_joiner='AND'
+            on_joiner='AND',
+            union_all_term_start='',
+            union_all_term_end='',
         )
 
     def prepare_connection(self, conn):
@@ -154,32 +156,6 @@ class SQLiteModel(data_algebra.db_model.DBModel):
 
         # https://docs.python.org/3/library/sqlite3.html
         conn.create_aggregate("median", 1, MedianAgg)
-
-    def table_values_to_sql(self, v):
-        assert v is not None
-        m = v.shape[0]
-        assert m > 0
-        n = v.shape[1]
-        assert n > 0
-
-        def q_row(i):
-            return (
-                '('
-                + ', '.join([self.value_to_sql(v[v.columns[j]][i]) for j in range(n)])
-                + ')'
-            )
-
-        sql = (
-            ['SELECT']
-            + ['   '
-               + self.quote_identifier(f'column{j+1}')
-               + ' AS ' + self.quote_identifier(v.columns[j]) + (',' if j < (n - 1) else '') for j in range(n)]
-            + ['FROM',
-               '  (VALUES']
-            + [ '    ' + q_row(i) + (',' if i < (m - 1) else '') for i in range(m)]
-            + ['  )']
-        )
-        return '\n'.join(sql) + '\n'
 
     # noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection
     def insert_table(

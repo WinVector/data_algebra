@@ -481,6 +481,8 @@ class DBModel:
     supports_with: bool
     allow_extend_merges: bool
     default_SQL_format_options:SQLFormatOptions
+    union_all_term_start: str
+    union_all_term_end: str
 
     def __init__(
         self,
@@ -499,6 +501,8 @@ class DBModel:
         supports_with=True,
         allow_extend_merges=True,
         default_SQL_format_options=None,
+        union_all_term_start='(',
+        union_all_term_end=')',
     ):
         if local_data_model is None:
             local_data_model = data_algebra.default_data_model
@@ -529,6 +533,8 @@ class DBModel:
         self.default_SQL_format_options = default_SQL_format_options
         self.supports_with = supports_with
         self.allow_extend_merges = allow_extend_merges
+        self.union_all_term_start = union_all_term_start
+        self.union_all_term_end=union_all_term_end
 
     def db_handle(self, conn):
         return DBHandle(db_model=self, conn=conn)
@@ -695,9 +701,10 @@ class DBModel:
 
         def q_row(i):
             return (
-                    '(SELECT '
+                    self.union_all_term_start
+                    + 'SELECT '
                     + ', '.join([f'{qv(v[v.columns[j]][i])} AS {qi(v.columns[j])}' for j in range(n)])
-                    + ')'
+                    + self.union_all_term_end
                 )
 
         sql = (
