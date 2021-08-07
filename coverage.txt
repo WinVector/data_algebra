@@ -89,9 +89,9 @@ tests/test_with.py ..                                                    [100%]
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
 data_algebra/BigQuery.py                 106     68    36%
-data_algebra/MySQL.py                     27      5    81%
+data_algebra/MySQL.py                     27      9    67%
 data_algebra/OrderedSet.py                53      7    87%
-data_algebra/PostgreSQL.py                17      2    88%
+data_algebra/PostgreSQL.py                17      6    65%
 data_algebra/SQLite.py                    76      8    89%
 data_algebra/SparkSQL.py                  68     43    37%
 data_algebra/__init__.py                   6      0   100%
@@ -102,7 +102,7 @@ data_algebra/data_model.py               128     22    83%
 data_algebra/data_ops.py                1149    192    83%
 data_algebra/data_ops_types.py            91     41    55%
 data_algebra/data_ops_utils.py            51      7    86%
-data_algebra/db_model.py                 884     86    90%
+data_algebra/db_model.py                 882     94    89%
 data_algebra/eval_model.py                16      1    94%
 data_algebra/expr_parse.py                32      0   100%
 data_algebra/expr_rep.py                 562    103    82%
@@ -113,10 +113,10 @@ data_algebra/pandas_base.py              305     32    90%
 data_algebra/pandas_model.py              18      3    83%
 data_algebra/parse_by_lark.py            143     26    82%
 data_algebra/python3_lark.py               1      0   100%
-data_algebra/test_util.py                203     29    86%
+data_algebra/test_util.py                203     37    82%
 data_algebra/util.py                      78      6    92%
 ----------------------------------------------------------
-TOTAL                                   4811    829    83%
+TOTAL                                   4809    853    82%
 
 
-============================= 206 passed in 34.89s =============================
+============================= 206 passed in 16.30s =============================
