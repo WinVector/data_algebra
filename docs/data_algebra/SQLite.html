@@ -55,9 +55,6 @@
                                 <a class="function" href="#SQLiteModel.prepare_connection">prepare_connection</a>
                         </li>
                         <li>
-                                <a class="function" href="#SQLiteModel.table_values_to_sql">table_values_to_sql</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#SQLiteModel.insert_table">insert_table</a>
                         </li>
                 </ul>
@@ -144,7 +141,9 @@
             <span class="n">identifier_quote</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
             <span class="n">string_quote</span><span class="o">=</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span>
             <span class="n">sql_formatters</span><span class="o">=</span><span class="n">SQLite_formatters</span><span class="p">,</span>
-            <span class="n">on_joiner</span><span class="o">=</span><span class="s1">&#39;AND&#39;</span>
+            <span class="n">on_joiner</span><span class="o">=</span><span class="s1">&#39;AND&#39;</span><span class="p">,</span>
+            <span class="n">union_all_term_start</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">union_all_term_end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">prepare_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
@@ -240,32 +239,6 @@
 
         <span class="c1"># https://docs.python.org/3/library/sqlite3.html</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MedianAgg</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">table_values_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="n">m</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">assert</span> <span class="n">m</span> <span class="o">&gt;</span> <span class="mi">0</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">assert</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span>
-
-        <span class="k">def</span> <span class="nf">q_row</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
-            <span class="k">return</span> <span class="p">(</span>
-                <span class="s1">&#39;(&#39;</span>
-                <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">j</span><span class="p">]][</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)])</span>
-                <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
-            <span class="p">)</span>
-
-        <span class="n">sql</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">[</span><span class="s1">&#39;SELECT&#39;</span><span class="p">]</span>
-            <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;   &#39;</span>
-               <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;column</span><span class="si">{</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-               <span class="o">+</span> <span class="s1">&#39; AS &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span> <span class="k">if</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
-            <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;FROM&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;  (VALUES&#39;</span><span class="p">]</span>
-            <span class="o">+</span> <span class="p">[</span> <span class="s1">&#39;    &#39;</span> <span class="o">+</span> <span class="n">q_row</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)]</span>
-            <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;  )&#39;</span><span class="p">]</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
 
     <span class="c1"># noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection</span>
     <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
@@ -416,7 +389,9 @@
             <span class="n">identifier_quote</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
             <span class="n">string_quote</span><span class="o">=</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span>
             <span class="n">sql_formatters</span><span class="o">=</span><span class="n">SQLite_formatters</span><span class="p">,</span>
-            <span class="n">on_joiner</span><span class="o">=</span><span class="s1">&#39;AND&#39;</span>
+            <span class="n">on_joiner</span><span class="o">=</span><span class="s1">&#39;AND&#39;</span><span class="p">,</span>
+            <span class="n">union_all_term_start</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">union_all_term_end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">prepare_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
@@ -513,32 +488,6 @@
         <span class="c1"># https://docs.python.org/3/library/sqlite3.html</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MedianAgg</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">table_values_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="n">m</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">assert</span> <span class="n">m</span> <span class="o">&gt;</span> <span class="mi">0</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">assert</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span>
-
-        <span class="k">def</span> <span class="nf">q_row</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
-            <span class="k">return</span> <span class="p">(</span>
-                <span class="s1">&#39;(&#39;</span>
-                <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">j</span><span class="p">]][</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)])</span>
-                <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
-            <span class="p">)</span>
-
-        <span class="n">sql</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">[</span><span class="s1">&#39;SELECT&#39;</span><span class="p">]</span>
-            <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;   &#39;</span>
-               <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;column</span><span class="si">{</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-               <span class="o">+</span> <span class="s1">&#39; AS &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span> <span class="k">if</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
-            <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;FROM&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;  (VALUES&#39;</span><span class="p">]</span>
-            <span class="o">+</span> <span class="p">[</span> <span class="s1">&#39;    &#39;</span> <span class="o">+</span> <span class="n">q_row</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)]</span>
-            <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;  )&#39;</span><span class="p">]</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
-
     <span class="c1"># noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection</span>
     <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span>
@@ -593,7 +542,9 @@
             <span class="n">identifier_quote</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
             <span class="n">string_quote</span><span class="o">=</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span>
             <span class="n">sql_formatters</span><span class="o">=</span><span class="n">SQLite_formatters</span><span class="p">,</span>
-            <span class="n">on_joiner</span><span class="o">=</span><span class="s1">&#39;AND&#39;</span>
+            <span class="n">on_joiner</span><span class="o">=</span><span class="s1">&#39;AND&#39;</span><span class="p">,</span>
+            <span class="n">union_all_term_start</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">union_all_term_end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -712,48 +663,6 @@
     
 
                             </div>
-                            <div id="SQLiteModel.table_values_to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#SQLiteModel.table_values_to_sql">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">table_values_to_sql</span><span class="signature">(self, v)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">table_values_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="n">m</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">assert</span> <span class="n">m</span> <span class="o">&gt;</span> <span class="mi">0</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">assert</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span>
-
-        <span class="k">def</span> <span class="nf">q_row</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
-            <span class="k">return</span> <span class="p">(</span>
-                <span class="s1">&#39;(&#39;</span>
-                <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">j</span><span class="p">]][</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)])</span>
-                <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
-            <span class="p">)</span>
-
-        <span class="n">sql</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">[</span><span class="s1">&#39;SELECT&#39;</span><span class="p">]</span>
-            <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;   &#39;</span>
-               <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;column</span><span class="si">{</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-               <span class="o">+</span> <span class="s1">&#39; AS &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span> <span class="k">if</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
-            <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;FROM&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;  (VALUES&#39;</span><span class="p">]</span>
-            <span class="o">+</span> <span class="p">[</span> <span class="s1">&#39;    &#39;</span> <span class="o">+</span> <span class="n">q_row</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)]</span>
-            <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;  )&#39;</span><span class="p">]</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            </div>
                             <div id="SQLiteModel.insert_table" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#SQLiteModel.insert_table">#&nbsp;&nbsp</a>
 
@@ -823,6 +732,7 @@
                 <dd id="SQLiteModel.quote_string" class="function"><a href="db_model.html#DBModel.quote_string">quote_string</a></dd>
                 <dd id="SQLiteModel.quote_literal" class="function"><a href="db_model.html#DBModel.quote_literal">quote_literal</a></dd>
                 <dd id="SQLiteModel.value_to_sql" class="function"><a href="db_model.html#DBModel.value_to_sql">value_to_sql</a></dd>
+                <dd id="SQLiteModel.table_values_to_sql" class="function"><a href="db_model.html#DBModel.table_values_to_sql">table_values_to_sql</a></dd>
                 <dd id="SQLiteModel.expr_to_sql" class="function"><a href="db_model.html#DBModel.expr_to_sql">expr_to_sql</a></dd>
                 <dd id="SQLiteModel.table_def_to_sql" class="function"><a href="db_model.html#DBModel.table_def_to_sql">table_def_to_sql</a></dd>
                 <dd id="SQLiteModel.extend_to_sql" class="function"><a href="db_model.html#DBModel.extend_to_sql">extend_to_sql</a></dd>

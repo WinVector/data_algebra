@@ -699,6 +699,8 @@
     <span class="n">supports_with</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">allow_extend_merges</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">default_SQL_format_options</span><span class="p">:</span><span class="n">SQLFormatOptions</span>
+    <span class="n">union_all_term_start</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">union_all_term_end</span><span class="p">:</span> <span class="nb">str</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -717,6 +719,8 @@
         <span class="n">supports_with</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">allow_extend_merges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">default_SQL_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">union_all_term_start</span><span class="o">=</span><span class="s1">&#39;(&#39;</span><span class="p">,</span>
+        <span class="n">union_all_term_end</span><span class="o">=</span><span class="s1">&#39;)&#39;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
@@ -747,6 +751,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span> <span class="o">=</span> <span class="n">default_SQL_format_options</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span> <span class="o">=</span> <span class="n">supports_with</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">allow_extend_merges</span> <span class="o">=</span> <span class="n">allow_extend_merges</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_start</span> <span class="o">=</span> <span class="n">union_all_term_start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_end</span><span class="o">=</span><span class="n">union_all_term_end</span>
 
     <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DBHandle</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="n">conn</span><span class="p">)</span>
@@ -913,9 +919,10 @@
 
         <span class="k">def</span> <span class="nf">q_row</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">(</span>
-                    <span class="s1">&#39;(SELECT &#39;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_start</span>
+                    <span class="o">+</span> <span class="s1">&#39;SELECT &#39;</span>
                     <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">qv</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">j</span><span class="p">]][</span><span class="n">i</span><span class="p">])</span><span class="si">}</span><span class="s1"> AS </span><span class="si">{</span><span class="n">qi</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)])</span>
-                    <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+                    <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_end</span>
                 <span class="p">)</span>
 
         <span class="n">sql</span> <span class="o">=</span> <span class="p">(</span>
@@ -2148,6 +2155,8 @@
     <span class="n">supports_with</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">allow_extend_merges</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">default_SQL_format_options</span><span class="p">:</span><span class="n">SQLFormatOptions</span>
+    <span class="n">union_all_term_start</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">union_all_term_end</span><span class="p">:</span> <span class="nb">str</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -2166,6 +2175,8 @@
         <span class="n">supports_with</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">allow_extend_merges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">default_SQL_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">union_all_term_start</span><span class="o">=</span><span class="s1">&#39;(&#39;</span><span class="p">,</span>
+        <span class="n">union_all_term_end</span><span class="o">=</span><span class="s1">&#39;)&#39;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
@@ -2196,6 +2207,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span> <span class="o">=</span> <span class="n">default_SQL_format_options</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span> <span class="o">=</span> <span class="n">supports_with</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">allow_extend_merges</span> <span class="o">=</span> <span class="n">allow_extend_merges</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_start</span> <span class="o">=</span> <span class="n">union_all_term_start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_end</span><span class="o">=</span><span class="n">union_all_term_end</span>
 
     <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DBHandle</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="n">conn</span><span class="p">)</span>
@@ -2362,9 +2375,10 @@
 
         <span class="k">def</span> <span class="nf">q_row</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">(</span>
-                    <span class="s1">&#39;(SELECT &#39;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_start</span>
+                    <span class="o">+</span> <span class="s1">&#39;SELECT &#39;</span>
                     <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">qv</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">j</span><span class="p">]][</span><span class="n">i</span><span class="p">])</span><span class="si">}</span><span class="s1"> AS </span><span class="si">{</span><span class="n">qi</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)])</span>
-                    <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+                    <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_end</span>
                 <span class="p">)</span>
 
         <span class="n">sql</span> <span class="o">=</span> <span class="p">(</span>
@@ -3394,7 +3408,9 @@
     join_name_map=None,
     supports_with=True,
     allow_extend_merges=True,
-    default_SQL_format_options=None
+    default_SQL_format_options=None,
+    union_all_term_start=&#39;(&#39;,
+    union_all_term_end=&#39;)&#39;
 )</span>
     </div>
 
@@ -3417,6 +3433,8 @@
         <span class="n">supports_with</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">allow_extend_merges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">default_SQL_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">union_all_term_start</span><span class="o">=</span><span class="s1">&#39;(&#39;</span><span class="p">,</span>
+        <span class="n">union_all_term_end</span><span class="o">=</span><span class="s1">&#39;)&#39;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
@@ -3447,6 +3465,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span> <span class="o">=</span> <span class="n">default_SQL_format_options</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">supports_with</span> <span class="o">=</span> <span class="n">supports_with</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">allow_extend_merges</span> <span class="o">=</span> <span class="n">allow_extend_merges</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_start</span> <span class="o">=</span> <span class="n">union_all_term_start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_end</span><span class="o">=</span><span class="n">union_all_term_end</span>
 </pre></div>
 
         </details>
@@ -3863,9 +3883,10 @@
 
         <span class="k">def</span> <span class="nf">q_row</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">(</span>
-                    <span class="s1">&#39;(SELECT &#39;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_start</span>
+                    <span class="o">+</span> <span class="s1">&#39;SELECT &#39;</span>
                     <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">qv</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">j</span><span class="p">]][</span><span class="n">i</span><span class="p">])</span><span class="si">}</span><span class="s1"> AS </span><span class="si">{</span><span class="n">qi</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)])</span>
-                    <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+                    <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_end</span>
                 <span class="p">)</span>
 
         <span class="n">sql</span> <span class="o">=</span> <span class="p">(</span>
