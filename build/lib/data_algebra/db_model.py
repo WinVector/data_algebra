@@ -690,7 +690,31 @@ class DBModel:
         return str(v)
 
     def table_values_to_sql(self, v):
-        raise TypeError("table_to_sql not implemented for this class")
+        assert v is not None
+        m = v.shape[0]
+        assert m > 0
+        n = v.shape[1]
+        assert n > 0
+        qi = self.quote_identifier
+        qv = self.value_to_sql
+
+        def q_row(i):
+            return (
+                    '(SELECT '
+                    + ', '.join([f'{qv(v[v.columns[j]][i])} AS {qi(v.columns[j])}' for j in range(n)])
+                    + ')'
+                )
+
+        sql = (
+            [
+                'SELECT',
+                ' *',
+                'FROM ('
+            ]
+            + ['    ' + ('' if (i < 1) else 'UNION ALL ') + q_row(i) for i in range(m)]
+            + [f') {qi("table_values")}']
+        )
+        return '\n'.join(sql) + '\n'
 
     def expr_to_sql(self, expression, *, want_inline_parens=False):
         if isinstance(expression, str):

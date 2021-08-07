@@ -556,7 +556,7 @@ def pivot_blocks_to_rowrecs(
     local_data_model=None
 ):
     """
-    Build a block records to row records map.
+    Build a block records to row records map. This is very similar to a SQL pivot.
 
     :param attribute_key_column: column to identify record attribute keys
     :param attribute_value_column: column for record attribute values
@@ -595,7 +595,7 @@ def pivot_rowrecs_to_blocks(
     local_data_model=None
 ):
     """
-    Build a row records to block records map.
+    Build a row records to block records map. This is very similar to a SQL unpivot.
 
     :param attribute_key_column: column to identify record attribute keys
     :param attribute_value_column: column for record attribute values

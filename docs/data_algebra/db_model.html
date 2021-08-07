@@ -908,7 +908,31 @@
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">table_values_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;table_to_sql not implemented for this class&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">m</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">qi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span>
+        <span class="n">qv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_to_sql</span>
+
+        <span class="k">def</span> <span class="nf">q_row</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span>
+                    <span class="s1">&#39;(SELECT &#39;</span>
+                    <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">qv</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">j</span><span class="p">]][</span><span class="n">i</span><span class="p">])</span><span class="si">}</span><span class="s1"> AS </span><span class="si">{</span><span class="n">qi</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)])</span>
+                    <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+                <span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[</span>
+                <span class="s1">&#39;SELECT&#39;</span><span class="p">,</span>
+                <span class="s1">&#39; *&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;FROM (&#39;</span>
+            <span class="p">]</span>
+            <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;    &#39;</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;UNION ALL &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">q_row</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)]</span>
+            <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;) </span><span class="si">{</span><span class="n">qi</span><span class="p">(</span><span class="s2">&quot;table_values&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
 
     <span class="k">def</span> <span class="nf">expr_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expression</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -2380,7 +2404,31 @@
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">table_values_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;table_to_sql not implemented for this class&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">m</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">qi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span>
+        <span class="n">qv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_to_sql</span>
+
+        <span class="k">def</span> <span class="nf">q_row</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span>
+                    <span class="s1">&#39;(SELECT &#39;</span>
+                    <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">qv</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">j</span><span class="p">]][</span><span class="n">i</span><span class="p">])</span><span class="si">}</span><span class="s1"> AS </span><span class="si">{</span><span class="n">qi</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)])</span>
+                    <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+                <span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[</span>
+                <span class="s1">&#39;SELECT&#39;</span><span class="p">,</span>
+                <span class="s1">&#39; *&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;FROM (&#39;</span>
+            <span class="p">]</span>
+            <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;    &#39;</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;UNION ALL &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">q_row</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)]</span>
+            <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;) </span><span class="si">{</span><span class="n">qi</span><span class="p">(</span><span class="s2">&quot;table_values&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
 
     <span class="k">def</span> <span class="nf">expr_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expression</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -3902,7 +3950,31 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">table_values_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;table_to_sql not implemented for this class&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">m</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">qi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span>
+        <span class="n">qv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_to_sql</span>
+
+        <span class="k">def</span> <span class="nf">q_row</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span>
+                    <span class="s1">&#39;(SELECT &#39;</span>
+                    <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">qv</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">j</span><span class="p">]][</span><span class="n">i</span><span class="p">])</span><span class="si">}</span><span class="s1"> AS </span><span class="si">{</span><span class="n">qi</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)])</span>
+                    <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+                <span class="p">)</span>
+
+        <span class="n">sql</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[</span>
+                <span class="s1">&#39;SELECT&#39;</span><span class="p">,</span>
+                <span class="s1">&#39; *&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;FROM (&#39;</span>
+            <span class="p">]</span>
+            <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;    &#39;</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;UNION ALL &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">q_row</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)]</span>
+            <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;) </span><span class="si">{</span><span class="n">qi</span><span class="p">(</span><span class="s2">&quot;table_values&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
 </pre></div>
 
         </details>

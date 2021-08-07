@@ -16,9 +16,9 @@ from data_algebra.data_ops import *
 
 
 # controls
-test_PostgreSQL = False  # causes an external dependency
+test_PostgreSQL = True  # causes an external dependency
 test_BigQuery = False  # causes an external dependency
-test_MySQL = False  # causes an external dependency
+test_MySQL = True  # causes an external dependency
 test_Spark = False  # causes an external dependency
 
 
@@ -285,6 +285,39 @@ def check_transform_on_handles(
                         raise ValueError(f"{db_handle} ops result did not match expect")
 
 
+def get_test_dbs():
+    """
+    handles connected to databases for testing.
+
+    """
+    db_handles = []
+    hdl = data_algebra.SQLite.example_handle()
+    assert hdl is not None
+    assert hdl.conn is not None
+    db_handles.append(hdl)
+    if test_PostgreSQL:
+        hdl = data_algebra.PostgreSQL.example_handle()
+        assert hdl is not None
+        assert hdl.conn is not None
+        db_handles.append(hdl)
+    if test_BigQuery:
+        hdl = data_algebra.BigQuery.example_handle()
+        assert hdl is not None
+        assert hdl.conn is not None
+        db_handles.append(hdl)
+    if test_MySQL:
+        hdl = data_algebra.MySQL.example_handle()
+        assert hdl is not None
+        assert hdl.conn is not None
+        db_handles.append(hdl)
+    if test_Spark:
+        hdl = data_algebra.SparkSQL.example_handle()
+        assert hdl is not None
+        assert hdl.conn is not None
+        db_handles.append(hdl)
+    return db_handles
+
+
 def check_transform(
     ops,
     data,
@@ -328,29 +361,10 @@ def check_transform(
         data_algebra.PostgreSQL.PostgreSQLModel().db_handle(None),
         data_algebra.SparkSQL.SparkSQLModel().db_handle(None),
         data_algebra.MySQL.MySQLModel().db_handle(None),
-        data_algebra.SQLite.example_handle(),  # actual database instance, not empty
     ]
 
-    if test_PostgreSQL:
-        hdl = data_algebra.PostgreSQL.example_handle()
-        assert hdl is not None
-        assert hdl.conn is not None
-        db_handles.append(hdl)
-    if test_BigQuery:
-        hdl = data_algebra.BigQuery.example_handle()
-        assert hdl is not None
-        assert hdl.conn is not None
-        db_handles.append(hdl)
-    if test_MySQL:
-        hdl = data_algebra.MySQL.example_handle()
-        assert hdl is not None
-        assert hdl.conn is not None
-        db_handles.append(hdl)
-    if test_Spark:
-        hdl = data_algebra.SparkSQL.example_handle()
-        assert hdl is not None
-        assert hdl.conn is not None
-        db_handles.append(hdl)
+    test_dbs = get_test_dbs()
+    db_handles = db_handles + test_dbs
 
     if models_to_skip is not None:
         db_handles = [h for h in db_handles if str(h.db_model) not in models_to_skip]

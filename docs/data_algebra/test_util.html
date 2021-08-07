@@ -40,6 +40,9 @@
                     <a class="function" href="#check_transform_on_handles">check_transform_on_handles</a>
             </li>
             <li>
+                    <a class="function" href="#get_test_dbs">get_test_dbs</a>
+            </li>
+            <li>
                     <a class="function" href="#check_transform">check_transform</a>
             </li>
     </ul>
@@ -78,9 +81,9 @@
 
 
 <span class="c1"># controls</span>
-<span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
+<span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># causes an external dependency</span>
 <span class="n">test_BigQuery</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-<span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
+<span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># causes an external dependency</span>
 <span class="n">test_Spark</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
 
 
@@ -347,6 +350,39 @@
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db_handle</span><span class="si">}</span><span class="s2"> ops result did not match expect&quot;</span><span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">get_test_dbs</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    handles connected to databases for testing.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">test_PostgreSQL</span><span class="p">:</span>
+        <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">test_BigQuery</span><span class="p">:</span>
+        <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">test_MySQL</span><span class="p">:</span>
+        <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">test_Spark</span><span class="p">:</span>
+        <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">db_handles</span>
+
+
 <span class="k">def</span> <span class="nf">check_transform</span><span class="p">(</span>
     <span class="n">ops</span><span class="p">,</span>
     <span class="n">data</span><span class="p">,</span>
@@ -390,29 +426,10 @@
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">SparkSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">example_handle</span><span class="p">(),</span>  <span class="c1"># actual database instance, not empty</span>
     <span class="p">]</span>
 
-    <span class="k">if</span> <span class="n">test_PostgreSQL</span><span class="p">:</span>
-        <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">test_BigQuery</span><span class="p">:</span>
-        <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">test_MySQL</span><span class="p">:</span>
-        <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">test_Spark</span><span class="p">:</span>
-        <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
+    <span class="n">test_dbs</span> <span class="o">=</span> <span class="n">get_test_dbs</span><span class="p">()</span>
+    <span class="n">db_handles</span> <span class="o">=</span> <span class="n">db_handles</span> <span class="o">+</span> <span class="n">test_dbs</span>
 
     <span class="k">if</span> <span class="n">models_to_skip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">db_handles</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">db_model</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">models_to_skip</span><span class="p">]</span>
@@ -792,6 +809,56 @@ Asserts if there are issues</p>
 
 
                 </section>
+                <section id="get_test_dbs">
+                            <div class="attr function"><a class="headerlink" href="#get_test_dbs">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">get_test_dbs</span><span class="signature">()</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_test_dbs</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    handles connected to databases for testing.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">test_PostgreSQL</span><span class="p">:</span>
+        <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">test_BigQuery</span><span class="p">:</span>
+        <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">test_MySQL</span><span class="p">:</span>
+        <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">test_Spark</span><span class="p">:</span>
+        <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">db_handles</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>handles connected to databases for testing.</p>
+</div>
+
+
+                </section>
                 <section id="check_transform">
                             <div class="attr function"><a class="headerlink" href="#check_transform">#&nbsp;&nbsp</a>
 
@@ -857,29 +924,10 @@ Asserts if there are issues</p>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">SparkSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">example_handle</span><span class="p">(),</span>  <span class="c1"># actual database instance, not empty</span>
     <span class="p">]</span>
 
-    <span class="k">if</span> <span class="n">test_PostgreSQL</span><span class="p">:</span>
-        <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">test_BigQuery</span><span class="p">:</span>
-        <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">test_MySQL</span><span class="p">:</span>
-        <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">test_Spark</span><span class="p">:</span>
-        <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
+    <span class="n">test_dbs</span> <span class="o">=</span> <span class="n">get_test_dbs</span><span class="p">()</span>
+    <span class="n">db_handles</span> <span class="o">=</span> <span class="n">db_handles</span> <span class="o">+</span> <span class="n">test_dbs</span>
 
     <span class="k">if</span> <span class="n">models_to_skip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">db_handles</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">db_model</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">models_to_skip</span><span class="p">]</span>
