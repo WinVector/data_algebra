@@ -1,5 +1,5 @@
 ============================= test session starts ==============================
-platform darwin -- Python 3.9.5, pytest-6.2.4, py-1.10.0, pluggy-0.13.1
+platform darwin -- Python 3.9.6, pytest-6.2.4, py-1.10.0, pluggy-0.13.1
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.12.1, anyio-2.2.0
 collected 206 items
@@ -85,13 +85,13 @@ tests/test_window2.py ...                                                [ 96%]
 tests/test_window_fns.py .....                                           [ 99%]
 tests/test_with.py ..                                                    [100%]
 
----------- coverage: platform darwin, python 3.9.5-final-0 -----------
+---------- coverage: platform darwin, python 3.9.6-final-0 -----------
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
-data_algebra/BigQuery.py                 106     68    36%
-data_algebra/MySQL.py                     27      9    67%
+data_algebra/BigQuery.py                 106     67    37%
+data_algebra/MySQL.py                     27      8    70%
 data_algebra/OrderedSet.py                53      7    87%
-data_algebra/PostgreSQL.py                17      6    65%
+data_algebra/PostgreSQL.py                17      5    71%
 data_algebra/SQLite.py                    66      8    88%
 data_algebra/SparkSQL.py                  65     40    38%
 data_algebra/__init__.py                   6      0   100%
@@ -116,7 +116,7 @@ data_algebra/python3_lark.py               1      0   100%
 data_algebra/test_util.py                195     37    81%
 data_algebra/util.py                      78      6    92%
 ----------------------------------------------------------
-TOTAL                                   4758    844    82%
+TOTAL                                   4758    841    82%
 
 
-============================= 206 passed in 16.44s =============================
+============================= 206 passed in 15.08s =============================
