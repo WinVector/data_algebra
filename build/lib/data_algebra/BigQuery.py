@@ -208,9 +208,7 @@ def example_handle():
     assert _have_bigquery
     credential_file = "/Users/johnmount/big_query/big_query_jm.json"
     # assert os.path.isfile(credential_file)
-    os.environ[
-        "GOOGLE_APPLICATION_CREDENTIALS"
-    ] = credential_file
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credential_file
     # os.environ["GOOGLE_APPLICATION_CREDENTIALS"]  # trigger key error if not present
     try:
         data_catalog = "data-algebra-test"

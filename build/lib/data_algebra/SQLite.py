@@ -58,9 +58,9 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             identifier_quote='"',
             string_quote="'",
             sql_formatters=SQLite_formatters,
-            on_joiner='AND',
-            union_all_term_start='',
-            union_all_term_end='',
+            on_joiner="AND",
+            union_all_term_start="",
+            union_all_term_end="",
         )
 
     def prepare_connection(self, conn):

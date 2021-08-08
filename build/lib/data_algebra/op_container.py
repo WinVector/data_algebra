@@ -1,6 +1,6 @@
-
 import collections
 from types import SimpleNamespace
+import typing
 
 import data_algebra.data_ops_types
 import data_algebra.data_ops
@@ -13,7 +13,7 @@ one = data_algebra.expr_rep.Value(1)
 class OpC(data_algebra.data_ops_types.OperatorPlatform):
     """Container that redirects to another to non-quoted notation."""
 
-    ops: data_algebra.data_ops_types.OperatorPlatform
+    ops: typing.Optional[data_algebra.data_ops_types.OperatorPlatform]
     column_namespace: SimpleNamespace
     used_result: bool
 
@@ -53,7 +53,11 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         :return: table result
         """
         self.used_result = True
-        return self.ops.ex(data_model=data_model, narrow=narrow, allow_limited_tables=allow_limited_tables)
+        return self.ops.ex(
+            data_model=data_model,
+            narrow=narrow,
+            allow_limited_tables=allow_limited_tables,
+        )
 
     # noinspection PyPep8Naming
     def transform(self, X, *, data_model=None, narrow=True):
@@ -121,15 +125,18 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         return self
 
     def project(self, ops=None, *, group_by=None):
-        self.set(self.ops.project(ops=ops, group_by=group_by, ))
+        self.set(self.ops.project(ops=ops, group_by=group_by,))
         return self
 
     def natural_join(self, b, *, by, jointype, check_all_common_keys_in_by=False):
-        self.set(self.ops.natural_join(
-            b=b,
-            by=by,
-            jointype=jointype,
-            check_all_common_keys_in_by=check_all_common_keys_in_by))
+        self.set(
+            self.ops.natural_join(
+                b=b,
+                by=by,
+                jointype=jointype,
+                check_all_common_keys_in_by=check_all_common_keys_in_by,
+            )
+        )
         return self
 
     def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):
@@ -143,7 +150,7 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         return self
 
     def select_rows(self, expr):
-        self.set(self.ops.select_rows(expr=expr, ))
+        self.set(self.ops.select_rows(expr=expr,))
         return self
 
     def drop_columns(self, column_deletions):
@@ -174,7 +181,7 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
             blocks_out=blocks_out,
             strict=strict,
             temp_namer=temp_namer,
-            )
+        )
         return self
 
     # sklearn step style interface

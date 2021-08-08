@@ -149,6 +149,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">SimpleNamespace</span>
+<span class="kn">import</span> <span class="nn">typing</span>
 
 <span class="kn">import</span> <span class="nn">data_algebra.data_ops_types</span>
 <span class="kn">import</span> <span class="nn">data_algebra.data_ops</span>
@@ -161,7 +162,7 @@
 <span class="k">class</span> <span class="nc">OpC</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Container that redirects to another to non-quoted notation.&quot;&quot;&quot;</span>
 
-    <span class="n">ops</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span>
+    <span class="n">ops</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">]</span>
     <span class="n">column_namespace</span><span class="p">:</span> <span class="n">SimpleNamespace</span>
     <span class="n">used_result</span><span class="p">:</span> <span class="nb">bool</span>
 
@@ -201,7 +202,11 @@
 <span class="sd">        :return: table result</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">used_result</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">ex</span><span class="p">(</span><span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,</span> <span class="n">allow_limited_tables</span><span class="o">=</span><span class="n">allow_limited_tables</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">ex</span><span class="p">(</span>
+            <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span>
+            <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,</span>
+            <span class="n">allow_limited_tables</span><span class="o">=</span><span class="n">allow_limited_tables</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -269,15 +274,18 @@
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">,</span> <span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">,))</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">natural_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">by</span><span class="p">,</span> <span class="n">jointype</span><span class="p">,</span> <span class="n">check_all_common_keys_in_by</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">natural_join</span><span class="p">(</span>
-            <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span>
-            <span class="n">by</span><span class="o">=</span><span class="n">by</span><span class="p">,</span>
-            <span class="n">jointype</span><span class="o">=</span><span class="n">jointype</span><span class="p">,</span>
-            <span class="n">check_all_common_keys_in_by</span><span class="o">=</span><span class="n">check_all_common_keys_in_by</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">natural_join</span><span class="p">(</span>
+                <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span>
+                <span class="n">by</span><span class="o">=</span><span class="n">by</span><span class="p">,</span>
+                <span class="n">jointype</span><span class="o">=</span><span class="n">jointype</span><span class="p">,</span>
+                <span class="n">check_all_common_keys_in_by</span><span class="o">=</span><span class="n">check_all_common_keys_in_by</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">concat_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">id_column</span><span class="o">=</span><span class="s2">&quot;source_name&quot;</span><span class="p">,</span> <span class="n">a_name</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">b_name</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">):</span>
@@ -291,7 +299,7 @@
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">select_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">select_rows</span><span class="p">(</span><span class="n">expr</span><span class="o">=</span><span class="n">expr</span><span class="p">,</span> <span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">select_rows</span><span class="p">(</span><span class="n">expr</span><span class="o">=</span><span class="n">expr</span><span class="p">,))</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">drop_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_deletions</span><span class="p">):</span>
@@ -322,7 +330,7 @@
             <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">,</span>
             <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">,</span>
             <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="c1"># sklearn step style interface</span>
@@ -372,7 +380,7 @@
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">OpC</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Container that redirects to another to non-quoted notation.&quot;&quot;&quot;</span>
 
-    <span class="n">ops</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span>
+    <span class="n">ops</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">]</span>
     <span class="n">column_namespace</span><span class="p">:</span> <span class="n">SimpleNamespace</span>
     <span class="n">used_result</span><span class="p">:</span> <span class="nb">bool</span>
 
@@ -412,7 +420,11 @@
 <span class="sd">        :return: table result</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">used_result</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">ex</span><span class="p">(</span><span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,</span> <span class="n">allow_limited_tables</span><span class="o">=</span><span class="n">allow_limited_tables</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">ex</span><span class="p">(</span>
+            <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span>
+            <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,</span>
+            <span class="n">allow_limited_tables</span><span class="o">=</span><span class="n">allow_limited_tables</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -480,15 +492,18 @@
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">,</span> <span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">,))</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">natural_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">by</span><span class="p">,</span> <span class="n">jointype</span><span class="p">,</span> <span class="n">check_all_common_keys_in_by</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">natural_join</span><span class="p">(</span>
-            <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span>
-            <span class="n">by</span><span class="o">=</span><span class="n">by</span><span class="p">,</span>
-            <span class="n">jointype</span><span class="o">=</span><span class="n">jointype</span><span class="p">,</span>
-            <span class="n">check_all_common_keys_in_by</span><span class="o">=</span><span class="n">check_all_common_keys_in_by</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">natural_join</span><span class="p">(</span>
+                <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span>
+                <span class="n">by</span><span class="o">=</span><span class="n">by</span><span class="p">,</span>
+                <span class="n">jointype</span><span class="o">=</span><span class="n">jointype</span><span class="p">,</span>
+                <span class="n">check_all_common_keys_in_by</span><span class="o">=</span><span class="n">check_all_common_keys_in_by</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">concat_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">id_column</span><span class="o">=</span><span class="s2">&quot;source_name&quot;</span><span class="p">,</span> <span class="n">a_name</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">b_name</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">):</span>
@@ -502,7 +517,7 @@
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">select_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">select_rows</span><span class="p">(</span><span class="n">expr</span><span class="o">=</span><span class="n">expr</span><span class="p">,</span> <span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">select_rows</span><span class="p">(</span><span class="n">expr</span><span class="o">=</span><span class="n">expr</span><span class="p">,))</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">drop_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_deletions</span><span class="p">):</span>
@@ -533,7 +548,7 @@
             <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">,</span>
             <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">,</span>
             <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="c1"># sklearn step style interface</span>
@@ -666,7 +681,11 @@
 <span class="sd">        :return: table result</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">used_result</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">ex</span><span class="p">(</span><span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,</span> <span class="n">allow_limited_tables</span><span class="o">=</span><span class="n">allow_limited_tables</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">ex</span><span class="p">(</span>
+            <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span>
+            <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,</span>
+            <span class="n">allow_limited_tables</span><span class="o">=</span><span class="n">allow_limited_tables</span><span class="p">,</span>
+        <span class="p">)</span>
 </pre></div>
 
         </details>
@@ -908,7 +927,7 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">,</span> <span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">,))</span>
         <span class="k">return</span> <span class="bp">self</span>
 </pre></div>
 
@@ -928,11 +947,14 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">natural_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">by</span><span class="p">,</span> <span class="n">jointype</span><span class="p">,</span> <span class="n">check_all_common_keys_in_by</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">natural_join</span><span class="p">(</span>
-            <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span>
-            <span class="n">by</span><span class="o">=</span><span class="n">by</span><span class="p">,</span>
-            <span class="n">jointype</span><span class="o">=</span><span class="n">jointype</span><span class="p">,</span>
-            <span class="n">check_all_common_keys_in_by</span><span class="o">=</span><span class="n">check_all_common_keys_in_by</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">natural_join</span><span class="p">(</span>
+                <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span>
+                <span class="n">by</span><span class="o">=</span><span class="n">by</span><span class="p">,</span>
+                <span class="n">jointype</span><span class="o">=</span><span class="n">jointype</span><span class="p">,</span>
+                <span class="n">check_all_common_keys_in_by</span><span class="o">=</span><span class="n">check_all_common_keys_in_by</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 </pre></div>
 
@@ -994,7 +1016,7 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">select_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">select_rows</span><span class="p">(</span><span class="n">expr</span><span class="o">=</span><span class="n">expr</span><span class="p">,</span> <span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">select_rows</span><span class="p">(</span><span class="n">expr</span><span class="o">=</span><span class="n">expr</span><span class="p">,))</span>
         <span class="k">return</span> <span class="bp">self</span>
 </pre></div>
 
@@ -1121,7 +1143,7 @@
             <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">,</span>
             <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">,</span>
             <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 </pre></div>
 

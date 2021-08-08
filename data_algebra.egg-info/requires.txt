@@ -20,11 +20,13 @@ pyspark
 
 [all]
 black
-graphviz
-BigQuery
-PostgreSQL
-MySQL
-Spark
+google.cloud
+pyarrow
+google-cloud-bigquery
+sqlalchemy
+psycopg2
+pymysql
+pyspark
 
 [pretty_python]
 black

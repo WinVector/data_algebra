@@ -147,7 +147,7 @@
     <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">a_columns</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">b_columns</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">check_column_order</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]):</span>
             <span class="k">return</span> <span class="kc">False</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># re-order b into a&#39;s column order</span>
@@ -177,9 +177,9 @@
             <span class="n">cb_null</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">ca_null</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">cb_null</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">ca_null</span> <span class="o">==</span> <span class="n">cb_null</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">ca_null</span> <span class="o">==</span> <span class="n">cb_null</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">ca_null</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">ca_null</span><span class="p">):</span>
                 <span class="n">ca</span> <span class="o">=</span> <span class="n">ca</span><span class="p">[</span><span class="n">ca_null</span> <span class="o">==</span> <span class="kc">False</span><span class="p">]</span>
                 <span class="n">cb</span> <span class="o">=</span> <span class="n">cb</span><span class="p">[</span><span class="n">cb_null</span> <span class="o">==</span> <span class="kc">False</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">c</span><span class="p">]):</span>
@@ -189,7 +189,7 @@
                     <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dif</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">float_tol</span><span class="p">:</span>
                         <span class="k">return</span> <span class="kc">False</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">ca</span> <span class="o">==</span> <span class="n">cb</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">ca</span> <span class="o">==</span> <span class="n">cb</span><span class="p">):</span>
                         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="kc">True</span>
 
@@ -293,12 +293,10 @@
                     <span class="n">sql_format_options</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">SQLFormatOptions</span><span class="p">(</span>
                         <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span><span class="p">,</span>
                         <span class="n">annotate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                        <span class="n">sql_indent</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span>
-                        <span class="n">initial_commas</span><span class="o">=</span><span class="n">initial_commas</span><span class="p">)</span>
-                    <span class="n">sql</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
-                        <span class="n">ops</span><span class="p">,</span>
-                        <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
+                        <span class="n">sql_indent</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span>
+                        <span class="n">initial_commas</span><span class="o">=</span><span class="n">initial_commas</span><span class="p">,</span>
                     <span class="p">)</span>
+                    <span class="n">sql</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,)</span>
                     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
                     <span class="n">sql_statements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
                     <span class="c1"># print(sql)</span>
@@ -545,7 +543,7 @@ Can raise exceptions. Also checks pickling.</p>
     <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">a_columns</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">b_columns</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">check_column_order</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]):</span>
             <span class="k">return</span> <span class="kc">False</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># re-order b into a&#39;s column order</span>
@@ -575,9 +573,9 @@ Can raise exceptions. Also checks pickling.</p>
             <span class="n">cb_null</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">ca_null</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">cb_null</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">ca_null</span> <span class="o">==</span> <span class="n">cb_null</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">ca_null</span> <span class="o">==</span> <span class="n">cb_null</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">ca_null</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">ca_null</span><span class="p">):</span>
                 <span class="n">ca</span> <span class="o">=</span> <span class="n">ca</span><span class="p">[</span><span class="n">ca_null</span> <span class="o">==</span> <span class="kc">False</span><span class="p">]</span>
                 <span class="n">cb</span> <span class="o">=</span> <span class="n">cb</span><span class="p">[</span><span class="n">cb_null</span> <span class="o">==</span> <span class="kc">False</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">c</span><span class="p">]):</span>
@@ -587,7 +585,7 @@ Can raise exceptions. Also checks pickling.</p>
                     <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dif</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">float_tol</span><span class="p">:</span>
                         <span class="k">return</span> <span class="kc">False</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">ca</span> <span class="o">==</span> <span class="n">cb</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">ca</span> <span class="o">==</span> <span class="n">cb</span><span class="p">):</span>
                         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="kc">True</span>
 </pre></div>
@@ -722,12 +720,10 @@ Ignores indexing.</p>
                     <span class="n">sql_format_options</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">SQLFormatOptions</span><span class="p">(</span>
                         <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span><span class="p">,</span>
                         <span class="n">annotate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                        <span class="n">sql_indent</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span>
-                        <span class="n">initial_commas</span><span class="o">=</span><span class="n">initial_commas</span><span class="p">)</span>
-                    <span class="n">sql</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
-                        <span class="n">ops</span><span class="p">,</span>
-                        <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
+                        <span class="n">sql_indent</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span>
+                        <span class="n">initial_commas</span><span class="o">=</span><span class="n">initial_commas</span><span class="p">,</span>
                     <span class="p">)</span>
+                    <span class="n">sql</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,)</span>
                     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
                     <span class="n">sql_statements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
                     <span class="c1"># print(sql)</span>

@@ -200,7 +200,9 @@
         <span class="k">if</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">column_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="n">types_seen</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_column_types</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns_using</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">({</span><span class="n">types_seen</span><span class="p">[</span><span class="n">c</span><span class="p">]}</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">op</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]}))</span>
+                <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">(</span>
+                    <span class="p">{</span><span class="n">types_seen</span><span class="p">[</span><span class="n">c</span><span class="p">]}</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">op</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]})</span>
+                <span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">columns_to_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_rows</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
@@ -208,6 +210,7 @@
 <span class="sd">        Convert a dictionary of column names to series-like objects and scalars into a Pandas data frame.</span>
 
 <span class="sd">        :param cols: dictionary mapping column names to columns</span>
+<span class="sd">        :param target_rows: number of rows we are shooting for</span>
 <span class="sd">        :return: Pandas data frame.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># noinspection PyUnresolvedReferences</span>
@@ -223,20 +226,20 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
 
         <span class="c1"># agg can return scalars, which then can&#39;t be made into a self.pd.DataFrame</span>
-        <span class="k">def</span> <span class="nf">promote_scalar</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_len</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">promote_scalar</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_len</span><span class="p">):</span>
             <span class="c1"># noinspection PyBroadException</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">len_v</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="n">len_v</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vi</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">len_v</span> <span class="o">!=</span> <span class="n">target_len</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">len_v</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="k">return</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">target_len</span>
                     <span class="k">elif</span> <span class="n">len_v</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="n">target_len</span>
+                        <span class="k">return</span> <span class="p">[</span><span class="n">vi</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="n">target_len</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;incompatible column lengths&quot;</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">*</span> <span class="n">target_len</span>  <span class="c1"># scalar</span>
-            <span class="k">return</span> <span class="n">v</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">vi</span><span class="p">]</span> <span class="o">*</span> <span class="n">target_len</span>  <span class="c1"># scalar</span>
+            <span class="k">return</span> <span class="n">vi</span>
 
         <span class="n">cols</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">promote_scalar</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">target_len</span><span class="o">=</span><span class="n">target_rows</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">cols</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
@@ -245,7 +248,9 @@
         <span class="k">if</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">transient_new_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="c1"># scalars get interpreted as single row items, instead of zero row items</span>
             <span class="c1"># growing the extension frame</span>
-            <span class="n">transient_new_frame</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">transient_new_frame</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span>
+                <span class="n">drop</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">transient_new_frame</span>
@@ -259,7 +264,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">res</span><span class="p">,</span> <span class="n">transient_new_frame</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="c1"># normal path</span>
         <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-           <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
@@ -347,7 +352,9 @@
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)):</span>
                             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">)</span>
-                        <span class="n">transform_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">))]</span>
+                        <span class="n">transform_args</span> <span class="o">=</span> <span class="p">[</span>
+                            <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">))</span>
+                        <span class="p">]</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ColumnReference</span><span class="p">):</span>
                         <span class="n">value_name</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_name</span>
                         <span class="k">if</span> <span class="n">value_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">col_list</span><span class="p">):</span>
@@ -427,7 +434,9 @@
             <span class="n">cols</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;_data_table_temp_col&quot;</span><span class="p">:</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;_data_table_temp_col&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="s2">&quot;sum&quot;</span><span class="p">)}</span>
         <span class="c1"># agg can return scalars, which then can&#39;t be made into a self.pd.DataFrame</span>
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_to_frame_</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">group_by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># grouping variables in the index</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span>
+            <span class="n">drop</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">group_by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span>
+        <span class="p">)</span>  <span class="c1"># grouping variables in the index</span>
         <span class="n">missing_group_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">group_by</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_group_cols</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="s2">&quot;_data_table_temp_col&quot;</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
@@ -529,7 +538,9 @@
         <span class="n">common_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">left</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
             <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">right</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
         <span class="p">)</span>
-        <span class="n">type_checks</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">check_columns_appear_compatible</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">common_cols</span><span class="p">)</span>
+        <span class="n">type_checks</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">check_columns_appear_compatible</span><span class="p">(</span>
+            <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">common_cols</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="n">type_checks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;join: incompatible column types: </span><span class="si">{</span><span class="n">type_checks</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">by</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">by</span>
@@ -679,7 +690,9 @@
         <span class="k">if</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">column_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="n">types_seen</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_column_types</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns_using</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">({</span><span class="n">types_seen</span><span class="p">[</span><span class="n">c</span><span class="p">]}</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">op</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]}))</span>
+                <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">(</span>
+                    <span class="p">{</span><span class="n">types_seen</span><span class="p">[</span><span class="n">c</span><span class="p">]}</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">op</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]})</span>
+                <span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">columns_to_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_rows</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
@@ -687,6 +700,7 @@
 <span class="sd">        Convert a dictionary of column names to series-like objects and scalars into a Pandas data frame.</span>
 
 <span class="sd">        :param cols: dictionary mapping column names to columns</span>
+<span class="sd">        :param target_rows: number of rows we are shooting for</span>
 <span class="sd">        :return: Pandas data frame.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># noinspection PyUnresolvedReferences</span>
@@ -702,20 +716,20 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
 
         <span class="c1"># agg can return scalars, which then can&#39;t be made into a self.pd.DataFrame</span>
-        <span class="k">def</span> <span class="nf">promote_scalar</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_len</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">promote_scalar</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_len</span><span class="p">):</span>
             <span class="c1"># noinspection PyBroadException</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">len_v</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="n">len_v</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vi</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">len_v</span> <span class="o">!=</span> <span class="n">target_len</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">len_v</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="k">return</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">target_len</span>
                     <span class="k">elif</span> <span class="n">len_v</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="n">target_len</span>
+                        <span class="k">return</span> <span class="p">[</span><span class="n">vi</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="n">target_len</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;incompatible column lengths&quot;</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">*</span> <span class="n">target_len</span>  <span class="c1"># scalar</span>
-            <span class="k">return</span> <span class="n">v</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">vi</span><span class="p">]</span> <span class="o">*</span> <span class="n">target_len</span>  <span class="c1"># scalar</span>
+            <span class="k">return</span> <span class="n">vi</span>
 
         <span class="n">cols</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">promote_scalar</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">target_len</span><span class="o">=</span><span class="n">target_rows</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">cols</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
@@ -724,7 +738,9 @@
         <span class="k">if</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">transient_new_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="c1"># scalars get interpreted as single row items, instead of zero row items</span>
             <span class="c1"># growing the extension frame</span>
-            <span class="n">transient_new_frame</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">transient_new_frame</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span>
+                <span class="n">drop</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">transient_new_frame</span>
@@ -738,7 +754,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">res</span><span class="p">,</span> <span class="n">transient_new_frame</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="c1"># normal path</span>
         <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-           <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
@@ -826,7 +842,9 @@
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)):</span>
                             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">)</span>
-                        <span class="n">transform_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">))]</span>
+                        <span class="n">transform_args</span> <span class="o">=</span> <span class="p">[</span>
+                            <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">))</span>
+                        <span class="p">]</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ColumnReference</span><span class="p">):</span>
                         <span class="n">value_name</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_name</span>
                         <span class="k">if</span> <span class="n">value_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">col_list</span><span class="p">):</span>
@@ -906,7 +924,9 @@
             <span class="n">cols</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;_data_table_temp_col&quot;</span><span class="p">:</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;_data_table_temp_col&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="s2">&quot;sum&quot;</span><span class="p">)}</span>
         <span class="c1"># agg can return scalars, which then can&#39;t be made into a self.pd.DataFrame</span>
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_to_frame_</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">group_by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># grouping variables in the index</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span>
+            <span class="n">drop</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">group_by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span>
+        <span class="p">)</span>  <span class="c1"># grouping variables in the index</span>
         <span class="n">missing_group_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">group_by</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_group_cols</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="s2">&quot;_data_table_temp_col&quot;</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
@@ -1008,7 +1028,9 @@
         <span class="n">common_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">left</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
             <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">right</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
         <span class="p">)</span>
-        <span class="n">type_checks</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">check_columns_appear_compatible</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">common_cols</span><span class="p">)</span>
+        <span class="n">type_checks</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">check_columns_appear_compatible</span><span class="p">(</span>
+            <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">common_cols</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="n">type_checks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;join: incompatible column types: </span><span class="si">{</span><span class="n">type_checks</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">by</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">by</span>
@@ -1270,7 +1292,9 @@ inheritance.</p>
         <span class="k">if</span> <span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">column_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="n">types_seen</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_column_types</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns_using</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">({</span><span class="n">types_seen</span><span class="p">[</span><span class="n">c</span><span class="p">]}</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">op</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]}))</span>
+                <span class="k">assert</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">(</span>
+                    <span class="p">{</span><span class="n">types_seen</span><span class="p">[</span><span class="n">c</span><span class="p">]}</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">op</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]})</span>
+                <span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span>
 </pre></div>
 
@@ -1301,6 +1325,7 @@ inheritance.</p>
 <span class="sd">        Convert a dictionary of column names to series-like objects and scalars into a Pandas data frame.</span>
 
 <span class="sd">        :param cols: dictionary mapping column names to columns</span>
+<span class="sd">        :param target_rows: number of rows we are shooting for</span>
 <span class="sd">        :return: Pandas data frame.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># noinspection PyUnresolvedReferences</span>
@@ -1316,20 +1341,20 @@ inheritance.</p>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
 
         <span class="c1"># agg can return scalars, which then can&#39;t be made into a self.pd.DataFrame</span>
-        <span class="k">def</span> <span class="nf">promote_scalar</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_len</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">promote_scalar</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_len</span><span class="p">):</span>
             <span class="c1"># noinspection PyBroadException</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">len_v</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="n">len_v</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vi</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">len_v</span> <span class="o">!=</span> <span class="n">target_len</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">len_v</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="k">return</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">target_len</span>
                     <span class="k">elif</span> <span class="n">len_v</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="n">target_len</span>
+                        <span class="k">return</span> <span class="p">[</span><span class="n">vi</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="n">target_len</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;incompatible column lengths&quot;</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">*</span> <span class="n">target_len</span>  <span class="c1"># scalar</span>
-            <span class="k">return</span> <span class="n">v</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">vi</span><span class="p">]</span> <span class="o">*</span> <span class="n">target_len</span>  <span class="c1"># scalar</span>
+            <span class="k">return</span> <span class="n">vi</span>
 
         <span class="n">cols</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">promote_scalar</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">target_len</span><span class="o">=</span><span class="n">target_rows</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">cols</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
@@ -1340,6 +1365,7 @@ inheritance.</p>
             <div class="docstring"><p>Convert a dictionary of column names to series-like objects and scalars into a Pandas data frame.</p>
 
 <p>:param cols: dictionary mapping column names to columns
+:param target_rows: number of rows we are shooting for
 :return: Pandas data frame.</p>
 </div>
 
@@ -1359,7 +1385,9 @@ inheritance.</p>
         <span class="k">if</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">transient_new_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="c1"># scalars get interpreted as single row items, instead of zero row items</span>
             <span class="c1"># growing the extension frame</span>
-            <span class="n">transient_new_frame</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">transient_new_frame</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span>
+                <span class="n">drop</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">transient_new_frame</span>
@@ -1373,7 +1401,7 @@ inheritance.</p>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">res</span><span class="p">,</span> <span class="n">transient_new_frame</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="c1"># normal path</span>
         <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-           <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">res</span>
 </pre></div>
 
@@ -1477,7 +1505,9 @@ inheritance.</p>
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)):</span>
                             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">)</span>
-                        <span class="n">transform_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">))]</span>
+                        <span class="n">transform_args</span> <span class="o">=</span> <span class="p">[</span>
+                            <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">))</span>
+                        <span class="p">]</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ColumnReference</span><span class="p">):</span>
                         <span class="n">value_name</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_name</span>
                         <span class="k">if</span> <span class="n">value_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">col_list</span><span class="p">):</span>
@@ -1573,7 +1603,9 @@ inheritance.</p>
             <span class="n">cols</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;_data_table_temp_col&quot;</span><span class="p">:</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;_data_table_temp_col&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="s2">&quot;sum&quot;</span><span class="p">)}</span>
         <span class="c1"># agg can return scalars, which then can&#39;t be made into a self.pd.DataFrame</span>
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_to_frame_</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">group_by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># grouping variables in the index</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span>
+            <span class="n">drop</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">group_by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span>
+        <span class="p">)</span>  <span class="c1"># grouping variables in the index</span>
         <span class="n">missing_group_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">group_by</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_group_cols</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="s2">&quot;_data_table_temp_col&quot;</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
@@ -1786,7 +1818,9 @@ inheritance.</p>
         <span class="n">common_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">left</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
             <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">right</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
         <span class="p">)</span>
-        <span class="n">type_checks</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">check_columns_appear_compatible</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">common_cols</span><span class="p">)</span>
+        <span class="n">type_checks</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">check_columns_appear_compatible</span><span class="p">(</span>
+            <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">common_cols</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="n">type_checks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;join: incompatible column types: </span><span class="si">{</span><span class="n">type_checks</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">by</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">by</span>

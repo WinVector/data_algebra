@@ -300,9 +300,7 @@
     <span class="k">assert</span> <span class="n">_have_bigquery</span>
     <span class="n">credential_file</span> <span class="o">=</span> <span class="s2">&quot;/Users/johnmount/big_query/big_query_jm.json&quot;</span>
     <span class="c1"># assert os.path.isfile(credential_file)</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span>
-        <span class="s2">&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n">credential_file</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">credential_file</span>
     <span class="c1"># os.environ[&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;]  # trigger key error if not present</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">data_catalog</span> <span class="o">=</span> <span class="s2">&quot;data-algebra-test&quot;</span>
@@ -884,9 +882,7 @@ inheritance.</p>
     <span class="k">assert</span> <span class="n">_have_bigquery</span>
     <span class="n">credential_file</span> <span class="o">=</span> <span class="s2">&quot;/Users/johnmount/big_query/big_query_jm.json&quot;</span>
     <span class="c1"># assert os.path.isfile(credential_file)</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span>
-        <span class="s2">&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n">credential_file</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">credential_file</span>
     <span class="c1"># os.environ[&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;]  # trigger key error if not present</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">data_catalog</span> <span class="o">=</span> <span class="s2">&quot;data-algebra-test&quot;</span>

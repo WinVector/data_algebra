@@ -81,7 +81,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         if (op.column_types is not None) and (len(op.column_types) > 0):
             types_seen = data_algebra.util.guess_column_types(res)
             for c in columns_using:
-                assert data_algebra.util.compatible_types({types_seen[c]}.union({op.column_types[c]}))
+                assert data_algebra.util.compatible_types(
+                    {types_seen[c]}.union({op.column_types[c]})
+                )
         return res
 
     def columns_to_frame_(self, cols, *, target_rows=0):
@@ -89,6 +91,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         Convert a dictionary of column names to series-like objects and scalars into a Pandas data frame.
 
         :param cols: dictionary mapping column names to columns
+        :param target_rows: number of rows we are shooting for
         :return: Pandas data frame.
         """
         # noinspection PyUnresolvedReferences
@@ -104,20 +107,20 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             return self.pd.DataFrame(cols)
 
         # agg can return scalars, which then can't be made into a self.pd.DataFrame
-        def promote_scalar(v, *, target_len):
+        def promote_scalar(vi, *, target_len):
             # noinspection PyBroadException
             try:
-                len_v = len(v)
+                len_v = len(vi)
                 if len_v != target_len:
                     if len_v == 0:
                         return [None] * target_len
                     elif len_v == 1:
-                        return [v[0]] * target_len
+                        return [vi[0]] * target_len
                     else:
                         raise ValueError("incompatible column lengths")
             except Exception:
-                return [v] * target_len  # scalar
-            return v
+                return [vi] * target_len  # scalar
+            return vi
 
         cols = {k: promote_scalar(v, target_len=target_rows) for (k, v) in cols.items()}
         return self.pd.DataFrame(cols)
@@ -126,7 +129,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         if (res.shape[0] == 0) and (transient_new_frame.shape[0] > 0):
             # scalars get interpreted as single row items, instead of zero row items
             # growing the extension frame
-            transient_new_frame = transient_new_frame.iloc[range(0), :].reset_index(drop=True)
+            transient_new_frame = transient_new_frame.iloc[range(0), :].reset_index(
+                drop=True
+            )
         if res.shape[0] == transient_new_frame.shape[0]:
             if res.shape[1] < 1:
                 return transient_new_frame
@@ -140,7 +145,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             return self.pd.concat([res, transient_new_frame], axis=1)
         # normal path
         for c in transient_new_frame.columns:
-           res[c] = transient_new_frame[c]
+            res[c] = transient_new_frame[c]
         return res
 
     def extend_step(self, op, *, data_map, narrow):
@@ -228,7 +233,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                     if len(opk.args) > 1:
                         for i in range(1, len(opk.args)):
                             assert isinstance(opk.args[i], data_algebra.expr_rep.Value)
-                        transform_args = [opk.args[i].value for i in range(1, len(opk.args))]
+                        transform_args = [
+                            opk.args[i].value for i in range(1, len(opk.args))
+                        ]
                     if isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
                         value_name = opk.args[0].column_name
                         if value_name not in set(col_list):
@@ -308,7 +315,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             cols = {"_data_table_temp_col": res["_data_table_temp_col"].agg("sum")}
         # agg can return scalars, which then can't be made into a self.pd.DataFrame
         res = self.columns_to_frame_(cols)
-        res = res.reset_index(drop=len(op.group_by) < 1)  # grouping variables in the index
+        res = res.reset_index(
+            drop=len(op.group_by) < 1
+        )  # grouping variables in the index
         missing_group_cols = set(op.group_by) - set(res.columns)
         assert len(missing_group_cols) <= 0
         if "_data_table_temp_col" in res.columns:
@@ -410,7 +419,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         common_cols = set([c for c in left.columns]).intersection(
             [c for c in right.columns]
         )
-        type_checks = data_algebra.util.check_columns_appear_compatible(left, right, columns=common_cols)
+        type_checks = data_algebra.util.check_columns_appear_compatible(
+            left, right, columns=common_cols
+        )
         if type_checks is not None:
             raise ValueError(f"join: incompatible column types: {type_checks}")
         by = op.by
