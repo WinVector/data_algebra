@@ -70,9 +70,9 @@ class SparkConnection:
         self.spark_session = spark_session
 
     def close(self):
-        if self.spark_conext is not None:
-            self.spark_conext.stop()  # probably only for local demos
-            self.spark_conext = None
+        if self.spark_context is not None:
+            self.spark_context.stop()  # probably only for local demos
+            self.spark_context = None
         if self.spark_session is not None:
             self.spark_session = None
 

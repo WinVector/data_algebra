@@ -20,7 +20,8 @@ def test_window_fns():
     )
 
     table_desciption = describe_table(d)
-    ops = table_desciption.extend({
+    ops = table_desciption.extend(
+        {
             "row_number": "_row_number()",
             # "shift_v": "v.shift()",
         },
@@ -30,7 +31,7 @@ def test_window_fns():
         {
             # "ngroup": "_ngroup()",
             "size": "_size()",
-            'size2': '(1).sum()',
+            "size2": "(1).sum()",
             "max_v": "v.max()",
             "min_v": "v.min()",
             "sum_v": "v.sum()",
@@ -73,17 +74,15 @@ def test_window_fns_pandas_only():
     )
 
     table_desciption = describe_table(d)
-    ops = table_desciption.extend({
-            "row_number": "_row_number()",
-            "shift_v": "v.shift()",
-        },
+    ops = table_desciption.extend(
+        {"row_number": "_row_number()", "shift_v": "v.shift()",},
         order_by=["x"],
         partition_by=["g"],
     ).extend(
         {
             "ngroup": "_ngroup()",
             "size": "_size()",
-            'size2': '(1).sum()',
+            "size2": "(1).sum()",
             "max_v": "v.max()",
             "min_v": "v.min()",
             "sum_v": "v.sum()",
@@ -135,7 +134,7 @@ def test_window_fns_project():
         {
             # "ngroup": "_ngroup()",
             "size": "_size()",
-            'size2': '(1).sum()',
+            "size2": "(1).sum()",
             "max_v": "v.max()",
             "min_v": "v.min()",
             "sum_v": "v.sum()",
@@ -146,17 +145,19 @@ def test_window_fns_project():
         group_by=["g"],
     )
 
-    expect1 = data_algebra.default_data_model.pd.DataFrame({
-        'g': [1, 2, 3],
-        'size': [1, 2, 3],
-        'size2': [1, 2, 3],
-        'max_v': [10, 50, 90],
-        'min_v': [10, 40, 70],
-        'sum_v': [10, 90, 240],
-        'mean_v': [10, 45, 80],
-        'count_v': [1, 2, 3],
-        'size_v': [1, 2, 3],
-        })
+    expect1 = data_algebra.default_data_model.pd.DataFrame(
+        {
+            "g": [1, 2, 3],
+            "size": [1, 2, 3],
+            "size2": [1, 2, 3],
+            "max_v": [10, 50, 90],
+            "min_v": [10, 40, 70],
+            "sum_v": [10, 90, 240],
+            "mean_v": [10, 45, 80],
+            "count_v": [1, 2, 3],
+            "size_v": [1, 2, 3],
+        }
+    )
 
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect1)
 
@@ -173,16 +174,14 @@ def test_window_fns_project_no_ngroup_project():
     table_desciption = describe_table(d)
     with pytest.raises(ValueError):
         table_desciption.extend(
-            {"row_number": "_row_number()",
-
-             "shift_v": "v.shift()",},
+            {"row_number": "_row_number()", "shift_v": "v.shift()",},
             order_by=["x"],
             partition_by=["g"],
         ).project(
             {
                 "ngroup": "_ngroup()",
                 "size": "_size()",
-                'size2': '(1).sum()',
+                "size2": "(1).sum()",
                 "max_v": "v.max()",
                 "min_v": "v.min()",
                 "sum_v": "v.sum()",
@@ -205,9 +204,7 @@ def test_window_fns_project_pandas_only():
 
     table_desciption = describe_table(d)
     ops = table_desciption.extend(
-        {"row_number": "_row_number()",
-         "ngroup": "_ngroup()",
-         "shift_v": "v.shift()",},
+        {"row_number": "_row_number()", "ngroup": "_ngroup()", "shift_v": "v.shift()",},
         order_by=["x"],
         partition_by=["g"],
     ).project(
@@ -215,7 +212,7 @@ def test_window_fns_project_pandas_only():
             "ng_max": "ngroup.max()",
             "ng_min": "ngroup.max()",
             "size": "_size()",
-            'size2': '(1).sum()',
+            "size2": "(1).sum()",
             "max_v": "v.max()",
             "min_v": "v.min()",
             "sum_v": "v.sum()",
@@ -228,18 +225,20 @@ def test_window_fns_project_pandas_only():
 
     res = ops.transform(d)
 
-    expect1 = data_algebra.default_data_model.pd.DataFrame({
-        'g': [1, 2, 3],
-        'ng_max': [0, 1, 2],
-        'ng_min': [0, 1, 2],
-        'size': [1, 2, 3],
-        'size2': [1, 2, 3],
-        'max_v': [10, 50, 90],
-        'min_v': [10, 40, 70],
-        'sum_v': [10, 90, 240],
-        'mean_v': [10, 45, 80],
-        'count_v': [1, 2, 3],
-        'size_v': [1, 2, 3],
-        })
+    expect1 = data_algebra.default_data_model.pd.DataFrame(
+        {
+            "g": [1, 2, 3],
+            "ng_max": [0, 1, 2],
+            "ng_min": [0, 1, 2],
+            "size": [1, 2, 3],
+            "size2": [1, 2, 3],
+            "max_v": [10, 50, 90],
+            "min_v": [10, 40, 70],
+            "sum_v": [10, 90, 240],
+            "mean_v": [10, 45, 80],
+            "count_v": [1, 2, 3],
+            "size_v": [1, 2, 3],
+        }
+    )
 
     assert data_algebra.test_util.equivalent_frames(res, expect1)

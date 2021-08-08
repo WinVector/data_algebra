@@ -2,7 +2,7 @@ from abc import ABC
 from typing import Set, Dict, List, Union
 import numbers
 import re
-import collections
+import typing
 
 import data_algebra
 import data_algebra.expr_parse
@@ -29,7 +29,7 @@ except ImportError:
 
 
 # noinspection PyBroadException
-def pretty_format_python(python_str, *, black_mode=None):
+def pretty_format_python(python_str: str, *, black_mode=None) -> str:
     assert isinstance(python_str, str)
     formatted_python = python_str
     if _have_black:
@@ -52,7 +52,13 @@ class ViewRepresentation(OperatorPlatform, ABC):
         "ViewRepresentation"
     ]  # https://www.python.org/dev/peps/pep-0484/#forward-references
 
-    def __init__(self, column_names, *, sources=None, node_name):
+    def __init__(
+        self,
+        column_names: List[str],
+        *,
+        sources: List["ViewRepresentation"] = None,
+        node_name: str,
+    ):
         if isinstance(column_names, str):
             column_names = [column_names]
         self.column_names = [c for c in column_names]
@@ -78,7 +84,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             self, node_name=node_name, column_map=collections.OrderedDict(**column_dict)
         )
 
-    def merged_rep_id(self):
+    def merged_rep_id(self) -> str:
         return "ops+ " + str(id(self))
 
     # convenience
@@ -94,6 +100,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         """
         tables = self.get_tables()
         for t in tables.values():
+            assert isinstance(t, TableDescription)
             assert t.head is not None
             if len(tables) > 1:
                 assert t.table_name_was_set_by_user
@@ -101,7 +108,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
                 assert t.limit_was is None
                 assert t.nrows == t.head.shape[0]
         data_map = {k: v.head for k, v in tables.items()}
-        return self.eval(data_map = data_map, data_model=data_model, narrow=narrow)
+        return self.eval(data_map=data_map, data_model=data_model, narrow=narrow)
 
     # characterization
 
@@ -113,7 +120,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             s = self.sources[i]
             ti = s.get_tables()
             for (k, v) in ti.items():
-                assert isinstance(v, OperatorPlatform)
+                assert isinstance(v, TableDescription)
                 assert v.node_name == "TableDescription"
                 if k in tables.keys():
                     if not v.same_table(tables[k]):
@@ -125,20 +132,20 @@ class ViewRepresentation(OperatorPlatform, ABC):
         return tables
 
     def columns_used_from_sources(self, using=None):
-        """Get column names used from direct source nodes when this ops is exececuted
+        """Get column names used from direct source nodes when this ops is executed
         with the using columns (None means all)."""
         raise NotImplementedError("base method called")
 
     def columns_produced(self):
         return self.column_names.copy()
 
-    def _columns_used_implementation(self, *, using, columns_currenty_using_records):
+    def _columns_used_implementation(self, *, using, columns_currently_using_records):
         self_merged_rep_id = self.merged_rep_id()
         try:
-            crec = columns_currenty_using_records[self_merged_rep_id]
+            crec = columns_currently_using_records[self_merged_rep_id]
         except KeyError:
             crec = set()
-            columns_currenty_using_records[self_merged_rep_id] = crec
+            columns_currently_using_records[self_merged_rep_id] = crec
         if using is None:
             crec.update(self.column_names)
         else:
@@ -150,23 +157,23 @@ class ViewRepresentation(OperatorPlatform, ABC):
         for i in range(len(self.sources)):
             self.sources[i]._columns_used_implementation(
                 using=cu_list[i],
-                columns_currenty_using_records=columns_currenty_using_records,
+                columns_currently_using_records=columns_currently_using_records,
             )
 
     def columns_used(self, *, using=None):
         """Determine which columns are used from source tables."""
 
         tables = self.get_tables()
-        columns_currenty_using_records = {
+        columns_currently_using_records = {
             v.merged_rep_id(): set() for v in tables.values()
         }
         self._columns_used_implementation(
-            using=using, columns_currenty_using_records=columns_currenty_using_records
+            using=using, columns_currently_using_records=columns_currently_using_records
         )
         columns_used = dict()
         for k in tables.keys():
             ti = tables[k]
-            vi = columns_currenty_using_records[ti.merged_rep_id()]
+            vi = columns_currently_using_records[ti.merged_rep_id()]
             columns_used[k] = vi.copy()
         return columns_used
 
@@ -198,7 +205,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
             strict = True
         python_str = (
             "(\n"
-            + self.to_python_implementation(indent=indent, strict=strict, print_sources=True)
+            + self.to_python_implementation(
+                indent=indent, strict=strict, print_sources=True
+            )
             + "\n)\n"
         )
         if pretty:
@@ -243,24 +252,20 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     # query generation
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
+    def to_near_sql_implementation(
+        self, db_model, *, using, temp_id_source, sql_format_options=None
+    ):
         raise NotImplementedError("base method called")
 
     def to_sql(
-        self,
-        db_model,
-        *,
-        sql_format_options=None,
+        self, db_model, *, sql_format_options=None,
     ):
         if isinstance(db_model, data_algebra.db_model.DBHandle):
             db_model = db_model.db_model
         assert isinstance(db_model, data_algebra.db_model.DBModel)
         if sql_format_options is None:
             sql_format_options = db_model.default_SQL_format_options
-        return db_model.to_sql(
-            ops=self,
-            sql_format_options=sql_format_options,
-        )
+        return db_model.to_sql(ops=self, sql_format_options=sql_format_options,)
 
     # Pandas realization
 
@@ -271,7 +276,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         """
         Check tables supplied meet data consistency constraints.
 
-        data_model: dictionairy of column name lists.
+        data_model: dictionary of column name lists.
         """
         self.columns_used()  # for table consistency check/raise
         forbidden = self.forbidden_columns()
@@ -329,7 +334,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
     # noinspection PyPep8Naming
     def transform(self, X, *, data_model=None, narrow=True):
         """
-        Apply data transfrom to a table
+        Apply data transform to a table
 
         :param X: tale to apply to
         :param data_model: data model for Pandas execution
@@ -467,6 +472,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         :param b: right table
         :param by: list of keys to join by
         :param jointype: one of 'INNER', 'LEFT', 'RIGHT', 'OUTER', 'FULL', 'CROSS' (case insensitive)
+        :param check_all_common_keys_in_by: logical if True don't allow shared column names that are not in by-term
         :return: ops describing join
         """
         assert isinstance(b, ViewRepresentation)
@@ -477,7 +483,8 @@ class ViewRepresentation(OperatorPlatform, ABC):
             b=b,
             by=by,
             jointype=jointype,
-            check_all_common_keys_in_by=check_all_common_keys_in_by)
+            check_all_common_keys_in_by=check_all_common_keys_in_by,
+        )
 
     def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):
         if b is None:
@@ -589,7 +596,7 @@ class TableDescription(ViewRepresentation):
         column_types=None,
         head=None,
         limit_was=None,
-        nrows=None
+        nrows=None,
     ):
         ViewRepresentation.__init__(
             self, column_names=column_names, node_name="TableDescription"
@@ -718,9 +725,14 @@ class TableDescription(ViewRepresentation):
     def columns_used_from_sources(self, using=None):
         return []  # no inputs to table description
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
+    def to_near_sql_implementation(
+        self, db_model, *, using, temp_id_source, sql_format_options=None
+    ):
         return db_model.table_def_to_sql(
-            self, using=using, temp_id_source=temp_id_source, sql_format_options=sql_format_options
+            self,
+            using=using,
+            temp_id_source=temp_id_source,
+            sql_format_options=sql_format_options,
         )
 
     def __str__(self):
@@ -751,21 +763,21 @@ def describe_table(
     qualifiers=None,
     sql_meta=None,
     column_types=None,
-    row_limit=7,
+    row_limit: typing.Optional[int] = 7,
     keep_sample=True,
-    keep_all=False
-):
+    keep_all=False,
+) -> TableDescription:
     """
     :param d: pandas table to describe
     :param table_name: name of table
-    :param qualifiers: optional able qualifiers
-    :param sql_meta: optional sql meta information map
+    :param qualifiers: optional, able qualifiers
+    :param sql_meta: optional, sql meta information map
+    :param column_types: optional, map of column types
     :param row_limit: how many rows to sample
     :param keep_sample: logical, if True retain head of table
     :param keep_all: logical, if True retain all of table
     :return: TableDescription
     """
-    assert d is not None
     assert not isinstance(d, OperatorPlatform)
     assert not isinstance(d, ViewRepresentation)
     column_names = [c for c in d.columns]
@@ -795,7 +807,7 @@ def describe_table(
     )
 
 
-def table(d, table_name):
+def table(d, table_name=None):
     """
     Capture a table for later use
 
@@ -973,7 +985,9 @@ class ExtendNode(ViewRepresentation):
                     if len(opk.args) > 1:
                         for i in range(1, len(opk.args)):
                             if not isinstance(opk.args[i], data_algebra.expr_rep.Value):
-                                raise ValueError("window function with more than one non-value argument")
+                                raise ValueError(
+                                    "window function with more than one non-value argument"
+                                )
                     for i in range(len(opk.args)):
                         if not (
                             isinstance(
@@ -1030,9 +1044,15 @@ class ExtendNode(ViewRepresentation):
         s = s + ")"
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
-        return db_model.extend_to_sql(self, using=using, temp_id_source=temp_id_source,
-                                      sql_format_options=sql_format_options)
+    def to_near_sql_implementation(
+        self, db_model, *, using, temp_id_source, sql_format_options=None
+    ):
+        return db_model.extend_to_sql(
+            self,
+            using=using,
+            temp_id_source=temp_id_source,
+            sql_format_options=sql_format_options,
+        )
 
     def eval_implementation(self, *, data_map, data_model, narrow):
         if data_model is None:
@@ -1095,10 +1115,7 @@ class ProjectNode(ViewRepresentation):
                     in data_algebra.expr_rep.fn_names_that_imply_ordered_windowed_situation
                 ):
                     raise ValueError(str(opk) + "' is not allowed in project")
-                if (
-                    opk.op
-                    in data_algebra.expr_rep.fn_names_not_allowed_in_project
-                ):
+                if opk.op in data_algebra.expr_rep.fn_names_not_allowed_in_project:
                     raise ValueError(str(opk) + "' is not allowed in project")
             else:
                 raise ValueError(
@@ -1171,9 +1188,15 @@ class ProjectNode(ViewRepresentation):
         s = s + ")"
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
-        return db_model.project_to_sql(self, using=using, temp_id_source=temp_id_source,
-                                       sql_format_options=sql_format_options)
+    def to_near_sql_implementation(
+        self, db_model, *, using, temp_id_source, sql_format_options=None
+    ):
+        return db_model.project_to_sql(
+            self,
+            using=using,
+            temp_id_source=temp_id_source,
+            sql_format_options=sql_format_options,
+        )
 
     def eval_implementation(self, *, data_map, data_model, narrow):
         if data_model is None:
@@ -1235,9 +1258,14 @@ class SelectRowsNode(ViewRepresentation):
         s = s + ("select_rows(" + self.expr.to_python().__repr__() + ")")
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
+    def to_near_sql_implementation(
+        self, db_model, *, using, temp_id_source, sql_format_options=None
+    ):
         return db_model.select_rows_to_sql(
-            self, using=using, temp_id_source=temp_id_source, sql_format_options=sql_format_options
+            self,
+            using=using,
+            temp_id_source=temp_id_source,
+            sql_format_options=sql_format_options,
         )
 
     def eval_implementation(self, *, data_map, data_model, narrow):
@@ -1304,9 +1332,14 @@ class SelectColumnsNode(ViewRepresentation):
         s = s + ("select_columns(" + self.column_selection.__repr__() + ")")
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
+    def to_near_sql_implementation(
+        self, db_model, *, using, temp_id_source, sql_format_options=None
+    ):
         return db_model.select_columns_to_sql(
-            self, using=using, temp_id_source=temp_id_source, sql_format_options=sql_format_options
+            self,
+            using=using,
+            temp_id_source=temp_id_source,
+            sql_format_options=sql_format_options,
         )
 
     def eval_implementation(self, *, data_map, data_model, narrow):
@@ -1373,9 +1406,14 @@ class DropColumnsNode(ViewRepresentation):
         s = s + ("drop_columns(" + self.column_deletions.__repr__() + ")")
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
+    def to_near_sql_implementation(
+        self, db_model, *, using, temp_id_source, sql_format_options=None
+    ):
         return db_model.drop_columns_to_sql(
-            self, using=using, temp_id_source=temp_id_source, sql_format_options=sql_format_options
+            self,
+            using=using,
+            temp_id_source=temp_id_source,
+            sql_format_options=sql_format_options,
         )
 
     def eval_implementation(self, *, data_map, data_model, narrow):
@@ -1454,9 +1492,15 @@ class OrderRowsNode(ViewRepresentation):
         s = s + ")"
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
-        return db_model.order_to_sql(self, using=using, temp_id_source=temp_id_source,
-                                     sql_format_options=sql_format_options)
+    def to_near_sql_implementation(
+        self, db_model, *, using, temp_id_source, sql_format_options=None
+    ):
+        return db_model.order_to_sql(
+            self,
+            using=using,
+            temp_id_source=temp_id_source,
+            sql_format_options=sql_format_options,
+        )
 
     def eval_implementation(self, *, data_map, data_model, narrow):
         if data_model is None:
@@ -1548,9 +1592,15 @@ class RenameColumnsNode(ViewRepresentation):
         s = s + ("rename_columns(" + self.column_remapping.__repr__() + ")")
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
-        return db_model.rename_to_sql(self, using=using, temp_id_source=temp_id_source,
-                                      sql_format_options=sql_format_options)
+    def to_near_sql_implementation(
+        self, db_model, *, using, temp_id_source, sql_format_options=None
+    ):
+        return db_model.rename_to_sql(
+            self,
+            using=using,
+            temp_id_source=temp_id_source,
+            sql_format_options=sql_format_options,
+        )
 
     def eval_implementation(self, *, data_map, data_model, narrow):
         if data_model is None:
@@ -1598,7 +1648,8 @@ class NaturalJoinNode(ViewRepresentation):
             if len(missing_common) > 0:
                 raise KeyError(
                     "check_all_common_keys_in_by set, and the following common keys are are not in the by-clause: "
-                    + str(missing_common))
+                    + str(missing_common)
+                )
         ViewRepresentation.__init__(
             self,
             column_names=column_names,
@@ -1658,9 +1709,14 @@ class NaturalJoinNode(ViewRepresentation):
         )
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
+    def to_near_sql_implementation(
+        self, db_model, *, using, temp_id_source, sql_format_options=None
+    ):
         return db_model.natural_join_to_sql(
-            self, using=using, temp_id_source=temp_id_source, sql_format_options=sql_format_options
+            self,
+            using=using,
+            temp_id_source=temp_id_source,
+            sql_format_options=sql_format_options,
         )
 
     def eval_implementation(self, *, data_map, data_model, narrow):
@@ -1689,10 +1745,19 @@ class ConcatRowsNode(ViewRepresentation):
         if id_column is not None and id_column in sources[0].column_names:
             raise ValueError("id_column should not be an input table column name")
         column_names = sources[0].column_names.copy()
-        if (isinstance(a, TableDescription) and (a.column_types is not None) and (len(a.column_types) > 0)
-            and isinstance(b, TableDescription) and (b.column_types is not None) and (len(b.column_types) > 0)):
+        if (
+            isinstance(a, TableDescription)
+            and (a.column_types is not None)
+            and (len(a.column_types) > 0)
+            and isinstance(b, TableDescription)
+            and (b.column_types is not None)
+            and (len(b.column_types) > 0)
+        ):
             for c in column_names:
-                assert len({a.column_types[c]}.union({b.column_types[c]}) - {type(None)}) <= 1
+                assert (
+                    len({a.column_types[c]}.union({b.column_types[c]}) - {type(None)})
+                    <= 1
+                )
         if id_column is not None:
             assert id_column not in column_names
             column_names.append(id_column)
@@ -1761,9 +1826,14 @@ class ConcatRowsNode(ViewRepresentation):
         )
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
+    def to_near_sql_implementation(
+        self, db_model, *, using, temp_id_source, sql_format_options=None
+    ):
         return db_model.concat_rows_to_sql(
-            self, using=using, temp_id_source=temp_id_source, sql_format_options=sql_format_options
+            self,
+            using=using,
+            temp_id_source=temp_id_source,
+            sql_format_options=sql_format_options,
         )
 
     def eval_implementation(self, *, data_map, data_model, narrow):
@@ -1817,12 +1887,17 @@ class ConvertRecordsNode(ViewRepresentation):
         s = s + ")"
         return s
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source, sql_format_options=None):
+    def to_near_sql_implementation(
+        self, db_model, *, using, temp_id_source, sql_format_options=None
+    ):
         if temp_id_source is None:
             temp_id_source = [0]
         # TODO: narrow to what we are using
         sub_query = self.sources[0].to_near_sql_implementation(
-            db_model=db_model, using=None, temp_id_source=temp_id_source, sql_format_options=sql_format_options
+            db_model=db_model,
+            using=None,
+            temp_id_source=temp_id_source,
+            sql_format_options=sql_format_options,
         )
         # claims to use all columns
         query = sub_query.to_sql(
@@ -1836,8 +1911,7 @@ class ConvertRecordsNode(ViewRepresentation):
             )
         if self.record_map.blocks_out is not None:
             query = db_model.row_recs_to_blocks_query(
-                query,
-                record_spec=self.record_map.blocks_out,
+                query, record_spec=self.record_map.blocks_out,
             )
         view_name = "convert_records_in_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1

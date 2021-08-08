@@ -42,13 +42,54 @@ def test_cdata_example():
 
     ops = td.convert_records(record_map=RecordMap(blocks_out=record_spec))
 
-    expect = data_algebra.default_data_model.pd.DataFrame({
-        'id': [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2],
-        'Species': ['setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa', 'setosa'],
-        'Part': ['Petal', 'Petal', 'Sepal', 'Sepal', 'Petal', 'Petal', 'Sepal', 'Sepal', 'Petal', 'Petal', 'Sepal', 'Sepal'],
-        'Measure': ['Length', 'Width', 'Length', 'Width', 'Length', 'Width', 'Length', 'Width', 'Length', 'Width', 'Length', 'Width'],
-        'Value': [1.4, 0.2, 5.1, 3.5, 1.4, 0.2, 4.9, 3.0, 1.3, 0.2, 4.7, 3.2],
-        })
+    expect = data_algebra.default_data_model.pd.DataFrame(
+        {
+            "id": [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2],
+            "Species": [
+                "setosa",
+                "setosa",
+                "setosa",
+                "setosa",
+                "setosa",
+                "setosa",
+                "setosa",
+                "setosa",
+                "setosa",
+                "setosa",
+                "setosa",
+                "setosa",
+            ],
+            "Part": [
+                "Petal",
+                "Petal",
+                "Sepal",
+                "Sepal",
+                "Petal",
+                "Petal",
+                "Sepal",
+                "Sepal",
+                "Petal",
+                "Petal",
+                "Sepal",
+                "Sepal",
+            ],
+            "Measure": [
+                "Length",
+                "Width",
+                "Length",
+                "Width",
+                "Length",
+                "Width",
+                "Length",
+                "Width",
+                "Length",
+                "Width",
+                "Length",
+                "Width",
+            ],
+            "Value": [1.4, 0.2, 5.1, 3.5, 1.4, 0.2, 4.9, 3.0, 1.3, 0.2, 4.7, 3.2],
+        }
+    )
 
     res_pandas = ops.transform(iris)
     assert data_algebra.test_util.equivalent_frames(res_pandas, expect)

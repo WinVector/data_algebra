@@ -86,7 +86,7 @@ def _type_safe_is_in(a, b):
         type_a = data_algebra.util.guess_carried_scalar_type(a)
         type_b = {data_algebra.util.map_type_to_canonical(type(v)) for v in b}
         if len(type_b) > 1:
-            raise TypeError(f'multiple types in set: {type_b}')
+            raise TypeError(f"multiple types in set: {type_b}")
         type_b = list(type_b)[0]
         if not data_algebra.util.compatible_types([type_a, type_b]):
             raise TypeError(f"can't check for an {type_a} in a set of {type_b}'s")

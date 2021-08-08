@@ -13,9 +13,7 @@ class NearSQL(ABC):
     Represent SQL queries in a mostly string-form
     """
 
-    def __init__(
-        self, *, terms, quoted_query_name, is_table=False, annotation=None
-    ):
+    def __init__(self, *, terms, quoted_query_name, is_table=False, annotation=None):
         assert isinstance(terms, (dict, type(None)))
         assert isinstance(quoted_query_name, str)
         assert isinstance(is_table, bool)
@@ -35,7 +33,13 @@ class NearSQL(ABC):
         )
 
     def to_sql(
-        self, *, columns=None, force_sql=False, constants=None, db_model, sql_format_options=None
+        self,
+        *,
+        columns=None,
+        force_sql=False,
+        constants=None,
+        db_model,
+        sql_format_options=None,
     ):
         raise NotImplementedError("base method called")
 
@@ -119,14 +123,17 @@ class NearSQLContainer:
 class NearSQLCommonTableExpression(NearSQL):
     def __init__(self, *, quoted_query_name):
         NearSQL.__init__(
-            self,
-            terms=None,
-            quoted_query_name=quoted_query_name,
-            is_table=True,
+            self, terms=None, quoted_query_name=quoted_query_name, is_table=True,
         )
 
     def to_sql(
-        self, *, columns=None, force_sql=False, constants=None, db_model, sql_format_options=None
+        self,
+        *,
+        columns=None,
+        force_sql=False,
+        constants=None,
+        db_model,
+        sql_format_options=None,
     ):
         return db_model.nearsqlcte_to_sql_(
             near_sql=self,
@@ -140,15 +147,18 @@ class NearSQLCommonTableExpression(NearSQL):
 class NearSQLTable(NearSQL):
     def __init__(self, *, terms, quoted_query_name, quoted_table_name):
         NearSQL.__init__(
-            self,
-            terms=terms,
-            quoted_query_name=quoted_query_name,
-            is_table=True,
+            self, terms=terms, quoted_query_name=quoted_query_name, is_table=True,
         )
         self.quoted_table_name = quoted_table_name
 
     def to_sql(
-        self, *, columns=None, force_sql=False, constants=None, db_model, sql_format_options=None
+        self,
+        *,
+        columns=None,
+        force_sql=False,
+        constants=None,
+        db_model,
+        sql_format_options=None,
     ):
         return db_model.nearsqltable_to_sql_(
             near_sql=self,
@@ -193,7 +203,13 @@ class NearSQLUnaryStep(NearSQL):
             self.mergeable = False
 
     def to_sql(
-        self, *, columns=None, force_sql=False, constants=None, db_model, sql_format_options=None
+        self,
+        *,
+        columns=None,
+        force_sql=False,
+        constants=None,
+        db_model,
+        sql_format_options=None,
     ):
         return db_model.nearsqlunary_to_sql_(
             near_sql=self,
@@ -231,7 +247,7 @@ class NearSQLBinaryStep(NearSQL):
         joiner,
         sub_sql2,
         suffix=None,
-        annotation=None
+        annotation=None,
     ):
         assert isinstance(sub_sql1, NearSQLContainer)
         assert isinstance(sub_sql2, NearSQLContainer)
@@ -251,7 +267,13 @@ class NearSQLBinaryStep(NearSQL):
         self.suffix = suffix
 
     def to_sql(
-        self, *, columns=None, force_sql=False, constants=None, db_model, sql_format_options=None
+        self,
+        *,
+        columns=None,
+        force_sql=False,
+        constants=None,
+        db_model,
+        sql_format_options=None,
     ):
         return db_model.nearsqlbinary_to_sql_(
             near_sql=self,
@@ -309,7 +331,7 @@ class NearSQLq(NearSQL):
         query,
         terms,
         prev_quoted_query_name,
-        annotation=None
+        annotation=None,
     ):
         assert isinstance(query, str)
         assert isinstance(prev_quoted_query_name, str)
@@ -323,7 +345,13 @@ class NearSQLq(NearSQL):
         self.prev_quoted_query_name = prev_quoted_query_name
 
     def to_sql(
-        self, *, columns=None, force_sql=False, constants=None, db_model, sql_format_options=None
+        self,
+        *,
+        columns=None,
+        force_sql=False,
+        constants=None,
+        db_model,
+        sql_format_options=None,
     ):
         return db_model.nearsqlq_to_sql_(
             near_sql=self,

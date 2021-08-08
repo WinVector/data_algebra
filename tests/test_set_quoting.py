@@ -1,4 +1,3 @@
-
 import data_algebra
 import data_algebra.db_model
 from data_algebra.data_ops import *
@@ -16,10 +15,8 @@ def test_set_quoting_1():
     ops = describe_table(d, table_name="d").extend({"select": f"x.is_in({targets})"})
 
     sql_format_options = data_algebra.db_model.SQLFormatOptions(
-        use_with=True,
-        annotate=False,
-        sql_indent=' ',
-        initial_commas=False)
+        use_with=True, annotate=False, sql_indent=" ", initial_commas=False
+    )
     sql = bq_handle.to_sql(ops, sql_format_options=sql_format_options)
     assert "'" not in sql
     assert '"' not in sql
@@ -33,10 +30,8 @@ def test_set_quoting_2():
     ops = describe_table(d, table_name="d").extend({"select": "x.is_in({-5, 3})"})
 
     sql_format_options = data_algebra.db_model.SQLFormatOptions(
-        use_with=True,
-        annotate=False,
-        sql_indent=' ',
-        initial_commas=False)
+        use_with=True, annotate=False, sql_indent=" ", initial_commas=False
+    )
     sql = bq_handle.to_sql(ops, sql_format_options=sql_format_options)
     assert "'" not in sql
     assert '"' not in sql
@@ -50,19 +45,19 @@ def test_set_quoting_inhom():
 
 
 def test_set_quoting_flex():
-    d = data_algebra.default_data_model.pd.DataFrame({"x": ['a', None]})
+    d = data_algebra.default_data_model.pd.DataFrame({"x": ["a", None]})
     ops = describe_table(d, table_name="d").extend({"select": "x.is_in({'a'})"})
     ops.transform(d)
 
 
 def test_set_quoting_mismatch():
-    d = data_algebra.default_data_model.pd.DataFrame({"x": ['a', 'b']})
+    d = data_algebra.default_data_model.pd.DataFrame({"x": ["a", "b"]})
     ops = describe_table(d, table_name="d").extend({"select": "x.is_in({-5, -2})"})
     with pytest.raises(TypeError):
         ops.transform(d)
 
 
 def test_set_quoting_exclude_none():
-    d = data_algebra.default_data_model.pd.DataFrame({"x": ['a', 'b']})
+    d = data_algebra.default_data_model.pd.DataFrame({"x": ["a", "b"]})
     with pytest.raises(TypeError):
         describe_table(d, table_name="d").extend({"select": "x.is_in({-5, None})"})

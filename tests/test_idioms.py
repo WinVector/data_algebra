@@ -9,29 +9,20 @@ import pytest
 
 
 def test_idiom_count_empty_frame_a():
-    d = data_algebra.default_data_model.pd.DataFrame(
-        {"group": [], "val": [],}
-    )
+    d = data_algebra.default_data_model.pd.DataFrame({"group": [], "val": [],})
     table_name = "pytest_temp_d"
 
-    ops = (
-        describe_table(d, table_name=table_name)
-        .project({"count": "(1).sum()"})
-    )
+    ops = describe_table(d, table_name=table_name).project({"count": "(1).sum()"})
 
     res = ops.transform(d)
 
-    expect = data_algebra.default_data_model.pd.DataFrame({
-        'count': [0],
-        })
+    expect = data_algebra.default_data_model.pd.DataFrame({"count": [0],})
 
     assert data_algebra.test_util.equivalent_frames(res, expect)
 
 
 def test_idiom_count_empty_frame_b():
-    d = data_algebra.default_data_model.pd.DataFrame(
-        {"group": [], "val": [],}
-    )
+    d = data_algebra.default_data_model.pd.DataFrame({"group": [], "val": [],})
     table_name = "pytest_temp_d"
 
     ops = (
@@ -42,9 +33,7 @@ def test_idiom_count_empty_frame_b():
 
     res = ops.transform(d)
 
-    expect = data_algebra.default_data_model.pd.DataFrame({
-        'count': [0],
-        })
+    expect = data_algebra.default_data_model.pd.DataFrame({"count": [0],})
 
     assert data_algebra.test_util.equivalent_frames(res, expect)
 
@@ -63,7 +52,9 @@ def test_idiom_extend_one_count():
 
     expect = data_algebra.default_data_model.pd.DataFrame({"count": [4]})
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect, empty_produces_empty=False)
+    data_algebra.test_util.check_transform(
+        ops=ops, data=d, expect=expect, empty_produces_empty=False
+    )
 
 
 def test_idiom_extend_special_count():
@@ -76,7 +67,9 @@ def test_idiom_extend_special_count():
 
     expect = data_algebra.default_data_model.pd.DataFrame({"count": [4]})
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect, empty_produces_empty=False)
+    data_algebra.test_util.check_transform(
+        ops=ops, data=d, expect=expect, empty_produces_empty=False
+    )
 
 
 # previously forbidden
@@ -111,11 +104,7 @@ def test_idiom_extend_test_trinary():
 
     ops = (
         describe_table(d, table_name=table_name)
-        .extend(
-            {
-                "select": "(val > 2.5)"
-            }
-        )
+        .extend({"select": "(val > 2.5)"})
         .extend({"select": 'select.if_else("high", "low")'})
     )
 
@@ -137,15 +126,12 @@ def test_idiom_extend_test_trinary():
 
 def test_idiom_extend_test_trinary_2():
     d = data_algebra.default_data_model.pd.DataFrame(
-        {"group": ["a", "a", "b", "b"], "val": [1, 2, 3, 4], }
+        {"group": ["a", "a", "b", "b"], "val": [1, 2, 3, 4],}
     )
     table_name = "pytest_temp_d"
 
-    ops = (
-        describe_table(d, table_name=table_name)
-            .extend(
-            {'select': '(val > 2.5).if_else("high", "low")' }
-        )
+    ops = describe_table(d, table_name=table_name).extend(
+        {"select": '(val > 2.5).if_else("high", "low")'}
     )
 
     db_handle = data_algebra.MySQL.MySQLModel().db_handle(conn=None)
@@ -323,7 +309,6 @@ def test_idiom_row_number_3():
     )
 
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
-
 
 
 def test_idiom_sum_cumsum():

@@ -20,7 +20,9 @@ def test_arrow1():
 
     d
 
-    table_description = TableDescription(table_name="d", column_names=["g", "x", "v", "i"])
+    table_description = TableDescription(
+        table_name="d", column_names=["g", "x", "v", "i"]
+    )
 
     id_ops_a = table_description.project(group_by=["g"]).extend(
         {"ngroup": "_row_number()",}, order_by=["g"]
@@ -63,7 +65,9 @@ def test_arrow1():
     a1.transform(d)
 
     cols2_too_small = [c for c in (set(id_ops_b.column_names) - set(["i"]))]
-    ordered_ops = TableDescription(table_name="d2", column_names=cols2_too_small).extend(
+    ordered_ops = TableDescription(
+        table_name="d2", column_names=cols2_too_small
+    ).extend(
         {"row_number": "_row_number()", "shift_v": "v.shift()",},
         order_by=["x"],
         partition_by=["g"],
@@ -79,7 +83,9 @@ def test_arrow1():
     # %%
 
     cols2_too_large = id_ops_b.column_names + ["q"]
-    ordered_ops = TableDescription(table_name="d2", column_names=cols2_too_large).extend(
+    ordered_ops = TableDescription(
+        table_name="d2", column_names=cols2_too_large
+    ).extend(
         {"row_number": "_row_number()", "shift_v": "v.shift()",},
         order_by=["x"],
         partition_by=["g"],
@@ -94,7 +100,9 @@ def test_arrow1():
 
     # %%
 
-    ordered_ops = TableDescription(table_name="d2", column_names=id_ops_b.column_names).extend(
+    ordered_ops = TableDescription(
+        table_name="d2", column_names=id_ops_b.column_names
+    ).extend(
         {"row_number": "_row_number()", "shift_v": "v.shift()",},
         order_by=["x"],
         partition_by=["g"],
@@ -128,7 +136,9 @@ def test_arrow1():
 
     # %%
 
-    unordered_ops = TableDescription(table_name="d3", column_names=ordered_ops.column_names).extend(
+    unordered_ops = TableDescription(
+        table_name="d3", column_names=ordered_ops.column_names
+    ).extend(
         {
             "size": "_size()",
             "max_v": "v.max()",

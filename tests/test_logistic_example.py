@@ -47,4 +47,5 @@ def test_logistic_example_one():
     )
 
     data_algebra.test_util.check_transform(
-        ops=ops, data=d_local, expect=expect, float_tol=1.e-3)
+        ops=ops, data=d_local, expect=expect, float_tol=1.0e-3
+    )

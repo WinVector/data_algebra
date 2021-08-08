@@ -18,27 +18,24 @@ def test_window2():
 
     ops = (
         describe_table(d)
-            .extend(
-                {
-                    "row_number": "_row_number()",
-                    "shift_v": "v.shift()",
-                },
-                order_by=["x"],
-                partition_by=["g"],
-            )
-            .extend(
-                {
-                    "size": "_size()",
-                    "max_v": "v.max()",
-                    "min_v": "v.min()",
-                    "sum_v": "v.sum()",
-                    "mean_v": "v.mean()",
-                    "count_v": "v.count()",
-                    "size_v": "v.size()",
-                },
-                partition_by=["g"],
-            )
+        .extend(
+            {"row_number": "_row_number()", "shift_v": "v.shift()",},
+            order_by=["x"],
+            partition_by=["g"],
         )
+        .extend(
+            {
+                "size": "_size()",
+                "max_v": "v.max()",
+                "min_v": "v.min()",
+                "sum_v": "v.sum()",
+                "mean_v": "v.mean()",
+                "count_v": "v.count()",
+                "size_v": "v.size()",
+            },
+            partition_by=["g"],
+        )
+    )
 
     res1 = ops.transform(d)
 
@@ -61,19 +58,46 @@ def test_window2():
 
     assert data_algebra.test_util.equivalent_frames(expect1, res1)
 
-    data_algebra.test_util.check_transform(
-        ops=ops, data=d, expect=expect1
-    )
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect1)
 
 
 def test_window2_k():
-    d = data_algebra.default_data_model.pd.DataFrame({
-        'o': range(0, 10),
-        'x': range(0, 10),
-        })
-    ops = (
-        describe_table(d)
-            .extend(
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"o": range(0, 10), "x": range(0, 10),}
+    )
+    ops = describe_table(d).extend(
+        {
+            "shift": "x.shift()",
+            "shift_1": "x.shift(1)",
+            "shift_2": "x.shift(2)",
+            "shift_m1": "x.shift(-1)",
+            "shift_m2": "x.shift(-2)",
+        },
+        order_by=["o"],
+    )
+
+    expect = data_algebra.default_data_model.pd.DataFrame(
+        {
+            "o": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            "x": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            "shift": [None, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0],
+            "shift_1": [None, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0],
+            "shift_2": [None, None, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
+            "shift_m1": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, None],
+            "shift_m2": [2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, None, None],
+        }
+    )
+
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+
+
+def test_window2_kf():
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"o": range(0, 10), "x": range(0, 10),}
+    )
+    with pytest.raises(ValueError):
+        (
+            describe_table(d).extend(
                 {
                     "shift": "x.shift()",
                     "shift_1": "x.shift(1)",
@@ -81,40 +105,5 @@ def test_window2_k():
                     "shift_m1": "x.shift(-1)",
                     "shift_m2": "x.shift(-2)",
                 },
-                order_by=['o'],
             )
-    )
-
-    expect = data_algebra.default_data_model.pd.DataFrame({
-        'o': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-        'x': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-        'shift': [None, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0],
-        'shift_1': [None, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0],
-        'shift_2': [None, None, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
-        'shift_m1': [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, None],
-        'shift_m2': [2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, None, None],
-    })
-
-    data_algebra.test_util.check_transform(
-        ops=ops, data=d, expect=expect
-    )
-
-
-def test_window2_kf():
-    d = data_algebra.default_data_model.pd.DataFrame({
-        'o': range(0, 10),
-        'x': range(0, 10),
-        })
-    with pytest.raises(ValueError):
-         (
-            describe_table(d)
-                .extend(
-                    {
-                        "shift": "x.shift()",
-                        "shift_1": "x.shift(1)",
-                        "shift_2": "x.shift(2)",
-                        "shift_m1": "x.shift(-1)",
-                        "shift_m2": "x.shift(-2)",
-                    },
-                )
         )

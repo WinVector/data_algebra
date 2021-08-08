@@ -1,4 +1,3 @@
-
 import numpy
 
 import data_algebra
@@ -16,7 +15,9 @@ def pandas_to_example_str(obj, *, local_data_model=None):
         col = obj[k]
         nulls = local_data_model.bad_column_positions(col)
         cells = ["None" if nulls[i] else col[i].__repr__() for i in range(nrow)]
-        pandas_string = pandas_string + "\n    " + k.__repr__() + ": [" + ", ".join(cells) + "],"
+        pandas_string = (
+            pandas_string + "\n    " + k.__repr__() + ": [" + ", ".join(cells) + "],"
+        )
     pandas_string = pandas_string + "\n    })"
     return pandas_string
 
@@ -52,7 +53,7 @@ type_conversions = {
     # (note even numpy.bool_ triggers the above, or the triggering it is in pyspark right now
     numpy.bool_: bool,
     numpy.int64: int,
-    numpy.float64: float
+    numpy.float64: float,
 }
 
 

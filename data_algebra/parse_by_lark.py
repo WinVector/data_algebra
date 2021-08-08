@@ -111,9 +111,15 @@ def _walk_lark_tree(op, *, data_def=None):
                 ops_seen = [str(r_op.children[i]) for i in range(nc) if (i % 2) == 1]
                 if (len(set(ops_seen)) == 1) and (r_op.data in ["arith_expr", "term"]):
                     op_name = ops_seen[0]
-                    if op_name in {'+', '*'}:
-                        children = [_r_walk_lark_tree(r_op.children[i]) for i in range(nc) if (i % 2) == 0]
-                        res = data_algebra.expr_rep.kop_expr(op_name, children, inline=True, method=False)
+                    if op_name in {"+", "*"}:
+                        children = [
+                            _r_walk_lark_tree(r_op.children[i])
+                            for i in range(nc)
+                            if (i % 2) == 0
+                        ]
+                        res = data_algebra.expr_rep.kop_expr(
+                            op_name, children, inline=True, method=False
+                        )
                         return res
                 # just linear chain ops
                 res = _r_walk_lark_tree(r_op.children[0])
@@ -172,12 +178,10 @@ def _walk_lark_tree(op, *, data_def=None):
                     method = getattr(var, op_name)
                     return method(*args)
                 else:
-                    if op_name.startswith(
-                        "_"
-                    ):  # TODO: get rid of underbar aliases
-                        op_name = op_name[1: len(op_name)]
+                    if op_name.startswith("_"):  # TODO: get rid of underbar aliases
+                        op_name = op_name[1 : len(op_name)]
                     return data_algebra.expr_rep.Expression(op=op_name, args=args)
-            if r_op.data in  {"or_test", "or_test_sym", "and_test", "and_test_sym"}:
+            if r_op.data in {"or_test", "or_test_sym", "and_test", "and_test_sym"}:
                 if len(r_op.children) < 2:
                     raise ValueError("unexpected " + r_op.data + " length")
                 if r_op.data in {"or_test", "or_test_sym"}:
@@ -187,7 +191,9 @@ def _walk_lark_tree(op, *, data_def=None):
                 else:
                     raise ValueError(f"unexpected test: {r_op.data}")
                 children = [_r_walk_lark_tree(ci) for ci in r_op.children]
-                res = data_algebra.expr_rep.kop_expr(op_name, children, inline=True, method=False)
+                res = data_algebra.expr_rep.kop_expr(
+                    op_name, children, inline=True, method=False
+                )
                 return res
             if r_op.data == "not":
                 if len(r_op.children) != 1:
@@ -198,10 +204,14 @@ def _walk_lark_tree(op, *, data_def=None):
             if r_op.data in ["list", "tuple", "set"]:
                 op_values = [_r_walk_lark_tree(vi) for vi in r_op.children[0].children]
                 # check all args are values, not None, same type
-                assert all([isinstance(vi, data_algebra.expr_rep.Value) for vi in op_values])
+                assert all(
+                    [isinstance(vi, data_algebra.expr_rep.Value) for vi in op_values]
+                )
                 assert all([vi.value is not None for vi in op_values])
                 observed_types = {type(vi.value) for vi in op_values}
-                observed_types = [data_algebra.util.map_type_to_canonical(v) for v in observed_types]
+                observed_types = [
+                    data_algebra.util.map_type_to_canonical(v) for v in observed_types
+                ]
                 assert len(observed_types) == 1
                 return data_algebra.expr_rep.ListTerm(op_values)
             if r_op.data == "expr_stmt":

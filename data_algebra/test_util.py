@@ -82,7 +82,7 @@ def equivalent_frames(
     if set(a_columns) != set(b_columns):
         return False
     if check_column_order:
-        if not all([a.columns[i] == b.columns[i] for i in range(a.shape[0])]):
+        if not numpy.all([a.columns[i] == b.columns[i] for i in range(a.shape[0])]):
             return False
     else:
         # re-order b into a's column order
@@ -112,9 +112,9 @@ def equivalent_frames(
             cb_null = cb.isnull()
             if (ca_null is None) != (cb_null is None):
                 return False
-            if not all(ca_null == cb_null):
+            if not numpy.all(ca_null == cb_null):
                 return False
-            if not all(ca_null):
+            if not numpy.all(ca_null):
                 ca = ca[ca_null == False]
                 cb = cb[cb_null == False]
                 if local_data_model.can_convert_col_to_numeric(a[c]):
@@ -124,7 +124,7 @@ def equivalent_frames(
                     if numpy.max(dif) > float_tol:
                         return False
                 else:
-                    if not all(ca == cb):
+                    if not numpy.all(ca == cb):
                         return False
     return True
 
@@ -228,12 +228,10 @@ def check_transform_on_handles(
                     sql_format_options = data_algebra.db_model.SQLFormatOptions(
                         use_with=use_with,
                         annotate=True,
-                        sql_indent=' ',
-                        initial_commas=initial_commas)
-                    sql = db_handle.to_sql(
-                        ops,
-                        sql_format_options=sql_format_options,
+                        sql_indent=" ",
+                        initial_commas=initial_commas,
                     )
+                    sql = db_handle.to_sql(ops, sql_format_options=sql_format_options,)
                     assert isinstance(sql, str)
                     sql_statements.append(sql)
                     # print(sql)

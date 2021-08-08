@@ -69,4 +69,5 @@ def test_cdata_convenience_1():
     assert data_algebra.test_util.equivalent_frames(d2p, expect_2)
 
     data_algebra.test_util.check_transform(
-        ops=ops1, data={'d': d, 'd2': d2}, expect=expect_2)
+        ops=ops1, data={"d": d, "d2": d2}, expect=expect_2
+    )

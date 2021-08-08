@@ -30,7 +30,9 @@ def test_project_z():
 
     expect = data_algebra.default_data_model.pd.DataFrame({"c": [1]})
 
-    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect, empty_produces_empty=False)
+    data_algebra.test_util.check_transform(
+        ops=ops, data=d, expect=expect, empty_produces_empty=False
+    )
 
 
 def test_project_zz():

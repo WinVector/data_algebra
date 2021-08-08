@@ -16,23 +16,17 @@ def test_compount_where_and():
         }
     )
 
-    ops = (
-        describe_table(d, table_name='d')
-            .select_rows(
-                'a == "a" and b == "c" and x > 0 and y < 4'
-            )
-        )
+    ops = describe_table(d, table_name="d").select_rows(
+        'a == "a" and b == "c" and x > 0 and y < 4'
+    )
 
     db_handle = data_algebra.SQLite.SQLiteModel().db_handle(conn=None)
     sql = db_handle.to_sql(ops)
     assert isinstance(sql, str)
 
-    expect = data_algebra.default_data_model.pd.DataFrame({
-        'a': ['a'],
-        'b': ['c'],
-        'x': [1.0],
-        'y': [3.0],
-        })
+    expect = data_algebra.default_data_model.pd.DataFrame(
+        {"a": ["a"], "b": ["c"], "x": [1.0], "y": [3.0],}
+    )
 
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
 
@@ -47,22 +41,16 @@ def test_compount_where_amp():
         }
     )
 
-    ops = (
-        describe_table(d, table_name='d')
-            .select_rows(
-                'a == "a" & b == "c" & x > 0 & y < 4'
-            )
-        )
+    ops = describe_table(d, table_name="d").select_rows(
+        'a == "a" & b == "c" & x > 0 & y < 4'
+    )
 
     db_handle = data_algebra.SQLite.SQLiteModel().db_handle(conn=None)
     sql = db_handle.to_sql(ops)
     assert isinstance(sql, str)
 
-    expect = data_algebra.default_data_model.pd.DataFrame({
-        'a': ['a'],
-        'b': ['c'],
-        'x': [1.0],
-        'y': [3.0],
-        })
+    expect = data_algebra.default_data_model.pd.DataFrame(
+        {"a": ["a"], "b": ["c"], "x": [1.0], "y": [3.0],}
+    )
 
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)

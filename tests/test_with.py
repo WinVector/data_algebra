@@ -63,4 +63,6 @@ def test_with_query_example_2():
 
     assert data_algebra.test_util.equivalent_frames(res_pandas, expect)
 
-    data_algebra.test_util.check_transform(ops=ops, data={"d1": d1, "d2": d2}, expect=expect)
+    data_algebra.test_util.check_transform(
+        ops=ops, data={"d1": d1, "d2": d2}, expect=expect
+    )

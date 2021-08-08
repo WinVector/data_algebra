@@ -72,7 +72,7 @@ fn_names_that_imply_ordered_windowed_situation = {
 
 # noinspection SpellCheckingInspection
 fn_names_not_allowed_in_project = {
-    'ngroup',
+    "ngroup",
 }
 
 
@@ -609,10 +609,17 @@ def kop_expr(op, args, inline=False, method=False):
 
 class Value(Term):
     def __init__(self, value):
-        allowed = {data_algebra.util.map_type_to_canonical(t) for t in [int, float, str, bool]}
+        allowed = {
+            data_algebra.util.map_type_to_canonical(t) for t in [int, float, str, bool]
+        }
         disaallowed = {data_algebra.util.map_type_to_canonical(type(value))} - allowed
         if len(disaallowed) != 0:
-            raise TypeError("value type must be one of: " + str(allowed) + ', saw ' + str(list(disaallowed)[0]))
+            raise TypeError(
+                "value type must be one of: "
+                + str(allowed)
+                + ", saw "
+                + str(list(disaallowed)[0])
+            )
         self.value = value
         Term.__init__(self)
 
@@ -695,16 +702,7 @@ class ListTerm(PreTerm):
             except AttributeError:
                 return str(value)  # TODO: check if this should be repr?
 
-        return (
-            "["
-            + ", ".join(
-                [
-                    li_to_python(ai)
-                    for ai in self.value
-                ]
-            )
-            + "]"
-        )
+        return "[" + ", ".join([li_to_python(ai) for ai in self.value]) + "]"
 
     def get_column_names(self, columns_seen):
         for ti in self.value:
@@ -922,12 +920,12 @@ class Expression(Term):
                 else:
                     return "(" + subs[0] + ")." + self.op + "()"
         if self.inline:
-            result = ''
+            result = ""
             if want_inline_parens:
-                result = result + '('
-            result = result + (' ' + self.op + ' ').join(subs)
+                result = result + "("
+            result = result + (" " + self.op + " ").join(subs)
             if want_inline_parens:
-                result = result + ')'
+                result = result + ")"
             return result
         if self.method:
             if isinstance(self.args[0], ColumnReference):
