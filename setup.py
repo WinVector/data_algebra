@@ -11,7 +11,7 @@ The primary purpose of the package is to support an easy to
 compose and maintain grammar of data processing steps that in turn can be used to generate
 database specific SQL. The package also implements the same transforms for Pandas DataFrames.
 
-Currently the system is primarily adapted and testing for Pandas, Google BigQuery, PostgreSQL, Spark, and
+Currently the system is primarily adapted and testing for Pandas, Google BigQuery, PostgreSQL, SQLite, Spark, and
 MySQL.
 
 [R](https://www.r-project.org) versions of the system are available as 
@@ -37,7 +37,12 @@ setuptools.setup(
         'PostgreSQL': ['sqlalchemy', 'psycopg2'],
         'MySQL': ['sqlalchemy', 'pymysql'],
         'Spark': ['pyspark'],
-        'all': ['black', 'graphviz', 'BigQuery', 'PostgreSQL', 'MySQL', 'Spark'],
+        'all': ['black',
+                'google.cloud', 'pyarrow', 'google-cloud-bigquery',
+                'sqlalchemy', 'psycopg2',
+                'pymysql',
+                'pyspark',
+                ],
     },
     platforms=['any'],
     license='License :: OSI Approved :: BSD 3-clause License',

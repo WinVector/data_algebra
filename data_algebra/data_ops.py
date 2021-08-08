@@ -48,6 +48,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     column_names: List[str]
     column_set: data_algebra.OrderedSet.OrderedSet
+    column_types: typing.Optional[Dict[str, type]]
     sources: List[
         "ViewRepresentation"
     ]  # https://www.python.org/dev/peps/pep-0484/#forward-references
@@ -56,6 +57,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         self,
         column_names: List[str],
         *,
+        column_types: typing.Optional[Dict[str, type]] = None,
         sources: List["ViewRepresentation"] = None,
         node_name: str,
     ):
@@ -80,6 +82,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
         for si in sources:
             assert isinstance(si, ViewRepresentation)
         self.sources = [si for si in sources]
+        self.column_types = None
+        if column_types is not None:
+            self.column_types = column_types.copy()
         OperatorPlatform.__init__(
             self, node_name=node_name, column_map=collections.OrderedDict(**column_dict)
         )
@@ -593,13 +598,13 @@ class TableDescription(ViewRepresentation):
         column_names,
         qualifiers=None,
         sql_meta=None,
-        column_types=None,
+        column_types: typing.Optional[Dict[str, type]] = None,
         head=None,
         limit_was=None,
         nrows=None,
     ):
         ViewRepresentation.__init__(
-            self, column_names=column_names, node_name="TableDescription"
+            self, column_names=column_names, node_name="TableDescription", column_types=column_types,
         )
         if table_name is None:
             self.table_name_was_set_by_user = False
@@ -618,9 +623,6 @@ class TableDescription(ViewRepresentation):
         if isinstance(column_names, str):
             column_names = [column_names]
         self.column_names = [c for c in column_names]
-        self.column_types = None
-        if column_types is not None:
-            self.column_types = column_types.copy()
         if qualifiers is None:
             qualifiers = {}
         assert isinstance(qualifiers, dict)
@@ -1730,6 +1732,8 @@ class ConcatRowsNode(ViewRepresentation):
 
     def __init__(self, a, b, *, id_column="table_name", a_name="a", b_name="b"):
         # check set of tables is consistent in both sub-dags
+        assert isinstance(a, ViewRepresentation)
+        assert isinstance(b, ViewRepresentation)
         a_tables = a.get_tables()
         b_tables = b.get_tables()
         common_keys = set(a_tables.keys()).intersection(b_tables.keys())
