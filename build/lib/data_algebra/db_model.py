@@ -1314,7 +1314,7 @@ class DBModel:
             ),
             joiner="UNION ALL",
             sub_sql2=sql_right.to_bound_near_sql(
-                columns=using_right, force_sql=True, constants=constants_right,
+                columns=using_left, force_sql=True, constants=constants_right,
             ),
             annotation=concat_node.to_python_implementation(
                 print_sources=False, indent=-1
