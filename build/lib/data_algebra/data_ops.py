@@ -527,6 +527,15 @@ class ViewRepresentation(OperatorPlatform, ABC):
     def select_rows(self, expr):
         if expr is None:
             return self
+        if isinstance(expr, (list, tuple)):
+            # convert lists to and expressions
+            assert all([isinstance(vi, str) for vi in expr])
+            if len(expr) < 1:
+                return self
+            elif len(expr) == 1:
+                expr = expr[0]
+            else:
+                expr = ' & '.join(['(' + vi + ')' for vi in expr])
         assert isinstance(expr, (str, data_algebra.expr_rep.PreTerm))
         if self.is_trivial_when_intermediate():
             return self.sources[0].select_rows(expr)
