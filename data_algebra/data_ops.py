@@ -443,6 +443,12 @@ class ViewRepresentation(OperatorPlatform, ABC):
     def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
         if (ops is None) or (len(ops) < 1):
             return self
+        if isinstance(partition_by, str):
+            partition_by = [partition_by]
+        if isinstance(order_by, str):
+            order_by = [order_by]
+        if isinstance(reverse, str):
+            reverse = [reverse]
         parsed_ops = data_algebra.expr_parse.parse_assignments_in_context(ops, self)
         return self.extend_parsed(
             parsed_ops=parsed_ops,
@@ -500,6 +506,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
         if b is None:
             return self
         assert isinstance(b, ViewRepresentation)
+        assert isinstance(id_column, (str, type(None)))
+        assert isinstance(a_name, str)
+        assert isinstance(b_name, str)
         if self.is_trivial_when_intermediate():
             return self.sources[0].concat_rows(
                 b, id_column=id_column, a_name=a_name, b_name=b_name
@@ -560,11 +569,16 @@ class ViewRepresentation(OperatorPlatform, ABC):
     def rename_columns(self, column_remapping):
         if (column_remapping is None) or (len(column_remapping) < 1):
             return self
+        assert isinstance(column_remapping, dict)
         if self.is_trivial_when_intermediate():
             return self.sources[0].rename_columns(column_remapping)
         return RenameColumnsNode(source=self, column_remapping=column_remapping)
 
     def order_rows(self, columns, *, reverse=None, limit=None):
+        if isinstance(columns, str):
+            columns = [columns]
+        if isinstance(reverse, str):
+            reverse = [reverse]
         if ((columns is None) or (len(columns) < 1)) and (limit is None):
             return self
         if self.is_trivial_when_intermediate():
