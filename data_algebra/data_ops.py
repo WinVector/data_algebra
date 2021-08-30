@@ -464,6 +464,8 @@ class ViewRepresentation(OperatorPlatform, ABC):
         return ProjectNode(source=self, parsed_ops=parsed_ops, group_by=group_by)
 
     def project(self, ops=None, *, group_by=None):
+        if isinstance(group_by, str):
+            group_by = [group_by]
         if group_by is None:
             group_by = []
         if ((ops is None) or (len(ops) < 1)) and (len(group_by) < 1):
@@ -481,6 +483,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
         :return: ops describing join
         """
         assert isinstance(b, ViewRepresentation)
+        if isinstance(by, str):
+            by = [by]
+        assert isinstance(jointype, str)
         if self.is_trivial_when_intermediate():
             return self.sources[0].natural_join(b, by=by, jointype=jointype)
         return NaturalJoinNode(
@@ -529,6 +534,8 @@ class ViewRepresentation(OperatorPlatform, ABC):
         return self.select_rows_parsed(parsed_expr=ops)
 
     def drop_columns(self, column_deletions):
+        if isinstance(column_deletions, str):
+            column_deletions = [column_deletions]
         if (column_deletions is None) or (len(column_deletions) < 1):
             return self
         if self.is_trivial_when_intermediate():
@@ -536,6 +543,8 @@ class ViewRepresentation(OperatorPlatform, ABC):
         return DropColumnsNode(source=self, column_deletions=column_deletions)
 
     def select_columns(self, columns):
+        if isinstance(columns, str):
+            columns = [columns]
         if (columns is None) or (len(columns) < 1):
             raise ValueError("must select at least one column")
         if columns == self.column_names:
