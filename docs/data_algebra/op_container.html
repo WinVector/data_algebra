@@ -318,18 +318,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">order_rows</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="n">reverse</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">map_records</span><span class="p">(</span>
             <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span>
             <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">,</span>
             <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">,</span>
-            <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
@@ -536,18 +535,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">order_rows</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="n">reverse</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">map_records</span><span class="p">(</span>
             <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span>
             <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">,</span>
             <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">,</span>
-            <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
@@ -1110,13 +1108,13 @@
 
         
             <span class="def">def</span>
-            <span class="name">convert_records</span><span class="signature">(self, record_map, *, temp_namer=None)</span>:
+            <span class="name">convert_records</span><span class="signature">(self, record_map)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">)</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 </pre></div>
 
@@ -1130,19 +1128,18 @@
 
         
             <span class="def">def</span>
-            <span class="name">map_records</span><span class="signature">(self, blocks_in=None, blocks_out=None, strict=False, temp_namer=None)</span>:
+            <span class="name">map_records</span><span class="signature">(self, blocks_in=None, blocks_out=None, strict=False)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">map_records</span><span class="p">(</span>
             <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span>
             <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">,</span>
             <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">,</span>
-            <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 </pre></div>

@@ -176,11 +176,11 @@ class OperatorPlatform:
     def order_rows(self, columns, *, reverse=None, limit=None):
         raise NotImplementedError("base class called")
 
-    def convert_records(self, record_map, *, temp_namer=None):
+    def convert_records(self, record_map):
         raise NotImplementedError("base class called")
 
     def map_records(
-        self, blocks_in=None, blocks_out=None, strict=False, temp_namer=None
+        self, blocks_in=None, blocks_out=None, strict=False
     ):
         if (blocks_in is None) and (blocks_out is None):
             return self  # NO-OP, return source ops
@@ -188,7 +188,6 @@ class OperatorPlatform:
             data_algebra.cdata.RecordMap(
                 blocks_in=blocks_in, blocks_out=blocks_out, strict=strict
             ),
-            temp_namer=temp_namer,
         )
 
     # sklearn step style interface

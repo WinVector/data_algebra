@@ -169,18 +169,17 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         self.set(self.ops.order_rows(columns=columns, reverse=reverse, limit=limit))
         return self
 
-    def convert_records(self, record_map, *, temp_namer=None):
-        self.ops.convert_records(record_map=record_map, temp_namer=temp_namer)
+    def convert_records(self, record_map):
+        self.ops.convert_records(record_map=record_map)
         return self
 
     def map_records(
-        self, blocks_in=None, blocks_out=None, strict=False, temp_namer=None
+        self, blocks_in=None, blocks_out=None, strict=False
     ):
         self.ops.map_records(
             blocks_in=blocks_in,
             blocks_out=blocks_out,
             strict=strict,
-            temp_namer=temp_namer,
         )
         return self
 

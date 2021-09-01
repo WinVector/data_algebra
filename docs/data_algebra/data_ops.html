@@ -1046,13 +1046,13 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">order_rows</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="n">reverse</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">OrderRowsNode</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="n">reverse</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">record_map</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_trivial_when_intermediate</span><span class="p">():</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ConvertRecordsNode</span><span class="p">(</span>
-            <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span>
+            <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span>
         <span class="p">)</span>
 
 
@@ -2331,10 +2331,9 @@
 
 
 <span class="k">class</span> <span class="nc">ConvertRecordsNode</span><span class="p">(</span><span class="n">ViewRepresentation</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">record_map</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">record_map</span><span class="p">):</span>
         <span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">source</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span> <span class="o">=</span> <span class="n">record_map</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">temp_namer</span> <span class="o">=</span> <span class="n">temp_namer</span>
         <span class="n">unknown</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">columns_needed</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;missing required columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">unknown</span><span class="p">))</span>
@@ -3017,13 +3016,13 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">order_rows</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="n">reverse</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">OrderRowsNode</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="n">reverse</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">record_map</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_trivial_when_intermediate</span><span class="p">():</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ConvertRecordsNode</span><span class="p">(</span>
-            <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span>
+            <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -4032,18 +4031,18 @@ with the using columns (None means all).</p>
 
         
             <span class="def">def</span>
-            <span class="name">convert_records</span><span class="signature">(self, record_map, *, temp_namer=None)</span>:
+            <span class="name">convert_records</span><span class="signature">(self, record_map)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">record_map</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_trivial_when_intermediate</span><span class="p">():</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ConvertRecordsNode</span><span class="p">(</span>
-            <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="n">temp_namer</span>
+            <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -8304,10 +8303,9 @@ with the using columns (None means all).</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">ConvertRecordsNode</span><span class="p">(</span><span class="n">ViewRepresentation</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">record_map</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">record_map</span><span class="p">):</span>
         <span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">source</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span> <span class="o">=</span> <span class="n">record_map</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">temp_namer</span> <span class="o">=</span> <span class="n">temp_namer</span>
         <span class="n">unknown</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">columns_needed</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;missing required columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">unknown</span><span class="p">))</span>
@@ -8407,15 +8405,14 @@ Abstract base class.</p>
                                         <div class="attr function"><a class="headerlink" href="#ConvertRecordsNode.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">ConvertRecordsNode</span><span class="signature">(*, source, record_map, temp_namer=None)</span>
+            <span class="name">ConvertRecordsNode</span><span class="signature">(*, source, record_map)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">record_map</span><span class="p">,</span> <span class="n">temp_namer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">record_map</span><span class="p">):</span>
         <span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">source</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span> <span class="o">=</span> <span class="n">record_map</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">temp_namer</span> <span class="o">=</span> <span class="n">temp_namer</span>
         <span class="n">unknown</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">columns_needed</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;missing required columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">unknown</span><span class="p">))</span>
