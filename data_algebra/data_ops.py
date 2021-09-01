@@ -594,13 +594,13 @@ class ViewRepresentation(OperatorPlatform, ABC):
             return self.sources[0].order_rows(columns, reverse=reverse, limit=limit)
         return OrderRowsNode(source=self, columns=columns, reverse=reverse, limit=limit)
 
-    def convert_records(self, record_map, *, temp_namer=None):
+    def convert_records(self, record_map):
         if record_map is None:
             return self
         if self.is_trivial_when_intermediate():
-            return self.sources[0].convert_records(record_map, temp_namer=temp_namer)
+            return self.sources[0].convert_records(record_map)
         return ConvertRecordsNode(
-            source=self, record_map=record_map, temp_namer=temp_namer
+            source=self, record_map=record_map
         )
 
 
@@ -1879,10 +1879,9 @@ class ConcatRowsNode(ViewRepresentation):
 
 
 class ConvertRecordsNode(ViewRepresentation):
-    def __init__(self, *, source, record_map, temp_namer=None):
+    def __init__(self, *, source, record_map):
         sources = [source]
         self.record_map = record_map
-        self.temp_namer = temp_namer
         unknown = set(self.record_map.columns_needed) - set(source.column_names)
         if len(unknown) > 0:
             raise ValueError("missing required columns: " + str(unknown))
