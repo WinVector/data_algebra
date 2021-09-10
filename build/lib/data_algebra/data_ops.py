@@ -800,6 +800,7 @@ def describe_table(
     row_limit: typing.Optional[int] = 7,
     keep_sample=True,
     keep_all=False,
+    guess_column_types=True,
 ) -> TableDescription:
     """
     :param d: pandas table to describe
@@ -810,13 +811,15 @@ def describe_table(
     :param row_limit: how many rows to sample
     :param keep_sample: logical, if True retain head of table
     :param keep_all: logical, if True retain all of table
+    :param guess_column_types: logical, if True try to infer column types
     :return: TableDescription
     """
     assert not isinstance(d, OperatorPlatform)
     assert not isinstance(d, ViewRepresentation)
     column_names = [c for c in d.columns]
-    if column_types is None:
-        column_types = data_algebra.util.guess_column_types(d)
+    if (column_types is None) or (len(column_types) < 1):
+        if guess_column_types:
+            column_types = data_algebra.util.guess_column_types(d)
     head = None
     nrows = d.shape[0]
     if keep_all:

@@ -172,6 +172,9 @@
     <span class="n">res</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
         <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">guess_carried_scalar_type</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">c</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.Series</span><span class="se">\&#39;</span><span class="s1">&gt;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">values</span><span class="p">()]):</span>
+        <span class="c1"># pandas.concat() poisons types with Series, don&#39;t allow that</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">res</span>
 
 
@@ -374,6 +377,9 @@
     <span class="n">res</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
         <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">guess_carried_scalar_type</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">c</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.Series</span><span class="se">\&#39;</span><span class="s1">&gt;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">values</span><span class="p">()]):</span>
+        <span class="c1"># pandas.concat() poisons types with Series, don&#39;t allow that</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">res</span>
 </pre></div>
 

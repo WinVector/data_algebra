@@ -101,6 +101,9 @@ def guess_column_types(d, *, columns=None):
     res = dict()
     for c in columns:
         res[c] = guess_carried_scalar_type(d[c])
+    if any([str(v).endswith('.Series\'>') for v in res.values()]):
+        # pandas.concat() poisons types with Series, don't allow that
+        return dict()
     return res
 
 
