@@ -78,7 +78,8 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = df.loc[:, columns_using]
         res = res.reset_index(drop=True)
         # check type compatibility
-        if (op.column_types is not None) and (len(op.column_types) > 0):
+        if((op.column_types is not None) and (len(op.column_types) > 0)
+                and (res.shape[0] > 0) and (res.shape[1] > 0)):
             types_seen = data_algebra.util.guess_column_types(res)
             for c in columns_using:
                 assert data_algebra.util.compatible_types(
@@ -465,15 +466,21 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             data_map=data_map, data_model=self, narrow=narrow
         )
         if op.id_column is not None:
-            left[op.id_column] = op.a_name
-            right[op.id_column] = op.b_name
-        type_checks = data_algebra.util.check_columns_appear_compatible(left, right)
-        if type_checks is not None:
-            raise ValueError(f"concat: incompatible column types: {type_checks}")
+            if left.shape[0] > 0:
+                left[op.id_column] = op.a_name
+            else:
+                left[op.id_column] = []
+            if right.shape[0] > 0:
+                right[op.id_column] = op.b_name
+            else:
+                right[op.id_column] = []
         if left.shape[0] < 1:
             return right
         if right.shape[0] < 1:
             return left
+        type_checks = data_algebra.util.check_columns_appear_compatible(left, right)
+        if type_checks is not None:
+            raise ValueError(f"concat: incompatible column types: {type_checks}")
         # noinspection PyUnresolvedReferences
         res = self.pd.concat([left, right], axis=0, ignore_index=True, sort=False)
         res = res.reset_index(drop=True)

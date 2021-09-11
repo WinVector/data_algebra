@@ -1,3 +1,6 @@
+
+import datetime
+
 import numpy
 
 import data_algebra
@@ -73,7 +76,8 @@ def guess_carried_scalar_type(col):
     :return: type of first non-None entry, if any , else type(None)
     """
     ct = map_type_to_canonical(type(col))
-    if ct in {str, int, float, bool, type(None), numpy.int64, numpy.float64}:
+    if ct in {str, int, float, bool, type(None), numpy.int64, numpy.float64,
+              datetime.datetime, datetime.date, datetime.timedelta}:
         return ct
     if len(col) < 1:
         return type(None)
@@ -85,25 +89,27 @@ def guess_carried_scalar_type(col):
 
 def guess_column_types(d, *, columns=None):
     """
-    Guess column types as type of first non-missing value
+    Guess column types as type of first non-missing value.
+    Will not return series types, as some pandas data frames with non-trivial indexing report this type.
 
     :param d: pandas.DataFrame
     :param columns: list of columns to check, if None all columns are checked
-    :return: map of column names to guessed types
+    :return: map of column names to guessed types, empty dict if any column guess fails
     """
-    if d.shape[1] <= 0:
+    if (d.shape[0] <= 0) or (d.shape[1] <= 0):
         return dict()
     if columns is None:
-        columns = d.columns
+        columns = d.columns.copy()
     assert len(set(columns) - set(d.columns)) == 0
-    if d.shape[0] <= 0:
-        return {c: type(None) for c in columns}
+    if len(columns) <= 0:
+        return dict()
     res = dict()
     for c in columns:
-        res[c] = guess_carried_scalar_type(d[c])
-    if any([str(v).endswith('.Series\'>') for v in res.values()]):
-        # pandas.concat() poisons types with Series, don't allow that
-        return dict()
+        gt = guess_carried_scalar_type(d[c])
+        if (gt is None) or (not isinstance(gt, type)) or str(gt).endswith('.Series\'>'):
+            # pandas.concat() poisons types with Series, don't allow that
+            return dict()
+        res[c] = gt
     return res
 
 
@@ -129,7 +135,11 @@ def check_columns_appear_compatible(d_left, d_right, *, columns=None):
     assert len(set(columns) - set(d_left.columns)) == 0
     assert len(set(columns) - set(d_right.columns)) == 0
     left_types = data_algebra.util.guess_column_types(d_left, columns=columns)
+    if (left_types is None) or (len(left_types) <= 0):
+        return None
     right_types = data_algebra.util.guess_column_types(d_right, columns=columns)
+    if (right_types is None) or (len(right_types) <= 0):
+        return None
     mismatches = dict()
     for c in columns:
         if not compatible_types([left_types[c], right_types[c]]):
