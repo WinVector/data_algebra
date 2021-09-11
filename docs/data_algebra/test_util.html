@@ -231,8 +231,9 @@
         <span class="n">cols_used</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>
         <span class="n">table_name</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cols_used</span><span class="o">.</span><span class="n">keys</span><span class="p">()][</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">table_name</span><span class="p">:</span> <span class="n">data</span><span class="p">}</span>
-
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+    <span class="n">n_tables</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">n_tables</span> <span class="o">&gt;</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
@@ -275,7 +276,7 @@
         <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pandas transform result did not match expect&quot;</span><span class="p">)</span>
     <span class="c1"># try on empty inputs</span>
-    <span class="n">empty_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">empty_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="n">empty_res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">empty_map</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">empty_res</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">empty_res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
@@ -283,6 +284,21 @@
         <span class="k">assert</span> <span class="n">empty_res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">assert</span> <span class="n">empty_res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="c1"># try on combinations of empty and original</span>
+    <span class="k">if</span> <span class="n">n_tables</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="n">partial_maps</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+            <span class="p">},</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">pm</span> <span class="ow">in</span> <span class="n">partial_maps</span><span class="p">:</span>
+            <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">pm</span><span class="p">)</span>
     <span class="c1"># try any db paths</span>
     <span class="k">if</span> <span class="n">db_handles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">db_handle</span> <span class="ow">in</span> <span class="n">db_handles</span><span class="p">:</span>
@@ -658,8 +674,9 @@ Ignores indexing.</p>
         <span class="n">cols_used</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>
         <span class="n">table_name</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cols_used</span><span class="o">.</span><span class="n">keys</span><span class="p">()][</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">table_name</span><span class="p">:</span> <span class="n">data</span><span class="p">}</span>
-
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+    <span class="n">n_tables</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">n_tables</span> <span class="o">&gt;</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
@@ -702,7 +719,7 @@ Ignores indexing.</p>
         <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pandas transform result did not match expect&quot;</span><span class="p">)</span>
     <span class="c1"># try on empty inputs</span>
-    <span class="n">empty_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">empty_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="n">empty_res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">empty_map</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">empty_res</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">empty_res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
@@ -710,6 +727,21 @@ Ignores indexing.</p>
         <span class="k">assert</span> <span class="n">empty_res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">assert</span> <span class="n">empty_res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="c1"># try on combinations of empty and original</span>
+    <span class="k">if</span> <span class="n">n_tables</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="n">partial_maps</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+            <span class="p">},</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">pm</span> <span class="ow">in</span> <span class="n">partial_maps</span><span class="p">:</span>
+            <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">pm</span><span class="p">)</span>
     <span class="c1"># try any db paths</span>
     <span class="k">if</span> <span class="n">db_handles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">db_handle</span> <span class="ow">in</span> <span class="n">db_handles</span><span class="p">:</span>

@@ -166,8 +166,9 @@ def check_transform_on_handles(
         cols_used = ops.columns_used()
         table_name = [k for k in cols_used.keys()][0]
         data = {table_name: data}
-
     assert isinstance(data, dict)
+    n_tables = len(data)
+    assert n_tables > 0
     if local_data_model is None:
         local_data_model = data_algebra.default_data_model
     assert isinstance(ops, ViewRepresentation)
@@ -210,7 +211,7 @@ def check_transform_on_handles(
         ):
             raise ValueError("Pandas transform result did not match expect")
     # try on empty inputs
-    empty_map = {k: v.iloc[range(0), :].reset_index(drop=True) for k, v in data.items()}
+    empty_map = {k: v.iloc[range(0), :].reset_index(drop=True, inplace=False) for k, v in data.items()}
     empty_res = ops.eval(empty_map)
     assert local_data_model.is_appropriate_data_instance(empty_res)
     assert set(empty_res.columns) == set(res.columns)
@@ -218,6 +219,21 @@ def check_transform_on_handles(
         assert empty_res.shape[0] == 0
     else:
         assert empty_res.shape[0] > 0
+    # try on combinations of empty and original
+    if n_tables == 2:
+        keys = [k for k in data.keys()]
+        partial_maps = [
+            {
+                keys[0]: data[keys[0]].reset_index(drop=True, inplace=False),
+                keys[1]: data[keys[1]],
+            },
+            {
+                keys[0]: data[keys[0]],
+                keys[1]: data[keys[1]].reset_index(drop=True, inplace=False),
+            },
+        ]
+        for pm in partial_maps:
+            ops.eval(pm)
     # try any db paths
     if db_handles is not None:
         for db_handle in db_handles:
