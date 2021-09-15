@@ -75,16 +75,21 @@ def guess_carried_scalar_type(col):
     :param col: column or scalar to inspect
     :return: type of first non-None entry, if any , else type(None)
     """
+    # check for scalars first
     ct = map_type_to_canonical(type(col))
     if ct in {str, int, float, bool, type(None), numpy.int64, numpy.float64,
               datetime.datetime, datetime.date, datetime.timedelta}:
         return ct
+    # look at a list or Series
+    if isinstance(col, data_algebra.default_data_model.pd.core.series.Series):
+        col = col.values
     if len(col) < 1:
         return type(None)
-    idx = col.notna().idxmax()
-    if idx is None:
-        return map_type_to_canonical(type(col[0]))
-    return map_type_to_canonical(type(col[idx]))
+    good_idx = numpy.where(numpy.logical_not(data_algebra.default_data_model.pd.isna(col)))[0]
+    test_idx = 0
+    if len(good_idx) > 0:
+        test_idx = good_idx[0]
+    return map_type_to_canonical(type(col[test_idx]))
 
 
 def guess_column_types(d, *, columns=None):
@@ -106,7 +111,7 @@ def guess_column_types(d, *, columns=None):
     res = dict()
     for c in columns:
         gt = guess_carried_scalar_type(d[c])
-        if (gt is None) or (not isinstance(gt, type)) or str(gt).endswith('.Series\'>'):
+        if (gt is None) or (not isinstance(gt, type)) or gt == data_algebra.default_data_model.pd.core.series.Series:
             # pandas.concat() poisons types with Series, don't allow that
             return dict()
         res[c] = gt
