@@ -34,4 +34,6 @@ def test_scalar_columns():
 
     assert data_algebra.test_util.equivalent_frames(res, expect)
 
-    # data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+    # TODO: turn on check_parse
+    # TODO: turn on DB checks
+    # data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect, check_parse=False)
