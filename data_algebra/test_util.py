@@ -41,6 +41,7 @@ def formats_to_self(ops):
     str2 = repr(ops2)
     strings_match = str1 == str2  # probably too strict
     ops_match = ops == ops2
+    assert ops_match
     if strings_match and (not ops_match):
         raise Exception("strings match, but ops did not")
     pickle_string = pickle.dumps(ops)
