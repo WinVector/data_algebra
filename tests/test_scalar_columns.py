@@ -14,9 +14,9 @@ def test_scalar_columns():
     ops = (
         describe_table(d, table_name="d")
             .extend({
+                'n1': 1,
                 'z1': numpy.nan,
                 'z2': None,
-                'n1': 1,
                 'c1': 'a',
                 'b1': True,
                 'f1': 2.1,
@@ -25,9 +25,9 @@ def test_scalar_columns():
     res = ops.transform(d)
 
     expect = d.copy()
+    expect['n1'] = 1
     expect['z1'] = numpy.nan
     expect['z2'] = None
-    expect['n1'] = 1
     expect['c1'] = 'a'
     expect['b1'] = True
     expect['f1'] = 2.1

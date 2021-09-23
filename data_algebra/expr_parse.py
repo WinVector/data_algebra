@@ -34,6 +34,7 @@ def parse_assignments_in_context(ops, view):
             v = data_algebra.parse_by_lark.parse_by_lark(source_str=str(v), data_def=mp)
         else:
             v = v.replace_view(view)
+        assert isinstance(v, data_algebra.expr_rep.PreTerm)
         newops[k] = v
         used_here = set()
         v.get_column_names(used_here)
