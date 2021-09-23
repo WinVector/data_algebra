@@ -17,7 +17,7 @@ def test_scalar_columns():
                 'n1': 1,
                 'z1': numpy.nan,
                 'z2': None,
-                'c1': 'a',
+                'c1': "'a'",
                 'b1': True,
                 'f1': 2.1,
             })

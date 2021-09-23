@@ -610,7 +610,7 @@ def kop_expr(op, args, inline=False, method=False):
 class Value(Term):
     def __init__(self, value):
         allowed = {
-            data_algebra.util.map_type_to_canonical(t) for t in [int, float, str, bool]
+            data_algebra.util.map_type_to_canonical(t) for t in [int, float, str, bool, type(None)]
         }
         disaallowed = {data_algebra.util.map_type_to_canonical(type(value))} - allowed
         if len(disaallowed) != 0:

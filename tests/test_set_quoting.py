@@ -59,5 +59,5 @@ def test_set_quoting_mismatch():
 
 def test_set_quoting_exclude_none():
     d = data_algebra.default_data_model.pd.DataFrame({"x": ["a", "b"]})
-    with pytest.raises(TypeError):
+    with pytest.raises(Exception):
         describe_table(d, table_name="d").extend({"select": "x.is_in({-5, None})"})
