@@ -222,19 +222,19 @@ def _walk_lark_tree(op, *, data_def=None):
     return _r_walk_lark_tree(op)
 
 
-def parse_by_lark(source_str, *, data_def=None):
+def parse_by_lark(source_str : str, *, data_def=None) -> data_algebra.expr_rep.PreTerm:
     """
     Parse an expression in terms of data views and values.
 
     :param source_str: string to parse
     :param data_def: dictionary of data_algebra.expr_rep.ColumnReference
-    :return:
+    :return: data_algebra.expr_rep.PreTerm
     """
     assert parser is not None
-    if not isinstance(source_str, str):
-        source_str = str(source_str)
+    assert isinstance(source_str, str)
     tree = parser.parse(source_str)
     # convert parse tree to our data structures for isolation
     v = _walk_lark_tree(tree, data_def=data_def)
     v.source_string = source_str
+    assert isinstance(v, data_algebra.expr_rep.PreTerm)
     return v
