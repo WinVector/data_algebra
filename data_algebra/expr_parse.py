@@ -30,10 +30,13 @@ def parse_assignments_in_context(ops, view):
         assert isinstance(k, str)
         orig_v = ops[k]  # make debugging easier
         v = orig_v
-        if not isinstance(v, data_algebra.expr_rep.PreTerm):
-            v = data_algebra.parse_by_lark.parse_by_lark(source_str=str(v), data_def=mp)
-        else:
+        if isinstance(v, data_algebra.expr_rep.PreTerm):
             v = v.replace_view(view)
+        else:
+            if isinstance(v, str):
+                v = data_algebra.parse_by_lark.parse_by_lark(source_str=v, data_def=mp)
+            else:
+                v = data_algebra.expr_rep.Value(v)
         assert isinstance(v, data_algebra.expr_rep.PreTerm)
         newops[k] = v
         used_here = set()
