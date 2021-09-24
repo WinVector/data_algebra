@@ -560,7 +560,7 @@ class Term(PreTerm, ABC):
 
     def concat(self, x):
         # TODO: see if we can format back to infix notation
-        return self.__op_expr__("concat", x, inline=False, method=True)
+        return self.__op_expr__("concat", x, inline=False, method=True, check_types=False,)
 
     def coalesce(self, x):
         # TODO: see if we can format back to infix notation
