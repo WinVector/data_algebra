@@ -108,7 +108,7 @@ data_algebra/data_ops_utils.py            51      7    86%
 data_algebra/db_model.py                 868     90    90%
 data_algebra/eval_model.py                16      1    94%
 data_algebra/expr_parse.py                35      0   100%
-data_algebra/expr_rep.py                 604    111    82%
+data_algebra/expr_rep.py                 606    111    82%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 144      1    99%
 data_algebra/op_container.py             112     39    65%
@@ -119,7 +119,7 @@ data_algebra/python3_lark.py               1      0   100%
 data_algebra/test_util.py                203     37    82%
 data_algebra/util.py                      89      6    93%
 ----------------------------------------------------------
-TOTAL                                   4860    858    82%
+TOTAL                                   4862    858    82%
 
 
-============================= 212 passed in 16.71s =============================
+============================= 212 passed in 17.46s =============================

@@ -647,6 +647,9 @@
 
 
 <span class="k">def</span> <span class="nf">_check_expr_incompatible_types</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    return None if no type problem, else return pair of types</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">obvious_declared_type</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -666,12 +669,14 @@
 
     <span class="n">type_a</span> <span class="o">=</span> <span class="n">obvious_declared_type</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">type_a</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">None</span>
     <span class="n">type_b</span> <span class="o">=</span> <span class="n">obvious_declared_type</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">type_b</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">([</span><span class="n">type_a</span><span class="p">,</span> <span class="n">type_b</span><span class="p">]):</span>
+        <span class="k">return</span> <span class="kc">None</span>
     <span class="n">looks_compatible</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">([</span><span class="n">type_a</span><span class="p">,</span> <span class="n">type_b</span><span class="p">])</span>
-    <span class="k">return</span> <span class="ow">not</span> <span class="n">looks_compatible</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">type_a</span><span class="p">,</span> <span class="n">type_b</span><span class="p">)</span>
 
 
 <span class="c1"># noinspection SpellCheckingInspection</span>
@@ -694,8 +699,11 @@
         <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">check_types</span><span class="p">:</span>
             <span class="n">obvious_type_problem</span> <span class="o">=</span> <span class="n">_check_expr_incompatible_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">obvious_type_problem</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;trying to combine incompatible types in binary operation&quot;</span><span class="p">)</span>  <span class="c1"># TODO: better error message</span>
+            <span class="k">if</span> <span class="n">obvious_type_problem</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;trying to combine incompatible values:&quot;</span>
+                    <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">obvious_type_problem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; and </span><span class="si">{</span><span class="n">other</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">obvious_type_problem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__rop_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -1041,6 +1049,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;is_bad&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">if_else</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="c1"># could check if x and y are compatible types</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span><span class="s2">&quot;if_else&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">is_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
@@ -1788,8 +1797,11 @@
         <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">check_types</span><span class="p">:</span>
             <span class="n">obvious_type_problem</span> <span class="o">=</span> <span class="n">_check_expr_incompatible_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">obvious_type_problem</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;trying to combine incompatible types in binary operation&quot;</span><span class="p">)</span>  <span class="c1"># TODO: better error message</span>
+            <span class="k">if</span> <span class="n">obvious_type_problem</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;trying to combine incompatible values:&quot;</span>
+                    <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">obvious_type_problem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; and </span><span class="si">{</span><span class="n">other</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">obvious_type_problem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__rop_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -2135,6 +2147,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;is_bad&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">if_else</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="c1"># could check if x and y are compatible types</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span><span class="s2">&quot;if_else&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">is_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
@@ -3485,6 +3498,7 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">if_else</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="c1"># could check if x and y are compatible types</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span><span class="s2">&quot;if_else&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 

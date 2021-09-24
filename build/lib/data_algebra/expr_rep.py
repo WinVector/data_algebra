@@ -159,6 +159,9 @@ def _is_none_value(x):
 
 
 def _check_expr_incompatible_types(a, b):
+    """
+    return None if no type problem, else return pair of types
+    """
 
     def obvious_declared_type(v):
         if v is None:
@@ -178,12 +181,14 @@ def _check_expr_incompatible_types(a, b):
 
     type_a = obvious_declared_type(a)
     if type_a is None:
-        return False
+        return None
     type_b = obvious_declared_type(b)
     if type_b is None:
-        return False
+        return None
+    if data_algebra.util.compatible_types([type_a, type_b]):
+        return None
     looks_compatible = data_algebra.util.compatible_types([type_a, type_b])
-    return not looks_compatible
+    return (type_a, type_b)
 
 
 # noinspection SpellCheckingInspection
@@ -206,8 +211,11 @@ class Term(PreTerm, ABC):
         assert not _is_none_value(other)
         if check_types:
             obvious_type_problem = _check_expr_incompatible_types(self, other)
-            if obvious_type_problem:
-                raise TypeError("trying to combine incompatible types in binary operation")  # TODO: better error message
+            if obvious_type_problem is not None:
+                raise TypeError(
+                    f"trying to combine incompatible values:"
+                    + f" {self}:{obvious_type_problem[0]}"
+                    + f" and {other}:{obvious_type_problem[0]} with {op}")
         return Expression(op, (self, other), inline=inline, method=method)
 
     def __rop_expr__(self, op, other):
@@ -553,6 +561,7 @@ class Term(PreTerm, ABC):
         return self.__uop_expr__("is_bad")
 
     def if_else(self, x, y):
+        # could check if x and y are compatible types
         return self.__triop_expr__("if_else", x, y, method=True)
 
     def is_in(self, x):
