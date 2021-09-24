@@ -1,6 +1,8 @@
 import math
 import numpy
 
+import pytest
+
 import data_algebra
 import data_algebra.util
 import data_algebra.test_util
@@ -36,3 +38,37 @@ def test_null_bad():
     data_algebra.test_util.check_transform(
         ops=ops, data=d, expect=expect, models_to_skip=models_to_skip,
     )
+
+
+def test_null_bad_no_compare():
+    # similar in intent to not allowing None in sets in this grammar
+    # Null/None/NaN should be checked by a method, not an expression
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"x": [1, numpy.nan, math.inf, -math.inf, None, 0]}
+    )
+
+    # good, compare x to number
+    ops = (
+        describe_table(d, table_name='d')
+            .extend({'c': 'x == 5'})
+    )
+
+    # good, check if x is missing
+    ops = (
+        describe_table(d, table_name='d')
+            .extend({'c': 'x.is_null()'})
+    )
+
+    with pytest.raises(Exception):
+        # bad, compare to None
+        ops = (
+            describe_table(d, table_name='d')
+                .extend({'c': 'x != None'})
+        )
+
+    with pytest.raises(Exception):
+        # bad, compare known numeric to string
+        ops = (
+            describe_table(d, table_name='d')
+                .extend({'c': 'x == "None"'})
+        )
