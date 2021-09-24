@@ -150,6 +150,14 @@ class PreTerm(ABC):
         return self.to_python(want_inline_parens=False)
 
 
+def _is_none_value(x):
+    if x is None:
+        return True
+    if isinstance(x, Value):
+        return x.value is None
+    return False
+
+
 # noinspection SpellCheckingInspection
 class Term(PreTerm, ABC):
     """
@@ -166,6 +174,8 @@ class Term(PreTerm, ABC):
         assert isinstance(op, str)
         if not isinstance(other, Term):
             other = enc_value(other)
+        assert not _is_none_value(self)
+        assert not _is_none_value(other)
         return Expression(op, (self, other), inline=inline, method=method)
 
     def __rop_expr__(self, op, other):
@@ -173,11 +183,14 @@ class Term(PreTerm, ABC):
         assert isinstance(op, str)
         if not isinstance(other, Term):
             other = enc_value(other)
+        assert not _is_none_value(self)
+        assert not _is_none_value(other)
         return Expression(op, (other, self), inline=True)
 
     def __uop_expr__(self, op, *, params=None, inline=False):
         """unary expression"""
         assert isinstance(op, str)
+        assert not _is_none_value(self)
         return Expression(op, (self,), params=params, inline=inline, method=not inline)
 
     def __triop_expr__(self, op, x, y, inline=False, method=False):
@@ -187,6 +200,9 @@ class Term(PreTerm, ABC):
             x = enc_value(x)
         if not isinstance(y, Term):
             y = enc_value(y)
+        assert not _is_none_value(self)
+        assert not _is_none_value(x)
+        assert not _is_none_value(y)
         return Expression(op, (self, x, y), inline=inline, method=method)
 
     # try to get at == and other comparison operators
