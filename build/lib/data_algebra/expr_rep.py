@@ -150,6 +150,42 @@ class PreTerm(ABC):
         return self.to_python(want_inline_parens=False)
 
 
+def _is_none_value(x):
+    if x is None:
+        return True
+    if isinstance(x, Value):
+        return x.value is None
+    return False
+
+
+def _check_expr_incompatible_types(a, b):
+
+    def obvious_declared_type(v):
+        if v is None:
+            return None  # None may be a placeholder for "don't know at this point"
+        if isinstance(v, Value):
+            return type(v.value)
+        if isinstance(v, ColumnReference):
+            if (v.view is None) or (v.view.column_types is None) or (len(v.view.column_types) <= 0):
+                return None
+            try:
+                return v.view.column_types[v.column_name]
+            except KeyError:
+                return None
+        if isinstance(v, PreTerm):
+            return None
+        return None  # dunno
+
+    type_a = obvious_declared_type(a)
+    if type_a is None:
+        return False
+    type_b = obvious_declared_type(b)
+    if type_b is None:
+        return False
+    looks_compatible = data_algebra.util.compatible_types([type_a, type_b])
+    return not looks_compatible
+
+
 # noinspection SpellCheckingInspection
 class Term(PreTerm, ABC):
     """
@@ -161,11 +197,17 @@ class Term(PreTerm, ABC):
 
     # builders
 
-    def __op_expr__(self, op, other, *, inline=True, method=False):
+    def __op_expr__(self, op, other, *, inline=True, method=False, check_types=True):
         """binary expression"""
         assert isinstance(op, str)
         if not isinstance(other, Term):
             other = enc_value(other)
+        assert not _is_none_value(self)
+        assert not _is_none_value(other)
+        if check_types:
+            obvious_type_problem = _check_expr_incompatible_types(self, other)
+            if obvious_type_problem:
+                raise TypeError("trying to combine incompatible types in binary operation")  # TODO: better error message
         return Expression(op, (self, other), inline=inline, method=method)
 
     def __rop_expr__(self, op, other):
@@ -173,11 +215,14 @@ class Term(PreTerm, ABC):
         assert isinstance(op, str)
         if not isinstance(other, Term):
             other = enc_value(other)
+        assert not _is_none_value(self)
+        assert not _is_none_value(other)
         return Expression(op, (other, self), inline=True)
 
     def __uop_expr__(self, op, *, params=None, inline=False):
         """unary expression"""
         assert isinstance(op, str)
+        assert not _is_none_value(self)
         return Expression(op, (self,), params=params, inline=inline, method=not inline)
 
     def __triop_expr__(self, op, x, y, inline=False, method=False):
@@ -187,6 +232,9 @@ class Term(PreTerm, ABC):
             x = enc_value(x)
         if not isinstance(y, Term):
             y = enc_value(y)
+        assert not _is_none_value(self)
+        assert not _is_none_value(x)
+        assert not _is_none_value(y)
         return Expression(op, (self, x, y), inline=inline, method=method)
 
     # try to get at == and other comparison operators
@@ -508,7 +556,7 @@ class Term(PreTerm, ABC):
         return self.__triop_expr__("if_else", x, y, method=True)
 
     def is_in(self, x):
-        return self.__op_expr__("is_in", x, inline=False, method=True)
+        return self.__op_expr__("is_in", x, inline=False, method=True, check_types=False,)
 
     def concat(self, x):
         # TODO: see if we can format back to infix notation
@@ -547,26 +595,26 @@ class Term(PreTerm, ABC):
             format = Value("%Y-%m-%d %H:%M:%S")
         assert isinstance(format, Value)
         return self.__op_expr__(
-            "parse_datetime", other=format, inline=False, method=True
+            "parse_datetime", other=format, inline=False, method=True, check_types=False,
         )
 
     def parse_date(self, format=None):
         if format is None:
             format = Value("%Y-%m-%d")
-        return self.__op_expr__("parse_date", other=format, inline=False, method=True)
+        return self.__op_expr__("parse_date", other=format, inline=False, method=True, check_types=False,)
 
     def format_datetime(self, format=None):
         if format is None:
             format = Value("%Y-%m-%d %H:%M:%S")
         assert isinstance(format, Value)
         return self.__op_expr__(
-            "format_datetime", other=format, inline=False, method=True
+            "format_datetime", other=format, inline=False, method=True, check_types=False,
         )
 
     def format_date(self, format=None):
         if format is None:
             format = Value("%Y-%m-%d")
-        return self.__op_expr__("format_date", other=format, inline=False, method=True)
+        return self.__op_expr__("format_date", other=format, inline=False, method=True, check_types=False,)
 
     def dayofweek(self):
         return self.__uop_expr__("dayofweek")
@@ -593,7 +641,7 @@ class Term(PreTerm, ABC):
         return self.__op_expr__("timestamp_diff", other, inline=False, method=True)
 
     def date_diff(self, other):
-        return self.__op_expr__("date_diff", other, inline=False, method=True)
+        return self.__op_expr__("date_diff", other, inline=False, method=True, check_types=False,)
 
     # noinspection PyPep8Naming
     def base_Sunday(self):

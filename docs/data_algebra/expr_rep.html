@@ -638,6 +638,42 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">_is_none_value</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">_check_expr_incompatible_types</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">obvious_declared_type</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># None may be a placeholder for &quot;don&#39;t know at this point&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Value</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">ColumnReference</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">view</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">column_types</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">v</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">column_name</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">PreTerm</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># dunno</span>
+
+    <span class="n">type_a</span> <span class="o">=</span> <span class="n">obvious_declared_type</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">type_a</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="n">type_b</span> <span class="o">=</span> <span class="n">obvious_declared_type</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">type_b</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="n">looks_compatible</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">([</span><span class="n">type_a</span><span class="p">,</span> <span class="n">type_b</span><span class="p">])</span>
+    <span class="k">return</span> <span class="ow">not</span> <span class="n">looks_compatible</span>
+
+
 <span class="c1"># noinspection SpellCheckingInspection</span>
 <span class="k">class</span> <span class="nc">Term</span><span class="p">(</span><span class="n">PreTerm</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -649,11 +685,17 @@
 
     <span class="c1"># builders</span>
 
-    <span class="k">def</span> <span class="nf">__op_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__op_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;binary expression&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
             <span class="n">other</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">check_types</span><span class="p">:</span>
+            <span class="n">obvious_type_problem</span> <span class="o">=</span> <span class="n">_check_expr_incompatible_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">obvious_type_problem</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;trying to combine incompatible types in binary operation&quot;</span><span class="p">)</span>  <span class="c1"># TODO: better error message</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__rop_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -661,11 +703,14 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
             <span class="n">other</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__uop_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;unary expression&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,),</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="ow">not</span> <span class="n">inline</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__triop_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -675,6 +720,9 @@
             <span class="n">x</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
 
     <span class="c1"># try to get at == and other comparison operators</span>
@@ -996,7 +1044,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span><span class="s2">&quot;if_else&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">is_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;is_in&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;is_in&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,)</span>
 
     <span class="k">def</span> <span class="nf">concat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="c1"># TODO: see if we can format back to infix notation</span>
@@ -1035,26 +1083,26 @@
             <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span>
-            <span class="s2">&quot;parse_datetime&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span>
+            <span class="s2">&quot;parse_datetime&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">parse_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;parse_date&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;parse_date&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,)</span>
 
     <span class="k">def</span> <span class="nf">format_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span>
-            <span class="s2">&quot;format_datetime&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span>
+            <span class="s2">&quot;format_datetime&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">format_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;format_date&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;format_date&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,)</span>
 
     <span class="k">def</span> <span class="nf">dayofweek</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;dayofweek&quot;</span><span class="p">)</span>
@@ -1081,7 +1129,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;timestamp_diff&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">date_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;date_diff&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;date_diff&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,)</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">base_Sunday</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1731,11 +1779,17 @@
 
     <span class="c1"># builders</span>
 
-    <span class="k">def</span> <span class="nf">__op_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__op_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;binary expression&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
             <span class="n">other</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">check_types</span><span class="p">:</span>
+            <span class="n">obvious_type_problem</span> <span class="o">=</span> <span class="n">_check_expr_incompatible_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">obvious_type_problem</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;trying to combine incompatible types in binary operation&quot;</span><span class="p">)</span>  <span class="c1"># TODO: better error message</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__rop_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -1743,11 +1797,14 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
             <span class="n">other</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__uop_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;unary expression&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,),</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="ow">not</span> <span class="n">inline</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__triop_expr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -1757,6 +1814,9 @@
             <span class="n">x</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">enc_value</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_is_none_value</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="n">inline</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
 
     <span class="c1"># try to get at == and other comparison operators</span>
@@ -2078,7 +2138,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span><span class="s2">&quot;if_else&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">is_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;is_in&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;is_in&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,)</span>
 
     <span class="k">def</span> <span class="nf">concat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="c1"># TODO: see if we can format back to infix notation</span>
@@ -2117,26 +2177,26 @@
             <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span>
-            <span class="s2">&quot;parse_datetime&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span>
+            <span class="s2">&quot;parse_datetime&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">parse_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;parse_date&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;parse_date&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,)</span>
 
     <span class="k">def</span> <span class="nf">format_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span>
-            <span class="s2">&quot;format_datetime&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span>
+            <span class="s2">&quot;format_datetime&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">format_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;format_date&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;format_date&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,)</span>
 
     <span class="k">def</span> <span class="nf">dayofweek</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;dayofweek&quot;</span><span class="p">)</span>
@@ -2163,7 +2223,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;timestamp_diff&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">date_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;date_diff&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;date_diff&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,)</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">base_Sunday</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -3444,7 +3504,7 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">is_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;is_in&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;is_in&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,)</span>
 </pre></div>
 
         </details>
@@ -3625,7 +3685,7 @@
             <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span>
-            <span class="s2">&quot;parse_datetime&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span>
+            <span class="s2">&quot;parse_datetime&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -3647,7 +3707,7 @@
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">parse_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;parse_date&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;parse_date&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,)</span>
 </pre></div>
 
         </details>
@@ -3670,7 +3730,7 @@
             <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span>
-            <span class="s2">&quot;format_datetime&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span>
+            <span class="s2">&quot;format_datetime&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -3692,7 +3752,7 @@
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">format_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">format</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;format_date&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;format_date&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,)</span>
 </pre></div>
 
         </details>
@@ -3863,7 +3923,7 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">date_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;date_diff&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;date_diff&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,)</span>
 </pre></div>
 
         </details>
