@@ -11,7 +11,6 @@ import data_algebra.near_sql
 import data_algebra.expr_rep
 import data_algebra.util
 import data_algebra.data_ops_types
-import data_algebra.eval_model
 import data_algebra.data_ops
 
 
@@ -1802,10 +1801,9 @@ class DBModel:
         return self.__str__()
 
 
-class DBHandle(data_algebra.eval_model.EvalModel):
+class DBHandle():
     def __init__(self, *, db_model, conn):
         assert isinstance(db_model, DBModel)
-        data_algebra.eval_model.EvalModel.__init__(self)
         self.db_model = db_model
         self.conn = conn
 
@@ -1872,42 +1870,6 @@ class DBHandle(data_algebra.eval_model.EvalModel):
 
     def table_values_to_sql(self, v):
         return self.db_model.table_values_to_sql(v)
-
-    def managed_eval(self, ops, *, data_map=None, result_name=None, narrow=True):
-        query = ops.to_sql(self.db_model)
-        if result_name is None:
-            result_name = self.mk_tmp_name(data_map)
-        tables_needed = [k for k in ops.get_tables().keys()]
-        if data_map is not None:
-            missing_tables = set(tables_needed) - set(data_map.keys())
-            if len(missing_tables) > 0:
-                raise ValueError("missing required tables: " + str(missing_tables))
-            for k in tables_needed:
-                assert isinstance(data_map[k], data_algebra.data_ops.TableDescription)
-                if data_map[k].table_name != k:
-                    raise ValueError(
-                        "data_map["
-                        + k
-                        + "].table_name == "
-                        + data_map[k].table_name
-                        + ", not "
-                        + k
-                    )
-        if result_name in tables_needed:
-            raise ValueError("Can not write over an input table")
-        q_table_name = self.db_model.quote_table_name(result_name)
-        drop_query = self.db_model.drop_text + " " + q_table_name
-        create_query = "CREATE TABLE " + q_table_name + " AS " + query
-        # noinspection PyBroadException
-        try:
-            self.db_model.execute(self.conn, drop_query)
-        except Exception:
-            pass
-        self.db_model.execute(self.conn, create_query)
-        res = self.describe_table(result_name)
-        if data_map is not None:
-            data_map[result_name] = res
-        return result_name
 
     def __str__(self):
         return (

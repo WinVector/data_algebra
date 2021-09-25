@@ -36,9 +36,6 @@
                         <li>
                                 <a class="function" href="#PandasModel.__init__">PandasModel</a>
                         </li>
-                        <li>
-                                <a class="function" href="#PandasModel.managed_eval">managed_eval</a>
-                        </li>
                 </ul>
 
             </li>
@@ -60,31 +57,14 @@
                 
                         <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">data_algebra.eval_model</span> <span class="kn">import</span> <span class="n">EvalModel</span>
-<span class="kn">from</span> <span class="nn">data_algebra.pandas_base</span> <span class="kn">import</span> <span class="n">PandasModelBase</span>
+            <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">data_algebra.pandas_base</span> <span class="kn">import</span> <span class="n">PandasModelBase</span>
 
 
-<span class="k">class</span> <span class="nc">PandasModel</span><span class="p">(</span><span class="n">EvalModel</span><span class="p">,</span> <span class="n">PandasModelBase</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">PandasModel</span><span class="p">(</span><span class="n">PandasModelBase</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="s2">&quot;pandas&quot;</span><span class="p">):</span>
-        <span class="n">EvalModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">PandasModelBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="n">presentation_model_name</span>
         <span class="p">)</span>
-
-    <span class="c1"># EvalModel interface</span>
-
-    <span class="k">def</span> <span class="nf">managed_eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">result_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="n">tables_needed</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ops</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
-        <span class="n">missing_tables</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">tables_needed</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">data_map</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;missing required tables: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing_tables</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">result_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">result_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mk_tmp_name</span><span class="p">(</span><span class="n">data_map</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">result_name</span> <span class="ow">in</span> <span class="n">tables_needed</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can not write over an input table&quot;</span><span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
-        <span class="n">data_map</span><span class="p">[</span><span class="n">result_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
-        <span class="k">return</span> <span class="n">result_name</span>
 </pre></div>
 
         </details>
@@ -96,32 +76,16 @@
 
         
         <span class="def">class</span>
-        <span class="name">PandasModel</span><wbr>(<span class="base"><a href="eval_model.html#EvalModel">data_algebra.eval_model.EvalModel</a></span>, <span class="base"><a href="pandas_base.html#PandasModelBase">data_algebra.pandas_base.PandasModelBase</a></span>):
+        <span class="name">PandasModel</span><wbr>(<span class="base"><a href="pandas_base.html#PandasModelBase">data_algebra.pandas_base.PandasModelBase</a></span>):
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">PandasModel</span><span class="p">(</span><span class="n">EvalModel</span><span class="p">,</span> <span class="n">PandasModelBase</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">PandasModel</span><span class="p">(</span><span class="n">PandasModelBase</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="s2">&quot;pandas&quot;</span><span class="p">):</span>
-        <span class="n">EvalModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">PandasModelBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="n">presentation_model_name</span>
         <span class="p">)</span>
-
-    <span class="c1"># EvalModel interface</span>
-
-    <span class="k">def</span> <span class="nf">managed_eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">result_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="n">tables_needed</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ops</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
-        <span class="n">missing_tables</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">tables_needed</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">data_map</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;missing required tables: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing_tables</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">result_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">result_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mk_tmp_name</span><span class="p">(</span><span class="n">data_map</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">result_name</span> <span class="ow">in</span> <span class="n">tables_needed</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can not write over an input table&quot;</span><span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
-        <span class="n">data_map</span><span class="p">[</span><span class="n">result_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
-        <span class="k">return</span> <span class="n">result_name</span>
 </pre></div>
 
         </details>
@@ -141,7 +105,6 @@ inheritance.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="s2">&quot;pandas&quot;</span><span class="p">):</span>
-        <span class="n">EvalModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">PandasModelBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="n">presentation_model_name</span>
         <span class="p">)</span>
@@ -152,51 +115,10 @@ inheritance.</p>
     
 
                             </div>
-                            <div id="PandasModel.managed_eval" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#PandasModel.managed_eval">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">managed_eval</span><span class="signature">(self, ops, *, data_map=None, result_name=None, narrow=True)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">managed_eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">result_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="n">tables_needed</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ops</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
-        <span class="n">missing_tables</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">tables_needed</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">data_map</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;missing required tables: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing_tables</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">result_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">result_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mk_tmp_name</span><span class="p">(</span><span class="n">data_map</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">result_name</span> <span class="ow">in</span> <span class="n">tables_needed</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can not write over an input table&quot;</span><span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
-        <span class="n">data_map</span><span class="p">[</span><span class="n">result_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
-        <span class="k">return</span> <span class="n">result_name</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>apply ops to data frames in data_map</p>
-
-<p>:param ops OperatorPlatform, operation to apply OperatorPlatform
-:param data_map map from data frame names to data frame representations, altered by eval.
-:param result_name Name for result.
-:param narrow logical, if True don't copy unexpected columns
-:return: result name</p>
-</div>
-
-
-                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
-                                    <div><dt><a href="eval_model.html#EvalModel">data_algebra.eval_model.EvalModel</a></dt>
-                                <dd id="PandasModel.mk_tmp_name" class="function"><a href="eval_model.html#EvalModel.mk_tmp_name">mk_tmp_name</a></dd>
-
-            </div>
-            <div><dt><a href="pandas_base.html#PandasModelBase">data_algebra.pandas_base.PandasModelBase</a></dt>
+                                    <div><dt><a href="pandas_base.html#PandasModelBase">data_algebra.pandas_base.PandasModelBase</a></dt>
                                 <dd id="PandasModel.data_frame" class="function"><a href="pandas_base.html#PandasModelBase.data_frame">data_frame</a></dd>
                 <dd id="PandasModel.is_appropriate_data_instance" class="function"><a href="pandas_base.html#PandasModelBase.is_appropriate_data_instance">is_appropriate_data_instance</a></dd>
                 <dd id="PandasModel.can_convert_col_to_numeric" class="function"><a href="pandas_base.html#PandasModelBase.can_convert_col_to_numeric">can_convert_col_to_numeric</a></dd>
