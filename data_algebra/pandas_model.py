@@ -1,9 +1,14 @@
 
+import pandas as pd
+
 from data_algebra.pandas_base import PandasModelBase
 
 
 class PandasModel(PandasModelBase):
-    def __init__(self, *, pd, presentation_model_name="pandas"):
+    """
+    Realize the data algebra over pandas.
+    """
+    def __init__(self):
         PandasModelBase.__init__(
-            self, pd=pd, presentation_model_name=presentation_model_name
+            self, pd=pd, presentation_model_name='pd'
         )

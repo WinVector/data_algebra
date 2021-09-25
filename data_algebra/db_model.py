@@ -872,7 +872,7 @@ class DBModel:
         origcols = [k for k in using if k not in subops.keys()]
         for k in origcols:
             terms[k] = None
-            declared_term_dependencies[k] = set([k])
+            declared_term_dependencies[k] = {k}
         for (ci, oi) in subops.items():
             terms[ci] = self.expr_to_sql(oi) + window_term
             cols_used_in_term = set()
@@ -895,7 +895,7 @@ class DBModel:
                 return [
                     k
                     for k, v in dep_dict.items()
-                    if (len(v - set([k])) > 0)
+                    if (len(v - {k}) > 0)
                     or (k not in v)
                     or ((term_dict[k] is not None) and (term_dict[k] != k))
                 ]
