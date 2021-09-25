@@ -1,5 +1,4 @@
 import re
-import collections
 
 import numpy
 
@@ -8,6 +7,9 @@ import data_algebra.util
 
 
 class RecordSpecification:
+    """
+    Class to represent a multi-row data record.
+    """
     def __init__(
         self,
         control_table,
@@ -18,8 +20,6 @@ class RecordSpecification:
         local_data_model=None
     ):
         """
-        Class to represent a multi-row data record.
-
         :param control_table: data.frame describing record layout
         :param record_keys: array of record key column names
         :param control_table_keys: array of control_table key column names

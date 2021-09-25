@@ -31,12 +31,6 @@
                     <h2>API Documentation</h2>
                         <ul class="memberlist">
             <li>
-                    <a class="function" href="#negate_or_subtract">negate_or_subtract</a>
-            </li>
-            <li>
-                    <a class="function" href="#populate_impl_map">populate_impl_map</a>
-            </li>
-            <li>
                     <a class="class" href="#DataModel">DataModel</a>
                             <ul class="memberlist">
                         <li>
@@ -115,226 +109,15 @@
                         <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
-<span class="kn">import</span> <span class="nn">datetime</span>
-
-<span class="kn">import</span> <span class="nn">numpy</span>
-
-<span class="kn">import</span> <span class="nn">data_algebra.util</span>
-<span class="kn">import</span> <span class="nn">data_algebra.connected_components</span>
-
-
-<span class="k">def</span> <span class="nf">negate_or_subtract</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">negative</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unexpected number of arguments in negate_or_subtract&quot;</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_calc_date_diff</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">):</span>
-    <span class="c1"># x is a pandas Series or list of datetime.date compatible types</span>
-    <span class="n">x0</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
-    <span class="n">x1</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
-    <span class="n">x0_dates</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">x1_dates</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">deltas</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x0_dates</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">x1_dates</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">days</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x0_dates</span><span class="p">))]</span>
-    <span class="k">return</span> <span class="n">deltas</span>
-
-
-<span class="k">def</span> <span class="nf">_calc_base_Sunday</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="c1"># x is a pandas Series or list of datetime.date compatible types</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="n">x_dates</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="n">xi</span> <span class="o">-</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="p">(</span><span class="n">xi</span><span class="o">.</span><span class="n">weekday</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">7</span><span class="p">)</span> <span class="k">for</span> <span class="n">xi</span> <span class="ow">in</span> <span class="n">x_dates</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">res</span>
-
-
-<span class="k">def</span> <span class="nf">_calc_week_of_Year</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="c1"># x is a pandas Series or list of datetime.date compatible types</span>
-    <span class="c1"># TODO: better impl</span>
-    <span class="c1"># Note was getting inconsistent results on vectorized methods</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="n">x_dates</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">cur_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="n">dti</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">dti</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">dti</span><span class="o">.</span><span class="n">day</span><span class="p">)</span> <span class="k">for</span> <span class="n">dti</span> <span class="ow">in</span> <span class="n">x_dates</span><span class="p">]</span>
-    <span class="n">base_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="n">dti</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">dti</span> <span class="ow">in</span> <span class="n">x_dates</span><span class="p">]</span>
-    <span class="n">base_dates</span> <span class="o">=</span> <span class="n">_calc_base_Sunday</span><span class="p">(</span><span class="n">base_dates</span><span class="p">)</span>
-    <span class="n">deltas</span> <span class="o">=</span> <span class="p">[(</span><span class="n">cur_dates</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">base_dates</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">days</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cur_dates</span><span class="p">))]</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="n">di</span> <span class="o">//</span> <span class="mi">7</span> <span class="k">for</span> <span class="n">di</span> <span class="ow">in</span> <span class="n">deltas</span><span class="p">]</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">res</span>
-
-
-<span class="k">def</span> <span class="nf">_coalesce</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
-    <span class="n">a_is_series</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span>
-    <span class="n">b_is_series</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span>
-    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">a_is_series</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">b_is_series</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;at least one argument must be a Pandas series&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">a_is_series</span><span class="p">:</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">a</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">b_is_series</span><span class="p">:</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">b</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)))</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">combine_first</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">res</span>
-
-
-<span class="k">def</span> <span class="nf">_type_safe_equal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
-    <span class="c1"># Could try numpy.logical_and(numpy.greater_equal(a, b), numpy.less_equal(a, b)).</span>
-    <span class="c1"># However, None &gt;= None throws</span>
-    <span class="n">type_a</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_carried_scalar_type</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-    <span class="n">type_b</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_carried_scalar_type</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">([</span><span class="n">type_a</span><span class="p">,</span> <span class="n">type_b</span><span class="p">]):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;can&#39;t compare </span><span class="si">{</span><span class="n">type_a</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">type_b</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_type_safe_not_equal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
-    <span class="c1"># Could try numpy.logical_or(numpy.greater(a, b), numpy.less(a, b)).</span>
-    <span class="c1"># However, None &gt; None throws</span>
-    <span class="n">type_a</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_carried_scalar_type</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-    <span class="n">type_b</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_carried_scalar_type</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">([</span><span class="n">type_a</span><span class="p">,</span> <span class="n">type_b</span><span class="p">]):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;can&#39;t compare </span><span class="si">{</span><span class="n">type_a</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">type_b</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">not_equal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_type_safe_is_in</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">type_a</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_carried_scalar_type</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-        <span class="n">type_b</span> <span class="o">=</span> <span class="p">{</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">map_type_to_canonical</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">b</span><span class="p">}</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">type_b</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;multiple types in set: </span><span class="si">{</span><span class="n">type_b</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">type_b</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">type_b</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">([</span><span class="n">type_a</span><span class="p">,</span> <span class="n">type_b</span><span class="p">]):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;can&#39;t check for an </span><span class="si">{</span><span class="n">type_a</span><span class="si">}</span><span class="s2"> in a set of </span><span class="si">{</span><span class="n">type_b</span><span class="si">}</span><span class="s2">&#39;s&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_k_and</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)):</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">res</span>
-
-
-<span class="k">def</span> <span class="nf">_k_or</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)):</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">res</span>
-
-
-<span class="k">def</span> <span class="nf">_k_add</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)):</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">res</span>
-
-
-<span class="k">def</span> <span class="nf">_k_mul</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)):</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">res</span>
-
-
-<span class="k">def</span> <span class="nf">populate_impl_map</span><span class="p">(</span><span class="n">data_model</span><span class="p">):</span>
-    <span class="n">impl_map</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;==&quot;</span><span class="p">:</span> <span class="n">_type_safe_equal</span><span class="p">,</span>
-        <span class="s2">&quot;=&quot;</span><span class="p">:</span> <span class="n">_type_safe_equal</span><span class="p">,</span>
-        <span class="s2">&quot;!=&quot;</span><span class="p">:</span> <span class="n">_type_safe_not_equal</span><span class="p">,</span>
-        <span class="s2">&quot;&lt;&gt;&quot;</span><span class="p">:</span> <span class="n">_type_safe_not_equal</span><span class="p">,</span>
-        <span class="s2">&quot;&lt;&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">less</span><span class="p">,</span>  <span class="c1"># already checks types</span>
-        <span class="s2">&quot;&lt;=&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">less_equal</span><span class="p">,</span>  <span class="c1"># already checks types</span>
-        <span class="s2">&quot;&gt;&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">greater</span><span class="p">,</span>  <span class="c1"># already checks types</span>
-        <span class="s2">&quot;&gt;=&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">greater_equal</span><span class="p">,</span>  <span class="c1"># already checks types</span>
-        <span class="s2">&quot;+&quot;</span><span class="p">:</span> <span class="n">_k_add</span><span class="p">,</span>
-        <span class="s2">&quot;-&quot;</span><span class="p">:</span> <span class="n">negate_or_subtract</span><span class="p">,</span>
-        <span class="s2">&quot;neg&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">negative</span><span class="p">,</span>
-        <span class="s2">&quot;*&quot;</span><span class="p">:</span> <span class="n">_k_mul</span><span class="p">,</span>
-        <span class="s2">&quot;/&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">divide</span><span class="p">,</span>
-        <span class="s2">&quot;//&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">,</span>
-        <span class="s2">&quot;%&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mod</span><span class="p">,</span>
-        <span class="s2">&quot;**&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">power</span><span class="p">,</span>
-        <span class="s2">&quot;and&quot;</span><span class="p">:</span> <span class="n">_k_and</span><span class="p">,</span>
-        <span class="s2">&quot;&amp;&quot;</span><span class="p">:</span> <span class="n">_k_and</span><span class="p">,</span>
-        <span class="s2">&quot;&amp;&amp;&quot;</span><span class="p">:</span> <span class="n">_k_and</span><span class="p">,</span>
-        <span class="s2">&quot;or&quot;</span><span class="p">:</span> <span class="n">_k_or</span><span class="p">,</span>
-        <span class="s2">&quot;|&quot;</span><span class="p">:</span> <span class="n">_k_or</span><span class="p">,</span>
-        <span class="s2">&quot;||&quot;</span><span class="p">:</span> <span class="n">_k_or</span><span class="p">,</span>
-        <span class="s2">&quot;xor&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_xor</span><span class="p">,</span>
-        <span class="s2">&quot;^&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_xor</span><span class="p">,</span>
-        <span class="s2">&quot;not&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">,</span>
-        <span class="s2">&quot;!&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">,</span>
-        <span class="s2">&quot;if_else&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">,</span>
-        <span class="s2">&quot;is_null&quot;</span><span class="p">:</span> <span class="n">data_model</span><span class="o">.</span><span class="n">isnull</span><span class="p">,</span>
-        <span class="s2">&quot;is_bad&quot;</span><span class="p">:</span> <span class="n">data_model</span><span class="o">.</span><span class="n">bad_column_positions</span><span class="p">,</span>
-        <span class="s2">&quot;is_in&quot;</span><span class="p">:</span> <span class="n">_type_safe_is_in</span><span class="p">,</span>
-        <span class="s2">&quot;concat&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">char</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-            <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
-        <span class="p">),</span>
-        <span class="s2">&quot;coalesce&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">_coalesce</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span>  <span class="c1"># assuming Pandas series</span>
-        <span class="s2">&quot;connected_components&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">connected_components</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span>
-            <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
-        <span class="p">),</span>
-        <span class="s2">&quot;co_equalizer&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">connected_components</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span>
-            <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
-        <span class="p">),</span>
-        <span class="c1"># fns that had been in bigquery_user_fns</span>
-        <span class="c1"># x is a pandas Series</span>
-        <span class="s2">&quot;as_int64&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int64&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="s2">&quot;as_str&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="s2">&quot;trimstr&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">),</span>
-        <span class="s2">&quot;datetime_to_date&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="s2">&quot;parse_datetime&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span>
-            <span class="n">x</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span>
-        <span class="p">),</span>
-        <span class="s2">&quot;parse_date&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span>
-            <span class="n">x</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="s2">&quot;format_datetime&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">date_format</span><span class="o">=</span><span class="nb">format</span><span class="p">),</span>
-        <span class="s2">&quot;format_date&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span>
-            <span class="n">x</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">date_format</span><span class="o">=</span><span class="nb">format</span><span class="p">),</span>
-        <span class="s2">&quot;dayofweek&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span>
-        <span class="o">+</span> <span class="p">(</span>
-            <span class="p">(</span>
-                <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">dayofweek</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
-                    <span class="s2">&quot;int64&quot;</span>
-                <span class="p">)</span>
-                <span class="o">+</span> <span class="mi">1</span>
-            <span class="p">)</span>
-            <span class="o">%</span> <span class="mi">7</span>
-        <span class="p">),</span>
-        <span class="s2">&quot;dayofyear&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">dayofyear</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int64&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="s2">&quot;weekofyear&quot;</span><span class="p">:</span> <span class="n">_calc_week_of_Year</span><span class="p">,</span>
-        <span class="s2">&quot;dayofmonth&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">day</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int64&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">month</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int64&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="s2">&quot;quarter&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">quarter</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int64&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int64&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="s2">&quot;timestamp_diff&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">:</span> <span class="p">[</span>
-            <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">c1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">c2</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">c1</span><span class="p">))</span>
-        <span class="p">],</span>
-        <span class="s2">&quot;date_diff&quot;</span><span class="p">:</span> <span class="n">_calc_date_diff</span><span class="p">,</span>
-        <span class="s2">&quot;base_Sunday&quot;</span><span class="p">:</span> <span class="n">_calc_base_Sunday</span><span class="p">,</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="n">impl_map</span>
 
 
 <span class="k">class</span> <span class="nc">DataModel</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Interface for realizing the data algebra as a sequence of steps over an object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">presentation_model_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">presentation_model_name</span> <span class="o">=</span> <span class="n">presentation_model_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">impl_map</span> <span class="o">=</span> <span class="n">populate_impl_map</span><span class="p">(</span><span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">user_fun_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
     <span class="c1"># helper functions</span>
@@ -406,138 +189,6 @@
         </details>
 
             </section>
-                <section id="negate_or_subtract">
-                            <div class="attr function"><a class="headerlink" href="#negate_or_subtract">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">negate_or_subtract</span><span class="signature">(*args)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">negate_or_subtract</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">negative</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unexpected number of arguments in negate_or_subtract&quot;</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-    
-
-                </section>
-                <section id="populate_impl_map">
-                            <div class="attr function"><a class="headerlink" href="#populate_impl_map">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">populate_impl_map</span><span class="signature">(data_model)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">populate_impl_map</span><span class="p">(</span><span class="n">data_model</span><span class="p">):</span>
-    <span class="n">impl_map</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;==&quot;</span><span class="p">:</span> <span class="n">_type_safe_equal</span><span class="p">,</span>
-        <span class="s2">&quot;=&quot;</span><span class="p">:</span> <span class="n">_type_safe_equal</span><span class="p">,</span>
-        <span class="s2">&quot;!=&quot;</span><span class="p">:</span> <span class="n">_type_safe_not_equal</span><span class="p">,</span>
-        <span class="s2">&quot;&lt;&gt;&quot;</span><span class="p">:</span> <span class="n">_type_safe_not_equal</span><span class="p">,</span>
-        <span class="s2">&quot;&lt;&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">less</span><span class="p">,</span>  <span class="c1"># already checks types</span>
-        <span class="s2">&quot;&lt;=&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">less_equal</span><span class="p">,</span>  <span class="c1"># already checks types</span>
-        <span class="s2">&quot;&gt;&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">greater</span><span class="p">,</span>  <span class="c1"># already checks types</span>
-        <span class="s2">&quot;&gt;=&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">greater_equal</span><span class="p">,</span>  <span class="c1"># already checks types</span>
-        <span class="s2">&quot;+&quot;</span><span class="p">:</span> <span class="n">_k_add</span><span class="p">,</span>
-        <span class="s2">&quot;-&quot;</span><span class="p">:</span> <span class="n">negate_or_subtract</span><span class="p">,</span>
-        <span class="s2">&quot;neg&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">negative</span><span class="p">,</span>
-        <span class="s2">&quot;*&quot;</span><span class="p">:</span> <span class="n">_k_mul</span><span class="p">,</span>
-        <span class="s2">&quot;/&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">divide</span><span class="p">,</span>
-        <span class="s2">&quot;//&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor_divide</span><span class="p">,</span>
-        <span class="s2">&quot;%&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mod</span><span class="p">,</span>
-        <span class="s2">&quot;**&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">power</span><span class="p">,</span>
-        <span class="s2">&quot;and&quot;</span><span class="p">:</span> <span class="n">_k_and</span><span class="p">,</span>
-        <span class="s2">&quot;&amp;&quot;</span><span class="p">:</span> <span class="n">_k_and</span><span class="p">,</span>
-        <span class="s2">&quot;&amp;&amp;&quot;</span><span class="p">:</span> <span class="n">_k_and</span><span class="p">,</span>
-        <span class="s2">&quot;or&quot;</span><span class="p">:</span> <span class="n">_k_or</span><span class="p">,</span>
-        <span class="s2">&quot;|&quot;</span><span class="p">:</span> <span class="n">_k_or</span><span class="p">,</span>
-        <span class="s2">&quot;||&quot;</span><span class="p">:</span> <span class="n">_k_or</span><span class="p">,</span>
-        <span class="s2">&quot;xor&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_xor</span><span class="p">,</span>
-        <span class="s2">&quot;^&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_xor</span><span class="p">,</span>
-        <span class="s2">&quot;not&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">,</span>
-        <span class="s2">&quot;!&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">,</span>
-        <span class="s2">&quot;if_else&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">,</span>
-        <span class="s2">&quot;is_null&quot;</span><span class="p">:</span> <span class="n">data_model</span><span class="o">.</span><span class="n">isnull</span><span class="p">,</span>
-        <span class="s2">&quot;is_bad&quot;</span><span class="p">:</span> <span class="n">data_model</span><span class="o">.</span><span class="n">bad_column_positions</span><span class="p">,</span>
-        <span class="s2">&quot;is_in&quot;</span><span class="p">:</span> <span class="n">_type_safe_is_in</span><span class="p">,</span>
-        <span class="s2">&quot;concat&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">char</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-            <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
-        <span class="p">),</span>
-        <span class="s2">&quot;coalesce&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">_coalesce</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span>  <span class="c1"># assuming Pandas series</span>
-        <span class="s2">&quot;connected_components&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">connected_components</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span>
-            <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
-        <span class="p">),</span>
-        <span class="s2">&quot;co_equalizer&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">connected_components</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span>
-            <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
-        <span class="p">),</span>
-        <span class="c1"># fns that had been in bigquery_user_fns</span>
-        <span class="c1"># x is a pandas Series</span>
-        <span class="s2">&quot;as_int64&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int64&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="s2">&quot;as_str&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="s2">&quot;trimstr&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="n">stop</span><span class="p">),</span>
-        <span class="s2">&quot;datetime_to_date&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="s2">&quot;parse_datetime&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span>
-            <span class="n">x</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span>
-        <span class="p">),</span>
-        <span class="s2">&quot;parse_date&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span>
-            <span class="n">x</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="s2">&quot;format_datetime&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">date_format</span><span class="o">=</span><span class="nb">format</span><span class="p">),</span>
-        <span class="s2">&quot;format_date&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span>
-            <span class="n">x</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">date_format</span><span class="o">=</span><span class="nb">format</span><span class="p">),</span>
-        <span class="s2">&quot;dayofweek&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span>
-        <span class="o">+</span> <span class="p">(</span>
-            <span class="p">(</span>
-                <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">dayofweek</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
-                    <span class="s2">&quot;int64&quot;</span>
-                <span class="p">)</span>
-                <span class="o">+</span> <span class="mi">1</span>
-            <span class="p">)</span>
-            <span class="o">%</span> <span class="mi">7</span>
-        <span class="p">),</span>
-        <span class="s2">&quot;dayofyear&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">dayofyear</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int64&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="s2">&quot;weekofyear&quot;</span><span class="p">:</span> <span class="n">_calc_week_of_Year</span><span class="p">,</span>
-        <span class="s2">&quot;dayofmonth&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">day</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int64&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">month</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int64&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="s2">&quot;quarter&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">quarter</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int64&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int64&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-        <span class="s2">&quot;timestamp_diff&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">:</span> <span class="p">[</span>
-            <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">c1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">c2</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">c1</span><span class="p">))</span>
-        <span class="p">],</span>
-        <span class="s2">&quot;date_diff&quot;</span><span class="p">:</span> <span class="n">_calc_date_diff</span><span class="p">,</span>
-        <span class="s2">&quot;base_Sunday&quot;</span><span class="p">:</span> <span class="n">_calc_base_Sunday</span><span class="p">,</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="n">impl_map</span>
-</pre></div>
-
-        </details>
-
-    
-
-                </section>
                 <section id="DataModel">
                                 <div class="attr class">
         <a class="headerlink" href="#DataModel">#&nbsp;&nbsp</a>
@@ -550,9 +201,12 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">DataModel</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Interface for realizing the data algebra as a sequence of steps over an object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">presentation_model_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">presentation_model_name</span> <span class="o">=</span> <span class="n">presentation_model_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">impl_map</span> <span class="o">=</span> <span class="n">populate_impl_map</span><span class="p">(</span><span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">user_fun_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
     <span class="c1"># helper functions</span>
@@ -623,8 +277,7 @@
 
         </details>
 
-            <div class="docstring"><p>Helper class that provides a standard way to create an ABC using
-inheritance.</p>
+            <div class="docstring"><p>Interface for realizing the data algebra as a sequence of steps over an object.</p>
 </div>
 
 
@@ -632,14 +285,14 @@ inheritance.</p>
                                         <div class="attr function"><a class="headerlink" href="#DataModel.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">DataModel</span><span class="signature">(presentation_model_name)</span>
+            <span class="name">DataModel</span><span class="signature">(presentation_model_name: str)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">presentation_model_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">presentation_model_name</span> <span class="o">=</span> <span class="n">presentation_model_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">impl_map</span> <span class="o">=</span> <span class="n">populate_impl_map</span><span class="p">(</span><span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">user_fun_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 </pre></div>
 

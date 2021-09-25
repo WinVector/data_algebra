@@ -57,13 +57,18 @@
                 
                         <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">data_algebra.pandas_base</span> <span class="kn">import</span> <span class="n">PandasModelBase</span>
+            <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">data_algebra.pandas_base</span> <span class="kn">import</span> <span class="n">PandasModelBase</span>
 
 
 <span class="k">class</span> <span class="nc">PandasModel</span><span class="p">(</span><span class="n">PandasModelBase</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="s2">&quot;pandas&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Realize the data algebra over pandas.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">PandasModelBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="n">presentation_model_name</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="s1">&#39;pd&#39;</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -82,16 +87,18 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">PandasModel</span><span class="p">(</span><span class="n">PandasModelBase</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="s2">&quot;pandas&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Realize the data algebra over pandas.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">PandasModelBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="n">presentation_model_name</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="s1">&#39;pd&#39;</span>
         <span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Helper class that provides a standard way to create an ABC using
-inheritance.</p>
+            <div class="docstring"><p>Realize the data algebra over pandas.</p>
 </div>
 
 
@@ -99,14 +106,14 @@ inheritance.</p>
                                         <div class="attr function"><a class="headerlink" href="#PandasModel.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">PandasModel</span><span class="signature">(*, pd, presentation_model_name=&#39;pandas&#39;)</span>
+            <span class="name">PandasModel</span><span class="signature">()</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="s2">&quot;pandas&quot;</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">PandasModelBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="n">presentation_model_name</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">pd</span><span class="o">=</span><span class="n">pd</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="o">=</span><span class="s1">&#39;pd&#39;</span>
         <span class="p">)</span>
 </pre></div>
 
