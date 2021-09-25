@@ -11,7 +11,7 @@ import data_algebra.data_ops_types
 import data_algebra.connected_components
 
 
-# TODO: possibly import dask, Nvidia Rapids, or modin instead
+# TODO: possibly import dask, Nvidia Rapids, modin, datatable versions
 
 # base class for Pandas-like API realization
 class PandasModelBase(data_algebra.data_model.DataModel, ABC):

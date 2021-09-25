@@ -186,23 +186,4 @@ def test_unionall_g2():
         res_pandas, res_sql, check_row_order=False
     )
 
-    res_name = db_handle.managed_eval(ops, data_map=tbl_map)
-    res_db2 = db_handle.to_pandas(res_name, data_map=tbl_map)
-    assert data_algebra.test_util.equivalent_frames(
-        res_pandas, res_db2, check_row_order=False
-    )
-
-    tbl_map_local = {
-        "d1": d1,
-        "d2": d2,
-    }
-
-    res_name_local = data_algebra.default_data_model.managed_eval(
-        ops, data_map=tbl_map_local
-    )
-    res_local2 = tbl_map_local[res_name_local]
-    assert data_algebra.test_util.equivalent_frames(
-        res_pandas, res_local2, check_row_order=False
-    )
-
     conn.close()
