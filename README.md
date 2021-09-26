@@ -48,6 +48,7 @@ Related work includes:
   * [`rquery`](https://github.com/WinVector/rquery/)
   * [`cdata`](https://github.com/WinVector/cdata/)
   * [`siuba`](https://github.com/machow/siuba)
+  * [`Preql`](https://github.com/erezsh/Preql)
   
 The `data_algebra` principles include:
 
@@ -86,7 +87,7 @@ data_algebra.__version__
 
 
 
-    '0.7.8'
+    '0.8.2'
 
 
 
@@ -172,7 +173,7 @@ db_handle = data_algebra.BigQuery.example_handle()
 print(db_handle)
 ```
 
-    BigQuery_DBHandle(db_model=BigQueryModel, conn=<google.cloud.bigquery.client.Client object at 0x7fabcb5fd700>)
+    BigQuery_DBHandle(db_model=BigQueryModel, conn=<google.cloud.bigquery.client.Client object at 0x7f93a0c54a60>)
 
 
 
@@ -258,17 +259,20 @@ Now we use the `data_algebra` to define our processing pipeline: `ops`.  We are 
 ```python
 scale = 0.237
 
-ops = data_algebra.data_ops.describe_table(d_local, 'd'). \
-    extend({'probability': f'(assessmentTotal * {scale}).exp()'}). \
-    extend({'total': 'probability.sum()'},
-           partition_by='subjectID'). \
-    extend({'probability': 'probability/total'}). \
-    extend({'row_number': '(1).cumsum()'},
-           partition_by=['subjectID'],
-           order_by=['probability'], reverse=['probability']). \
-    select_rows('row_number == 1'). \
-    select_columns(['subjectID', 'surveyCategory', 'probability']). \
-    rename_columns({'diagnosis': 'surveyCategory'})
+ops = (
+    data_algebra.data_ops.describe_table(d_local, 'd')
+        .extend({'probability': f'(assessmentTotal * {scale}).exp()'})
+        .extend({'total': 'probability.sum()'},
+                partition_by='subjectID')
+        .extend({'probability': 'probability / total'})
+        .extend({'row_number': '(1).cumsum()'},
+                partition_by=['subjectID'],
+                order_by=['probability'], 
+                reverse=['probability'])
+        .select_rows('row_number == 1')
+        .select_columns(['subjectID', 'surveyCategory', 'probability'])
+        .rename_columns({'diagnosis': 'surveyCategory'})
+    )
 
 ```
 
@@ -346,24 +350,24 @@ print(sql)
     WITH
      `table_reference_0` AS (
       SELECT
-       `surveyCategory` ,
        `subjectID` ,
+       `surveyCategory` ,
        `assessmentTotal`
       FROM
        `data-algebra-test.test_1.d`
      ),
      `extend_1` AS (
       SELECT  -- extend({ 'probability': '((assessmentTotal * 0.237)).exp()'})
-       `surveyCategory` ,
        `subjectID` ,
+       `surveyCategory` ,
        EXP(`assessmentTotal` * 0.237) AS `probability`
       FROM
        `table_reference_0`
      ),
      `extend_2` AS (
       SELECT  -- extend({ 'total': 'probability.sum()'}, partition_by=['subjectID'])
-       `surveyCategory` ,
        `subjectID` ,
+       `surveyCategory` ,
        `probability` ,
        SUM(`probability`) OVER ( PARTITION BY `subjectID`  )  AS `total`
       FROM
@@ -371,26 +375,26 @@ print(sql)
      ),
      `extend_3` AS (
       SELECT  -- extend({ 'probability': 'probability / total'})
-       `probability` / `total` AS `probability` ,
+       `subjectID` ,
        `surveyCategory` ,
-       `subjectID`
+       `probability` / `total` AS `probability`
       FROM
        `extend_2`
      ),
      `extend_4` AS (
       SELECT  -- extend({ 'row_number': '(1).cumsum()'}, partition_by=['subjectID'], order_by=['probability'], reverse=['probability'])
-       `probability` ,
-       `surveyCategory` ,
        `subjectID` ,
+       `surveyCategory` ,
+       `probability` ,
        SUM(1) OVER ( PARTITION BY `subjectID` ORDER BY `probability` DESC  )  AS `row_number`
       FROM
        `extend_3`
      ),
      `select_rows_5` AS (
       SELECT  -- select_rows('row_number == 1')
-       `probability` ,
+       `subjectID` ,
        `surveyCategory` ,
-       `subjectID`
+       `probability`
       FROM
        `extend_4`
       WHERE
@@ -398,8 +402,8 @@ print(sql)
      )
     SELECT  -- rename_columns({'diagnosis': 'surveyCategory'})
      `surveyCategory` AS `diagnosis` ,
-     `probability` ,
-     `subjectID`
+     `subjectID` ,
+     `probability`
     FROM
      `select_rows_5`
     
@@ -426,22 +430,22 @@ db_handle.read_query(sql)
     <tr style="text-align: right;">
       <th></th>
       <th>diagnosis</th>
-      <th>probability</th>
       <th>subjectID</th>
+      <th>probability</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
       <td>withdrawal behavior</td>
-      <td>0.670622</td>
       <td>1</td>
+      <td>0.670622</td>
     </tr>
     <tr>
       <th>1</th>
       <td>positive re-framing</td>
-      <td>0.558974</td>
       <td>2</td>
+      <td>0.558974</td>
     </tr>
   </tbody>
 </table>
