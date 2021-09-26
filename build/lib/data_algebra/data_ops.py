@@ -104,14 +104,13 @@ class ViewRepresentation(OperatorPlatform, ABC):
         :return: table result
         """
         tables = self.get_tables()
-        for t in tables.values():
-            assert isinstance(t, TableDescription)
-            assert t.head is not None
+        for tv in tables.values():
+            assert isinstance(tv, TableDescription)
+            assert tv.head is not None
             if len(tables) > 1:
-                assert t.table_name_was_set_by_user
+                assert tv.table_name_was_set_by_user
             if not allow_limited_tables:
-                assert t.limit_was is None
-                assert t.nrows == t.head.shape[0]
+                assert tv.nrows == tv.head.shape[0]
         data_map = {k: v.head for k, v in tables.items()}
         return self.eval(data_map=data_map, data_model=data_model, narrow=narrow)
 
@@ -850,7 +849,7 @@ def table(d, table_name=None):
 
     :param d: Pandas data frame to capture
     :param table_name: name for this table
-    :return: a table description
+    :return: a table description, with values retained
     """
     return describe_table(
         d=d,
@@ -862,6 +861,19 @@ def table(d, table_name=None):
         keep_sample=True,
         keep_all=True,
     )
+
+
+def data(**kwargs):
+    """
+    Capture a table for later use
+
+    :param kwargs: one named table of the form table_name=table_value
+    :return: a table description, with values retained
+    """
+    assert len(kwargs) == 1
+    table_name = [k for k in kwargs.keys()][0]
+    d = kwargs[table_name]
+    return table(d=d, table_name=table_name)
 
 
 class ExtendNode(ViewRepresentation):
@@ -1971,3 +1983,16 @@ class ConvertRecordsNode(ViewRepresentation):
         return data_model.convert_records_step(
             op=self, data_map=data_map, narrow=narrow
         )
+
+
+def ex(d, *, data_model=None, narrow=True, allow_limited_tables=False):
+    """
+    Evaluate operators with respect to Pandas data frames already stored in the operator chain.
+
+    :param d: data algebra pipeline or OpC container to evaluate.
+    :param data_model: adaptor to data dialect (Pandas for now)
+    :param narrow: logical, if True don't copy unexpected columns
+    :param allow_limited_tables: logical, if True allow execution on non-complete tables
+    :return: table result
+    """
+    return d.ex(data_model=data_model, narrow=narrow, allow_limited_tables=allow_limited_tables)
