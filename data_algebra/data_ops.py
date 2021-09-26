@@ -111,8 +111,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
                 assert tv.table_name_was_set_by_user
             if not allow_limited_tables:
                 assert tv.nrows == tv.head.shape[0]
-        data_map = {k: v.head for k, v in tables.items()}
-        return self.eval(data_map=data_map, data_model=data_model, narrow=narrow)
+        return self.eval(data_map=None, data_model=data_model, narrow=narrow)
 
     # characterization
 
@@ -314,23 +313,23 @@ class ViewRepresentation(OperatorPlatform, ABC):
          :return: table result
          """
 
-        assert isinstance(data_map, dict)
-        if len(data_map) < 1:
-            raise ValueError("Expected data_map to be non-empty")
+        if data_map is not None:
+            assert isinstance(data_map, dict)
         if data_model is None:
             data_model = data_algebra.default_data_model
         assert isinstance(data_model, data_algebra.data_model.DataModel)
-        self.columns_used()  # for table consistency check/raise
-        tables = self.get_tables()
-        self.check_constraints(
-            {k: x.columns for (k, x) in data_map.items()}, strict=not narrow
-        )
-        for k in tables.keys():
-            if k not in data_map.keys():
-                raise ValueError("Required table " + k + " not in data_map")
-            else:
-                if not data_model.is_appropriate_data_instance(data_map[k]):
-                    raise ValueError("data_map[" + k + "] was not a usable type")
+        if (data_map is not None) and (len(data_map) > 0):
+            self.columns_used()  # for table consistency check/raise
+            tables = self.get_tables()
+            self.check_constraints(
+                {k: x.columns for (k, x) in data_map.items()}, strict=not narrow
+            )
+            for k in tables.keys():
+                if k not in data_map.keys():
+                    raise ValueError("Required table " + k + " not in data_map")
+                else:
+                    if not data_model.is_appropriate_data_instance(data_map[k]):
+                        raise ValueError("data_map[" + k + "] was not a usable type")
         return self.eval_implementation(
             data_map=data_map, data_model=data_model, narrow=narrow
         )
@@ -664,6 +663,8 @@ class TableDescription(ViewRepresentation):
 
     def same_table(self, other):
         if not isinstance(other, data_algebra.data_ops.TableDescription):
+            return False
+        if self.table_name_was_set_by_user != other.table_name_was_set_by_user:
             return False
         if self.table_name != other.table_name:
             return False

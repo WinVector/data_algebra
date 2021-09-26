@@ -82,7 +82,7 @@ def test_ex_examples_join_catch_partial():
     )
 
     # failed to explicitly capture all rows
-    with pytest.raises(AssertionError):
+    with pytest.raises(Exception):
         ops.ex()
 
     res = ops.ex(allow_limited_tables=True)
