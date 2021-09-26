@@ -400,9 +400,15 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.TableDescription&quot;</span>
             <span class="p">)</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">data_map</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">table_name</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data_map[&quot;</span> <span class="o">+</span> <span class="n">op</span><span class="o">.</span><span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot;] was not the right type&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">data_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_map</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">data_map</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">table_name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data_map[&quot;</span> <span class="o">+</span> <span class="n">op</span><span class="o">.</span><span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot;] was not the right type&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">head</span>
+            <span class="k">assert</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unnamed TableDescription stored was not the right type&quot;</span><span class="p">)</span>
         <span class="c1"># check all columns we expect are present</span>
         <span class="n">columns_using</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">column_names</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">narrow</span><span class="p">:</span>
@@ -1010,9 +1016,15 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.TableDescription&quot;</span>
             <span class="p">)</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">data_map</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">table_name</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data_map[&quot;</span> <span class="o">+</span> <span class="n">op</span><span class="o">.</span><span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot;] was not the right type&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">data_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_map</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">data_map</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">table_name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data_map[&quot;</span> <span class="o">+</span> <span class="n">op</span><span class="o">.</span><span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot;] was not the right type&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">head</span>
+            <span class="k">assert</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unnamed TableDescription stored was not the right type&quot;</span><span class="p">)</span>
         <span class="c1"># check all columns we expect are present</span>
         <span class="n">columns_using</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">column_names</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">narrow</span><span class="p">:</span>
@@ -1619,9 +1631,15 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.TableDescription&quot;</span>
             <span class="p">)</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">data_map</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">table_name</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data_map[&quot;</span> <span class="o">+</span> <span class="n">op</span><span class="o">.</span><span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot;] was not the right type&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">data_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_map</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">data_map</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">table_name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data_map[&quot;</span> <span class="o">+</span> <span class="n">op</span><span class="o">.</span><span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot;] was not the right type&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">head</span>
+            <span class="k">assert</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unnamed TableDescription stored was not the right type&quot;</span><span class="p">)</span>
         <span class="c1"># check all columns we expect are present</span>
         <span class="n">columns_using</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">column_names</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">narrow</span><span class="p">:</span>

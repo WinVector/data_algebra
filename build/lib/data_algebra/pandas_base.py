@@ -278,9 +278,15 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.TableDescription"
             )
-        df = data_map[op.table_name]
-        if not self.is_appropriate_data_instance(df):
-            raise ValueError("data_map[" + op.table_name + "] was not the right type")
+        if (data_map is not None) and (len(data_map) > 0):
+            df = data_map[op.table_name]
+            if not self.is_appropriate_data_instance(df):
+                raise ValueError("data_map[" + op.table_name + "] was not the right type")
+        else:
+            df = op.head
+            assert df is not None
+            if not self.is_appropriate_data_instance(df):
+                raise ValueError("Unnamed TableDescription stored was not the right type")
         # check all columns we expect are present
         columns_using = op.column_names
         if not narrow:

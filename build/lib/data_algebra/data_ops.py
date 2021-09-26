@@ -111,8 +111,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
                 assert tv.table_name_was_set_by_user
             if not allow_limited_tables:
                 assert tv.nrows == tv.head.shape[0]
-        data_map = {k: v.head for k, v in tables.items()}
-        return self.eval(data_map=data_map, data_model=data_model, narrow=narrow)
+        return self.eval(data_map=None, data_model=data_model, narrow=narrow)
 
     # characterization
 
@@ -314,23 +313,23 @@ class ViewRepresentation(OperatorPlatform, ABC):
          :return: table result
          """
 
-        assert isinstance(data_map, dict)
-        if len(data_map) < 1:
-            raise ValueError("Expected data_map to be non-empty")
+        if data_map is not None:
+            assert isinstance(data_map, dict)
         if data_model is None:
             data_model = data_algebra.default_data_model
         assert isinstance(data_model, data_algebra.data_model.DataModel)
-        self.columns_used()  # for table consistency check/raise
-        tables = self.get_tables()
-        self.check_constraints(
-            {k: x.columns for (k, x) in data_map.items()}, strict=not narrow
-        )
-        for k in tables.keys():
-            if k not in data_map.keys():
-                raise ValueError("Required table " + k + " not in data_map")
-            else:
-                if not data_model.is_appropriate_data_instance(data_map[k]):
-                    raise ValueError("data_map[" + k + "] was not a usable type")
+        if (data_map is not None) and (len(data_map) > 0):
+            self.columns_used()  # for table consistency check/raise
+            tables = self.get_tables()
+            self.check_constraints(
+                {k: x.columns for (k, x) in data_map.items()}, strict=not narrow
+            )
+            for k in tables.keys():
+                if k not in data_map.keys():
+                    raise ValueError("Required table " + k + " not in data_map")
+                else:
+                    if not data_model.is_appropriate_data_instance(data_map[k]):
+                        raise ValueError("data_map[" + k + "] was not a usable type")
         return self.eval_implementation(
             data_map=data_map, data_model=data_model, narrow=narrow
         )
@@ -665,6 +664,8 @@ class TableDescription(ViewRepresentation):
     def same_table(self, other):
         if not isinstance(other, data_algebra.data_ops.TableDescription):
             return False
+        if self.table_name_was_set_by_user != other.table_name_was_set_by_user:
+            return False
         if self.table_name != other.table_name:
             return False
         if self.key != other.key:
@@ -843,7 +844,7 @@ def describe_table(
     )
 
 
-def table(d, table_name=None):
+def table(d, *, table_name=None):
     """
     Capture a table for later use
 
@@ -863,17 +864,43 @@ def table(d, table_name=None):
     )
 
 
-def data(**kwargs):
+def descr(**kwargs):
     """
-    Capture a table for later use
+    Capture a named partial table as a description.
 
-    :param kwargs: one named table of the form table_name=table_value
-    :return: a table description, with values retained
+    :param kwargs: exactly one named table of the form table_name=table_value
+    :return: a table description (not all values retained)
     """
     assert len(kwargs) == 1
     table_name = [k for k in kwargs.keys()][0]
     d = kwargs[table_name]
-    return table(d=d, table_name=table_name)
+    return describe_table(
+        d=d,
+        table_name=table_name,
+        qualifiers=None,
+        sql_meta=None,
+        column_types=None,
+        row_limit=7,
+        keep_sample=True,
+        keep_all=False,
+    )
+
+
+def data(*args, **kwargs):
+    """
+    Capture a full table for later use. Exactly one of args/kwags can be set.
+
+    :param args: at most one unnamed table of the form table_name=table_value
+    :param kwargs: at most one named table of the form table_name=table_value
+    :return: a table description, with all values retained
+    """
+    assert (len(args) + len(kwargs)) == 1
+    if len(kwargs) == 1:
+        table_name = [k for k in kwargs.keys()][0]
+        d = kwargs[table_name]
+        return table(d=d, table_name=table_name)
+    d = args[0]
+    return table(d=d, table_name=None)
 
 
 class ExtendNode(ViewRepresentation):
