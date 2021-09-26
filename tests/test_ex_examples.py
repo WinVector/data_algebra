@@ -125,3 +125,20 @@ def test_ex_examples_join_catch_unnamed_2():
 
     with pytest.raises(AssertionError):
         ops.ex()
+
+
+def test_ex_examples_fn_notation_1():
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"x": [1, 1, 2], "y": [5, 4, 3], "z": [6, 7, 8],}
+    )
+
+    res = ex(
+        data(d=d)
+            .drop_columns(['z'])
+    )
+
+    expect = data_algebra.default_data_model.pd.DataFrame(
+        {"x": [1, 1, 2], "y": [5, 4, 3],}
+    )
+
+    assert data_algebra.test_util.equivalent_frames(expect, res)
