@@ -7,6 +7,12 @@ import data_algebra.SQLite
 import data_algebra.test_util
 
 
+def test_ex_example_ex_descr():
+    ops = TableDescription(table_name='d', column_names=['x']).extend({'z': 'x + 1'})
+    with pytest.raises(Exception):
+        ops.ex()
+
+
 def test_ex_examples_1():
     d = data_algebra.default_data_model.pd.DataFrame(
         {"x": [1, 1, 2], "y": [5, 4, 3], "z": [6, 7, 8],}
@@ -32,7 +38,7 @@ def test_ex_examples_catch_partial():
         {"x": [1, 1, 2], "y": [5, 4, 3], "z": [6, 7, 8],}
     )
 
-    ops = describe_table(d, table_name="d").drop_columns(["z"])
+    ops = describe_table(d, table_name="d", row_limit=2).drop_columns(["z"])
 
     with pytest.raises(AssertionError):
         ops.ex()
@@ -71,8 +77,8 @@ def test_ex_examples_join_catch_partial():
         {"x": [1, 2, 2], "y": [3, 3, 4], "q": ["a", "b", "c"],}
     )
 
-    ops = describe_table(d1, table_name="d1").natural_join(
-        b=describe_table(d2, table_name="d2"), by=["x", "y"], jointype="inner"
+    ops = describe_table(d1, table_name="d1", row_limit=2).natural_join(
+        b=describe_table(d2, table_name="d2", row_limit=2), by=["x", "y"], jointype="inner"
     )
 
     # failed to explicitly capture all rows
@@ -82,7 +88,7 @@ def test_ex_examples_join_catch_partial():
     res = ops.ex(allow_limited_tables=True)
 
     expect = data_algebra.default_data_model.pd.DataFrame(
-        {"x": [1, 2, 2], "y": [3, 3, 4], "z": [6, 7, 8], "q": ["a", "b", "c"],}
+        {"x": [1, 2,], "y": [3, 3,], "z": [6, 7,], "q": ["a", "b",],}
     )
 
     assert data_algebra.test_util.equivalent_frames(expect, res)
