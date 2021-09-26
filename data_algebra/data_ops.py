@@ -844,7 +844,7 @@ def describe_table(
     )
 
 
-def table(d, table_name=None):
+def table(d, *, table_name=None):
     """
     Capture a table for later use
 
@@ -864,17 +864,43 @@ def table(d, table_name=None):
     )
 
 
-def data(**kwargs):
+def descr(**kwargs):
     """
-    Capture a table for later use
+    Capture a named partial table as a description.
 
-    :param kwargs: one named table of the form table_name=table_value
-    :return: a table description, with values retained
+    :param kwargs: exactly one named table of the form table_name=table_value
+    :return: a table description (not all values retained)
     """
     assert len(kwargs) == 1
     table_name = [k for k in kwargs.keys()][0]
     d = kwargs[table_name]
-    return table(d=d, table_name=table_name)
+    return describe_table(
+        d=d,
+        table_name=table_name,
+        qualifiers=None,
+        sql_meta=None,
+        column_types=None,
+        row_limit=7,
+        keep_sample=True,
+        keep_all=False,
+    )
+
+
+def data(*args, **kwargs):
+    """
+    Capture a full table for later use. Exactly one of args/kwags can be set.
+
+    :param args: at most one unnamed table of the form table_name=table_value
+    :param kwargs: at most one named table of the form table_name=table_value
+    :return: a table description, with all values retained
+    """
+    assert (len(args) + len(kwargs)) == 1
+    if len(kwargs) == 1:
+        table_name = [k for k in kwargs.keys()][0]
+        d = kwargs[table_name]
+        return table(d=d, table_name=table_name)
+    d = args[0]
+    return table(d=d, table_name=None)
 
 
 class ExtendNode(ViewRepresentation):

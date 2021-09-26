@@ -142,3 +142,72 @@ def test_ex_examples_fn_notation_1():
     )
 
     assert data_algebra.test_util.equivalent_frames(expect, res)
+
+
+def test_ex_examples_fn_notation_1_unnamed():
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"x": [1, 1, 2], "y": [5, 4, 3], "z": [6, 7, 8],}
+    )
+
+    res = ex(
+        data(d)
+            .drop_columns(['z'])
+    )
+
+    expect = data_algebra.default_data_model.pd.DataFrame(
+        {"x": [1, 1, 2], "y": [5, 4, 3],}
+    )
+
+    assert data_algebra.test_util.equivalent_frames(expect, res)
+
+
+def test_ex_examples_fn_notation_1_cant_ex_short_descr():
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"x": range(20),  "z": 7,}
+    )
+
+    with pytest.raises(Exception):
+        res = ex(
+            descr(d=d)
+                .drop_columns(['z'])
+        )
+
+
+def test_ex_examples_fn_notation_1_short_descr():
+    d = data_algebra.default_data_model.pd.DataFrame(
+        {"x": range(20),  "z": 7,}
+    )
+
+    ops = (
+        descr(d=d)
+            .drop_columns(['z'])
+    )
+    res = ops.transform(d)
+    expect = d = data_algebra.default_data_model.pd.DataFrame(
+        {"x": range(20)}
+    )
+    assert data_algebra.test_util.equivalent_frames(expect, res)
+
+
+def test_ex_examples_fn_notation_data_named():
+    d1 = data_algebra.default_data_model.pd.DataFrame(
+        {"x": [1, 1, 2], "y": [5, 4, 3], "z": [6, 7, 8]}
+    )
+    d2 = data_algebra.default_data_model.pd.DataFrame(
+        {"x": [1, 1, 2], "y": [5, 4, 3], "q": [10, 11, 12]}
+    )
+
+    res = ex(
+        data(d1=d1)
+            .natural_join(
+                b=data(d2=d2),
+                by=['x', 'y'],
+                jointype='inner',
+            )
+    )
+
+    expect = data_algebra.default_data_model.pd.DataFrame(
+        {"x": [1, 1, 2], "y": [5, 4, 3], "z": [6, 7, 8], "q": [10, 11, 12]}
+    )
+
+    assert data_algebra.test_util.equivalent_frames(expect, res)
