@@ -52,12 +52,16 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         :param allow_limited_tables: logical, if True allow execution on non-complete tables
         :return: table result
         """
+        assert not self.used_result
+        assert self.ops is not None
         self.used_result = True
-        return self.ops.ex(
+        res = self.ops.ex(
             data_model=data_model,
             narrow=narrow,
             allow_limited_tables=allow_limited_tables,
         )
+        self.ops = None
+        return res
 
     # noinspection PyPep8Naming
     def transform(self, X, *, data_model=None, narrow=True):

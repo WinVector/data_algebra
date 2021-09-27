@@ -201,12 +201,16 @@
 <span class="sd">        :param allow_limited_tables: logical, if True allow execution on non-complete tables</span>
 <span class="sd">        :return: table result</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">used_result</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">used_result</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">ex</span><span class="p">(</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">ex</span><span class="p">(</span>
             <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span>
             <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,</span>
             <span class="n">allow_limited_tables</span><span class="o">=</span><span class="n">allow_limited_tables</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ops</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">res</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -418,12 +422,16 @@
 <span class="sd">        :param allow_limited_tables: logical, if True allow execution on non-complete tables</span>
 <span class="sd">        :return: table result</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">used_result</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">used_result</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">ex</span><span class="p">(</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">ex</span><span class="p">(</span>
             <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span>
             <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,</span>
             <span class="n">allow_limited_tables</span><span class="o">=</span><span class="n">allow_limited_tables</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ops</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">res</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -678,12 +686,16 @@
 <span class="sd">        :param allow_limited_tables: logical, if True allow execution on non-complete tables</span>
 <span class="sd">        :return: table result</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">used_result</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">used_result</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">ex</span><span class="p">(</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">ex</span><span class="p">(</span>
             <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span>
             <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,</span>
             <span class="n">allow_limited_tables</span><span class="o">=</span><span class="n">allow_limited_tables</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ops</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">res</span>
 </pre></div>
 
         </details>

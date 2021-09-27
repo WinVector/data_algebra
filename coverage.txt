@@ -110,7 +110,7 @@ data_algebra/expr_parse.py                35      0   100%
 data_algebra/expr_rep.py                 606    111    82%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 144      1    99%
-data_algebra/op_container.py             112     39    65%
+data_algebra/op_container.py             116     43    63%
 data_algebra/pandas_base.py              400     36    91%
 data_algebra/pandas_model.py               5      0   100%
 data_algebra/parse_by_lark.py            143     25    83%
@@ -118,7 +118,7 @@ data_algebra/python3_lark.py               1      0   100%
 data_algebra/test_util.py                203     37    82%
 data_algebra/util.py                      89      6    93%
 ----------------------------------------------------------
-TOTAL                                   4819    859    82%
+TOTAL                                   4823    863    82%
 
 
-============================= 218 passed in 16.00s =============================
+============================= 218 passed in 17.48s =============================
