@@ -39,8 +39,8 @@ def _clean_annotation(annotation):
     if annotation is None:
         return annotation
     annotation = annotation.strip()
-    annotation = re.sub(r"\s+", " ", annotation)
-    return annotation
+    annotation = re.sub(r"(\s|\r|\n)+", " ", annotation)
+    return annotation.strip()
 
 
 # map from op-name to special SQL formatting code
@@ -1782,7 +1782,7 @@ class DBModel:
             and (near_sql.annotation is not None)
             and (len(near_sql.annotation) > 0)
         ):
-            sql_start = "SELECT  -- " + _clean_annotation(near_sql.annotation) + "\n "
+            sql_start = "SELECT  -- " + _clean_annotation(near_sql.annotation)
         return (
             [sql_start]
             + self._indent_and_sep_terms(

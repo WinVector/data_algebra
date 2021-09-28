@@ -254,8 +254,8 @@
     <span class="k">if</span> <span class="n">annotation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">annotation</span>
     <span class="n">annotation</span> <span class="o">=</span> <span class="n">annotation</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-    <span class="n">annotation</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">annotation</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">annotation</span>
+    <span class="n">annotation</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\s|\r|\n)+&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">annotation</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">annotation</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
 
 <span class="c1"># map from op-name to special SQL formatting code</span>
@@ -1997,7 +1997,7 @@
             <span class="ow">and</span> <span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">annotation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
             <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">annotation</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
         <span class="p">):</span>
-            <span class="n">sql_start</span> <span class="o">=</span> <span class="s2">&quot;SELECT  -- &quot;</span> <span class="o">+</span> <span class="n">_clean_annotation</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">annotation</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> &quot;</span>
+            <span class="n">sql_start</span> <span class="o">=</span> <span class="s2">&quot;SELECT  -- &quot;</span> <span class="o">+</span> <span class="n">_clean_annotation</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">annotation</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="p">[</span><span class="n">sql_start</span><span class="p">]</span>
             <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indent_and_sep_terms</span><span class="p">(</span>
@@ -3501,7 +3501,7 @@
             <span class="ow">and</span> <span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">annotation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
             <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">annotation</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
         <span class="p">):</span>
-            <span class="n">sql_start</span> <span class="o">=</span> <span class="s2">&quot;SELECT  -- &quot;</span> <span class="o">+</span> <span class="n">_clean_annotation</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">annotation</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> &quot;</span>
+            <span class="n">sql_start</span> <span class="o">=</span> <span class="s2">&quot;SELECT  -- &quot;</span> <span class="o">+</span> <span class="n">_clean_annotation</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">annotation</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="p">[</span><span class="n">sql_start</span><span class="p">]</span>
             <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indent_and_sep_terms</span><span class="p">(</span>
@@ -5514,7 +5514,7 @@
             <span class="ow">and</span> <span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">annotation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
             <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">annotation</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
         <span class="p">):</span>
-            <span class="n">sql_start</span> <span class="o">=</span> <span class="s2">&quot;SELECT  -- &quot;</span> <span class="o">+</span> <span class="n">_clean_annotation</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">annotation</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> &quot;</span>
+            <span class="n">sql_start</span> <span class="o">=</span> <span class="s2">&quot;SELECT  -- &quot;</span> <span class="o">+</span> <span class="n">_clean_annotation</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">annotation</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="p">[</span><span class="n">sql_start</span><span class="p">]</span>
             <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indent_and_sep_terms</span><span class="p">(</span>
