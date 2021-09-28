@@ -299,7 +299,8 @@
             <span class="p">},</span>
         <span class="p">]</span>
         <span class="k">for</span> <span class="n">pm</span> <span class="ow">in</span> <span class="n">partial_maps</span><span class="p">:</span>
-            <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">pm</span><span class="p">)</span>
+            <span class="n">empty_res_i</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">pm</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">empty_res_i</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
     <span class="c1"># try any db paths</span>
     <span class="k">if</span> <span class="n">db_handles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">db_handle</span> <span class="ow">in</span> <span class="n">db_handles</span><span class="p">:</span>
@@ -743,7 +744,8 @@ Ignores indexing.</p>
             <span class="p">},</span>
         <span class="p">]</span>
         <span class="k">for</span> <span class="n">pm</span> <span class="ow">in</span> <span class="n">partial_maps</span><span class="p">:</span>
-            <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">pm</span><span class="p">)</span>
+            <span class="n">empty_res_i</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">pm</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">empty_res_i</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
     <span class="c1"># try any db paths</span>
     <span class="k">if</span> <span class="n">db_handles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">db_handle</span> <span class="ow">in</span> <span class="n">db_handles</span><span class="p">:</span>
