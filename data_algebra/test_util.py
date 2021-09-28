@@ -234,7 +234,8 @@ def check_transform_on_handles(
             },
         ]
         for pm in partial_maps:
-            ops.eval(pm)
+            empty_res_i = ops.eval(pm)
+            assert set(empty_res_i.columns) == set(res.columns)
     # try any db paths
     if db_handles is not None:
         for db_handle in db_handles:
