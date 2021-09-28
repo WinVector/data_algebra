@@ -218,10 +218,10 @@ class ViewRepresentation(OperatorPlatform, ABC):
         return python_str
 
     def __repr__(self):
-        return self.to_python(strict=True)
+        return self.to_python(strict=True, pretty=True)
 
     def __str__(self):
-        return self.to_python(strict=True)
+        return self.to_python(strict=True, pretty=True)
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def _equiv_nodes(self, other):
@@ -1099,7 +1099,6 @@ class ExtendNode(ViewRepresentation):
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                + " .\\"
                 + spacer
             )
         ops = [
@@ -1107,7 +1106,7 @@ class ExtendNode(ViewRepresentation):
             for (k, opi) in self.ops.items()
         ]
         flowed = ("," + spacer + " ").join(ops)
-        s = s + ("extend({" + spacer + " " + flowed + "}")
+        s = s + (".extend({" + spacer + " " + flowed + "}")
         if self.windowed_situation:
             if len(self.partition_by) > 0:
                 s = s + "," + spacer + "partition_by=" + self.partition_by.__repr__()
@@ -1244,11 +1243,11 @@ class ProjectNode(ViewRepresentation):
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                + " .\\\n"
+                + "\n"
                 + " " * (max(indent, 0) + 3)
             )
         s = s + (
-            "project({"
+            ".project({"
             + spacer
             + " "
             + ("," + spacer + " ").join(
@@ -1328,10 +1327,10 @@ class SelectRowsNode(ViewRepresentation):
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                + " .\\\n"
+                + "\n"
                 + " " * (max(indent, 0) + 3)
             )
-        s = s + ("select_rows(" + self.expr.to_python().__repr__() + ")")
+        s = s + (".select_rows(" + self.expr.to_python().__repr__() + ")")
         return s
 
     def to_near_sql_implementation(
@@ -1402,10 +1401,10 @@ class SelectColumnsNode(ViewRepresentation):
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                + " .\\\n"
+                + "\n"
                 + " " * (max(indent, 0) + 3)
             )
-        s = s + ("select_columns(" + self.column_selection.__repr__() + ")")
+        s = s + (".select_columns(" + self.column_selection.__repr__() + ")")
         return s
 
     def to_near_sql_implementation(
@@ -1476,10 +1475,10 @@ class DropColumnsNode(ViewRepresentation):
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                + " .\\\n"
+                + "\n"
                 + " " * (max(indent, 0) + 3)
             )
-        s = s + ("drop_columns(" + self.column_deletions.__repr__() + ")")
+        s = s + (".drop_columns(" + self.column_deletions.__repr__() + ")")
         return s
 
     def to_near_sql_implementation(
@@ -1557,10 +1556,10 @@ class OrderRowsNode(ViewRepresentation):
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                + " .\\\n"
+                + "\n"
                 + " " * (max(indent, 0) + 3)
             )
-        s = s + ("order_rows(" + self.order_columns.__repr__())
+        s = s + (".order_rows(" + self.order_columns.__repr__())
         if len(self.reverse) > 0:
             s = s + ", reverse=" + self.reverse.__repr__()
         if self.limit is not None:
@@ -1662,10 +1661,10 @@ class RenameColumnsNode(ViewRepresentation):
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                + " .\\\n"
+                + "\n"
                 + " " * (max(indent, 0) + 3)
             )
-        s = s + ("rename_columns(" + self.column_remapping.__repr__() + ")")
+        s = s + (".rename_columns(" + self.column_remapping.__repr__() + ")")
         return s
 
     def to_near_sql_implementation(
@@ -1766,10 +1765,10 @@ class NaturalJoinNode(ViewRepresentation):
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                + " .\\\n"
+                + "\n"
                 + " " * (max(indent, 0) + 3)
             )
-        s = s + ("natural_join(b=\n" + " " * (indent + 6))
+        s = s + (".natural_join(b=\n" + " " * (indent + 6))
         if print_sources:
             s = s + (
                 self.sources[1].to_python_implementation(
@@ -1879,10 +1878,10 @@ class ConcatRowsNode(ViewRepresentation):
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                + " .\\\n"
+                + "\n"
                 + " " * (max(indent, 0) + 3)
             )
-        s = s + ("concat_rows(b=\n" + " " * (indent + 6))
+        s = s + (".concat_rows(b=\n" + " " * (indent + 6))
         if print_sources:
             s = s + (
                 self.sources[1].to_python_implementation(
@@ -1955,12 +1954,12 @@ class ConvertRecordsNode(ViewRepresentation):
         if print_sources:
             s = (
                 self.sources[0].to_python_implementation(indent=indent, strict=strict)
-                + " .\\\n"
+                + "\n"
                 + " " * (max(indent, 0) + 3)
             )
         rm_str = self.record_map.__repr__()
         rm_str = re.sub("\n", "\n   ", rm_str)
-        s = s + "convert_records(" + rm_str
+        s = s + ".convert_records(" + rm_str
         s = s + ")"
         return s
 
