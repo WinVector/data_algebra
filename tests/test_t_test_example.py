@@ -6,6 +6,7 @@ import numpy.random
 
 from data_algebra.data_ops import *
 from data_algebra.cdata import *
+import data_algebra.SQLite
 import data_algebra.test_util
 
 
@@ -73,6 +74,7 @@ def test_t_test_example():
         )
 
     # res = ops.transform(d)
+    db_handle = data_algebra.db_model.DBHandle(db_model=data_algebra.SQLite.SQLiteModel(), conn=None)
 
     expect = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'b', 'c'],
