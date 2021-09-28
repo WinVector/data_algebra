@@ -173,7 +173,7 @@ db_handle = data_algebra.BigQuery.example_handle()
 print(db_handle)
 ```
 
-    BigQuery_DBHandle(db_model=BigQueryModel, conn=<google.cloud.bigquery.client.Client object at 0x7f93a0c54a60>)
+    BigQuery_DBHandle(db_model=BigQueryModel, conn=<google.cloud.bigquery.client.Client object at 0x7fb578a72e80>)
 
 
 
@@ -350,60 +350,60 @@ print(sql)
     WITH
      `table_reference_0` AS (
       SELECT
-       `subjectID` ,
        `surveyCategory` ,
+       `subjectID` ,
        `assessmentTotal`
       FROM
        `data-algebra-test.test_1.d`
      ),
      `extend_1` AS (
-      SELECT  -- extend({ 'probability': '((assessmentTotal * 0.237)).exp()'})
-       `subjectID` ,
+      SELECT  -- .extend({ 'probability': '((assessmentTotal * 0.237)).exp()'})
        `surveyCategory` ,
+       `subjectID` ,
        EXP(`assessmentTotal` * 0.237) AS `probability`
       FROM
        `table_reference_0`
      ),
      `extend_2` AS (
-      SELECT  -- extend({ 'total': 'probability.sum()'}, partition_by=['subjectID'])
-       `subjectID` ,
+      SELECT  -- .extend({ 'total': 'probability.sum()'}, partition_by=['subjectID'])
        `surveyCategory` ,
+       `subjectID` ,
        `probability` ,
        SUM(`probability`) OVER ( PARTITION BY `subjectID`  )  AS `total`
       FROM
        `extend_1`
      ),
      `extend_3` AS (
-      SELECT  -- extend({ 'probability': 'probability / total'})
-       `subjectID` ,
+      SELECT  -- .extend({ 'probability': 'probability / total'})
+       `probability` / `total` AS `probability` ,
        `surveyCategory` ,
-       `probability` / `total` AS `probability`
+       `subjectID`
       FROM
        `extend_2`
      ),
      `extend_4` AS (
-      SELECT  -- extend({ 'row_number': '(1).cumsum()'}, partition_by=['subjectID'], order_by=['probability'], reverse=['probability'])
-       `subjectID` ,
-       `surveyCategory` ,
+      SELECT  -- .extend({ 'row_number': '(1).cumsum()'}, partition_by=['subjectID'], order_by=['probability'], reverse=['probability'])
        `probability` ,
+       `surveyCategory` ,
+       `subjectID` ,
        SUM(1) OVER ( PARTITION BY `subjectID` ORDER BY `probability` DESC  )  AS `row_number`
       FROM
        `extend_3`
      ),
      `select_rows_5` AS (
-      SELECT  -- select_rows('row_number == 1')
-       `subjectID` ,
+      SELECT  -- .select_rows('row_number == 1')
+       `probability` ,
        `surveyCategory` ,
-       `probability`
+       `subjectID`
       FROM
        `extend_4`
       WHERE
        `row_number` = 1
      )
-    SELECT  -- rename_columns({'diagnosis': 'surveyCategory'})
+    SELECT  -- .rename_columns({'diagnosis': 'surveyCategory'})
      `surveyCategory` AS `diagnosis` ,
-     `subjectID` ,
-     `probability`
+     `probability` ,
+     `subjectID`
     FROM
      `select_rows_5`
     
@@ -430,22 +430,22 @@ db_handle.read_query(sql)
     <tr style="text-align: right;">
       <th></th>
       <th>diagnosis</th>
-      <th>subjectID</th>
       <th>probability</th>
+      <th>subjectID</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
       <td>withdrawal behavior</td>
-      <td>1</td>
       <td>0.670622</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>1</th>
       <td>positive re-framing</td>
-      <td>2</td>
       <td>0.558974</td>
+      <td>2</td>
     </tr>
   </tbody>
 </table>
