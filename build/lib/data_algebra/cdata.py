@@ -227,6 +227,9 @@ def blocks_to_rowrecs(data, *, blocks_in, local_data_model=None):
     for c in blocks_in.row_version():
         if c not in colset:
             res[c] = None
+    if data.shape[0] <= 0:
+        res = res.loc[range(0), :]
+        res = res.reset_index(inplace=False, drop=True)
     return res
 
 
@@ -299,6 +302,9 @@ def rowrecs_to_blocks(
     if data.shape[0] < 1:
         # empty input produces emtpy output (with different column structure)
         res = res.iloc[range(0), :].reset_index(drop=True)
+    if data.shape[0] <= 0:
+        res = res.loc[range(0), :]
+        res = res.reset_index(inplace=False, drop=True)
     return res
 
 
