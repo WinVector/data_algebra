@@ -1,12 +1,10 @@
 
-import sqlite3
 import numpy
 import numpy.random
 
 
 from data_algebra.data_ops import *
 from data_algebra.cdata import *
-import data_algebra.SQLite
 import data_algebra.test_util
 
 
@@ -63,8 +61,7 @@ def test_t_test_example():
                'group_sensor_mean': ['group_sensor_mean_s1', 'group_sensor_mean_s2'],
                'group_sensor_est_var': ['group_sensor_est_var_s1', 'group_sensor_est_var_s2'],
                }),
-               control_table_keys=['sensor']),
-               blocks_out=None)) .\
+               control_table_keys=['sensor']))) .\
            extend({
             'mean_diff': 'group_sensor_mean_s1 - group_sensor_mean_s2'}) .\
            extend({
@@ -73,13 +70,53 @@ def test_t_test_example():
            order_rows(['group'])
         )
 
-    # res = ops.transform(d)
-    db_handle = data_algebra.db_model.DBHandle(db_model=data_algebra.SQLite.SQLiteModel(), conn=None)
-
     expect = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'b', 'c'],
         'mean_diff': [-0.1227200059303106, -0.37230214817674523, 0.05174373615504563],
         't': [-1.1391763140653364, -3.3953523914502717, 0.4678435568035228],
         })
+
+    data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
+
+    ops_join = (
+        describe_table(d, table_name='d')
+            .extend({'group_mean': 'value.mean()'},
+                    partition_by=['group'])
+            .extend({'sq_diff': '(value - group_mean)**2'})
+            .project(
+            {
+                'group_var': 'sq_diff.mean()',
+                'group_size': '(1).sum()',
+            },
+            group_by=['group'])
+            .extend({'group_var': 'group_var * group_size / (group_size - 1)'})
+            .natural_join(
+            b=describe_table(d, table_name='d')
+                    .project(
+                    {
+                        'group_sensor_mean': 'value.mean()',
+                        'group_sensor_size': '(1).sum()',
+                    },
+                    group_by=['group', 'sensor']
+                ),
+                by=['group'],
+                jointype='inner',
+            )
+            .extend({'group_sensor_est_var': 'group_var / group_sensor_size'})
+            .convert_records(data_algebra.cdata.RecordMap(
+                   blocks_in=data_algebra.cdata.RecordSpecification(
+                   record_keys=['group'],
+                   control_table=data_algebra.default_data_model.pd.DataFrame({
+                   'sensor':['s1', 's2'],
+                   'group_sensor_mean':['group_sensor_mean_s1', 'group_sensor_mean_s2'],
+                   'group_sensor_est_var':['group_sensor_est_var_s1', 'group_sensor_est_var_s2'],
+                   }),
+                control_table_keys = ['sensor'])))
+            .extend({'mean_diff': 'group_sensor_mean_s1 - group_sensor_mean_s2'})
+            .extend({'t': 'mean_diff / (group_sensor_est_var_s1 + group_sensor_est_var_s2).sqrt()'})
+            .drop_columns(['group_sensor_mean_s1', 'group_sensor_est_var_s1',
+                           'group_sensor_mean_s2', 'group_sensor_est_var_s2'])
+            .order_rows(['group'])
+    )
 
     data_algebra.test_util.check_transform(ops=ops, data=d, expect=expect)
