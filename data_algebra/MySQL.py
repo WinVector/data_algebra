@@ -43,7 +43,7 @@ def _MySQL_concat_expr(dbmodel, expression):
 
 # map from op-name to special SQL formatting code
 MySQL_formatters = {
-    "___": lambda dbmodel, expression: expression.to_python(),
+    "___": lambda dbmodel, expression: str(expression.to_python()),
     "is_bad": _MySQL_is_bad_expr,
     "concat": _MySQL_concat_expr,
 }

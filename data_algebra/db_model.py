@@ -879,9 +879,9 @@ class DBModel:
             oi.get_column_names(cols_used_in_term)
             cols_used_in_term.update(window_vars)
             declared_term_dependencies[ci] = cols_used_in_term
-        annotation = extend_node.to_python_implementation(
+        annotation = str(extend_node.to_python_implementation(
             print_sources=False, indent=-1
-        )
+        ))
         # TODO: see if we can merge with subsql instead of building a new one
         if (
             self.allow_extend_merges
@@ -978,9 +978,9 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
-            annotation=project_node.to_python_implementation(
+            annotation=str(project_node.to_python_implementation(
                 print_sources=False, indent=-1
-            ),
+            )),
         )
         return near_sql
 
@@ -1018,9 +1018,9 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
-            annotation=select_rows_node.to_python_implementation(
+            annotation=str(select_rows_node.to_python_implementation(
                 print_sources=False, indent=-1
-            ),
+            )),
         )
         return near_sql
 
@@ -1127,9 +1127,9 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
-            annotation=order_node.to_python_implementation(
+            annotation=str(order_node.to_python_implementation(
                 print_sources=False, indent=-1
-            ),
+            )),
         )
         return near_sql
 
@@ -1162,9 +1162,9 @@ class DBModel:
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
-            annotation=rename_node.to_python_implementation(
+            annotation=str(rename_node.to_python_implementation(
                 print_sources=False, indent=-1
-            ),
+            )),
         )
         return near_sql
 
@@ -1259,9 +1259,9 @@ class DBModel:
             joiner=jointype + " JOIN",
             sub_sql2=sql_right.to_bound_near_sql(columns=using_right, force_sql=False),
             suffix=on_terms,
-            annotation=join_node.to_python_implementation(
+            annotation=str(join_node.to_python_implementation(
                 print_sources=False, indent=-1
-            ),
+            )),
         )
         return near_sql
 
@@ -1315,9 +1315,9 @@ class DBModel:
             sub_sql2=sql_right.to_bound_near_sql(
                 columns=using_left, force_sql=True, constants=constants_right,
             ),
-            annotation=concat_node.to_python_implementation(
+            annotation=str(concat_node.to_python_implementation(
                 print_sources=False, indent=-1
-            ),
+            )),
         )
         return near_sql
 
