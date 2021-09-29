@@ -173,7 +173,7 @@ db_handle = data_algebra.BigQuery.example_handle()
 print(db_handle)
 ```
 
-    BigQuery_DBHandle(db_model=BigQueryModel, conn=<google.cloud.bigquery.client.Client object at 0x7fb578a72e80>)
+    BigQuery_DBHandle(db_model=BigQueryModel, conn=<google.cloud.bigquery.client.Client object at 0x7fa6a0a4da30>)
 
 
 
@@ -301,7 +301,7 @@ print(py_source)
                 "irrelevantCol2",
             ],
         )
-        .extend({"probability": "((assessmentTotal * 0.237)).exp()"})
+        .extend({"probability": "(assessmentTotal * 0.237).exp()"})
         .extend({"total": "probability.sum()"}, partition_by=["subjectID"])
         .extend({"probability": "probability / total"})
         .extend(
@@ -357,7 +357,7 @@ print(sql)
        `data-algebra-test.test_1.d`
      ),
      `extend_1` AS (
-      SELECT  -- .extend({ 'probability': '((assessmentTotal * 0.237)).exp()'})
+      SELECT  -- .extend({ 'probability': '(assessmentTotal * 0.237).exp()'})
        `surveyCategory` ,
        `subjectID` ,
        EXP(`assessmentTotal` * 0.237) AS `probability`
@@ -437,15 +437,15 @@ db_handle.read_query(sql)
   <tbody>
     <tr>
       <th>0</th>
-      <td>withdrawal behavior</td>
-      <td>0.670622</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1</th>
       <td>positive re-framing</td>
       <td>0.558974</td>
       <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>withdrawal behavior</td>
+      <td>0.670622</td>
+      <td>1</td>
     </tr>
   </tbody>
 </table>

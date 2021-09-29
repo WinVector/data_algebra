@@ -14,6 +14,24 @@ import data_algebra.util
 #  http://tomerfiliba.com/blog/Infix-Operators/
 
 
+class PythonText:
+    """
+    Class for holding text representation of Python, with possible additional annotations.
+    str() method returns only the text for interoperability.
+    """
+    def __init__(self, s: str, *, is_in_parens: bool = False):
+        assert isinstance(s, str)
+        assert isinstance(is_in_parens, bool)
+        self.s = s
+        self.is_in_parens = is_in_parens
+
+    def __str__(self):
+        return self.s
+
+    def __repr__(self):
+        return self.s.__repr__()
+
+
 # list of window/aggregation functions that must be windowed/aggregated
 # (note some other functions work in more than one mode)
 # noinspection SpellCheckingInspection
@@ -130,7 +148,12 @@ class PreTerm(ABC):
 
     # emitters
 
-    def to_python(self, *, want_inline_parens=False):
+    def to_python(self, *, want_inline_parens : bool = False) -> PythonText:
+        """
+        Convert parsed expression into a string
+
+        :param want_inline_parens: bool if True put parens around complex expressions that don't already have a grouper.
+        """
         raise NotImplementedError(
             "base class method called"
         )  # https://docs.python.org/3/library/exceptions.html
@@ -144,10 +167,10 @@ class PreTerm(ABC):
     # printing
 
     def __repr__(self):
-        return self.to_python(want_inline_parens=False)
+        return str(self.to_python(want_inline_parens=False))
 
     def __str__(self):
-        return self.to_python(want_inline_parens=False)
+        return str(self.to_python(want_inline_parens=False))
 
 
 def _is_none_value(x):
@@ -696,8 +719,8 @@ class Value(Term):
     def evaluate(self, data_frame):
         return self.value
 
-    def to_python(self, *, want_inline_parens=False):
-        return self.value.__repr__()
+    def to_python(self, *, want_inline_parens : bool = False) -> PythonText:
+        return PythonText(self.value.__repr__(), is_in_parens=False)
 
     # don't collect -5 as a complex expression
     def __neg__(self):
@@ -752,14 +775,14 @@ class ListTerm(PreTerm):
             res[i] = vi
         return res
 
-    def to_python(self, *, want_inline_parens=False):
+    def to_python(self, *, want_inline_parens : bool = False) -> PythonText:
         def li_to_python(value):
             try:
-                return value.to_python(want_inline_parens=want_inline_parens)
+                return str(value.to_python(want_inline_parens=False))
             except AttributeError:
                 return str(value)  # TODO: check if this should be repr?
 
-        return "[" + ", ".join([li_to_python(ai) for ai in self.value]) + "]"
+        return PythonText("[" + ", ".join([li_to_python(ai) for ai in self.value]) + "]", is_in_parens=False)
 
     def get_column_names(self, columns_seen):
         for ti in self.value:
@@ -814,8 +837,8 @@ class ColumnReference(Term):
     def replace_view(self, view):
         return ColumnReference(view=view, column_name=self.column_name)
 
-    def to_python(self, want_inline_parens=False):
-        return self.column_name
+    def to_python(self, *, want_inline_parens : bool = False) -> PythonText:
+        return PythonText(self.column_name, is_in_parens=False)
 
     def get_column_names(self, columns_seen):
         columns_seen.add(self.column_name)
@@ -964,32 +987,36 @@ class Expression(Term):
             pass
         raise KeyError(f"function {self.op} not found")
 
-    def to_python(self, *, want_inline_parens=False):
-        subs = [ai.to_python(want_inline_parens=True) for ai in self.args]
-        if len(subs) <= 0:
-            return self.op + "()"
-        if len(subs) == 1:
+    def to_python(self, *, want_inline_parens : bool = False) -> PythonText:
+        n_args = len(self.args)
+        if n_args <= 0:
+            return PythonText(self.op + "()", is_in_parens=False)
+        if n_args == 1:
+            sub_0 = self.args[0].to_python(want_inline_parens=False)
             if self.inline:
-                return self.op + self.args[0].to_python(want_inline_parens=True)
+                if sub_0.is_in_parens:
+                    return PythonText(self.op + str(sub_0), is_in_parens=False)
+                return PythonText(self.op + '(' + str(sub_0) + ')', is_in_parens=False)
             if self.method:
-                if isinstance(self.args[0], ColumnReference):
-                    return subs[0] + "." + self.op + "()"
-                else:
-                    return "(" + subs[0] + ")." + self.op + "()"
+                if sub_0.is_in_parens or isinstance(self.args[0], ColumnReference):
+                    return PythonText(str(sub_0) + "." + self.op + "()", is_in_parens=False)
+                return PythonText("(" + str(sub_0) + ")." + self.op + "()", is_in_parens=False)
         if self.inline:
-            result = ""
+            subs = [str(ai.to_python(want_inline_parens=True)) for ai in self.args]
+            result = (" " + self.op + " ").join(subs)
             if want_inline_parens:
-                result = result + "("
-            result = result + (" " + self.op + " ").join(subs)
-            if want_inline_parens:
-                result = result + ")"
-            return result
+                return PythonText('(' + result + ')', is_in_parens=True)
+            return PythonText(result, is_in_parens=False)
+        subs = [ai.to_python(want_inline_parens=False) for ai in self.args]
+        subs_0 = subs[0]
+        subs = [str(si) for si in subs]
         if self.method:
-            if isinstance(self.args[0], ColumnReference):
-                return subs[0] + "." + self.op + "(" + ", ".join(subs[1:]) + ")"
+            if subs_0.is_in_parens or isinstance(self.args[0], ColumnReference):
+                return PythonText(subs[0] + "." + self.op + "(" + ", ".join(subs[1:]) + ")", is_in_parens=False)
             else:
-                return "(" + subs[0] + ")." + self.op + "(" + ", ".join(subs[1:]) + ")"
-        return self.op + "(" + ", ".join(subs) + ")"
+                return PythonText("(" + subs[0] + ")." + self.op + "(" + ", ".join(subs[1:]) + ")", is_in_parens=False)
+        # treat as fn call
+        return PythonText(self.op + '(' + ", ".join(subs) + ')', is_in_parens=False)
 
 
 # define with def so function has usable __name__

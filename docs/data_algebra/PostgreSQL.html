@@ -76,7 +76,7 @@
 
 <span class="c1"># map from op-name to special SQL formatting code</span>
 <span class="n">PostgreSQL_formatters</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;___&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">:</span> <span class="n">expression</span><span class="o">.</span><span class="n">to_python</span><span class="p">(),</span>
+    <span class="s2">&quot;___&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">to_python</span><span class="p">()),</span>
 <span class="p">}</span>
 
 

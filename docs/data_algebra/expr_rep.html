@@ -31,6 +31,15 @@
                     <h2>API Documentation</h2>
                         <ul class="memberlist">
             <li>
+                    <a class="class" href="#PythonText">PythonText</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#PythonText.__init__">PythonText</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
                     <a class="class" href="#PreTerm">PreTerm</a>
                             <ul class="memberlist">
                         <li>
@@ -502,6 +511,24 @@
 <span class="c1">#  http://tomerfiliba.com/blog/Infix-Operators/</span>
 
 
+<span class="k">class</span> <span class="nc">PythonText</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for holding text representation of Python, with possible additional annotations.</span>
+<span class="sd">    str() method returns only the text for interoperability.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">is_in_parens</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">s</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_in_parens</span> <span class="o">=</span> <span class="n">is_in_parens</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
+
+
 <span class="c1"># list of window/aggregation functions that must be windowed/aggregated</span>
 <span class="c1"># (note some other functions work in more than one mode)</span>
 <span class="c1"># noinspection SpellCheckingInspection</span>
@@ -618,7 +645,12 @@
 
     <span class="c1"># emitters</span>
 
-    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert parsed expression into a string</span>
+
+<span class="sd">        :param want_inline_parens: bool if True put parens around complex expressions that don&#39;t already have a grouper.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
             <span class="s2">&quot;base class method called&quot;</span>
         <span class="p">)</span>  <span class="c1"># https://docs.python.org/3/library/exceptions.html</span>
@@ -632,10 +664,10 @@
     <span class="c1"># printing</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">_is_none_value</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
@@ -1184,8 +1216,8 @@
     <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
 
-    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">(),</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="c1"># don&#39;t collect -5 as a complex expression</span>
     <span class="k">def</span> <span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1240,14 +1272,14 @@
             <span class="n">res</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">vi</span>
         <span class="k">return</span> <span class="n">res</span>
 
-    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
         <span class="k">def</span> <span class="nf">li_to_python</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="n">want_inline_parens</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
             <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
                 <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># TODO: check if this should be repr?</span>
 
-        <span class="k">return</span> <span class="s2">&quot;[&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">li_to_python</span><span class="p">(</span><span class="n">ai</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;]&quot;</span>
+        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s2">&quot;[&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">li_to_python</span><span class="p">(</span><span class="n">ai</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;]&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">ti</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
@@ -1302,8 +1334,8 @@
     <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ColumnReference</span><span class="p">(</span><span class="n">view</span><span class="o">=</span><span class="n">view</span><span class="p">,</span> <span class="n">column_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_name</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_name</span>
+    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_name</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
         <span class="n">columns_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_name</span><span class="p">)</span>
@@ -1452,32 +1484,36 @@
             <span class="k">pass</span>
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;function </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ai</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
+        <span class="n">n_args</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_args</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_args</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">sub_0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inline</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">sub_0</span><span class="o">.</span><span class="n">is_in_parens</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sub_0</span><span class="p">),</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sub_0</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ColumnReference</span><span class="p">):</span>
-                    <span class="k">return</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;).&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span>
+                <span class="k">if</span> <span class="n">sub_0</span><span class="o">.</span><span class="n">is_in_parens</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ColumnReference</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">sub_0</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sub_0</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;).&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inline</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">ai</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">want_inline_parens</span><span class="p">:</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">want_inline_parens</span><span class="p">:</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
-            <span class="k">return</span> <span class="n">result</span>
+                <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="n">result</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ai</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
+        <span class="n">subs_0</span> <span class="o">=</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">si</span><span class="p">)</span> <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="n">subs</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ColumnReference</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+            <span class="k">if</span> <span class="n">subs_0</span><span class="o">.</span><span class="n">is_in_parens</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ColumnReference</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;).&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+                <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;).&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># treat as fn call</span>
+        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 
 <span class="c1"># define with def so function has usable __name__</span>
@@ -1516,6 +1552,64 @@
         </details>
 
             </section>
+                <section id="PythonText">
+                                <div class="attr class">
+        <a class="headerlink" href="#PythonText">#&nbsp;&nbsp</a>
+
+        
+        <span class="def">class</span>
+        <span class="name">PythonText</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">PythonText</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for holding text representation of Python, with possible additional annotations.</span>
+<span class="sd">    str() method returns only the text for interoperability.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">is_in_parens</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">s</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_in_parens</span> <span class="o">=</span> <span class="n">is_in_parens</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Class for holding text representation of Python, with possible additional annotations.
+str() method returns only the text for interoperability.</p>
+</div>
+
+
+                            <div id="PythonText.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#PythonText.__init__">#&nbsp;&nbsp</a>
+
+        
+            <span class="name">PythonText</span><span class="signature">(s: str, *, is_in_parens: bool = False)</span>
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">is_in_parens</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">s</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_in_parens</span> <span class="o">=</span> <span class="n">is_in_parens</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                </section>
                 <section id="PreTerm">
                                 <div class="attr class">
         <a class="headerlink" href="#PreTerm">#&nbsp;&nbsp</a>
@@ -1569,7 +1663,12 @@
 
     <span class="c1"># emitters</span>
 
-    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert parsed expression into a string</span>
+
+<span class="sd">        :param want_inline_parens: bool if True put parens around complex expressions that don&#39;t already have a grouper.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
             <span class="s2">&quot;base class method called&quot;</span>
         <span class="p">)</span>  <span class="c1"># https://docs.python.org/3/library/exceptions.html</span>
@@ -1583,10 +1682,10 @@
     <span class="c1"># printing</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
 </pre></div>
 
         </details>
@@ -1728,12 +1827,21 @@
 
         
             <span class="def">def</span>
-            <span class="name">to_python</span><span class="signature">(self, *, want_inline_parens=False)</span>:
+            <span class="name">to_python</span><span class="signature">(
+    self,
+    *,
+    want_inline_parens: bool = False
+) -&gt; <a href="#PythonText">data_algebra.expr_rep.PythonText</a></span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert parsed expression into a string</span>
+
+<span class="sd">        :param want_inline_parens: bool if True put parens around complex expressions that don&#39;t already have a grouper.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
             <span class="s2">&quot;base class method called&quot;</span>
         <span class="p">)</span>  <span class="c1"># https://docs.python.org/3/library/exceptions.html</span>
@@ -1741,7 +1849,11 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Convert parsed expression into a string</p>
+
+<p>:param want_inline_parens: bool if True put parens around complex expressions that don't already have a grouper.</p>
+</div>
+
 
                             </div>
                             <div id="PreTerm.to_source" class="classattr">
@@ -4047,8 +4159,8 @@
     <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
 
-    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">(),</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="c1"># don&#39;t collect -5 as a complex expression</span>
     <span class="k">def</span> <span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -4178,18 +4290,26 @@
 
         
             <span class="def">def</span>
-            <span class="name">to_python</span><span class="signature">(self, *, want_inline_parens=False)</span>:
+            <span class="name">to_python</span><span class="signature">(
+    self,
+    *,
+    want_inline_parens: bool = False
+) -&gt; <a href="#PythonText">data_algebra.expr_rep.PythonText</a></span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">(),</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Convert parsed expression into a string</p>
+
+<p>:param want_inline_parens: bool if True put parens around complex expressions that don't already have a grouper.</p>
+</div>
+
 
                             </div>
                             <div class="inherited">
@@ -4473,14 +4593,14 @@ errors defaults to 'strict'.</p>
             <span class="n">res</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">vi</span>
         <span class="k">return</span> <span class="n">res</span>
 
-    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
         <span class="k">def</span> <span class="nf">li_to_python</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="n">want_inline_parens</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
             <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
                 <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># TODO: check if this should be repr?</span>
 
-        <span class="k">return</span> <span class="s2">&quot;[&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">li_to_python</span><span class="p">(</span><span class="n">ai</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;]&quot;</span>
+        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s2">&quot;[&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">li_to_python</span><span class="p">(</span><span class="n">ai</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;]&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">ti</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
@@ -4613,24 +4733,32 @@ errors defaults to 'strict'.</p>
 
         
             <span class="def">def</span>
-            <span class="name">to_python</span><span class="signature">(self, *, want_inline_parens=False)</span>:
+            <span class="name">to_python</span><span class="signature">(
+    self,
+    *,
+    want_inline_parens: bool = False
+) -&gt; <a href="#PythonText">data_algebra.expr_rep.PythonText</a></span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
         <span class="k">def</span> <span class="nf">li_to_python</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="n">want_inline_parens</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
             <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
                 <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># TODO: check if this should be repr?</span>
 
-        <span class="k">return</span> <span class="s2">&quot;[&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">li_to_python</span><span class="p">(</span><span class="n">ai</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;]&quot;</span>
+        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s2">&quot;[&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">li_to_python</span><span class="p">(</span><span class="n">ai</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;]&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Convert parsed expression into a string</p>
+
+<p>:param want_inline_parens: bool if True put parens around complex expressions that don't already have a grouper.</p>
+</div>
+
 
                             </div>
                             <div id="ListTerm.get_column_names" class="classattr">
@@ -4741,8 +4869,8 @@ errors defaults to 'strict'.</p>
     <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ColumnReference</span><span class="p">(</span><span class="n">view</span><span class="o">=</span><span class="n">view</span><span class="p">,</span> <span class="n">column_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_name</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_name</span>
+    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_name</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
         <span class="n">columns_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_name</span><span class="p">)</span>
@@ -4872,18 +5000,26 @@ errors defaults to 'strict'.</p>
 
         
             <span class="def">def</span>
-            <span class="name">to_python</span><span class="signature">(self, want_inline_parens=False)</span>:
+            <span class="name">to_python</span><span class="signature">(
+    self,
+    *,
+    want_inline_parens: bool = False
+) -&gt; <a href="#PythonText">data_algebra.expr_rep.PythonText</a></span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_name</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_name</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Convert parsed expression into a string</p>
+
+<p>:param want_inline_parens: bool if True put parens around complex expressions that don't already have a grouper.</p>
+</div>
+
 
                             </div>
                             <div id="ColumnReference.get_column_names" class="classattr">
@@ -5115,32 +5251,36 @@ errors defaults to 'strict'.</p>
             <span class="k">pass</span>
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;function </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ai</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
+        <span class="n">n_args</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_args</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_args</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">sub_0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inline</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">sub_0</span><span class="o">.</span><span class="n">is_in_parens</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sub_0</span><span class="p">),</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sub_0</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ColumnReference</span><span class="p">):</span>
-                    <span class="k">return</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;).&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span>
+                <span class="k">if</span> <span class="n">sub_0</span><span class="o">.</span><span class="n">is_in_parens</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ColumnReference</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">sub_0</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sub_0</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;).&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inline</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">ai</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">want_inline_parens</span><span class="p">:</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">want_inline_parens</span><span class="p">:</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
-            <span class="k">return</span> <span class="n">result</span>
+                <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="n">result</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ai</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
+        <span class="n">subs_0</span> <span class="o">=</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">si</span><span class="p">)</span> <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="n">subs</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ColumnReference</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+            <span class="k">if</span> <span class="n">subs_0</span><span class="o">.</span><span class="n">is_in_parens</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ColumnReference</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;).&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+                <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;).&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># treat as fn call</span>
+        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -5348,42 +5488,54 @@ errors defaults to 'strict'.</p>
 
         
             <span class="def">def</span>
-            <span class="name">to_python</span><span class="signature">(self, *, want_inline_parens=False)</span>:
+            <span class="name">to_python</span><span class="signature">(
+    self,
+    *,
+    want_inline_parens: bool = False
+) -&gt; <a href="#PythonText">data_algebra.expr_rep.PythonText</a></span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ai</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
+        <span class="n">n_args</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_args</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_args</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">sub_0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inline</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">sub_0</span><span class="o">.</span><span class="n">is_in_parens</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sub_0</span><span class="p">),</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sub_0</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ColumnReference</span><span class="p">):</span>
-                    <span class="k">return</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;).&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span>
+                <span class="k">if</span> <span class="n">sub_0</span><span class="o">.</span><span class="n">is_in_parens</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ColumnReference</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">sub_0</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sub_0</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;).&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inline</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">ai</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">want_inline_parens</span><span class="p">:</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">want_inline_parens</span><span class="p">:</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
-            <span class="k">return</span> <span class="n">result</span>
+                <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="n">result</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ai</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
+        <span class="n">subs_0</span> <span class="o">=</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">si</span><span class="p">)</span> <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="n">subs</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ColumnReference</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+            <span class="k">if</span> <span class="n">subs_0</span><span class="o">.</span><span class="n">is_in_parens</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ColumnReference</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;).&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+                <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">subs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;).&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># treat as fn call</span>
+        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">+</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subs</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Convert parsed expression into a string</p>
+
+<p>:param want_inline_parens: bool if True put parens around complex expressions that don't already have a grouper.</p>
+</div>
+
 
                             </div>
                             <div class="inherited">

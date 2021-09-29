@@ -14,7 +14,7 @@ except ImportError:
 
 # map from op-name to special SQL formatting code
 PostgreSQL_formatters = {
-    "___": lambda dbmodel, expression: expression.to_python(),
+    "___": lambda dbmodel, expression: str(expression.to_python()),
 }
 
 
