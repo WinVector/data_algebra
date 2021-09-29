@@ -1454,7 +1454,7 @@ class DBModel:
             + "CROSS JOIN (\n  "
             + _str_join_expecting_list("\n", ctab_sql)
             + " ) b\n"
-            + " ORDER BY "
+            + " ORDER BY "  # order by not required, but nice to have
             + _str_join_expecting_list(", ", control_cols)
         )
         return sql
@@ -1527,7 +1527,7 @@ class DBModel:
             + " GROUP BY "
             + _str_join_expecting_list(", ", control_cols)
             + "\n"
-            + " ORDER BY "
+            + " ORDER BY "  # order by not required, but nice to have
             + _str_join_expecting_list(", ", control_cols)
         )
         return sql

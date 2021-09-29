@@ -1669,7 +1669,7 @@
             <span class="o">+</span> <span class="s2">&quot;CROSS JOIN (</span><span class="se">\n</span><span class="s2">  &quot;</span>
             <span class="o">+</span> <span class="n">_str_join_expecting_list</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ctab_sql</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot; ) b</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="o">+</span> <span class="s2">&quot; ORDER BY &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot; ORDER BY &quot;</span>  <span class="c1"># order by not required, but nice to have</span>
             <span class="o">+</span> <span class="n">_str_join_expecting_list</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="p">,</span> <span class="n">control_cols</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">sql</span>
@@ -1742,7 +1742,7 @@
             <span class="o">+</span> <span class="s2">&quot; GROUP BY &quot;</span>
             <span class="o">+</span> <span class="n">_str_join_expecting_list</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="p">,</span> <span class="n">control_cols</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="o">+</span> <span class="s2">&quot; ORDER BY &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot; ORDER BY &quot;</span>  <span class="c1"># order by not required, but nice to have</span>
             <span class="o">+</span> <span class="n">_str_join_expecting_list</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="p">,</span> <span class="n">control_cols</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">sql</span>
@@ -3173,7 +3173,7 @@
             <span class="o">+</span> <span class="s2">&quot;CROSS JOIN (</span><span class="se">\n</span><span class="s2">  &quot;</span>
             <span class="o">+</span> <span class="n">_str_join_expecting_list</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ctab_sql</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot; ) b</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="o">+</span> <span class="s2">&quot; ORDER BY &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot; ORDER BY &quot;</span>  <span class="c1"># order by not required, but nice to have</span>
             <span class="o">+</span> <span class="n">_str_join_expecting_list</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="p">,</span> <span class="n">control_cols</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">sql</span>
@@ -3246,7 +3246,7 @@
             <span class="o">+</span> <span class="s2">&quot; GROUP BY &quot;</span>
             <span class="o">+</span> <span class="n">_str_join_expecting_list</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="p">,</span> <span class="n">control_cols</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="o">+</span> <span class="s2">&quot; ORDER BY &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot; ORDER BY &quot;</span>  <span class="c1"># order by not required, but nice to have</span>
             <span class="o">+</span> <span class="n">_str_join_expecting_list</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="p">,</span> <span class="n">control_cols</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">sql</span>
@@ -5012,7 +5012,7 @@
             <span class="o">+</span> <span class="s2">&quot;CROSS JOIN (</span><span class="se">\n</span><span class="s2">  &quot;</span>
             <span class="o">+</span> <span class="n">_str_join_expecting_list</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ctab_sql</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot; ) b</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="o">+</span> <span class="s2">&quot; ORDER BY &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot; ORDER BY &quot;</span>  <span class="c1"># order by not required, but nice to have</span>
             <span class="o">+</span> <span class="n">_str_join_expecting_list</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="p">,</span> <span class="n">control_cols</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">sql</span>
@@ -5108,7 +5108,7 @@
             <span class="o">+</span> <span class="s2">&quot; GROUP BY &quot;</span>
             <span class="o">+</span> <span class="n">_str_join_expecting_list</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="p">,</span> <span class="n">control_cols</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="o">+</span> <span class="s2">&quot; ORDER BY &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot; ORDER BY &quot;</span>  <span class="c1"># order by not required, but nice to have</span>
             <span class="o">+</span> <span class="n">_str_join_expecting_list</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="p">,</span> <span class="n">control_cols</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">sql</span>
