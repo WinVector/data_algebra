@@ -271,25 +271,23 @@
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">map_to_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">map_to_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build a RecordMap mapping this RecordSpecification to rowrecs</span>
 
-<span class="sd">        :param strict:</span>
 <span class="sd">        :return: RecordMap</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">map_from_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build a RecordMap mapping this RecordSpecification from rowrecs</span>
 
-<span class="sd">        :param strict:</span>
 <span class="sd">        :return: RecordMap</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_out</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_out</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">blocks_to_rowrecs</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -443,7 +441,7 @@
 
 
 <span class="k">class</span> <span class="nc">RecordMap</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">)</span>
             <span class="n">ck</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">blocks_in</span><span class="o">.</span><span class="n">content_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
@@ -462,15 +460,6 @@
             <span class="n">unknown</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">content_keys</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">content_keys</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unknown outgoing content_keys&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">unknown</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">strict</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">record_keys</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">record_keys</span><span class="p">):</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;record keys must match when using both blocks in and blocks out&quot;</span>
-                    <span class="p">)</span>
-                <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">content_keys</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">content_keys</span><span class="p">):</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;content keys must match when using both blocks in and blocks out&quot;</span>
-                    <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="o">=</span> <span class="n">blocks_in</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span> <span class="o">=</span> <span class="n">blocks_out</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -692,7 +681,6 @@
     <span class="n">attribute_value_column</span><span class="p">,</span>
     <span class="n">record_keys</span><span class="p">,</span>
     <span class="n">record_value_columns</span><span class="p">,</span>
-    <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -702,7 +690,6 @@
 <span class="sd">    :param attribute_value_column: column for record attribute values</span>
 <span class="sd">    :param record_keys: names of key columns identifying row record blocks</span>
 <span class="sd">    :param record_value_columns: names of columns to take row record values from</span>
-<span class="sd">    :param strict: logical, if True more checks on transform</span>
 <span class="sd">    :param local_data_model: data.frame data model</span>
 <span class="sd">    :return: RecordMap</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -719,10 +706,9 @@
         <span class="n">control_table</span><span class="p">,</span>
         <span class="n">record_keys</span><span class="o">=</span><span class="n">record_keys</span><span class="p">,</span>
         <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">attribute_key_column</span><span class="p">],</span>
-        <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">,</span>
         <span class="n">local_data_model</span><span class="o">=</span><span class="n">local_data_model</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">map_to_rows</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">map_to_rows</span><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">pivot_rowrecs_to_blocks</span><span class="p">(</span>
@@ -731,7 +717,6 @@
     <span class="n">attribute_value_column</span><span class="p">,</span>
     <span class="n">record_keys</span><span class="p">,</span>
     <span class="n">record_value_columns</span><span class="p">,</span>
-    <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -741,7 +726,6 @@
 <span class="sd">    :param attribute_value_column: column for record attribute values</span>
 <span class="sd">    :param record_keys: names of key columns identifying row record blocks</span>
 <span class="sd">    :param record_value_columns: names of columns to take row record values from</span>
-<span class="sd">    :param strict: logical, if True more checks on transform</span>
 <span class="sd">    :param local_data_model: data.frame data model</span>
 <span class="sd">    :return: RecordMap</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -758,10 +742,9 @@
         <span class="n">control_table</span><span class="p">,</span>
         <span class="n">record_keys</span><span class="o">=</span><span class="n">record_keys</span><span class="p">,</span>
         <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">attribute_key_column</span><span class="p">],</span>
-        <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">,</span>
         <span class="n">local_data_model</span><span class="o">=</span><span class="n">local_data_model</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">map_from_rows</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">map_from_rows</span><span class="p">()</span>
 </pre></div>
 
         </details>
@@ -915,25 +898,23 @@
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">map_to_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">map_to_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build a RecordMap mapping this RecordSpecification to rowrecs</span>
 
-<span class="sd">        :param strict:</span>
 <span class="sd">        :return: RecordMap</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">map_from_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build a RecordMap mapping this RecordSpecification from rowrecs</span>
 
-<span class="sd">        :param strict:</span>
 <span class="sd">        :return: RecordMap</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_out</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_out</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -1125,28 +1106,26 @@
 
         
             <span class="def">def</span>
-            <span class="name">map_to_rows</span><span class="signature">(self, *, strict=False)</span>:
+            <span class="name">map_to_rows</span><span class="signature">(self)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">map_to_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">map_to_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build a RecordMap mapping this RecordSpecification to rowrecs</span>
 
-<span class="sd">        :param strict:</span>
 <span class="sd">        :return: RecordMap</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
             <div class="docstring"><p>Build a RecordMap mapping this RecordSpecification to rowrecs</p>
 
-<p>:param strict:
-:return: RecordMap</p>
+<p>:return: RecordMap</p>
 </div>
 
 
@@ -1165,19 +1144,17 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build a RecordMap mapping this RecordSpecification from rowrecs</span>
 
-<span class="sd">        :param strict:</span>
 <span class="sd">        :return: RecordMap</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_out</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_out</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
             <div class="docstring"><p>Build a RecordMap mapping this RecordSpecification from rowrecs</p>
 
-<p>:param strict:
-:return: RecordMap</p>
+<p>:return: RecordMap</p>
 </div>
 
 
@@ -1381,7 +1358,7 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">RecordMap</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">)</span>
             <span class="n">ck</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">blocks_in</span><span class="o">.</span><span class="n">content_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
@@ -1400,15 +1377,6 @@
             <span class="n">unknown</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">content_keys</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">content_keys</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unknown outgoing content_keys&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">unknown</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">strict</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">record_keys</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">record_keys</span><span class="p">):</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;record keys must match when using both blocks in and blocks out&quot;</span>
-                    <span class="p">)</span>
-                <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">content_keys</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">content_keys</span><span class="p">):</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;content keys must match when using both blocks in and blocks out&quot;</span>
-                    <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="o">=</span> <span class="n">blocks_in</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span> <span class="o">=</span> <span class="n">blocks_out</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1632,12 +1600,12 @@
                                         <div class="attr function"><a class="headerlink" href="#RecordMap.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">RecordMap</span><span class="signature">(*, blocks_in=None, blocks_out=None, strict=False)</span>
+            <span class="name">RecordMap</span><span class="signature">(*, blocks_in=None, blocks_out=None)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">)</span>
             <span class="n">ck</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">blocks_in</span><span class="o">.</span><span class="n">content_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
@@ -1656,15 +1624,6 @@
             <span class="n">unknown</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">content_keys</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">content_keys</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unknown outgoing content_keys&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">unknown</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">strict</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">record_keys</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">record_keys</span><span class="p">):</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;record keys must match when using both blocks in and blocks out&quot;</span>
-                    <span class="p">)</span>
-                <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">content_keys</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">content_keys</span><span class="p">):</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;content keys must match when using both blocks in and blocks out&quot;</span>
-                    <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="o">=</span> <span class="n">blocks_in</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span> <span class="o">=</span> <span class="n">blocks_out</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -2049,7 +2008,6 @@
     attribute_value_column,
     record_keys,
     record_value_columns,
-    strict=False,
     local_data_model=None
 )</span>:
     </div>
@@ -2062,7 +2020,6 @@
     <span class="n">attribute_value_column</span><span class="p">,</span>
     <span class="n">record_keys</span><span class="p">,</span>
     <span class="n">record_value_columns</span><span class="p">,</span>
-    <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -2072,7 +2029,6 @@
 <span class="sd">    :param attribute_value_column: column for record attribute values</span>
 <span class="sd">    :param record_keys: names of key columns identifying row record blocks</span>
 <span class="sd">    :param record_value_columns: names of columns to take row record values from</span>
-<span class="sd">    :param strict: logical, if True more checks on transform</span>
 <span class="sd">    :param local_data_model: data.frame data model</span>
 <span class="sd">    :return: RecordMap</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2089,10 +2045,9 @@
         <span class="n">control_table</span><span class="p">,</span>
         <span class="n">record_keys</span><span class="o">=</span><span class="n">record_keys</span><span class="p">,</span>
         <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">attribute_key_column</span><span class="p">],</span>
-        <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">,</span>
         <span class="n">local_data_model</span><span class="o">=</span><span class="n">local_data_model</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">map_to_rows</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">map_to_rows</span><span class="p">()</span>
 </pre></div>
 
         </details>
@@ -2103,7 +2058,6 @@
 :param attribute_value_column: column for record attribute values
 :param record_keys: names of key columns identifying row record blocks
 :param record_value_columns: names of columns to take row record values from
-:param strict: logical, if True more checks on transform
 :param local_data_model: data.frame data model
 :return: RecordMap</p>
 </div>
@@ -2121,7 +2075,6 @@
     attribute_value_column,
     record_keys,
     record_value_columns,
-    strict=False,
     local_data_model=None
 )</span>:
     </div>
@@ -2134,7 +2087,6 @@
     <span class="n">attribute_value_column</span><span class="p">,</span>
     <span class="n">record_keys</span><span class="p">,</span>
     <span class="n">record_value_columns</span><span class="p">,</span>
-    <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -2144,7 +2096,6 @@
 <span class="sd">    :param attribute_value_column: column for record attribute values</span>
 <span class="sd">    :param record_keys: names of key columns identifying row record blocks</span>
 <span class="sd">    :param record_value_columns: names of columns to take row record values from</span>
-<span class="sd">    :param strict: logical, if True more checks on transform</span>
 <span class="sd">    :param local_data_model: data.frame data model</span>
 <span class="sd">    :return: RecordMap</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2161,10 +2112,9 @@
         <span class="n">control_table</span><span class="p">,</span>
         <span class="n">record_keys</span><span class="o">=</span><span class="n">record_keys</span><span class="p">,</span>
         <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">attribute_key_column</span><span class="p">],</span>
-        <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">,</span>
         <span class="n">local_data_model</span><span class="o">=</span><span class="n">local_data_model</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">map_from_rows</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">map_from_rows</span><span class="p">()</span>
 </pre></div>
 
         </details>
@@ -2175,7 +2125,6 @@
 :param attribute_value_column: column for record attribute values
 :param record_keys: names of key columns identifying row record blocks
 :param record_value_columns: names of columns to take row record values from
-:param strict: logical, if True more checks on transform
 :param local_data_model: data.frame data model
 :return: RecordMap</p>
 </div>

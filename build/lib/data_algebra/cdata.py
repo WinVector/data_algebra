@@ -143,25 +143,23 @@ class RecordSpecification:
     def __str__(self):
         return self.fmt()
 
-    def map_to_rows(self, *, strict=False):
+    def map_to_rows(self):
         """
         Build a RecordMap mapping this RecordSpecification to rowrecs
 
-        :param strict:
         :return: RecordMap
         """
 
-        return RecordMap(blocks_in=self, strict=strict)
+        return RecordMap(blocks_in=self)
 
     def map_from_rows(self, *, strict=False):
         """
         Build a RecordMap mapping this RecordSpecification from rowrecs
 
-        :param strict:
         :return: RecordMap
         """
 
-        return RecordMap(blocks_out=self, strict=strict)
+        return RecordMap(blocks_out=self)
 
 
 def blocks_to_rowrecs(data, *, blocks_in, local_data_model=None):
@@ -315,7 +313,7 @@ def rowrecs_to_blocks(
 
 
 class RecordMap:
-    def __init__(self, *, blocks_in=None, blocks_out=None, strict=False):
+    def __init__(self, *, blocks_in=None, blocks_out=None):
         if blocks_in is not None:
             assert isinstance(blocks_in, data_algebra.cdata.RecordSpecification)
             ck = [k for k in blocks_in.content_keys if k is not None]
@@ -334,15 +332,6 @@ class RecordMap:
             unknown = set(blocks_out.content_keys) - set(blocks_in.content_keys)
             if len(unknown) > 0:
                 raise ValueError("unknown outgoing content_keys" + str(unknown))
-            if strict:
-                if set(blocks_in.record_keys) != set(blocks_out.record_keys):
-                    raise ValueError(
-                        "record keys must match when using both blocks in and blocks out"
-                    )
-                if set(blocks_in.content_keys) != set(blocks_out.content_keys):
-                    raise ValueError(
-                        "content keys must match when using both blocks in and blocks out"
-                    )
         self.blocks_in = blocks_in
         self.blocks_out = blocks_out
         if self.blocks_in is not None:
@@ -564,7 +553,6 @@ def pivot_blocks_to_rowrecs(
     attribute_value_column,
     record_keys,
     record_value_columns,
-    strict=False,
     local_data_model=None
 ):
     """
@@ -574,7 +562,6 @@ def pivot_blocks_to_rowrecs(
     :param attribute_value_column: column for record attribute values
     :param record_keys: names of key columns identifying row record blocks
     :param record_value_columns: names of columns to take row record values from
-    :param strict: logical, if True more checks on transform
     :param local_data_model: data.frame data model
     :return: RecordMap
     """
@@ -591,10 +578,9 @@ def pivot_blocks_to_rowrecs(
         control_table,
         record_keys=record_keys,
         control_table_keys=[attribute_key_column],
-        strict=strict,
         local_data_model=local_data_model,
     )
-    return ct.map_to_rows(strict=strict)
+    return ct.map_to_rows()
 
 
 def pivot_rowrecs_to_blocks(
@@ -603,7 +589,6 @@ def pivot_rowrecs_to_blocks(
     attribute_value_column,
     record_keys,
     record_value_columns,
-    strict=False,
     local_data_model=None
 ):
     """
@@ -613,7 +598,6 @@ def pivot_rowrecs_to_blocks(
     :param attribute_value_column: column for record attribute values
     :param record_keys: names of key columns identifying row record blocks
     :param record_value_columns: names of columns to take row record values from
-    :param strict: logical, if True more checks on transform
     :param local_data_model: data.frame data model
     :return: RecordMap
     """
@@ -630,7 +614,6 @@ def pivot_rowrecs_to_blocks(
         control_table,
         record_keys=record_keys,
         control_table_keys=[attribute_key_column],
-        strict=strict,
         local_data_model=local_data_model,
     )
-    return ct.map_from_rows(strict=strict)
+    return ct.map_from_rows()
