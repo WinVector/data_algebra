@@ -150,7 +150,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param control_table: data.frame describing record layout</span>
 <span class="sd">        :param record_keys: array of record key column names</span>
-<span class="sd">        :param control_table_keys: array of control_table key column names</span>
+<span class="sd">               defaults to no columns.</span>
+<span class="sd">        :param control_table_keys: array of control_table key column names,</span>
+<span class="sd">               defaults to first column for non-trivial blocks and no columns for rows.</span>
 <span class="sd">        :param strict: logical, if True more checks on transform</span>
 <span class="sd">        :param local_data_model: data.frame data model</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -161,18 +163,22 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;control table should have at least 1 row&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;control table columns should be unique&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">control_table</span> <span class="o">=</span> <span class="n">control_table</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_table</span> <span class="o">=</span> <span class="n">control_table</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_table</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="n">record_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">record_keys</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">record_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">record_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">record_keys</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">record_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">record_keys</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">control_table_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">control_table_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">control_table_keys</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must have at least one control table key&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_table</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">control_table_keys</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">control_table_keys</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># single row records don&#39;t need to be keyed</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">control_table_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">control_table_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">control_table_keys</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">control_table</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">control_table_keys</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;multi-row records must have at least one control table key&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">control_table_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">control_table_keys</span><span class="p">]</span>
         <span class="n">unknown</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">control_table_keys</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -788,7 +794,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param control_table: data.frame describing record layout</span>
 <span class="sd">        :param record_keys: array of record key column names</span>
-<span class="sd">        :param control_table_keys: array of control_table key column names</span>
+<span class="sd">               defaults to no columns.</span>
+<span class="sd">        :param control_table_keys: array of control_table key column names,</span>
+<span class="sd">               defaults to first column for non-trivial blocks and no columns for rows.</span>
 <span class="sd">        :param strict: logical, if True more checks on transform</span>
 <span class="sd">        :param local_data_model: data.frame data model</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -799,18 +807,22 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;control table should have at least 1 row&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;control table columns should be unique&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">control_table</span> <span class="o">=</span> <span class="n">control_table</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_table</span> <span class="o">=</span> <span class="n">control_table</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_table</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="n">record_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">record_keys</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">record_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">record_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">record_keys</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">record_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">record_keys</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">control_table_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">control_table_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">control_table_keys</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must have at least one control table key&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_table</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">control_table_keys</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">control_table_keys</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># single row records don&#39;t need to be keyed</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">control_table_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">control_table_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">control_table_keys</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">control_table</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">control_table_keys</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;multi-row records must have at least one control table key&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">control_table_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">control_table_keys</span><span class="p">]</span>
         <span class="n">unknown</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">control_table_keys</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -958,7 +970,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param control_table: data.frame describing record layout</span>
 <span class="sd">        :param record_keys: array of record key column names</span>
-<span class="sd">        :param control_table_keys: array of control_table key column names</span>
+<span class="sd">               defaults to no columns.</span>
+<span class="sd">        :param control_table_keys: array of control_table key column names,</span>
+<span class="sd">               defaults to first column for non-trivial blocks and no columns for rows.</span>
 <span class="sd">        :param strict: logical, if True more checks on transform</span>
 <span class="sd">        :param local_data_model: data.frame data model</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -969,18 +983,22 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;control table should have at least 1 row&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;control table columns should be unique&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">control_table</span> <span class="o">=</span> <span class="n">control_table</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_table</span> <span class="o">=</span> <span class="n">control_table</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_table</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="n">record_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">record_keys</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">record_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">record_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">record_keys</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">record_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">record_keys</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">control_table_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">control_table_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">control_table_keys</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must have at least one control table key&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_table</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">control_table_keys</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">control_table_keys</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># single row records don&#39;t need to be keyed</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">control_table_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">control_table_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">control_table_keys</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">control_table</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">control_table_keys</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;multi-row records must have at least one control table key&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">control_table_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">control_table_keys</span><span class="p">]</span>
         <span class="n">unknown</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">control_table_keys</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">control_table</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -1029,7 +1047,9 @@
 
             <div class="docstring"><p>:param control_table: data.frame describing record layout
 :param record_keys: array of record key column names
-:param control_table_keys: array of control_table key column names
+       defaults to no columns.
+:param control_table_keys: array of control_table key column names,
+       defaults to first column for non-trivial blocks and no columns for rows.
 :param strict: logical, if True more checks on transform
 :param local_data_model: data.frame data model</p>
 </div>
