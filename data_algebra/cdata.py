@@ -22,7 +22,9 @@ class RecordSpecification:
         """
         :param control_table: data.frame describing record layout
         :param record_keys: array of record key column names
-        :param control_table_keys: array of control_table key column names
+               defaults to no columns.
+        :param control_table_keys: array of control_table key column names,
+               defaults to first column for non-trivial blocks and no columns for rows.
         :param strict: logical, if True more checks on transform
         :param local_data_model: data.frame data model
         """
@@ -33,18 +35,22 @@ class RecordSpecification:
             raise ValueError("control table should have at least 1 row")
         if len(control_table.columns) != len(set(control_table.columns)):
             raise ValueError("control table columns should be unique")
-        self.control_table = control_table.reset_index(drop=True)
+        self.control_table = control_table.reset_index(drop=True, inplace=False)
+        assert self.control_table.shape[0] > 0
         if record_keys is None:
             record_keys = []
         if isinstance(record_keys, str):
             record_keys = [record_keys]
         self.record_keys = [k for k in record_keys]
         if control_table_keys is None:
-            control_table_keys = [control_table.columns[0]]
-        if len(control_table_keys) <= 0:
-            raise ValueError("must have at least one control table key")
+            if self.control_table.shape[0] > 1:
+                control_table_keys = [self.control_table.columns[0]]
+            else:
+                control_table_keys = []  # single row records don't need to be keyed
         if isinstance(control_table_keys, str):
             control_table_keys = [control_table_keys]
+        if (self.control_table.shape[0] != 1) and (len(control_table_keys) <= 0):
+            raise ValueError("multi-row records must have at least one control table key")
         self.control_table_keys = [k for k in control_table_keys]
         unknown = set(self.control_table_keys) - set(control_table.columns)
         if len(unknown) > 0:
