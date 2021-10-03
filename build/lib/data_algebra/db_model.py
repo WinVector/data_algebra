@@ -1478,17 +1478,35 @@ class DBModel:
         assert isinstance(sql_format_options, SQLFormatOptions)
         if isinstance(source_sql, str):
             source_sql = [source_sql]
+        assert record_spec.control_table.shape[0] >= 1
+        col_stmts = []
+        for c in record_spec.record_keys:
+            col_stmts.append(
+                " " + self.quote_identifier(c) + " AS " + self.quote_identifier(c)
+            )
+        if record_spec.control_table.shape[0] == 1:
+            # special case with one row control table (rowrec)
+            for cc in record_spec.control_table.columns:
+                cc0 = record_spec.control_table[cc][0]
+                col_stmts.append(
+                    " " + self.quote_identifier(cc) + " AS " + self.quote_identifier(cc0)
+                )
+            sql = (
+                    "SELECT\n"
+                    + _str_join_expecting_list(",\n", col_stmts)
+                    + "\n"
+                    + "FROM (\n  "
+                    + _str_join_expecting_list("\n", source_sql)
+                    + "\n"
+                    + " ) a\n"
+            )
+            return sql
         control_value_cols = [
             c
             for c in record_spec.control_table.columns
             if c not in record_spec.control_table_keys
         ]
         control_cols = [self.quote_identifier(c) for c in record_spec.record_keys]
-        col_stmts = []
-        for c in record_spec.record_keys:
-            col_stmts.append(
-                " " + self.quote_identifier(c) + " AS " + self.quote_identifier(c)
-            )
         seen = set()
         for i in range(record_spec.control_table.shape[0]):
             for vc in control_value_cols:
