@@ -9,6 +9,8 @@ from data_algebra.cdata import *
 def test_one_row_cdata_convert():
     # test some conversions related to:
     # https://github.com/WinVector/data_algebra/blob/main/Examples/GettingStarted/solving_problems_using_data_algebra.ipynb
+    # Note: in converting to row recs we currently prefer no table for the single row case, but
+    # making sure this case works on all code paths.
     a = data_algebra.default_data_model.pd.DataFrame({
         'group': ['a', 'a'],
         'sensor': ['s1', 's2'],
@@ -43,6 +45,8 @@ def test_one_row_cdata_convert():
     )
     f_a = record_map.transform(a)
     assert data_algebra.test_util.equivalent_frames(b, f_a)
+    f_b = record_map.inverse().transform(b)
+    assert data_algebra.test_util.equivalent_frames(a, f_b)
 
     # explicit output row version
     record_map_e = RecordMap(
@@ -58,6 +62,8 @@ def test_one_row_cdata_convert():
     )
     f_a_e = record_map_e.transform(a)
     assert data_algebra.test_util.equivalent_frames(b, f_a_e)
+    f_b_e = record_map_e.inverse().transform(b)
+    assert data_algebra.test_util.equivalent_frames(a, f_b_e)
 
     # explicit output row version, 2
     record_map_e2 = RecordMap(
@@ -72,5 +78,38 @@ def test_one_row_cdata_convert():
     )
     f_a_e2 = record_map_e2.transform(a)
     assert data_algebra.test_util.equivalent_frames(b, f_a_e2)
+    f_b_e2 = record_map_e2.inverse().transform(b)
+    assert data_algebra.test_util.equivalent_frames(a, f_b_e2)
 
-    # TODO: test inverses and DB paths
+    # test db paths
+
+    ops1 = describe_table(a, table_name="a").convert_records(record_map)
+    data_algebra.test_util.check_transform(
+        ops=ops1, data=a, expect=b
+    )
+    ops1_r = describe_table(b, table_name="b").convert_records(record_map.inverse())
+    data_algebra.test_util.check_transform(
+        ops=ops1_r, data=b, expect=a
+    )
+
+    ops1_e = describe_table(a, table_name="a").convert_records(record_map_e)
+    data_algebra.test_util.check_transform(
+        ops=ops1_e, data=a, expect=b
+    )
+    ops1_e_r = describe_table(b, table_name="b").convert_records(record_map_e.inverse())
+    data_algebra.test_util.check_transform(
+        ops=ops1_e_r, data=b, expect=a
+    )
+
+    ops1_e2 = describe_table(a, table_name="a").convert_records(record_map_e2)
+    data_algebra.test_util.check_transform(
+        ops=ops1_e2, data=a, expect=b
+    )
+    ops1_e2_r = describe_table(b, table_name="b").convert_records(record_map_e2.inverse())
+    data_algebra.test_util.check_transform(
+        ops=ops1_e2_r, data=b, expect=a
+    )
+
+
+
+
