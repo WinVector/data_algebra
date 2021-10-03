@@ -49,14 +49,20 @@ class RecordSpecification:
                 control_table_keys = []  # single row records don't need to be keyed
         if isinstance(control_table_keys, str):
             control_table_keys = [control_table_keys]
-        if (self.control_table.shape[0] != 1) and (len(control_table_keys) <= 0):
-            raise ValueError("multi-row records must have at least one control table key")
+        if self.control_table.shape[0] == 1:
+            if len(control_table_keys) > 0:
+                raise ValueError("signle-row records must not have control table keys")
+        else:
+            if len(control_table_keys) <= 0:
+                raise ValueError("multi-row records must have at least one control table key")
         self.control_table_keys = [k for k in control_table_keys]
         unknown = set(self.control_table_keys) - set(control_table.columns)
         if len(unknown) > 0:
             raise ValueError(
                 "control table keys that are not in the control table: " + str(unknown)
             )
+        if len(self.control_table_keys) >= control_table.shape[1]:
+            raise ValueError("control table columns must not all be keys")
         confused = set(record_keys).intersection(control_table_keys)
         if len(confused) > 0:
             raise ValueError(
