@@ -189,6 +189,38 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         d.to_sql(name=table_name, con=conn, index=False)
 
 
+    def natural_join_to_sql(
+        self, join_node, *, using=None, temp_id_source=None, sql_format_options=None
+    ):
+        if join_node.node_name != "NaturalJoinNode":
+            raise TypeError(
+                "Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)"
+            )
+        if temp_id_source is None:
+            temp_id_source = [0]
+        if join_node.jointype == 'RIGHT':
+            # convert to left to avoid SQLite not having a right jone
+            join_node_copy = join_node.copy()
+            join_node_copy.sources = [join_node.sources[1], join_node.soures[0]]
+            return data_algebra.db_model.DBModel.natural_join_to_sql(
+                self,
+                join_node=join_node_copy,
+                using=using,
+                temp_id_source=temp_id_source,
+                sql_format_options=sql_format_options
+            )
+        if join_node.jointype == 'FULL':
+            raise ValueError("FULL join not implemented from SQLite")
+        # delegate back to parent class
+        return data_algebra.db_model.DBModel.natural_join_to_sql(
+            self,
+            join_node=join_node,
+            using=using,
+            temp_id_source=temp_id_source,
+            sql_format_options=sql_format_options
+        )
+
+
 def example_handle():
     """
     Return an example db handle for testing. Returns None if helper packages not present.

@@ -9,6 +9,7 @@ from data_algebra.data_ops import *
 from data_algebra.cdata import *
 import data_algebra.test_util
 import data_algebra.util
+import data_algebra.SQLite
 
 
 def test_compare_data_frames():
@@ -67,6 +68,10 @@ def test_compare_data_frames():
         })
 
     assert data_algebra.test_util.equivalent_frames(res, expect)
+
+    # sqlite_handle = data_algebra.SQLite.example_handle()
+    # print(sqlite_handle.to_sql(summary_ops))
+    # sqlite_handle.close()
 
     # ops2 = (
     #     summary_ops
