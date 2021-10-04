@@ -190,6 +190,34 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         # it refers to sqlite_master
         d.to_sql(name=table_name, con=conn, index=False)
 
+    def _emit_right_join_as_left_join(
+        self, join_node, *, using=None, temp_id_source, sql_format_options=None
+    ):
+        assert join_node.node_name == "NaturalJoinNode"
+        assert join_node.jointype == 'RIGHT'
+        # convert to left to avoid SQLite not having a right jone
+        join_node_copy_right = copy.copy(join_node)
+        join_node_copy_right.jointype = 'LEFT'
+        join_node_copy_right.sources = [join_node.sources[1], join_node.sources[0]]
+        near_sql_right = data_algebra.db_model.DBModel.natural_join_to_sql(
+            self,
+            join_node=join_node_copy_right,
+            using=using,
+            temp_id_source=temp_id_source,
+            sql_format_options=sql_format_options
+        )
+        return near_sql_right
+
+    def _emit_full_join_as_complex(
+        self, join_node, *, using=None, temp_id_source, sql_format_options=None
+    ):
+        assert join_node.node_name == "NaturalJoinNode"
+        assert join_node.jointype == 'FULL'
+        raise ValueError("FULL join not implemented from SQLite")
+        # plan:
+        #  1) build a shared key table by aggregating both tables by join keys
+        #     and then union-all them (may need to special case no key case).
+        #  2) left join keys on left table, then left join that on right table
 
     def natural_join_to_sql(
         self, join_node, *, using=None, temp_id_source=None, sql_format_options=None
@@ -200,35 +228,18 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             )
         if temp_id_source is None:
             temp_id_source = [0]
-        if join_node.jointype in {'RIGHT', 'FULL'}:
-            # convert to left to avoid SQLite not having a right jone
-            join_node_copy_right = copy.copy(join_node)
-            join_node_copy_right.jointype = 'LEFT'
-            join_node_copy_right.sources = [join_node.sources[1], join_node.sources[0]]
-            near_sql_right = data_algebra.db_model.DBModel.natural_join_to_sql(
-                self,
-                join_node=join_node_copy_right,
+        if join_node.jointype == 'RIGHT':
+            return self._emit_right_join_as_left_join(
+                join_node,
                 using=using,
                 temp_id_source=temp_id_source,
-                sql_format_options=sql_format_options
-            )
-            if join_node.jointype == 'RIGHT':
-                return near_sql_right
-            # FULL JOIN
-            # use strategy of coalescing a left join with a right join
-            # and aggregating to get the full key-set.
-            # ref: https://www.sqlitetutorial.net/sqlite-full-outer-join/
-            # Then left join sources twice.
-            join_node_copy_left = copy.copy(join_node)
-            join_node_copy_left.jointype = 'LEFT'
-            near_sql_left = data_algebra.db_model.DBModel.natural_join_to_sql(
-                self,
-                join_node=join_node_copy_left,
+                sql_format_options=sql_format_options)
+        if join_node.jointype == 'FULL':
+            return self._emit_full_join_as_complex(
+                join_node,
                 using=using,
                 temp_id_source=temp_id_source,
-                sql_format_options=sql_format_options
-            )
-            raise ValueError("FULL join not implemented from SQLite")
+                sql_format_options=sql_format_options)
         # delegate back to parent class
         return data_algebra.db_model.DBModel.natural_join_to_sql(
             self,
