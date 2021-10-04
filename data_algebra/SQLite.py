@@ -204,7 +204,8 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             join_node=join_node_copy_right,
             using=using,
             temp_id_source=temp_id_source,
-            sql_format_options=sql_format_options
+            sql_format_options=sql_format_options,
+            left_is_first=False,
         )
         return near_sql_right
 
@@ -220,12 +221,13 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         #  2) left join keys on left table, then left join that on right table
 
     def natural_join_to_sql(
-        self, join_node, *, using=None, temp_id_source=None, sql_format_options=None
+        self, join_node, *, using=None, temp_id_source=None, sql_format_options=None, left_is_first=True
     ):
         if join_node.node_name != "NaturalJoinNode":
             raise TypeError(
                 "Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)"
             )
+        assert left_is_first
         if temp_id_source is None:
             temp_id_source = [0]
         if join_node.jointype == 'RIGHT':
@@ -246,7 +248,8 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             join_node=join_node,
             using=using,
             temp_id_source=temp_id_source,
-            sql_format_options=sql_format_options
+            sql_format_options=sql_format_options,
+            left_is_first=left_is_first,
         )
 
 

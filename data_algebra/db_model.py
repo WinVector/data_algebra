@@ -1163,7 +1163,7 @@ class DBModel:
         )
         return near_sql
 
-    def _coalesce_terms(self, *, sub_view_name_left, sub_view_name_right, cols):
+    def _coalesce_terms(self, *, sub_view_name_first, sub_view_name_second, cols):
         coalesce_formatter = self.sql_formatters["coalesce"]
 
         class PseudoExpression:
@@ -1175,8 +1175,8 @@ class DBModel:
                 self,
                 PseudoExpression(
                     [
-                        sub_view_name_left + "." + self.quote_identifier(ci),
-                        sub_view_name_right + "." + self.quote_identifier(ci),
+                        sub_view_name_first + "." + self.quote_identifier(ci),
+                        sub_view_name_second + "." + self.quote_identifier(ci),
                     ]
                 ),
             )
@@ -1185,7 +1185,7 @@ class DBModel:
         return terms
 
     def natural_join_to_sql(
-        self, join_node, *, using=None, temp_id_source=None, sql_format_options=None
+        self, join_node, *, using=None, temp_id_source=None, sql_format_options=None, left_is_first=True
     ):
         if join_node.node_name != "NaturalJoinNode":
             raise TypeError(
@@ -1215,11 +1215,18 @@ class DBModel:
         view_name = "natural_join_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         common = using_left.intersection(using_right)
-        terms = self._coalesce_terms(
-            sub_view_name_left=sub_view_name_left,
-            sub_view_name_right=sub_view_name_right,
-            cols=[ci for ci in common if ci in using],
-        )
+        if left_is_first:
+            terms = self._coalesce_terms(
+                sub_view_name_first=sub_view_name_left,
+                sub_view_name_second=sub_view_name_right,
+                cols=[ci for ci in common if ci in using],
+            )
+        else:
+            terms = self._coalesce_terms(
+                sub_view_name_first=sub_view_name_right,
+                sub_view_name_second=sub_view_name_left,
+                cols=[ci for ci in common if ci in using],
+            )
         terms.update({ci: None for ci in using_left - common})
         terms.update({ci: None for ci in using_right - common})
         on_terms = []
