@@ -201,6 +201,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         if join_node.jointype == 'RIGHT':
             # convert to left to avoid SQLite not having a right jone
             join_node_copy = join_node.copy()
+            join_node_copy.jointype = 'LEFT'
             join_node_copy.sources = [join_node.sources[1], join_node.soures[0]]
             return data_algebra.db_model.DBModel.natural_join_to_sql(
                 self,
