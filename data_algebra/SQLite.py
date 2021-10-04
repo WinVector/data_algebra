@@ -1,4 +1,6 @@
+
 import math
+import copy
 import numpy
 import numbers
 
@@ -200,9 +202,9 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             temp_id_source = [0]
         if join_node.jointype in {'RIGHT', 'FULL'}:
             # convert to left to avoid SQLite not having a right jone
-            join_node_copy_right = join_node.copy()
+            join_node_copy_right = copy.copy(join_node)
             join_node_copy_right.jointype = 'LEFT'
-            join_node_copy_right.sources = [join_node.sources[1], join_node.soures[0]]
+            join_node_copy_right.sources = [join_node.sources[1], join_node.sources[0]]
             near_sql_right = data_algebra.db_model.DBModel.natural_join_to_sql(
                 self,
                 join_node=join_node_copy_right,
@@ -216,7 +218,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             # use strategy of coalescing a left join with a right join
             # and then aggregate the rows
             # ref: https://www.sqlitetutorial.net/sqlite-full-outer-join/
-            join_node_copy_left = join_node.copy()
+            join_node_copy_left = copy.copy(join_node)
             join_node_copy_left.jointype = 'LEFT'
             near_sql_left = data_algebra.db_model.DBModel.natural_join_to_sql(
                 self,
