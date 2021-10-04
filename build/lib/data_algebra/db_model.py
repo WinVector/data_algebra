@@ -474,7 +474,6 @@ class DBModel:
     on_joiner: str
     drop_text: str
     string_type: str
-    join_name_map: dict
     supports_with: bool
     allow_extend_merges: bool
     default_SQL_format_options: SQLFormatOptions
@@ -494,7 +493,6 @@ class DBModel:
         on_joiner="AND",
         drop_text="DROP TABLE",
         string_type="VARCHAR",
-        join_name_map=None,
         supports_with=True,
         allow_extend_merges=True,
         default_SQL_format_options=None,
@@ -521,9 +519,6 @@ class DBModel:
         self.on_joiner = on_joiner
         self.drop_text = drop_text
         self.string_type = string_type
-        if join_name_map is None:
-            join_name_map = {}
-        self.join_name_map = join_name_map.copy()
         if default_SQL_format_options is None:
             default_SQL_format_options = SQLFormatOptions()
         assert isinstance(default_SQL_format_options, SQLFormatOptions)
@@ -1246,12 +1241,6 @@ class DBModel:
             if (self.on_end is not None) and (len(self.on_end) > 0):
                 on_terms = on_terms + [self.on_end]
         jointype = join_node.jointype
-        try:
-            jointype = self.join_name_map[
-                jointype
-            ]  # TODO: maybe move this mapping earlier
-        except KeyError:
-            pass
         near_sql = data_algebra.near_sql.NearSQLBinaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),

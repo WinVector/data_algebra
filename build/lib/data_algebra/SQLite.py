@@ -1,4 +1,6 @@
+
 import math
+import copy
 import numpy
 import numbers
 
@@ -187,6 +189,53 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         # Note: the Pandas to_sql() method appears to have SQLite hard-wired into it
         # it refers to sqlite_master
         d.to_sql(name=table_name, con=conn, index=False)
+
+
+    def natural_join_to_sql(
+        self, join_node, *, using=None, temp_id_source=None, sql_format_options=None
+    ):
+        if join_node.node_name != "NaturalJoinNode":
+            raise TypeError(
+                "Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)"
+            )
+        if temp_id_source is None:
+            temp_id_source = [0]
+        if join_node.jointype in {'RIGHT', 'FULL'}:
+            # convert to left to avoid SQLite not having a right jone
+            join_node_copy_right = copy.copy(join_node)
+            join_node_copy_right.jointype = 'LEFT'
+            join_node_copy_right.sources = [join_node.sources[1], join_node.sources[0]]
+            near_sql_right = data_algebra.db_model.DBModel.natural_join_to_sql(
+                self,
+                join_node=join_node_copy_right,
+                using=using,
+                temp_id_source=temp_id_source,
+                sql_format_options=sql_format_options
+            )
+            if join_node.jointype == 'RIGHT':
+                return near_sql_right
+            # FULL JOIN
+            # use strategy of coalescing a left join with a right join
+            # and then aggregate the rows
+            # ref: https://www.sqlitetutorial.net/sqlite-full-outer-join/
+            join_node_copy_left = copy.copy(join_node)
+            join_node_copy_left.jointype = 'LEFT'
+            near_sql_left = data_algebra.db_model.DBModel.natural_join_to_sql(
+                self,
+                join_node=join_node_copy_left,
+                using=using,
+                temp_id_source=temp_id_source,
+                sql_format_options=sql_format_options
+            )
+            raise ValueError("FULL join not implemented from SQLite")
+        # delegate back to parent class
+        return data_algebra.db_model.DBModel.natural_join_to_sql(
+            self,
+            join_node=join_node,
+            using=using,
+            temp_id_source=temp_id_source,
+            sql_format_options=sql_format_options
+        )
 
 
 def example_handle():
