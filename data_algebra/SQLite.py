@@ -216,8 +216,9 @@ class SQLiteModel(data_algebra.db_model.DBModel):
                 return near_sql_right
             # FULL JOIN
             # use strategy of coalescing a left join with a right join
-            # and then aggregate the rows
+            # and aggregating to get the full key-set.
             # ref: https://www.sqlitetutorial.net/sqlite-full-outer-join/
+            # Then left join sources twice.
             join_node_copy_left = copy.copy(join_node)
             join_node_copy_left.jointype = 'LEFT'
             near_sql_left = data_algebra.db_model.DBModel.natural_join_to_sql(
