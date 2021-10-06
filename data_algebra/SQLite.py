@@ -10,6 +10,9 @@ import data_algebra.util
 import data_algebra.db_model
 import data_algebra.data_ops
 
+import data_algebra.near_sql
+from data_algebra.data_ops import *
+
 
 # map from op-name to special SQL formatting code
 
@@ -214,6 +217,49 @@ class SQLiteModel(data_algebra.db_model.DBModel):
     ):
         assert join_node.node_name == "NaturalJoinNode"
         assert join_node.jointype == 'FULL'
+        assert len(join_node.by) > 0  # could special case zero case later
+        if temp_id_source is None:
+            temp_id_source = [0]
+        if using is None:
+            using = join_node.column_set
+        using_left, sql_left, using_right, sql_right = self.natural_join_sub_queries(
+            join_node=join_node, using=using, temp_id_source=temp_id_source
+        )
+        assert isinstance(
+            sql_left,
+            (data_algebra.near_sql.NearSQLCommonTableExpression, data_algebra.near_sql.NearSQLTable))
+        assert isinstance(
+            sql_right,
+            (data_algebra.near_sql.NearSQLCommonTableExpression, data_algebra.near_sql.NearSQLTable))
+        join_columns = join_node.by
+        left_descr = TableDescription(
+            table_name=sql_left.quoted_query_name,
+            column_names=join_node.sources[0].column_names
+        )
+        right_descr = TableDescription(
+            table_name=sql_right.quoted_query_name,
+            column_names=join_node.sources[1].column_names
+        )
+        ops_simulate = (
+            # get shared key set
+            left_descr
+                .project({}, group_by=join_columns)
+                .concat_rows(
+                    b=right_descr
+                        .project({}, group_by=join_columns),
+                    id_column=None,
+                )
+                .project({}, group_by=join_columns)
+                # simulate full join with left joins
+                .natural_join(
+                    b=left_descr,
+                    by=join_columns,
+                    jointype='left')
+                .natural_join(
+                    b=right_descr,
+                    by=join_columns,
+                    jointype='left')
+        )
         raise ValueError("FULL join not implemented for SQLite")
         # plan:
         #  1) build a shared key table by aggregating both tables by join keys
