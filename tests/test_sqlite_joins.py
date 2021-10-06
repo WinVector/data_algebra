@@ -78,13 +78,13 @@ def test_sqlite_joins_simulate_full_join():
         'v2': [1, None, 2],
     })
 
-    grouping_columns = ['g']
+    join_columns = ['g']
 
     ops = (
         descr(d1=d1)
             .natural_join(
             b=descr(d2=d2),
-            by=grouping_columns,
+            by=join_columns,
             jointype='full')
     )
 
@@ -93,22 +93,22 @@ def test_sqlite_joins_simulate_full_join():
     ops_simulate = (
         # get shared key set
         descr(d1=d1)
-            .project({}, group_by=grouping_columns)
-            .concat_rows(
-            b=descr(d2=d2)
-                .project({}, group_by=grouping_columns),
-            id_column=None,
-        )
-            .project({}, group_by=grouping_columns)
+            .project({}, group_by=join_columns)
+                .concat_rows(
+                b=descr(d2=d2)
+                    .project({}, group_by=join_columns),
+                id_column=None,
+            )
+            .project({}, group_by=join_columns)
             # simulate full join with left joins
             .natural_join(
-            b=descr(d1=d1),
-            by=grouping_columns,
-            jointype='left')
-            .natural_join(
-            b=descr(d2=d2),
-            by=grouping_columns,
-            jointype='left')
+                b=descr(d1=d1),
+                by=join_columns,
+                jointype='left')
+                .natural_join(
+                b=descr(d2=d2),
+                by=join_columns,
+                jointype='left')
     )
 
     data_algebra.test_util.check_transform(
