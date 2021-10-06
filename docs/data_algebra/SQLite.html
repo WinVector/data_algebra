@@ -275,51 +275,66 @@
         <span class="c1"># it refers to sqlite_master</span>
         <span class="n">d</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span> <span class="n">con</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">_emit_right_join_as_left_join</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="k">assert</span> <span class="n">join_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;NaturalJoinNode&quot;</span>
+        <span class="k">assert</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">==</span> <span class="s1">&#39;RIGHT&#39;</span>
+        <span class="c1"># convert to left to avoid SQLite not having a right jone</span>
+        <span class="n">join_node_copy_right</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">join_node</span><span class="p">)</span>
+        <span class="n">join_node_copy_right</span><span class="o">.</span><span class="n">jointype</span> <span class="o">=</span> <span class="s1">&#39;LEFT&#39;</span>
+        <span class="n">join_node_copy_right</span><span class="o">.</span><span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">near_sql_right</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">join_node</span><span class="o">=</span><span class="n">join_node_copy_right</span><span class="p">,</span>
+            <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
+            <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
+            <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
+            <span class="n">left_is_first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">near_sql_right</span>
+
+    <span class="k">def</span> <span class="nf">_emit_full_join_as_complex</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="k">assert</span> <span class="n">join_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;NaturalJoinNode&quot;</span>
+        <span class="k">assert</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">==</span> <span class="s1">&#39;FULL&#39;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;FULL join not implemented for SQLite&quot;</span><span class="p">)</span>
+        <span class="c1"># plan:</span>
+        <span class="c1">#  1) build a shared key table by aggregating both tables by join keys</span>
+        <span class="c1">#     and then union-all them (may need to special case no key case).</span>
+        <span class="c1">#  2) left join keys on left table, then left join that on right table</span>
 
     <span class="k">def</span> <span class="nf">natural_join_to_sql</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">left_is_first</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)&quot;</span>
             <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">left_is_first</span>
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;RIGHT&#39;</span><span class="p">,</span> <span class="s1">&#39;FULL&#39;</span><span class="p">}:</span>
-            <span class="c1"># convert to left to avoid SQLite not having a right jone</span>
-            <span class="n">join_node_copy_right</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">join_node</span><span class="p">)</span>
-            <span class="n">join_node_copy_right</span><span class="o">.</span><span class="n">jointype</span> <span class="o">=</span> <span class="s1">&#39;LEFT&#39;</span>
-            <span class="n">join_node_copy_right</span><span class="o">.</span><span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-            <span class="n">near_sql_right</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
-                <span class="bp">self</span><span class="p">,</span>
-                <span class="n">join_node</span><span class="o">=</span><span class="n">join_node_copy_right</span><span class="p">,</span>
+        <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">==</span> <span class="s1">&#39;RIGHT&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emit_right_join_as_left_join</span><span class="p">(</span>
+                <span class="n">join_node</span><span class="p">,</span>
                 <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
                 <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
-                <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">==</span> <span class="s1">&#39;RIGHT&#39;</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">near_sql_right</span>
-            <span class="c1"># FULL JOIN</span>
-            <span class="c1"># use strategy of coalescing a left join with a right join</span>
-            <span class="c1"># and then aggregate the rows</span>
-            <span class="c1"># ref: https://www.sqlitetutorial.net/sqlite-full-outer-join/</span>
-            <span class="n">join_node_copy_left</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">join_node</span><span class="p">)</span>
-            <span class="n">join_node_copy_left</span><span class="o">.</span><span class="n">jointype</span> <span class="o">=</span> <span class="s1">&#39;LEFT&#39;</span>
-            <span class="n">near_sql_left</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
-                <span class="bp">self</span><span class="p">,</span>
-                <span class="n">join_node</span><span class="o">=</span><span class="n">join_node_copy_left</span><span class="p">,</span>
+                <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">==</span> <span class="s1">&#39;FULL&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emit_full_join_as_complex</span><span class="p">(</span>
+                <span class="n">join_node</span><span class="p">,</span>
                 <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
                 <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
-                <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
-            <span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;FULL join not implemented from SQLite&quot;</span><span class="p">)</span>
+                <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">)</span>
         <span class="c1"># delegate back to parent class</span>
         <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">join_node</span><span class="o">=</span><span class="n">join_node</span><span class="p">,</span>
             <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
-            <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
+            <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
+            <span class="n">left_is_first</span><span class="o">=</span><span class="n">left_is_first</span><span class="p">,</span>
         <span class="p">)</span>
 
 
@@ -570,51 +585,66 @@
         <span class="c1"># it refers to sqlite_master</span>
         <span class="n">d</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span> <span class="n">con</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">_emit_right_join_as_left_join</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="k">assert</span> <span class="n">join_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;NaturalJoinNode&quot;</span>
+        <span class="k">assert</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">==</span> <span class="s1">&#39;RIGHT&#39;</span>
+        <span class="c1"># convert to left to avoid SQLite not having a right jone</span>
+        <span class="n">join_node_copy_right</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">join_node</span><span class="p">)</span>
+        <span class="n">join_node_copy_right</span><span class="o">.</span><span class="n">jointype</span> <span class="o">=</span> <span class="s1">&#39;LEFT&#39;</span>
+        <span class="n">join_node_copy_right</span><span class="o">.</span><span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">near_sql_right</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">join_node</span><span class="o">=</span><span class="n">join_node_copy_right</span><span class="p">,</span>
+            <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
+            <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
+            <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
+            <span class="n">left_is_first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">near_sql_right</span>
+
+    <span class="k">def</span> <span class="nf">_emit_full_join_as_complex</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="k">assert</span> <span class="n">join_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;NaturalJoinNode&quot;</span>
+        <span class="k">assert</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">==</span> <span class="s1">&#39;FULL&#39;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;FULL join not implemented for SQLite&quot;</span><span class="p">)</span>
+        <span class="c1"># plan:</span>
+        <span class="c1">#  1) build a shared key table by aggregating both tables by join keys</span>
+        <span class="c1">#     and then union-all them (may need to special case no key case).</span>
+        <span class="c1">#  2) left join keys on left table, then left join that on right table</span>
 
     <span class="k">def</span> <span class="nf">natural_join_to_sql</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">left_is_first</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)&quot;</span>
             <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">left_is_first</span>
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;RIGHT&#39;</span><span class="p">,</span> <span class="s1">&#39;FULL&#39;</span><span class="p">}:</span>
-            <span class="c1"># convert to left to avoid SQLite not having a right jone</span>
-            <span class="n">join_node_copy_right</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">join_node</span><span class="p">)</span>
-            <span class="n">join_node_copy_right</span><span class="o">.</span><span class="n">jointype</span> <span class="o">=</span> <span class="s1">&#39;LEFT&#39;</span>
-            <span class="n">join_node_copy_right</span><span class="o">.</span><span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-            <span class="n">near_sql_right</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
-                <span class="bp">self</span><span class="p">,</span>
-                <span class="n">join_node</span><span class="o">=</span><span class="n">join_node_copy_right</span><span class="p">,</span>
+        <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">==</span> <span class="s1">&#39;RIGHT&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emit_right_join_as_left_join</span><span class="p">(</span>
+                <span class="n">join_node</span><span class="p">,</span>
                 <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
                 <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
-                <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">==</span> <span class="s1">&#39;RIGHT&#39;</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">near_sql_right</span>
-            <span class="c1"># FULL JOIN</span>
-            <span class="c1"># use strategy of coalescing a left join with a right join</span>
-            <span class="c1"># and then aggregate the rows</span>
-            <span class="c1"># ref: https://www.sqlitetutorial.net/sqlite-full-outer-join/</span>
-            <span class="n">join_node_copy_left</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">join_node</span><span class="p">)</span>
-            <span class="n">join_node_copy_left</span><span class="o">.</span><span class="n">jointype</span> <span class="o">=</span> <span class="s1">&#39;LEFT&#39;</span>
-            <span class="n">near_sql_left</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
-                <span class="bp">self</span><span class="p">,</span>
-                <span class="n">join_node</span><span class="o">=</span><span class="n">join_node_copy_left</span><span class="p">,</span>
+                <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">==</span> <span class="s1">&#39;FULL&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emit_full_join_as_complex</span><span class="p">(</span>
+                <span class="n">join_node</span><span class="p">,</span>
                 <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
                 <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
-                <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
-            <span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;FULL join not implemented from SQLite&quot;</span><span class="p">)</span>
+                <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">)</span>
         <span class="c1"># delegate back to parent class</span>
         <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">join_node</span><span class="o">=</span><span class="n">join_node</span><span class="p">,</span>
             <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
-            <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
+            <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
+            <span class="n">left_is_first</span><span class="o">=</span><span class="n">left_is_first</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -824,56 +854,43 @@
     *,
     using=None,
     temp_id_source=None,
-    sql_format_options=None
+    sql_format_options=None,
+    left_is_first=True
 )</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">natural_join_to_sql</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">left_is_first</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)&quot;</span>
             <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">left_is_first</span>
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;RIGHT&#39;</span><span class="p">,</span> <span class="s1">&#39;FULL&#39;</span><span class="p">}:</span>
-            <span class="c1"># convert to left to avoid SQLite not having a right jone</span>
-            <span class="n">join_node_copy_right</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">join_node</span><span class="p">)</span>
-            <span class="n">join_node_copy_right</span><span class="o">.</span><span class="n">jointype</span> <span class="o">=</span> <span class="s1">&#39;LEFT&#39;</span>
-            <span class="n">join_node_copy_right</span><span class="o">.</span><span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-            <span class="n">near_sql_right</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
-                <span class="bp">self</span><span class="p">,</span>
-                <span class="n">join_node</span><span class="o">=</span><span class="n">join_node_copy_right</span><span class="p">,</span>
+        <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">==</span> <span class="s1">&#39;RIGHT&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emit_right_join_as_left_join</span><span class="p">(</span>
+                <span class="n">join_node</span><span class="p">,</span>
                 <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
                 <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
-                <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">==</span> <span class="s1">&#39;RIGHT&#39;</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">near_sql_right</span>
-            <span class="c1"># FULL JOIN</span>
-            <span class="c1"># use strategy of coalescing a left join with a right join</span>
-            <span class="c1"># and then aggregate the rows</span>
-            <span class="c1"># ref: https://www.sqlitetutorial.net/sqlite-full-outer-join/</span>
-            <span class="n">join_node_copy_left</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">join_node</span><span class="p">)</span>
-            <span class="n">join_node_copy_left</span><span class="o">.</span><span class="n">jointype</span> <span class="o">=</span> <span class="s1">&#39;LEFT&#39;</span>
-            <span class="n">near_sql_left</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
-                <span class="bp">self</span><span class="p">,</span>
-                <span class="n">join_node</span><span class="o">=</span><span class="n">join_node_copy_left</span><span class="p">,</span>
+                <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">==</span> <span class="s1">&#39;FULL&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emit_full_join_as_complex</span><span class="p">(</span>
+                <span class="n">join_node</span><span class="p">,</span>
                 <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
                 <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
-                <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
-            <span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;FULL join not implemented from SQLite&quot;</span><span class="p">)</span>
+                <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">)</span>
         <span class="c1"># delegate back to parent class</span>
         <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">join_node</span><span class="o">=</span><span class="n">join_node</span><span class="p">,</span>
             <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
-            <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
+            <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
+            <span class="n">left_is_first</span><span class="o">=</span><span class="n">left_is_first</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
 

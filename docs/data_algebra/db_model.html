@@ -1378,7 +1378,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
-    <span class="k">def</span> <span class="nf">_coalesce_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sub_view_name_left</span><span class="p">,</span> <span class="n">sub_view_name_right</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_coalesce_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sub_view_name_first</span><span class="p">,</span> <span class="n">sub_view_name_second</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
         <span class="n">coalesce_formatter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql_formatters</span><span class="p">[</span><span class="s2">&quot;coalesce&quot;</span><span class="p">]</span>
 
         <span class="k">class</span> <span class="nc">PseudoExpression</span><span class="p">:</span>
@@ -1390,8 +1390,8 @@
                 <span class="bp">self</span><span class="p">,</span>
                 <span class="n">PseudoExpression</span><span class="p">(</span>
                     <span class="p">[</span>
-                        <span class="n">sub_view_name_left</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">ci</span><span class="p">),</span>
-                        <span class="n">sub_view_name_right</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">ci</span><span class="p">),</span>
+                        <span class="n">sub_view_name_first</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">ci</span><span class="p">),</span>
+                        <span class="n">sub_view_name_second</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">ci</span><span class="p">),</span>
                     <span class="p">]</span>
                 <span class="p">),</span>
             <span class="p">)</span>
@@ -1400,7 +1400,7 @@
         <span class="k">return</span> <span class="n">terms</span>
 
     <span class="k">def</span> <span class="nf">natural_join_to_sql</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">left_is_first</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -1430,11 +1430,18 @@
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;natural_join_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">common</span> <span class="o">=</span> <span class="n">using_left</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">using_right</span><span class="p">)</span>
-        <span class="n">terms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coalesce_terms</span><span class="p">(</span>
-            <span class="n">sub_view_name_left</span><span class="o">=</span><span class="n">sub_view_name_left</span><span class="p">,</span>
-            <span class="n">sub_view_name_right</span><span class="o">=</span><span class="n">sub_view_name_right</span><span class="p">,</span>
-            <span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="n">ci</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">common</span> <span class="k">if</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">using</span><span class="p">],</span>
-        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">left_is_first</span><span class="p">:</span>
+            <span class="n">terms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coalesce_terms</span><span class="p">(</span>
+                <span class="n">sub_view_name_first</span><span class="o">=</span><span class="n">sub_view_name_left</span><span class="p">,</span>
+                <span class="n">sub_view_name_second</span><span class="o">=</span><span class="n">sub_view_name_right</span><span class="p">,</span>
+                <span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="n">ci</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">common</span> <span class="k">if</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">using</span><span class="p">],</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">terms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coalesce_terms</span><span class="p">(</span>
+                <span class="n">sub_view_name_first</span><span class="o">=</span><span class="n">sub_view_name_right</span><span class="p">,</span>
+                <span class="n">sub_view_name_second</span><span class="o">=</span><span class="n">sub_view_name_left</span><span class="p">,</span>
+                <span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="n">ci</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">common</span> <span class="k">if</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">using</span><span class="p">],</span>
+            <span class="p">)</span>
         <span class="n">terms</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">ci</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">using_left</span> <span class="o">-</span> <span class="n">common</span><span class="p">})</span>
         <span class="n">terms</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">ci</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">using_right</span> <span class="o">-</span> <span class="n">common</span><span class="p">})</span>
         <span class="n">on_terms</span> <span class="o">=</span> <span class="p">[]</span>
@@ -2889,7 +2896,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
-    <span class="k">def</span> <span class="nf">_coalesce_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sub_view_name_left</span><span class="p">,</span> <span class="n">sub_view_name_right</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_coalesce_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sub_view_name_first</span><span class="p">,</span> <span class="n">sub_view_name_second</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
         <span class="n">coalesce_formatter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql_formatters</span><span class="p">[</span><span class="s2">&quot;coalesce&quot;</span><span class="p">]</span>
 
         <span class="k">class</span> <span class="nc">PseudoExpression</span><span class="p">:</span>
@@ -2901,8 +2908,8 @@
                 <span class="bp">self</span><span class="p">,</span>
                 <span class="n">PseudoExpression</span><span class="p">(</span>
                     <span class="p">[</span>
-                        <span class="n">sub_view_name_left</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">ci</span><span class="p">),</span>
-                        <span class="n">sub_view_name_right</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">ci</span><span class="p">),</span>
+                        <span class="n">sub_view_name_first</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">ci</span><span class="p">),</span>
+                        <span class="n">sub_view_name_second</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">ci</span><span class="p">),</span>
                     <span class="p">]</span>
                 <span class="p">),</span>
             <span class="p">)</span>
@@ -2911,7 +2918,7 @@
         <span class="k">return</span> <span class="n">terms</span>
 
     <span class="k">def</span> <span class="nf">natural_join_to_sql</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">left_is_first</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -2941,11 +2948,18 @@
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;natural_join_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">common</span> <span class="o">=</span> <span class="n">using_left</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">using_right</span><span class="p">)</span>
-        <span class="n">terms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coalesce_terms</span><span class="p">(</span>
-            <span class="n">sub_view_name_left</span><span class="o">=</span><span class="n">sub_view_name_left</span><span class="p">,</span>
-            <span class="n">sub_view_name_right</span><span class="o">=</span><span class="n">sub_view_name_right</span><span class="p">,</span>
-            <span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="n">ci</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">common</span> <span class="k">if</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">using</span><span class="p">],</span>
-        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">left_is_first</span><span class="p">:</span>
+            <span class="n">terms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coalesce_terms</span><span class="p">(</span>
+                <span class="n">sub_view_name_first</span><span class="o">=</span><span class="n">sub_view_name_left</span><span class="p">,</span>
+                <span class="n">sub_view_name_second</span><span class="o">=</span><span class="n">sub_view_name_right</span><span class="p">,</span>
+                <span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="n">ci</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">common</span> <span class="k">if</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">using</span><span class="p">],</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">terms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coalesce_terms</span><span class="p">(</span>
+                <span class="n">sub_view_name_first</span><span class="o">=</span><span class="n">sub_view_name_right</span><span class="p">,</span>
+                <span class="n">sub_view_name_second</span><span class="o">=</span><span class="n">sub_view_name_left</span><span class="p">,</span>
+                <span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="n">ci</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">common</span> <span class="k">if</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">using</span><span class="p">],</span>
+            <span class="p">)</span>
         <span class="n">terms</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">ci</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">using_left</span> <span class="o">-</span> <span class="n">common</span><span class="p">})</span>
         <span class="n">terms</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">ci</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">using_right</span> <span class="o">-</span> <span class="n">common</span><span class="p">})</span>
         <span class="n">on_terms</span> <span class="o">=</span> <span class="p">[]</span>
@@ -4695,14 +4709,15 @@
     *,
     using=None,
     temp_id_source=None,
-    sql_format_options=None
+    sql_format_options=None,
+    left_is_first=True
 )</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">natural_join_to_sql</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">left_is_first</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -4732,11 +4747,18 @@
         <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;natural_join_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">common</span> <span class="o">=</span> <span class="n">using_left</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">using_right</span><span class="p">)</span>
-        <span class="n">terms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coalesce_terms</span><span class="p">(</span>
-            <span class="n">sub_view_name_left</span><span class="o">=</span><span class="n">sub_view_name_left</span><span class="p">,</span>
-            <span class="n">sub_view_name_right</span><span class="o">=</span><span class="n">sub_view_name_right</span><span class="p">,</span>
-            <span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="n">ci</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">common</span> <span class="k">if</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">using</span><span class="p">],</span>
-        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">left_is_first</span><span class="p">:</span>
+            <span class="n">terms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coalesce_terms</span><span class="p">(</span>
+                <span class="n">sub_view_name_first</span><span class="o">=</span><span class="n">sub_view_name_left</span><span class="p">,</span>
+                <span class="n">sub_view_name_second</span><span class="o">=</span><span class="n">sub_view_name_right</span><span class="p">,</span>
+                <span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="n">ci</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">common</span> <span class="k">if</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">using</span><span class="p">],</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">terms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coalesce_terms</span><span class="p">(</span>
+                <span class="n">sub_view_name_first</span><span class="o">=</span><span class="n">sub_view_name_right</span><span class="p">,</span>
+                <span class="n">sub_view_name_second</span><span class="o">=</span><span class="n">sub_view_name_left</span><span class="p">,</span>
+                <span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="n">ci</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">common</span> <span class="k">if</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">using</span><span class="p">],</span>
+            <span class="p">)</span>
         <span class="n">terms</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">ci</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">using_left</span> <span class="o">-</span> <span class="n">common</span><span class="p">})</span>
         <span class="n">terms</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">ci</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">using_right</span> <span class="o">-</span> <span class="n">common</span><span class="p">})</span>
         <span class="n">on_terms</span> <span class="o">=</span> <span class="p">[]</span>
