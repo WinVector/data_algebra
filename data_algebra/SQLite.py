@@ -67,6 +67,14 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             union_all_term_end="",
         )
 
+    def _unquote_identifier(self, s: str) -> str:
+        # good enough
+        assert s.startswith(self.identifier_quote)
+        assert s.endswith(self.identifier_quote)
+        res = s[1:(len(s) - 1)]
+        assert self.identifier_quote not in res
+        return res
+
     def prepare_connection(self, conn):
         # https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.create_function
         conn.create_function("is_bad", 1, _check_scalar_bad)
@@ -233,11 +241,11 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             (data_algebra.near_sql.NearSQLCommonTableExpression, data_algebra.near_sql.NearSQLTable))
         join_columns = join_node.by
         left_descr = TableDescription(
-            table_name=sql_left.quoted_query_name,
+            table_name=self._unquote_identifier(sql_left.quoted_query_name),
             column_names=join_node.sources[0].column_names
         )
         right_descr = TableDescription(
-            table_name=sql_right.quoted_query_name,
+            table_name=self._unquote_identifier(sql_right.quoted_query_name),
             column_names=join_node.sources[1].column_names
         )
         ops_simulate = (
@@ -260,11 +268,9 @@ class SQLiteModel(data_algebra.db_model.DBModel):
                     by=join_columns,
                     jointype='left')
         )
+        simulate_sql = self.to_sql(ops_simulate)
+        # TODO: finish by integrating the SQL in (emit without with and paste in)
         raise ValueError("FULL join not implemented for SQLite")
-        # plan:
-        #  1) build a shared key table by aggregating both tables by join keys
-        #     and then union-all them (may need to special case no key case).
-        #  2) left join keys on left table, then left join that on right table
 
     def natural_join_to_sql(
         self, join_node, *, using=None, temp_id_source=None, sql_format_options=None, left_is_first=True

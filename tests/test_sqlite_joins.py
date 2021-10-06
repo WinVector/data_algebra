@@ -12,6 +12,10 @@ direct_test_sqlite = False
 
 
 def test_sqlite_joins_left_to_right():
+    sqlite_handle = None
+    if direct_test_sqlite:
+        sqlite_handle = data_algebra.SQLite.example_handle()
+
     # No none keys, as they treat missingness different
     # in Pandas and databases
     d1 = data_algebra.default_data_model.pd.DataFrame({
@@ -25,10 +29,6 @@ def test_sqlite_joins_left_to_right():
         'v1': [None, 1, None],
         'v2': [1, None, 2],
     })
-
-    sqlite_handle = None
-    if direct_test_sqlite:
-        sqlite_handle = data_algebra.SQLite.example_handle()
 
     ops_1 = descr(d1=d1).natural_join(b=descr(d2=d2), by=['g'], jointype='left')
     expect_1 = data_algebra.default_data_model.pd.DataFrame({

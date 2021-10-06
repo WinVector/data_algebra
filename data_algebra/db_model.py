@@ -15,9 +15,16 @@ import data_algebra.data_ops
 
 
 class SQLFormatOptions(SimpleNamespace):
+    """
+    Simple class for holding SQL formatting options
+    """
     def __init__(
-        self, use_with=True, annotate=True, sql_indent=" ", initial_commas=False,
+        self, use_with: bool = True, annotate: bool = True, sql_indent: str = " ", initial_commas: bool = False,
     ):
+        assert isinstance(use_with, bool)
+        assert isinstance(annotate, bool)
+        assert isinstance(sql_indent, str)
+        assert isinstance(initial_commas, bool)
         SimpleNamespace.__init__(
             self,
             use_with=use_with,
@@ -25,6 +32,16 @@ class SQLFormatOptions(SimpleNamespace):
             sql_indent=sql_indent,
             initial_commas=initial_commas,
         )
+
+    def __str__(self):
+        return self.__repr__()
+
+    def _repr_pretty_(self, p, cycle):
+        """
+        IPython pretty print, used at implicit print time
+        https://ipython.readthedocs.io/en/stable/config/integrating.html
+        """
+        p.text(str(self))
 
 
 def _str_join_expecting_list(joiner, str_list):
