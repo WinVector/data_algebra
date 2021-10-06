@@ -8,7 +8,7 @@ from data_algebra.data_ops import *
 # import data_algebra.SQLite
 
 
-def test_sqlite_joins():
+def test_sqlite_joins_left_to_right():
     # No none keys, as they treat missingness different
     # in Pandas and databases
     d1 = data_algebra.default_data_model.pd.DataFrame({
@@ -63,3 +63,55 @@ def test_sqlite_joins():
     assert not data_algebra.test_util.equivalent_frames(res_n, expect_2)
 
     # sqlite_handle.close()
+
+
+def test_sqlite_joins_simulate_full_join():
+    d1 = data_algebra.default_data_model.pd.DataFrame({
+        'g': ['a', 'a', 'b', 'b', 'b'],
+        'v1': [1, None, 3, 4, None],
+        'v2': [None, 1, None, 7, 8],
+    })
+
+    d2 = data_algebra.default_data_model.pd.DataFrame({
+        'g': ['c', 'b', 'b'],
+        'v1': [None, 1, None],
+        'v2': [1, None, 2],
+    })
+
+    grouping_columns = ['g']
+
+    ops = (
+        descr(d1=d1)
+            .natural_join(
+            b=descr(d2=d2),
+            by=grouping_columns,
+            jointype='full')
+    )
+
+    res_pandas = ops.eval({'d1': d1, 'd2': d2})
+
+    ops_simulate = (
+        # get shared key set
+        descr(d1=d1)
+            .project({}, group_by=grouping_columns)
+            .concat_rows(
+            b=descr(d2=d2)
+                .project({}, group_by=grouping_columns),
+            id_column=None,
+        )
+            .project({}, group_by=grouping_columns)
+            # simulate full join with left joins
+            .natural_join(
+            b=descr(d1=d1),
+            by=grouping_columns,
+            jointype='left')
+            .natural_join(
+            b=descr(d2=d2),
+            by=grouping_columns,
+            jointype='left')
+    )
+
+    data_algebra.test_util.check_transform(
+        ops=ops_simulate,
+        data={'d1': d1, 'd2': d2},
+        expect=res_pandas)
