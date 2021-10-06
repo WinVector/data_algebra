@@ -1184,26 +1184,22 @@ class DBModel:
         }
         return terms
 
-    def natural_join_to_sql(
-        self, join_node, *, using=None, temp_id_source=None, sql_format_options=None, left_is_first=True
+    def natural_join_sub_queries(
+            self,  *, join_node, using, temp_id_source
     ):
         if join_node.node_name != "NaturalJoinNode":
             raise TypeError(
                 "Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)"
             )
-        if temp_id_source is None:
-            temp_id_source = [0]
         if using is None:
             using = join_node.column_set
         by_set = set(join_node.by)
         if len(using) < 1:
-            raise ValueError("must select at least one column")
+            raise ValueError("join must use or select at least one column")
         missing = using - join_node.column_set
         if len(missing) > 0:
             raise KeyError("referred to unknown columns: " + str(missing))
-        subusing = join_node.columns_used_from_sources(using=using.union(by_set))
-        using_left = subusing[0]
-        using_right = subusing[1]
+        using_left, using_right = join_node.columns_used_from_sources(using=using.union(by_set))
         sql_left = join_node.sources[0].to_near_sql_implementation(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
@@ -1212,6 +1208,20 @@ class DBModel:
             db_model=self, using=using_right, temp_id_source=temp_id_source
         )
         sub_view_name_right = sql_right.quoted_query_name
+        return using_left, sql_left, using_right, sql_right
+
+    def natural_join_to_sql(
+        self, join_node, *, using=None, temp_id_source=None, sql_format_options=None, left_is_first=True
+    ):
+        if temp_id_source is None:
+            temp_id_source = [0]
+        if using is None:
+            using = join_node.column_set
+        using_left, sql_left, using_right, sql_right = self.natural_join_sub_queries(
+            join_node=join_node, using=using, temp_id_source=temp_id_source
+        )
+        sub_view_name_right = sql_right.quoted_query_name
+        sub_view_name_left = sql_left.quoted_query_name
         view_name = "natural_join_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         common = using_left.intersection(using_right)

@@ -5,7 +5,10 @@ import data_algebra
 import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
-# import data_algebra.SQLite
+import data_algebra.SQLite
+
+
+direct_test_sqlite = False
 
 
 def test_sqlite_joins_left_to_right():
@@ -23,7 +26,9 @@ def test_sqlite_joins_left_to_right():
         'v2': [1, None, 2],
     })
 
-    # sqlite_handle = data_algebra.SQLite.example_handle()
+    sqlite_handle = None
+    if direct_test_sqlite:
+        sqlite_handle = data_algebra.SQLite.example_handle()
 
     ops_1 = descr(d1=d1).natural_join(b=descr(d2=d2), by=['g'], jointype='left')
     expect_1 = data_algebra.default_data_model.pd.DataFrame({
@@ -33,7 +38,8 @@ def test_sqlite_joins_left_to_right():
         })
     res_1 = ops_1.eval({'d1': d1, 'd2': d2})
     assert data_algebra.test_util.equivalent_frames(res_1, expect_1)
-    # print(sqlite_handle.to_sql(ops_1))
+    if direct_test_sqlite:
+        print(sqlite_handle.to_sql(ops_1))
     data_algebra.test_util.check_transform(
         ops=ops_1,
         data={'d1': d1, 'd2': d2},
@@ -47,7 +53,8 @@ def test_sqlite_joins_left_to_right():
         })
     res_2 = ops_2.eval({'d1': d1, 'd2': d2})
     assert data_algebra.test_util.equivalent_frames(res_2, expect_2)
-    # print(sqlite_handle.to_sql(ops_2))
+    if direct_test_sqlite:
+        print(sqlite_handle.to_sql(ops_2))
     data_algebra.test_util.check_transform(
         ops=ops_2,
         data={'d1': d1, 'd2': d2},
@@ -62,10 +69,15 @@ def test_sqlite_joins_left_to_right():
     assert not data_algebra.test_util.equivalent_frames(res_n, expect_1)
     assert not data_algebra.test_util.equivalent_frames(res_n, expect_2)
 
-    # sqlite_handle.close()
+    if sqlite_handle is not None:
+        sqlite_handle.close()
 
 
 def test_sqlite_joins_simulate_full_join():
+    sqlite_handle = None
+    if direct_test_sqlite:
+        sqlite_handle = data_algebra.SQLite.example_handle()
+
     d1 = data_algebra.default_data_model.pd.DataFrame({
         'g': ['a', 'a', 'b', 'b', 'b'],
         'v1': [1, None, 3, 4, None],
@@ -88,6 +100,9 @@ def test_sqlite_joins_simulate_full_join():
             jointype='full')
     )
 
+    if direct_test_sqlite:
+        print(sqlite_handle.to_sql(ops))
+
     res_pandas = ops.eval({'d1': d1, 'd2': d2})
 
     ops_simulate = (
@@ -105,7 +120,7 @@ def test_sqlite_joins_simulate_full_join():
                 b=descr(d1=d1),
                 by=join_columns,
                 jointype='left')
-                .natural_join(
+            .natural_join(
                 b=descr(d2=d2),
                 by=join_columns,
                 jointype='left')
@@ -115,3 +130,6 @@ def test_sqlite_joins_simulate_full_join():
         ops=ops_simulate,
         data={'d1': d1, 'd2': d2},
         expect=res_pandas)
+
+    if sqlite_handle is not None:
+        sqlite_handle.close()
