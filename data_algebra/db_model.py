@@ -1203,11 +1203,9 @@ class DBModel:
         sql_left = join_node.sources[0].to_near_sql_implementation(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
-        sub_view_name_left = sql_left.quoted_query_name
         sql_right = join_node.sources[1].to_near_sql_implementation(
             db_model=self, using=using_right, temp_id_source=temp_id_source
         )
-        sub_view_name_right = sql_right.quoted_query_name
         return using_left, sql_left, using_right, sql_right
 
     def natural_join_to_sql(
@@ -1220,21 +1218,19 @@ class DBModel:
         using_left, sql_left, using_right, sql_right = self.natural_join_sub_queries(
             join_node=join_node, using=using, temp_id_source=temp_id_source
         )
-        sub_view_name_right = sql_right.quoted_query_name
-        sub_view_name_left = sql_left.quoted_query_name
         view_name = "natural_join_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         common = using_left.intersection(using_right)
         if left_is_first:
             terms = self._coalesce_terms(
-                sub_view_name_first=sub_view_name_left,
-                sub_view_name_second=sub_view_name_right,
+                sub_view_name_first=sql_left.quoted_query_name,
+                sub_view_name_second=sql_right.quoted_query_name,
                 cols=[ci for ci in common if ci in using],
             )
         else:
             terms = self._coalesce_terms(
-                sub_view_name_first=sub_view_name_right,
-                sub_view_name_second=sub_view_name_left,
+                sub_view_name_first=sql_right.quoted_query_name,
+                sub_view_name_second=sql_left.quoted_query_name,
                 cols=[ci for ci in common if ci in using],
             )
         terms.update({ci: None for ci in using_left - common})
@@ -1243,11 +1239,11 @@ class DBModel:
         if len(join_node.by) > 0:
             on_terms = ["ON " + self.on_start] + self._indent_and_sep_terms(
                 [
-                    sub_view_name_left
+                    sql_left.quoted_query_name
                     + "."
                     + self.quote_identifier(c)
                     + " = "
-                    + sub_view_name_right
+                    + sql_right.quoted_query_name
                     + "."
                     + self.quote_identifier(c)
                     for c in join_node.by
@@ -1257,12 +1253,11 @@ class DBModel:
             )
             if (self.on_end is not None) and (len(self.on_end) > 0):
                 on_terms = on_terms + [self.on_end]
-        jointype = join_node.jointype
         near_sql = data_algebra.near_sql.NearSQLBinaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql1=sql_left.to_bound_near_sql(columns=using_left, force_sql=False),
-            joiner=jointype + " JOIN",
+            joiner=join_node.jointype + " JOIN",
             sub_sql2=sql_right.to_bound_near_sql(columns=using_right, force_sql=False),
             suffix=on_terms,
             annotation=str(join_node.to_python_implementation(
