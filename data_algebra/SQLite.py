@@ -214,7 +214,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
     ):
         assert join_node.node_name == "NaturalJoinNode"
         assert join_node.jointype == 'FULL'
-        raise ValueError("FULL join not implemented from SQLite")
+        raise ValueError("FULL join not implemented for SQLite")
         # plan:
         #  1) build a shared key table by aggregating both tables by join keys
         #     and then union-all them (may need to special case no key case).
