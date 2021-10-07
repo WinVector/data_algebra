@@ -1,6 +1,7 @@
 import math
 import re
 from collections import OrderedDict
+from typing import List, Optional
 from types import SimpleNamespace
 
 import pandas.io.sql
@@ -44,14 +45,14 @@ class SQLFormatOptions(SimpleNamespace):
         p.text(str(self))
 
 
-def _str_join_expecting_list(joiner, str_list):
+def _str_join_expecting_list(joiner: str, str_list: List[str]):
     assert isinstance(joiner, str)
     assert isinstance(str_list, list)
     assert all([isinstance(vi, str) for vi in str_list])
     return joiner.join(str_list)
 
 
-def _clean_annotation(annotation):
+def _clean_annotation(annotation: Optional[str]):
     assert isinstance(annotation, (str, type(None)))
     if annotation is None:
         return annotation

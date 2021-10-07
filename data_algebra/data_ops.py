@@ -1969,6 +1969,7 @@ class ConvertRecordsNode(ViewRepresentation):
         if temp_id_source is None:
             temp_id_source = [0]
         # TODO: narrow to what we are using
+        # TODO: use nearsql instead of strings / lists of strings
         sub_query = self.sources[0].to_near_sql_implementation(
             db_model=db_model,
             using=None,
