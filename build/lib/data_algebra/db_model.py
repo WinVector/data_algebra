@@ -15,9 +15,16 @@ import data_algebra.data_ops
 
 
 class SQLFormatOptions(SimpleNamespace):
+    """
+    Simple class for holding SQL formatting options
+    """
     def __init__(
-        self, use_with=True, annotate=True, sql_indent=" ", initial_commas=False,
+        self, use_with: bool = True, annotate: bool = True, sql_indent: str = " ", initial_commas: bool = False,
     ):
+        assert isinstance(use_with, bool)
+        assert isinstance(annotate, bool)
+        assert isinstance(sql_indent, str)
+        assert isinstance(initial_commas, bool)
         SimpleNamespace.__init__(
             self,
             use_with=use_with,
@@ -25,6 +32,16 @@ class SQLFormatOptions(SimpleNamespace):
             sql_indent=sql_indent,
             initial_commas=initial_commas,
         )
+
+    def __str__(self):
+        return self.__repr__()
+
+    def _repr_pretty_(self, p, cycle):
+        """
+        IPython pretty print, used at implicit print time
+        https://ipython.readthedocs.io/en/stable/config/integrating.html
+        """
+        p.text(str(self))
 
 
 def _str_join_expecting_list(joiner, str_list):
@@ -1184,47 +1201,53 @@ class DBModel:
         }
         return terms
 
-    def natural_join_to_sql(
-        self, join_node, *, using=None, temp_id_source=None, sql_format_options=None, left_is_first=True
+    def _natural_join_sub_queries(
+            self,  *, join_node, using, temp_id_source
     ):
         if join_node.node_name != "NaturalJoinNode":
             raise TypeError(
                 "Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)"
             )
-        if temp_id_source is None:
-            temp_id_source = [0]
         if using is None:
             using = join_node.column_set
         by_set = set(join_node.by)
         if len(using) < 1:
-            raise ValueError("must select at least one column")
+            raise ValueError("join must use or select at least one column")
         missing = using - join_node.column_set
         if len(missing) > 0:
             raise KeyError("referred to unknown columns: " + str(missing))
-        subusing = join_node.columns_used_from_sources(using=using.union(by_set))
-        using_left = subusing[0]
-        using_right = subusing[1]
+        using_left, using_right = join_node.columns_used_from_sources(using=using.union(by_set))
         sql_left = join_node.sources[0].to_near_sql_implementation(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
-        sub_view_name_left = sql_left.quoted_query_name
         sql_right = join_node.sources[1].to_near_sql_implementation(
             db_model=self, using=using_right, temp_id_source=temp_id_source
         )
-        sub_view_name_right = sql_right.quoted_query_name
+        return using_left, sql_left, using_right, sql_right
+
+    def natural_join_to_sql(
+        self, join_node, *, using=None, temp_id_source=None, sql_format_options=None, left_is_first=True
+    ):
+        if temp_id_source is None:
+            temp_id_source = [0]
+        if using is None:
+            using = join_node.column_set
+        using_left, sql_left, using_right, sql_right = self._natural_join_sub_queries(
+            join_node=join_node, using=using, temp_id_source=temp_id_source
+        )
         view_name = "natural_join_" + str(temp_id_source[0])
         temp_id_source[0] = temp_id_source[0] + 1
         common = using_left.intersection(using_right)
         if left_is_first:
             terms = self._coalesce_terms(
-                sub_view_name_first=sub_view_name_left,
-                sub_view_name_second=sub_view_name_right,
+                sub_view_name_first=sql_left.quoted_query_name,
+                sub_view_name_second=sql_right.quoted_query_name,
                 cols=[ci for ci in common if ci in using],
             )
         else:
             terms = self._coalesce_terms(
-                sub_view_name_first=sub_view_name_right,
-                sub_view_name_second=sub_view_name_left,
+                sub_view_name_first=sql_right.quoted_query_name,
+                sub_view_name_second=sql_left.quoted_query_name,
                 cols=[ci for ci in common if ci in using],
             )
         terms.update({ci: None for ci in using_left - common})
@@ -1233,11 +1256,11 @@ class DBModel:
         if len(join_node.by) > 0:
             on_terms = ["ON " + self.on_start] + self._indent_and_sep_terms(
                 [
-                    sub_view_name_left
+                    sql_left.quoted_query_name
                     + "."
                     + self.quote_identifier(c)
                     + " = "
-                    + sub_view_name_right
+                    + sql_right.quoted_query_name
                     + "."
                     + self.quote_identifier(c)
                     for c in join_node.by
@@ -1247,12 +1270,11 @@ class DBModel:
             )
             if (self.on_end is not None) and (len(self.on_end) > 0):
                 on_terms = on_terms + [self.on_end]
-        jointype = join_node.jointype
         near_sql = data_algebra.near_sql.NearSQLBinaryStep(
             terms=terms,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql1=sql_left.to_bound_near_sql(columns=using_left, force_sql=False),
-            joiner=jointype + " JOIN",
+            joiner=join_node.jointype + " JOIN",
             sub_sql2=sql_right.to_bound_near_sql(columns=using_right, force_sql=False),
             suffix=on_terms,
             annotation=str(join_node.to_python_implementation(

@@ -10,6 +10,9 @@ import data_algebra.util
 import data_algebra.db_model
 import data_algebra.data_ops
 
+import data_algebra.near_sql
+from data_algebra.data_ops import *
+
 
 # map from op-name to special SQL formatting code
 
@@ -63,6 +66,14 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             union_all_term_start="",
             union_all_term_end="",
         )
+
+    def _unquote_identifier(self, s: str) -> str:
+        # good enough
+        assert s.startswith(self.identifier_quote)
+        assert s.endswith(self.identifier_quote)
+        res = s[1:(len(s) - 1)]
+        assert self.identifier_quote not in res
+        return res
 
     def prepare_connection(self, conn):
         # https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.create_function
@@ -212,13 +223,45 @@ class SQLiteModel(data_algebra.db_model.DBModel):
     def _emit_full_join_as_complex(
         self, join_node, *, using=None, temp_id_source, sql_format_options=None
     ):
+        # this is an example how to tree-rewrite the operator platform before emitting SQL.
         assert join_node.node_name == "NaturalJoinNode"
         assert join_node.jointype == 'FULL'
-        raise ValueError("FULL join not implemented for SQLite")
-        # plan:
-        #  1) build a shared key table by aggregating both tables by join keys
-        #     and then union-all them (may need to special case no key case).
-        #  2) left join keys on left table, then left join that on right table
+        assert len(join_node.by) > 0  # could special case zero case later
+        if temp_id_source is None:
+            temp_id_source = [0]
+        if using is None:
+            using = join_node.column_set
+        join_columns = join_node.by
+        left_descr = join_node.sources[0]
+        right_descr = join_node.sources[1]
+        ops_simulate = (
+            # get shared key set
+            left_descr
+                .project({}, group_by=join_columns)
+                .concat_rows(
+                    b=right_descr
+                        .project({}, group_by=join_columns),
+                    id_column=None,
+                )
+                .project({}, group_by=join_columns)
+                # simulate full join with left joins
+                .natural_join(
+                    b=left_descr,
+                    by=join_columns,
+                    jointype='left')
+                .natural_join(
+                    b=right_descr,
+                    by=join_columns,
+                    jointype='left')
+        )
+        assert isinstance(ops_simulate, NaturalJoinNode)
+        simulate_near_sql = self.natural_join_to_sql(
+            join_node=ops_simulate,
+            using=using,
+            temp_id_source=temp_id_source,
+            sql_format_options=sql_format_options
+        )
+        return simulate_near_sql
 
     def natural_join_to_sql(
         self, join_node, *, using=None, temp_id_source=None, sql_format_options=None, left_is_first=True

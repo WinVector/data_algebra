@@ -95,6 +95,9 @@
 <span class="kn">import</span> <span class="nn">data_algebra.db_model</span>
 <span class="kn">import</span> <span class="nn">data_algebra.data_ops</span>
 
+<span class="kn">import</span> <span class="nn">data_algebra.near_sql</span>
+<span class="kn">from</span> <span class="nn">data_algebra.data_ops</span> <span class="kn">import</span> <span class="o">*</span>
+
 
 <span class="c1"># map from op-name to special SQL formatting code</span>
 
@@ -148,6 +151,14 @@
             <span class="n">union_all_term_start</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
             <span class="n">union_all_term_end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_unquote_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="c1"># good enough</span>
+        <span class="k">assert</span> <span class="n">s</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">s</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">:(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">res</span>
+        <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">prepare_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
         <span class="c1"># https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.create_function</span>
@@ -297,13 +308,45 @@
     <span class="k">def</span> <span class="nf">_emit_full_join_as_complex</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
+        <span class="c1"># this is an example how to tree-rewrite the operator platform before emitting SQL.</span>
         <span class="k">assert</span> <span class="n">join_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;NaturalJoinNode&quot;</span>
         <span class="k">assert</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">==</span> <span class="s1">&#39;FULL&#39;</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;FULL join not implemented for SQLite&quot;</span><span class="p">)</span>
-        <span class="c1"># plan:</span>
-        <span class="c1">#  1) build a shared key table by aggregating both tables by join keys</span>
-        <span class="c1">#     and then union-all them (may need to special case no key case).</span>
-        <span class="c1">#  2) left join keys on left table, then left join that on right table</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">join_node</span><span class="o">.</span><span class="n">by</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>  <span class="c1"># could special case zero case later</span>
+        <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">join_columns</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">by</span>
+        <span class="n">left_descr</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">right_descr</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">ops_simulate</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="c1"># get shared key set</span>
+            <span class="n">left_descr</span>
+                <span class="o">.</span><span class="n">project</span><span class="p">({},</span> <span class="n">group_by</span><span class="o">=</span><span class="n">join_columns</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">concat_rows</span><span class="p">(</span>
+                    <span class="n">b</span><span class="o">=</span><span class="n">right_descr</span>
+                        <span class="o">.</span><span class="n">project</span><span class="p">({},</span> <span class="n">group_by</span><span class="o">=</span><span class="n">join_columns</span><span class="p">),</span>
+                    <span class="n">id_column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="o">.</span><span class="n">project</span><span class="p">({},</span> <span class="n">group_by</span><span class="o">=</span><span class="n">join_columns</span><span class="p">)</span>
+                <span class="c1"># simulate full join with left joins</span>
+                <span class="o">.</span><span class="n">natural_join</span><span class="p">(</span>
+                    <span class="n">b</span><span class="o">=</span><span class="n">left_descr</span><span class="p">,</span>
+                    <span class="n">by</span><span class="o">=</span><span class="n">join_columns</span><span class="p">,</span>
+                    <span class="n">jointype</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">natural_join</span><span class="p">(</span>
+                    <span class="n">b</span><span class="o">=</span><span class="n">right_descr</span><span class="p">,</span>
+                    <span class="n">by</span><span class="o">=</span><span class="n">join_columns</span><span class="p">,</span>
+                    <span class="n">jointype</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ops_simulate</span><span class="p">,</span> <span class="n">NaturalJoinNode</span><span class="p">)</span>
+        <span class="n">simulate_near_sql</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
+            <span class="n">join_node</span><span class="o">=</span><span class="n">ops_simulate</span><span class="p">,</span>
+            <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
+            <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
+            <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">simulate_near_sql</span>
 
     <span class="k">def</span> <span class="nf">natural_join_to_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">left_is_first</span><span class="o">=</span><span class="kc">True</span>
@@ -459,6 +502,14 @@
             <span class="n">union_all_term_end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">_unquote_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="c1"># good enough</span>
+        <span class="k">assert</span> <span class="n">s</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">s</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">:(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">res</span>
+        <span class="k">return</span> <span class="n">res</span>
+
     <span class="k">def</span> <span class="nf">prepare_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
         <span class="c1"># https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.create_function</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_bad&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_bad</span><span class="p">)</span>
@@ -607,13 +658,45 @@
     <span class="k">def</span> <span class="nf">_emit_full_join_as_complex</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
+        <span class="c1"># this is an example how to tree-rewrite the operator platform before emitting SQL.</span>
         <span class="k">assert</span> <span class="n">join_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;NaturalJoinNode&quot;</span>
         <span class="k">assert</span> <span class="n">join_node</span><span class="o">.</span><span class="n">jointype</span> <span class="o">==</span> <span class="s1">&#39;FULL&#39;</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;FULL join not implemented for SQLite&quot;</span><span class="p">)</span>
-        <span class="c1"># plan:</span>
-        <span class="c1">#  1) build a shared key table by aggregating both tables by join keys</span>
-        <span class="c1">#     and then union-all them (may need to special case no key case).</span>
-        <span class="c1">#  2) left join keys on left table, then left join that on right table</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">join_node</span><span class="o">.</span><span class="n">by</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>  <span class="c1"># could special case zero case later</span>
+        <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">join_columns</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">by</span>
+        <span class="n">left_descr</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">right_descr</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">ops_simulate</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="c1"># get shared key set</span>
+            <span class="n">left_descr</span>
+                <span class="o">.</span><span class="n">project</span><span class="p">({},</span> <span class="n">group_by</span><span class="o">=</span><span class="n">join_columns</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">concat_rows</span><span class="p">(</span>
+                    <span class="n">b</span><span class="o">=</span><span class="n">right_descr</span>
+                        <span class="o">.</span><span class="n">project</span><span class="p">({},</span> <span class="n">group_by</span><span class="o">=</span><span class="n">join_columns</span><span class="p">),</span>
+                    <span class="n">id_column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="o">.</span><span class="n">project</span><span class="p">({},</span> <span class="n">group_by</span><span class="o">=</span><span class="n">join_columns</span><span class="p">)</span>
+                <span class="c1"># simulate full join with left joins</span>
+                <span class="o">.</span><span class="n">natural_join</span><span class="p">(</span>
+                    <span class="n">b</span><span class="o">=</span><span class="n">left_descr</span><span class="p">,</span>
+                    <span class="n">by</span><span class="o">=</span><span class="n">join_columns</span><span class="p">,</span>
+                    <span class="n">jointype</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">natural_join</span><span class="p">(</span>
+                    <span class="n">b</span><span class="o">=</span><span class="n">right_descr</span><span class="p">,</span>
+                    <span class="n">by</span><span class="o">=</span><span class="n">join_columns</span><span class="p">,</span>
+                    <span class="n">jointype</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ops_simulate</span><span class="p">,</span> <span class="n">NaturalJoinNode</span><span class="p">)</span>
+        <span class="n">simulate_near_sql</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
+            <span class="n">join_node</span><span class="o">=</span><span class="n">ops_simulate</span><span class="p">,</span>
+            <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
+            <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
+            <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">simulate_near_sql</span>
 
     <span class="k">def</span> <span class="nf">natural_join_to_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">left_is_first</span><span class="o">=</span><span class="kc">True</span>
