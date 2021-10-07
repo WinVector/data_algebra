@@ -1,3 +1,4 @@
+
 import math
 import re
 from collections import OrderedDict
@@ -914,11 +915,11 @@ class DBModel:
             # check detailed merge conditions
             def non_trivial_terms(*, dep_dict, term_dict):
                 return [
-                    k
-                    for k, v in dep_dict.items()
-                    if (len(v - {k}) > 0)
-                    or (k not in v)
-                    or ((term_dict[k] is not None) and (term_dict[k] != k))
+                    ki
+                    for ki, vi in dep_dict.items()
+                    if (len(vi - {ki}) > 0)
+                    or (ki not in vi)
+                    or ((term_dict[ki] is not None) and (term_dict[ki] != ki))
                 ]
 
             our_non_trivial_terms = non_trivial_terms(
@@ -1846,7 +1847,7 @@ class DBModel:
         return self.__str__()
 
 
-class DBHandle():
+class DBHandle:
     def __init__(self, *, db_model, conn):
         assert isinstance(db_model, DBModel)
         self.db_model = db_model

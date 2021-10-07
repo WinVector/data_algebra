@@ -1,4 +1,5 @@
 from abc import ABC
+from typing import List
 
 import data_algebra.OrderedSet
 
@@ -92,7 +93,6 @@ class NearSQLContainer:
     # sequence: a list where last element is a NearSQLContainer previous elements are (name, NearSQLContainer) pairs
     # stub the replacement common table expression in a NearSQLContainer
     def to_with_form_stub(self):
-        stub = None
         if self.near_sql.is_table:
             stub = self
             sequence = list()
@@ -184,7 +184,7 @@ class NearSQLUnaryStep(NearSQL):
         assert isinstance(mergeable, bool)
         assert isinstance(sub_sql, NearSQLContainer)
         assert isinstance(suffix, (list, type(None)))
-        if not suffix is None:
+        if suffix is not None:
             assert all([isinstance(v, str) for v in suffix])
         NearSQL.__init__(
             self,
@@ -252,7 +252,7 @@ class NearSQLBinaryStep(NearSQL):
         assert isinstance(sub_sql1, NearSQLContainer)
         assert isinstance(sub_sql2, NearSQLContainer)
         assert isinstance(suffix, (list, type(None)))
-        if not suffix is None:
+        if suffix is not None:
             assert all([isinstance(v, str) for v in suffix])
         assert isinstance(joiner, str)
         NearSQL.__init__(
@@ -302,7 +302,7 @@ class NearSQLBinaryStep(NearSQL):
         # assume any name collisions are the same table/common_table_expression
         for stepi in sequence2:
             nmi = stepi[0]
-            if not nmi in seen:
+            if nmi not in seen:
                 seen.add(nmi)
                 sequence.append(stepi)
         stubbed_step = NearSQLBinaryStep(
