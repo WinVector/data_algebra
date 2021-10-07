@@ -15,6 +15,14 @@ import data_algebra.data_ops_types
 import data_algebra.data_ops
 
 
+# The db_model can be a bit tricky as SQL is represented a few ways depending
+# on how close to a final result we are.
+# The end representation is a single string.
+# The nearly there representation is a list of strings, which makes indenting much easier.
+# The primary computational representation is a NearSQL structure, as it is a dag of objects.
+# Note: near sql has a bound/unbound variation treating the top layer differently than
+# subordinate nodes.
+
 class SQLFormatOptions(SimpleNamespace):
     """
     Simple class for holding SQL formatting options
