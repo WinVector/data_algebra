@@ -700,7 +700,7 @@ class DBModel:
             return "(" + ", ".join([self.value_to_sql(vi) for vi in v]) + ")"
         return str(v)
 
-    def table_values_to_sql(self, v):
+    def table_values_to_sql(self, v) -> str:
         assert v is not None
         m = v.shape[0]
         assert m > 0
@@ -790,7 +790,7 @@ class DBModel:
 
     def table_def_to_sql(
         self, table_def, *, using=None, temp_id_source=None, sql_format_options=None
-    ):
+    ) -> data_algebra.near_sql.NearSQL:
         if table_def.node_name != "TableDescription":
             raise TypeError(
                 "Expected table_def to be a data_algebra.data_ops.TableDescription)"
@@ -828,7 +828,7 @@ class DBModel:
 
     def extend_to_sql(
         self, extend_node, *, using=None, temp_id_source=None, sql_format_options=None
-    ):
+    ) -> data_algebra.near_sql.NearSQL:
         if extend_node.node_name != "ExtendNode":
             raise TypeError(
                 "Expected extend_node to be a data_algebra.data_ops.ExtendNode)"
@@ -1004,7 +1004,7 @@ class DBModel:
         using=None,
         temp_id_source=None,
         sql_format_options=None,
-    ):
+    ) -> data_algebra.near_sql.NearSQL:
         if select_rows_node.node_name != "SelectRowsNode":
             raise TypeError(
                 "Expected select_rows_node to be a data_algebra.data_ops.SelectRowsNode)"
@@ -1044,7 +1044,7 @@ class DBModel:
         using=None,
         temp_id_source=None,
         sql_format_options=None,
-    ):
+    ) -> data_algebra.near_sql.NearSQL:
         if select_columns_node.node_name != "SelectColumnsNode":
             raise TypeError(
                 "Expected select_columns_to_sql to be a data_algebra.data_ops.SelectColumnsNode)"
@@ -1075,7 +1075,7 @@ class DBModel:
         using=None,
         temp_id_source=None,
         sql_format_options=None,
-    ):
+    ) -> data_algebra.near_sql.NearSQL:
         if drop_columns_node.node_name != "DropColumnsNode":
             raise TypeError(
                 "Expected drop_columns_node to be a data_algebra.data_ops.DropColumnsNode)"
@@ -1098,7 +1098,7 @@ class DBModel:
 
     def order_to_sql(
         self, order_node, *, using=None, temp_id_source=None, sql_format_options=None
-    ):
+    ) -> data_algebra.near_sql.NearSQL:
         if order_node.node_name != "OrderRowsNode":
             raise TypeError(
                 "Expected order_node to be a data_algebra.data_ops.OrderRowsNode)"
@@ -1148,7 +1148,7 @@ class DBModel:
 
     def rename_to_sql(
         self, rename_node, *, using=None, temp_id_source=None, sql_format_options=None
-    ):
+    ) -> data_algebra.near_sql.NearSQL:
         if rename_node.node_name != "RenameColumnsNode":
             raise TypeError(
                 "Expected rename_node to be a data_algebra.data_ops.RenameColumnsNode)"
@@ -1228,7 +1228,7 @@ class DBModel:
 
     def natural_join_to_sql(
         self, join_node, *, using=None, temp_id_source=None, sql_format_options=None, left_is_first=True
-    ):
+    ) -> data_algebra.near_sql.NearSQL:
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
@@ -1286,7 +1286,7 @@ class DBModel:
 
     def concat_rows_to_sql(
         self, concat_node, *, using=None, temp_id_source=None, sql_format_options=None
-    ):
+    ) -> data_algebra.near_sql.NearSQL:
         if concat_node.node_name != "ConcatRowsNode":
             raise TypeError(
                 "Expected join_node to be a data_algebra.data_ops.ConcatRowsNode)"
@@ -1342,7 +1342,7 @@ class DBModel:
 
     def to_sql(
         self, ops, *, sql_format_options=None,
-    ):
+    ) -> str:
         assert isinstance(self, DBModel)
         assert isinstance(ops, data_algebra.data_ops.ViewRepresentation)
         if sql_format_options is None:
@@ -1405,7 +1405,7 @@ class DBModel:
 
     def row_recs_to_blocks_query(
         self, source_sql, record_spec, *, using=None, temp_id_source=None
-    ):
+    ) -> str:
         if temp_id_source is None:
             temp_id_source = [0]
         if isinstance(source_sql, str):
@@ -1487,7 +1487,7 @@ class DBModel:
         using=None,
         temp_id_source=None,
         sql_format_options=None,
-    ):
+    ) -> str:
         # if not isinstance(record_spec, data_algebra.cdata.RecordSpecification):
         #     raise TypeError(
         #         "record_spec should be a data_algebra.cdata.RecordSpecification"
@@ -1570,7 +1570,7 @@ class DBModel:
         return sql
 
     # encode and name a term for use in a SQL expression
-    def enc_term_(self, k, *, terms):
+    def enc_term_(self, k, *, terms) -> str:
         v = None
         try:
             v = terms[k]
@@ -1582,7 +1582,7 @@ class DBModel:
 
     def convert_nearsql_container_subsql_(
         self, nearsql_container, *, sql_format_options=None
-    ):
+    ) -> List[str]:
         assert isinstance(nearsql_container, data_algebra.near_sql.NearSQLContainer)
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
@@ -1615,7 +1615,7 @@ class DBModel:
         force_sql=False,
         constants=None,
         sql_format_options=None,
-    ):
+    ) -> List[str]:
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLCommonTableExpression)
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
@@ -1637,7 +1637,7 @@ class DBModel:
         force_sql=False,
         constants=None,
         sql_format_options=None,
-    ):
+    ) -> List[str]:
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLTable)
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
@@ -1676,7 +1676,7 @@ class DBModel:
         force_sql=False,
         constants=None,
         sql_format_options=None,
-    ):
+    ) -> List[str]:
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLUnaryStep)
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
@@ -1729,7 +1729,7 @@ class DBModel:
         constants=None,
         sql_format_options=None,
         quoted_query_name=None,
-    ):
+    ) -> List[str]:
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLBinaryStep)
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
@@ -1791,7 +1791,7 @@ class DBModel:
 
     def nearsqlq_to_sql_(
         self, near_sql, *, columns=None, constants=None, sql_format_options=None
-    ):
+    ) -> List[str]:
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLq)
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
@@ -1898,14 +1898,14 @@ class DBHandle():
 
     def to_sql(
         self, ops, *, sql_format_options=None,
-    ):
+    ) -> str:
         return self.db_model.to_sql(ops=ops, sql_format_options=sql_format_options,)
 
     def query_to_csv(self, q, *, res_name):
         d = self.read_query(q)
         d.to_csv(res_name, index=False)
 
-    def table_values_to_sql(self, v):
+    def table_values_to_sql(self, v) -> str:
         return self.db_model.table_values_to_sql(v)
 
     def __str__(self):
