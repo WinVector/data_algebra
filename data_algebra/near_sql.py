@@ -13,7 +13,7 @@ class SQLWithList:
     """
     Carry an ordered sequence of SQL steps for use with a SQL WITH statement.
     """
-    def __init__(self, *, last_step : 'NearSQL', previous_steps : List[Tuple[str, 'NearSQLContainer']]):
+    def __init__(self, *, last_step: 'NearSQL', previous_steps: List[Tuple[str, 'NearSQLContainer']]):
         assert isinstance(last_step, NearSQL)
         assert isinstance(previous_steps, List)
         assert all([isinstance(vi, Tuple)
@@ -146,6 +146,9 @@ class NearSQLNamedEntity(NearSQL):
 
     def to_with_form(self) -> SQLWithList:
         return SQLWithList(last_step=self, previous_steps=[])
+
+    def to_sql(self, *, columns=None, force_sql=False, constants=None, db_model, sql_format_options=None):
+        raise NotImplementedError("abstract class method called")
 
 
 class NearSQLCommonTableExpression(NearSQLNamedEntity):
