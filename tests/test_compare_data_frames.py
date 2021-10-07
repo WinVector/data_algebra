@@ -10,6 +10,7 @@ from data_algebra.cdata import *
 import data_algebra.test_util
 import data_algebra.util
 import data_algebra.SQLite
+import data_algebra.MySQL
 
 
 def test_compare_data_frames():
@@ -79,5 +80,6 @@ def test_compare_data_frames():
             .order_rows(grouping_columns)
     )
     data_algebra.test_util.check_transform(
-        ops=ops2, data={"d1": d1, "d2": d2}, expect=expect
+        ops=ops2, data={"d1": d1, "d2": d2}, expect=expect,
+        models_to_skip={str(data_algebra.MySQL.MySQLModel())},
     )

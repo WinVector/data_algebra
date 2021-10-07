@@ -51,10 +51,10 @@ MySQL_formatters = {
 
 class MySQLModel(data_algebra.db_model.DBModel):
     """A model of how SQL should be generated for MySQL.
-       Assuming we are using a sqlalhemy engine as our connection
+       Assuming we are using a sqlalchemy engine as our connection.
     """
 
-    def __init__(self):
+    def __init__(self, *, supports_with=False):
         data_algebra.db_model.DBModel.__init__(
             self,
             string_type="CHAR",

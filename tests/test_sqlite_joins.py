@@ -6,7 +6,7 @@ import data_algebra.test_util
 import data_algebra.util
 from data_algebra.data_ops import *
 import data_algebra.SQLite
-
+import data_algebra.MySQL
 
 direct_test_sqlite = False
 
@@ -43,7 +43,8 @@ def test_sqlite_joins_left_to_right():
     data_algebra.test_util.check_transform(
         ops=ops_1,
         data={'d1': d1, 'd2': d2},
-        expect=expect_1)
+        expect=expect_1,
+        models_to_skip={str(data_algebra.MySQL.MySQLModel())},)
 
     ops_2 = descr(d1=d1).natural_join(b=descr(d2=d2), by=['g'], jointype='right')
     expect_2 = data_algebra.default_data_model.pd.DataFrame({
@@ -58,7 +59,8 @@ def test_sqlite_joins_left_to_right():
     data_algebra.test_util.check_transform(
         ops=ops_2,
         data={'d1': d1, 'd2': d2},
-        expect=expect_2)
+        expect=expect_2,
+        models_to_skip={str(data_algebra.MySQL.MySQLModel())},)
 
     # check test is strong enough
     assert not data_algebra.test_util.equivalent_frames(expect_1, expect_2)
@@ -108,7 +110,8 @@ def test_sqlite_joins_simulate_full_join():
     data_algebra.test_util.check_transform(
         ops=ops,
         data={'d1': d1, 'd2': d2},
-        expect=res_pandas)
+        expect=res_pandas,
+        models_to_skip={str(data_algebra.MySQL.MySQLModel())},)
 
     ops_simulate = (
         # get shared key set
@@ -134,7 +137,8 @@ def test_sqlite_joins_simulate_full_join():
     data_algebra.test_util.check_transform(
         ops=ops_simulate,
         data={'d1': d1, 'd2': d2},
-        expect=res_pandas)
+        expect=res_pandas,
+        models_to_skip={str(data_algebra.MySQL.MySQLModel())},)
 
     if sqlite_handle is not None:
         sqlite_handle.close()
