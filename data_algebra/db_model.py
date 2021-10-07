@@ -1671,7 +1671,7 @@ class DBModel:
                 ]
             if len(terms_strs) < 1:
                 terms_strs = [
-                    f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}'
+                    '*'
                 ]
             return (
                 ["SELECT"]
@@ -1709,7 +1709,7 @@ class DBModel:
                 ]
             if len(terms_strs) < 1:
                 terms_strs = [
-                    f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}'
+                    '*'
                 ]
         sql_start = "SELECT"
         if (
@@ -1757,7 +1757,7 @@ class DBModel:
         terms_strs = [self.enc_term_(k, terms=terms) for k in columns]
         if len(terms_strs) < 1:
             terms_strs = [
-                f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}'
+                '*'
             ]
         is_union = "union" in near_sql.joiner.lower()
         sql_start = "SELECT"
@@ -1826,7 +1826,7 @@ class DBModel:
         terms_strs = [enc_term(k) for k in columns]
         if len(terms_strs) < 1:
             terms_strs = [
-                f'1 AS {self.quote_identifier("data_algebra_placeholder_col_name")}'
+                '*'
             ]
         sql_start = "SELECT"
         if (
