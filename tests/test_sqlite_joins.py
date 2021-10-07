@@ -100,10 +100,15 @@ def test_sqlite_joins_simulate_full_join():
             jointype='full')
     )
 
+    res_pandas = ops.eval({'d1': d1, 'd2': d2})
+
     if direct_test_sqlite:
         print(sqlite_handle.to_sql(ops))
 
-    res_pandas = ops.eval({'d1': d1, 'd2': d2})
+    data_algebra.test_util.check_transform(
+        ops=ops,
+        data={'d1': d1, 'd2': d2},
+        expect=res_pandas)
 
     ops_simulate = (
         # get shared key set

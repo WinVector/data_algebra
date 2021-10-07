@@ -1201,7 +1201,7 @@ class DBModel:
         }
         return terms
 
-    def natural_join_sub_queries(
+    def _natural_join_sub_queries(
             self,  *, join_node, using, temp_id_source
     ):
         if join_node.node_name != "NaturalJoinNode":
@@ -1232,7 +1232,7 @@ class DBModel:
             temp_id_source = [0]
         if using is None:
             using = join_node.column_set
-        using_left, sql_left, using_right, sql_right = self.natural_join_sub_queries(
+        using_left, sql_left, using_right, sql_right = self._natural_join_sub_queries(
             join_node=join_node, using=using, temp_id_source=temp_id_source
         )
         view_name = "natural_join_" + str(temp_id_source[0])

@@ -223,6 +223,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
     def _emit_full_join_as_complex(
         self, join_node, *, using=None, temp_id_source, sql_format_options=None
     ):
+        # this is an example how to tree-rewrite the operator platform before emitting SQL.
         assert join_node.node_name == "NaturalJoinNode"
         assert join_node.jointype == 'FULL'
         assert len(join_node.by) > 0  # could special case zero case later
@@ -230,24 +231,9 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             temp_id_source = [0]
         if using is None:
             using = join_node.column_set
-        using_left, sql_left, using_right, sql_right = self.natural_join_sub_queries(
-            join_node=join_node, using=using, temp_id_source=temp_id_source
-        )
-        assert isinstance(
-            sql_left,
-            (data_algebra.near_sql.NearSQLCommonTableExpression, data_algebra.near_sql.NearSQLTable))
-        assert isinstance(
-            sql_right,
-            (data_algebra.near_sql.NearSQLCommonTableExpression, data_algebra.near_sql.NearSQLTable))
         join_columns = join_node.by
-        left_descr = TableDescription(
-            table_name=self._unquote_identifier(sql_left.quoted_query_name),
-            column_names=join_node.sources[0].column_names
-        )
-        right_descr = TableDescription(
-            table_name=self._unquote_identifier(sql_right.quoted_query_name),
-            column_names=join_node.sources[1].column_names
-        )
+        left_descr = join_node.sources[0]
+        right_descr = join_node.sources[1]
         ops_simulate = (
             # get shared key set
             left_descr
@@ -268,9 +254,14 @@ class SQLiteModel(data_algebra.db_model.DBModel):
                     by=join_columns,
                     jointype='left')
         )
-        simulate_sql = self.to_sql(ops_simulate)
-        # TODO: finish by integrating the SQL in (emit without with and paste in)
-        raise ValueError("FULL join not implemented for SQLite")
+        assert isinstance(ops_simulate, NaturalJoinNode)
+        simulate_near_sql = self.natural_join_to_sql(
+            join_node=ops_simulate,
+            using=using,
+            temp_id_source=temp_id_source,
+            sql_format_options=sql_format_options
+        )
+        return simulate_near_sql
 
     def natural_join_to_sql(
         self, join_node, *, using=None, temp_id_source=None, sql_format_options=None, left_is_first=True

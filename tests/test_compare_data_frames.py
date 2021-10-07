@@ -73,13 +73,11 @@ def test_compare_data_frames():
     # print(sqlite_handle.to_sql(summary_ops))
     # sqlite_handle.close()
 
-    # ops2 = (
-    #     summary_ops
-    #         .select_rows('(d1_count <= 0) | (d2_count <= 0)')
-    #         .order_rows(grouping_columns)
-    # )
-    # # TODO: emulate right and full join in SQLite
-    # # https://www.sqlitetutorial.net/sqlite-full-outer-join/
-    # data_algebra.test_util.check_transform(
-    #     ops=ops2, data={"d1": d1, "d2": d2}, expect=expect
-    # )
+    ops2 = (
+        summary_ops
+            .select_rows('(d1_count <= 0) | (d2_count <= 0)')
+            .order_rows(grouping_columns)
+    )
+    data_algebra.test_util.check_transform(
+        ops=ops2, data={"d1": d1, "d2": d2}, expect=expect
+    )
