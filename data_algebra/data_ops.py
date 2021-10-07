@@ -1977,7 +1977,7 @@ class ConvertRecordsNode(ViewRepresentation):
             sql_format_options=sql_format_options,
         )
         # claims to use all columns
-        query = sub_query.to_sql(
+        query = sub_query.to_sql_str_list(
             columns=self.columns_used_from_sources()[0],
             db_model=db_model,
             force_sql=True,
