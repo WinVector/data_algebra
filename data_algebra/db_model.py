@@ -1070,11 +1070,14 @@ class DBModel:
             db_model=self, using=set(subusing), temp_id_source=temp_id_source
         )
         # order/limit columns
-        subsql.terms = {
-            k: subsql.terms[k]
-            for k in select_columns_node.column_selection
-            if k in subusing
-        }
+        if subsql.terms is not None:
+            subsql.terms = {
+                k: subsql.terms[k]
+                for k in select_columns_node.column_selection
+                if k in subusing
+            }
+        else:
+            subsql.terms = []
         return subsql
 
     def drop_columns_to_sql(
@@ -1366,13 +1369,13 @@ class DBModel:
         sql_str_list = None
         if sql_format_options.use_with and self.supports_with:
             sequence = near_sql.to_with_form()
-            len_sequence = len(sequence)
+            len_sequence = len(sequence.previous_steps)
             # can fall back to the non-with path
-            if len(sequence) >= 2:
+            if len(sequence.previous_steps) >= 1:
                 sql_sequence = []
-                for i in range(len_sequence - 1):
-                    nmi = sequence[i][0]  # already quoted
-                    sqli = sequence[i][1].to_sql(
+                for i in range(len_sequence):
+                    nmi = sequence.previous_steps[i][0]  # already quoted
+                    sqli = sequence.previous_steps[i][1].to_sql(
                         db_model=self, sql_format_options=sql_format_options
                     )
                     sql_sequence = (
@@ -1385,15 +1388,15 @@ class DBModel:
                             for s in sqli
                         ]
                     )
-                    if i < (len_sequence - 2):
+                    if i < (len_sequence - 1):
                         sql_sequence = sql_sequence + [
-                            sql_format_options.sql_indent + "),"
+                            sql_format_options.sql_indent + ") ,"
                         ]
                     else:
                         sql_sequence = sql_sequence + [
                             sql_format_options.sql_indent + ")"
                         ]
-                sql_last = sequence[len_sequence - 1].to_sql(
+                sql_last = sequence.last_step.to_sql(
                     db_model=self, force_sql=True, sql_format_options=sql_format_options
                 )
                 sql_str_list = ["WITH"] + sql_sequence + sql_last
@@ -1652,9 +1655,12 @@ class DBModel:
             sql_format_options = self.default_SQL_format_options
         assert isinstance(sql_format_options, SQLFormatOptions)
         if columns is None:
-            columns = [k for k in near_sql.terms.keys()]
+            if near_sql.terms is not None:
+                columns = [k for k in near_sql.terms.keys()]
+            else:
+                columns = []
         if len(columns) <= 0:
-            force_sql = False
+            columns = []
         have_constants = (constants is not None) and (len(constants) > 0)
         if force_sql or have_constants:
             terms_strs = [self.quote_identifier(k) for k in columns]
