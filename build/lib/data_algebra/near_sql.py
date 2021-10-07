@@ -13,7 +13,7 @@ class SQLWithList:
     """
     Carry an ordered sequence of SQL steps for use with a SQL WITH statement.
     """
-    def __init__(self, *, last_step : 'NearSQL', previous_steps : List[Tuple[str, 'NearSQLContainer']]):
+    def __init__(self, *, last_step: 'NearSQL', previous_steps: List[Tuple[str, 'NearSQLContainer']]):
         assert isinstance(last_step, NearSQL)
         assert isinstance(previous_steps, List)
         assert all([isinstance(vi, Tuple)
@@ -57,7 +57,7 @@ class NearSQL(ABC):
             near_sql=self, columns=columns, force_sql=force_sql, constants=constants
         )
 
-    def to_sql(
+    def to_sql_str_list(
         self,
         *,
         columns=None,
@@ -65,7 +65,7 @@ class NearSQL(ABC):
         constants=None,
         db_model,
         sql_format_options=None,
-    ):
+    ) -> List[str]:
         raise NotImplementedError("base method called")
 
     def to_with_form(self) -> SQLWithList:
@@ -94,8 +94,8 @@ class NearSQLContainer:
         if constants is not None:
             self.constants = constants.copy()
 
-    def to_sql(self, db_model, sql_format_options=None):
-        return self.near_sql.to_sql(
+    def to_sql_str_list(self, db_model, sql_format_options=None) -> List[str]:
+        return self.near_sql.to_sql_str_list(
             columns=self.columns,
             force_sql=self.force_sql,
             constants=self.constants,
@@ -147,12 +147,17 @@ class NearSQLNamedEntity(NearSQL):
     def to_with_form(self) -> SQLWithList:
         return SQLWithList(last_step=self, previous_steps=[])
 
+    def to_sql_str_list(self, *,
+                        columns=None, force_sql=False, constants=None, db_model, sql_format_options=None
+                        ) -> List[str]:
+        raise NotImplementedError("abstract class method called")
+
 
 class NearSQLCommonTableExpression(NearSQLNamedEntity):
     def __init__(self, *, quoted_query_name):
         NearSQLNamedEntity.__init__(self, terms=None, quoted_query_name=quoted_query_name)
 
-    def to_sql(
+    def to_sql_str_list(
         self,
         *,
         columns=None,
@@ -160,7 +165,7 @@ class NearSQLCommonTableExpression(NearSQLNamedEntity):
         constants=None,
         db_model,
         sql_format_options=None,
-    ):
+    ) -> List[str]:
         return db_model.nearsqlcte_to_sql_(
             near_sql=self,
             columns=columns,
@@ -175,7 +180,7 @@ class NearSQLTable(NearSQLNamedEntity):
         NearSQLNamedEntity.__init__(self, terms=terms, quoted_query_name=quoted_query_name)
         self.quoted_table_name = quoted_table_name
 
-    def to_sql(
+    def to_sql_str_list(
         self,
         *,
         columns=None,
@@ -183,7 +188,7 @@ class NearSQLTable(NearSQLNamedEntity):
         constants=None,
         db_model,
         sql_format_options=None,
-    ):
+    ) -> List[str]:
         return db_model.nearsqltable_to_sql_(
             near_sql=self,
             columns=columns,
@@ -226,7 +231,7 @@ class NearSQLUnaryStep(NearSQL):
         else:
             self.mergeable = False
 
-    def to_sql(
+    def to_sql_str_list(
         self,
         *,
         columns=None,
@@ -234,8 +239,8 @@ class NearSQLUnaryStep(NearSQL):
         constants=None,
         db_model,
         sql_format_options=None,
-    ):
-        return db_model.nearsqlunary_to_sql_(
+    ) -> List[str]:
+        return db_model.nearsqlunary_to_sql_str_list_(
             near_sql=self,
             columns=columns,
             constants=constants,
@@ -287,7 +292,7 @@ class NearSQLBinaryStep(NearSQL):
         self.sub_sql2 = sub_sql2
         self.suffix = suffix
 
-    def to_sql(
+    def to_sql_str_list(
         self,
         *,
         columns=None,
@@ -295,8 +300,8 @@ class NearSQLBinaryStep(NearSQL):
         constants=None,
         db_model,
         sql_format_options=None,
-    ):
-        return db_model.nearsqlbinary_to_sql_(
+    ) -> List[str]:
+        return db_model.nearsqlbinary_to_sql_str_list_(
             near_sql=self,
             columns=columns,
             force_sql=force_sql,
@@ -362,7 +367,7 @@ class NearSQLq(NearSQL):
         self.query = query
         self.prev_quoted_query_name = prev_quoted_query_name
 
-    def to_sql(
+    def to_sql_str_list(
         self,
         *,
         columns=None,
@@ -370,7 +375,7 @@ class NearSQLq(NearSQL):
         constants=None,
         db_model,
         sql_format_options=None,
-    ):
+    ) -> List[str]:
         return db_model.nearsqlq_to_sql_(
             near_sql=self,
             columns=columns,

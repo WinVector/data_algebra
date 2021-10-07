@@ -574,6 +574,7 @@ class DBModel:
             q = q.to_sql(db_model=self)
         else:
             q = str(q)
+        assert isinstance(q, str)
         pandas.io.sql.execute(q, conn)
 
     def read_query(self, conn, q):
@@ -587,6 +588,7 @@ class DBModel:
             q = q.to_sql(db_model=self)
         else:
             q = str(q)
+        assert isinstance(q, str)
         r = pandas.io.sql.read_sql(q, conn)
         r = self.local_data_model.pd.DataFrame(r)
         r = r.reset_index(drop=True)
@@ -1375,7 +1377,7 @@ class DBModel:
                 sql_sequence = []
                 for i in range(len_sequence):
                     nmi = sequence.previous_steps[i][0]  # already quoted
-                    sqli = sequence.previous_steps[i][1].to_sql(
+                    sqli = sequence.previous_steps[i][1].to_sql_str_list(
                         db_model=self, sql_format_options=sql_format_options
                     )
                     sql_sequence = (
@@ -1396,13 +1398,13 @@ class DBModel:
                         sql_sequence = sql_sequence + [
                             sql_format_options.sql_indent + ")"
                         ]
-                sql_last = sequence.last_step.to_sql(
+                sql_last = sequence.last_step.to_sql_str_list(
                     db_model=self, force_sql=True, sql_format_options=sql_format_options
                 )
                 sql_str_list = ["WITH"] + sql_sequence + sql_last
         if sql_str_list is None:
             # non-with path
-            sql_str_list = near_sql.to_sql(
+            sql_str_list = near_sql.to_sql_str_list(
                 db_model=self, force_sql=True, sql_format_options=sql_format_options
             )
         if sql_format_options.annotate:
@@ -1599,7 +1601,7 @@ class DBModel:
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
         assert isinstance(sql_format_options, SQLFormatOptions)
-        sub_sql = nearsql_container.to_sql(self, sql_format_options=sql_format_options)
+        sub_sql = nearsql_container.to_sql_str_list(self, sql_format_options=sql_format_options)
         assert isinstance(sub_sql, list)
         if isinstance(nearsql_container.near_sql, data_algebra.near_sql.NearSQLTable):
             sql = sub_sql
@@ -1683,7 +1685,7 @@ class DBModel:
             )
         return [near_sql.quoted_table_name]
 
-    def nearsqlunary_to_sql_(
+    def nearsqlunary_to_sql_str_list_(
         self,
         near_sql,
         *,
@@ -1735,7 +1737,7 @@ class DBModel:
             sql = sql + near_sql.suffix
         return sql
 
-    def nearsqlbinary_to_sql_(
+    def nearsqlbinary_to_sql_str_list_(
         self,
         near_sql,
         *,
@@ -1768,10 +1770,10 @@ class DBModel:
         ):
             sql_start = "SELECT  -- " + _clean_annotation(near_sql.annotation)
         if is_union:
-            substr_1 = near_sql.sub_sql1.to_sql(
+            substr_1 = near_sql.sub_sql1.to_sql_str_list(
                 db_model=self, sql_format_options=sql_format_options
             )
-            substr_2 = near_sql.sub_sql2.to_sql(
+            substr_2 = near_sql.sub_sql2.to_sql_str_list(
                 db_model=self, sql_format_options=sql_format_options
             )
         else:

@@ -145,10 +145,10 @@
                                 <a class="function" href="#DBModel.nearsqltable_to_sql_">nearsqltable_to_sql_</a>
                         </li>
                         <li>
-                                <a class="function" href="#DBModel.nearsqlunary_to_sql_">nearsqlunary_to_sql_</a>
+                                <a class="function" href="#DBModel.nearsqlunary_to_sql_str_list_">nearsqlunary_to_sql_str_list_</a>
                         </li>
                         <li>
-                                <a class="function" href="#DBModel.nearsqlbinary_to_sql_">nearsqlbinary_to_sql_</a>
+                                <a class="function" href="#DBModel.nearsqlbinary_to_sql_str_list_">nearsqlbinary_to_sql_str_list_</a>
                         </li>
                         <li>
                                 <a class="function" href="#DBModel.nearsqlq_to_sql_">nearsqlq_to_sql_</a>
@@ -788,6 +788,7 @@
             <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">q</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">pandas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">read_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
@@ -801,6 +802,7 @@
             <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">q</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1589,7 +1591,7 @@
                 <span class="n">sql_sequence</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">len_sequence</span><span class="p">):</span>
                     <span class="n">nmi</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">previous_steps</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># already quoted</span>
-                    <span class="n">sqli</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">previous_steps</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+                    <span class="n">sqli</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">previous_steps</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
                         <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
                     <span class="p">)</span>
                     <span class="n">sql_sequence</span> <span class="o">=</span> <span class="p">(</span>
@@ -1610,13 +1612,13 @@
                         <span class="n">sql_sequence</span> <span class="o">=</span> <span class="n">sql_sequence</span> <span class="o">+</span> <span class="p">[</span>
                             <span class="n">sql_format_options</span><span class="o">.</span><span class="n">sql_indent</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
                         <span class="p">]</span>
-                <span class="n">sql_last</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">last_step</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+                <span class="n">sql_last</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">last_step</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
                     <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
                 <span class="p">)</span>
                 <span class="n">sql_str_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;WITH&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">sql_sequence</span> <span class="o">+</span> <span class="n">sql_last</span>
         <span class="k">if</span> <span class="n">sql_str_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># non-with path</span>
-            <span class="n">sql_str_list</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+            <span class="n">sql_str_list</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
                 <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">annotate</span><span class="p">:</span>
@@ -1813,7 +1815,7 @@
         <span class="k">if</span> <span class="n">sql_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
-        <span class="n">sub_sql</span> <span class="o">=</span> <span class="n">nearsql_container</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">)</span>
+        <span class="n">sub_sql</span> <span class="o">=</span> <span class="n">nearsql_container</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_sql</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nearsql_container</span><span class="o">.</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLTable</span><span class="p">):</span>
             <span class="n">sql</span> <span class="o">=</span> <span class="n">sub_sql</span>
@@ -1897,7 +1899,7 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">near_sql</span><span class="o">.</span><span class="n">quoted_table_name</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">nearsqlunary_to_sql_</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">nearsqlunary_to_sql_str_list_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">near_sql</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1949,7 +1951,7 @@
             <span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span> <span class="o">+</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">suffix</span>
         <span class="k">return</span> <span class="n">sql</span>
 
-    <span class="k">def</span> <span class="nf">nearsqlbinary_to_sql_</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">nearsqlbinary_to_sql_str_list_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">near_sql</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1982,10 +1984,10 @@
         <span class="p">):</span>
             <span class="n">sql_start</span> <span class="o">=</span> <span class="s2">&quot;SELECT  -- &quot;</span> <span class="o">+</span> <span class="n">_clean_annotation</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">annotation</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">is_union</span><span class="p">:</span>
-            <span class="n">substr_1</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">sub_sql1</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+            <span class="n">substr_1</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">sub_sql1</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
                 <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
             <span class="p">)</span>
-            <span class="n">substr_2</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">sub_sql2</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+            <span class="n">substr_2</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">sub_sql2</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
                 <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -2341,6 +2343,7 @@
             <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">q</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">pandas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">read_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
@@ -2354,6 +2357,7 @@
             <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">q</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -3142,7 +3146,7 @@
                 <span class="n">sql_sequence</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">len_sequence</span><span class="p">):</span>
                     <span class="n">nmi</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">previous_steps</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># already quoted</span>
-                    <span class="n">sqli</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">previous_steps</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+                    <span class="n">sqli</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">previous_steps</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
                         <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
                     <span class="p">)</span>
                     <span class="n">sql_sequence</span> <span class="o">=</span> <span class="p">(</span>
@@ -3163,13 +3167,13 @@
                         <span class="n">sql_sequence</span> <span class="o">=</span> <span class="n">sql_sequence</span> <span class="o">+</span> <span class="p">[</span>
                             <span class="n">sql_format_options</span><span class="o">.</span><span class="n">sql_indent</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
                         <span class="p">]</span>
-                <span class="n">sql_last</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">last_step</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+                <span class="n">sql_last</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">last_step</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
                     <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
                 <span class="p">)</span>
                 <span class="n">sql_str_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;WITH&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">sql_sequence</span> <span class="o">+</span> <span class="n">sql_last</span>
         <span class="k">if</span> <span class="n">sql_str_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># non-with path</span>
-            <span class="n">sql_str_list</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+            <span class="n">sql_str_list</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
                 <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">annotate</span><span class="p">:</span>
@@ -3366,7 +3370,7 @@
         <span class="k">if</span> <span class="n">sql_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
-        <span class="n">sub_sql</span> <span class="o">=</span> <span class="n">nearsql_container</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">)</span>
+        <span class="n">sub_sql</span> <span class="o">=</span> <span class="n">nearsql_container</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_sql</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nearsql_container</span><span class="o">.</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLTable</span><span class="p">):</span>
             <span class="n">sql</span> <span class="o">=</span> <span class="n">sub_sql</span>
@@ -3450,7 +3454,7 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">near_sql</span><span class="o">.</span><span class="n">quoted_table_name</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">nearsqlunary_to_sql_</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">nearsqlunary_to_sql_str_list_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">near_sql</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3502,7 +3506,7 @@
             <span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span> <span class="o">+</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">suffix</span>
         <span class="k">return</span> <span class="n">sql</span>
 
-    <span class="k">def</span> <span class="nf">nearsqlbinary_to_sql_</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">nearsqlbinary_to_sql_str_list_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">near_sql</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3535,10 +3539,10 @@
         <span class="p">):</span>
             <span class="n">sql_start</span> <span class="o">=</span> <span class="s2">&quot;SELECT  -- &quot;</span> <span class="o">+</span> <span class="n">_clean_annotation</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">annotation</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">is_union</span><span class="p">:</span>
-            <span class="n">substr_1</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">sub_sql1</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+            <span class="n">substr_1</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">sub_sql1</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
                 <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
             <span class="p">)</span>
-            <span class="n">substr_2</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">sub_sql2</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+            <span class="n">substr_2</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">sub_sql2</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
                 <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -3764,6 +3768,7 @@
             <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">q</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">pandas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
 </pre></div>
 
@@ -3796,6 +3801,7 @@
             <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">q</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -4967,7 +4973,7 @@
                 <span class="n">sql_sequence</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">len_sequence</span><span class="p">):</span>
                     <span class="n">nmi</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">previous_steps</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># already quoted</span>
-                    <span class="n">sqli</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">previous_steps</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+                    <span class="n">sqli</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">previous_steps</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
                         <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
                     <span class="p">)</span>
                     <span class="n">sql_sequence</span> <span class="o">=</span> <span class="p">(</span>
@@ -4988,13 +4994,13 @@
                         <span class="n">sql_sequence</span> <span class="o">=</span> <span class="n">sql_sequence</span> <span class="o">+</span> <span class="p">[</span>
                             <span class="n">sql_format_options</span><span class="o">.</span><span class="n">sql_indent</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
                         <span class="p">]</span>
-                <span class="n">sql_last</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">last_step</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+                <span class="n">sql_last</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">last_step</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
                     <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
                 <span class="p">)</span>
                 <span class="n">sql_str_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;WITH&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">sql_sequence</span> <span class="o">+</span> <span class="n">sql_last</span>
         <span class="k">if</span> <span class="n">sql_str_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># non-with path</span>
-            <span class="n">sql_str_list</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+            <span class="n">sql_str_list</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
                 <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">sql_format_options</span><span class="o">.</span><span class="n">annotate</span><span class="p">:</span>
@@ -5268,7 +5274,7 @@
         <span class="k">if</span> <span class="n">sql_format_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
-        <span class="n">sub_sql</span> <span class="o">=</span> <span class="n">nearsql_container</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">)</span>
+        <span class="n">sub_sql</span> <span class="o">=</span> <span class="n">nearsql_container</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_sql</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nearsql_container</span><span class="o">.</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLTable</span><span class="p">):</span>
             <span class="n">sql</span> <span class="o">=</span> <span class="n">sub_sql</span>
@@ -5406,12 +5412,12 @@
     
 
                             </div>
-                            <div id="DBModel.nearsqlunary_to_sql_" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#DBModel.nearsqlunary_to_sql_">#&nbsp;&nbsp</a>
+                            <div id="DBModel.nearsqlunary_to_sql_str_list_" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DBModel.nearsqlunary_to_sql_str_list_">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">nearsqlunary_to_sql_</span><span class="signature">(
+            <span class="name">nearsqlunary_to_sql_str_list_</span><span class="signature">(
     self,
     near_sql,
     *,
@@ -5424,7 +5430,7 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">nearsqlunary_to_sql_</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">nearsqlunary_to_sql_str_list_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">near_sql</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -5482,12 +5488,12 @@
     
 
                             </div>
-                            <div id="DBModel.nearsqlbinary_to_sql_" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#DBModel.nearsqlbinary_to_sql_">#&nbsp;&nbsp</a>
+                            <div id="DBModel.nearsqlbinary_to_sql_str_list_" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DBModel.nearsqlbinary_to_sql_str_list_">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">nearsqlbinary_to_sql_</span><span class="signature">(
+            <span class="name">nearsqlbinary_to_sql_str_list_</span><span class="signature">(
     self,
     near_sql,
     *,
@@ -5501,7 +5507,7 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">nearsqlbinary_to_sql_</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">nearsqlbinary_to_sql_str_list_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">near_sql</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -5534,10 +5540,10 @@
         <span class="p">):</span>
             <span class="n">sql_start</span> <span class="o">=</span> <span class="s2">&quot;SELECT  -- &quot;</span> <span class="o">+</span> <span class="n">_clean_annotation</span><span class="p">(</span><span class="n">near_sql</span><span class="o">.</span><span class="n">annotation</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">is_union</span><span class="p">:</span>
-            <span class="n">substr_1</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">sub_sql1</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+            <span class="n">substr_1</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">sub_sql1</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
                 <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
             <span class="p">)</span>
-            <span class="n">substr_2</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">sub_sql2</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+            <span class="n">substr_2</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">sub_sql2</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
                 <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>

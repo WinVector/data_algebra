@@ -49,7 +49,7 @@
                                 <a class="function" href="#NearSQL.to_bound_near_sql">to_bound_near_sql</a>
                         </li>
                         <li>
-                                <a class="function" href="#NearSQL.to_sql">to_sql</a>
+                                <a class="function" href="#NearSQL.to_sql_str_list">to_sql_str_list</a>
                         </li>
                         <li>
                                 <a class="function" href="#NearSQL.to_with_form">to_with_form</a>
@@ -64,7 +64,7 @@
                                 <a class="function" href="#NearSQLContainer.__init__">NearSQLContainer</a>
                         </li>
                         <li>
-                                <a class="function" href="#NearSQLContainer.to_sql">to_sql</a>
+                                <a class="function" href="#NearSQLContainer.to_sql_str_list">to_sql_str_list</a>
                         </li>
                         <li>
                                 <a class="function" href="#NearSQLContainer.convert_subsql">convert_subsql</a>
@@ -84,6 +84,9 @@
                         <li>
                                 <a class="function" href="#NearSQLNamedEntity.to_with_form">to_with_form</a>
                         </li>
+                        <li>
+                                <a class="function" href="#NearSQLNamedEntity.to_sql_str_list">to_sql_str_list</a>
+                        </li>
                 </ul>
 
             </li>
@@ -94,7 +97,7 @@
                                 <a class="function" href="#NearSQLCommonTableExpression.__init__">NearSQLCommonTableExpression</a>
                         </li>
                         <li>
-                                <a class="function" href="#NearSQLCommonTableExpression.to_sql">to_sql</a>
+                                <a class="function" href="#NearSQLCommonTableExpression.to_sql_str_list">to_sql_str_list</a>
                         </li>
                 </ul>
 
@@ -106,7 +109,7 @@
                                 <a class="function" href="#NearSQLTable.__init__">NearSQLTable</a>
                         </li>
                         <li>
-                                <a class="function" href="#NearSQLTable.to_sql">to_sql</a>
+                                <a class="function" href="#NearSQLTable.to_sql_str_list">to_sql_str_list</a>
                         </li>
                 </ul>
 
@@ -118,7 +121,7 @@
                                 <a class="function" href="#NearSQLUnaryStep.__init__">NearSQLUnaryStep</a>
                         </li>
                         <li>
-                                <a class="function" href="#NearSQLUnaryStep.to_sql">to_sql</a>
+                                <a class="function" href="#NearSQLUnaryStep.to_sql_str_list">to_sql_str_list</a>
                         </li>
                         <li>
                                 <a class="function" href="#NearSQLUnaryStep.to_with_form">to_with_form</a>
@@ -133,7 +136,7 @@
                                 <a class="function" href="#NearSQLBinaryStep.__init__">NearSQLBinaryStep</a>
                         </li>
                         <li>
-                                <a class="function" href="#NearSQLBinaryStep.to_sql">to_sql</a>
+                                <a class="function" href="#NearSQLBinaryStep.to_sql_str_list">to_sql_str_list</a>
                         </li>
                         <li>
                                 <a class="function" href="#NearSQLBinaryStep.to_with_form">to_with_form</a>
@@ -148,7 +151,7 @@
                                 <a class="function" href="#NearSQLq.__init__">NearSQLq</a>
                         </li>
                         <li>
-                                <a class="function" href="#NearSQLq.to_sql">to_sql</a>
+                                <a class="function" href="#NearSQLq.to_sql_str_list">to_sql_str_list</a>
                         </li>
                         <li>
                                 <a class="function" href="#NearSQLq.to_with_form">to_with_form</a>
@@ -189,7 +192,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Carry an ordered sequence of SQL steps for use with a SQL WITH statement.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last_step</span> <span class="p">:</span> <span class="s1">&#39;NearSQL&#39;</span><span class="p">,</span> <span class="n">previous_steps</span> <span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;NearSQLContainer&#39;</span><span class="p">]]):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last_step</span><span class="p">:</span> <span class="s1">&#39;NearSQL&#39;</span><span class="p">,</span> <span class="n">previous_steps</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;NearSQLContainer&#39;</span><span class="p">]]):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">last_step</span><span class="p">,</span> <span class="n">NearSQL</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_steps</span><span class="p">,</span> <span class="n">List</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">)</span>
@@ -233,7 +236,7 @@
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="n">force_sql</span><span class="p">,</span> <span class="n">constants</span><span class="o">=</span><span class="n">constants</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -241,7 +244,7 @@
         <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_with_form</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SQLWithList</span><span class="p">:</span>
@@ -270,8 +273,8 @@
         <span class="k">if</span> <span class="n">constants</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">constants</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
             <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
             <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,</span>
             <span class="n">constants</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">constants</span><span class="p">,</span>
@@ -323,12 +326,17 @@
     <span class="k">def</span> <span class="nf">to_with_form</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SQLWithList</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">SQLWithList</span><span class="p">(</span><span class="n">last_step</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">previous_steps</span><span class="o">=</span><span class="p">[])</span>
 
+    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span>
+                        <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
+                        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract class method called&quot;</span><span class="p">)</span>
+
 
 <span class="k">class</span> <span class="nc">NearSQLCommonTableExpression</span><span class="p">(</span><span class="n">NearSQLNamedEntity</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">quoted_query_name</span><span class="p">):</span>
         <span class="n">NearSQLNamedEntity</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">terms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -336,7 +344,7 @@
         <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlcte_to_sql_</span><span class="p">(</span>
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
@@ -351,7 +359,7 @@
         <span class="n">NearSQLNamedEntity</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span> <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quoted_table_name</span> <span class="o">=</span> <span class="n">quoted_table_name</span>
 
-    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -359,7 +367,7 @@
         <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqltable_to_sql_</span><span class="p">(</span>
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
@@ -402,7 +410,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mergeable</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -410,8 +418,8 @@
         <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlunary_to_sql_</span><span class="p">(</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlunary_to_sql_str_list_</span><span class="p">(</span>
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
             <span class="n">constants</span><span class="o">=</span><span class="n">constants</span><span class="p">,</span>
@@ -463,7 +471,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql2</span> <span class="o">=</span> <span class="n">sub_sql2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span>
 
-    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -471,8 +479,8 @@
         <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlbinary_to_sql_</span><span class="p">(</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlbinary_to_sql_str_list_</span><span class="p">(</span>
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
             <span class="n">force_sql</span><span class="o">=</span><span class="n">force_sql</span><span class="p">,</span>
@@ -538,7 +546,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">query</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prev_quoted_query_name</span> <span class="o">=</span> <span class="n">prev_quoted_query_name</span>
 
-    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -546,7 +554,7 @@
         <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlq_to_sql_</span><span class="p">(</span>
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
@@ -576,7 +584,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Carry an ordered sequence of SQL steps for use with a SQL WITH statement.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last_step</span> <span class="p">:</span> <span class="s1">&#39;NearSQL&#39;</span><span class="p">,</span> <span class="n">previous_steps</span> <span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;NearSQLContainer&#39;</span><span class="p">]]):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last_step</span><span class="p">:</span> <span class="s1">&#39;NearSQL&#39;</span><span class="p">,</span> <span class="n">previous_steps</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;NearSQLContainer&#39;</span><span class="p">]]):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">last_step</span><span class="p">,</span> <span class="n">NearSQL</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_steps</span><span class="p">,</span> <span class="n">List</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">)</span>
@@ -615,7 +623,7 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last_step</span> <span class="p">:</span> <span class="s1">&#39;NearSQL&#39;</span><span class="p">,</span> <span class="n">previous_steps</span> <span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;NearSQLContainer&#39;</span><span class="p">]]):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last_step</span><span class="p">:</span> <span class="s1">&#39;NearSQL&#39;</span><span class="p">,</span> <span class="n">previous_steps</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;NearSQLContainer&#39;</span><span class="p">]]):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">last_step</span><span class="p">,</span> <span class="n">NearSQL</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">previous_steps</span><span class="p">,</span> <span class="n">List</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">)</span>
@@ -676,7 +684,7 @@
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="n">force_sql</span><span class="p">,</span> <span class="n">constants</span><span class="o">=</span><span class="n">constants</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -684,7 +692,7 @@
         <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_with_form</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SQLWithList</span><span class="p">:</span>
@@ -747,12 +755,12 @@
     
 
                             </div>
-                            <div id="NearSQL.to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#NearSQL.to_sql">#&nbsp;&nbsp</a>
+                            <div id="NearSQL.to_sql_str_list" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#NearSQL.to_sql_str_list">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">to_sql</span><span class="signature">(
+            <span class="name">to_sql_str_list</span><span class="signature">(
     self,
     *,
     columns=None,
@@ -760,12 +768,12 @@
     constants=None,
     db_model,
     sql_format_options=None
-)</span>:
+) -&gt; List[str]</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -773,7 +781,7 @@
         <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
@@ -835,8 +843,8 @@
         <span class="k">if</span> <span class="n">constants</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">constants</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
             <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
             <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,</span>
             <span class="n">constants</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">constants</span><span class="p">,</span>
@@ -917,18 +925,18 @@
     
 
                             </div>
-                            <div id="NearSQLContainer.to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#NearSQLContainer.to_sql">#&nbsp;&nbsp</a>
+                            <div id="NearSQLContainer.to_sql_str_list" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#NearSQLContainer.to_sql_str_list">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">to_sql</span><span class="signature">(self, db_model, sql_format_options=None)</span>:
+            <span class="name">to_sql_str_list</span><span class="signature">(self, db_model, sql_format_options=None) -&gt; List[str]</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
             <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
             <span class="n">force_sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">force_sql</span><span class="p">,</span>
             <span class="n">constants</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">constants</span><span class="p">,</span>
@@ -1027,6 +1035,11 @@
 
     <span class="k">def</span> <span class="nf">to_with_form</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SQLWithList</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">SQLWithList</span><span class="p">(</span><span class="n">last_step</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">previous_steps</span><span class="o">=</span><span class="p">[])</span>
+
+    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span>
+                        <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
+                        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract class method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -1074,12 +1087,40 @@
     
 
                             </div>
+                            <div id="NearSQLNamedEntity.to_sql_str_list" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#NearSQLNamedEntity.to_sql_str_list">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">to_sql_str_list</span><span class="signature">(
+    self,
+    *,
+    columns=None,
+    force_sql=False,
+    constants=None,
+    db_model,
+    sql_format_options=None
+) -&gt; List[str]</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span>
+                        <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force_sql</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
+                        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract class method called&quot;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
                                     <div><dt><a href="#NearSQL">NearSQL</a></dt>
                                 <dd id="NearSQLNamedEntity.to_bound_near_sql" class="function"><a href="#NearSQL.to_bound_near_sql">to_bound_near_sql</a></dd>
-                <dd id="NearSQLNamedEntity.to_sql" class="function"><a href="#NearSQL.to_sql">to_sql</a></dd>
 
             </div>
                                 </dl>
@@ -1100,7 +1141,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">quoted_query_name</span><span class="p">):</span>
         <span class="n">NearSQLNamedEntity</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">terms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1108,7 +1149,7 @@
         <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlcte_to_sql_</span><span class="p">(</span>
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
@@ -1142,12 +1183,12 @@
     
 
                             </div>
-                            <div id="NearSQLCommonTableExpression.to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#NearSQLCommonTableExpression.to_sql">#&nbsp;&nbsp</a>
+                            <div id="NearSQLCommonTableExpression.to_sql_str_list" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#NearSQLCommonTableExpression.to_sql_str_list">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">to_sql</span><span class="signature">(
+            <span class="name">to_sql_str_list</span><span class="signature">(
     self,
     *,
     columns=None,
@@ -1155,12 +1196,12 @@
     constants=None,
     db_model,
     sql_format_options=None
-)</span>:
+) -&gt; List[str]</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1168,7 +1209,7 @@
         <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlcte_to_sql_</span><span class="p">(</span>
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
@@ -1213,7 +1254,7 @@
         <span class="n">NearSQLNamedEntity</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span> <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quoted_table_name</span> <span class="o">=</span> <span class="n">quoted_table_name</span>
 
-    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1221,7 +1262,7 @@
         <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqltable_to_sql_</span><span class="p">(</span>
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
@@ -1256,12 +1297,12 @@
     
 
                             </div>
-                            <div id="NearSQLTable.to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#NearSQLTable.to_sql">#&nbsp;&nbsp</a>
+                            <div id="NearSQLTable.to_sql_str_list" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#NearSQLTable.to_sql_str_list">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">to_sql</span><span class="signature">(
+            <span class="name">to_sql_str_list</span><span class="signature">(
     self,
     *,
     columns=None,
@@ -1269,12 +1310,12 @@
     constants=None,
     db_model,
     sql_format_options=None
-)</span>:
+) -&gt; List[str]</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1282,7 +1323,7 @@
         <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqltable_to_sql_</span><span class="p">(</span>
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
@@ -1355,7 +1396,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mergeable</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1363,8 +1404,8 @@
         <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlunary_to_sql_</span><span class="p">(</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlunary_to_sql_str_list_</span><span class="p">(</span>
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
             <span class="n">constants</span><span class="o">=</span><span class="n">constants</span><span class="p">,</span>
@@ -1449,12 +1490,12 @@
     
 
                             </div>
-                            <div id="NearSQLUnaryStep.to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#NearSQLUnaryStep.to_sql">#&nbsp;&nbsp</a>
+                            <div id="NearSQLUnaryStep.to_sql_str_list" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#NearSQLUnaryStep.to_sql_str_list">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">to_sql</span><span class="signature">(
+            <span class="name">to_sql_str_list</span><span class="signature">(
     self,
     *,
     columns=None,
@@ -1462,12 +1503,12 @@
     constants=None,
     db_model,
     sql_format_options=None
-)</span>:
+) -&gt; List[str]</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1475,8 +1516,8 @@
         <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlunary_to_sql_</span><span class="p">(</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlunary_to_sql_str_list_</span><span class="p">(</span>
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
             <span class="n">constants</span><span class="o">=</span><span class="n">constants</span><span class="p">,</span>
@@ -1570,7 +1611,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql2</span> <span class="o">=</span> <span class="n">sub_sql2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span>
 
-    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1578,8 +1619,8 @@
         <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlbinary_to_sql_</span><span class="p">(</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlbinary_to_sql_str_list_</span><span class="p">(</span>
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
             <span class="n">force_sql</span><span class="o">=</span><span class="n">force_sql</span><span class="p">,</span>
@@ -1677,12 +1718,12 @@
     
 
                             </div>
-                            <div id="NearSQLBinaryStep.to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#NearSQLBinaryStep.to_sql">#&nbsp;&nbsp</a>
+                            <div id="NearSQLBinaryStep.to_sql_str_list" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#NearSQLBinaryStep.to_sql_str_list">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">to_sql</span><span class="signature">(
+            <span class="name">to_sql_str_list</span><span class="signature">(
     self,
     *,
     columns=None,
@@ -1690,12 +1731,12 @@
     constants=None,
     db_model,
     sql_format_options=None
-)</span>:
+) -&gt; List[str]</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1703,8 +1744,8 @@
         <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlbinary_to_sql_</span><span class="p">(</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlbinary_to_sql_str_list_</span><span class="p">(</span>
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
             <span class="n">force_sql</span><span class="o">=</span><span class="n">force_sql</span><span class="p">,</span>
@@ -1812,7 +1853,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">query</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prev_quoted_query_name</span> <span class="o">=</span> <span class="n">prev_quoted_query_name</span>
 
-    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1820,7 +1861,7 @@
         <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlq_to_sql_</span><span class="p">(</span>
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
@@ -1880,12 +1921,12 @@
     
 
                             </div>
-                            <div id="NearSQLq.to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#NearSQLq.to_sql">#&nbsp;&nbsp</a>
+                            <div id="NearSQLq.to_sql_str_list" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#NearSQLq.to_sql_str_list">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">to_sql</span><span class="signature">(
+            <span class="name">to_sql_str_list</span><span class="signature">(
     self,
     *,
     columns=None,
@@ -1893,12 +1934,12 @@
     constants=None,
     db_model,
     sql_format_options=None
-)</span>:
+) -&gt; List[str]</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1906,7 +1947,7 @@
         <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">db_model</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlq_to_sql_</span><span class="p">(</span>
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>

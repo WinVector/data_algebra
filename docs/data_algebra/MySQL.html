@@ -116,10 +116,10 @@
 
 <span class="k">class</span> <span class="nc">MySQLModel</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A model of how SQL should be generated for MySQL.</span>
-<span class="sd">       Assuming we are using a sqlalhemy engine as our connection</span>
+<span class="sd">       Assuming we are using a sqlalchemy engine as our connection.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">supports_with</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">string_type</span><span class="o">=</span><span class="s2">&quot;CHAR&quot;</span><span class="p">,</span>
@@ -168,10 +168,10 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">MySQLModel</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A model of how SQL should be generated for MySQL.</span>
-<span class="sd">       Assuming we are using a sqlalhemy engine as our connection</span>
+<span class="sd">       Assuming we are using a sqlalchemy engine as our connection.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">supports_with</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">string_type</span><span class="o">=</span><span class="s2">&quot;CHAR&quot;</span><span class="p">,</span>
@@ -193,7 +193,7 @@
         </details>
 
             <div class="docstring"><p>A model of how SQL should be generated for MySQL.
-Assuming we are using a sqlalhemy engine as our connection</p>
+Assuming we are using a sqlalchemy engine as our connection.</p>
 </div>
 
 
@@ -201,12 +201,12 @@ Assuming we are using a sqlalhemy engine as our connection</p>
                                         <div class="attr function"><a class="headerlink" href="#MySQLModel.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">MySQLModel</span><span class="signature">()</span>
+            <span class="name">MySQLModel</span><span class="signature">(*, supports_with=False)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">supports_with</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">string_type</span><span class="o">=</span><span class="s2">&quot;CHAR&quot;</span><span class="p">,</span>
@@ -282,8 +282,8 @@ Assuming we are using a sqlalhemy engine as our connection</p>
                 <dd id="MySQLModel.convert_nearsql_container_subsql_" class="function"><a href="db_model.html#DBModel.convert_nearsql_container_subsql_">convert_nearsql_container_subsql_</a></dd>
                 <dd id="MySQLModel.nearsqlcte_to_sql_" class="function"><a href="db_model.html#DBModel.nearsqlcte_to_sql_">nearsqlcte_to_sql_</a></dd>
                 <dd id="MySQLModel.nearsqltable_to_sql_" class="function"><a href="db_model.html#DBModel.nearsqltable_to_sql_">nearsqltable_to_sql_</a></dd>
-                <dd id="MySQLModel.nearsqlunary_to_sql_" class="function"><a href="db_model.html#DBModel.nearsqlunary_to_sql_">nearsqlunary_to_sql_</a></dd>
-                <dd id="MySQLModel.nearsqlbinary_to_sql_" class="function"><a href="db_model.html#DBModel.nearsqlbinary_to_sql_">nearsqlbinary_to_sql_</a></dd>
+                <dd id="MySQLModel.nearsqlunary_to_sql_str_list_" class="function"><a href="db_model.html#DBModel.nearsqlunary_to_sql_str_list_">nearsqlunary_to_sql_str_list_</a></dd>
+                <dd id="MySQLModel.nearsqlbinary_to_sql_str_list_" class="function"><a href="db_model.html#DBModel.nearsqlbinary_to_sql_str_list_">nearsqlbinary_to_sql_str_list_</a></dd>
                 <dd id="MySQLModel.nearsqlq_to_sql_" class="function"><a href="db_model.html#DBModel.nearsqlq_to_sql_">nearsqlq_to_sql_</a></dd>
 
             </div>
