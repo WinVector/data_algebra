@@ -1686,7 +1686,7 @@
         <span class="n">ctab_sql</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">table_values_to_sql</span><span class="p">(</span><span class="n">record_spec</span><span class="o">.</span><span class="n">control_table</span><span class="p">)]</span>
         <span class="n">sql_prefix</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">_list_join_expecting_list</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="n">col_stmts</span><span class="p">)</span>
-            <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM (&quot;</span><span class="p">]</span>
+            <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM ( SELECT * FROM &quot;</span><span class="p">]</span>
         <span class="p">)</span>
         <span class="n">sql_suffix</span> <span class="o">=</span> <span class="p">(</span>
             <span class="p">[</span><span class="s2">&quot; ) a&quot;</span><span class="p">]</span>
@@ -1717,7 +1717,7 @@
                 <span class="p">)</span>
             <span class="n">sql_prefix</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">_list_join_expecting_list</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">col_stmts</span><span class="p">)</span>
-                    <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM (&quot;</span><span class="p">]</span>
+                    <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM ( SELECT * FROM &quot;</span><span class="p">]</span>
             <span class="p">)</span>
             <span class="n">sql_suffix</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="p">[</span><span class="s2">&quot; ) a&quot;</span><span class="p">]</span>
@@ -1758,7 +1758,7 @@
                     <span class="n">col_stmts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cstmt</span><span class="p">)</span>
         <span class="n">sql_prefix</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">_list_join_expecting_list</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">col_stmts</span><span class="p">)</span>
-                <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM (&quot;</span><span class="p">]</span>
+                <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM ( SELECT * FROM &quot;</span><span class="p">]</span>
         <span class="p">)</span>
         <span class="n">sql_suffix</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="p">[</span><span class="s2">&quot; ) a&quot;</span><span class="p">]</span>
@@ -3196,7 +3196,7 @@
         <span class="n">ctab_sql</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">table_values_to_sql</span><span class="p">(</span><span class="n">record_spec</span><span class="o">.</span><span class="n">control_table</span><span class="p">)]</span>
         <span class="n">sql_prefix</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">_list_join_expecting_list</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="n">col_stmts</span><span class="p">)</span>
-            <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM (&quot;</span><span class="p">]</span>
+            <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM ( SELECT * FROM &quot;</span><span class="p">]</span>
         <span class="p">)</span>
         <span class="n">sql_suffix</span> <span class="o">=</span> <span class="p">(</span>
             <span class="p">[</span><span class="s2">&quot; ) a&quot;</span><span class="p">]</span>
@@ -3227,7 +3227,7 @@
                 <span class="p">)</span>
             <span class="n">sql_prefix</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">_list_join_expecting_list</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">col_stmts</span><span class="p">)</span>
-                    <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM (&quot;</span><span class="p">]</span>
+                    <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM ( SELECT * FROM &quot;</span><span class="p">]</span>
             <span class="p">)</span>
             <span class="n">sql_suffix</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="p">[</span><span class="s2">&quot; ) a&quot;</span><span class="p">]</span>
@@ -3268,7 +3268,7 @@
                     <span class="n">col_stmts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cstmt</span><span class="p">)</span>
         <span class="n">sql_prefix</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">_list_join_expecting_list</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">col_stmts</span><span class="p">)</span>
-                <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM (&quot;</span><span class="p">]</span>
+                <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM ( SELECT * FROM &quot;</span><span class="p">]</span>
         <span class="p">)</span>
         <span class="n">sql_suffix</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="p">[</span><span class="s2">&quot; ) a&quot;</span><span class="p">]</span>
@@ -4994,7 +4994,7 @@
         <span class="n">ctab_sql</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">table_values_to_sql</span><span class="p">(</span><span class="n">record_spec</span><span class="o">.</span><span class="n">control_table</span><span class="p">)]</span>
         <span class="n">sql_prefix</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">_list_join_expecting_list</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="n">col_stmts</span><span class="p">)</span>
-            <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM (&quot;</span><span class="p">]</span>
+            <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM ( SELECT * FROM &quot;</span><span class="p">]</span>
         <span class="p">)</span>
         <span class="n">sql_suffix</span> <span class="o">=</span> <span class="p">(</span>
             <span class="p">[</span><span class="s2">&quot; ) a&quot;</span><span class="p">]</span>
@@ -5040,7 +5040,7 @@
                 <span class="p">)</span>
             <span class="n">sql_prefix</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">_list_join_expecting_list</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">col_stmts</span><span class="p">)</span>
-                    <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM (&quot;</span><span class="p">]</span>
+                    <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM ( SELECT * FROM &quot;</span><span class="p">]</span>
             <span class="p">)</span>
             <span class="n">sql_suffix</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="p">[</span><span class="s2">&quot; ) a&quot;</span><span class="p">]</span>
@@ -5081,7 +5081,7 @@
                     <span class="n">col_stmts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cstmt</span><span class="p">)</span>
         <span class="n">sql_prefix</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">_list_join_expecting_list</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">col_stmts</span><span class="p">)</span>
-                <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM (&quot;</span><span class="p">]</span>
+                <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM ( SELECT * FROM &quot;</span><span class="p">]</span>
         <span class="p">)</span>
         <span class="n">sql_suffix</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="p">[</span><span class="s2">&quot; ) a&quot;</span><span class="p">]</span>

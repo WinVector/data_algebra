@@ -338,13 +338,12 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span>
-    <span class="p">):</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span>  <span class="c1"># NO-OP, return source ops</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span>
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordMap</span><span class="p">(</span>
-                <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span>
+                <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span>
             <span class="p">),</span>
         <span class="p">)</span>
 
@@ -619,13 +618,12 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span>
-    <span class="p">):</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span>  <span class="c1"># NO-OP, return source ops</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span>
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordMap</span><span class="p">(</span>
-                <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span>
+                <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span>
             <span class="p">),</span>
         <span class="p">)</span>
 
@@ -1195,19 +1193,18 @@ raise an exception if the values are not consistent.</p>
 
         
             <span class="def">def</span>
-            <span class="name">map_records</span><span class="signature">(self, blocks_in=None, blocks_out=None, strict=False)</span>:
+            <span class="name">map_records</span><span class="signature">(self, blocks_in=None, blocks_out=None)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span>
-    <span class="p">):</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span>  <span class="c1"># NO-OP, return source ops</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span>
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordMap</span><span class="p">(</span>
-                <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span>
+                <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span>
             <span class="p">),</span>
         <span class="p">)</span>
 </pre></div>

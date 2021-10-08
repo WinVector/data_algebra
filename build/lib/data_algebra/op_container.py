@@ -178,12 +178,11 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         return self
 
     def map_records(
-        self, blocks_in=None, blocks_out=None, strict=False
+        self, blocks_in=None, blocks_out=None
     ):
         self.ops.map_records(
             blocks_in=blocks_in,
             blocks_out=blocks_out,
-            strict=strict,
         )
         return self
 
