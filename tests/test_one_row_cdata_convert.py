@@ -109,7 +109,3 @@ def test_one_row_cdata_convert():
     data_algebra.test_util.check_transform(
         ops=ops1_e2_r, data=b, expect=a
     )
-
-
-
-

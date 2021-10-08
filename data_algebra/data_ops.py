@@ -1970,38 +1970,42 @@ class ConvertRecordsNode(ViewRepresentation):
             temp_id_source = [0]
         # TODO: narrow to what we are using
         # TODO: use nearsql instead of strings / lists of strings
-        sub_query = self.sources[0].to_near_sql_implementation(
+        near_sql = self.sources[0].to_near_sql_implementation(
             db_model=db_model,
             using=None,
             temp_id_source=temp_id_source,
             sql_format_options=sql_format_options,
         )
+        assert isinstance(near_sql, data_algebra.near_sql.NearSQL)
         # claims to use all columns
-        query = sub_query.to_sql_str_list(
-            columns=self.columns_used_from_sources()[0],
-            db_model=db_model,
-            force_sql=True,
-        )
         if self.record_map.blocks_in is not None:
-            query = db_model.blocks_to_row_recs_query(
-                query, record_spec=self.record_map.blocks_in
+            view_name = "convert_records_blocks_in_" + str(temp_id_source[0])
+            temp_id_source[0] = temp_id_source[0] + 1
+            pi, si = db_model.blocks_to_row_recs_query_str_list_pair(
+                record_spec=self.record_map.blocks_in
             )
+            near_sql = data_algebra.near_sql.NearSQLRawQStep(
+                prefix=pi,
+                quoted_query_name=db_model.quote_identifier(view_name),
+                sub_sql=data_algebra.near_sql.NearSQLContainer(near_sql=near_sql),
+                suffix=si,
+                annotation="convert records blocks in",
+            )
+            assert isinstance(near_sql, data_algebra.near_sql.NearSQL)
         if self.record_map.blocks_out is not None:
-            query = db_model.row_recs_to_blocks_query(
-                query, record_spec=self.record_map.blocks_out,
+            view_name = "convert_records_blocks_out_" + str(temp_id_source[0])
+            temp_id_source[0] = temp_id_source[0] + 1
+            pi, si = db_model.row_recs_to_blocks_query_str_list_pair(
+                record_spec=self.record_map.blocks_out,
             )
-        view_name = "convert_records_in_" + str(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
-        prev_view_name = "convert_records_out_" + str(temp_id_source[0])
-        temp_id_source[0] = temp_id_source[0] + 1
-        terms = {k: None for k in self.record_map.columns_produced}
-        near_sql = data_algebra.near_sql.NearSQLq(
-            quoted_query_name=db_model.quote_identifier(view_name),
-            prev_quoted_query_name=db_model.quote_identifier(prev_view_name),
-            query=query,
-            terms=terms,
-            annotation="convert records",
-        )
+            near_sql = data_algebra.near_sql.NearSQLRawQStep(
+                prefix=pi,
+                quoted_query_name=db_model.quote_identifier(view_name),
+                sub_sql=data_algebra.near_sql.NearSQLContainer(near_sql=near_sql),
+                suffix=si,
+                annotation="convert records blocks out",
+            )
+            assert isinstance(near_sql, data_algebra.near_sql.NearSQL)
         return near_sql
 
     def eval_implementation(self, *, data_map, data_model, narrow):
