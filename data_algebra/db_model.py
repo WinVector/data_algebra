@@ -1472,7 +1472,7 @@ class DBModel:
         ctab_sql = [self.table_values_to_sql(record_spec.control_table)]
         sql_prefix = (
             _list_join_expecting_list(",", col_stmts)
-            + ["FROM ("]
+            + ["FROM ( SELECT * FROM "]
         )
         sql_suffix = (
             [" ) a"]
@@ -1503,7 +1503,7 @@ class DBModel:
                 )
             sql_prefix = (
                     _list_join_expecting_list(',', col_stmts)
-                    + ["FROM ("]
+                    + ["FROM ( SELECT * FROM "]
             )
             sql_suffix = (
                 [" ) a"]
@@ -1544,7 +1544,7 @@ class DBModel:
                     col_stmts.append(cstmt)
         sql_prefix = (
                 _list_join_expecting_list(',', col_stmts)
-                + ["FROM ("]
+                + ["FROM ( SELECT * FROM "]
         )
         sql_suffix = (
                 [" ) a"]
