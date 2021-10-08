@@ -14,7 +14,7 @@ def test_select_values_db_test_1():
 
     for db_handle in db_handles:
         print(db_handle)
-        sql = db_handle.table_values_to_sql(d)
+        sql = '\n'.join(db_handle.table_values_to_sql_str_list(d)) + '\n'
         print(sql)
         res = db_handle.read_query(sql)
         assert data_algebra.test_util.equivalent_frames(res, d)

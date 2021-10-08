@@ -4,6 +4,7 @@ import data_algebra.util
 import data_algebra.test_util
 from data_algebra.data_ops import *
 from data_algebra.cdata import *
+import data_algebra.SQLite
 
 
 def test_one_row_cdata_convert():
@@ -92,10 +93,15 @@ def test_one_row_cdata_convert():
         ops=ops1_r, data=b, expect=a
     )
 
+    db_model = data_algebra.SQLite.SQLiteModel()
+
     ops1_e = describe_table(a, table_name="a").convert_records(record_map_e)
     data_algebra.test_util.check_transform(
         ops=ops1_e, data=a, expect=b
     )
+    example_sql = db_model.to_sql(ops1_e)
+    assert isinstance(example_sql, str)
+    # print(example_sql)
     ops1_e_r = describe_table(b, table_name="b").convert_records(record_map_e.inverse())
     data_algebra.test_util.check_transform(
         ops=ops1_e_r, data=b, expect=a
