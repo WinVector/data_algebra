@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 import data_algebra.OrderedSet
 
@@ -166,7 +166,7 @@ class NearSQLCommonTableExpression(NearSQLNamedEntity):
         db_model,
         sql_format_options=None,
     ) -> List[str]:
-        return db_model.nearsqlcte_to_sql_(
+        return db_model.nearsqlcte_to_sql_str_list_(
             near_sql=self,
             columns=columns,
             force_sql=force_sql,
@@ -189,7 +189,7 @@ class NearSQLTable(NearSQLNamedEntity):
         db_model,
         sql_format_options=None,
     ) -> List[str]:
-        return db_model.nearsqltable_to_sql_(
+        return db_model.nearsqltable_to_sql_str_list_(
             near_sql=self,
             columns=columns,
             force_sql=force_sql,
@@ -341,31 +341,34 @@ class NearSQLBinaryStep(NearSQL):
         return SQLWithList(last_step=stubbed_step, previous_steps=sequence)
 
 
-class NearSQLq(NearSQL):
-    """
-    Adapter to wrap a pre-existing query as a NearSQL
-
-    """
-
+class NearSQLRawQStep(NearSQL):
     def __init__(
         self,
         *,
-        quoted_query_name,
-        query,
-        terms,
-        prev_quoted_query_name,
-        annotation=None,
+        prefix: List[str],
+        quoted_query_name: str,
+        sub_sql: NearSQLContainer,
+        suffix: Optional[List[str]] = None,
+        annotation: Optional[str] = None,
     ):
-        assert isinstance(query, str)
-        assert isinstance(prev_quoted_query_name, str)
+        assert isinstance(prefix, list)
+        assert len(prefix) > 0
+        assert all([isinstance(v, str) for v in prefix])
+        assert isinstance(quoted_query_name, str)
+        assert isinstance(sub_sql, NearSQLContainer)
+        assert isinstance(suffix, (list, type(None)))
+        if suffix is not None:
+            assert all([isinstance(v, str) for v in suffix])
+        assert isinstance(annotation, (str, type(None)))
         NearSQL.__init__(
             self,
-            terms=terms,
+            terms=None,  # not using this in this node
             quoted_query_name=quoted_query_name,
             annotation=annotation,
         )
-        self.query = query
-        self.prev_quoted_query_name = prev_quoted_query_name
+        self.prefix = prefix
+        self.sub_sql = sub_sql
+        self.suffix = suffix
 
     def to_sql_str_list(
         self,
@@ -376,7 +379,7 @@ class NearSQLq(NearSQL):
         db_model,
         sql_format_options=None,
     ) -> List[str]:
-        return db_model.nearsqlq_to_sql_(
+        return db_model.nearsqlrawq_to_sql_str_list_(
             near_sql=self,
             columns=columns,
             constants=constants,
@@ -384,4 +387,16 @@ class NearSQLq(NearSQL):
         )
 
     def to_with_form(self) -> SQLWithList:
-        return SQLWithList(last_step=self, previous_steps=[])
+        if self.sub_sql.near_sql.is_table:
+            # table references don't need to be re-encoded
+            return SQLWithList(last_step=self, previous_steps=[])
+        # non-trivial sequence
+        stub, sequence = self.sub_sql.to_with_form_stub()
+        stubbed_step = NearSQLRawQStep(
+            prefix=self.prefix,
+            quoted_query_name=self.quoted_query_name,
+            sub_sql=stub,
+            suffix=self.suffix,
+            annotation=self.annotation,
+        )
+        return SQLWithList(last_step=stubbed_step, previous_steps=sequence)

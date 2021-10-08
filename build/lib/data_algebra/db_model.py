@@ -4,6 +4,7 @@ import re
 from collections import OrderedDict
 from typing import List, Optional
 from types import SimpleNamespace
+from typing import Tuple
 
 import pandas.io.sql
 
@@ -54,11 +55,12 @@ class SQLFormatOptions(SimpleNamespace):
         p.text(str(self))
 
 
-def _str_join_expecting_list(joiner: str, str_list: List[str]):
+def _list_join_expecting_list(joiner: str, str_list: List[str]):
     assert isinstance(joiner, str)
     assert isinstance(str_list, list)
     assert all([isinstance(vi, str) for vi in str_list])
-    return joiner.join(str_list)
+    n = len(str_list)
+    return [' ' + str_list[i] + (joiner if i < (n - 1) else '') for i in range(n)]
 
 
 def _clean_annotation(annotation: Optional[str]):
@@ -1417,17 +1419,8 @@ class DBModel:
             ] + sql_str_list
         return "\n".join(sql_str_list) + "\n"
 
-    def row_recs_to_blocks_query(
-        self, source_sql, record_spec, *, using=None, temp_id_source=None
-    ) -> str:
-        if temp_id_source is None:
-            temp_id_source = [0]
-        if isinstance(source_sql, str):
-            source_sql = [source_sql]
-        # if not isinstance(record_spec, data_algebra.cdata.RecordSpecification):
-        #     raise TypeError(
-        #         "record_spec should be a data_algebra.cdata.RecordSpecification"
-        #     )
+    def row_recs_to_blocks_query_str_list_pair(
+        self, record_spec) -> Tuple[List[str], List[str]]:
         control_value_cols = [
             c
             for c in record_spec.control_table.columns
@@ -1456,7 +1449,7 @@ class DBModel:
             if result_col in seen:
                 continue
             seen.add(result_col)
-            cstmt = " CASE\n"
+            cstmt = " CASE "
             col = record_spec.control_table[result_col]
             isnull = col.isnull()
             for i in range(len(col)):
@@ -1471,46 +1464,30 @@ class DBModel:
                         + self.quote_string(str(source_col))
                         + " THEN a."
                         + self.quote_identifier(source_col)
-                        + "\n"
+                        + " "
                     )
                     cstmt = cstmt + col_sql
-            cstmt = cstmt + "  ELSE NULL END AS " + self.quote_identifier(result_col)
+            cstmt = cstmt + " ELSE NULL END AS " + self.quote_identifier(result_col)
             col_stmts.append(cstmt)
         ctab_sql = [self.table_values_to_sql(record_spec.control_table)]
-        sql = (
-            "SELECT\n"
-            + _str_join_expecting_list(",\n", col_stmts)
-            + "\n"
-            + "FROM (\n  "
-            + _str_join_expecting_list("\n", source_sql)
-            + " ) a\n"
-            + "CROSS JOIN (\n  "
-            + _str_join_expecting_list("\n", ctab_sql)
-            + " ) b\n"
-            + " ORDER BY "  # order by not required, but nice to have
-            + _str_join_expecting_list(", ", control_cols)
+        sql_prefix = (
+            _list_join_expecting_list(",", col_stmts)
+            + ["FROM ("]
         )
-        return sql
+        sql_suffix = (
+            [" ) a"]
+            + ["CROSS JOIN ("]
+            + _list_join_expecting_list("", ctab_sql)
+            + [" ) b"]
+            + [" ORDER BY"]  # order by not required, but nice to have
+            + _list_join_expecting_list(", ", control_cols)
+        )
+        return sql_prefix, sql_suffix
 
     # noinspection PyUnusedLocal
-    def blocks_to_row_recs_query(
+    def blocks_to_row_recs_query_str_list_pair(
         self,
-        source_sql,
-        record_spec,
-        *,
-        using=None,
-        temp_id_source=None,
-        sql_format_options=None,
-    ) -> str:
-        # if not isinstance(record_spec, data_algebra.cdata.RecordSpecification):
-        #     raise TypeError(
-        #         "record_spec should be a data_algebra.cdata.RecordSpecification"
-        #     )
-        if sql_format_options is None:
-            sql_format_options = self.default_SQL_format_options
-        assert isinstance(sql_format_options, SQLFormatOptions)
-        if isinstance(source_sql, str):
-            source_sql = [source_sql]
+        record_spec) -> Tuple[List[str], List[str]]:
         assert record_spec.control_table.shape[0] >= 1
         col_stmts = []
         for c in record_spec.record_keys:
@@ -1524,16 +1501,14 @@ class DBModel:
                 col_stmts.append(
                     " " + self.quote_identifier(cc) + " AS " + self.quote_identifier(cc0)
                 )
-            sql = (
-                    "SELECT\n"
-                    + _str_join_expecting_list(",\n", col_stmts)
-                    + "\n"
-                    + "FROM (\n  "
-                    + _str_join_expecting_list("\n", source_sql)
-                    + "\n"
-                    + " ) a\n"
+            sql_prefix = (
+                    _list_join_expecting_list(',', col_stmts)
+                    + ["FROM ("]
             )
-            return sql
+            sql_suffix = (
+                [" ) a"]
+            )
+            return sql_prefix, sql_suffix
         control_value_cols = [
             c
             for c in record_spec.control_table.columns
@@ -1567,21 +1542,18 @@ class DBModel:
                         + self.quote_identifier(col[i])
                     )
                     col_stmts.append(cstmt)
-        sql = (
-            "SELECT\n"
-            + _str_join_expecting_list(",\n", col_stmts)
-            + "\n"
-            + "FROM (\n  "
-            + _str_join_expecting_list("\n", source_sql)
-            + "\n"
-            + " ) a\n"
-            + " GROUP BY "
-            + _str_join_expecting_list(", ", control_cols)
-            + "\n"
-            + " ORDER BY "  # order by not required, but nice to have
-            + _str_join_expecting_list(", ", control_cols)
+        sql_prefix = (
+                _list_join_expecting_list(',', col_stmts)
+                + ["FROM ("]
         )
-        return sql
+        sql_suffix = (
+                [" ) a"]
+                + ["GROUP BY"]
+                + _list_join_expecting_list(',', control_cols)
+                + ["ORDER BY "]  # order by not required, but nice to have
+                + _list_join_expecting_list(',', control_cols)
+        )
+        return sql_prefix, sql_suffix
 
     # encode and name a term for use in a SQL expression
     def enc_term_(self, k, *, terms) -> str:
@@ -1621,7 +1593,7 @@ class DBModel:
             )
         return sql
 
-    def nearsqlcte_to_sql_(
+    def nearsqlcte_to_sql_str_list_(
         self,
         near_sql,
         *,
@@ -1643,7 +1615,7 @@ class DBModel:
             ]
         return [near_sql.quoted_query_name]
 
-    def nearsqltable_to_sql_(
+    def nearsqltable_to_sql_str_list_(
         self,
         near_sql,
         *,
@@ -1737,6 +1709,33 @@ class DBModel:
             sql = sql + near_sql.suffix
         return sql
 
+    def nearsqlrawq_to_sql_str_list_(
+        self,
+        near_sql,
+        *,
+        columns=None,
+        force_sql=False,
+        constants=None,
+        sql_format_options=None,
+    ) -> List[str]:
+        assert isinstance(near_sql, data_algebra.near_sql.NearSQLRawQStep)
+        if sql_format_options is None:
+            sql_format_options = self.default_SQL_format_options
+        assert isinstance(sql_format_options, SQLFormatOptions)
+        sql = (
+            ["SELECT"]
+            + [' ' + v for v in near_sql.prefix]
+            + [
+                sql_format_options.sql_indent + si
+                for si in near_sql.sub_sql.convert_subsql(
+                    db_model=self, sql_format_options=sql_format_options
+                )
+            ]
+        )
+        if (near_sql.suffix is not None) and (len(near_sql.suffix) > 0):
+            sql = sql + [' ' + v for v in near_sql.suffix]
+        return sql
+
     def nearsqlbinary_to_sql_str_list_(
         self,
         near_sql,
@@ -1805,48 +1804,6 @@ class DBModel:
         else:
             sql = sql + [")"]
         return sql
-
-    def nearsqlq_to_sql_(
-        self, near_sql, *, columns=None, constants=None, sql_format_options=None
-    ) -> List[str]:
-        assert isinstance(near_sql, data_algebra.near_sql.NearSQLq)
-        if sql_format_options is None:
-            sql_format_options = self.default_SQL_format_options
-        assert isinstance(sql_format_options, SQLFormatOptions)
-        if columns is None:
-            columns = [k for k in near_sql.terms.keys()]
-        terms = near_sql.terms
-        if (constants is not None) and (len(constants) > 0):
-            terms.update(constants)
-
-        def enc_term(k):
-            v = terms[k]
-            if v is None:
-                return self.quote_identifier(k)
-            return v + " AS " + self.quote_identifier(k)
-
-        terms_strs = [enc_term(k) for k in columns]
-        if len(terms_strs) < 1:
-            terms_strs = [
-                '*'
-            ]
-        sql_start = "SELECT"
-        if (
-            sql_format_options.annotate
-            and (near_sql.annotation is not None)
-            and (len(near_sql.annotation) > 0)
-        ):
-            sql_start = "SELECT  -- " + _clean_annotation(near_sql.annotation)
-        return (
-            [sql_start]
-            + self._indent_and_sep_terms(
-                terms_strs, sql_format_options=sql_format_options
-            )
-            + ["FROM"]
-            + ["("]
-            + [near_sql.query]  # TODO: see if we can vectorized
-            + [") " + near_sql.prev_quoted_query_name]
-        )
 
     def __str__(self):
         return str(type(self).__name__)

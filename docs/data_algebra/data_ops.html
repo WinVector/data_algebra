@@ -2431,38 +2431,42 @@
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="c1"># TODO: narrow to what we are using</span>
         <span class="c1"># TODO: use nearsql instead of strings / lists of strings</span>
-        <span class="n">sub_query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
+        <span class="n">near_sql</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span>
             <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
         <span class="c1"># claims to use all columns</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="n">sub_query</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
-            <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span>
-            <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">query</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">blocks_to_row_recs_query</span><span class="p">(</span>
-                <span class="n">query</span><span class="p">,</span> <span class="n">record_spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_in</span>
+            <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;convert_records_blocks_in_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">pi</span><span class="p">,</span> <span class="n">si</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">blocks_to_row_recs_query_str_list_pair</span><span class="p">(</span>
+                <span class="n">record_spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_in</span>
             <span class="p">)</span>
+            <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLRawQStep</span><span class="p">(</span>
+                <span class="n">prefix</span><span class="o">=</span><span class="n">pi</span><span class="p">,</span>
+                <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
+                <span class="n">sub_sql</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">near_sql</span><span class="p">),</span>
+                <span class="n">suffix</span><span class="o">=</span><span class="n">si</span><span class="p">,</span>
+                <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;convert records blocks in&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">query</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">row_recs_to_blocks_query</span><span class="p">(</span>
-                <span class="n">query</span><span class="p">,</span> <span class="n">record_spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span><span class="p">,</span>
+            <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;convert_records_blocks_out_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">pi</span><span class="p">,</span> <span class="n">si</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">row_recs_to_blocks_query_str_list_pair</span><span class="p">(</span>
+                <span class="n">record_spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;convert_records_in_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="n">prev_view_name</span> <span class="o">=</span> <span class="s2">&quot;convert_records_out_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="n">terms</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">columns_produced</span><span class="p">}</span>
-        <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLq</span><span class="p">(</span>
-            <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
-            <span class="n">prev_quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">prev_view_name</span><span class="p">),</span>
-            <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
-            <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
-            <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;convert records&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
+            <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLRawQStep</span><span class="p">(</span>
+                <span class="n">prefix</span><span class="o">=</span><span class="n">pi</span><span class="p">,</span>
+                <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
+                <span class="n">sub_sql</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">near_sql</span><span class="p">),</span>
+                <span class="n">suffix</span><span class="o">=</span><span class="n">si</span><span class="p">,</span>
+                <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;convert records blocks out&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
     <span class="k">def</span> <span class="nf">eval_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
@@ -8577,38 +8581,42 @@ with the using columns (None means all).</p>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="c1"># TODO: narrow to what we are using</span>
         <span class="c1"># TODO: use nearsql instead of strings / lists of strings</span>
-        <span class="n">sub_query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
+        <span class="n">near_sql</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span>
             <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
         <span class="c1"># claims to use all columns</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="n">sub_query</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
-            <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span>
-            <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">query</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">blocks_to_row_recs_query</span><span class="p">(</span>
-                <span class="n">query</span><span class="p">,</span> <span class="n">record_spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_in</span>
+            <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;convert_records_blocks_in_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">pi</span><span class="p">,</span> <span class="n">si</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">blocks_to_row_recs_query_str_list_pair</span><span class="p">(</span>
+                <span class="n">record_spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_in</span>
             <span class="p">)</span>
+            <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLRawQStep</span><span class="p">(</span>
+                <span class="n">prefix</span><span class="o">=</span><span class="n">pi</span><span class="p">,</span>
+                <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
+                <span class="n">sub_sql</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">near_sql</span><span class="p">),</span>
+                <span class="n">suffix</span><span class="o">=</span><span class="n">si</span><span class="p">,</span>
+                <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;convert records blocks in&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">query</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">row_recs_to_blocks_query</span><span class="p">(</span>
-                <span class="n">query</span><span class="p">,</span> <span class="n">record_spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span><span class="p">,</span>
+            <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;convert_records_blocks_out_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">pi</span><span class="p">,</span> <span class="n">si</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">row_recs_to_blocks_query_str_list_pair</span><span class="p">(</span>
+                <span class="n">record_spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;convert_records_in_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="n">prev_view_name</span> <span class="o">=</span> <span class="s2">&quot;convert_records_out_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="n">terms</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">columns_produced</span><span class="p">}</span>
-        <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLq</span><span class="p">(</span>
-            <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
-            <span class="n">prev_quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">prev_view_name</span><span class="p">),</span>
-            <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
-            <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
-            <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;convert records&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
+            <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLRawQStep</span><span class="p">(</span>
+                <span class="n">prefix</span><span class="o">=</span><span class="n">pi</span><span class="p">,</span>
+                <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
+                <span class="n">sub_sql</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">near_sql</span><span class="p">),</span>
+                <span class="n">suffix</span><span class="o">=</span><span class="n">si</span><span class="p">,</span>
+                <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;convert records blocks out&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
     <span class="k">def</span> <span class="nf">eval_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
@@ -8758,38 +8766,42 @@ with the using columns (None means all).</p>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="c1"># TODO: narrow to what we are using</span>
         <span class="c1"># TODO: use nearsql instead of strings / lists of strings</span>
-        <span class="n">sub_query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
+        <span class="n">near_sql</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span>
             <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
         <span class="c1"># claims to use all columns</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="n">sub_query</span><span class="o">.</span><span class="n">to_sql_str_list</span><span class="p">(</span>
-            <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span>
-            <span class="n">force_sql</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">query</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">blocks_to_row_recs_query</span><span class="p">(</span>
-                <span class="n">query</span><span class="p">,</span> <span class="n">record_spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_in</span>
+            <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;convert_records_blocks_in_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">pi</span><span class="p">,</span> <span class="n">si</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">blocks_to_row_recs_query_str_list_pair</span><span class="p">(</span>
+                <span class="n">record_spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_in</span>
             <span class="p">)</span>
+            <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLRawQStep</span><span class="p">(</span>
+                <span class="n">prefix</span><span class="o">=</span><span class="n">pi</span><span class="p">,</span>
+                <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
+                <span class="n">sub_sql</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">near_sql</span><span class="p">),</span>
+                <span class="n">suffix</span><span class="o">=</span><span class="n">si</span><span class="p">,</span>
+                <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;convert records blocks in&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">query</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">row_recs_to_blocks_query</span><span class="p">(</span>
-                <span class="n">query</span><span class="p">,</span> <span class="n">record_spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span><span class="p">,</span>
+            <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;convert_records_blocks_out_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">pi</span><span class="p">,</span> <span class="n">si</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">row_recs_to_blocks_query_str_list_pair</span><span class="p">(</span>
+                <span class="n">record_spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">blocks_out</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;convert_records_in_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="n">prev_view_name</span> <span class="o">=</span> <span class="s2">&quot;convert_records_out_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="n">terms</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">columns_produced</span><span class="p">}</span>
-        <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLq</span><span class="p">(</span>
-            <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
-            <span class="n">prev_quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">prev_view_name</span><span class="p">),</span>
-            <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
-            <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
-            <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;convert records&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
+            <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLRawQStep</span><span class="p">(</span>
+                <span class="n">prefix</span><span class="o">=</span><span class="n">pi</span><span class="p">,</span>
+                <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
+                <span class="n">sub_sql</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">near_sql</span><span class="p">),</span>
+                <span class="n">suffix</span><span class="o">=</span><span class="n">si</span><span class="p">,</span>
+                <span class="n">annotation</span><span class="o">=</span><span class="s2">&quot;convert records blocks out&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 </pre></div>
 
