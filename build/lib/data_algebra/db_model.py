@@ -713,7 +713,7 @@ class DBModel:
             return "(" + ", ".join([self.value_to_sql(vi) for vi in v]) + ")"
         return str(v)
 
-    def table_values_to_sql(self, v) -> str:
+    def table_values_to_sql_str_list(self, v) -> str:
         assert v is not None
         m = v.shape[0]
         assert m > 0
@@ -740,7 +740,7 @@ class DBModel:
             + ["    " + ("" if (i < 1) else "UNION ALL ") + q_row(i) for i in range(m)]
             + [f') {qi("table_values")}']
         )
-        return "\n".join(sql) + "\n"
+        return sql
 
     def expr_to_sql(self, expression, *, want_inline_parens=False):
         if isinstance(expression, str):
@@ -1417,6 +1417,8 @@ class DBModel:
                 f"--       string quote: {self.string_quote}",
                 f"--   identifier quote: {self.identifier_quote}",
             ] + sql_str_list
+        sql_str_list = [v.rstrip() for v in sql_str_list]
+        sql_str_list = [v for v in sql_str_list if len(v) > 0]
         return "\n".join(sql_str_list) + "\n"
 
     def row_recs_to_blocks_query_str_list_pair(
@@ -1469,7 +1471,7 @@ class DBModel:
                     cstmt = cstmt + col_sql
             cstmt = cstmt + " ELSE NULL END AS " + self.quote_identifier(result_col)
             col_stmts.append(cstmt)
-        ctab_sql = [self.table_values_to_sql(record_spec.control_table)]
+        ctab_sql = self.table_values_to_sql_str_list(record_spec.control_table)
         sql_prefix = (
             _list_join_expecting_list(",", col_stmts)
             + ["FROM ( SELECT * FROM "]
@@ -1879,8 +1881,8 @@ class DBHandle:
         d = self.read_query(q)
         d.to_csv(res_name, index=False)
 
-    def table_values_to_sql(self, v) -> str:
-        return self.db_model.table_values_to_sql(v)
+    def table_values_to_sql_str_list(self, v) -> str:
+        return self.db_model.table_values_to_sql_str_list(v)
 
     def __str__(self):
         return (

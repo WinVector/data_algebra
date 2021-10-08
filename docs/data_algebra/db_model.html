@@ -88,7 +88,7 @@
                                 <a class="function" href="#DBModel.value_to_sql">value_to_sql</a>
                         </li>
                         <li>
-                                <a class="function" href="#DBModel.table_values_to_sql">table_values_to_sql</a>
+                                <a class="function" href="#DBModel.table_values_to_sql_str_list">table_values_to_sql_str_list</a>
                         </li>
                         <li>
                                 <a class="function" href="#DBModel.expr_to_sql">expr_to_sql</a>
@@ -187,7 +187,7 @@
                                 <a class="function" href="#DBHandle.query_to_csv">query_to_csv</a>
                         </li>
                         <li>
-                                <a class="function" href="#DBHandle.table_values_to_sql">table_values_to_sql</a>
+                                <a class="function" href="#DBHandle.table_values_to_sql_str_list">table_values_to_sql_str_list</a>
                         </li>
                         <li>
                                 <a class="function" href="#DBHandle.close">close</a>
@@ -927,7 +927,7 @@
             <span class="k">return</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="n">vi</span><span class="p">)</span> <span class="k">for</span> <span class="n">vi</span> <span class="ow">in</span> <span class="n">v</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">table_values_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">table_values_to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">assert</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">assert</span> <span class="n">m</span> <span class="o">&gt;</span> <span class="mi">0</span>
@@ -954,7 +954,7 @@
             <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;    &quot;</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;UNION ALL &quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">q_row</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)]</span>
             <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;) </span><span class="si">{</span><span class="n">qi</span><span class="p">(</span><span class="s2">&quot;table_values&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">sql</span>
 
     <span class="k">def</span> <span class="nf">expr_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expression</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -1631,6 +1631,8 @@
                 <span class="sa">f</span><span class="s2">&quot;--       string quote: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="sa">f</span><span class="s2">&quot;--   identifier quote: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="p">]</span> <span class="o">+</span> <span class="n">sql_str_list</span>
+        <span class="n">sql_str_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sql_str_list</span><span class="p">]</span>
+        <span class="n">sql_str_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sql_str_list</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sql_str_list</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
 
     <span class="k">def</span> <span class="nf">row_recs_to_blocks_query_str_list_pair</span><span class="p">(</span>
@@ -1683,7 +1685,7 @@
                     <span class="n">cstmt</span> <span class="o">=</span> <span class="n">cstmt</span> <span class="o">+</span> <span class="n">col_sql</span>
             <span class="n">cstmt</span> <span class="o">=</span> <span class="n">cstmt</span> <span class="o">+</span> <span class="s2">&quot; ELSE NULL END AS &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">result_col</span><span class="p">)</span>
             <span class="n">col_stmts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cstmt</span><span class="p">)</span>
-        <span class="n">ctab_sql</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">table_values_to_sql</span><span class="p">(</span><span class="n">record_spec</span><span class="o">.</span><span class="n">control_table</span><span class="p">)]</span>
+        <span class="n">ctab_sql</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_values_to_sql_str_list</span><span class="p">(</span><span class="n">record_spec</span><span class="o">.</span><span class="n">control_table</span><span class="p">)</span>
         <span class="n">sql_prefix</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">_list_join_expecting_list</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="n">col_stmts</span><span class="p">)</span>
             <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM ( SELECT * FROM &quot;</span><span class="p">]</span>
@@ -2093,8 +2095,8 @@
         <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
         <span class="n">d</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">res_name</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">table_values_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">table_values_to_sql</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">table_values_to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">table_values_to_sql_str_list</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
@@ -2437,7 +2439,7 @@
             <span class="k">return</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="n">vi</span><span class="p">)</span> <span class="k">for</span> <span class="n">vi</span> <span class="ow">in</span> <span class="n">v</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">table_values_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">table_values_to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">assert</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">assert</span> <span class="n">m</span> <span class="o">&gt;</span> <span class="mi">0</span>
@@ -2464,7 +2466,7 @@
             <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;    &quot;</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;UNION ALL &quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">q_row</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)]</span>
             <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;) </span><span class="si">{</span><span class="n">qi</span><span class="p">(</span><span class="s2">&quot;table_values&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">sql</span>
 
     <span class="k">def</span> <span class="nf">expr_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expression</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -3141,6 +3143,8 @@
                 <span class="sa">f</span><span class="s2">&quot;--       string quote: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="sa">f</span><span class="s2">&quot;--   identifier quote: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="p">]</span> <span class="o">+</span> <span class="n">sql_str_list</span>
+        <span class="n">sql_str_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sql_str_list</span><span class="p">]</span>
+        <span class="n">sql_str_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sql_str_list</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sql_str_list</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
 
     <span class="k">def</span> <span class="nf">row_recs_to_blocks_query_str_list_pair</span><span class="p">(</span>
@@ -3193,7 +3197,7 @@
                     <span class="n">cstmt</span> <span class="o">=</span> <span class="n">cstmt</span> <span class="o">+</span> <span class="n">col_sql</span>
             <span class="n">cstmt</span> <span class="o">=</span> <span class="n">cstmt</span> <span class="o">+</span> <span class="s2">&quot; ELSE NULL END AS &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">result_col</span><span class="p">)</span>
             <span class="n">col_stmts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cstmt</span><span class="p">)</span>
-        <span class="n">ctab_sql</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">table_values_to_sql</span><span class="p">(</span><span class="n">record_spec</span><span class="o">.</span><span class="n">control_table</span><span class="p">)]</span>
+        <span class="n">ctab_sql</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_values_to_sql_str_list</span><span class="p">(</span><span class="n">record_spec</span><span class="o">.</span><span class="n">control_table</span><span class="p">)</span>
         <span class="n">sql_prefix</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">_list_join_expecting_list</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="n">col_stmts</span><span class="p">)</span>
             <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM ( SELECT * FROM &quot;</span><span class="p">]</span>
@@ -4012,17 +4016,17 @@
     
 
                             </div>
-                            <div id="DBModel.table_values_to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#DBModel.table_values_to_sql">#&nbsp;&nbsp</a>
+                            <div id="DBModel.table_values_to_sql_str_list" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DBModel.table_values_to_sql_str_list">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">table_values_to_sql</span><span class="signature">(self, v) -&gt; str</span>:
+            <span class="name">table_values_to_sql_str_list</span><span class="signature">(self, v) -&gt; str</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">table_values_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">table_values_to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">assert</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">assert</span> <span class="n">m</span> <span class="o">&gt;</span> <span class="mi">0</span>
@@ -4049,7 +4053,7 @@
             <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;    &quot;</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;UNION ALL &quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">q_row</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)]</span>
             <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;) </span><span class="si">{</span><span class="n">qi</span><span class="p">(</span><span class="s2">&quot;table_values&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">sql</span>
 </pre></div>
 
         </details>
@@ -4923,6 +4927,8 @@
                 <span class="sa">f</span><span class="s2">&quot;--       string quote: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">string_quote</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="sa">f</span><span class="s2">&quot;--   identifier quote: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier_quote</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="p">]</span> <span class="o">+</span> <span class="n">sql_str_list</span>
+        <span class="n">sql_str_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sql_str_list</span><span class="p">]</span>
+        <span class="n">sql_str_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sql_str_list</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sql_str_list</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
 </pre></div>
 
@@ -4991,7 +4997,7 @@
                     <span class="n">cstmt</span> <span class="o">=</span> <span class="n">cstmt</span> <span class="o">+</span> <span class="n">col_sql</span>
             <span class="n">cstmt</span> <span class="o">=</span> <span class="n">cstmt</span> <span class="o">+</span> <span class="s2">&quot; ELSE NULL END AS &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">result_col</span><span class="p">)</span>
             <span class="n">col_stmts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cstmt</span><span class="p">)</span>
-        <span class="n">ctab_sql</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">table_values_to_sql</span><span class="p">(</span><span class="n">record_spec</span><span class="o">.</span><span class="n">control_table</span><span class="p">)]</span>
+        <span class="n">ctab_sql</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_values_to_sql_str_list</span><span class="p">(</span><span class="n">record_spec</span><span class="o">.</span><span class="n">control_table</span><span class="p">)</span>
         <span class="n">sql_prefix</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">_list_join_expecting_list</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="n">col_stmts</span><span class="p">)</span>
             <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;FROM ( SELECT * FROM &quot;</span><span class="p">]</span>
@@ -5579,8 +5585,8 @@
         <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
         <span class="n">d</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">res_name</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">table_values_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">table_values_to_sql</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">table_values_to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">table_values_to_sql_str_list</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
@@ -5811,18 +5817,18 @@
     
 
                             </div>
-                            <div id="DBHandle.table_values_to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#DBHandle.table_values_to_sql">#&nbsp;&nbsp</a>
+                            <div id="DBHandle.table_values_to_sql_str_list" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DBHandle.table_values_to_sql_str_list">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">table_values_to_sql</span><span class="signature">(self, v) -&gt; str</span>:
+            <span class="name">table_values_to_sql_str_list</span><span class="signature">(self, v) -&gt; str</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">table_values_to_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">table_values_to_sql</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">table_values_to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">table_values_to_sql_str_list</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
 </pre></div>
 
         </details>
