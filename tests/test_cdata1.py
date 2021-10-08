@@ -164,6 +164,42 @@ def test_cdata1():
         ],
     )
 
+    conn = sqlite3.connect(":memory:")
+
+    sql = db_model.row_recs_to_blocks_query(source_table.to_sql(db_model), record_spec)
+    waste_str = str(sql)
+
+    # %%
+
+    db_model.insert_table(conn, iris, "iris")
+
+    res_blocks = db_model.read_query(conn, sql)
+    assert data_algebra.test_util.equivalent_frames(res_blocks, iris_blocks_orig)
+    waste_str = str(res_blocks)
+
+    # %%
+
+    db_model.insert_table(conn, res_blocks, "res_blocks")
+    source_table2 = data_algebra.data_ops.TableDescription(
+        table_name="res_blocks",
+        column_names=["id", "Species", "Part", "Measure", "Value"],
+    )
+
+    sql_back = db_model.blocks_to_row_recs_query(
+        source_table2.to_sql(db_model), record_spec
+    )
+    waste_str = str(sql_back)
+
+    # %%
+
+    res_rows = db_model.read_query(conn, sql_back)
+    assert data_algebra.test_util.equivalent_frames(res_rows, iris_orig)
+    waste_str = str(res_rows)
+
+    # %%
+
+    conn.close()
+
     # %%
 
     waste_str = str(iris)
