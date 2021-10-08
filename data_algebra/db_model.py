@@ -1621,7 +1621,7 @@ class DBModel:
             )
         return sql
 
-    def nearsqlcte_to_sql_(
+    def nearsqlcte_to_sql_str_list_(
         self,
         near_sql,
         *,
@@ -1643,7 +1643,7 @@ class DBModel:
             ]
         return [near_sql.quoted_query_name]
 
-    def nearsqltable_to_sql_(
+    def nearsqltable_to_sql_str_list_(
         self,
         near_sql,
         *,
@@ -1806,7 +1806,7 @@ class DBModel:
             sql = sql + [")"]
         return sql
 
-    def nearsqlq_to_sql_(
+    def nearsqlq_to_sql_str_list_(
         self, near_sql, *, columns=None, constants=None, sql_format_options=None
     ) -> List[str]:
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLq)

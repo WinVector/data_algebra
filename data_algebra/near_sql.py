@@ -166,7 +166,7 @@ class NearSQLCommonTableExpression(NearSQLNamedEntity):
         db_model,
         sql_format_options=None,
     ) -> List[str]:
-        return db_model.nearsqlcte_to_sql_(
+        return db_model.nearsqlcte_to_sql_str_list_(
             near_sql=self,
             columns=columns,
             force_sql=force_sql,
@@ -189,7 +189,7 @@ class NearSQLTable(NearSQLNamedEntity):
         db_model,
         sql_format_options=None,
     ) -> List[str]:
-        return db_model.nearsqltable_to_sql_(
+        return db_model.nearsqltable_to_sql_str_list_(
             near_sql=self,
             columns=columns,
             force_sql=force_sql,
@@ -376,7 +376,7 @@ class NearSQLq(NearSQL):
         db_model,
         sql_format_options=None,
     ) -> List[str]:
-        return db_model.nearsqlq_to_sql_(
+        return db_model.nearsqlq_to_sql_str_list_(
             near_sql=self,
             columns=columns,
             constants=constants,
