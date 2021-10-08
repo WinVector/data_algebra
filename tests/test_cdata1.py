@@ -166,8 +166,9 @@ def test_cdata1():
 
     conn = sqlite3.connect(":memory:")
 
-    sql = db_model.row_recs_to_blocks_query(source_table.to_sql(db_model), record_spec)
+    sql = db_model.to_sql(source_table.map_records(blocks_out=record_spec))
     waste_str = str(sql)
+
 
     # %%
 
@@ -185,9 +186,7 @@ def test_cdata1():
         column_names=["id", "Species", "Part", "Measure", "Value"],
     )
 
-    sql_back = db_model.blocks_to_row_recs_query(
-        source_table2.to_sql(db_model), record_spec
-    )
+    sql_back = db_model.to_sql(source_table2.map_records(blocks_in=record_spec))
     waste_str = str(sql_back)
 
     # %%
