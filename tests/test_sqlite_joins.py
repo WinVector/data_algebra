@@ -142,3 +142,48 @@ def test_sqlite_joins_simulate_full_join():
 
     if sqlite_handle is not None:
         sqlite_handle.close()
+
+
+def test_sqlite_joins_staged():
+    sqlite_handle = None
+    if direct_test_sqlite:
+        sqlite_handle = data_algebra.SQLite.example_handle()
+
+    d1 = data_algebra.default_data_model.pd.DataFrame({
+        'g': ['a', 'a', 'b', 'b', 'b'],
+        'v1': [1, None, 3, 4, None],
+        'v2': [None, 1, None, 7, 8],
+    })
+
+    d2 = data_algebra.default_data_model.pd.DataFrame({
+        'g': ['c', 'b', 'b'],
+        'v1': [None, 1, None],
+        'v2': [1, None, 2],
+    })
+
+    join_columns = ['g']
+
+    ops = (
+        descr(d1=d1)
+            .extend({'v1': 'v1 * v1'})
+            .natural_join(
+                b=(
+                    descr(d2=d2)
+                        .extend({'v2': 'v2 + v2'})),
+                by=join_columns,
+                jointype='full')
+    )
+
+    res_pandas = ops.eval({'d1': d1, 'd2': d2})
+
+    if direct_test_sqlite:
+        print(sqlite_handle.to_sql(ops))
+
+    data_algebra.test_util.check_transform(
+        ops=ops,
+        data={'d1': d1, 'd2': d2},
+        expect=res_pandas,
+        models_to_skip={str(data_algebra.MySQL.MySQLModel())}, )
+
+    if sqlite_handle is not None:
+        sqlite_handle.close()
