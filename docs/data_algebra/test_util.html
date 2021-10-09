@@ -81,10 +81,10 @@
 
 
 <span class="c1"># controls</span>
-<span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="bp">False</span>  <span class="c1"># causes an external dependency</span>
-<span class="n">test_BigQuery</span> <span class="o">=</span> <span class="bp">False</span>  <span class="c1"># causes an external dependency</span>
-<span class="n">test_MySQL</span> <span class="o">=</span> <span class="bp">False</span>  <span class="c1"># causes an external dependency</span>
-<span class="n">test_Spark</span> <span class="o">=</span> <span class="bp">False</span>  <span class="c1"># causes an external dependency</span>
+<span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
+<span class="n">test_BigQuery</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
+<span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
+<span class="n">test_Spark</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
 
 
 <span class="k">def</span> <span class="nf">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
@@ -120,79 +120,79 @@
     <span class="n">b</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">float_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
-    <span class="n">check_column_order</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">check_row_order</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">local_data_model</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">check_column_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;return False if the frames are equivalent (up to column re-ordering and possible row-reordering).</span>
 <span class="sd">    Ignores indexing.&quot;&quot;&quot;</span>
     <span class="c1"># leave in extra checks as this is usually used by test code</span>
-    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">True</span>
-    <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-    <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">cols_case_sensitive</span><span class="p">:</span>
         <span class="n">a</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">b</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">a_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
     <span class="n">b_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">a_columns</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">b_columns</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">check_column_order</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]):</span>
-            <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">return</span> <span class="kc">False</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># re-order b into a&#39;s column order</span>
         <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="n">a_columns</span><span class="p">]</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">a_columns</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span>
             <span class="n">a</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
         <span class="p">)</span> <span class="o">!=</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">c</span><span class="p">]):</span>
-            <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">return</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="kc">True</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">check_row_order</span><span class="p">:</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">a_columns</span><span class="p">)</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">a_columns</span><span class="p">)</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">a_columns</span><span class="p">:</span>
         <span class="n">ca</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
         <span class="n">cb</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">ca</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">cb</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">False</span>
-        <span class="k">if</span> <span class="n">ca</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ca</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">cb</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">ca</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ca</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cb</span><span class="p">):</span>
-                <span class="k">return</span> <span class="bp">False</span>
+                <span class="k">return</span> <span class="kc">False</span>
             <span class="n">ca_null</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span>
             <span class="n">cb_null</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">ca_null</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">cb_null</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
-                <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">ca_null</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">cb_null</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">ca_null</span> <span class="o">==</span> <span class="n">cb_null</span><span class="p">):</span>
-                <span class="k">return</span> <span class="bp">False</span>
+                <span class="k">return</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">ca_null</span><span class="p">):</span>
-                <span class="n">ca</span> <span class="o">=</span> <span class="n">ca</span><span class="p">[</span><span class="n">ca_null</span> <span class="o">==</span> <span class="bp">False</span><span class="p">]</span>
-                <span class="n">cb</span> <span class="o">=</span> <span class="n">cb</span><span class="p">[</span><span class="n">cb_null</span> <span class="o">==</span> <span class="bp">False</span><span class="p">]</span>
+                <span class="n">ca</span> <span class="o">=</span> <span class="n">ca</span><span class="p">[</span><span class="n">ca_null</span> <span class="o">==</span> <span class="kc">False</span><span class="p">]</span>
+                <span class="n">cb</span> <span class="o">=</span> <span class="n">cb</span><span class="p">[</span><span class="n">cb_null</span> <span class="o">==</span> <span class="kc">False</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">c</span><span class="p">]):</span>
                     <span class="n">ca</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ca</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
                     <span class="n">cb</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">cb</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
                     <span class="n">dif</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">ca</span> <span class="o">-</span> <span class="n">cb</span><span class="p">)</span> <span class="o">/</span> <span class="n">numpy</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">ca</span><span class="p">,</span> <span class="n">cb</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dif</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">float_tol</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="bp">False</span>
+                        <span class="k">return</span> <span class="kc">False</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">ca</span> <span class="o">==</span> <span class="n">cb</span><span class="p">):</span>
-                        <span class="k">return</span> <span class="bp">False</span>
-    <span class="k">return</span> <span class="bp">True</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
 
 
 <span class="k">def</span> <span class="nf">check_transform_on_handles</span><span class="p">(</span>
@@ -202,12 +202,12 @@
     <span class="n">expect</span><span class="p">,</span>
     <span class="n">db_handles</span><span class="p">,</span>
     <span class="n">float_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
-    <span class="n">check_column_order</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">check_row_order</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">check_parse</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-    <span class="n">local_data_model</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-    <span class="n">empty_produces_empty</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">check_column_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">empty_produces_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
@@ -235,7 +235,7 @@
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
     <span class="n">n_tables</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">n_tables</span> <span class="o">&gt;</span> <span class="mi">0</span>
-    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">expect</span><span class="p">):</span>
@@ -277,7 +277,7 @@
         <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pandas transform result did not match expect&quot;</span><span class="p">)</span>
     <span class="c1"># try on empty inputs</span>
-    <span class="n">empty_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">empty_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="n">empty_res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">empty_map</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">empty_res</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">empty_res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
@@ -290,27 +290,27 @@
         <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
         <span class="n">partial_maps</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">{</span>
-                <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+                <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
                 <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
             <span class="p">},</span>
             <span class="p">{</span>
                 <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
-                <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+                <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="p">},</span>
         <span class="p">]</span>
         <span class="k">for</span> <span class="n">pm</span> <span class="ow">in</span> <span class="n">partial_maps</span><span class="p">:</span>
             <span class="n">empty_res_i</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">pm</span><span class="p">)</span>
             <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">empty_res_i</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
     <span class="c1"># try any db paths</span>
-    <span class="k">if</span> <span class="n">db_handles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">db_handles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">db_handle</span> <span class="ow">in</span> <span class="n">db_handles</span><span class="p">:</span>
             <span class="n">to_del</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
             <span class="n">sql_statements</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">initial_commas</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">]:</span>
-                <span class="k">for</span> <span class="n">use_with</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">initial_commas</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">use_with</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
                     <span class="n">sql_format_options</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">SQLFormatOptions</span><span class="p">(</span>
                         <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span><span class="p">,</span>
-                        <span class="n">annotate</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                        <span class="n">annotate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                         <span class="n">sql_indent</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span>
                         <span class="n">initial_commas</span><span class="o">=</span><span class="n">initial_commas</span><span class="p">,</span>
                     <span class="p">)</span>
@@ -318,13 +318,13 @@
                     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
                     <span class="n">sql_statements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
                     <span class="c1"># print(sql)</span>
-            <span class="k">if</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="n">db_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                    <span class="n">db_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                     <span class="n">to_del</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-                <span class="n">caught</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="n">caught</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="n">res_db_sql</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="n">res_db_ops</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="n">res_db_ops</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">sql</span> <span class="ow">in</span> <span class="n">sql_statements</span><span class="p">:</span>
                         <span class="n">res_db_sql_i</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
@@ -334,7 +334,7 @@
                     <span class="n">caught</span> <span class="o">=</span> <span class="n">e</span>
                 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">to_del</span><span class="p">:</span>
                     <span class="n">db_handle</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">caught</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">caught</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">caught</span>
                 <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">res_db_sql</span><span class="p">:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
@@ -345,7 +345,7 @@
                         <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
                         <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
                     <span class="p">):</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{db_handle} SQL result did not match expect&quot;</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db_handle</span><span class="si">}</span><span class="s2"> SQL result did not match expect&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
                     <span class="n">res_db_ops</span><span class="p">,</span>
                     <span class="n">expect</span><span class="p">,</span>
@@ -354,7 +354,7 @@
                     <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
                     <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
                 <span class="p">):</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{db_handle} ops result did not match expect&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db_handle</span><span class="si">}</span><span class="s2"> ops result did not match expect&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">get_test_dbs</span><span class="p">():</span>
@@ -364,28 +364,28 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
-    <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
-    <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">test_PostgreSQL</span><span class="p">:</span>
         <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
-        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">test_BigQuery</span><span class="p">:</span>
         <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
-        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">test_MySQL</span><span class="p">:</span>
         <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
-        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">test_Spark</span><span class="p">:</span>
         <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
-        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">db_handles</span>
 
@@ -396,12 +396,12 @@
     <span class="n">expect</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">float_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
-    <span class="n">check_column_order</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">check_row_order</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">check_parse</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-    <span class="n">models_to_skip</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-    <span class="n">empty_produces_empty</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">check_column_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">models_to_skip</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">empty_produces_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
@@ -428,17 +428,17 @@
 
     <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[</span>
         <span class="c1"># non-connected handles, lets us test some of the SQL generation path</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="bp">None</span><span class="p">),</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">BigQueryModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="bp">None</span><span class="p">),</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="bp">None</span><span class="p">),</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">SparkSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="bp">None</span><span class="p">),</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="bp">None</span><span class="p">),</span>
+        <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+        <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">BigQueryModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+        <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+        <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">SparkSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+        <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
     <span class="p">]</span>
 
     <span class="n">test_dbs</span> <span class="o">=</span> <span class="n">get_test_dbs</span><span class="p">()</span>
     <span class="n">db_handles</span> <span class="o">=</span> <span class="n">db_handles</span> <span class="o">+</span> <span class="n">test_dbs</span>
 
-    <span class="k">if</span> <span class="n">models_to_skip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">models_to_skip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">db_handles</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">db_model</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">models_to_skip</span><span class="p">]</span>
 
     <span class="n">check_transform_on_handles</span><span class="p">(</span>
@@ -534,79 +534,79 @@ Can raise exceptions. Also checks pickling.</p>
     <span class="n">b</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">float_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
-    <span class="n">check_column_order</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">check_row_order</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">local_data_model</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">check_column_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;return False if the frames are equivalent (up to column re-ordering and possible row-reordering).</span>
 <span class="sd">    Ignores indexing.&quot;&quot;&quot;</span>
     <span class="c1"># leave in extra checks as this is usually used by test code</span>
-    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">True</span>
-    <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-    <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">cols_case_sensitive</span><span class="p">:</span>
         <span class="n">a</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">b</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">a_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
     <span class="n">b_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">a_columns</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">b_columns</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">check_column_order</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]):</span>
-            <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">return</span> <span class="kc">False</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># re-order b into a&#39;s column order</span>
         <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="n">a_columns</span><span class="p">]</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">a_columns</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span>
             <span class="n">a</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
         <span class="p">)</span> <span class="o">!=</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">c</span><span class="p">]):</span>
-            <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">return</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="kc">True</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">check_row_order</span><span class="p">:</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">a_columns</span><span class="p">)</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">a_columns</span><span class="p">)</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">a_columns</span><span class="p">:</span>
         <span class="n">ca</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
         <span class="n">cb</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">ca</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">cb</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">False</span>
-        <span class="k">if</span> <span class="n">ca</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ca</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">cb</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">ca</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ca</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cb</span><span class="p">):</span>
-                <span class="k">return</span> <span class="bp">False</span>
+                <span class="k">return</span> <span class="kc">False</span>
             <span class="n">ca_null</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span>
             <span class="n">cb_null</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">ca_null</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">cb_null</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
-                <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">ca_null</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">cb_null</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">ca_null</span> <span class="o">==</span> <span class="n">cb_null</span><span class="p">):</span>
-                <span class="k">return</span> <span class="bp">False</span>
+                <span class="k">return</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">ca_null</span><span class="p">):</span>
-                <span class="n">ca</span> <span class="o">=</span> <span class="n">ca</span><span class="p">[</span><span class="n">ca_null</span> <span class="o">==</span> <span class="bp">False</span><span class="p">]</span>
-                <span class="n">cb</span> <span class="o">=</span> <span class="n">cb</span><span class="p">[</span><span class="n">cb_null</span> <span class="o">==</span> <span class="bp">False</span><span class="p">]</span>
+                <span class="n">ca</span> <span class="o">=</span> <span class="n">ca</span><span class="p">[</span><span class="n">ca_null</span> <span class="o">==</span> <span class="kc">False</span><span class="p">]</span>
+                <span class="n">cb</span> <span class="o">=</span> <span class="n">cb</span><span class="p">[</span><span class="n">cb_null</span> <span class="o">==</span> <span class="kc">False</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">c</span><span class="p">]):</span>
                     <span class="n">ca</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ca</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
                     <span class="n">cb</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">cb</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
                     <span class="n">dif</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">ca</span> <span class="o">-</span> <span class="n">cb</span><span class="p">)</span> <span class="o">/</span> <span class="n">numpy</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">ca</span><span class="p">,</span> <span class="n">cb</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dif</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">float_tol</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="bp">False</span>
+                        <span class="k">return</span> <span class="kc">False</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">ca</span> <span class="o">==</span> <span class="n">cb</span><span class="p">):</span>
-                        <span class="k">return</span> <span class="bp">False</span>
-    <span class="k">return</span> <span class="bp">True</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
 </pre></div>
 
         </details>
@@ -647,12 +647,12 @@ Ignores indexing.</p>
     <span class="n">expect</span><span class="p">,</span>
     <span class="n">db_handles</span><span class="p">,</span>
     <span class="n">float_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
-    <span class="n">check_column_order</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">check_row_order</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">check_parse</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-    <span class="n">local_data_model</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-    <span class="n">empty_produces_empty</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">check_column_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">empty_produces_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
@@ -680,7 +680,7 @@ Ignores indexing.</p>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
     <span class="n">n_tables</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">n_tables</span> <span class="o">&gt;</span> <span class="mi">0</span>
-    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">expect</span><span class="p">):</span>
@@ -722,7 +722,7 @@ Ignores indexing.</p>
         <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pandas transform result did not match expect&quot;</span><span class="p">)</span>
     <span class="c1"># try on empty inputs</span>
-    <span class="n">empty_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">empty_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="n">empty_res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">empty_map</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">empty_res</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">empty_res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
@@ -735,27 +735,27 @@ Ignores indexing.</p>
         <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
         <span class="n">partial_maps</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">{</span>
-                <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+                <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
                 <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
             <span class="p">},</span>
             <span class="p">{</span>
                 <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
-                <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+                <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="p">},</span>
         <span class="p">]</span>
         <span class="k">for</span> <span class="n">pm</span> <span class="ow">in</span> <span class="n">partial_maps</span><span class="p">:</span>
             <span class="n">empty_res_i</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">pm</span><span class="p">)</span>
             <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">empty_res_i</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
     <span class="c1"># try any db paths</span>
-    <span class="k">if</span> <span class="n">db_handles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">db_handles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">db_handle</span> <span class="ow">in</span> <span class="n">db_handles</span><span class="p">:</span>
             <span class="n">to_del</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
             <span class="n">sql_statements</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">initial_commas</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">]:</span>
-                <span class="k">for</span> <span class="n">use_with</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">initial_commas</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">use_with</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
                     <span class="n">sql_format_options</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">SQLFormatOptions</span><span class="p">(</span>
                         <span class="n">use_with</span><span class="o">=</span><span class="n">use_with</span><span class="p">,</span>
-                        <span class="n">annotate</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                        <span class="n">annotate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                         <span class="n">sql_indent</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span>
                         <span class="n">initial_commas</span><span class="o">=</span><span class="n">initial_commas</span><span class="p">,</span>
                     <span class="p">)</span>
@@ -763,13 +763,13 @@ Ignores indexing.</p>
                     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
                     <span class="n">sql_statements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
                     <span class="c1"># print(sql)</span>
-            <span class="k">if</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="n">db_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                    <span class="n">db_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                     <span class="n">to_del</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-                <span class="n">caught</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="n">caught</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="n">res_db_sql</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="n">res_db_ops</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="n">res_db_ops</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">sql</span> <span class="ow">in</span> <span class="n">sql_statements</span><span class="p">:</span>
                         <span class="n">res_db_sql_i</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
@@ -779,7 +779,7 @@ Ignores indexing.</p>
                     <span class="n">caught</span> <span class="o">=</span> <span class="n">e</span>
                 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">to_del</span><span class="p">:</span>
                     <span class="n">db_handle</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">caught</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">caught</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">caught</span>
                 <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">res_db_sql</span><span class="p">:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
@@ -790,7 +790,7 @@ Ignores indexing.</p>
                         <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
                         <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
                     <span class="p">):</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{db_handle} SQL result did not match expect&quot;</span><span class="p">)</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db_handle</span><span class="si">}</span><span class="s2"> SQL result did not match expect&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
                     <span class="n">res_db_ops</span><span class="p">,</span>
                     <span class="n">expect</span><span class="p">,</span>
@@ -799,7 +799,7 @@ Ignores indexing.</p>
                     <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
                     <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
                 <span class="p">):</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{db_handle} ops result did not match expect&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db_handle</span><span class="si">}</span><span class="s2"> ops result did not match expect&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -840,28 +840,28 @@ Asserts if there are issues</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
-    <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
-    <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">test_PostgreSQL</span><span class="p">:</span>
         <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
-        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">test_BigQuery</span><span class="p">:</span>
         <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
-        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">test_MySQL</span><span class="p">:</span>
         <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
-        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">test_Spark</span><span class="p">:</span>
         <span class="n">hdl</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">example_handle</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
-        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">hdl</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">db_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdl</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">db_handles</span>
 </pre></div>
@@ -901,12 +901,12 @@ Asserts if there are issues</p>
     <span class="n">expect</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">float_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
-    <span class="n">check_column_order</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">check_row_order</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">check_parse</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-    <span class="n">models_to_skip</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-    <span class="n">empty_produces_empty</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">check_column_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">models_to_skip</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">empty_produces_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
@@ -933,17 +933,17 @@ Asserts if there are issues</p>
 
     <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[</span>
         <span class="c1"># non-connected handles, lets us test some of the SQL generation path</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="bp">None</span><span class="p">),</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">BigQueryModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="bp">None</span><span class="p">),</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="bp">None</span><span class="p">),</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">SparkSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="bp">None</span><span class="p">),</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="bp">None</span><span class="p">),</span>
+        <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+        <span class="n">data_algebra</span><span class="o">.</span><span class="n">BigQuery</span><span class="o">.</span><span class="n">BigQueryModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+        <span class="n">data_algebra</span><span class="o">.</span><span class="n">PostgreSQL</span><span class="o">.</span><span class="n">PostgreSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+        <span class="n">data_algebra</span><span class="o">.</span><span class="n">SparkSQL</span><span class="o">.</span><span class="n">SparkSQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+        <span class="n">data_algebra</span><span class="o">.</span><span class="n">MySQL</span><span class="o">.</span><span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
     <span class="p">]</span>
 
     <span class="n">test_dbs</span> <span class="o">=</span> <span class="n">get_test_dbs</span><span class="p">()</span>
     <span class="n">db_handles</span> <span class="o">=</span> <span class="n">db_handles</span> <span class="o">+</span> <span class="n">test_dbs</span>
 
-    <span class="k">if</span> <span class="n">models_to_skip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">models_to_skip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">db_handles</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">db_model</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">models_to_skip</span><span class="p">]</span>
 
     <span class="n">check_transform_on_handles</span><span class="p">(</span>

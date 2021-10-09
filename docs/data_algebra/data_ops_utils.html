@@ -72,23 +72,23 @@
         <span class="p">)</span>
         <span class="n">ops2_common_columns_produced</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ops2_common</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops1_common_columns_used</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ops2_columns_produced</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops1_common_columns_used</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ops1_columns_produced</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops2_common_columns_used</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ops1_columns_produced</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops2_common_columns_used</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ops2_columns_produced</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="n">new_ops</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">ops1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ops1</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">common_produced</span><span class="p">}</span>
         <span class="n">new_ops</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ops2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_ops</span>
     <span class="c1"># check required disjointness conditions</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops1_columns_produced</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ops2_columns_produced</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops1_columns_used</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ops2_columns_produced</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops2_columns_used</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ops1_columns_produced</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="kc">None</span>
     <span class="c1"># all of ops1 must have the same view</span>
     <span class="n">views1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ops1</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
@@ -101,9 +101,9 @@
             <span class="k">if</span> <span class="n">vi</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">views2</span><span class="p">:</span>  <span class="c1"># expect list to be of size zero or one</span>
                 <span class="n">views2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vi</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">views1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">views2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="kc">None</span>
     <span class="c1"># merge the extends</span>
     <span class="n">new_ops</span> <span class="o">=</span> <span class="n">ops1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">new_ops2</span> <span class="o">=</span> <span class="n">ops2</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -144,23 +144,23 @@
         <span class="p">)</span>
         <span class="n">ops2_common_columns_produced</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ops2_common</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops1_common_columns_used</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ops2_columns_produced</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops1_common_columns_used</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ops1_columns_produced</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops2_common_columns_used</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ops1_columns_produced</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops2_common_columns_used</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ops2_columns_produced</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="n">new_ops</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">ops1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ops1</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">common_produced</span><span class="p">}</span>
         <span class="n">new_ops</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ops2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_ops</span>
     <span class="c1"># check required disjointness conditions</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops1_columns_produced</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ops2_columns_produced</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops1_columns_used</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ops2_columns_produced</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops2_columns_used</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ops1_columns_produced</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="kc">None</span>
     <span class="c1"># all of ops1 must have the same view</span>
     <span class="n">views1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ops1</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
@@ -173,9 +173,9 @@
             <span class="k">if</span> <span class="n">vi</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">views2</span><span class="p">:</span>  <span class="c1"># expect list to be of size zero or one</span>
                 <span class="n">views2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vi</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">views1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">views2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="kc">None</span>
     <span class="c1"># merge the extends</span>
     <span class="n">new_ops</span> <span class="o">=</span> <span class="n">ops1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">new_ops2</span> <span class="o">=</span> <span class="n">ops2</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>

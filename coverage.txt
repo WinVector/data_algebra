@@ -1,7 +1,7 @@
 ============================= test session starts ==============================
-platform darwin -- Python 3.7.4, pytest-5.2.1, py-1.8.0, pluggy-0.13.0
+platform darwin -- Python 3.9.6, pytest-6.2.4, py-1.10.0, pluggy-0.13.1
 rootdir: /Users/johnmount/Documents/work/data_algebra
-plugins: cov-2.12.1, arraydiff-0.3, remotedata-0.3.2, doctestplus-0.4.0, openfiles-0.4.0
+plugins: cov-2.12.1, anyio-2.2.0
 collected 225 items
 
 tests/test_OrderedSet.py .                                               [  0%]
@@ -94,10 +94,10 @@ tests/test_window2.py ...                                                [ 96%]
 tests/test_window_fns.py .....                                           [ 99%]
 tests/test_with.py ..                                                    [100%]
 
----------- coverage: platform darwin, python 3.7.4-final-0 -----------
+---------- coverage: platform darwin, python 3.9.6-final-0 -----------
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
-data_algebra/BigQuery.py                 106     67    37%
+data_algebra/BigQuery.py                 106     68    36%
 data_algebra/MySQL.py                     27      9    67%
 data_algebra/OrderedSet.py                53      7    87%
 data_algebra/PostgreSQL.py                17      6    65%
@@ -108,7 +108,7 @@ data_algebra/arrow.py                    170     36    79%
 data_algebra/cdata.py                    339     66    81%
 data_algebra/connected_components.py      22      0   100%
 data_algebra/data_model.py                40     17    58%
-data_algebra/data_ops.py                1185    202    83%
+data_algebra/data_ops.py                1185    199    83%
 data_algebra/data_ops_types.py            91     39    57%
 data_algebra/data_ops_utils.py            51      7    86%
 data_algebra/db_model.py                 840     96    89%
@@ -124,7 +124,7 @@ data_algebra/python3_lark.py               1      0   100%
 data_algebra/test_util.py                204     37    82%
 data_algebra/util.py                      89      6    93%
 ----------------------------------------------------------
-TOTAL                                   4915    871    82%
+TOTAL                                   4915    869    82%
 
 
-============================= 225 passed in 28.97s =============================
+============================= 225 passed in 23.78s =============================

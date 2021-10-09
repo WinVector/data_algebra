@@ -66,7 +66,7 @@
 
 
 <span class="c1"># set up parser</span>
-<span class="n">parser</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">parser</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="c1"># noinspection PyBroadException</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">lark</span><span class="o">.</span><span class="n">Lark</span><span class="p">(</span>
@@ -77,7 +77,7 @@
         <span class="c1"># propagate_positions=True,</span>
     <span class="p">)</span>
 <span class="k">except</span><span class="p">:</span>
-    <span class="n">parser</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="kc">None</span>
 
 
 <span class="c1"># set up tree walker, including re-mapped names</span>
@@ -114,7 +114,7 @@
 <span class="p">}</span>
 
 
-<span class="k">def</span> <span class="nf">_walk_lark_tree</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_def</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_walk_lark_tree</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_def</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Walk a lark parse tree and return our own representation.</span>
 
@@ -122,14 +122,14 @@
 <span class="sd">    :param data_def: dictionary of data_algebra.expr_rep.ColumnReference</span>
 <span class="sd">    :return: PreTerm tree.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">data_def</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">data_def</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">data_def</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">lookup_symbol</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">enc_value</span><span class="p">(</span><span class="n">data_def</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;unknown symbol: {key}&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unknown symbol: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># noinspection SpellCheckingInspection</span>
     <span class="k">def</span> <span class="nf">_r_walk_lark_tree</span><span class="p">(</span><span class="n">r_op</span><span class="p">):</span>
@@ -147,11 +147,11 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unexpected Token type: &quot;</span> <span class="o">+</span> <span class="n">r_op</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">r_op</span><span class="p">,</span> <span class="n">lark</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">Tree</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="s2">&quot;const_true&quot;</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="s2">&quot;const_false&quot;</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="s2">&quot;const_none&quot;</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;single_input&quot;</span><span class="p">,</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;var&quot;</span><span class="p">]:</span>
                 <span class="k">return</span> <span class="n">_r_walk_lark_tree</span><span class="p">(</span><span class="n">r_op</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;arith_expr&quot;</span><span class="p">,</span> <span class="s2">&quot;term&quot;</span><span class="p">,</span> <span class="s2">&quot;comparison&quot;</span><span class="p">]:</span>
@@ -171,7 +171,7 @@
                             <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
                         <span class="p">]</span>
                         <span class="n">res</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">kop_expr</span><span class="p">(</span>
-                            <span class="n">op_name</span><span class="p">,</span> <span class="n">children</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="bp">False</span>
+                            <span class="n">op_name</span><span class="p">,</span> <span class="n">children</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">False</span>
                         <span class="p">)</span>
                         <span class="k">return</span> <span class="n">res</span>
                 <span class="c1"># just linear chain ops</span>
@@ -206,8 +206,8 @@
             <span class="k">if</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="s2">&quot;funccall&quot;</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r_op</span><span class="o">.</span><span class="n">children</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unexpected funccall length&quot;</span><span class="p">)</span>
-                <span class="n">var</span> <span class="o">=</span> <span class="bp">None</span>
-                <span class="n">op_name</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="n">var</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">op_name</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="n">method_carrier</span> <span class="o">=</span> <span class="n">r_op</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">method_carrier</span><span class="p">,</span> <span class="n">lark</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">Tree</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">method_carrier</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="s2">&quot;getattr&quot;</span><span class="p">:</span>
@@ -216,18 +216,18 @@
                         <span class="n">op_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">method_carrier</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="c1"># function invoke</span>
-                        <span class="n">var</span> <span class="o">=</span> <span class="bp">None</span>
+                        <span class="n">var</span> <span class="o">=</span> <span class="kc">None</span>
                         <span class="n">op_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">method_carrier</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">method_carrier</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                         <span class="n">op_name</span> <span class="o">=</span> <span class="n">method_carrier</span>
-                <span class="k">if</span> <span class="n">op_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">op_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;couldn&#39;t work out method name&quot;</span><span class="p">)</span>
                 <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r_op</span><span class="o">.</span><span class="n">children</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">raw_args</span> <span class="o">=</span> <span class="n">r_op</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">children</span>
                     <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">_r_walk_lark_tree</span><span class="p">(</span><span class="n">ai</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="n">raw_args</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">var</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">var</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">method</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">op_name</span><span class="p">)</span>
                     <span class="k">return</span> <span class="n">method</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -242,10 +242,10 @@
                 <span class="k">elif</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;and_test&quot;</span><span class="p">,</span> <span class="s2">&quot;and_test_sym&quot;</span><span class="p">}:</span>
                     <span class="n">op_name</span> <span class="o">=</span> <span class="s2">&quot;and&quot;</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;unexpected test: {r_op.data}&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unexpected test: </span><span class="si">{</span><span class="n">r_op</span><span class="o">.</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="n">_r_walk_lark_tree</span><span class="p">(</span><span class="n">ci</span><span class="p">)</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">r_op</span><span class="o">.</span><span class="n">children</span><span class="p">]</span>
                 <span class="n">res</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">kop_expr</span><span class="p">(</span>
-                    <span class="n">op_name</span><span class="p">,</span> <span class="n">children</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="bp">False</span>
+                    <span class="n">op_name</span><span class="p">,</span> <span class="n">children</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">False</span>
                 <span class="p">)</span>
                 <span class="k">return</span> <span class="n">res</span>
             <span class="k">if</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="s2">&quot;not&quot;</span><span class="p">:</span>
@@ -253,14 +253,14 @@
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unexpected &quot;</span> <span class="o">+</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="o">+</span> <span class="s2">&quot; length&quot;</span><span class="p">)</span>
                 <span class="n">left</span> <span class="o">=</span> <span class="n">_r_walk_lark_tree</span><span class="p">(</span><span class="n">r_op</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                 <span class="n">op_name</span> <span class="o">=</span> <span class="s2">&quot;__eq__&quot;</span>
-                <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">op_name</span><span class="p">)(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="bp">False</span><span class="p">))</span>
+                <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">op_name</span><span class="p">)(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="kc">False</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="s2">&quot;tuple&quot;</span><span class="p">,</span> <span class="s2">&quot;set&quot;</span><span class="p">]:</span>
                 <span class="n">op_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">_r_walk_lark_tree</span><span class="p">(</span><span class="n">vi</span><span class="p">)</span> <span class="k">for</span> <span class="n">vi</span> <span class="ow">in</span> <span class="n">r_op</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="p">]</span>
                 <span class="c1"># check all args are values, not None, same type</span>
                 <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span>
                     <span class="p">[</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">)</span> <span class="k">for</span> <span class="n">vi</span> <span class="ow">in</span> <span class="n">op_values</span><span class="p">]</span>
                 <span class="p">)</span>
-                <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">vi</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">for</span> <span class="n">vi</span> <span class="ow">in</span> <span class="n">op_values</span><span class="p">])</span>
+                <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">vi</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">vi</span> <span class="ow">in</span> <span class="n">op_values</span><span class="p">])</span>
                 <span class="n">observed_types</span> <span class="o">=</span> <span class="p">{</span><span class="nb">type</span><span class="p">(</span><span class="n">vi</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">vi</span> <span class="ow">in</span> <span class="n">op_values</span><span class="p">}</span>
                 <span class="n">observed_types</span> <span class="o">=</span> <span class="p">[</span>
                     <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">map_type_to_canonical</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">observed_types</span>
@@ -275,7 +275,7 @@
     <span class="k">return</span> <span class="n">_r_walk_lark_tree</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">parse_by_lark</span><span class="p">(</span><span class="n">source_str</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_def</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">PreTerm</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">parse_by_lark</span><span class="p">(</span><span class="n">source_str</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_def</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">PreTerm</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parse an expression in terms of data views and values.</span>
 
@@ -283,7 +283,7 @@
 <span class="sd">    :param data_def: dictionary of data_algebra.expr_rep.ColumnReference</span>
 <span class="sd">    :return: data_algebra.expr_rep.PreTerm</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="n">parser</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">parser</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source_str</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="n">tree</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">source_str</span><span class="p">)</span>
     <span class="c1"># convert parse tree to our data structures for isolation</span>
@@ -306,7 +306,7 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">parse_by_lark</span><span class="p">(</span><span class="n">source_str</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_def</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">PreTerm</span><span class="p">:</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">parse_by_lark</span><span class="p">(</span><span class="n">source_str</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_def</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">PreTerm</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parse an expression in terms of data views and values.</span>
 
@@ -314,7 +314,7 @@
 <span class="sd">    :param data_def: dictionary of data_algebra.expr_rep.ColumnReference</span>
 <span class="sd">    :return: data_algebra.expr_rep.PreTerm</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="n">parser</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">parser</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source_str</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="n">tree</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">source_str</span><span class="p">)</span>
     <span class="c1"># convert parse tree to our data structures for isolation</span>
