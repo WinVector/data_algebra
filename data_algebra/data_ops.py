@@ -2019,11 +2019,13 @@ class ConvertRecordsNode(ViewRepresentation):
 
 
 class SQLNode(ViewRepresentation):
-    def __init__(self, *, sql: List[str], column_names: List[str]):
+    def __init__(self, *, sql: List[str], column_names: List[str], view_name: Optional[str]):
         assert isinstance(sql, list)
         assert len(sql) > 0
         assert all([isinstance(v, str) for v in sql])
+        assert isinstance(view_name, (str, type(None)))
         self.sql = sql.copy()
+        self.view_name = view_name
         ViewRepresentation.__init__(
             self,
             column_names=column_names,
@@ -2036,9 +2038,14 @@ class SQLNode(ViewRepresentation):
     def _equiv_nodes(self, other):
         if not isinstance(other, SQLNode):
             return False
-        if not self.column_names == other.column_names:
+        if (self.view_name is None) != (other.view_name is None):
             return False
-        if not self.sql == other.sql:
+        if self.view_name is not None:
+            if self.view_name != other.view_name:
+                return False
+        if self.column_names != other.column_names:
+            return False
+        if self.sql != other.sql:
             return False
         return True
 
@@ -2046,15 +2053,22 @@ class SQLNode(ViewRepresentation):
         return []
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
-        s = "SQLNode(sql=" + str(self.sql) + ", column_names="+ str(self.column_names) + ")"
+        s = (
+                "SQLNode(sql=" + str(self.sql)
+                + ", column_names=" + str(self.column_names)
+                + ", view_name=" + self.view_name.__repr__()
+                + ")")
         return s
 
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        quoted_query_name = None
+        if self.view_name is not None:
+            quoted_query_name = db_model.quote_identifier(self.view_name)
         near_sql = data_algebra.near_sql.NearSQLRawQStep(
             prefix=self.sql,
-            quoted_query_name=None,
+            quoted_query_name=quoted_query_name,
             sub_sql=None,
             suffix=None,
             annotation="user supplied SQL",
@@ -2062,11 +2076,9 @@ class SQLNode(ViewRepresentation):
         return near_sql
 
     def eval_implementation(self, *, data_map, data_model, narrow):
-        if data_model is None:
-            raise ValueError("Expected data_model to not be None")
-        return data_model.convert_records_step(
-            op=self, data_map=data_map, narrow=narrow
-        )
+        if self.view_name is None:
+            raise ValueError("can only use SQLNode with Pandas if it is a named view")
+        return data_map[self.view_name]
 
 
 def ex(d, *, data_model=None, narrow=True, allow_limited_tables=False):
