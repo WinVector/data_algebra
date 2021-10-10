@@ -529,7 +529,9 @@
         <span class="n">sub_sql</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NearSQLContainer</span><span class="p">],</span>
         <span class="n">suffix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">annotation</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">add_select</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">add_select</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
         <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">prefix</span><span class="p">])</span>
@@ -548,6 +550,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql</span> <span class="o">=</span> <span class="n">sub_sql</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_select</span> <span class="o">=</span> <span class="n">add_select</span>
 
     <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -561,6 +564,7 @@
         <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlrawq_to_sql_str_list_</span><span class="p">(</span>
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
+            <span class="n">add_select</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_select</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_with_form</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SQLWithList</span><span class="p">:</span>
@@ -578,6 +582,7 @@
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">stub</span><span class="p">,</span>
             <span class="n">suffix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">suffix</span><span class="p">,</span>
             <span class="n">annotation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">annotation</span><span class="p">,</span>
+            <span class="n">add_select</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_select</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">SQLWithList</span><span class="p">(</span><span class="n">last_step</span><span class="o">=</span><span class="n">stubbed_step</span><span class="p">,</span> <span class="n">previous_steps</span><span class="o">=</span><span class="n">sequence</span><span class="p">)</span>
 </pre></div>
@@ -1852,7 +1857,9 @@
         <span class="n">sub_sql</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NearSQLContainer</span><span class="p">],</span>
         <span class="n">suffix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">annotation</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">add_select</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">add_select</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
         <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">prefix</span><span class="p">])</span>
@@ -1871,6 +1878,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql</span> <span class="o">=</span> <span class="n">sub_sql</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_select</span> <span class="o">=</span> <span class="n">add_select</span>
 
     <span class="k">def</span> <span class="nf">to_sql_str_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1884,6 +1892,7 @@
         <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlrawq_to_sql_str_list_</span><span class="p">(</span>
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
+            <span class="n">add_select</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_select</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_with_form</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SQLWithList</span><span class="p">:</span>
@@ -1901,6 +1910,7 @@
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">stub</span><span class="p">,</span>
             <span class="n">suffix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">suffix</span><span class="p">,</span>
             <span class="n">annotation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">annotation</span><span class="p">,</span>
+            <span class="n">add_select</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_select</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">SQLWithList</span><span class="p">(</span><span class="n">last_step</span><span class="o">=</span><span class="n">stubbed_step</span><span class="p">,</span> <span class="n">previous_steps</span><span class="o">=</span><span class="n">sequence</span><span class="p">)</span>
 </pre></div>
@@ -1921,7 +1931,8 @@
     quoted_query_name: str,
     sub_sql: Optional[<a href="#NearSQLContainer">data_algebra.near_sql.NearSQLContainer</a>],
     suffix: Optional[List[str]] = None,
-    annotation: Optional[str] = None
+    annotation: Optional[str] = None,
+    add_select: bool = True
 )</span>
     </div>
 
@@ -1935,7 +1946,9 @@
         <span class="n">sub_sql</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NearSQLContainer</span><span class="p">],</span>
         <span class="n">suffix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">annotation</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">add_select</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">add_select</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
         <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">prefix</span><span class="p">])</span>
@@ -1954,6 +1967,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_sql</span> <span class="o">=</span> <span class="n">sub_sql</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_select</span> <span class="o">=</span> <span class="n">add_select</span>
 </pre></div>
 
         </details>
@@ -1991,6 +2005,7 @@
         <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">nearsqlrawq_to_sql_str_list_</span><span class="p">(</span>
             <span class="n">near_sql</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
+            <span class="n">add_select</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_select</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -2024,6 +2039,7 @@
             <span class="n">sub_sql</span><span class="o">=</span><span class="n">stub</span><span class="p">,</span>
             <span class="n">suffix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">suffix</span><span class="p">,</span>
             <span class="n">annotation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">annotation</span><span class="p">,</span>
+            <span class="n">add_select</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_select</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">SQLWithList</span><span class="p">(</span><span class="n">last_step</span><span class="o">=</span><span class="n">stubbed_step</span><span class="p">,</span> <span class="n">previous_steps</span><span class="o">=</span><span class="n">sequence</span><span class="p">)</span>
 </pre></div>

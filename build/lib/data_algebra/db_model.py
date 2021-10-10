@@ -1716,21 +1716,25 @@ class DBModel:
         near_sql,
         *,
         sql_format_options=None,
+        add_select=True,
     ) -> List[str]:
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLRawQStep)
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
         assert isinstance(sql_format_options, SQLFormatOptions)
-        sql = (
-            ["SELECT"]
-            + [' ' + v for v in near_sql.prefix]
-            + [
+        sql = []
+        if near_sql.annotation is not None:
+            sql = sql + ["-- " + _clean_annotation(near_sql.annotation)]
+        if add_select:
+            sql = sql + ["SELECT"]
+        sql = sql + [' ' + v for v in near_sql.prefix]
+        if near_sql.sub_sql is not None:
+            sql = sql + [
                 sql_format_options.sql_indent + si
                 for si in near_sql.sub_sql.convert_subsql(
                     db_model=self, sql_format_options=sql_format_options
                 )
             ]
-        )
         if (near_sql.suffix is not None) and (len(near_sql.suffix) > 0):
             sql = sql + [' ' + v for v in near_sql.suffix]
         return sql

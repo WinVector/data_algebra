@@ -350,7 +350,9 @@ class NearSQLRawQStep(NearSQL):
         sub_sql: Optional[NearSQLContainer],
         suffix: Optional[List[str]] = None,
         annotation: Optional[str] = None,
+        add_select: bool = True,
     ):
+        assert isinstance(add_select, bool)
         assert isinstance(prefix, list)
         assert len(prefix) > 0
         assert all([isinstance(v, str) for v in prefix])
@@ -369,6 +371,7 @@ class NearSQLRawQStep(NearSQL):
         self.prefix = prefix
         self.sub_sql = sub_sql
         self.suffix = suffix
+        self.add_select = add_select
 
     def to_sql_str_list(
         self,
@@ -382,6 +385,7 @@ class NearSQLRawQStep(NearSQL):
         return db_model.nearsqlrawq_to_sql_str_list_(
             near_sql=self,
             sql_format_options=sql_format_options,
+            add_select=self.add_select,
         )
 
     def to_with_form(self) -> SQLWithList:
@@ -399,5 +403,6 @@ class NearSQLRawQStep(NearSQL):
             sub_sql=stub,
             suffix=self.suffix,
             annotation=self.annotation,
+            add_select=self.add_select,
         )
         return SQLWithList(last_step=stubbed_step, previous_steps=sequence)
