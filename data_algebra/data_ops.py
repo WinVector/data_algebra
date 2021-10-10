@@ -776,11 +776,6 @@ class TableDescription(ViewRepresentation):
         return rep
 
     # comparable to other table descriptions
-    def __lt__(self, other):
-        if not isinstance(other, TableDescription):
-            return True
-        return self.key.__lt__(other.key)
-
     def __eq__(self, other):
         if not isinstance(other, TableDescription):
             return False
