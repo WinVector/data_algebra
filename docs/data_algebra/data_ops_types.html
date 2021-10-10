@@ -31,18 +31,6 @@
                     <h2>API Documentation</h2>
                         <ul class="memberlist">
             <li>
-                    <a class="class" href="#PipeStep">PipeStep</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#PipeStep.__init__">PipeStep</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#PipeStep.apply_to">apply_to</a>
-                        </li>
-                </ul>
-
-            </li>
-            <li>
                     <a class="class" href="#OperatorPlatform">OperatorPlatform</a>
                             <ul class="memberlist">
                         <li>
@@ -163,14 +151,6 @@
 <span class="kn">import</span> <span class="nn">data_algebra.cdata</span>
 
 
-<span class="k">class</span> <span class="nc">PipeStep</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span>
-
-    <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
-
-
 <span class="k">class</span> <span class="nc">OperatorPlatform</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Abstract class representing ability to apply data_algebra operations.&quot;&quot;&quot;</span>
 
@@ -235,8 +215,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">OperatorPlatform</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">PipeStep</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">act_on</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__rshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>  <span class="c1"># override self &gt;&gt; other</span>
@@ -249,8 +227,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># can&#39;t use type &gt;&gt; type if only __rrshift__ is defined (must have __rshift__ in this case)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">OperatorPlatform</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">PipeStep</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;unexpected type: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)))</span>
 
@@ -379,67 +355,6 @@
         </details>
 
             </section>
-                <section id="PipeStep">
-                                <div class="attr class">
-        <a class="headerlink" href="#PipeStep">#&nbsp;&nbsp</a>
-
-        
-        <span class="def">class</span>
-        <span class="name">PipeStep</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">PipeStep</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span>
-
-    <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            <div id="PipeStep.__init__" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#PipeStep.__init__">#&nbsp;&nbsp</a>
-
-        
-            <span class="name">PipeStep</span><span class="signature">()</span>
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            </div>
-                            <div id="PipeStep.apply_to" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#PipeStep.apply_to">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">apply_to</span><span class="signature">(self, other, **kwargs)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            </div>
-                </section>
                 <section id="OperatorPlatform">
                                 <div class="attr class">
         <a class="headerlink" href="#OperatorPlatform">#&nbsp;&nbsp</a>
@@ -515,8 +430,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">OperatorPlatform</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">PipeStep</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">act_on</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__rshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>  <span class="c1"># override self &gt;&gt; other</span>
@@ -529,8 +442,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># can&#39;t use type &gt;&gt; type if only __rrshift__ is defined (must have __rshift__ in this case)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">OperatorPlatform</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">PipeStep</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;unexpected type: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)))</span>
 

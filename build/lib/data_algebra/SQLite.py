@@ -210,7 +210,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         join_node_copy_right = copy.copy(join_node)
         join_node_copy_right.jointype = 'LEFT'
         join_node_copy_right.sources = [join_node.sources[1], join_node.sources[0]]
-        near_sql_right = data_algebra.db_model.DBModel.natural_join_to_sql(
+        near_sql_right = data_algebra.db_model.DBModel.natural_join_to_near_sql(
             self,
             join_node=join_node_copy_right,
             using=using,
@@ -255,7 +255,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
                     jointype='left')
         )
         assert isinstance(ops_simulate, NaturalJoinNode)
-        simulate_near_sql = self.natural_join_to_sql(
+        simulate_near_sql = self.natural_join_to_near_sql(
             join_node=ops_simulate,
             using=using,
             temp_id_source=temp_id_source,
@@ -263,7 +263,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         )
         return simulate_near_sql
 
-    def natural_join_to_sql(
+    def natural_join_to_near_sql(
         self, join_node, *, using=None, temp_id_source=None, sql_format_options=None, left_is_first=True
     ):
         if join_node.node_name != "NaturalJoinNode":
@@ -286,7 +286,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
                 temp_id_source=temp_id_source,
                 sql_format_options=sql_format_options)
         # delegate back to parent class
-        return data_algebra.db_model.DBModel.natural_join_to_sql(
+        return data_algebra.db_model.DBModel.natural_join_to_near_sql(
             self,
             join_node=join_node,
             using=using,

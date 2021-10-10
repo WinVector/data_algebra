@@ -1,8 +1,7 @@
 from abc import ABC
-from typing import Set, Dict, List, Union
+from typing import Iterable, Set, Dict, List, Optional, Union
 import numbers
 import re
-import typing
 
 import data_algebra
 import data_algebra.expr_parse
@@ -48,22 +47,26 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     column_names: List[str]
     column_set: data_algebra.OrderedSet.OrderedSet
-    column_types: typing.Optional[Dict[str, type]]
+    column_types: Optional[Dict[str, type]]
     sources: List[
         "ViewRepresentation"
     ]  # https://www.python.org/dev/peps/pep-0484/#forward-references
 
     def __init__(
         self,
-        column_names: List[str],
+        column_names: Iterable[str],
         *,
-        column_types: typing.Optional[Dict[str, type]] = None,
-        sources: List["ViewRepresentation"] = None,
+        column_types: Optional[Dict[str, type]] = None,
+        sources: Optional[List["ViewRepresentation"]] = None,
         node_name: str,
     ):
         if isinstance(column_names, str):
             column_names = [column_names]
-        self.column_names = [c for c in column_names]
+        else:
+            column_names = [v for v in column_names]  # make sure a list and a disjoint copy
+        assert isinstance(column_names, list)
+        assert all([isinstance(v, str) for v in column_names])
+        self.column_names = column_names
         for ci in self.column_names:
             assert isinstance(ci, str)
         if len(self.column_names) < 1:
@@ -616,7 +619,7 @@ class TableDescription(ViewRepresentation):
     """
 
     table_name: str
-    column_names: List[str]
+    column_names: Iterable[str]
     qualifiers: Dict[str, str]
     key: str
     table_name_was_set_by_user: bool
@@ -628,11 +631,15 @@ class TableDescription(ViewRepresentation):
         column_names,
         qualifiers=None,
         sql_meta=None,
-        column_types: typing.Optional[Dict[str, type]] = None,
+        column_types: Optional[Dict[str, type]] = None,
         head=None,
         limit_was=None,
         nrows=None,
     ):
+        if isinstance(column_names, str):
+            column_names = [column_names]
+        else:
+            column_names = [v for v in column_names]  # convert to list from other types such as series
         ViewRepresentation.__init__(
             self, column_names=column_names, node_name="TableDescription", column_types=column_types,
         )
@@ -762,7 +769,7 @@ class TableDescription(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.table_def_to_sql(
+        return db_model.table_def_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
@@ -776,11 +783,6 @@ class TableDescription(ViewRepresentation):
         return rep
 
     # comparable to other table descriptions
-    def __lt__(self, other):
-        if not isinstance(other, TableDescription):
-            return True
-        return self.key.__lt__(other.key)
-
     def __eq__(self, other):
         if not isinstance(other, TableDescription):
             return False
@@ -797,7 +799,7 @@ def describe_table(
     qualifiers=None,
     sql_meta=None,
     column_types=None,
-    row_limit: typing.Optional[int] = 7,
+    row_limit: Optional[int] = 7,
     keep_sample=True,
     keep_all=False,
     guess_column_types=True,
@@ -1122,7 +1124,7 @@ class ExtendNode(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.extend_to_sql(
+        return db_model.extend_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
@@ -1266,7 +1268,7 @@ class ProjectNode(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.project_to_sql(
+        return db_model.project_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
@@ -1336,7 +1338,7 @@ class SelectRowsNode(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.select_rows_to_sql(
+        return db_model.select_rows_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
@@ -1410,7 +1412,7 @@ class SelectColumnsNode(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.select_columns_to_sql(
+        return db_model.select_columns_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
@@ -1484,7 +1486,7 @@ class DropColumnsNode(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.drop_columns_to_sql(
+        return db_model.drop_columns_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
@@ -1570,7 +1572,7 @@ class OrderRowsNode(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.order_to_sql(
+        return db_model.order_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
@@ -1670,7 +1672,7 @@ class RenameColumnsNode(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.rename_to_sql(
+        return db_model.rename_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
@@ -1787,7 +1789,7 @@ class NaturalJoinNode(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.natural_join_to_sql(
+        return db_model.natural_join_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
@@ -1906,7 +1908,7 @@ class ConcatRowsNode(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.concat_rows_to_sql(
+        return db_model.concat_rows_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
@@ -2014,6 +2016,69 @@ class ConvertRecordsNode(ViewRepresentation):
         return data_model.convert_records_step(
             op=self, data_map=data_map, narrow=narrow
         )
+
+
+class SQLNode(ViewRepresentation):
+    def __init__(self, *, sql: List[str], column_names: List[str], view_name: Optional[str]):
+        assert isinstance(sql, list)
+        assert len(sql) > 0
+        assert all([isinstance(v, str) for v in sql])
+        assert isinstance(view_name, (str, type(None)))
+        self.sql = sql.copy()
+        self.view_name = view_name
+        ViewRepresentation.__init__(
+            self,
+            column_names=column_names,
+            node_name="SQLNode",
+        )
+
+    def apply_to(self, a, *, target_table_key=None):
+        return self
+
+    def _equiv_nodes(self, other):
+        if not isinstance(other, SQLNode):
+            return False
+        if (self.view_name is None) != (other.view_name is None):
+            return False
+        if self.view_name is not None:
+            if self.view_name != other.view_name:
+                return False
+        if self.column_names != other.column_names:
+            return False
+        if self.sql != other.sql:
+            return False
+        return True
+
+    def columns_used_from_sources(self, using=None):
+        return []
+
+    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+        s = (
+                "SQLNode(sql=" + str(self.sql)
+                + ", column_names=" + str(self.column_names)
+                + ", view_name=" + self.view_name.__repr__()
+                + ")")
+        return s
+
+    def to_near_sql_implementation(
+        self, db_model, *, using, temp_id_source, sql_format_options=None
+    ) -> data_algebra.near_sql.NearSQL:
+        quoted_query_name = None
+        if self.view_name is not None:
+            quoted_query_name = db_model.quote_identifier(self.view_name)
+        near_sql = data_algebra.near_sql.NearSQLRawQStep(
+            prefix=self.sql,
+            quoted_query_name=quoted_query_name,
+            sub_sql=None,
+            suffix=None,
+            annotation="user supplied SQL",
+        )
+        return near_sql
+
+    def eval_implementation(self, *, data_map, data_model, narrow):
+        if self.view_name is None:
+            raise ValueError("can only use SQLNode with Pandas if it is a named view")
+        return data_map[self.view_name]
 
 
 def ex(d, *, data_model=None, narrow=True, allow_limited_tables=False):

@@ -94,34 +94,34 @@
                                 <a class="function" href="#DBModel.expr_to_sql">expr_to_sql</a>
                         </li>
                         <li>
-                                <a class="function" href="#DBModel.table_def_to_sql">table_def_to_sql</a>
+                                <a class="function" href="#DBModel.table_def_to_near_sql">table_def_to_near_sql</a>
                         </li>
                         <li>
-                                <a class="function" href="#DBModel.extend_to_sql">extend_to_sql</a>
+                                <a class="function" href="#DBModel.extend_to_near_sql">extend_to_near_sql</a>
                         </li>
                         <li>
-                                <a class="function" href="#DBModel.project_to_sql">project_to_sql</a>
+                                <a class="function" href="#DBModel.project_to_near_sql">project_to_near_sql</a>
                         </li>
                         <li>
-                                <a class="function" href="#DBModel.select_rows_to_sql">select_rows_to_sql</a>
+                                <a class="function" href="#DBModel.select_rows_to_near_sql">select_rows_to_near_sql</a>
                         </li>
                         <li>
-                                <a class="function" href="#DBModel.select_columns_to_sql">select_columns_to_sql</a>
+                                <a class="function" href="#DBModel.select_columns_to_near_sql">select_columns_to_near_sql</a>
                         </li>
                         <li>
-                                <a class="function" href="#DBModel.drop_columns_to_sql">drop_columns_to_sql</a>
+                                <a class="function" href="#DBModel.drop_columns_to_near_sql">drop_columns_to_near_sql</a>
                         </li>
                         <li>
-                                <a class="function" href="#DBModel.order_to_sql">order_to_sql</a>
+                                <a class="function" href="#DBModel.order_to_near_sql">order_to_near_sql</a>
                         </li>
                         <li>
-                                <a class="function" href="#DBModel.rename_to_sql">rename_to_sql</a>
+                                <a class="function" href="#DBModel.rename_to_near_sql">rename_to_near_sql</a>
                         </li>
                         <li>
-                                <a class="function" href="#DBModel.natural_join_to_sql">natural_join_to_sql</a>
+                                <a class="function" href="#DBModel.natural_join_to_near_sql">natural_join_to_near_sql</a>
                         </li>
                         <li>
-                                <a class="function" href="#DBModel.concat_rows_to_sql">concat_rows_to_sql</a>
+                                <a class="function" href="#DBModel.concat_rows_to_near_sql">concat_rows_to_near_sql</a>
                         </li>
                         <li>
                                 <a class="function" href="#DBModel.to_sql">to_sql</a>
@@ -1015,7 +1015,7 @@
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
         <span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">table_def_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">table_def_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">table_def</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">table_def</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span>
@@ -1043,17 +1043,17 @@
             <span class="c1"># need a non-trivial select here</span>
             <span class="n">terms</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">using</span><span class="p">:</span>
-                <span class="n">terms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+                <span class="n">terms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>  <span class="c1"># these get quoted later</span>
             <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;table_reference_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-                <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>  <span class="c1"># TODO: implement pruning</span>
+                <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
                 <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using</span><span class="p">),</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
-    <span class="k">def</span> <span class="nf">extend_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">extend_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">extend_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ExtendNode&quot;</span><span class="p">:</span>
@@ -1187,7 +1187,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
-    <span class="k">def</span> <span class="nf">project_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">project_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">project_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">project_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ProjectNode&quot;</span><span class="p">:</span>
@@ -1224,7 +1224,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
-    <span class="k">def</span> <span class="nf">select_rows_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">select_rows_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">select_rows_node</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1264,7 +1264,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
-    <span class="k">def</span> <span class="nf">select_columns_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">select_columns_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">select_columns_node</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1274,7 +1274,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;SelectColumnsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;Expected select_columns_to_sql to be a data_algebra.data_ops.SelectColumnsNode)&quot;</span>
+                <span class="s2">&quot;Expected select_columns_to_near_sql to be a data_algebra.data_ops.SelectColumnsNode)&quot;</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1298,7 +1298,7 @@
             <span class="n">subsql</span><span class="o">.</span><span class="n">terms</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">return</span> <span class="n">subsql</span>
 
-    <span class="k">def</span> <span class="nf">drop_columns_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">drop_columns_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">drop_columns_node</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1326,7 +1326,7 @@
         <span class="p">}</span>
         <span class="k">return</span> <span class="n">subsql</span>
 
-    <span class="k">def</span> <span class="nf">order_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">order_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">order_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">order_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;OrderRowsNode&quot;</span><span class="p">:</span>
@@ -1376,7 +1376,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
-    <span class="k">def</span> <span class="nf">rename_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">rename_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">rename_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;RenameColumnsNode&quot;</span><span class="p">:</span>
@@ -1456,7 +1456,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">using_left</span><span class="p">,</span> <span class="n">sql_left</span><span class="p">,</span> <span class="n">using_right</span><span class="p">,</span> <span class="n">sql_right</span>
 
-    <span class="k">def</span> <span class="nf">natural_join_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">natural_join_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">left_is_first</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1514,7 +1514,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
-    <span class="k">def</span> <span class="nf">concat_rows_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">concat_rows_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">concat_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ConcatRowsNode&quot;</span><span class="p">:</span>
@@ -1929,9 +1929,6 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">near_sql</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">force_sql</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLRawQStep</span><span class="p">)</span>
@@ -2527,7 +2524,7 @@
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
         <span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">table_def_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">table_def_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">table_def</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">table_def</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span>
@@ -2555,17 +2552,17 @@
             <span class="c1"># need a non-trivial select here</span>
             <span class="n">terms</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">using</span><span class="p">:</span>
-                <span class="n">terms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+                <span class="n">terms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>  <span class="c1"># these get quoted later</span>
             <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;table_reference_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-                <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>  <span class="c1"># TODO: implement pruning</span>
+                <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
                 <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using</span><span class="p">),</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
-    <span class="k">def</span> <span class="nf">extend_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">extend_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">extend_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ExtendNode&quot;</span><span class="p">:</span>
@@ -2699,7 +2696,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
-    <span class="k">def</span> <span class="nf">project_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">project_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">project_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">project_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ProjectNode&quot;</span><span class="p">:</span>
@@ -2736,7 +2733,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
-    <span class="k">def</span> <span class="nf">select_rows_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">select_rows_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">select_rows_node</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2776,7 +2773,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
-    <span class="k">def</span> <span class="nf">select_columns_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">select_columns_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">select_columns_node</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2786,7 +2783,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;SelectColumnsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;Expected select_columns_to_sql to be a data_algebra.data_ops.SelectColumnsNode)&quot;</span>
+                <span class="s2">&quot;Expected select_columns_to_near_sql to be a data_algebra.data_ops.SelectColumnsNode)&quot;</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -2810,7 +2807,7 @@
             <span class="n">subsql</span><span class="o">.</span><span class="n">terms</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">return</span> <span class="n">subsql</span>
 
-    <span class="k">def</span> <span class="nf">drop_columns_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">drop_columns_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">drop_columns_node</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2838,7 +2835,7 @@
         <span class="p">}</span>
         <span class="k">return</span> <span class="n">subsql</span>
 
-    <span class="k">def</span> <span class="nf">order_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">order_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">order_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">order_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;OrderRowsNode&quot;</span><span class="p">:</span>
@@ -2888,7 +2885,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
-    <span class="k">def</span> <span class="nf">rename_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">rename_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">rename_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;RenameColumnsNode&quot;</span><span class="p">:</span>
@@ -2968,7 +2965,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">using_left</span><span class="p">,</span> <span class="n">sql_left</span><span class="p">,</span> <span class="n">using_right</span><span class="p">,</span> <span class="n">sql_right</span>
 
-    <span class="k">def</span> <span class="nf">natural_join_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">natural_join_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">left_is_first</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -3026,7 +3023,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
-    <span class="k">def</span> <span class="nf">concat_rows_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">concat_rows_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">concat_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ConcatRowsNode&quot;</span><span class="p">:</span>
@@ -3441,9 +3438,6 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">near_sql</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">force_sql</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLRawQStep</span><span class="p">)</span>
@@ -4115,12 +4109,12 @@
     
 
                             </div>
-                            <div id="DBModel.table_def_to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#DBModel.table_def_to_sql">#&nbsp;&nbsp</a>
+                            <div id="DBModel.table_def_to_near_sql" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DBModel.table_def_to_near_sql">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">table_def_to_sql</span><span class="signature">(
+            <span class="name">table_def_to_near_sql</span><span class="signature">(
     self,
     table_def,
     *,
@@ -4132,7 +4126,7 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">table_def_to_sql</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">table_def_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">table_def</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">table_def</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span>
@@ -4160,11 +4154,11 @@
             <span class="c1"># need a non-trivial select here</span>
             <span class="n">terms</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">using</span><span class="p">:</span>
-                <span class="n">terms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+                <span class="n">terms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>  <span class="c1"># these get quoted later</span>
             <span class="n">view_name</span> <span class="o">=</span> <span class="s2">&quot;table_reference_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_id_source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLUnaryStep</span><span class="p">(</span>
-                <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>  <span class="c1"># TODO: implement pruning</span>
+                <span class="n">terms</span><span class="o">=</span><span class="n">terms</span><span class="p">,</span>
                 <span class="n">quoted_query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">subsql</span><span class="o">.</span><span class="n">to_bound_near_sql</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">using</span><span class="p">),</span>
             <span class="p">)</span>
@@ -4176,12 +4170,12 @@
     
 
                             </div>
-                            <div id="DBModel.extend_to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#DBModel.extend_to_sql">#&nbsp;&nbsp</a>
+                            <div id="DBModel.extend_to_near_sql" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DBModel.extend_to_near_sql">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">extend_to_sql</span><span class="signature">(
+            <span class="name">extend_to_near_sql</span><span class="signature">(
     self,
     extend_node,
     *,
@@ -4193,7 +4187,7 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">extend_to_sql</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">extend_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">extend_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ExtendNode&quot;</span><span class="p">:</span>
@@ -4333,12 +4327,12 @@
     
 
                             </div>
-                            <div id="DBModel.project_to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#DBModel.project_to_sql">#&nbsp;&nbsp</a>
+                            <div id="DBModel.project_to_near_sql" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DBModel.project_to_near_sql">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">project_to_sql</span><span class="signature">(
+            <span class="name">project_to_near_sql</span><span class="signature">(
     self,
     project_node,
     *,
@@ -4350,7 +4344,7 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">project_to_sql</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">project_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">project_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">project_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ProjectNode&quot;</span><span class="p">:</span>
@@ -4393,12 +4387,12 @@
     
 
                             </div>
-                            <div id="DBModel.select_rows_to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#DBModel.select_rows_to_sql">#&nbsp;&nbsp</a>
+                            <div id="DBModel.select_rows_to_near_sql" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DBModel.select_rows_to_near_sql">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">select_rows_to_sql</span><span class="signature">(
+            <span class="name">select_rows_to_near_sql</span><span class="signature">(
     self,
     select_rows_node,
     *,
@@ -4410,7 +4404,7 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">select_rows_to_sql</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">select_rows_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">select_rows_node</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -4456,12 +4450,12 @@
     
 
                             </div>
-                            <div id="DBModel.select_columns_to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#DBModel.select_columns_to_sql">#&nbsp;&nbsp</a>
+                            <div id="DBModel.select_columns_to_near_sql" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DBModel.select_columns_to_near_sql">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">select_columns_to_sql</span><span class="signature">(
+            <span class="name">select_columns_to_near_sql</span><span class="signature">(
     self,
     select_columns_node,
     *,
@@ -4473,7 +4467,7 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">select_columns_to_sql</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">select_columns_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">select_columns_node</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -4483,7 +4477,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;SelectColumnsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;Expected select_columns_to_sql to be a data_algebra.data_ops.SelectColumnsNode)&quot;</span>
+                <span class="s2">&quot;Expected select_columns_to_near_sql to be a data_algebra.data_ops.SelectColumnsNode)&quot;</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -4513,12 +4507,12 @@
     
 
                             </div>
-                            <div id="DBModel.drop_columns_to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#DBModel.drop_columns_to_sql">#&nbsp;&nbsp</a>
+                            <div id="DBModel.drop_columns_to_near_sql" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DBModel.drop_columns_to_near_sql">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">drop_columns_to_sql</span><span class="signature">(
+            <span class="name">drop_columns_to_near_sql</span><span class="signature">(
     self,
     drop_columns_node,
     *,
@@ -4530,7 +4524,7 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">drop_columns_to_sql</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">drop_columns_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">drop_columns_node</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -4564,12 +4558,12 @@
     
 
                             </div>
-                            <div id="DBModel.order_to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#DBModel.order_to_sql">#&nbsp;&nbsp</a>
+                            <div id="DBModel.order_to_near_sql" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DBModel.order_to_near_sql">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">order_to_sql</span><span class="signature">(
+            <span class="name">order_to_near_sql</span><span class="signature">(
     self,
     order_node,
     *,
@@ -4581,7 +4575,7 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">order_to_sql</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">order_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">order_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">order_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;OrderRowsNode&quot;</span><span class="p">:</span>
@@ -4637,12 +4631,12 @@
     
 
                             </div>
-                            <div id="DBModel.rename_to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#DBModel.rename_to_sql">#&nbsp;&nbsp</a>
+                            <div id="DBModel.rename_to_near_sql" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DBModel.rename_to_near_sql">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">rename_to_sql</span><span class="signature">(
+            <span class="name">rename_to_near_sql</span><span class="signature">(
     self,
     rename_node,
     *,
@@ -4654,7 +4648,7 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">rename_to_sql</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">rename_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">rename_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;RenameColumnsNode&quot;</span><span class="p">:</span>
@@ -4695,12 +4689,12 @@
     
 
                             </div>
-                            <div id="DBModel.natural_join_to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#DBModel.natural_join_to_sql">#&nbsp;&nbsp</a>
+                            <div id="DBModel.natural_join_to_near_sql" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DBModel.natural_join_to_near_sql">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">natural_join_to_sql</span><span class="signature">(
+            <span class="name">natural_join_to_near_sql</span><span class="signature">(
     self,
     join_node,
     *,
@@ -4713,7 +4707,7 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">natural_join_to_sql</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">natural_join_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">left_is_first</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -4777,12 +4771,12 @@
     
 
                             </div>
-                            <div id="DBModel.concat_rows_to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#DBModel.concat_rows_to_sql">#&nbsp;&nbsp</a>
+                            <div id="DBModel.concat_rows_to_near_sql" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DBModel.concat_rows_to_near_sql">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">concat_rows_to_sql</span><span class="signature">(
+            <span class="name">concat_rows_to_near_sql</span><span class="signature">(
     self,
     concat_node,
     *,
@@ -4794,7 +4788,7 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">concat_rows_to_sql</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">concat_rows_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">concat_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ConcatRowsNode&quot;</span><span class="p">:</span>
@@ -5366,15 +5360,7 @@
 
         
             <span class="def">def</span>
-            <span class="name">nearsqlrawq_to_sql_str_list_</span><span class="signature">(
-    self,
-    near_sql,
-    *,
-    columns=None,
-    force_sql=False,
-    constants=None,
-    sql_format_options=None
-) -&gt; List[str]</span>:
+            <span class="name">nearsqlrawq_to_sql_str_list_</span><span class="signature">(self, near_sql, *, sql_format_options=None) -&gt; List[str]</span>:
     </div>
 
                 <details>
@@ -5383,9 +5369,6 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">near_sql</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">force_sql</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">constants</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLRawQStep</span><span class="p">)</span>

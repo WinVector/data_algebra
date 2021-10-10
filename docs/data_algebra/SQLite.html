@@ -58,7 +58,7 @@
                                 <a class="function" href="#SQLiteModel.insert_table">insert_table</a>
                         </li>
                         <li>
-                                <a class="function" href="#SQLiteModel.natural_join_to_sql">natural_join_to_sql</a>
+                                <a class="function" href="#SQLiteModel.natural_join_to_near_sql">natural_join_to_near_sql</a>
                         </li>
                 </ul>
 
@@ -295,7 +295,7 @@
         <span class="n">join_node_copy_right</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">join_node</span><span class="p">)</span>
         <span class="n">join_node_copy_right</span><span class="o">.</span><span class="n">jointype</span> <span class="o">=</span> <span class="s1">&#39;LEFT&#39;</span>
         <span class="n">join_node_copy_right</span><span class="o">.</span><span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-        <span class="n">near_sql_right</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
+        <span class="n">near_sql_right</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_near_sql</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">join_node</span><span class="o">=</span><span class="n">join_node_copy_right</span><span class="p">,</span>
             <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
@@ -340,7 +340,7 @@
                     <span class="n">jointype</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ops_simulate</span><span class="p">,</span> <span class="n">NaturalJoinNode</span><span class="p">)</span>
-        <span class="n">simulate_near_sql</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
+        <span class="n">simulate_near_sql</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">natural_join_to_near_sql</span><span class="p">(</span>
             <span class="n">join_node</span><span class="o">=</span><span class="n">ops_simulate</span><span class="p">,</span>
             <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
@@ -348,7 +348,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">simulate_near_sql</span>
 
-    <span class="k">def</span> <span class="nf">natural_join_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">natural_join_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">left_is_first</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span>
@@ -371,7 +371,7 @@
                 <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
                 <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">)</span>
         <span class="c1"># delegate back to parent class</span>
-        <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
+        <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_near_sql</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">join_node</span><span class="o">=</span><span class="n">join_node</span><span class="p">,</span>
             <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
@@ -645,7 +645,7 @@
         <span class="n">join_node_copy_right</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">join_node</span><span class="p">)</span>
         <span class="n">join_node_copy_right</span><span class="o">.</span><span class="n">jointype</span> <span class="o">=</span> <span class="s1">&#39;LEFT&#39;</span>
         <span class="n">join_node_copy_right</span><span class="o">.</span><span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-        <span class="n">near_sql_right</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
+        <span class="n">near_sql_right</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_near_sql</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">join_node</span><span class="o">=</span><span class="n">join_node_copy_right</span><span class="p">,</span>
             <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
@@ -690,7 +690,7 @@
                     <span class="n">jointype</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ops_simulate</span><span class="p">,</span> <span class="n">NaturalJoinNode</span><span class="p">)</span>
-        <span class="n">simulate_near_sql</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
+        <span class="n">simulate_near_sql</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">natural_join_to_near_sql</span><span class="p">(</span>
             <span class="n">join_node</span><span class="o">=</span><span class="n">ops_simulate</span><span class="p">,</span>
             <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
@@ -698,7 +698,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">simulate_near_sql</span>
 
-    <span class="k">def</span> <span class="nf">natural_join_to_sql</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">natural_join_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">left_is_first</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span>
@@ -721,7 +721,7 @@
                 <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
                 <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">)</span>
         <span class="c1"># delegate back to parent class</span>
-        <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
+        <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_near_sql</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">join_node</span><span class="o">=</span><span class="n">join_node</span><span class="p">,</span>
             <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
@@ -926,12 +926,12 @@
 
 
                             </div>
-                            <div id="SQLiteModel.natural_join_to_sql" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#SQLiteModel.natural_join_to_sql">#&nbsp;&nbsp</a>
+                            <div id="SQLiteModel.natural_join_to_near_sql" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SQLiteModel.natural_join_to_near_sql">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">natural_join_to_sql</span><span class="signature">(
+            <span class="name">natural_join_to_near_sql</span><span class="signature">(
     self,
     join_node,
     *,
@@ -944,7 +944,7 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">natural_join_to_sql</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">natural_join_to_near_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">left_is_first</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span>
@@ -967,7 +967,7 @@
                 <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
                 <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">)</span>
         <span class="c1"># delegate back to parent class</span>
-        <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_sql</span><span class="p">(</span>
+        <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="n">natural_join_to_near_sql</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">join_node</span><span class="o">=</span><span class="n">join_node</span><span class="p">,</span>
             <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span>
@@ -1000,15 +1000,15 @@
                 <dd id="SQLiteModel.value_to_sql" class="function"><a href="db_model.html#DBModel.value_to_sql">value_to_sql</a></dd>
                 <dd id="SQLiteModel.table_values_to_sql_str_list" class="function"><a href="db_model.html#DBModel.table_values_to_sql_str_list">table_values_to_sql_str_list</a></dd>
                 <dd id="SQLiteModel.expr_to_sql" class="function"><a href="db_model.html#DBModel.expr_to_sql">expr_to_sql</a></dd>
-                <dd id="SQLiteModel.table_def_to_sql" class="function"><a href="db_model.html#DBModel.table_def_to_sql">table_def_to_sql</a></dd>
-                <dd id="SQLiteModel.extend_to_sql" class="function"><a href="db_model.html#DBModel.extend_to_sql">extend_to_sql</a></dd>
-                <dd id="SQLiteModel.project_to_sql" class="function"><a href="db_model.html#DBModel.project_to_sql">project_to_sql</a></dd>
-                <dd id="SQLiteModel.select_rows_to_sql" class="function"><a href="db_model.html#DBModel.select_rows_to_sql">select_rows_to_sql</a></dd>
-                <dd id="SQLiteModel.select_columns_to_sql" class="function"><a href="db_model.html#DBModel.select_columns_to_sql">select_columns_to_sql</a></dd>
-                <dd id="SQLiteModel.drop_columns_to_sql" class="function"><a href="db_model.html#DBModel.drop_columns_to_sql">drop_columns_to_sql</a></dd>
-                <dd id="SQLiteModel.order_to_sql" class="function"><a href="db_model.html#DBModel.order_to_sql">order_to_sql</a></dd>
-                <dd id="SQLiteModel.rename_to_sql" class="function"><a href="db_model.html#DBModel.rename_to_sql">rename_to_sql</a></dd>
-                <dd id="SQLiteModel.concat_rows_to_sql" class="function"><a href="db_model.html#DBModel.concat_rows_to_sql">concat_rows_to_sql</a></dd>
+                <dd id="SQLiteModel.table_def_to_near_sql" class="function"><a href="db_model.html#DBModel.table_def_to_near_sql">table_def_to_near_sql</a></dd>
+                <dd id="SQLiteModel.extend_to_near_sql" class="function"><a href="db_model.html#DBModel.extend_to_near_sql">extend_to_near_sql</a></dd>
+                <dd id="SQLiteModel.project_to_near_sql" class="function"><a href="db_model.html#DBModel.project_to_near_sql">project_to_near_sql</a></dd>
+                <dd id="SQLiteModel.select_rows_to_near_sql" class="function"><a href="db_model.html#DBModel.select_rows_to_near_sql">select_rows_to_near_sql</a></dd>
+                <dd id="SQLiteModel.select_columns_to_near_sql" class="function"><a href="db_model.html#DBModel.select_columns_to_near_sql">select_columns_to_near_sql</a></dd>
+                <dd id="SQLiteModel.drop_columns_to_near_sql" class="function"><a href="db_model.html#DBModel.drop_columns_to_near_sql">drop_columns_to_near_sql</a></dd>
+                <dd id="SQLiteModel.order_to_near_sql" class="function"><a href="db_model.html#DBModel.order_to_near_sql">order_to_near_sql</a></dd>
+                <dd id="SQLiteModel.rename_to_near_sql" class="function"><a href="db_model.html#DBModel.rename_to_near_sql">rename_to_near_sql</a></dd>
+                <dd id="SQLiteModel.concat_rows_to_near_sql" class="function"><a href="db_model.html#DBModel.concat_rows_to_near_sql">concat_rows_to_near_sql</a></dd>
                 <dd id="SQLiteModel.to_sql" class="function"><a href="db_model.html#DBModel.to_sql">to_sql</a></dd>
                 <dd id="SQLiteModel.row_recs_to_blocks_query_str_list_pair" class="function"><a href="db_model.html#DBModel.row_recs_to_blocks_query_str_list_pair">row_recs_to_blocks_query_str_list_pair</a></dd>
                 <dd id="SQLiteModel.blocks_to_row_recs_query_str_list_pair" class="function"><a href="db_model.html#DBModel.blocks_to_row_recs_query_str_list_pair">blocks_to_row_recs_query_str_list_pair</a></dd>

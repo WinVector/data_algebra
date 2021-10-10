@@ -5,14 +5,6 @@ import data_algebra.expr_rep
 import data_algebra.cdata
 
 
-class PipeStep:
-    def __init__(self):
-        pass
-
-    def apply_to(self, other, **kwargs):
-        raise NotImplementedError("base class called")
-
-
 class OperatorPlatform:
     """Abstract class representing ability to apply data_algebra operations."""
 
@@ -77,8 +69,6 @@ class OperatorPlatform:
         """
         if isinstance(other, OperatorPlatform):
             return self.apply_to(other)
-        if isinstance(other, PipeStep):
-            return other.apply_to(other)
         return self.act_on(other)
 
     def __rshift__(self, other):  # override self >> other
@@ -91,8 +81,6 @@ class OperatorPlatform:
         """
         # can't use type >> type if only __rrshift__ is defined (must have __rshift__ in this case)
         if isinstance(other, OperatorPlatform):
-            return other.apply_to(self)
-        if isinstance(other, PipeStep):
             return other.apply_to(self)
         raise TypeError("unexpected type: " + str(type(other)))
 

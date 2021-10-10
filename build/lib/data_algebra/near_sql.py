@@ -347,7 +347,7 @@ class NearSQLRawQStep(NearSQL):
         *,
         prefix: List[str],
         quoted_query_name: str,
-        sub_sql: NearSQLContainer,
+        sub_sql: Optional[NearSQLContainer],
         suffix: Optional[List[str]] = None,
         annotation: Optional[str] = None,
     ):
@@ -355,7 +355,7 @@ class NearSQLRawQStep(NearSQL):
         assert len(prefix) > 0
         assert all([isinstance(v, str) for v in prefix])
         assert isinstance(quoted_query_name, str)
-        assert isinstance(sub_sql, NearSQLContainer)
+        assert isinstance(sub_sql, (NearSQLContainer, type(None)))
         assert isinstance(suffix, (list, type(None)))
         if suffix is not None:
             assert all([isinstance(v, str) for v in suffix])
@@ -381,12 +381,13 @@ class NearSQLRawQStep(NearSQL):
     ) -> List[str]:
         return db_model.nearsqlrawq_to_sql_str_list_(
             near_sql=self,
-            columns=columns,
-            constants=constants,
             sql_format_options=sql_format_options,
         )
 
     def to_with_form(self) -> SQLWithList:
+        if self.sub_sql is None:
+            # no sub-steps
+            return SQLWithList(last_step=self, previous_steps=[])
         if self.sub_sql.near_sql.is_table:
             # table references don't need to be re-encoded
             return SQLWithList(last_step=self, previous_steps=[])
