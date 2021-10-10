@@ -801,7 +801,7 @@ class DBModel:
             for i in range(n)
         ]
 
-    def table_def_to_sql(
+    def table_def_to_near_sql(
         self, table_def, *, using=None, temp_id_source=None, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
         if table_def.node_name != "TableDescription":
@@ -839,7 +839,7 @@ class DBModel:
             )
         return near_sql
 
-    def extend_to_sql(
+    def extend_to_near_sql(
         self, extend_node, *, using=None, temp_id_source=None, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
         if extend_node.node_name != "ExtendNode":
@@ -973,7 +973,7 @@ class DBModel:
         )
         return near_sql
 
-    def project_to_sql(
+    def project_to_near_sql(
         self, project_node, *, using=None, temp_id_source=None, sql_format_options=None
     ):
         if project_node.node_name != "ProjectNode":
@@ -1010,7 +1010,7 @@ class DBModel:
         )
         return near_sql
 
-    def select_rows_to_sql(
+    def select_rows_to_near_sql(
         self,
         select_rows_node,
         *,
@@ -1050,7 +1050,7 @@ class DBModel:
         )
         return near_sql
 
-    def select_columns_to_sql(
+    def select_columns_to_near_sql(
         self,
         select_columns_node,
         *,
@@ -1060,7 +1060,7 @@ class DBModel:
     ) -> data_algebra.near_sql.NearSQL:
         if select_columns_node.node_name != "SelectColumnsNode":
             raise TypeError(
-                "Expected select_columns_to_sql to be a data_algebra.data_ops.SelectColumnsNode)"
+                "Expected select_columns_to_near_sql to be a data_algebra.data_ops.SelectColumnsNode)"
             )
         if temp_id_source is None:
             temp_id_source = [0]
@@ -1084,7 +1084,7 @@ class DBModel:
             subsql.terms = []
         return subsql
 
-    def drop_columns_to_sql(
+    def drop_columns_to_near_sql(
         self,
         drop_columns_node,
         *,
@@ -1112,7 +1112,7 @@ class DBModel:
         }
         return subsql
 
-    def order_to_sql(
+    def order_to_near_sql(
         self, order_node, *, using=None, temp_id_source=None, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
         if order_node.node_name != "OrderRowsNode":
@@ -1162,7 +1162,7 @@ class DBModel:
         )
         return near_sql
 
-    def rename_to_sql(
+    def rename_to_near_sql(
         self, rename_node, *, using=None, temp_id_source=None, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
         if rename_node.node_name != "RenameColumnsNode":
@@ -1242,7 +1242,7 @@ class DBModel:
         )
         return using_left, sql_left, using_right, sql_right
 
-    def natural_join_to_sql(
+    def natural_join_to_near_sql(
         self, join_node, *, using=None, temp_id_source=None, sql_format_options=None, left_is_first=True
     ) -> data_algebra.near_sql.NearSQL:
         if temp_id_source is None:
@@ -1300,7 +1300,7 @@ class DBModel:
         )
         return near_sql
 
-    def concat_rows_to_sql(
+    def concat_rows_to_near_sql(
         self, concat_node, *, using=None, temp_id_source=None, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
         if concat_node.node_name != "ConcatRowsNode":

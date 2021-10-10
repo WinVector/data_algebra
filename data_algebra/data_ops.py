@@ -769,7 +769,7 @@ class TableDescription(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.table_def_to_sql(
+        return db_model.table_def_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
@@ -1124,7 +1124,7 @@ class ExtendNode(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.extend_to_sql(
+        return db_model.extend_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
@@ -1268,7 +1268,7 @@ class ProjectNode(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.project_to_sql(
+        return db_model.project_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
@@ -1338,7 +1338,7 @@ class SelectRowsNode(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.select_rows_to_sql(
+        return db_model.select_rows_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
@@ -1412,7 +1412,7 @@ class SelectColumnsNode(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.select_columns_to_sql(
+        return db_model.select_columns_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
@@ -1486,7 +1486,7 @@ class DropColumnsNode(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.drop_columns_to_sql(
+        return db_model.drop_columns_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
@@ -1572,7 +1572,7 @@ class OrderRowsNode(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.order_to_sql(
+        return db_model.order_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
@@ -1672,7 +1672,7 @@ class RenameColumnsNode(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.rename_to_sql(
+        return db_model.rename_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
@@ -1789,7 +1789,7 @@ class NaturalJoinNode(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.natural_join_to_sql(
+        return db_model.natural_join_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
@@ -1908,7 +1908,7 @@ class ConcatRowsNode(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        return db_model.concat_rows_to_sql(
+        return db_model.concat_rows_to_near_sql(
             self,
             using=using,
             temp_id_source=temp_id_source,
