@@ -829,11 +829,11 @@ class DBModel:
             # need a non-trivial select here
             terms = OrderedDict()
             for k in using:
-                terms[k] = k
+                terms[k] = k  # these get quoted later
             view_name = "table_reference_" + str(temp_id_source[0])
             temp_id_source[0] = temp_id_source[0] + 1
             near_sql = data_algebra.near_sql.NearSQLUnaryStep(
-                terms=terms,  # TODO: implement pruning
+                terms=terms,
                 quoted_query_name=self.quote_identifier(view_name),
                 sub_sql=subsql.to_bound_near_sql(columns=using),
             )
