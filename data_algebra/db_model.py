@@ -1715,9 +1715,6 @@ class DBModel:
         self,
         near_sql,
         *,
-        columns=None,
-        force_sql=False,
-        constants=None,
         sql_format_options=None,
     ) -> List[str]:
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLRawQStep)

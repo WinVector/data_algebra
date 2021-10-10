@@ -381,8 +381,6 @@ class NearSQLRawQStep(NearSQL):
     ) -> List[str]:
         return db_model.nearsqlrawq_to_sql_str_list_(
             near_sql=self,
-            columns=columns,
-            constants=constants,
             sql_format_options=sql_format_options,
         )
 
