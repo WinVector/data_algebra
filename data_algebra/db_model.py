@@ -1838,7 +1838,7 @@ class DBHandle:
             head, table_name=table_name, qualifiers=qualifiers, row_limit=row_limit
         )
 
-    def to_pandas(self, handle: data_algebra.data_ops.TableDescription, *, data_map=None):
+    def to_pandas(self, handle, *, data_map=None):
         if isinstance(handle, data_algebra.data_ops.TableDescription):
             handle = handle.table_name
         assert isinstance(handle, str)
