@@ -1838,25 +1838,6 @@ class DBHandle:
             head, table_name=table_name, qualifiers=qualifiers, row_limit=row_limit
         )
 
-    def to_pandas(self, handle, *, data_map=None):
-        if isinstance(handle, data_algebra.data_ops.TableDescription):
-            handle = handle.table_name
-        assert isinstance(handle, str)
-        if data_map is not None:
-            if handle not in data_map:
-                return ValueError("Expected handle to be a data_map key " + handle)
-            assert isinstance(data_map[handle], data_algebra.data_ops.TableDescription)
-            if data_map[handle].table_name != handle:
-                raise ValueError(
-                    "data_map["
-                    + handle
-                    + "].table_name == "
-                    + data_map[handle].table_name
-                    + ", not "
-                    + handle
-                )
-        return self.db_model.read_table(self.conn, handle)
-
     def execute(self, q):
         self.db_model.execute(conn=self.conn, q=q)
 
