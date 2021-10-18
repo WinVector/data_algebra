@@ -1812,7 +1812,7 @@ class DBModel:
 
 
 class DBHandle:
-    def __init__(self, *, db_model, conn):
+    def __init__(self, *, db_model: DBModel, conn):
         assert isinstance(db_model, DBModel)
         self.db_model = db_model
         self.conn = conn
@@ -1827,7 +1827,7 @@ class DBHandle:
     def read_query(self, q):
         return self.db_model.read_query(conn=self.conn, q=q)
 
-    def describe_table(self, table_name, *, qualifiers=None, row_limit=7):
+    def describe_table(self, table_name: str, *, qualifiers=None, row_limit: Optional[int] = 7):
         head = self.read_query(
             q="SELECT * FROM "
             + self.db_model.quote_table_name(table_name)
@@ -1838,13 +1838,13 @@ class DBHandle:
             head, table_name=table_name, qualifiers=qualifiers, row_limit=row_limit
         )
 
-    def execute(self, q):
+    def execute(self, q) -> None:
         self.db_model.execute(conn=self.conn, q=q)
 
-    def drop_table(self, table_name):
+    def drop_table(self, table_name: str) -> None:
         self.db_model.drop_table(self.conn, table_name)
 
-    def insert_table(self, d, *, table_name, allow_overwrite=False):
+    def insert_table(self, d, *, table_name: str, allow_overwrite: bool = False):
         self.db_model.insert_table(
             conn=self.conn, d=d, table_name=table_name, allow_overwrite=allow_overwrite
         )
@@ -1855,7 +1855,7 @@ class DBHandle:
     ) -> str:
         return self.db_model.to_sql(ops=ops, sql_format_options=sql_format_options,)
 
-    def query_to_csv(self, q, *, res_name):
+    def query_to_csv(self, q, *, res_name: str) -> None:
         d = self.read_query(q)
         d.to_csv(res_name, index=False)
 
