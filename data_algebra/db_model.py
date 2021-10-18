@@ -712,7 +712,7 @@ class DBModel:
             return "(" + ", ".join([self.value_to_sql(vi) for vi in v]) + ")"
         return str(v)
 
-    def table_values_to_sql_str_list(self, v) -> List[str]:
+    def table_values_to_sql_str_list(self, v, *, result_name: str = 'table_values') -> List[str]:
         assert v is not None
         m = v.shape[0]
         assert m > 0
@@ -737,7 +737,7 @@ class DBModel:
         sql = (
             ["SELECT", " *", "FROM ("]
             + ["    " + ("" if (i < 1) else "UNION ALL ") + q_row(i) for i in range(m)]
-            + [f') {qi("table_values")}']
+            + [f') {qi(result_name)}']
         )
         return sql
 
@@ -1859,8 +1859,8 @@ class DBHandle:
         d = self.read_query(q)
         d.to_csv(res_name, index=False)
 
-    def table_values_to_sql_str_list(self, v) -> List[str]:
-        return self.db_model.table_values_to_sql_str_list(v)
+    def table_values_to_sql_str_list(self, v, *, result_name: str = 'table_values') -> List[str]:
+        return self.db_model.table_values_to_sql_str_list(v, result_name=result_name)
 
     def __str__(self):
         return (
