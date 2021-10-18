@@ -1,3 +1,8 @@
+
+"""
+Package for data processing in Python: https://github.com/WinVector/data_algebra
+"""
+
 __docformat__ = "restructuredtext"
 __version__ = "0.9.1"
 
@@ -20,4 +25,3 @@ import data_algebra.pandas_model
 
 # set up what pandas supplier we are using
 default_data_model = data_algebra.pandas_model.PandasModel()
-
