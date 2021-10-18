@@ -1,3 +1,8 @@
+"""
+Interface for realizing the data algebra as a sequence of steps over an object.
+"""
+
+
 from abc import ABC
 
 

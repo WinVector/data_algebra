@@ -48,13 +48,22 @@
                     <h1 class="modulename">
 <a href="./../data_algebra.html">data_algebra</a><wbr>.data_ops_utils    </h1>
 
-                
+                        <div class="docstring"><p>Utility to merge extend operations, when appropriate.</p>
+</div>
+
                         <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">data_algebra.expr_rep</span>
+            <div class="codehilite"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utility to merge extend operations, when appropriate.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">data_algebra.expr_rep</span>
 
 
 <span class="k">def</span> <span class="nf">try_to_merge_ops</span><span class="p">(</span><span class="n">ops1</span><span class="p">,</span> <span class="n">ops2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Try to merge two extends into one. Return merged op, or None if not possible.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ops1_columns_used</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">get_columns_used</span><span class="p">(</span><span class="n">ops1</span><span class="p">))</span>
     <span class="n">ops1_columns_produced</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ops1</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
     <span class="n">ops2_columns_used</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">get_columns_used</span><span class="p">(</span><span class="n">ops2</span><span class="p">))</span>
@@ -66,11 +75,9 @@
         <span class="n">ops1_common_columns_used</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">get_columns_used</span><span class="p">(</span><span class="n">ops1_common</span><span class="p">)</span>
         <span class="p">)</span>
-        <span class="n">ops1_common_columns_produced</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ops1_common</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
         <span class="n">ops2_common_columns_used</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">get_columns_used</span><span class="p">(</span><span class="n">ops2_common</span><span class="p">)</span>
         <span class="p">)</span>
-        <span class="n">ops2_common_columns_produced</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ops2_common</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops1_common_columns_used</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ops2_columns_produced</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops1_common_columns_used</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ops1_columns_produced</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -127,6 +134,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">try_to_merge_ops</span><span class="p">(</span><span class="n">ops1</span><span class="p">,</span> <span class="n">ops2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Try to merge two extends into one. Return merged op, or None if not possible.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ops1_columns_used</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">get_columns_used</span><span class="p">(</span><span class="n">ops1</span><span class="p">))</span>
     <span class="n">ops1_columns_produced</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ops1</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
     <span class="n">ops2_columns_used</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">get_columns_used</span><span class="p">(</span><span class="n">ops2</span><span class="p">))</span>
@@ -138,11 +148,9 @@
         <span class="n">ops1_common_columns_used</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">get_columns_used</span><span class="p">(</span><span class="n">ops1_common</span><span class="p">)</span>
         <span class="p">)</span>
-        <span class="n">ops1_common_columns_produced</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ops1_common</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
         <span class="n">ops2_common_columns_used</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">get_columns_used</span><span class="p">(</span><span class="n">ops2_common</span><span class="p">)</span>
         <span class="p">)</span>
-        <span class="n">ops2_common_columns_produced</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ops2_common</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops1_common_columns_used</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ops2_columns_produced</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops1_common_columns_used</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ops1_columns_produced</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -187,7 +195,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Try to merge two extends into one. Return merged op, or None if not possible.</p>
+</div>
+
 
                 </section>
     </main>

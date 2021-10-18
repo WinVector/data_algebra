@@ -1,6 +1,14 @@
+"""
+Modified Lark grammar for Python-like expressions.
+
+https://github.com/lark-parser/lark/blob/master/examples/advanced/python3.lark
+Copyright 2017 Erez Shinan
+Licence: https://github.com/lark-parser/lark/blob/master/LICENSE (MIT)
+"""
+
 # python3.lark from:
 #    https://github.com/lark-parser/lark/blob/master/examples/advanced/python3.lark
-#    Copyright © 2017 Erez Shinan
+#    Copyright 2017 Erez Shinan
 #    Licence: https://github.com/lark-parser/lark/blob/master/LICENSE (MIT)
 #
 # Python driver example:

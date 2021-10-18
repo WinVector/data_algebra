@@ -1,3 +1,7 @@
+"""
+Parse expressions.
+"""
+
 import collections
 
 import data_algebra.expr_rep

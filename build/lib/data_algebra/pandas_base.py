@@ -1,3 +1,7 @@
+"""
+Base clas for adapters for Pandas-like APIs
+"""
+
 from abc import ABC
 import datetime
 import types
@@ -130,6 +134,9 @@ def _k_mul(*args):
 
 
 def populate_impl_map(data_model):
+    """
+    Map symbols to implementations.
+    """
     impl_map = {
         "==": _type_safe_equal,
         "=": _type_safe_equal,
@@ -228,7 +235,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
     """
     Base class for implementing the data algebra on pandas-like APIs
     """
-    def __init__(self, *, pd, presentation_model_name):
+    def __init__(self, *, pd: types.ModuleType, presentation_model_name: str):
         assert isinstance(pd, types.ModuleType)
         data_algebra.data_model.DataModel.__init__(
             self, presentation_model_name=presentation_model_name

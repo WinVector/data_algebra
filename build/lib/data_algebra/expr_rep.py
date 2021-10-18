@@ -148,7 +148,7 @@ class PreTerm(ABC):
 
     # emitters
 
-    def to_python(self, *, want_inline_parens : bool = False) -> PythonText:
+    def to_python(self, *, want_inline_parens: bool = False) -> PythonText:
         """
         Convert parsed expression into a string
 
@@ -208,10 +208,10 @@ def _check_expr_incompatible_types(a, b):
     type_b = obvious_declared_type(b)
     if type_b is None:
         return None
-    if data_algebra.util.compatible_types([type_a, type_b]):
-        return None
     looks_compatible = data_algebra.util.compatible_types([type_a, type_b])
-    return (type_a, type_b)
+    if looks_compatible:
+        return None
+    return type_a, type_b
 
 
 # noinspection SpellCheckingInspection
@@ -692,13 +692,13 @@ class Value(Term):
         allowed = {
             data_algebra.util.map_type_to_canonical(t) for t in [int, float, str, bool, type(None)]
         }
-        disaallowed = {data_algebra.util.map_type_to_canonical(type(value))} - allowed
-        if len(disaallowed) != 0:
+        disallowed = {data_algebra.util.map_type_to_canonical(type(value))} - allowed
+        if len(disallowed) != 0:
             raise TypeError(
                 "value type must be one of: "
                 + str(allowed)
                 + ", saw "
-                + str(list(disaallowed)[0])
+                + str(list(disallowed)[0])
             )
         self.value = value
         Term.__init__(self)
@@ -719,7 +719,7 @@ class Value(Term):
     def evaluate(self, data_frame):
         return self.value
 
-    def to_python(self, *, want_inline_parens : bool = False) -> PythonText:
+    def to_python(self, *, want_inline_parens: bool = False) -> PythonText:
         return PythonText(self.value.__repr__(), is_in_parens=False)
 
     # don't collect -5 as a complex expression
@@ -775,7 +775,7 @@ class ListTerm(PreTerm):
             res[i] = vi
         return res
 
-    def to_python(self, *, want_inline_parens : bool = False) -> PythonText:
+    def to_python(self, *, want_inline_parens: bool = False) -> PythonText:
         def li_to_python(value):
             try:
                 return str(value.to_python(want_inline_parens=False))
@@ -837,7 +837,7 @@ class ColumnReference(Term):
     def replace_view(self, view):
         return ColumnReference(view=view, column_name=self.column_name)
 
-    def to_python(self, *, want_inline_parens : bool = False) -> PythonText:
+    def to_python(self, *, want_inline_parens: bool = False) -> PythonText:
         return PythonText(self.column_name, is_in_parens=False)
 
     def get_column_names(self, columns_seen):
@@ -987,7 +987,7 @@ class Expression(Term):
             pass
         raise KeyError(f"function {self.op} not found")
 
-    def to_python(self, *, want_inline_parens : bool = False) -> PythonText:
+    def to_python(self, *, want_inline_parens: bool = False) -> PythonText:
         n_args = len(self.args)
         if n_args <= 0:
             return PythonText(self.op + "()", is_in_parens=False)

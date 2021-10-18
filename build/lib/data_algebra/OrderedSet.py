@@ -1,3 +1,9 @@
+"""
+Ordered set to enhance presentation of column names.
+
+Adapted from: https://stackoverflow.com/a/1653978
+"""
+
 import collections
 import collections.abc
 
@@ -6,6 +12,9 @@ import collections.abc
 
 
 class OrderedSet(collections.OrderedDict, collections.abc.MutableSet):
+    """
+    Ordered set to enhance presentation of column names.
+    """
     def __init__(self, v=None):
         collections.OrderedDict.__init__(self)
         if v is not None:
@@ -13,6 +22,7 @@ class OrderedSet(collections.OrderedDict, collections.abc.MutableSet):
                 self.add(val)
 
     def update(self, *args, **kwargs):
+        """add/replace elements"""
         if kwargs:
             raise TypeError("update() takes no keyword arguments")
 
@@ -21,9 +31,11 @@ class OrderedSet(collections.OrderedDict, collections.abc.MutableSet):
                 self.add(e)
 
     def add(self, elem):
+        """add an element"""
         self[elem] = None
 
     def discard(self, elem):
+        """delete an element"""
         self.pop(elem, None)
 
     def __le__(self, other):
@@ -63,6 +75,7 @@ class OrderedSet(collections.OrderedDict, collections.abc.MutableSet):
         return item in self.keys()
 
     def union(self, *args):
+        """create new set union"""
         res = OrderedSet()
         for k in self.keys():
             res.add(k)

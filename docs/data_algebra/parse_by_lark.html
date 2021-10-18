@@ -48,10 +48,16 @@
                     <h1 class="modulename">
 <a href="./../data_algebra.html">data_algebra</a><wbr>.parse_by_lark    </h1>
 
-                
+                        <div class="docstring"><p>Use Lark to parse a near-Python expression grammar.</p>
+</div>
+
                         <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">ast</span>
+            <div class="codehilite"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Use Lark to parse a near-Python expression grammar.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">ast</span>
 
 <span class="kn">import</span> <span class="nn">lark</span>
 <span class="kn">import</span> <span class="nn">lark.tree</span>
@@ -114,18 +120,19 @@
 <span class="p">}</span>
 
 
-<span class="k">def</span> <span class="nf">_walk_lark_tree</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_def</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_walk_lark_tree</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_def</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Term</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Walk a lark parse tree and return our own representation.</span>
 
 <span class="sd">    :param op: lark parse tree</span>
 <span class="sd">    :param data_def: dictionary of data_algebra.expr_rep.ColumnReference</span>
-<span class="sd">    :return: PreTerm tree.</span>
+<span class="sd">    :return: Term tree.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">data_def</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">data_def</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">lookup_symbol</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;look for symbol&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">enc_value</span><span class="p">(</span><span class="n">data_def</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
@@ -232,7 +239,7 @@
                     <span class="k">return</span> <span class="n">method</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">op_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">):</span>  <span class="c1"># TODO: get rid of underbar aliases</span>
-                        <span class="n">op_name</span> <span class="o">=</span> <span class="n">op_name</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">op_name</span><span class="p">)]</span>
+                        <span class="n">op_name</span> <span class="o">=</span> <span class="n">op_name</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">op_name</span><span class="p">)]</span>
                     <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="n">op_name</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">r_op</span><span class="o">.</span><span class="n">data</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;or_test&quot;</span><span class="p">,</span> <span class="s2">&quot;or_test_sym&quot;</span><span class="p">,</span> <span class="s2">&quot;and_test&quot;</span><span class="p">,</span> <span class="s2">&quot;and_test_sym&quot;</span><span class="p">}:</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r_op</span><span class="o">.</span><span class="n">children</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
@@ -275,13 +282,13 @@
     <span class="k">return</span> <span class="n">_r_walk_lark_tree</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">parse_by_lark</span><span class="p">(</span><span class="n">source_str</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_def</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">PreTerm</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">parse_by_lark</span><span class="p">(</span><span class="n">source_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_def</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Term</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parse an expression in terms of data views and values.</span>
 
 <span class="sd">    :param source_str: string to parse</span>
 <span class="sd">    :param data_def: dictionary of data_algebra.expr_rep.ColumnReference</span>
-<span class="sd">    :return: data_algebra.expr_rep.PreTerm</span>
+<span class="sd">    :return: data_algebra.expr_rep.Term</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">parser</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source_str</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
@@ -289,7 +296,7 @@
     <span class="c1"># convert parse tree to our data structures for isolation</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">_walk_lark_tree</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">data_def</span><span class="o">=</span><span class="n">data_def</span><span class="p">)</span>
     <span class="n">v</span><span class="o">.</span><span class="n">source_string</span> <span class="o">=</span> <span class="n">source_str</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">PreTerm</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Term</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">v</span>
 </pre></div>
 
@@ -301,18 +308,18 @@
 
         
             <span class="def">def</span>
-            <span class="name">parse_by_lark</span><span class="signature">(source_str: str, *, data_def=None) -&gt; <a href="expr_rep.html#PreTerm">data_algebra.expr_rep.PreTerm</a></span>:
+            <span class="name">parse_by_lark</span><span class="signature">(source_str: str, *, data_def=None) -&gt; <a href="expr_rep.html#Term">data_algebra.expr_rep.Term</a></span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">parse_by_lark</span><span class="p">(</span><span class="n">source_str</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_def</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">PreTerm</span><span class="p">:</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">parse_by_lark</span><span class="p">(</span><span class="n">source_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_def</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Term</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parse an expression in terms of data views and values.</span>
 
 <span class="sd">    :param source_str: string to parse</span>
 <span class="sd">    :param data_def: dictionary of data_algebra.expr_rep.ColumnReference</span>
-<span class="sd">    :return: data_algebra.expr_rep.PreTerm</span>
+<span class="sd">    :return: data_algebra.expr_rep.Term</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">parser</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source_str</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
@@ -320,7 +327,7 @@
     <span class="c1"># convert parse tree to our data structures for isolation</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">_walk_lark_tree</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">data_def</span><span class="o">=</span><span class="n">data_def</span><span class="p">)</span>
     <span class="n">v</span><span class="o">.</span><span class="n">source_string</span> <span class="o">=</span> <span class="n">source_str</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">PreTerm</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Term</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">v</span>
 </pre></div>
 
@@ -330,7 +337,7 @@
 
 <p>:param source_str: string to parse
 :param data_def: dictionary of <a href="expr_rep.html#ColumnReference">data_algebra.expr_rep.ColumnReference</a>
-:return: <a href="expr_rep.html#PreTerm">data_algebra.expr_rep.PreTerm</a></p>
+:return: <a href="expr_rep.html#Term">data_algebra.expr_rep.Term</a></p>
 </div>
 
 

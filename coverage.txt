@@ -104,28 +104,28 @@ data_algebra/OrderedSet.py                53      7    87%
 data_algebra/PostgreSQL.py                17      6    65%
 data_algebra/SQLite.py                   108     16    85%
 data_algebra/SparkSQL.py                  65     40    38%
-data_algebra/__init__.py                   5      0   100%
+data_algebra/__init__.py                   6      0   100%
 data_algebra/arrow.py                    170     36    79%
-data_algebra/cdata.py                    339     66    81%
+data_algebra/cdata.py                    341     67    80%
 data_algebra/connected_components.py      22      0   100%
 data_algebra/data_model.py                40     17    58%
 data_algebra/data_ops.py                1225    209    83%
-data_algebra/data_ops_types.py            82     34    59%
-data_algebra/data_ops_utils.py            51      7    86%
+data_algebra/data_ops_types.py            81     34    58%
+data_algebra/data_ops_utils.py            49      7    86%
 data_algebra/db_model.py                 835     85    90%
 data_algebra/expr_parse.py                35      0   100%
 data_algebra/expr_rep.py                 620    112    82%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 170      4    98%
-data_algebra/op_container.py             116     43    63%
+data_algebra/op_container.py             121     45    63%
 data_algebra/pandas_base.py              400     36    91%
 data_algebra/pandas_model.py               5      0   100%
 data_algebra/parse_by_lark.py            143     25    83%
 data_algebra/python3_lark.py               1      0   100%
-data_algebra/test_util.py                204     37    82%
-data_algebra/util.py                      89      6    93%
+data_algebra/test_util.py                215     42    80%
+data_algebra/util.py                      93      6    94%
 ----------------------------------------------------------
-TOTAL                                   4945    863    83%
+TOTAL                                   4965    871    82%
 
 
-============================= 228 passed in 23.34s =============================
+============================= 228 passed in 23.35s =============================

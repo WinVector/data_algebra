@@ -60,10 +60,16 @@
                     <h1 class="modulename">
 <a href="./../data_algebra.html">data_algebra</a><wbr>.test_util    </h1>
 
-                
+                        <div class="docstring"><p>Utils that help with testing. This module is allowed to import many other modules.</p>
+</div>
+
                         <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span>
+            <div class="codehilite"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utils that help with testing. This module is allowed to import many other modules.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
 
 <span class="c1"># noinspection PyUnresolvedReferences</span>
 <span class="kn">import</span> <span class="nn">data_algebra</span>
@@ -87,7 +93,7 @@
 <span class="n">test_Spark</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
 
 
-<span class="k">def</span> <span class="nf">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check a operator dag formats and parses back to itself.</span>
 <span class="sd">    Can raise exceptions. Also checks pickling.</span>
@@ -119,12 +125,12 @@
     <span class="n">a</span><span class="p">,</span>
     <span class="n">b</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">float_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
-    <span class="n">check_column_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">float_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
+    <span class="n">check_column_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">cols_case_sensitive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_row_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<span class="p">):</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;return False if the frames are equivalent (up to column re-ordering and possible row-reordering).</span>
 <span class="sd">    Ignores indexing.&quot;&quot;&quot;</span>
     <span class="c1"># leave in extra checks as this is usually used by test code</span>
@@ -195,20 +201,21 @@
     <span class="k">return</span> <span class="kc">True</span>
 
 
+<span class="c1"># noinspection PyShadowingNames</span>
 <span class="k">def</span> <span class="nf">check_transform_on_handles</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">ops</span><span class="p">,</span>
     <span class="n">data</span><span class="p">,</span>
     <span class="n">expect</span><span class="p">,</span>
     <span class="n">db_handles</span><span class="p">,</span>
-    <span class="n">float_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
-    <span class="n">check_column_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">check_parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">float_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
+    <span class="n">check_column_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">cols_case_sensitive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_row_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_parse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">empty_produces_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="p">):</span>
+    <span class="n">empty_produces_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
 <span class="sd">    Asserts if there are issues</span>
@@ -390,19 +397,20 @@
     <span class="k">return</span> <span class="n">db_handles</span>
 
 
+<span class="c1"># noinspection PyShadowingNames</span>
 <span class="k">def</span> <span class="nf">check_transform</span><span class="p">(</span>
     <span class="n">ops</span><span class="p">,</span>
     <span class="n">data</span><span class="p">,</span>
     <span class="n">expect</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">float_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
-    <span class="n">check_column_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">check_parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">models_to_skip</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">empty_produces_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="p">):</span>
+    <span class="n">float_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
+    <span class="n">check_column_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">cols_case_sensitive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_row_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_parse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">models_to_skip</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">empty_produces_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
 <span class="sd">    Assert if there are issues.</span>
@@ -439,23 +447,35 @@
     <span class="n">db_handles</span> <span class="o">=</span> <span class="n">db_handles</span> <span class="o">+</span> <span class="n">test_dbs</span>
 
     <span class="k">if</span> <span class="n">models_to_skip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">models_to_skip</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">models_to_skip</span><span class="p">)</span>
         <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">db_handles</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">db_model</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">models_to_skip</span><span class="p">]</span>
 
-    <span class="n">check_transform_on_handles</span><span class="p">(</span>
-        <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span>
-        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-        <span class="n">expect</span><span class="o">=</span><span class="n">expect</span><span class="p">,</span>
-        <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
-        <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
-        <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
-        <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
-        <span class="n">check_parse</span><span class="o">=</span><span class="n">check_parse</span><span class="p">,</span>
-        <span class="n">db_handles</span><span class="o">=</span><span class="n">db_handles</span><span class="p">,</span>
-        <span class="n">empty_produces_empty</span><span class="o">=</span><span class="n">empty_produces_empty</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="n">caught</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">check_transform_on_handles</span><span class="p">(</span>
+            <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">expect</span><span class="o">=</span><span class="n">expect</span><span class="p">,</span>
+            <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
+            <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
+            <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
+            <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
+            <span class="n">check_parse</span><span class="o">=</span><span class="n">check_parse</span><span class="p">,</span>
+            <span class="n">db_handles</span><span class="o">=</span><span class="n">db_handles</span><span class="p">,</span>
+            <span class="n">empty_produces_empty</span><span class="o">=</span><span class="n">empty_produces_empty</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="n">caught</span> <span class="o">=</span> <span class="n">exc</span>
 
     <span class="k">for</span> <span class="n">handle</span> <span class="ow">in</span> <span class="n">db_handles</span><span class="p">:</span>
-        <span class="n">handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="c1"># noinspection PyBroadException</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="k">if</span> <span class="n">caught</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">caught</span>
 </pre></div>
 
         </details>
@@ -466,12 +486,12 @@
 
         
             <span class="def">def</span>
-            <span class="name">formats_to_self</span><span class="signature">(ops)</span>:
+            <span class="name">formats_to_self</span><span class="signature">(ops) -&gt; bool</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check a operator dag formats and parses back to itself.</span>
 <span class="sd">    Can raise exceptions. Also checks pickling.</span>
@@ -519,12 +539,12 @@ Can raise exceptions. Also checks pickling.</p>
     a,
     b,
     *,
-    float_tol=1e-08,
-    check_column_order=False,
-    cols_case_sensitive=False,
-    check_row_order=False,
+    float_tol: float = 1e-08,
+    check_column_order: bool = False,
+    cols_case_sensitive: bool = False,
+    check_row_order: bool = False,
     local_data_model=None
-)</span>:
+) -&gt; bool</span>:
     </div>
 
                 <details>
@@ -533,12 +553,12 @@ Can raise exceptions. Also checks pickling.</p>
     <span class="n">a</span><span class="p">,</span>
     <span class="n">b</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">float_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
-    <span class="n">check_column_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">float_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
+    <span class="n">check_column_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">cols_case_sensitive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_row_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<span class="p">):</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;return False if the frames are equivalent (up to column re-ordering and possible row-reordering).</span>
 <span class="sd">    Ignores indexing.&quot;&quot;&quot;</span>
     <span class="c1"># leave in extra checks as this is usually used by test code</span>
@@ -628,14 +648,14 @@ Ignores indexing.</p>
     data,
     expect,
     db_handles,
-    float_tol=1e-08,
-    check_column_order=False,
-    cols_case_sensitive=False,
-    check_row_order=False,
-    check_parse=True,
+    float_tol: float = 1e-08,
+    check_column_order: bool = False,
+    cols_case_sensitive: bool = False,
+    check_row_order: bool = False,
+    check_parse: bool = True,
     local_data_model=None,
-    empty_produces_empty=True
-)</span>:
+    empty_produces_empty: bool = True
+) -&gt; None</span>:
     </div>
 
                 <details>
@@ -646,14 +666,14 @@ Ignores indexing.</p>
     <span class="n">data</span><span class="p">,</span>
     <span class="n">expect</span><span class="p">,</span>
     <span class="n">db_handles</span><span class="p">,</span>
-    <span class="n">float_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
-    <span class="n">check_column_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">check_parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">float_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
+    <span class="n">check_column_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">cols_case_sensitive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_row_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_parse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">empty_produces_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="p">):</span>
+    <span class="n">empty_produces_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
 <span class="sd">    Asserts if there are issues</span>
@@ -883,14 +903,14 @@ Asserts if there are issues</p>
     data,
     expect,
     *,
-    float_tol=1e-08,
-    check_column_order=False,
-    cols_case_sensitive=False,
-    check_row_order=False,
-    check_parse=True,
-    models_to_skip=None,
-    empty_produces_empty=True
-)</span>:
+    float_tol: float = 1e-08,
+    check_column_order: bool = False,
+    cols_case_sensitive: bool = False,
+    check_row_order: bool = False,
+    check_parse: bool = True,
+    models_to_skip: Optional[Iterable[str]] = None,
+    empty_produces_empty: bool = True
+) -&gt; None</span>:
     </div>
 
                 <details>
@@ -900,14 +920,14 @@ Asserts if there are issues</p>
     <span class="n">data</span><span class="p">,</span>
     <span class="n">expect</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">float_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
-    <span class="n">check_column_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">check_row_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">check_parse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">models_to_skip</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">empty_produces_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="p">):</span>
+    <span class="n">float_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
+    <span class="n">check_column_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">cols_case_sensitive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_row_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">check_parse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">models_to_skip</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">empty_produces_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Test an operator dag produces the expected result, and parses correctly.</span>
 <span class="sd">    Assert if there are issues.</span>
@@ -944,23 +964,35 @@ Asserts if there are issues</p>
     <span class="n">db_handles</span> <span class="o">=</span> <span class="n">db_handles</span> <span class="o">+</span> <span class="n">test_dbs</span>
 
     <span class="k">if</span> <span class="n">models_to_skip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">models_to_skip</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">models_to_skip</span><span class="p">)</span>
         <span class="n">db_handles</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">db_handles</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">db_model</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">models_to_skip</span><span class="p">]</span>
 
-    <span class="n">check_transform_on_handles</span><span class="p">(</span>
-        <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span>
-        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-        <span class="n">expect</span><span class="o">=</span><span class="n">expect</span><span class="p">,</span>
-        <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
-        <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
-        <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
-        <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
-        <span class="n">check_parse</span><span class="o">=</span><span class="n">check_parse</span><span class="p">,</span>
-        <span class="n">db_handles</span><span class="o">=</span><span class="n">db_handles</span><span class="p">,</span>
-        <span class="n">empty_produces_empty</span><span class="o">=</span><span class="n">empty_produces_empty</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="n">caught</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">check_transform_on_handles</span><span class="p">(</span>
+            <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">expect</span><span class="o">=</span><span class="n">expect</span><span class="p">,</span>
+            <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
+            <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
+            <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
+            <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
+            <span class="n">check_parse</span><span class="o">=</span><span class="n">check_parse</span><span class="p">,</span>
+            <span class="n">db_handles</span><span class="o">=</span><span class="n">db_handles</span><span class="p">,</span>
+            <span class="n">empty_produces_empty</span><span class="o">=</span><span class="n">empty_produces_empty</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="n">caught</span> <span class="o">=</span> <span class="n">exc</span>
 
     <span class="k">for</span> <span class="n">handle</span> <span class="ow">in</span> <span class="n">db_handles</span><span class="p">:</span>
-        <span class="n">handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="c1"># noinspection PyBroadException</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="k">if</span> <span class="n">caught</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">caught</span>
 </pre></div>
 
         </details>

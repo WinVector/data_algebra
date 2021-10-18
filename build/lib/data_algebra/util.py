@@ -1,12 +1,24 @@
 
+"""
+Basic utilities. Not allowed to import many other modules.
+"""
+
 import datetime
+from typing import Dict, Iterable, Optional, Tuple
 
 import numpy
 
 import data_algebra
 
 
-def pandas_to_example_str(obj, *, local_data_model=None):
+def pandas_to_example_str(obj, *, local_data_model=None) -> str:
+    """
+    Convert data frame to a Python source code string.
+
+    :param obj: data frame to convert.
+    :param local_data_model: data model to use.
+    :return: Python source code representation of obj.
+    """
     if local_data_model is None:
         local_data_model = data_algebra.default_data_model
     pd_module_name = local_data_model.presentation_model_name
@@ -25,7 +37,7 @@ def pandas_to_example_str(obj, *, local_data_model=None):
     return pandas_string
 
 
-def table_is_keyed_by_columns(table, column_names):
+def table_is_keyed_by_columns(table, column_names: Iterable[str]) -> bool:
     """
 
     :param table: pandas DataFrame
@@ -35,6 +47,8 @@ def table_is_keyed_by_columns(table, column_names):
     # check for ill-condition
     if isinstance(column_names, str):
         column_names = [column_names]
+    else:
+        column_names = [c for c in column_names]
     missing_columns = set(column_names) - set([c for c in table.columns])
     if len(missing_columns) > 0:
         raise KeyError("missing columns: " + str(missing_columns))
@@ -60,15 +74,22 @@ type_conversions = {
 }
 
 
-def map_type_to_canonical(v):
+def map_type_to_canonical(v: type) -> type:
+    """
+    Map type to a smaller set of considered equivalent types.
+
+    :param v: type to map
+    :return: type
+    """
     try:
+        # noinspection PyTypeChecker
         return type_conversions[v]
     except KeyError:
         pass
     return v
 
 
-def guess_carried_scalar_type(col):
+def guess_carried_scalar_type(col) -> type:
     """
     Guess the type of a column or scalar.
 
@@ -92,7 +113,7 @@ def guess_carried_scalar_type(col):
     return map_type_to_canonical(type(col[test_idx]))
 
 
-def guess_column_types(d, *, columns=None):
+def guess_column_types(d, *, columns: Optional[Iterable[str]] = None) -> Dict[str, type]:
     """
     Guess column types as type of first non-missing value.
     Will not return series types, as some pandas data frames with non-trivial indexing report this type.
@@ -118,14 +139,21 @@ def guess_column_types(d, *, columns=None):
     return res
 
 
-def compatible_types(types_seen):
+def compatible_types(types_seen: Iterable[type]) -> bool:
+    """
+    Check if a set of types are all considered equivalent.
+
+    :param types_seen: collection of types seen
+    :return: True if types are all compatible, else False.
+    """
     mapped_comparison = {map_type_to_canonical(t) for t in types_seen} - {type(None)}
     if (len(mapped_comparison) > 1) and (mapped_comparison != {int, float}):
         return False
     return True
 
 
-def check_columns_appear_compatible(d_left, d_right, *, columns=None):
+def check_columns_appear_compatible(d_left, d_right, *, columns: Optional[Iterable[str]] = None
+                                    ) -> Optional[Dict[str, Tuple[type, type]]]:
     """
     Check if columns have compatible types
 
@@ -135,8 +163,10 @@ def check_columns_appear_compatible(d_left, d_right, *, columns=None):
     :return: None if compatible, else dictionary of mismatches
     """
     if columns is None:
-        columns = d_left.columns
+        columns = [c for c in d_left.columns]
         assert set(d_left.columns) == set(d_right.columns)
+    else:
+        columns = [c for c in columns]
     assert len(set(columns) - set(d_left.columns)) == 0
     assert len(set(columns) - set(d_right.columns)) == 0
     left_types = data_algebra.util.guess_column_types(d_left, columns=columns)

@@ -1,3 +1,7 @@
+"""
+Representation for operations that are nearly translated into SQL.
+"""
+
 from abc import ABC
 from typing import List, Optional, Tuple
 

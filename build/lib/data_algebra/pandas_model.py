@@ -1,3 +1,7 @@
+"""
+Adapter for Pandas API.
+"""
+
 
 import pandas as pd
 
