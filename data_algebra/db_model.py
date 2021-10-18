@@ -117,11 +117,11 @@ def _db_is_bad_expr(dbmodel, expression):
         + " IS NULL OR "
         + subexpr
         + " >= "
-        + dbmodel.quote_literal("+infinity")
+        + dbmodel.value_to_sql("+infinity")
         + " OR "
         + subexpr
         + " <= "
-        + dbmodel.quote_literal("-infinity")
+        + dbmodel.value_to_sql("-infinity")
         + " OR ("
         + subexpr
         + " != 0 AND "
@@ -685,9 +685,6 @@ class DBModel:
             + re.sub(self.string_quote, self.string_quote + self.string_quote, string)
             + self.string_quote
         )
-
-    def quote_literal(self, val):
-        return self.quote_string(str(val))
 
     def value_to_sql(self, v):
         if v is None:

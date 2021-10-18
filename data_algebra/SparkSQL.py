@@ -22,11 +22,11 @@ def _sparksql_is_bad_expr(dbmodel, expression):
         + " IS NULL OR "
         + subexpr
         + " >= "
-        + dbmodel.quote_literal("+infinity")
+        + dbmodel.value_to_sql("+infinity")
         + " OR "
         + subexpr
         + " <= "
-        + dbmodel.quote_literal("-infinity")
+        + dbmodel.value_to_sql("-infinity")
         + " OR "
         + " isNaN("
         + subexpr
