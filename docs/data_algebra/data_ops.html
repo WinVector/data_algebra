@@ -154,6 +154,9 @@
                                 <a class="function" href="#TableDescription.to_python_implementation">to_python_implementation</a>
                         </li>
                         <li>
+                                <a class="function" href="#TableDescription.example_values_to_sql_str_list">example_values_to_sql_str_list</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#TableDescription.get_tables">get_tables</a>
                         </li>
                         <li>
@@ -1104,7 +1107,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">column_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="n">qualifiers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
     <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">table_name_was_set_by_user</span><span class="p">:</span> <span class="nb">bool</span>
@@ -1112,14 +1115,14 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">column_names</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">column_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">head</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">limit_was</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">nrows</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">limit_was</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">nrows</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">column_names</span><span class="p">]</span>
@@ -1237,6 +1240,10 @@
             <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="n">spacer</span> <span class="o">+</span> <span class="s2">&quot;qualifiers=&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">qualifiers</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
         <span class="k">return</span> <span class="n">s</span>
+
+    <span class="k">def</span> <span class="nf">example_values_to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">table_values_to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">,</span> <span class="n">result_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">table_name</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;get a dictionary of all tables used in an operator DAG,</span>
@@ -4257,7 +4264,7 @@ with the using columns (None means all).</p>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">column_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="n">qualifiers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
     <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">table_name_was_set_by_user</span><span class="p">:</span> <span class="nb">bool</span>
@@ -4265,14 +4272,14 @@ with the using columns (None means all).</p>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">column_names</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">column_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">head</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">limit_was</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">nrows</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">limit_was</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">nrows</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">column_names</span><span class="p">]</span>
@@ -4391,6 +4398,10 @@ with the using columns (None means all).</p>
         <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
         <span class="k">return</span> <span class="n">s</span>
 
+    <span class="k">def</span> <span class="nf">example_values_to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">table_values_to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">,</span> <span class="n">result_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">table_name</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;get a dictionary of all tables used in an operator DAG,</span>
 <span class="sd">        raise an exception if the values are not consistent&quot;&quot;&quot;</span>
@@ -4447,14 +4458,14 @@ with the using columns (None means all).</p>
         
             <span class="name">TableDescription</span><span class="signature">(
     *,
-    table_name=None,
-    column_names,
+    table_name: Optional[str] = None,
+    column_names: Iterable[str],
     qualifiers=None,
     sql_meta=None,
     column_types: Optional[Dict[str, type]] = None,
     head=None,
-    limit_was=None,
-    nrows=None
+    limit_was: Optional[int] = None,
+    nrows: Optional[int] = None
 )</span>
     </div>
 
@@ -4463,14 +4474,14 @@ with the using columns (None means all).</p>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">column_names</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">column_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">head</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">limit_was</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">nrows</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">limit_was</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">nrows</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">column_names</span><span class="p">]</span>
@@ -4663,6 +4674,26 @@ with the using columns (None means all).</p>
             <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="n">spacer</span> <span class="o">+</span> <span class="s2">&quot;qualifiers=&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">qualifiers</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
         <span class="k">return</span> <span class="n">s</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="TableDescription.example_values_to_sql_str_list" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#TableDescription.example_values_to_sql_str_list">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">example_values_to_sql_str_list</span><span class="signature">(self, db_model) -&gt; List[str]</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">example_values_to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">table_values_to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">,</span> <span class="n">result_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">table_name</span><span class="p">)</span>
 </pre></div>
 
         </details>

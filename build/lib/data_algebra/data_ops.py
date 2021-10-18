@@ -619,7 +619,7 @@ class TableDescription(ViewRepresentation):
     """
 
     table_name: str
-    column_names: Iterable[str]
+    column_names: List[str]
     qualifiers: Dict[str, str]
     key: str
     table_name_was_set_by_user: bool
@@ -627,14 +627,14 @@ class TableDescription(ViewRepresentation):
     def __init__(
         self,
         *,
-        table_name=None,
-        column_names,
+        table_name: Optional[str] = None,
+        column_names: Iterable[str],
         qualifiers=None,
         sql_meta=None,
         column_types: Optional[Dict[str, type]] = None,
         head=None,
-        limit_was=None,
-        nrows=None,
+        limit_was: Optional[int] = None,
+        nrows: Optional[int] = None,
     ):
         if isinstance(column_names, str):
             column_names = [column_names]
@@ -752,6 +752,10 @@ class TableDescription(ViewRepresentation):
             s = s + "," + spacer + "qualifiers=" + self.qualifiers.__repr__()
         s = s + ")"
         return s
+
+    def example_values_to_sql_str_list(self, db_model) -> List[str]:
+        assert self.head is not None
+        return db_model.table_values_to_sql_str_list(self.head, result_name=self.table_name)
 
     def get_tables(self):
         """get a dictionary of all tables used in an operator DAG,
