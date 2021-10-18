@@ -1,4 +1,8 @@
-from types import SimpleNamespace
+"""
+Type defs for data operations.
+"""
+
+
 import collections
 
 import data_algebra.expr_rep
@@ -167,8 +171,7 @@ class OperatorPlatform:
     def convert_records(self, record_map):
         raise NotImplementedError("base class called")
 
-    def map_records(
-        self, blocks_in=None, blocks_out=None):
+    def map_records(self, blocks_in=None, blocks_out=None):
         if (blocks_in is None) and (blocks_out is None):
             return self  # NO-OP, return source ops
         return self.convert_records(

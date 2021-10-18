@@ -1,3 +1,8 @@
+"""
+Flow text around a margin for presentation.
+"""
+
+
 def flow_text(tokens, *, align_right=70, sep_width=1):
     """
 

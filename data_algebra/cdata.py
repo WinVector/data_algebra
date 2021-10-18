@@ -51,7 +51,7 @@ class RecordSpecification:
             control_table_keys = [control_table_keys]
         if self.control_table.shape[0] == 1:
             if len(control_table_keys) > 0:
-                raise ValueError("signle-row records must not have control table keys")
+                raise ValueError("single-row records must not have control table keys")
         else:
             if len(control_table_keys) <= 0:
                 raise ValueError("multi-row records must have at least one control table key")
@@ -158,7 +158,7 @@ class RecordSpecification:
 
         return RecordMap(blocks_in=self)
 
-    def map_from_rows(self, *, strict=False):
+    def map_from_rows(self):
         """
         Build a RecordMap mapping this RecordSpecification from rowrecs
 
@@ -499,7 +499,7 @@ class RecordMap:
                 + "\n"
             )
             return s
-        else:
+        if self.blocks_out is not None:
             s = (
                 "Transform row records of the form:\n"
                 + "  record_keys: "
@@ -512,6 +512,7 @@ class RecordMap:
                 + str(self.blocks_out)
             )
             return s
+        raise ValueError("should not be reached")
 
     def __repr__(self):
         s = (

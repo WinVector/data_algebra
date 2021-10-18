@@ -1,3 +1,7 @@
+"""
+Use Lark to parse a near-Python expression grammar.
+"""
+
 import ast
 
 import lark
@@ -61,18 +65,19 @@ factor_remap = {
 }
 
 
-def _walk_lark_tree(op, *, data_def=None):
+def _walk_lark_tree(op, *, data_def=None) -> data_algebra.expr_rep.Term:
     """
     Walk a lark parse tree and return our own representation.
 
     :param op: lark parse tree
     :param data_def: dictionary of data_algebra.expr_rep.ColumnReference
-    :return: PreTerm tree.
+    :return: Term tree.
     """
     if data_def is None:
         data_def = dict()
 
     def lookup_symbol(key):
+        """look for symbol"""
         try:
             return data_algebra.expr_rep.enc_value(data_def[key])
         except KeyError:
@@ -179,7 +184,7 @@ def _walk_lark_tree(op, *, data_def=None):
                     return method(*args)
                 else:
                     if op_name.startswith("_"):  # TODO: get rid of underbar aliases
-                        op_name = op_name[1 : len(op_name)]
+                        op_name = op_name[1: len(op_name)]
                     return data_algebra.expr_rep.Expression(op=op_name, args=args)
             if r_op.data in {"or_test", "or_test_sym", "and_test", "and_test_sym"}:
                 if len(r_op.children) < 2:
@@ -222,13 +227,13 @@ def _walk_lark_tree(op, *, data_def=None):
     return _r_walk_lark_tree(op)
 
 
-def parse_by_lark(source_str : str, *, data_def=None) -> data_algebra.expr_rep.PreTerm:
+def parse_by_lark(source_str: str, *, data_def=None) -> data_algebra.expr_rep.Term:
     """
     Parse an expression in terms of data views and values.
 
     :param source_str: string to parse
     :param data_def: dictionary of data_algebra.expr_rep.ColumnReference
-    :return: data_algebra.expr_rep.PreTerm
+    :return: data_algebra.expr_rep.Term
     """
     assert parser is not None
     assert isinstance(source_str, str)
@@ -236,5 +241,5 @@ def parse_by_lark(source_str : str, *, data_def=None) -> data_algebra.expr_rep.P
     # convert parse tree to our data structures for isolation
     v = _walk_lark_tree(tree, data_def=data_def)
     v.source_string = source_str
-    assert isinstance(v, data_algebra.expr_rep.PreTerm)
+    assert isinstance(v, data_algebra.expr_rep.Term)
     return v

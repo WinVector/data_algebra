@@ -1,4 +1,12 @@
+"""
+Code for computing collected components.
+"""
+
+
 class Component:
+    """
+    Holder for a connected component.
+    """
     def __init__(self, item):
         self.id = item
         self.items = {item}

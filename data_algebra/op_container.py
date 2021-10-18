@@ -1,9 +1,14 @@
+"""
+Redirecting container.
+"""
+
 import collections
 from types import SimpleNamespace
 import typing
 
 import data_algebra.data_ops_types
 import data_algebra.data_ops
+import data_algebra.expr_rep
 
 
 # for use in building expressions such as one.sum()
@@ -83,6 +88,12 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
     def __rshift__(self, other):  # override self >> other
         self.set(self.ops.__rshift__(other))
         return self
+
+    def eval(self, data_map, *, data_model=None, narrow=True):
+        return self.ops.eval(data_map=data_map, data_model=data_model, narrow=narrow)
+
+    def get_tables(self):
+        return self.ops.get_tables()
 
     # composition
     def add(self, other):
