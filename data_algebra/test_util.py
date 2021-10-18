@@ -1,3 +1,8 @@
+
+"""
+Utils that help with testing. This module is allowed to import many other modules.
+"""
+
 import numpy
 
 # noinspection PyUnresolvedReferences
@@ -22,7 +27,7 @@ test_MySQL = False  # causes an external dependency
 test_Spark = False  # causes an external dependency
 
 
-def formats_to_self(ops):
+def formats_to_self(ops) -> bool:
     """
     Check a operator dag formats and parses back to itself.
     Can raise exceptions. Also checks pickling.
@@ -54,12 +59,12 @@ def equivalent_frames(
     a,
     b,
     *,
-    float_tol=1e-8,
-    check_column_order=False,
-    cols_case_sensitive=False,
-    check_row_order=False,
+    float_tol: float = 1e-8,
+    check_column_order: bool = False,
+    cols_case_sensitive: bool = False,
+    check_row_order: bool = False,
     local_data_model=None,
-):
+) -> bool:
     """return False if the frames are equivalent (up to column re-ordering and possible row-reordering).
     Ignores indexing."""
     # leave in extra checks as this is usually used by test code
@@ -130,20 +135,21 @@ def equivalent_frames(
     return True
 
 
+# noinspection PyShadowingNames
 def check_transform_on_handles(
     *,
     ops,
     data,
     expect,
     db_handles,
-    float_tol=1e-8,
-    check_column_order=False,
-    cols_case_sensitive=False,
-    check_row_order=False,
-    check_parse=True,
+    float_tol: float = 1e-8,
+    check_column_order: bool = False,
+    cols_case_sensitive: bool = False,
+    check_row_order: bool = False,
+    check_parse: bool = True,
     local_data_model=None,
-    empty_produces_empty=True,
-):
+    empty_produces_empty: bool = True,
+) -> None:
     """
     Test an operator dag produces the expected result, and parses correctly.
     Asserts if there are issues
@@ -325,19 +331,20 @@ def get_test_dbs():
     return db_handles
 
 
+# noinspection PyShadowingNames
 def check_transform(
     ops,
     data,
     expect,
     *,
-    float_tol=1e-8,
-    check_column_order=False,
-    cols_case_sensitive=False,
-    check_row_order=False,
-    check_parse=True,
-    models_to_skip=None,
-    empty_produces_empty=True,
-):
+    float_tol: float = 1e-8,
+    check_column_order: bool = False,
+    cols_case_sensitive: bool = False,
+    check_row_order: bool = False,
+    check_parse: bool = True,
+    models_to_skip: Optional[Iterable[str]] = None,
+    empty_produces_empty: bool = True,
+) -> None:
     """
     Test an operator dag produces the expected result, and parses correctly.
     Assert if there are issues.
@@ -374,20 +381,32 @@ def check_transform(
     db_handles = db_handles + test_dbs
 
     if models_to_skip is not None:
+        models_to_skip = set(models_to_skip)
         db_handles = [h for h in db_handles if str(h.db_model) not in models_to_skip]
 
-    check_transform_on_handles(
-        ops=ops,
-        data=data,
-        expect=expect,
-        float_tol=float_tol,
-        check_column_order=check_column_order,
-        cols_case_sensitive=cols_case_sensitive,
-        check_row_order=check_row_order,
-        check_parse=check_parse,
-        db_handles=db_handles,
-        empty_produces_empty=empty_produces_empty,
-    )
+    caught = None
+    try:
+        check_transform_on_handles(
+            ops=ops,
+            data=data,
+            expect=expect,
+            float_tol=float_tol,
+            check_column_order=check_column_order,
+            cols_case_sensitive=cols_case_sensitive,
+            check_row_order=check_row_order,
+            check_parse=check_parse,
+            db_handles=db_handles,
+            empty_produces_empty=empty_produces_empty,
+        )
+    except Exception as exc:
+        caught = exc
 
     for handle in db_handles:
-        handle.close()
+        # noinspection PyBroadException
+        try:
+            handle.close()
+        except Exception:
+            pass
+
+    if caught is not None:
+        raise caught

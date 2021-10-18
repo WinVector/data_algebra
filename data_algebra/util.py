@@ -1,4 +1,8 @@
 
+"""
+Basic utilities. Not allowed to import many other modules.
+"""
+
 import datetime
 from typing import Dict, Iterable, Optional, Tuple
 
@@ -8,6 +12,13 @@ import data_algebra
 
 
 def pandas_to_example_str(obj, *, local_data_model=None) -> str:
+    """
+    Convert data frame to a Python source code string.
+
+    :param obj: data frame to convert.
+    :param local_data_model: data model to use.
+    :return: Python source code representation of obj.
+    """
     if local_data_model is None:
         local_data_model = data_algebra.default_data_model
     pd_module_name = local_data_model.presentation_model_name
@@ -64,6 +75,12 @@ type_conversions = {
 
 
 def map_type_to_canonical(v: type) -> type:
+    """
+    Map type to a smaller set of considered equivalent types.
+
+    :param v: type to map
+    :return: type
+    """
     try:
         # noinspection PyTypeChecker
         return type_conversions[v]
@@ -123,6 +140,12 @@ def guess_column_types(d, *, columns: Optional[Iterable[str]] = None) -> Dict[st
 
 
 def compatible_types(types_seen: Iterable[type]) -> bool:
+    """
+    Check if a set of types are all considered equivalent.
+
+    :param types_seen: collection of types seen
+    :return: True if types are all compatible, else False.
+    """
     mapped_comparison = {map_type_to_canonical(t) for t in types_seen} - {type(None)}
     if (len(mapped_comparison) > 1) and (mapped_comparison != {int, float}):
         return False
