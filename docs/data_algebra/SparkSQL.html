@@ -105,11 +105,11 @@
         <span class="o">+</span> <span class="s2">&quot; IS NULL OR &quot;</span>
         <span class="o">+</span> <span class="n">subexpr</span>
         <span class="o">+</span> <span class="s2">&quot; &gt;= &quot;</span>
-        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">quote_literal</span><span class="p">(</span><span class="s2">&quot;+infinity&quot;</span><span class="p">)</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="s2">&quot;+infinity&quot;</span><span class="p">)</span>
         <span class="o">+</span> <span class="s2">&quot; OR &quot;</span>
         <span class="o">+</span> <span class="n">subexpr</span>
         <span class="o">+</span> <span class="s2">&quot; &lt;= &quot;</span>
-        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">quote_literal</span><span class="p">(</span><span class="s2">&quot;-infinity&quot;</span><span class="p">)</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="s2">&quot;-infinity&quot;</span><span class="p">)</span>
         <span class="o">+</span> <span class="s2">&quot; OR &quot;</span>
         <span class="o">+</span> <span class="s2">&quot; isNaN(&quot;</span>
         <span class="o">+</span> <span class="n">subexpr</span>
@@ -514,7 +514,6 @@
                 <dd id="SparkSQLModel.quote_identifier" class="function"><a href="db_model.html#DBModel.quote_identifier">quote_identifier</a></dd>
                 <dd id="SparkSQLModel.quote_table_name" class="function"><a href="db_model.html#DBModel.quote_table_name">quote_table_name</a></dd>
                 <dd id="SparkSQLModel.quote_string" class="function"><a href="db_model.html#DBModel.quote_string">quote_string</a></dd>
-                <dd id="SparkSQLModel.quote_literal" class="function"><a href="db_model.html#DBModel.quote_literal">quote_literal</a></dd>
                 <dd id="SparkSQLModel.value_to_sql" class="function"><a href="db_model.html#DBModel.value_to_sql">value_to_sql</a></dd>
                 <dd id="SparkSQLModel.table_values_to_sql_str_list" class="function"><a href="db_model.html#DBModel.table_values_to_sql_str_list">table_values_to_sql_str_list</a></dd>
                 <dd id="SparkSQLModel.expr_to_sql" class="function"><a href="db_model.html#DBModel.expr_to_sql">expr_to_sql</a></dd>

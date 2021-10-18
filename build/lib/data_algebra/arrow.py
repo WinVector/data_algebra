@@ -308,5 +308,5 @@ class DataOpArrow(Arrow):
         return not self.__eq__(other)
 
 
-def fmt_as_arrow(ops):
+def fmt_as_arrow(ops) -> str:
     return str(DataOpArrow(ops))

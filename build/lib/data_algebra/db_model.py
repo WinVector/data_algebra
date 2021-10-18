@@ -55,7 +55,7 @@ class SQLFormatOptions(SimpleNamespace):
         p.text(str(self))
 
 
-def _list_join_expecting_list(joiner: str, str_list: List[str]):
+def _list_join_expecting_list(joiner: str, str_list: List[str]) -> List[str]:
     assert isinstance(joiner, str)
     assert isinstance(str_list, list)
     assert all([isinstance(vi, str) for vi in str_list])
@@ -63,7 +63,7 @@ def _list_join_expecting_list(joiner: str, str_list: List[str]):
     return [' ' + str_list[i] + (joiner if i < (n - 1) else '') for i in range(n)]
 
 
-def _clean_annotation(annotation: Optional[str]):
+def _clean_annotation(annotation: Optional[str]) -> Optional[str]:
     assert isinstance(annotation, (str, type(None)))
     if annotation is None:
         return annotation
@@ -117,11 +117,11 @@ def _db_is_bad_expr(dbmodel, expression):
         + " IS NULL OR "
         + subexpr
         + " >= "
-        + dbmodel.quote_literal("+infinity")
+        + dbmodel.value_to_sql("+infinity")
         + " OR "
         + subexpr
         + " <= "
-        + dbmodel.quote_literal("-infinity")
+        + dbmodel.value_to_sql("-infinity")
         + " OR ("
         + subexpr
         + " != 0 AND "
@@ -512,21 +512,21 @@ class DBModel:
     def __init__(
         self,
         *,
-        identifier_quote='"',
-        string_quote="'",
+        identifier_quote: str = '"',
+        string_quote: str = "'",
         sql_formatters=None,
         op_replacements=None,
         local_data_model=None,
-        on_start="",
-        on_end="",
-        on_joiner="AND",
-        drop_text="DROP TABLE",
-        string_type="VARCHAR",
-        supports_with=True,
-        allow_extend_merges=True,
+        on_start: str = "",
+        on_end: str = "",
+        on_joiner: str = "AND",
+        drop_text: str = "DROP TABLE",
+        string_type: str = "VARCHAR",
+        supports_with: bool = True,
+        allow_extend_merges: bool = True,
         default_SQL_format_options=None,
-        union_all_term_start="(",
-        union_all_term_end=")",
+        union_all_term_start: str = "(",
+        union_all_term_end: str = ")",
     ):
         if local_data_model is None:
             local_data_model = data_algebra.default_data_model
@@ -596,7 +596,8 @@ class DBModel:
         r = r.reset_index(drop=True)
         return r
 
-    def table_exists(self, conn, table_name):
+    def table_exists(self, conn, table_name: str) -> bool:
+        assert isinstance(table_name, str)
         q_table_name = self.quote_table_name(table_name)
         # noinspection PyBroadException
         table_exists = True
@@ -606,15 +607,15 @@ class DBModel:
             table_exists = False
         return table_exists
 
-    def drop_table(self, conn, table_name, *, check=True):
+    def drop_table(self, conn, table_name: str, *, check: bool = True) -> None:
         if (not check) or self.table_exists(conn, table_name):
             q_table_name = self.quote_table_name(table_name)
             self.execute(conn, self.drop_text + " " + q_table_name)
 
     # noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection
     def insert_table(
-        self, conn, d, table_name, *, qualifiers=None, allow_overwrite=False
-    ):
+        self, conn, d, table_name: str, *, qualifiers=None, allow_overwrite=False
+    ) -> None:
         """
         Insert a table.
 
@@ -634,10 +635,11 @@ class DBModel:
                 self.drop_table(conn, table_name, check=False)
         # Note: the Pandas to_sql() method appears to have SQLite hard-wired into it
         # it refers to sqlite_master
+        # this behavior seems to change if sqlalchemy is active
         d.to_sql(name=table_name, con=conn, index=False)
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
-    def read_table(self, conn, table_name, *, qualifiers=None, limit=None):
+    def read_table(self, conn, table_name: str, *, qualifiers=None, limit=None):
         assert isinstance(table_name, str)
         q_table_name = self.quote_table_name(table_name)
         sql = "SELECT * FROM " + q_table_name
@@ -654,7 +656,7 @@ class DBModel:
             conn=conn, table_name=table.table_name, qualifiers=table.qualifiers
         )
 
-    def quote_identifier(self, identifier):
+    def quote_identifier(self, identifier: str) -> str:
         assert isinstance(identifier, str)
         if self.identifier_quote in identifier:
             raise ValueError(
@@ -662,7 +664,7 @@ class DBModel:
             )
         return self.identifier_quote + identifier + self.identifier_quote
 
-    def quote_table_name(self, table_description):
+    def quote_table_name(self, table_description) -> str:
         if not isinstance(table_description, str):
             try:
                 if table_description.node_name == "TableDescription":
@@ -677,7 +679,7 @@ class DBModel:
                 )
         return self.quote_identifier(table_description)
 
-    def quote_string(self, string):
+    def quote_string(self, string: str) -> str:
         assert isinstance(string, str)
         # replace all string with doubled string quotes
         return (
@@ -686,10 +688,7 @@ class DBModel:
             + self.string_quote
         )
 
-    def quote_literal(self, val):
-        return self.quote_string(str(val))
-
-    def value_to_sql(self, v):
+    def value_to_sql(self, v) -> str:
         if v is None:
             return "NULL"
         if isinstance(v, data_algebra.expr_rep.ListTerm):
@@ -713,7 +712,7 @@ class DBModel:
             return "(" + ", ".join([self.value_to_sql(vi) for vi in v]) + ")"
         return str(v)
 
-    def table_values_to_sql_str_list(self, v) -> str:
+    def table_values_to_sql_str_list(self, v) -> List[str]:
         assert v is not None
         m = v.shape[0]
         assert m > 0
@@ -742,7 +741,7 @@ class DBModel:
         )
         return sql
 
-    def expr_to_sql(self, expression, *, want_inline_parens=False):
+    def expr_to_sql(self, expression, *, want_inline_parens: bool = False) -> str:
         if isinstance(expression, str):
             return expression
         assert isinstance(expression, data_algebra.expr_rep.PreTerm)
@@ -780,7 +779,7 @@ class DBModel:
             return self.value_to_sql(expression.value)
         raise TypeError("unexpected type: " + str(type(expression)))
 
-    def _indent_and_sep_terms(self, terms, *, sep=",", sql_format_options=None):
+    def _indent_and_sep_terms(self, terms, *, sep: str = ",", sql_format_options=None) -> List[str]:
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
         n = len(terms)
@@ -975,7 +974,7 @@ class DBModel:
 
     def project_to_near_sql(
         self, project_node, *, using=None, temp_id_source=None, sql_format_options=None
-    ):
+    ) -> data_algebra.near_sql.NearSQL:
         if project_node.node_name != "ProjectNode":
             raise TypeError(
                 "Expected project_node to be a data_algebra.data_ops.ProjectNode)"
@@ -1421,8 +1420,7 @@ class DBModel:
         sql_str_list = [v for v in sql_str_list if len(v) > 0]
         return "\n".join(sql_str_list) + "\n"
 
-    def row_recs_to_blocks_query_str_list_pair(
-        self, record_spec) -> Tuple[List[str], List[str]]:
+    def row_recs_to_blocks_query_str_list_pair(self, record_spec) -> Tuple[List[str], List[str]]:
         control_value_cols = [
             c
             for c in record_spec.control_table.columns
@@ -1487,9 +1485,7 @@ class DBModel:
         return sql_prefix, sql_suffix
 
     # noinspection PyUnusedLocal
-    def blocks_to_row_recs_query_str_list_pair(
-        self,
-        record_spec) -> Tuple[List[str], List[str]]:
+    def blocks_to_row_recs_query_str_list_pair(self, record_spec) -> Tuple[List[str], List[str]]:
         assert record_spec.control_table.shape[0] >= 1
         col_stmts = []
         for c in record_spec.record_keys:
@@ -1842,25 +1838,6 @@ class DBHandle:
             head, table_name=table_name, qualifiers=qualifiers, row_limit=row_limit
         )
 
-    def to_pandas(self, handle, *, data_map=None):
-        if isinstance(handle, data_algebra.data_ops.TableDescription):
-            handle = handle.table_name
-        assert isinstance(handle, str)
-        if data_map is not None:
-            if handle not in data_map:
-                return ValueError("Expected handle to be a data_map key " + handle)
-            assert isinstance(data_map[handle], data_algebra.data_ops.TableDescription)
-            if data_map[handle].table_name != handle:
-                raise ValueError(
-                    "data_map["
-                    + handle
-                    + "].table_name == "
-                    + data_map[handle].table_name
-                    + ", not "
-                    + handle
-                )
-        return self.db_model.read_table(self.conn, handle)
-
     def execute(self, q):
         self.db_model.execute(conn=self.conn, q=q)
 
@@ -1882,7 +1859,7 @@ class DBHandle:
         d = self.read_query(q)
         d.to_csv(res_name, index=False)
 
-    def table_values_to_sql_str_list(self, v) -> str:
+    def table_values_to_sql_str_list(self, v) -> List[str]:
         return self.db_model.table_values_to_sql_str_list(v)
 
     def __str__(self):
@@ -1899,7 +1876,7 @@ class DBHandle:
     def __repr__(self):
         return self.__str__()
 
-    def close(self):
+    def close(self) -> None:
         if self.conn is not None:
             try:
                 self.conn.close()
