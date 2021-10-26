@@ -52,7 +52,16 @@ threshold,count,fraction,precision,true_positive_rate,false_positive_rate,true_n
     assert data_algebra.test_util.equivalent_frames(to_plot.loc[:, ['threshold'] + plotvars], back)
     back2 = reshaper.inverse().transform(prtlong)
     assert data_algebra.test_util.equivalent_frames(to_plot.loc[:, ['threshold'] + plotvars], back2)
-    # TODO: test DB path on same examples
+    pipe1 = (
+                descr(to_plot=to_plot)
+                    .convert_records(reshaper)
+    )
+    data_algebra.test_util.check_transform(ops=pipe1, data=to_plot, expect=prtlong)
+    pipe2 = (
+                descr(prtlong=prtlong)
+                    .convert_records(reshaper.inverse())
+    )
+    data_algebra.test_util.check_transform(ops=pipe2, data=prtlong, expect=to_plot.loc[:, ['threshold'] + plotvars])
 
     plotvars = ['sensitivity']
     reshaper = RecordMap(
@@ -73,3 +82,13 @@ threshold,count,fraction,precision,true_positive_rate,false_positive_rate,true_n
     assert data_algebra.test_util.equivalent_frames(to_plot.loc[:, ['threshold'] + plotvars], back)
     back2 = reshaper.inverse().transform(prtlong)
     assert data_algebra.test_util.equivalent_frames(to_plot.loc[:, ['threshold'] + plotvars], back2)
+    pipe1 = (
+                descr(to_plot=to_plot)
+                    .convert_records(reshaper)
+    )
+    data_algebra.test_util.check_transform(ops=pipe1, data=to_plot, expect=prtlong)
+    pipe2 = (
+                descr(prtlong=prtlong)
+                    .convert_records(reshaper.inverse())
+    )
+    data_algebra.test_util.check_transform(ops=pipe2, data=prtlong, expect=to_plot.loc[:, ['threshold'] + plotvars])

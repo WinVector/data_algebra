@@ -1495,10 +1495,11 @@ class DBModel:
         if record_spec.control_table.shape[0] == 1:
             # special case with one row control table (rowrec)
             for cc in record_spec.control_table.columns:
-                cc0 = record_spec.control_table[cc][0]
-                col_stmts.append(
-                    " " + self.quote_identifier(cc) + " AS " + self.quote_identifier(cc0)
-                )
+                if cc not in record_spec.control_table_keys:
+                    cc0 = record_spec.control_table[cc][0]
+                    col_stmts.append(
+                        " " + self.quote_identifier(cc) + " AS " + self.quote_identifier(cc0)
+                    )
             sql_prefix = (
                     _list_join_expecting_list(',', col_stmts)
                     + ["FROM ( SELECT * FROM "]
