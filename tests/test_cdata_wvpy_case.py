@@ -62,6 +62,7 @@ threshold,count,fraction,precision,true_positive_rate,false_positive_rate,true_n
                     .convert_records(reshaper.inverse())
     )
     data_algebra.test_util.check_transform(ops=pipe2, data=prtlong, expect=to_plot.loc[:, ['threshold'] + plotvars])
+    # TODO: should we get measure back?
 
     plotvars = ['sensitivity']
     reshaper = RecordMap(
@@ -92,3 +93,4 @@ threshold,count,fraction,precision,true_positive_rate,false_positive_rate,true_n
                     .convert_records(reshaper.inverse())
     )
     data_algebra.test_util.check_transform(ops=pipe2, data=prtlong, expect=to_plot.loc[:, ['threshold'] + plotvars])
+    # TODO: should we get measure back?
