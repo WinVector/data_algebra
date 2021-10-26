@@ -48,6 +48,10 @@ threshold,count,fraction,precision,true_positive_rate,false_positive_rate,true_n
                   0.6666666666666667, 0.0, 1.0],
     })
     assert data_algebra.test_util.equivalent_frames(expect, prtlong)
+    back = reshaper.inverse_transform(prtlong)
+    assert data_algebra.test_util.equivalent_frames(to_plot.loc[:, ['threshold'] + plotvars], back)
+    back2 = reshaper.inverse().transform(prtlong)
+    assert data_algebra.test_util.equivalent_frames(to_plot.loc[:, ['threshold'] + plotvars], back2)
 
     plotvars = ['sensitivity']
     reshaper = RecordMap(
@@ -64,3 +68,7 @@ threshold,count,fraction,precision,true_positive_rate,false_positive_rate,true_n
         'value': [1.0, 1.0, 1.0, 1.0, 0.5, 0.0, 0.0],
         })
     assert data_algebra.test_util.equivalent_frames(expect, prtlong)
+    back = reshaper.inverse_transform(prtlong)
+    assert data_algebra.test_util.equivalent_frames(to_plot.loc[:, ['threshold'] + plotvars], back)
+    back2 = reshaper.inverse().transform(prtlong)
+    assert data_algebra.test_util.equivalent_frames(to_plot.loc[:, ['threshold'] + plotvars], back2)
