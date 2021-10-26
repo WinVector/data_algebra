@@ -24,6 +24,7 @@ def pandas_to_example_str(obj, *, local_data_model=None) -> str:
     pd_module_name = local_data_model.presentation_model_name
     if not local_data_model.is_appropriate_data_instance(obj):
         raise TypeError("Expect obj to be local_data_model.pd.DataFrame")
+    obj = obj.reset_index(drop=True, inplace=False)
     nrow = obj.shape[0]
     pandas_string = pd_module_name + ".DataFrame({"
     for k in obj.columns:

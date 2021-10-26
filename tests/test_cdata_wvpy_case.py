@@ -52,6 +52,7 @@ threshold,count,fraction,precision,true_positive_rate,false_positive_rate,true_n
     assert data_algebra.test_util.equivalent_frames(to_plot.loc[:, ['threshold'] + plotvars], back)
     back2 = reshaper.inverse().transform(prtlong)
     assert data_algebra.test_util.equivalent_frames(to_plot.loc[:, ['threshold'] + plotvars], back2)
+    # TODO: test DB path on same examples
 
     plotvars = ['sensitivity']
     reshaper = RecordMap(
