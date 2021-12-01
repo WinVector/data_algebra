@@ -88,6 +88,18 @@ class OperatorPlatform:
             return other.apply_to(self)
         raise TypeError("unexpected type: " + str(type(other)))
 
+    # imitate a method
+    def use(self, user_function, *args, **kwargs):
+        """
+        Apply f as if it was a method on this chain.
+        Defined as return f(self, *args, **kwargs).
+
+        :param user_function: function to apply
+        :param *args: additional positional arguments
+        :param **kwargs: additional keyword arguments
+        """
+        return user_function(self, *args, **kwargs)
+
     # composition
     def add(self, other):
         """

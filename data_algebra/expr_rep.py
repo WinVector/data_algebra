@@ -377,7 +377,6 @@ class Term(PreTerm, ABC):
     # https://docs.scipy.org/doc/numpy-1.13.0/reference/routines.math.html
 
     # TODO: double check https://docs.python.org/3/library/operator.html
-    # for more ops such as concat() and so on
 
     def sign(self):
         return self.__uop_expr__("sign")
