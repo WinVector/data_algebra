@@ -49,6 +49,9 @@
                                 <a class="function" href="#OperatorPlatform.apply_to">apply_to</a>
                         </li>
                         <li>
+                                <a class="function" href="#OperatorPlatform.use">use</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#OperatorPlatform.add">add</a>
                         </li>
                         <li>
@@ -236,6 +239,18 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">OperatorPlatform</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;unexpected type: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)))</span>
+
+    <span class="c1"># imitate a method</span>
+    <span class="k">def</span> <span class="nf">use</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_function</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply f as if it was a method on this chain.</span>
+<span class="sd">        Defined as return f(self, *args, **kwargs).</span>
+
+<span class="sd">        :param user_function: function to apply</span>
+<span class="sd">        :param *args: additional positional arguments</span>
+<span class="sd">        :param **kwargs: additional keyword arguments</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">user_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="c1"># composition</span>
     <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -450,6 +465,18 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">OperatorPlatform</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;unexpected type: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)))</span>
+
+    <span class="c1"># imitate a method</span>
+    <span class="k">def</span> <span class="nf">use</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_function</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply f as if it was a method on this chain.</span>
+<span class="sd">        Defined as return f(self, *args, **kwargs).</span>
+
+<span class="sd">        :param user_function: function to apply</span>
+<span class="sd">        :param *args: additional positional arguments</span>
+<span class="sd">        :param **kwargs: additional keyword arguments</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">user_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="c1"># composition</span>
     <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -725,6 +752,40 @@
 <p>:param a: operators to apply to
 :param target_table_key: table key to replace with self, None counts as "match all"
 :return: new operator DAG</p>
+</div>
+
+
+                            </div>
+                            <div id="OperatorPlatform.use" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OperatorPlatform.use">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">use</span><span class="signature">(self, user_function, *args, **kwargs)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">use</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_function</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply f as if it was a method on this chain.</span>
+<span class="sd">        Defined as return f(self, *args, **kwargs).</span>
+
+<span class="sd">        :param user_function: function to apply</span>
+<span class="sd">        :param *args: additional positional arguments</span>
+<span class="sd">        :param **kwargs: additional keyword arguments</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">user_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Apply f as if it was a method on this chain.
+Defined as return f(self, <em>args, *</em>kwargs).</p>
+
+<p>:param user_function: function to apply
+:param <em>args: additional positional arguments
+:param *</em>kwargs: additional keyword arguments</p>
 </div>
 
 
