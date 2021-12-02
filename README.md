@@ -7,7 +7,7 @@ compose and maintain grammar of data processing steps that in turn can be used t
 database specific SQL. The package also implements the same transforms for Pandas DataFrames.
 
 A good introduction can be found [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Introduction/data_algebra_Introduction.ipynb),
-and numerous examples are catalogued [here](https://github.com/WinVector/data_algebra/tree/main/Examples).
+and numerous examples are catalogued [here](https://github.com/WinVector/data_algebra/tree/main/Examples). Additional documentation is [here](https://winvector.github.io/data_algebra/).
 
 Currently the system is primarily adapted and testing for Pandas, Google BigQuery, PostgreSQL, SQLite, and Spark. Porting and extension is designed to be easy.
 
