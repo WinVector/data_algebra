@@ -1,13 +1,13 @@
 
-import pandas
+from typing import List
 
 import data_algebra.test_util
 from data_algebra.data_ops import *
-
+import data_algebra.util
 
 def test_use_1():
     # some example data
-    d = pandas.DataFrame({
+    d = data_algebra.default_data_model.pd.DataFrame({
         'ID': [1, 1, 2, 3, 4, 4, 4, 4, 5, 5, 6],
         'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
     })
@@ -22,3 +22,52 @@ def test_use_1():
     res2 = ex(ops2)
 
     assert data_algebra.test_util.equivalent_frames(res, res2)
+
+
+def test_use_2():
+    # https://github.com/WinVector/data_algebra/blob/main/Examples/Macros/use.ipynb
+    # some example data
+    d1 = data_algebra.default_data_model.pd.DataFrame({
+        'ID': [2, 3, 7, 7],
+        'OP': ['A', 'B', 'B', 'D'],
+    })
+
+    d2 = data_algebra.default_data_model.pd.DataFrame({
+        'ID': [1, 1, 2, 3, 4, 2, 4, 4, 5, 5, 6],
+        'OP': ['A', 'B', 'A', 'D', 'C', 'A', 'D', 'B', 'A', 'B', 'B'],
+    })
+
+    keys = ['ID']
+    
+    def merge_in_counts(
+            pipeline: ViewRepresentation,
+            id_cols: List[str],
+            new_table_descr: TableDescription):
+        return pipeline.natural_join(
+            b=new_table_descr
+                .project(
+                {f'count_{new_table_descr.table_name}': '(1).sum()'},
+                group_by=id_cols),
+            by=id_cols,
+            jointype='full')
+    
+    ops = (
+        data(d1=d1)
+            .project({'count_d1': '(1).sum()'}, group_by=['ID'])
+            .use(merge_in_counts, ['ID'], data(d2=d2))
+    )
+
+    count_cols = [c for c in ops.column_names if c.startswith('count_')]
+    ops = (
+        ops
+            .extend({f'{c}': f'{c}.coalesce_0()' for c in count_cols})
+            .order_rows(['ID'])
+    )
+
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        'ID': [1, 2, 3, 4, 5, 6, 7],
+        'count_d1': [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 2.0],
+        'count_d2': [2.0, 2.0, 1.0, 3.0, 2.0, 1.0, 0.0],
+        })
+
+    data_algebra.test_util.check_transform(ops, data={"d1": d1, "d2": d2}, expect=expect)

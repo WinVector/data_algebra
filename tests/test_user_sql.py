@@ -1,7 +1,5 @@
 
 
-import pandas
-
 from data_algebra.data_ops import *
 import data_algebra.SQLite
 import data_algebra.test_util
@@ -13,7 +11,7 @@ def test_user_sql():
 
     # %%
 
-    d1 = pandas.DataFrame({
+    d1 = data_algebra.default_data_model.pd.DataFrame({
         'g': ['a', 'a', 'b', 'b'],
         'v1': [1, 2, 3, 4],
         'v2': [5, 6, 7, 8],
