@@ -53,15 +53,15 @@ def test_use_2():
     
     ops = (
         data(d1=d1)
-            .project({'count_d1': '(1).sum()'}, group_by=['ID'])
-            .use(merge_in_counts, ['ID'], data(d2=d2))
+            .project({'count_d1': '(1).sum()'}, group_by=keys)
+            .use(merge_in_counts, keys, data(d2=d2))
     )
 
     count_cols = [c for c in ops.column_names if c.startswith('count_')]
     ops = (
         ops
             .extend({f'{c}': f'{c}.coalesce_0()' for c in count_cols})
-            .order_rows(['ID'])
+            .order_rows(keys)
     )
 
     expect = data_algebra.default_data_model.pd.DataFrame({
