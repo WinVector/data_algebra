@@ -451,6 +451,9 @@
                                 <a class="function" href="#SQLNode.apply_to">apply_to</a>
                         </li>
                         <li>
+                                <a class="function" href="#SQLNode.get_tables">get_tables</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#SQLNode.columns_used_from_sources">columns_used_from_sources</a>
                         </li>
                         <li>
@@ -617,9 +620,15 @@
     <span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get a dictionary of all tables used in an operator DAG,</span>
 <span class="sd">        raise an exception if the values are not consistent.&quot;&quot;&quot;</span>
-        <span class="n">tables</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">)):</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="c1"># eliminate tail recursions by stepping through sources</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">sources</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">sources</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">sources</span><span class="p">)):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">ti</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
             <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ti</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span>
@@ -2549,6 +2558,9 @@
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
 
+    <span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
+
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[]</span>
 
@@ -2714,9 +2726,15 @@
     <span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get a dictionary of all tables used in an operator DAG,</span>
 <span class="sd">        raise an exception if the values are not consistent.&quot;&quot;&quot;</span>
-        <span class="n">tables</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">)):</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="c1"># eliminate tail recursions by stepping through sources</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">sources</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">sources</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">sources</span><span class="p">)):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">ti</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
             <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ti</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span>
@@ -3340,9 +3358,15 @@ Abstract base class.</p>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get a dictionary of all tables used in an operator DAG,</span>
 <span class="sd">        raise an exception if the values are not consistent.&quot;&quot;&quot;</span>
-        <span class="n">tables</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">)):</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="c1"># eliminate tail recursions by stepping through sources</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">sources</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">sources</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">sources</span><span class="p">)):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">ti</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
             <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ti</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span>
@@ -9071,6 +9095,9 @@ with the using columns (None means all).</p>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
 
+    <span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
+
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[]</span>
 
@@ -9165,6 +9192,28 @@ Abstract base class.</p>
 <p>:param a: operators to apply to
 :param target_table_key: table key to replace with self, None counts as "match all"
 :return: new operator DAG</p>
+</div>
+
+
+                            </div>
+                            <div id="SQLNode.get_tables" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#SQLNode.get_tables">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">get_tables</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Get a dictionary of all tables used in an operator DAG,
+raise an exception if the values are not consistent.</p>
 </div>
 
 
@@ -9278,7 +9327,6 @@ with the using columns (None means all).</p>
                                     <div><dt><a href="#ViewRepresentation">ViewRepresentation</a></dt>
                                 <dd id="SQLNode.merged_rep_id" class="function"><a href="#ViewRepresentation.merged_rep_id">merged_rep_id</a></dd>
                 <dd id="SQLNode.ex" class="function"><a href="#ViewRepresentation.ex">ex</a></dd>
-                <dd id="SQLNode.get_tables" class="function"><a href="#ViewRepresentation.get_tables">get_tables</a></dd>
                 <dd id="SQLNode.columns_produced" class="function"><a href="#ViewRepresentation.columns_produced">columns_produced</a></dd>
                 <dd id="SQLNode.columns_used" class="function"><a href="#ViewRepresentation.columns_used">columns_used</a></dd>
                 <dd id="SQLNode.forbidden_columns" class="function"><a href="#ViewRepresentation.forbidden_columns">forbidden_columns</a></dd>

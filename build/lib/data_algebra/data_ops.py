@@ -126,9 +126,15 @@ class ViewRepresentation(OperatorPlatform, ABC):
     def get_tables(self):
         """Get a dictionary of all tables used in an operator DAG,
         raise an exception if the values are not consistent."""
-        tables = {}
-        for i in range(len(self.sources)):
-            s = self.sources[i]
+        obj = self
+        # eliminate tail recursions by stepping through sources
+        while len(obj.sources) == 1:
+            obj = obj.sources[0]
+        if len(obj.sources) < 1:
+            return obj.get_tables()
+        tables = dict()
+        for i in range(len(obj.sources)):
+            s = obj.sources[i]
             ti = s.get_tables()
             for (k, v) in ti.items():
                 assert isinstance(v, TableDescription)
@@ -2057,6 +2063,9 @@ class SQLNode(ViewRepresentation):
         if self.sql != other.sql:
             return False
         return True
+
+    def get_tables(self):
+        return dict()
 
     def columns_used_from_sources(self, using=None):
         return []
