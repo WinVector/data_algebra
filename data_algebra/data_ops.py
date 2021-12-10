@@ -126,19 +126,16 @@ class ViewRepresentation(OperatorPlatform, ABC):
     def get_tables(self):
         """Get a dictionary of all tables used in an operator DAG,
         raise an exception if the values are not consistent."""
-        obj = self
-        # eliminate tail recursions by stepping through sources
-        while len(obj.sources) == 1:
-            obj = obj.sources[0]
-        if len(obj.sources) < 1:
-            return obj.get_tables()
+
         tables = dict()
-        for i in range(len(obj.sources)):
-            s = obj.sources[i]
-            ti = s.get_tables()
-            for (k, v) in ti.items():
-                assert isinstance(v, TableDescription)
-                assert v.node_name == "TableDescription"
+        # eliminate recursions by stepping through sources
+        visit_stack = list()
+        visit_stack.append(self)
+        while len(visit_stack) > 0:
+            cursor = visit_stack.pop()
+            if isinstance(cursor, TableDescription):
+                k = cursor.key
+                v = cursor
                 if k in tables.keys():
                     if not v.same_table(tables[k]):
                         raise ValueError(
@@ -146,6 +143,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
                         )
                 else:
                     tables[k] = v
+            else:
+                for s in cursor.sources:
+                    visit_stack.append(s)
         return tables
 
     def columns_used_from_sources(self, using=None):
