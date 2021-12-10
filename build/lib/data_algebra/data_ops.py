@@ -46,6 +46,17 @@ def pretty_format_python(python_str: str, *, black_mode=None) -> str:
     return formatted_python
 
 
+def _assert_tables_defs_consistent(tm1: Dict, tm2: Dict):
+    common_keys = set(tm1.keys()).intersection(tm2.keys())
+    for k in common_keys:
+        t1 = tm1[k]
+        t2 = tm2[k]
+        if not t1.same_table(t2):
+            raise ValueError(
+                "Table " + k + " has two incompatible representations"
+            )
+
+
 class ViewRepresentation(OperatorPlatform, ABC):
     """Structure to represent the columns of a query or a table.
        Abstract base class."""
@@ -68,12 +79,11 @@ class ViewRepresentation(OperatorPlatform, ABC):
         if isinstance(column_names, str):
             column_names = [column_names]
         else:
-            column_names = [v for v in column_names]  # make sure a list and a disjoint copy
+            column_names = list(column_names)  # make sure a list and a disjoint copy
         assert isinstance(column_names, list)
-        assert all([isinstance(v, str) for v in column_names])
+        for v in column_names:
+            assert isinstance(v, str)
         self.column_names = column_names
-        for ci in self.column_names:
-            assert isinstance(ci, str)
         if len(self.column_names) < 1:
             raise ValueError("no column names")
         self.column_set = data_algebra.OrderedSet.OrderedSet()
@@ -96,6 +106,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         OperatorPlatform.__init__(
             self, node_name=node_name, column_map=collections.OrderedDict(**column_dict)
         )
+        self._tables_cache = None
 
     def merged_rep_id(self) -> str:
         return "ops+ " + str(id(self))
@@ -127,6 +138,8 @@ class ViewRepresentation(OperatorPlatform, ABC):
         """Get a dictionary of all tables used in an operator DAG,
         raise an exception if the values are not consistent."""
 
+        if self._tables_cache is not None:
+            return self._tables_cache
         tables = dict()
         # eliminate recursions by stepping through sources
         visit_stack = list()
@@ -139,13 +152,14 @@ class ViewRepresentation(OperatorPlatform, ABC):
                 if k in tables.keys():
                     if not v.same_table(tables[k]):
                         raise ValueError(
-                            "Table " + k + " has two different representation objects"
+                            "Table " + k + " has two incompatible representations"
                         )
                 else:
                     tables[k] = v
             else:
                 for s in cursor.sources:
                     visit_stack.append(s)
+        self._tables_cache = tables
         return tables
 
     def columns_used_from_sources(self, using=None):
@@ -1708,6 +1722,7 @@ class NaturalJoinNode(ViewRepresentation):
         # check set of tables is consistent in both sub-dags
         a_tables = a.get_tables()
         b_tables = b.get_tables()
+        _assert_tables_defs_consistent(a_tables, b_tables)
         if by is None:
             raise ValueError(
                 "Must specify by in natural joins ([] for empty conditions)"
@@ -1752,7 +1767,6 @@ class NaturalJoinNode(ViewRepresentation):
         self.jointype = data_algebra.expr_rep.standardize_join_type(jointype)
         if (self.jointype == "CROSS") and (len(self.by) != 0):
             raise ValueError("CROSS joins must have an empty 'by' list")
-        self.get_tables()  # causes a throw if left and right table descriptions are inconsistent
 
     def apply_to(self, a, *, target_table_key=None):
         new_sources = [
@@ -1826,6 +1840,7 @@ class ConcatRowsNode(ViewRepresentation):
         assert isinstance(b, ViewRepresentation)
         a_tables = a.get_tables()
         b_tables = b.get_tables()
+        _assert_tables_defs_consistent(a_tables, b_tables)
         common_keys = set(a_tables.keys()).intersection(b_tables.keys())
         for k in common_keys:
             if not a_tables[k].same_table(b_tables[k]):
@@ -1861,7 +1876,6 @@ class ConcatRowsNode(ViewRepresentation):
         self.id_column = id_column
         self.a_name = a_name
         self.b_name = b_name
-        self.get_tables()  # causes a throw if left and right table descriptions are inconsistent
 
     def apply_to(self, a, *, target_table_key=None):
         new_sources = [
