@@ -64,7 +64,7 @@
 <span class="kn">import</span> <span class="nn">data_algebra.parse_by_lark</span>
 
 
-<span class="k">def</span> <span class="nf">parse_assignments_in_context</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">parse_assignments_in_context</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert all entries of ops map to Term-expressions</span>
 
@@ -80,7 +80,7 @@
         <span class="k">if</span> <span class="n">opslen</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ops keys must be unique&quot;</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-    <span class="n">column_defs</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">column_map</span>
+    <span class="n">column_defs</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">column_map</span><span class="p">()</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_defs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
     <span class="c1"># first: make sure all entries are parsed</span>
     <span class="n">columns_used</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -120,12 +120,12 @@
 
         
             <span class="def">def</span>
-            <span class="name">parse_assignments_in_context</span><span class="signature">(ops, view)</span>:
+            <span class="name">parse_assignments_in_context</span><span class="signature">(*, ops, view)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">parse_assignments_in_context</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">parse_assignments_in_context</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert all entries of ops map to Term-expressions</span>
 
@@ -141,7 +141,7 @@
         <span class="k">if</span> <span class="n">opslen</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ops keys must be unique&quot;</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-    <span class="n">column_defs</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">column_map</span>
+    <span class="n">column_defs</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">column_map</span><span class="p">()</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_defs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
     <span class="c1"># first: make sure all entries are parsed</span>
     <span class="n">columns_used</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>

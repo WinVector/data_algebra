@@ -25,10 +25,6 @@ class OperatorPlatform:
         Build a map of column names to ColumnReferences
         """
         raise NotImplementedError("base class called")
-        res = collections.OrderedDict()
-        for ci in self.column_names:
-            res[ci] = data_algebra.expr_rep.ColumnReference(self, ci)
-        return res
 
     def eval(self, data_map, *, data_model=None, narrow=True):
         """
