@@ -935,8 +935,6 @@ class ExtendNode(ViewRepresentation):
         windowed_situation = data_algebra.expr_rep.implies_windowed(parsed_ops)
         ordered_windowed_situation = False
         self.ops = parsed_ops
-        self.cols_used_in_calc = data_algebra.expr_rep.get_columns_used(parsed_ops)
-        self.cols_produced_in_calc = [k for k in parsed_ops.keys()]
         if partition_by is None:
             partition_by = []
         if isinstance(partition_by, numbers.Number):
