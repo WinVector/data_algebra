@@ -26,19 +26,18 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         self.ops = None
         self.column_namespace = SimpleNamespace()  # allows a dot notation
         self.used_result = False
-        data_algebra.data_ops_types.OperatorPlatform.__init__(
-            self, node_name="container", column_map=collections.OrderedDict()
-        )
+        data_algebra.data_ops_types.OperatorPlatform.__init__(self, node_name="container")
 
     def set(self, other):
         assert isinstance(other, data_algebra.data_ops_types.OperatorPlatform)
         assert not isinstance(other, OpC)  # don't allow deep nesting for now
         self.ops = other
         self.column_namespace.__dict__.clear()
-        self.column_namespace.__dict__.update(self.ops.column_map)
-        self.column_map.clear()
-        self.column_map.update(self.ops.column_map)
+        self.column_namespace.__dict__.update(self.ops.column_map())
         return self
+
+    def column_map(self) -> collections.OrderedDict:
+        return self.ops.column_map()
 
     def start(self, other):
         assert self.ops is None

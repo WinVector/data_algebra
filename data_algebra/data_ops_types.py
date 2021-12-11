@@ -3,21 +3,32 @@ Type defs for data operations.
 """
 
 
+from typing import List
 import collections
 
 import data_algebra.expr_rep
 import data_algebra.cdata
+import data_algebra.OrderedSet
 
 
 class OperatorPlatform:
     """Abstract class representing ability to apply data_algebra operations."""
 
     node_name: str
-    column_map: collections.OrderedDict
 
-    def __init__(self, *, node_name, column_map):
+    def __init__(self, *, node_name: str):
+        assert isinstance(node_name, str)
         self.node_name = node_name
-        self.column_map = column_map.copy()
+
+    def column_map(self) -> collections.OrderedDict:
+        """
+        Build a map of column names to ColumnReferences
+        """
+        raise NotImplementedError("base class called")
+        res = collections.OrderedDict()
+        for ci in self.column_names:
+            res[ci] = data_algebra.expr_rep.ColumnReference(self, ci)
+        return res
 
     def eval(self, data_map, *, data_model=None, narrow=True):
         """

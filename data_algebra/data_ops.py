@@ -62,7 +62,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
        Abstract base class."""
 
     column_names: List[str]
-    column_set: data_algebra.OrderedSet.OrderedSet
+    column_set: data_algebra.OrderedSet.OrderedSet[str]
     column_types: Optional[Dict[str, type]]
     sources: List[
         "ViewRepresentation"
@@ -80,21 +80,14 @@ class ViewRepresentation(OperatorPlatform, ABC):
             column_names = [column_names]
         else:
             column_names = list(column_names)  # make sure a list and a disjoint copy
-        assert isinstance(column_names, list)
-        for v in column_names:
-            assert isinstance(v, str)
         self.column_names = column_names
-        if len(self.column_names) < 1:
-            raise ValueError("no column names")
+        assert len(self.column_names) > 0
+        for v in self.column_names:
+            assert isinstance(v, str)
         self.column_set = data_algebra.OrderedSet.OrderedSet()
         for c in self.column_names:
             self.column_set.add(c)
-        if not len(self.column_names) == len(self.column_set):
-            raise ValueError("duplicate column name(s)")
-        column_dict = {
-            ci: data_algebra.expr_rep.ColumnReference(self, ci)
-            for ci in self.column_names
-        }
+        assert len(self.column_names) == len(self.column_set)
         if sources is None:
             sources = []
         for si in sources:
@@ -103,10 +96,16 @@ class ViewRepresentation(OperatorPlatform, ABC):
         self.column_types = None
         if column_types is not None:
             self.column_types = column_types.copy()
-        OperatorPlatform.__init__(
-            self, node_name=node_name, column_map=collections.OrderedDict(**column_dict)
-        )
-        self._tables_cache = None
+        OperatorPlatform.__init__(self, node_name=node_name)
+
+    def column_map(self) -> collections.OrderedDict:
+        """
+        Build a map of column names to ColumnReferences
+        """
+        res = collections.OrderedDict()
+        for ci in self.column_names:
+            res[ci] = data_algebra.expr_rep.ColumnReference(self, ci)
+        return res
 
     def merged_rep_id(self) -> str:
         return "ops+ " + str(id(self))
@@ -138,8 +137,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
         """Get a dictionary of all tables used in an operator DAG,
         raise an exception if the values are not consistent."""
 
-        if self._tables_cache is not None:
-            return self._tables_cache
         tables = dict()
         # eliminate recursions by stepping through sources
         visit_stack = list()
@@ -159,7 +156,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
             else:
                 for s in cursor.sources:
                     visit_stack.append(s)
-        self._tables_cache = tables
         return tables
 
     def columns_used_from_sources(self, using=None):
@@ -266,8 +262,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
         if self.node_name != other.node_name:
             return False
         if self.column_names != other.column_names:
-            return False
-        if self.column_map != other.column_map:
             return False
         if len(self.sources) != len(other.sources):
             return False

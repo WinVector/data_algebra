@@ -24,7 +24,7 @@ def parse_assignments_in_context(*, ops, view):
         if opslen != len(ops):
             raise ValueError("ops keys must be unique")
     assert isinstance(ops, dict)
-    column_defs = view.column_map
+    column_defs = view.column_map()
     assert isinstance(column_defs, dict)
     # first: make sure all entries are parsed
     columns_used = set()
