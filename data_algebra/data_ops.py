@@ -475,7 +475,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             order_by = [order_by]
         if isinstance(reverse, str):
             reverse = [reverse]
-        parsed_ops = data_algebra.expr_parse.parse_assignments_in_context(ops, self)
+        parsed_ops = data_algebra.expr_parse.parse_assignments_in_context(ops=ops, view=self)
         return self.extend_parsed(
             parsed_ops=parsed_ops,
             partition_by=partition_by,
@@ -502,7 +502,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             group_by = []
         if ((ops is None) or (len(ops) < 1)) and (len(group_by) < 1):
             raise ValueError("must have ops or group_by")
-        parsed_ops = data_algebra.expr_parse.parse_assignments_in_context(ops, self)
+        parsed_ops = data_algebra.expr_parse.parse_assignments_in_context(ops=ops, view=self)
         return self.project_parsed(parsed_ops=parsed_ops, group_by=group_by)
 
     def natural_join(self, b, *, by, jointype, check_all_common_keys_in_by=False):
@@ -565,7 +565,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         assert isinstance(expr, (str, data_algebra.expr_rep.PreTerm))
         if self.is_trivial_when_intermediate():
             return self.sources[0].select_rows(expr)
-        ops = data_algebra.expr_parse.parse_assignments_in_context({"expr": expr}, self)
+        ops = data_algebra.expr_parse.parse_assignments_in_context(ops={"expr": expr}, view=self)
 
         def r_walk_expr(opv):
             if not isinstance(opv, data_algebra.expr_rep.Expression):

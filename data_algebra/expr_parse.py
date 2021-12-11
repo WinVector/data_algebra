@@ -8,7 +8,7 @@ import data_algebra.expr_rep
 import data_algebra.parse_by_lark
 
 
-def parse_assignments_in_context(ops, view):
+def parse_assignments_in_context(*, ops, view):
     """
     Convert all entries of ops map to Term-expressions
 
