@@ -62,17 +62,59 @@ def table_is_keyed_by_columns(table, column_names: Iterable[str]) -> bool:
     return max(counts) <= 1
 
 
-type_conversions = {
+# noinspection PyBroadException
+def _mk_type_coversion_table():
+    type_conversions = dict()
     # DeprecationWarning: `np.bool` is a deprecated alias for the builtin `bool`.
     # To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe.
     # If you specifically wanted the numpy scalar type, use `np.bool_` here.
     #   Deprecated in NumPy 1.20; for more details and guidance:
     #   https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
     # (note even numpy.bool_ triggers the above, or the triggering it is in pyspark right now
-    numpy.bool_: bool,
-    numpy.int64: int,
-    numpy.float64: float,
-}
+    try:
+        type_conversions[numpy.bool_] = bool
+    except Exception:
+        pass
+    try:
+        type_conversions[numpy.bool] = bool
+    except Exception:
+        pass
+    try:
+        type_conversions[numpy.int] = int
+    except Exception:
+        pass
+    try:
+        type_conversions[numpy.int_] = int
+    except Exception:
+        pass
+    try:
+        type_conversions[numpy.int64] = int
+    except Exception:
+        pass
+    try:
+        type_conversions[numpy.float64] = float
+    except Exception:
+        pass
+    try:
+        type_conversions[numpy.float] = float
+    except Exception:
+        pass
+    try:
+        type_conversions[numpy.float_] = float
+    except Exception:
+        pass
+    try:
+        type_conversions[numpy.str] = str
+    except Exception:
+        pass
+    try:
+        type_conversions[numpy.str_] = str
+    except Exception:
+        pass
+    return type_conversions
+
+
+type_conversions = _mk_type_coversion_table()
 
 
 def map_type_to_canonical(v: type) -> type:
