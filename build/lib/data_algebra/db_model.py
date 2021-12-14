@@ -761,8 +761,6 @@ class DBModel:
     def expr_to_sql(self, expression, *, want_inline_parens: bool = False) -> str:
         if isinstance(expression, str):
             return expression
-        if not isinstance(expression, data_algebra.expr_rep.PreTerm):
-            print("break")
         assert isinstance(expression, data_algebra.expr_rep.PreTerm)
         if isinstance(expression, data_algebra.expr_rep.Value):
             return self.value_to_sql(expression.value)
