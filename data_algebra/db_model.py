@@ -150,6 +150,22 @@ def _db_if_else_expr(dbmodel, expression):
     )
 
 
+def _db_mapv(dbmodel, expression):
+    if_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    mapping_dict = expression.args[1]
+    default_value_expr = dbmodel.expr_to_sql(expression.args[2], want_inline_parens=True)
+    terms = [
+        "WHEN " + dbmodel.value_to_sql(k) + " THEN " + dbmodel.value_to_sql(v) for k, v in mapping_dict.value.items()
+    ]
+    if len(terms) <= 0:
+        return default_value_expr
+    return (
+            "CASE" + " " + if_expr + " "
+            + " ".join(terms)
+            + " ELSE " + default_value_expr + " END"
+    )
+
+
 def _db_maximum_expr(dbmodel, expression):
     x_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     y_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
@@ -456,6 +472,7 @@ db_expr_formatters = {
     "ceil": _db_ceil_expr,
     "**": _db_pow_expr,
     "nunique": _db_nunique_expr,
+    "mapv": _db_mapv,
     # fns that had been in bigquery_user_fns
     "as_int64": _as_int64,
     "as_str": _as_str,
@@ -744,6 +761,8 @@ class DBModel:
     def expr_to_sql(self, expression, *, want_inline_parens: bool = False) -> str:
         if isinstance(expression, str):
             return expression
+        if not isinstance(expression, data_algebra.expr_rep.PreTerm):
+            print("break")
         assert isinstance(expression, data_algebra.expr_rep.PreTerm)
         if isinstance(expression, data_algebra.expr_rep.Value):
             return self.value_to_sql(expression.value)

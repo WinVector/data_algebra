@@ -600,6 +600,17 @@ class Term(PreTerm, ABC):
     def co_equalizer(self, x):
         return self.__op_expr__("co_equalizer", x, inline=False, method=True)
 
+    def mapv(self, value_map, default_value):
+        """
+        Map values.
+        """
+
+        assert isinstance(value_map, DictTerm)
+        assert isinstance(default_value, Value)
+        return self.__triop_expr__(
+            "mapv", x=value_map, y=default_value, inline=False, method=True
+        )
+
     # fns that had been in bigquery_user_fns
 
     def as_int64(self):
@@ -786,6 +797,44 @@ class ListTerm(PreTerm):
     def get_column_names(self, columns_seen):
         for ti in self.value:
             ti.get_column_names(columns_seen)
+
+
+class DictTerm(PreTerm):
+    # derived from PreTerm as this is not combinable
+    # only holds values
+    def __init__(self, value):
+        assert isinstance(value, dict)
+        self.value = value.copy()
+        PreTerm.__init__(self)
+
+    def is_equal(self, other):
+        # can't use == as that builds a larger expression
+        if not isinstance(other, DictTerm):
+            return False
+        return self.value == other.value
+
+    def get_views(self):
+        views = list()
+        return views
+
+    def replace_view(self, view):
+        return DictTerm(self.value)
+
+    def evaluate(self, data_frame):
+        return self.value.copy()
+
+    def to_python(self, *, want_inline_parens: bool = False) -> PythonText:
+        def li_to_python(value):
+            try:
+                return str(value.to_python(want_inline_parens=False))
+            except AttributeError:
+                return value.__repr__()
+
+        terms = [li_to_python(k) + ': ' + li_to_python(v) for k, v in self.value.items()]
+        return PythonText("{" + ", ".join(terms) + "}", is_in_parens=False)
+
+    def get_column_names(self, columns_seen):
+        pass
 
 
 def enc_value(value):

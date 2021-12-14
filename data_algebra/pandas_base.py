@@ -105,6 +105,28 @@ def _type_safe_is_in(a, b):
     return numpy.isin(a, b)
 
 
+def _map_v(a, value_map, default_value):
+    if len(value_map) > 0:
+        type_a = data_algebra.util.guess_carried_scalar_type(a)
+        type_v = {data_algebra.util.map_type_to_canonical(type(v)) for v in value_map.keys()}
+        if len(type_v) > 1:
+            raise TypeError(f"multiple types in dictionary: {type_v}")
+        type_v = list(type_v)[0]
+        if not data_algebra.util.compatible_types([type_a, type_v]):
+            raise TypeError(f"can't map {type_a} from a dict of {type_v}'s")
+        # TODO: also check values types and default_value same as such
+    # TODO: change to Pandas map
+    # https://pandas.pydata.org/docs/reference/api/pandas.Series.map.html
+
+    def lk(k):
+        try:
+            return value_map[k]
+        except KeyError:
+            return default_value
+
+    return numpy.array([lk(k) for k in a])
+
+
 def _k_and(*args):
     res = args[0]
     for i in range(1, len(args)):
@@ -178,6 +200,7 @@ def populate_impl_map(data_model):
         "co_equalizer": lambda a, b: data_algebra.connected_components.connected_components(
             a, b
         ),
+        "mapv": _map_v,
         # fns that had been in bigquery_user_fns
         # x is a pandas Series
         "as_int64": lambda x: x.astype("int64").copy(),
