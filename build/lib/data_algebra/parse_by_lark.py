@@ -207,6 +207,7 @@ def _walk_lark_tree(op, *, data_def=None) -> data_algebra.expr_rep.Term:
                 op_name = "__eq__"
                 return getattr(left, op_name)(data_algebra.expr_rep.Value(False))
             if r_op.data in ["list", "tuple", "set"]:
+                assert len(r_op.children) == 1
                 op_values = [_r_walk_lark_tree(vi) for vi in r_op.children[0].children]
                 # check all args are values, not None, same type
                 assert all(
@@ -219,6 +220,19 @@ def _walk_lark_tree(op, *, data_def=None) -> data_algebra.expr_rep.Term:
                 ]
                 assert len(observed_types) == 1
                 return data_algebra.expr_rep.ListTerm(op_values)
+            if r_op.data == 'dict':
+                assert len(r_op.children) == 1
+                op_values = [_r_walk_lark_tree(vi) for vi in r_op.children[0].children]
+                combined = dict()
+                for s in op_values:
+                    for k, v in s.value.items():
+                        combined[k] = v
+                return data_algebra.expr_rep.DictTerm(combined)
+            if r_op.data == 'key_value':
+                assert len(r_op.children) == 2
+                k = _r_walk_lark_tree(r_op.children[0])
+                v = _r_walk_lark_tree(r_op.children[1])
+                return data_algebra.expr_rep.DictTerm({k.value: v.value})
             if r_op.data == "expr_stmt":
                 raise ValueError("Error must use == for comparison, not =")
             raise ValueError("unexpected/not-allowed lark Tree kind: " + str(r_op.data))

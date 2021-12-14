@@ -283,6 +283,9 @@
                                 <a class="function" href="#Term.co_equalizer">co_equalizer</a>
                         </li>
                         <li>
+                                <a class="function" href="#Term.mapv">mapv</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#Term.as_int64">as_int64</a>
                         </li>
                         <li>
@@ -404,6 +407,33 @@
                         </li>
                         <li>
                                 <a class="function" href="#ListTerm.get_column_names">get_column_names</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#DictTerm">DictTerm</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#DictTerm.__init__">DictTerm</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#DictTerm.is_equal">is_equal</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#DictTerm.get_views">get_views</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#DictTerm.replace_view">replace_view</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#DictTerm.evaluate">evaluate</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#DictTerm.to_python">to_python</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#DictTerm.get_column_names">get_column_names</a>
                         </li>
                 </ul>
 
@@ -1098,6 +1128,17 @@
     <span class="k">def</span> <span class="nf">co_equalizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;co_equalizer&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">mapv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_map</span><span class="p">,</span> <span class="n">default_value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Map values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_map</span><span class="p">,</span> <span class="n">DictTerm</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_value</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span>
+            <span class="s2">&quot;mapv&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">value_map</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">default_value</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
     <span class="c1"># fns that had been in bigquery_user_fns</span>
 
     <span class="k">def</span> <span class="nf">as_int64</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1284,6 +1325,44 @@
     <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">ti</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
             <span class="n">ti</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">(</span><span class="n">columns_seen</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">DictTerm</span><span class="p">(</span><span class="n">PreTerm</span><span class="p">):</span>
+    <span class="c1"># derived from PreTerm as this is not combinable</span>
+    <span class="c1"># only holds values</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">PreTerm</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">is_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="c1"># can&#39;t use == as that builds a larger expression</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">DictTerm</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">views</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">views</span>
+
+    <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">DictTerm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">li_to_python</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
+
+        <span class="n">terms</span> <span class="o">=</span> <span class="p">[</span><span class="n">li_to_python</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span> <span class="o">+</span> <span class="n">li_to_python</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
+        <span class="k">pass</span>
 
 
 <span class="k">def</span> <span class="nf">enc_value</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
@@ -2274,6 +2353,17 @@ str() method returns only the text for interoperability.</p>
 
     <span class="k">def</span> <span class="nf">co_equalizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;co_equalizer&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">mapv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_map</span><span class="p">,</span> <span class="n">default_value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Map values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_map</span><span class="p">,</span> <span class="n">DictTerm</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_value</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span>
+            <span class="s2">&quot;mapv&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">value_map</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">default_value</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
 
     <span class="c1"># fns that had been in bigquery_user_fns</span>
 
@@ -3696,6 +3786,35 @@ str() method returns only the text for interoperability.</p>
     
 
                             </div>
+                            <div id="Term.mapv" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Term.mapv">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">mapv</span><span class="signature">(self, value_map, default_value)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">mapv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_map</span><span class="p">,</span> <span class="n">default_value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Map values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_map</span><span class="p">,</span> <span class="n">DictTerm</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_value</span><span class="p">,</span> <span class="n">Value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__triop_expr__</span><span class="p">(</span>
+            <span class="s2">&quot;mapv&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">value_map</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">default_value</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Map values.</p>
+</div>
+
+
+                            </div>
                             <div id="Term.as_int64" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#Term.as_int64">#&nbsp;&nbsp</a>
 
@@ -4384,6 +4503,7 @@ str() method returns only the text for interoperability.</p>
                 <dd id="Value.concat" class="function"><a href="#Term.concat">concat</a></dd>
                 <dd id="Value.coalesce" class="function"><a href="#Term.coalesce">coalesce</a></dd>
                 <dd id="Value.co_equalizer" class="function"><a href="#Term.co_equalizer">co_equalizer</a></dd>
+                <dd id="Value.mapv" class="function"><a href="#Term.mapv">mapv</a></dd>
                 <dd id="Value.as_int64" class="function"><a href="#Term.as_int64">as_int64</a></dd>
                 <dd id="Value.as_str" class="function"><a href="#Term.as_str">as_str</a></dd>
                 <dd id="Value.trimstr" class="function"><a href="#Term.trimstr">trimstr</a></dd>
@@ -4794,6 +4914,230 @@ errors defaults to 'strict'.</p>
                                 </dl>
                             </div>
                 </section>
+                <section id="DictTerm">
+                                <div class="attr class">
+        <a class="headerlink" href="#DictTerm">#&nbsp;&nbsp</a>
+
+        
+        <span class="def">class</span>
+        <span class="name">DictTerm</span><wbr>(<span class="base"><a href="#PreTerm">PreTerm</a></span>):
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">DictTerm</span><span class="p">(</span><span class="n">PreTerm</span><span class="p">):</span>
+    <span class="c1"># derived from PreTerm as this is not combinable</span>
+    <span class="c1"># only holds values</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">PreTerm</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">is_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="c1"># can&#39;t use == as that builds a larger expression</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">DictTerm</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">views</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">views</span>
+
+    <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">DictTerm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">li_to_python</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
+
+        <span class="n">terms</span> <span class="o">=</span> <span class="p">[</span><span class="n">li_to_python</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span> <span class="o">+</span> <span class="n">li_to_python</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
+        <span class="k">pass</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>abstract base class, without combination ability</p>
+</div>
+
+
+                            <div id="DictTerm.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DictTerm.__init__">#&nbsp;&nbsp</a>
+
+        
+            <span class="name">DictTerm</span><span class="signature">(value)</span>
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">PreTerm</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="DictTerm.is_equal" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DictTerm.is_equal">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">is_equal</span><span class="signature">(self, other)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">is_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="c1"># can&#39;t use == as that builds a larger expression</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">DictTerm</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="DictTerm.get_views" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DictTerm.get_views">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">get_views</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">views</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">views</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>return list of unique views, expectation list is of size zero or one</p>
+</div>
+
+
+                            </div>
+                            <div id="DictTerm.replace_view" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DictTerm.replace_view">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">replace_view</span><span class="signature">(self, view)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">replace_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">DictTerm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="DictTerm.evaluate" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DictTerm.evaluate">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">evaluate</span><span class="signature">(self, data_frame)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="DictTerm.to_python" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DictTerm.to_python">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">to_python</span><span class="signature">(
+    self,
+    *,
+    want_inline_parens: bool = False
+) -&gt; <a href="#PythonText">data_algebra.expr_rep.PythonText</a></span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PythonText</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">li_to_python</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">to_python</span><span class="p">(</span><span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
+
+        <span class="n">terms</span> <span class="o">=</span> <span class="p">[</span><span class="n">li_to_python</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span> <span class="o">+</span> <span class="n">li_to_python</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+        <span class="k">return</span> <span class="n">PythonText</span><span class="p">(</span><span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span><span class="p">,</span> <span class="n">is_in_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Convert parsed expression into a string</p>
+
+<p>:param want_inline_parens: bool if True put parens around complex expressions that don't already have a grouper.</p>
+</div>
+
+
+                            </div>
+                            <div id="DictTerm.get_column_names" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DictTerm.get_column_names">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">get_column_names</span><span class="signature">(self, columns_seen)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_seen</span><span class="p">):</span>
+        <span class="k">pass</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Add column names to columns_seen
+:param columns_seen: set of strings
+:return:</p>
+</div>
+
+
+                            </div>
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#PreTerm">PreTerm</a></dt>
+                                <dd id="DictTerm.to_source" class="function"><a href="#PreTerm.to_source">to_source</a></dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
                 <section id="enc_value">
                             <div class="attr function"><a class="headerlink" href="#enc_value">#&nbsp;&nbsp</a>
 
@@ -5117,6 +5461,7 @@ errors defaults to 'strict'.</p>
                 <dd id="ColumnReference.concat" class="function"><a href="#Term.concat">concat</a></dd>
                 <dd id="ColumnReference.coalesce" class="function"><a href="#Term.coalesce">coalesce</a></dd>
                 <dd id="ColumnReference.co_equalizer" class="function"><a href="#Term.co_equalizer">co_equalizer</a></dd>
+                <dd id="ColumnReference.mapv" class="function"><a href="#Term.mapv">mapv</a></dd>
                 <dd id="ColumnReference.as_int64" class="function"><a href="#Term.as_int64">as_int64</a></dd>
                 <dd id="ColumnReference.as_str" class="function"><a href="#Term.as_str">as_str</a></dd>
                 <dd id="ColumnReference.trimstr" class="function"><a href="#Term.trimstr">trimstr</a></dd>
@@ -5610,6 +5955,7 @@ errors defaults to 'strict'.</p>
                 <dd id="Expression.concat" class="function"><a href="#Term.concat">concat</a></dd>
                 <dd id="Expression.coalesce" class="function"><a href="#Term.coalesce">coalesce</a></dd>
                 <dd id="Expression.co_equalizer" class="function"><a href="#Term.co_equalizer">co_equalizer</a></dd>
+                <dd id="Expression.mapv" class="function"><a href="#Term.mapv">mapv</a></dd>
                 <dd id="Expression.as_int64" class="function"><a href="#Term.as_int64">as_int64</a></dd>
                 <dd id="Expression.as_str" class="function"><a href="#Term.as_str">as_str</a></dd>
                 <dd id="Expression.trimstr" class="function"><a href="#Term.trimstr">trimstr</a></dd>
