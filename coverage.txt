@@ -121,14 +121,14 @@ data_algebra/expr_rep.py                 650    114    82%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 170      4    98%
 data_algebra/op_container.py             121     46    62%
-data_algebra/pandas_base.py              422     39    91%
+data_algebra/pandas_base.py              420     39    91%
 data_algebra/pandas_model.py               5      0   100%
 data_algebra/parse_by_lark.py            157     25    84%
 data_algebra/python3_lark.py               1      0   100%
 data_algebra/test_util.py                215     42    80%
 data_algebra/util.py                     137     26    81%
 ----------------------------------------------------------
-TOTAL                                   5095    896    82%
+TOTAL                                   5093    896    82%
 
 
-============================= 232 passed in 24.06s =============================
+============================= 232 passed in 23.97s =============================

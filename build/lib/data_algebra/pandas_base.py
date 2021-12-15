@@ -97,7 +97,7 @@ def _type_safe_is_in(a, b):
     if len(b) > 0:
         type_a = data_algebra.util.guess_carried_scalar_type(a)
         type_b = {data_algebra.util.map_type_to_canonical(type(v)) for v in b}
-        if len(type_b) > 1:
+        if not data_algebra.util.compatible_types(type_b):
             raise TypeError(f"multiple types in set: {type_b}")
         type_b = list(type_b)[0]
         if not data_algebra.util.compatible_types([type_a, type_b]):
@@ -106,31 +106,27 @@ def _type_safe_is_in(a, b):
 
 
 def _map_v(a, value_map, default_value):
+    # TODO: copy these checks closer to construction if practical
     if len(value_map) > 0:
         type_a = data_algebra.util.guess_carried_scalar_type(a)
         type_k = {data_algebra.util.map_type_to_canonical(type(v)) for v in value_map.keys()}
-        if len(type_k) > 1:
-            raise TypeError(f"multiple types in dictionary keys: {type_k}")
+        if not data_algebra.util.compatible_types(type_k):
+            raise TypeError(f"multiple types in dictionary keys: {type_k} in mapv()")
         type_k = list(type_k)[0]
         if not data_algebra.util.compatible_types([type_a, type_k]):
-            raise TypeError(f"can't map {type_a} from a dict of {type_k}'s")
+            raise TypeError(f"can't map {type_a} from a dict of {type_k}'s in mapv()")
         type_v = {data_algebra.util.map_type_to_canonical(type(v)) for v in value_map.values()}
         if not data_algebra.util.compatible_types(type_v):
-            raise TypeError(f"multiple types in dictionary values: {type_v}")
+            raise TypeError(f"multiple types in dictionary values: {type_v} in mapv()")
         type_v = list(type_v)[0]
         type_d = data_algebra.util.guess_carried_scalar_type(default_value)
         if not data_algebra.util.compatible_types([type_d, type_v]):
             raise TypeError(f"default is {type_d} for {type_v} values in mapv()'s")
-    # TODO: change to Pandas map
     # https://pandas.pydata.org/docs/reference/api/pandas.Series.map.html
-
-    def lk(k):
-        try:
-            return value_map[k]
-        except KeyError:
-            return default_value
-
-    return numpy.array([lk(k) for k in a])
+    a = data_algebra.default_data_model.pd.Series(a)
+    a = a.map(value_map, na_action='ignore')
+    a[data_algebra.default_data_model.bad_column_positions(a)] = default_value
+    return numpy.array(a.values)
 
 
 def _k_and(*args):
