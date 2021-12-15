@@ -206,7 +206,7 @@ def _walk_lark_tree(op, *, data_def=None) -> data_algebra.expr_rep.Term:
                 left = _r_walk_lark_tree(r_op.children[0])
                 op_name = "__eq__"
                 return getattr(left, op_name)(data_algebra.expr_rep.Value(False))
-            if r_op.data in ["list", "tuple", "set"]:
+            if r_op.data in ["list", "tuple", "set"]:  # any collection
                 assert len(r_op.children) == 1
                 op_values = [_r_walk_lark_tree(vi) for vi in r_op.children[0].children]
                 # check all args are values, not None, same type
@@ -218,7 +218,7 @@ def _walk_lark_tree(op, *, data_def=None) -> data_algebra.expr_rep.Term:
                 observed_types = [
                     data_algebra.util.map_type_to_canonical(v) for v in observed_types
                 ]
-                assert len(observed_types) == 1
+                assert data_algebra.util.compatible_types(observed_types)
                 return data_algebra.expr_rep.ListTerm(op_values)
             if r_op.data == 'dict':
                 assert len(r_op.children) == 1
@@ -226,11 +226,19 @@ def _walk_lark_tree(op, *, data_def=None) -> data_algebra.expr_rep.Term:
                 combined = dict()
                 for s in op_values:
                     for k, v in s.value.items():
+                        assert k is not None
                         combined[k] = v
+                type_k = {data_algebra.util.map_type_to_canonical(type(v)) for v in combined.keys()}
+                if not data_algebra.util.compatible_types(type_k):
+                    raise TypeError(f"multiple types in dictionary keys: {type_k} in dict")
+                type_v = {data_algebra.util.map_type_to_canonical(type(v)) for v in combined.values()}
+                if not data_algebra.util.compatible_types(type_v):
+                    raise TypeError(f"multiple types in dictionary values: {type_v} in dict")
                 return data_algebra.expr_rep.DictTerm(combined)
             if r_op.data == 'key_value':
                 assert len(r_op.children) == 2
                 k = _r_walk_lark_tree(r_op.children[0])
+                assert k is not None
                 v = _r_walk_lark_tree(r_op.children[1])
                 return data_algebra.expr_rep.DictTerm({k.value: v.value})
             if r_op.data == "expr_stmt":

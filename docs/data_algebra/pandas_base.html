@@ -231,7 +231,6 @@
 
 
 <span class="k">def</span> <span class="nf">_map_v</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">value_map</span><span class="p">,</span> <span class="n">default_value</span><span class="p">):</span>
-    <span class="c1"># TODO: copy these checks closer to construction if practical</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value_map</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">type_a</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_carried_scalar_type</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
         <span class="n">type_k</span> <span class="o">=</span> <span class="p">{</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">map_type_to_canonical</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value_map</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>

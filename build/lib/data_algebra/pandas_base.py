@@ -106,7 +106,6 @@ def _type_safe_is_in(a, b):
 
 
 def _map_v(a, value_map, default_value):
-    # TODO: copy these checks closer to construction if practical
     if len(value_map) > 0:
         type_a = data_algebra.util.guess_carried_scalar_type(a)
         type_k = {data_algebra.util.map_type_to_canonical(type(v)) for v in value_map.keys()}
