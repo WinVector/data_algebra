@@ -108,13 +108,19 @@ def _type_safe_is_in(a, b):
 def _map_v(a, value_map, default_value):
     if len(value_map) > 0:
         type_a = data_algebra.util.guess_carried_scalar_type(a)
-        type_v = {data_algebra.util.map_type_to_canonical(type(v)) for v in value_map.keys()}
-        if len(type_v) > 1:
-            raise TypeError(f"multiple types in dictionary: {type_v}")
+        type_k = {data_algebra.util.map_type_to_canonical(type(v)) for v in value_map.keys()}
+        if len(type_k) > 1:
+            raise TypeError(f"multiple types in dictionary keys: {type_k}")
+        type_k = list(type_k)[0]
+        if not data_algebra.util.compatible_types([type_a, type_k]):
+            raise TypeError(f"can't map {type_a} from a dict of {type_k}'s")
+        type_v = {data_algebra.util.map_type_to_canonical(type(v)) for v in value_map.values()}
+        if not data_algebra.util.compatible_types(type_v):
+            raise TypeError(f"multiple types in dictionary values: {type_v}")
         type_v = list(type_v)[0]
-        if not data_algebra.util.compatible_types([type_a, type_v]):
-            raise TypeError(f"can't map {type_a} from a dict of {type_v}'s")
-        # TODO: also check values types and default_value same as such
+        type_d = data_algebra.util.guess_carried_scalar_type(default_value)
+        if not data_algebra.util.compatible_types([type_d, type_v]):
+            raise TypeError(f"default is {type_d} for {type_v} values in mapv()'s")
     # TODO: change to Pandas map
     # https://pandas.pydata.org/docs/reference/api/pandas.Series.map.html
 
