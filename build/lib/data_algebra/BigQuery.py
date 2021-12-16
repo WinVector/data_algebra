@@ -66,7 +66,7 @@ class BigQueryModel(data_algebra.db_model.DBModel):
         )
         self.table_prefix = table_prefix
 
-    def quote_table_name(self, table_description):
+    def get_table_name(self, table_description):
         if not isinstance(table_description, str):
             try:
                 if table_description.node_name == "TableDescription":
@@ -81,7 +81,11 @@ class BigQueryModel(data_algebra.db_model.DBModel):
                 )
         if self.table_prefix is not None:
             table_description = self.table_prefix + "." + table_description
-        return self.quote_identifier(table_description)
+        return table_description
+
+    def quote_table_name(self, table_description):
+        table_name = self.get_table_name(table_description)
+        return self.quote_identifier(table_name)
 
     # noinspection PyMethodMayBeStatic
     def execute(self, conn, q):

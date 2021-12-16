@@ -1986,6 +1986,7 @@ class ConvertRecordsNode(ViewRepresentation):
             )
             near_sql = data_algebra.near_sql.NearSQLRawQStep(
                 prefix=pi,
+                query_name=view_name,
                 quoted_query_name=db_model.quote_identifier(view_name),
                 sub_sql=data_algebra.near_sql.NearSQLContainer(near_sql=near_sql),
                 suffix=si,
@@ -2000,6 +2001,7 @@ class ConvertRecordsNode(ViewRepresentation):
             )
             near_sql = data_algebra.near_sql.NearSQLRawQStep(
                 prefix=pi,
+                query_name=view_name,
                 quoted_query_name=db_model.quote_identifier(view_name),
                 sub_sql=data_algebra.near_sql.NearSQLContainer(near_sql=near_sql),
                 suffix=si,
@@ -2064,10 +2066,10 @@ class SQLNode(ViewRepresentation):
     def to_near_sql_implementation(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
-        quoted_query_name = None
         quoted_query_name = db_model.quote_identifier(self.view_name)
         near_sql = data_algebra.near_sql.NearSQLRawQStep(
             prefix=self.sql,
+            query_name=self.view_name,
             quoted_query_name=quoted_query_name,
             sub_sql=None,
             suffix=None,

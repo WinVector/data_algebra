@@ -37,6 +37,9 @@
                                 <a class="function" href="#BigQueryModel.__init__">BigQueryModel</a>
                         </li>
                         <li>
+                                <a class="function" href="#BigQueryModel.get_table_name">get_table_name</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#BigQueryModel.quote_table_name">quote_table_name</a>
                         </li>
                         <li>
@@ -159,7 +162,7 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">table_prefix</span> <span class="o">=</span> <span class="n">table_prefix</span>
 
-    <span class="k">def</span> <span class="nf">quote_table_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_description</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_table_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_description</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_description</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">table_description</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span>
@@ -174,7 +177,11 @@
                 <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">table_description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_prefix</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">table_description</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">table_description</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">table_description</span>
+
+    <span class="k">def</span> <span class="nf">quote_table_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_description</span><span class="p">):</span>
+        <span class="n">table_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_table_name</span><span class="p">(</span><span class="n">table_description</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyMethodMayBeStatic</span>
     <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
@@ -346,7 +353,7 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">table_prefix</span> <span class="o">=</span> <span class="n">table_prefix</span>
 
-    <span class="k">def</span> <span class="nf">quote_table_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_description</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_table_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_description</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_description</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">table_description</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span>
@@ -361,7 +368,11 @@
                 <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">table_description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_prefix</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">table_description</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">table_description</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">table_description</span>
+
+    <span class="k">def</span> <span class="nf">quote_table_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_description</span><span class="p">):</span>
+        <span class="n">table_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_table_name</span><span class="p">(</span><span class="n">table_description</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyMethodMayBeStatic</span>
     <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
@@ -459,17 +470,17 @@ connection should be google.cloud.bigquery.client.Client</p>
     
 
                             </div>
-                            <div id="BigQueryModel.quote_table_name" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#BigQueryModel.quote_table_name">#&nbsp;&nbsp</a>
+                            <div id="BigQueryModel.get_table_name" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#BigQueryModel.get_table_name">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">quote_table_name</span><span class="signature">(self, table_description)</span>:
+            <span class="name">get_table_name</span><span class="signature">(self, table_description)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">quote_table_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_description</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_table_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_description</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_description</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">table_description</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span>
@@ -484,7 +495,27 @@ connection should be google.cloud.bigquery.client.Client</p>
                 <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">table_description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_prefix</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">table_description</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">table_description</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">table_description</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="BigQueryModel.quote_table_name" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#BigQueryModel.quote_table_name">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">quote_table_name</span><span class="signature">(self, table_description)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">quote_table_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_description</span><span class="p">):</span>
+        <span class="n">table_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_table_name</span><span class="p">(</span><span class="n">table_description</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
 </pre></div>
 
         </details>

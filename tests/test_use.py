@@ -73,5 +73,6 @@ def test_use_2():
 
     data_algebra.test_util.check_transform(
         ops, data={"d1": d1, "d2": d2}, expect=expect,
-        models_to_skip={str(data_algebra.MySQL.MySQLModel())})
+        models_to_skip={str(data_algebra.MySQL.MySQLModel())},
+    )
     # MySQL seems to not handle `a`.`b` as a qualified column name

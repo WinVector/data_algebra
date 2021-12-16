@@ -2483,6 +2483,7 @@
             <span class="p">)</span>
             <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLRawQStep</span><span class="p">(</span>
                 <span class="n">prefix</span><span class="o">=</span><span class="n">pi</span><span class="p">,</span>
+                <span class="n">query_name</span><span class="o">=</span><span class="n">view_name</span><span class="p">,</span>
                 <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">near_sql</span><span class="p">),</span>
                 <span class="n">suffix</span><span class="o">=</span><span class="n">si</span><span class="p">,</span>
@@ -2497,6 +2498,7 @@
             <span class="p">)</span>
             <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLRawQStep</span><span class="p">(</span>
                 <span class="n">prefix</span><span class="o">=</span><span class="n">pi</span><span class="p">,</span>
+                <span class="n">query_name</span><span class="o">=</span><span class="n">view_name</span><span class="p">,</span>
                 <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">near_sql</span><span class="p">),</span>
                 <span class="n">suffix</span><span class="o">=</span><span class="n">si</span><span class="p">,</span>
@@ -2561,10 +2563,10 @@
     <span class="k">def</span> <span class="nf">to_near_sql_implementation</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
-        <span class="n">quoted_query_name</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">quoted_query_name</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">view_name</span><span class="p">)</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLRawQStep</span><span class="p">(</span>
             <span class="n">prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="p">,</span>
+            <span class="n">query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">view_name</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">,</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -8735,6 +8737,7 @@ with the using columns (None means all).</p>
             <span class="p">)</span>
             <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLRawQStep</span><span class="p">(</span>
                 <span class="n">prefix</span><span class="o">=</span><span class="n">pi</span><span class="p">,</span>
+                <span class="n">query_name</span><span class="o">=</span><span class="n">view_name</span><span class="p">,</span>
                 <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">near_sql</span><span class="p">),</span>
                 <span class="n">suffix</span><span class="o">=</span><span class="n">si</span><span class="p">,</span>
@@ -8749,6 +8752,7 @@ with the using columns (None means all).</p>
             <span class="p">)</span>
             <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLRawQStep</span><span class="p">(</span>
                 <span class="n">prefix</span><span class="o">=</span><span class="n">pi</span><span class="p">,</span>
+                <span class="n">query_name</span><span class="o">=</span><span class="n">view_name</span><span class="p">,</span>
                 <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">near_sql</span><span class="p">),</span>
                 <span class="n">suffix</span><span class="o">=</span><span class="n">si</span><span class="p">,</span>
@@ -8920,6 +8924,7 @@ with the using columns (None means all).</p>
             <span class="p">)</span>
             <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLRawQStep</span><span class="p">(</span>
                 <span class="n">prefix</span><span class="o">=</span><span class="n">pi</span><span class="p">,</span>
+                <span class="n">query_name</span><span class="o">=</span><span class="n">view_name</span><span class="p">,</span>
                 <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">near_sql</span><span class="p">),</span>
                 <span class="n">suffix</span><span class="o">=</span><span class="n">si</span><span class="p">,</span>
@@ -8934,6 +8939,7 @@ with the using columns (None means all).</p>
             <span class="p">)</span>
             <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLRawQStep</span><span class="p">(</span>
                 <span class="n">prefix</span><span class="o">=</span><span class="n">pi</span><span class="p">,</span>
+                <span class="n">query_name</span><span class="o">=</span><span class="n">view_name</span><span class="p">,</span>
                 <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="n">view_name</span><span class="p">),</span>
                 <span class="n">sub_sql</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLContainer</span><span class="p">(</span><span class="n">near_sql</span><span class="o">=</span><span class="n">near_sql</span><span class="p">),</span>
                 <span class="n">suffix</span><span class="o">=</span><span class="n">si</span><span class="p">,</span>
@@ -9079,10 +9085,10 @@ with the using columns (None means all).</p>
     <span class="k">def</span> <span class="nf">to_near_sql_implementation</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
-        <span class="n">quoted_query_name</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">quoted_query_name</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">view_name</span><span class="p">)</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLRawQStep</span><span class="p">(</span>
             <span class="n">prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="p">,</span>
+            <span class="n">query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">view_name</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">,</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -9251,10 +9257,10 @@ with the using columns (None means all).</p>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_near_sql_implementation</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">:</span>
-        <span class="n">quoted_query_name</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">quoted_query_name</span> <span class="o">=</span> <span class="n">db_model</span><span class="o">.</span><span class="n">quote_identifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">view_name</span><span class="p">)</span>
         <span class="n">near_sql</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQLRawQStep</span><span class="p">(</span>
             <span class="n">prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="p">,</span>
+            <span class="n">query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">view_name</span><span class="p">,</span>
             <span class="n">quoted_query_name</span><span class="o">=</span><span class="n">quoted_query_name</span><span class="p">,</span>
             <span class="n">sub_sql</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>

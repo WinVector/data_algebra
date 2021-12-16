@@ -42,8 +42,22 @@ class NearSQL(ABC):
     Represent SQL queries in a mostly string-form
     """
 
-    def __init__(self, *, terms, quoted_query_name, is_table=False, annotation=None):
+    terms: Optional[dict]
+    query_name: Optional[str]
+    quoted_query_name: str
+    is_table: bool = False
+    annotation: Optional[str] = None
+
+    def __init__(
+            self,
+            *,
+            terms: Optional[dict],
+            query_name: Optional[str] = None,
+            quoted_query_name: str,
+            is_table: bool = False,
+            annotation: Optional[str] = None):
         assert isinstance(terms, (dict, type(None)))
+        assert isinstance(query_name, (str, type(None)))
         assert isinstance(quoted_query_name, str)
         assert isinstance(is_table, bool)
         assert isinstance(annotation, (str, type(None)))
@@ -52,6 +66,7 @@ class NearSQL(ABC):
             assert isinstance(terms, dict)
             if len(terms) > 0:
                 self.terms = terms.copy()
+        self.query_name = query_name
         self.quoted_query_name = quoted_query_name
         self.is_table = is_table
         self.annotation = annotation
@@ -135,7 +150,8 @@ class NearSQLContainer:
                 ))
             stub = NearSQLContainer(
                 near_sql=NearSQLCommonTableExpression(
-                    quoted_query_name=stub.quoted_query_name
+                    query_name=stub.query_name,
+                    quoted_query_name=stub.quoted_query_name,
                 ),
                 force_sql=self.force_sql,
             )
@@ -143,9 +159,13 @@ class NearSQLContainer:
 
 
 class NearSQLNamedEntity(NearSQL):
-    def __init__(self, *, terms, quoted_query_name):
+    def __init__(self, *, terms, query_name, quoted_query_name):
         NearSQL.__init__(
-            self, terms=terms, quoted_query_name=quoted_query_name, is_table=True,
+            self,
+            terms=terms,
+            query_name=query_name,
+            quoted_query_name=quoted_query_name,
+            is_table=True,
         )
 
     def to_with_form(self) -> SQLWithList:
@@ -158,8 +178,8 @@ class NearSQLNamedEntity(NearSQL):
 
 
 class NearSQLCommonTableExpression(NearSQLNamedEntity):
-    def __init__(self, *, quoted_query_name):
-        NearSQLNamedEntity.__init__(self, terms=None, quoted_query_name=quoted_query_name)
+    def __init__(self, *, query_name, quoted_query_name):
+        NearSQLNamedEntity.__init__(self, terms=None, query_name=query_name, quoted_query_name=quoted_query_name)
 
     def to_sql_str_list(
         self,
@@ -180,8 +200,9 @@ class NearSQLCommonTableExpression(NearSQLNamedEntity):
 
 
 class NearSQLTable(NearSQLNamedEntity):
-    def __init__(self, *, terms, quoted_query_name, quoted_table_name):
-        NearSQLNamedEntity.__init__(self, terms=terms, quoted_query_name=quoted_query_name)
+    def __init__(self, *, terms, table_name, quoted_table_name):
+        NearSQLNamedEntity.__init__(self, terms=terms, query_name=table_name, quoted_query_name=quoted_table_name)
+        self.table_name = table_name
         self.quoted_table_name = quoted_table_name
 
     def to_sql_str_list(
@@ -207,6 +228,7 @@ class NearSQLUnaryStep(NearSQL):
         self,
         *,
         terms,
+        query_name,
         quoted_query_name,
         sub_sql,
         suffix=None,
@@ -222,6 +244,7 @@ class NearSQLUnaryStep(NearSQL):
         NearSQL.__init__(
             self,
             terms=terms,
+            query_name=query_name,
             quoted_query_name=quoted_query_name,
             annotation=annotation,
         )
@@ -259,6 +282,7 @@ class NearSQLUnaryStep(NearSQL):
         stub, sequence = self.sub_sql.to_with_form_stub()
         stubbed_step = NearSQLUnaryStep(
             terms=self.terms,
+            query_name=self.query_name,
             quoted_query_name=self.quoted_query_name,
             sub_sql=stub,
             suffix=self.suffix,
@@ -272,6 +296,7 @@ class NearSQLBinaryStep(NearSQL):
         self,
         *,
         terms,
+        query_name,
         quoted_query_name,
         sub_sql1,
         joiner,
@@ -288,6 +313,7 @@ class NearSQLBinaryStep(NearSQL):
         NearSQL.__init__(
             self,
             terms=terms,
+            query_name=query_name,
             quoted_query_name=quoted_query_name,
             annotation=annotation,
         )
@@ -335,6 +361,7 @@ class NearSQLBinaryStep(NearSQL):
                 sequence.append(stepi)
         stubbed_step = NearSQLBinaryStep(
             terms=self.terms,
+            query_name=self.query_name,
             quoted_query_name=self.quoted_query_name,
             sub_sql1=stub1,
             joiner=self.joiner,
@@ -350,6 +377,7 @@ class NearSQLRawQStep(NearSQL):
         self,
         *,
         prefix: List[str],
+        query_name: str,
         quoted_query_name: str,
         sub_sql: Optional[NearSQLContainer],
         suffix: Optional[List[str]] = None,
@@ -360,6 +388,7 @@ class NearSQLRawQStep(NearSQL):
         assert isinstance(prefix, list)
         assert len(prefix) > 0
         assert all([isinstance(v, str) for v in prefix])
+        assert isinstance(query_name, str)
         assert isinstance(quoted_query_name, str)
         assert isinstance(sub_sql, (NearSQLContainer, type(None)))
         assert isinstance(suffix, (list, type(None)))
@@ -369,6 +398,7 @@ class NearSQLRawQStep(NearSQL):
         NearSQL.__init__(
             self,
             terms=None,  # not using this in this node
+            query_name=query_name,
             quoted_query_name=quoted_query_name,
             annotation=annotation,
         )
@@ -403,6 +433,7 @@ class NearSQLRawQStep(NearSQL):
         stub, sequence = self.sub_sql.to_with_form_stub()
         stubbed_step = NearSQLRawQStep(
             prefix=self.prefix,
+            query_name=self.query_name,
             quoted_query_name=self.quoted_query_name,
             sub_sql=stub,
             suffix=self.suffix,
