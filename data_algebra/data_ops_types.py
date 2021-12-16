@@ -20,12 +20,6 @@ class OperatorPlatform:
         assert isinstance(node_name, str)
         self.node_name = node_name
 
-    def column_map(self) -> collections.OrderedDict:
-        """
-        Build a map of column names to ColumnReferences
-        """
-        raise NotImplementedError("base class called")
-
     def eval(self, data_map, *, data_model=None, narrow=True):
         """
         Evaluate operators with respect to Pandas data frames.

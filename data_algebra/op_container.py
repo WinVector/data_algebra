@@ -18,7 +18,7 @@ one = data_algebra.expr_rep.Value(1)
 class OpC(data_algebra.data_ops_types.OperatorPlatform):
     """Container that redirects to another to non-quoted notation."""
 
-    ops: typing.Optional[data_algebra.data_ops_types.OperatorPlatform]
+    ops: typing.Optional[data_algebra.data_ops.ViewRepresentation]
     column_namespace: SimpleNamespace
     used_result: bool
 
@@ -29,15 +29,12 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         data_algebra.data_ops_types.OperatorPlatform.__init__(self, node_name="container")
 
     def set(self, other):
-        assert isinstance(other, data_algebra.data_ops_types.OperatorPlatform)
-        assert not isinstance(other, OpC)  # don't allow deep nesting for now
+        assert isinstance(other, data_algebra.data_ops.ViewRepresentation)
+        assert not isinstance(other, OpC)  # don't allow deep nesting
         self.ops = other
         self.column_namespace.__dict__.clear()
         self.column_namespace.__dict__.update(self.ops.column_map())
         return self
-
-    def column_map(self) -> collections.OrderedDict:
-        return self.ops.column_map()
 
     def start(self, other):
         assert self.ops is None
