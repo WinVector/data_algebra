@@ -16,3 +16,21 @@ def test_OrderedSet_1():
     s.add("x_1")
     res3 = [v for v in s]
     assert expect2 == res3
+
+
+def test_OrderedSet_ordered_intersect():
+    res = list(data_algebra.OrderedSet.ordered_intersect(['a', 'b', 'c'], ['c', 'a']))
+    expect = ['a', 'c']
+    assert res == expect
+
+
+def test_OrderedSet_ordered_union():
+    res = list(data_algebra.OrderedSet.ordered_union(['a', 'b', 'c'], ['d', 'a']))
+    expect = ['a', 'b', 'c', 'd']
+    assert res == expect
+
+
+def test_OrderedSet_ordered_diff():
+    res = list(data_algebra.OrderedSet.ordered_diff(['a', 'b', 'c'], ['c', 'z']))
+    expect = ['a', 'b']
+    assert res == expect
