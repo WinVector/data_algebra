@@ -62,7 +62,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
        Abstract base class."""
 
     column_names: Tuple[str]
-    sources: List[
+    sources: Tuple[
         "ViewRepresentation"
     ]  # https://www.python.org/dev/peps/pep-0484/#forward-references
 
@@ -73,17 +73,21 @@ class ViewRepresentation(OperatorPlatform, ABC):
         sources: Optional[Iterable["ViewRepresentation"]] = None,
         node_name: str,
     ):
-        column_names = tuple(column_names)  # make sure a list and a disjoint copy
-        self.column_names = column_names
-        assert len(self.column_names) > 0
-        for v in self.column_names:
+        if not isinstance(column_names, tuple):
+            column_names = tuple(column_names)
+        assert len(column_names) > 0
+        for v in column_names:
             assert isinstance(v, str)
         assert len(column_names) == len(set(column_names))
+        self.column_names = column_names
         if sources is None:
-            sources = []
+            sources = ()
+        else:
+            if not isinstance(sources, tuple):
+                sources = tuple(sources)
         for si in sources:
             assert isinstance(si, ViewRepresentation)
-        self.sources = [si for si in sources]
+        self.sources = sources
         OperatorPlatform.__init__(self, node_name=node_name)
 
     def column_map(self) -> collections.OrderedDict:
