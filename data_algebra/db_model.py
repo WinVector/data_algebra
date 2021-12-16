@@ -15,6 +15,7 @@ import data_algebra.expr_rep
 import data_algebra.util
 import data_algebra.data_ops_types
 import data_algebra.data_ops
+from data_algebra.OrderedSet import OrderedSet
 
 
 # The db_model can be a bit tricky as SQL is represented a few ways depending
@@ -827,8 +828,8 @@ class DBModel:
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
-            using = table_def.column_set
-        missing = using - table_def.column_set
+            using = set(table_def.column_names)
+        missing = using - OrderedSet(table_def.column_names)
         if len(missing) > 0:
             raise KeyError("referred to unknown columns: " + str(missing))
         cols_using = [c for c in table_def.column_names if c in using]
@@ -865,7 +866,7 @@ class DBModel:
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
-            using = extend_node.column_set
+            using = OrderedSet(extend_node.column_names)
         using = using.union(
             extend_node.partition_by, extend_node.order_by, extend_node.reverse
         )
@@ -874,13 +875,13 @@ class DBModel:
             if k in using:
                 subops[k] = op
         if len(subops) <= 0:
-            # know using was not None is this case as len(extend_node.ops)>0 and all keys are in extend_node.column_set
+            # using was not None is this case as len(extend_node.ops)>0 and all keys are in extend_node.column_names
             return extend_node.sources[0].to_near_sql_implementation(
                 db_model=self, using=using, temp_id_source=temp_id_source
             )
         if len(using) < 1:
             raise ValueError("must produce at least one column")
-        missing = using - extend_node.column_set
+        missing = using - set(extend_node.column_names)
         if len(missing) > 0:
             raise KeyError("referred to unknown columns: " + str(missing))
         # get set of columns we need from subquery
@@ -999,7 +1000,7 @@ class DBModel:
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
-            using = project_node.column_set
+            using = OrderedSet(project_node.column_names)
         subops = {k: op for (k, op) in project_node.ops.items() if k in using}
         subusing = project_node.columns_used_from_sources(using=using)[0]
         terms = {ci: self.expr_to_sql(oi) for (ci, oi) in subops.items()}
@@ -1044,7 +1045,7 @@ class DBModel:
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
-            using = select_rows_node.column_set
+            using = OrderedSet(select_rows_node.column_names)
         subusing = select_rows_node.columns_used_from_sources(using=using)[0]
         subsql = select_rows_node.sources[0].to_near_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
@@ -1081,7 +1082,7 @@ class DBModel:
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
-            using = select_columns_node.column_set
+            using = OrderedSet(select_columns_node.column_names)
         subusing = select_columns_node.columns_used_from_sources(using=using)[0]
         subusing = [
             c for c in select_columns_node.column_selection if c in subusing
@@ -1115,7 +1116,7 @@ class DBModel:
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
-            using = drop_columns_node.column_set
+            using = OrderedSet(drop_columns_node.column_names)
         subusing = drop_columns_node.columns_used_from_sources(using=using)[0]
         subsql = drop_columns_node.sources[0].to_near_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
@@ -1139,7 +1140,7 @@ class DBModel:
             temp_id_source = [0]
         using_was_None = False
         if using is None:
-            using = order_node.column_set
+            using = OrderedSet(order_node.column_names)
             using_was_None = True
         subusing = order_node.columns_used_from_sources(using=using)[0]
         subusing = [c for c in order_node.column_names if c in subusing]  # fix order
@@ -1188,7 +1189,7 @@ class DBModel:
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
-            using = rename_node.column_set
+            using = OrderedSet(rename_node.column_names)
         subusing = rename_node.columns_used_from_sources(using=using)[0]
         subsql = rename_node.sources[0].to_near_sql_implementation(
             db_model=self, using=subusing, temp_id_source=temp_id_source
@@ -1242,11 +1243,11 @@ class DBModel:
                 "Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)"
             )
         if using is None:
-            using = join_node.column_set
+            using = OrderedSet(join_node.column_names)
         by_set = set(join_node.by)
         if len(using) < 1:
             raise ValueError("join must use or select at least one column")
-        missing = using - join_node.column_set
+        missing = using - set(join_node.column_names)
         if len(missing) > 0:
             raise KeyError("referred to unknown columns: " + str(missing))
         using_left, using_right = join_node.columns_used_from_sources(using=using.union(by_set))
@@ -1264,7 +1265,7 @@ class DBModel:
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
-            using = join_node.column_set
+            using = OrderedSet(join_node.column_names)
         using_left, sql_left, using_right, sql_right = self._natural_join_sub_queries(
             join_node=join_node, using=using, temp_id_source=temp_id_source
         )
@@ -1326,10 +1327,10 @@ class DBModel:
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
-            using = concat_node.column_set
+            using = OrderedSet(concat_node.column_names)
         if len(using) < 1:
             raise ValueError("must select at least one column")
-        missing = using - concat_node.column_set
+        missing = using - set(concat_node.column_names)
         if len(missing) > 0:
             raise KeyError("referred to unknown columns: " + str(missing))
         subusing = concat_node.columns_used_from_sources(using=using)

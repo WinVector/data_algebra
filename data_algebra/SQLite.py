@@ -230,7 +230,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
-            using = join_node.column_set
+            using = set(join_node.column_names)
         join_columns = join_node.by
         left_descr = join_node.sources[0]
         right_descr = join_node.sources[1]

@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Union
+from typing import Optional, Union
 
 import numpy
 
@@ -850,20 +850,21 @@ def enc_value(value):
 class ColumnReference(Term):
     """class to represent referring to a column"""
 
-    view: any
+    view: Optional["data_algebra.data_ops.ViewRepresentation"]
     column_name: str
 
     def __init__(self, view, column_name):
         self.view = view
         self.column_name = column_name
         assert isinstance(column_name, str)
-        if view is not None:
-            if column_name not in view.column_set:
-                raise KeyError(
-                    "column_name '"
-                    + str(column_name)
-                    + "' must be a column of the given view"
-                )
+        # # an invariant we want, but don't want the expense of checking it against lists
+        # if view is not None:
+        #     if column_name not in view.column_names:
+        #         raise KeyError(
+        #             "column_name '"
+        #             + str(column_name)
+        #             + "' must be a column of the given view"
+        #         )
         Term.__init__(self)
 
     def evaluate(self, data_frame):
