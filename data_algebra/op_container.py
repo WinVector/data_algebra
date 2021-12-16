@@ -18,8 +18,8 @@ one = data_algebra.expr_rep.Value(1)
 class OpC(data_algebra.data_ops_types.OperatorPlatform):
     """Container that redirects to another to non-quoted notation."""
 
-    ops: typing.Optional[data_algebra.data_ops.ViewRepresentation]
-    column_namespace: SimpleNamespace
+    ops: typing.Optional[data_algebra.data_ops.ViewRepresentation]  # this reference gets replaced
+    column_namespace: SimpleNamespace  # don't replace the reference, instead mutate (reference shared!)
     used_result: bool
 
     def __init__(self):
