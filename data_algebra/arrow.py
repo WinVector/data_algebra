@@ -96,9 +96,9 @@ class DataOpArrow(Arrow):
                     "free_table_key must be a table key used in the pipeline"
                 )
         self.free_table_key = free_table_key
-        self.incoming_columns = t_used[free_table_key].column_names.copy()
+        self.incoming_columns = list(t_used[free_table_key].column_names)
         self.disallowed_columns = pipeline.forbidden_columns()[free_table_key]
-        self.outgoing_columns = pipeline.column_names.copy()
+        self.outgoing_columns = list(pipeline.column_names)
         self.outgoing_columns.sort()
         Arrow.__init__(self)
 

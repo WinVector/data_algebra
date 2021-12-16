@@ -82,7 +82,7 @@ def test_arrow1():
 
     # %%
 
-    cols2_too_large = id_ops_b.column_names + ["q"]
+    cols2_too_large = list(id_ops_b.column_names) + ["q"]
     ordered_ops = TableDescription(
         table_name="d2", column_names=cols2_too_large
     ).extend(
