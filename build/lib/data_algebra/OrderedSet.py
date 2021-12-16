@@ -6,6 +6,8 @@ Adapted from: https://stackoverflow.com/a/1653978
 
 import collections
 import collections.abc
+from collections.abc import Iterable
+from typing import Optional
 
 # adapted from:
 # https://stackoverflow.com/a/1653978
@@ -15,7 +17,7 @@ class OrderedSet(collections.OrderedDict, collections.abc.MutableSet):
     """
     Ordered set to enhance presentation of column names.
     """
-    def __init__(self, v=None):
+    def __init__(self, v: Optional[Iterable] = None):
         collections.OrderedDict.__init__(self)
         if v is not None:
             for val in v:
@@ -84,3 +86,31 @@ class OrderedSet(collections.OrderedDict, collections.abc.MutableSet):
                 if k not in res:
                     res.add(k)
         return res
+
+
+def ordered_intersect(a: Iterable, b: Iterable) -> OrderedSet:
+    """
+    Intersection of two iterables, ordered by a.
+    """
+    b = set(b)
+    return OrderedSet([v for v in a if v in b])
+
+
+def ordered_union(a: Iterable, b: Iterable) -> OrderedSet:
+    """
+    Untion of two iterables, ordered by a first, then b.
+    """
+    a = OrderedSet(a)
+    for v in b:
+        if v not in a:
+            a.add(v)
+    return a
+
+
+def ordered_diff(a: Iterable, b: Iterable) -> OrderedSet:
+    """
+    a with b removed
+    """
+    b = set(b)
+    a = OrderedSet([v for v in a if v not in b])
+    return a

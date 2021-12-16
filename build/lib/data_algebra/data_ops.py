@@ -18,7 +18,7 @@ import data_algebra.expr_rep
 from data_algebra.data_ops_types import *
 import data_algebra.data_ops_utils
 import data_algebra.near_sql
-import data_algebra.OrderedSet
+from data_algebra.OrderedSet import OrderedSet, ordered_intersect, ordered_union, ordered_diff
 import data_algebra.util
 
 
@@ -62,8 +62,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
        Abstract base class."""
 
     column_names: List[str]
-    column_set: data_algebra.OrderedSet.OrderedSet[str]
-    column_types: Optional[Dict[str, type]]
     sources: List[
         "ViewRepresentation"
     ]  # https://www.python.org/dev/peps/pep-0484/#forward-references
@@ -72,7 +70,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
         self,
         column_names: Iterable[str],
         *,
-        column_types: Optional[Dict[str, type]] = None,
         sources: Optional[List["ViewRepresentation"]] = None,
         node_name: str,
     ):
@@ -84,18 +81,12 @@ class ViewRepresentation(OperatorPlatform, ABC):
         assert len(self.column_names) > 0
         for v in self.column_names:
             assert isinstance(v, str)
-        self.column_set = data_algebra.OrderedSet.OrderedSet()
-        for c in self.column_names:
-            self.column_set.add(c)
-        assert len(self.column_names) == len(self.column_set)
+        assert len(column_names) == len(set(column_names))
         if sources is None:
             sources = []
         for si in sources:
             assert isinstance(si, ViewRepresentation)
         self.sources = [si for si in sources]
-        self.column_types = None
-        if column_types is not None:
-            self.column_types = column_types.copy()
         OperatorPlatform.__init__(self, node_name=node_name)
 
     def column_map(self) -> collections.OrderedDict:
@@ -388,13 +379,12 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     # return table representation of self
     def as_table_description(
-        self, table_name=None, *, qualifiers=None, column_types=None
+        self, table_name=None, *, qualifiers=None
     ):
         return TableDescription(
             table_name=table_name,
             column_names=self.column_names.copy(),
             qualifiers=qualifiers,
-            column_types=column_types,
         )
 
     # implement builders for all non-initial ops types on base class
@@ -650,7 +640,6 @@ class TableDescription(ViewRepresentation):
         column_names: Iterable[str],
         qualifiers=None,
         sql_meta=None,
-        column_types: Optional[Dict[str, type]] = None,
         head=None,
         limit_was: Optional[int] = None,
         nrows: Optional[int] = None,
@@ -660,7 +649,7 @@ class TableDescription(ViewRepresentation):
         else:
             column_names = [v for v in column_names]  # convert to list from other types such as series
         ViewRepresentation.__init__(
-            self, column_names=column_names, node_name="TableDescription", column_types=column_types,
+            self, column_names=column_names, node_name="TableDescription"
         )
         if table_name is None:
             self.table_name_was_set_by_user = False
@@ -720,7 +709,6 @@ class TableDescription(ViewRepresentation):
             table_name=self.table_name,
             column_names=self.column_names,
             qualifiers=self.qualifiers,
-            column_types=self.column_types,
         )
         return r
 
@@ -821,30 +809,23 @@ def describe_table(
     *,
     qualifiers=None,
     sql_meta=None,
-    column_types=None,
     row_limit: Optional[int] = 7,
     keep_sample=True,
     keep_all=False,
-    guess_column_types=True,
 ) -> TableDescription:
     """
     :param d: pandas table to describe
     :param table_name: name of table
     :param qualifiers: optional, able qualifiers
     :param sql_meta: optional, sql meta information map
-    :param column_types: optional, map of column types
     :param row_limit: how many rows to sample
     :param keep_sample: logical, if True retain head of table
     :param keep_all: logical, if True retain all of table
-    :param guess_column_types: logical, if True try to infer column types
     :return: TableDescription
     """
     assert not isinstance(d, OperatorPlatform)
     assert not isinstance(d, ViewRepresentation)
     column_names = [c for c in d.columns]
-    if (column_types is None) or (len(column_types) < 1):
-        if guess_column_types:
-            column_types = data_algebra.util.guess_column_types(d)
     head = None
     nrows = d.shape[0]
     if keep_all:
@@ -860,7 +841,6 @@ def describe_table(
     return TableDescription(
         table_name=table_name,
         column_names=column_names,
-        column_types=column_types,
         qualifiers=qualifiers,
         sql_meta=sql_meta,
         head=head,
@@ -882,7 +862,6 @@ def table(d, *, table_name=None):
         table_name=table_name,
         qualifiers=None,
         sql_meta=None,
-        column_types=None,
         row_limit=None,
         keep_sample=True,
         keep_all=True,
@@ -904,7 +883,6 @@ def descr(**kwargs):
         table_name=table_name,
         qualifiers=None,
         sql_meta=None,
-        column_types=None,
         row_limit=7,
         keep_sample=True,
         keep_all=False,
@@ -963,7 +941,7 @@ class ExtendNode(ViewRepresentation):
         consumed_cols = set()
         for (k, o) in parsed_ops.items():
             o.get_column_names(consumed_cols)
-        unknown_cols = consumed_cols - source.column_set
+        unknown_cols = consumed_cols - set(source.column_names)
         if len(unknown_cols) > 0:
             raise KeyError("referred to unknown columns: " + str(unknown_cols))
         known_cols = set(column_names)
@@ -992,6 +970,7 @@ class ExtendNode(ViewRepresentation):
             raise ValueError("tried to change: " + str(bad_overwrite))
         # check op arguments are very simple: all arguments are column names
         if windowed_situation:
+            source_col_set = set(source.column_names)
             for (k, opk) in parsed_ops.items():
                 if not isinstance(opk, data_algebra.expr_rep.Expression):
                     raise ValueError(
@@ -1016,7 +995,7 @@ class ExtendNode(ViewRepresentation):
                 if len(opk.args) > 0:
                     if isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
                         value_name = opk.args[0].column_name
-                        if value_name not in source.column_set:
+                        if value_name not in source_col_set:
                             raise ValueError(value_name + " not in source column set")
                     else:
                         if not isinstance(opk.args[0], data_algebra.expr_rep.Value):
@@ -1102,17 +1081,17 @@ class ExtendNode(ViewRepresentation):
                             )
 
     def columns_used_from_sources(self, using=None):
-        columns_we_take = self.sources[0].column_set.copy()
         if using is None:
-            return [columns_we_take]
+            return [OrderedSet(self.sources[0].column_names)]
         subops = {k: op for (k, op) in self.ops.items() if k in using}
         if len(subops) <= 0:
-            return [columns_we_take]
+            return [OrderedSet(self.sources[0].column_names)]
+        columns_we_take = set(self.sources[0].column_names)
         columns_we_take = using.union(self.partition_by, self.order_by, self.reverse)
         columns_we_take = columns_we_take - subops.keys()
         for (k, o) in subops.items():
             o.get_column_names(columns_we_take)
-        return [columns_we_take]
+        return [OrderedSet([v for v in self.sources[0].column_names if v in columns_we_take])]
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
         spacer = " "
@@ -1173,7 +1152,7 @@ class ProjectNode(ViewRepresentation):
             consumed_cols.add(c)
         for (k, o) in parsed_ops.items():
             o.get_column_names(consumed_cols)
-        unknown_cols = consumed_cols - source.column_set
+        unknown_cols = consumed_cols - set(source.column_names)
         if len(unknown_cols) > 0:
             raise KeyError("referred to unknown columns: " + str(unknown_cols))
         known_cols = set(column_names)
@@ -1338,11 +1317,11 @@ class SelectRowsNode(ViewRepresentation):
         return True
 
     def columns_used_from_sources(self, using=None):
-        columns_we_take = self.sources[0].column_set.copy()
+        columns_we_take = OrderedSet(self.sources[0].column_names)
         if using is None:
             return [columns_we_take]
-        columns_we_take = columns_we_take.intersection(using)
-        columns_we_take = columns_we_take.union(self.decision_columns)
+        columns_we_take = ordered_intersect(columns_we_take, using)
+        columns_we_take = ordered_union(columns_we_take, self.decision_columns)
         return [columns_we_take]
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
@@ -1725,25 +1704,26 @@ class NaturalJoinNode(ViewRepresentation):
                 raise ValueError(
                     "Different definition of table object on a/b for: " + k
                 )
-        sources = [a, b]
         # check columns
-        column_names = sources[0].column_names.copy()
-        for ci in sources[1].column_names:
-            if ci not in sources[0].column_set:
+        column_names = a.column_names.copy()
+        columns_seen = set(column_names)
+        for ci in b.column_names:
+            if ci not in columns_seen:
                 column_names.append(ci)
+                columns_seen.add(ci)
         if isinstance(by, str):
             by = [by]
         by_set = set(by)
         if len(by) != len(by_set):
             raise ValueError("duplicate column names in by")
-        missing_left = by_set - a.column_set
+        missing_left = by_set - set(a.column_names)
         if len(missing_left) > 0:
             raise KeyError("left table missing join keys: " + str(missing_left))
-        missing_right = by_set - b.column_set
+        missing_right = by_set - set(b.column_names)
         if len(missing_right) > 0:
             raise KeyError("right table missing join keys: " + str(missing_right))
         if check_all_common_keys_in_by:
-            missing_common = a.column_set.intersection(b.column_set) - by_set
+            missing_common = set(a.column_names).intersection(set(b.column_names)) - by_set
             if len(missing_common) > 0:
                 raise KeyError(
                     "check_all_common_keys_in_by set, and the following common keys are are not in the by-clause: "
@@ -1752,7 +1732,7 @@ class NaturalJoinNode(ViewRepresentation):
         ViewRepresentation.__init__(
             self,
             column_names=column_names,
-            sources=sources,
+            sources=[a, b],
             node_name="NaturalJoinNode",
         )
         self.by = by
@@ -1779,9 +1759,9 @@ class NaturalJoinNode(ViewRepresentation):
 
     def columns_used_from_sources(self, using=None):
         if using is None:
-            return [self.sources[i].column_set.copy() for i in range(2)]
+            return [OrderedSet(self.sources[i].column_names) for i in range(2)]
         using = using.union(self.by)
-        return [self.sources[i].column_set.intersection(using) for i in range(2)]
+        return [ordered_intersect(self.sources[i].column_names, using) for i in range(2)]
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
         s = "_0."
@@ -1846,19 +1826,6 @@ class ConcatRowsNode(ViewRepresentation):
         if id_column is not None and id_column in sources[0].column_names:
             raise ValueError("id_column should not be an input table column name")
         column_names = sources[0].column_names.copy()
-        if (
-            isinstance(a, TableDescription)
-            and (a.column_types is not None)
-            and (len(a.column_types) > 0)
-            and isinstance(b, TableDescription)
-            and (b.column_types is not None)
-            and (len(b.column_types) > 0)
-        ):
-            for c in column_names:
-                assert (
-                    len({a.column_types[c]}.union({b.column_types[c]}) - {type(None)})
-                    <= 1
-                )
         if id_column is not None:
             assert id_column not in column_names
             column_names.append(id_column)
@@ -1893,8 +1860,8 @@ class ConcatRowsNode(ViewRepresentation):
 
     def columns_used_from_sources(self, using=None):
         if using is None:
-            return [self.sources[i].column_set.copy() for i in range(2)]
-        return [self.sources[i].column_set.intersection(using) for i in range(2)]
+            return [OrderedSet(self.sources[i].column_names) for i in range(2)]
+        return [ordered_intersect(self.sources[i].column_names, using) for i in range(2)]
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
         s = "_0."

@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Union
+from typing import Optional, Union
 
 import numpy
 
@@ -192,12 +192,7 @@ def _check_expr_incompatible_types(a, b):
         if isinstance(v, Value):
             return type(v.value)
         if isinstance(v, ColumnReference):
-            if (v.view is None) or (v.view.column_types is None) or (len(v.view.column_types) <= 0):
-                return None
-            try:
-                return v.view.column_types[v.column_name]
-            except KeyError:
-                return None
+            return None
         if isinstance(v, PreTerm):
             return None
         return None  # dunno
@@ -850,20 +845,21 @@ def enc_value(value):
 class ColumnReference(Term):
     """class to represent referring to a column"""
 
-    view: any
+    view: Optional["data_algebra.data_ops.ViewRepresentation"]
     column_name: str
 
     def __init__(self, view, column_name):
         self.view = view
         self.column_name = column_name
         assert isinstance(column_name, str)
-        if view is not None:
-            if column_name not in view.column_set:
-                raise KeyError(
-                    "column_name '"
-                    + str(column_name)
-                    + "' must be a column of the given view"
-                )
+        # # an invariant we want, but don't want the expense of checking it against lists
+        # if view is not None:
+        #     if column_name not in view.column_names:
+        #         raise KeyError(
+        #             "column_name '"
+        #             + str(column_name)
+        #             + "' must be a column of the given view"
+        #         )
         Term.__init__(self)
 
     def evaluate(self, data_frame):

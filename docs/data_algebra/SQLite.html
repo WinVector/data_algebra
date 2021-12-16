@@ -316,7 +316,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">join_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">join_columns</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">by</span>
         <span class="n">left_descr</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">right_descr</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -666,7 +666,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">join_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">join_columns</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">by</span>
         <span class="n">left_descr</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">right_descr</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>

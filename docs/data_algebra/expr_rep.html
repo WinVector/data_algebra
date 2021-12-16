@@ -527,7 +527,7 @@
                         <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span>
 
@@ -720,12 +720,7 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Value</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">ColumnReference</span><span class="p">):</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">view</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">column_types</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
-                <span class="k">return</span> <span class="kc">None</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">v</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">column_name</span><span class="p">]</span>
-            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">PreTerm</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># dunno</span>
@@ -1378,20 +1373,21 @@
 <span class="k">class</span> <span class="nc">ColumnReference</span><span class="p">(</span><span class="n">Term</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;class to represent referring to a column&quot;&quot;&quot;</span>
 
-    <span class="n">view</span><span class="p">:</span> <span class="nb">any</span>
+    <span class="n">view</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;data_algebra.data_ops.ViewRepresentation&quot;</span><span class="p">]</span>
     <span class="n">column_name</span><span class="p">:</span> <span class="nb">str</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">column_name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">view</span> <span class="o">=</span> <span class="n">view</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">column_name</span> <span class="o">=</span> <span class="n">column_name</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">view</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">column_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">view</span><span class="o">.</span><span class="n">column_set</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-                    <span class="s2">&quot;column_name &#39;&quot;</span>
-                    <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">column_name</span><span class="p">)</span>
-                    <span class="o">+</span> <span class="s2">&quot;&#39; must be a column of the given view&quot;</span>
-                <span class="p">)</span>
+        <span class="c1"># # an invariant we want, but don&#39;t want the expense of checking it against lists</span>
+        <span class="c1"># if view is not None:</span>
+        <span class="c1">#     if column_name not in view.column_names:</span>
+        <span class="c1">#         raise KeyError(</span>
+        <span class="c1">#             &quot;column_name &#39;&quot;</span>
+        <span class="c1">#             + str(column_name)</span>
+        <span class="c1">#             + &quot;&#39; must be a column of the given view&quot;</span>
+        <span class="c1">#         )</span>
         <span class="n">Term</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">):</span>
@@ -5177,20 +5173,21 @@ errors defaults to 'strict'.</p>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">ColumnReference</span><span class="p">(</span><span class="n">Term</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;class to represent referring to a column&quot;&quot;&quot;</span>
 
-    <span class="n">view</span><span class="p">:</span> <span class="nb">any</span>
+    <span class="n">view</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;data_algebra.data_ops.ViewRepresentation&quot;</span><span class="p">]</span>
     <span class="n">column_name</span><span class="p">:</span> <span class="nb">str</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">column_name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">view</span> <span class="o">=</span> <span class="n">view</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">column_name</span> <span class="o">=</span> <span class="n">column_name</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">view</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">column_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">view</span><span class="o">.</span><span class="n">column_set</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-                    <span class="s2">&quot;column_name &#39;&quot;</span>
-                    <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">column_name</span><span class="p">)</span>
-                    <span class="o">+</span> <span class="s2">&quot;&#39; must be a column of the given view&quot;</span>
-                <span class="p">)</span>
+        <span class="c1"># # an invariant we want, but don&#39;t want the expense of checking it against lists</span>
+        <span class="c1"># if view is not None:</span>
+        <span class="c1">#     if column_name not in view.column_names:</span>
+        <span class="c1">#         raise KeyError(</span>
+        <span class="c1">#             &quot;column_name &#39;&quot;</span>
+        <span class="c1">#             + str(column_name)</span>
+        <span class="c1">#             + &quot;&#39; must be a column of the given view&quot;</span>
+        <span class="c1">#         )</span>
         <span class="n">Term</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">):</span>
@@ -5238,13 +5235,14 @@ errors defaults to 'strict'.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">view</span> <span class="o">=</span> <span class="n">view</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">column_name</span> <span class="o">=</span> <span class="n">column_name</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">view</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">column_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">view</span><span class="o">.</span><span class="n">column_set</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-                    <span class="s2">&quot;column_name &#39;&quot;</span>
-                    <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">column_name</span><span class="p">)</span>
-                    <span class="o">+</span> <span class="s2">&quot;&#39; must be a column of the given view&quot;</span>
-                <span class="p">)</span>
+        <span class="c1"># # an invariant we want, but don&#39;t want the expense of checking it against lists</span>
+        <span class="c1"># if view is not None:</span>
+        <span class="c1">#     if column_name not in view.column_names:</span>
+        <span class="c1">#         raise KeyError(</span>
+        <span class="c1">#             &quot;column_name &#39;&quot;</span>
+        <span class="c1">#             + str(column_name)</span>
+        <span class="c1">#             + &quot;&#39; must be a column of the given view&quot;</span>
+        <span class="c1">#         )</span>
         <span class="n">Term</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </pre></div>
 

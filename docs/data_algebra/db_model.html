@@ -224,6 +224,7 @@
 <span class="kn">import</span> <span class="nn">data_algebra.util</span>
 <span class="kn">import</span> <span class="nn">data_algebra.data_ops_types</span>
 <span class="kn">import</span> <span class="nn">data_algebra.data_ops</span>
+<span class="kn">from</span> <span class="nn">data_algebra.OrderedSet</span> <span class="kn">import</span> <span class="n">OrderedSet</span>
 
 
 <span class="c1"># The db_model can be a bit tricky as SQL is represented a few ways depending</span>
@@ -1036,8 +1037,8 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">table_def</span><span class="o">.</span><span class="n">column_set</span>
-        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="n">table_def</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">table_def</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">table_def</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="n">cols_using</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">table_def</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">using</span><span class="p">]</span>
@@ -1074,7 +1075,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">extend_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">using</span> <span class="o">=</span> <span class="n">using</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="n">extend_node</span><span class="o">.</span><span class="n">partition_by</span><span class="p">,</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">order_by</span><span class="p">,</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">reverse</span>
         <span class="p">)</span>
@@ -1083,13 +1084,13 @@
             <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">using</span><span class="p">:</span>
                 <span class="n">subops</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subops</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="c1"># know using was not None is this case as len(extend_node.ops)&gt;0 and all keys are in extend_node.column_set</span>
+            <span class="c1"># using was not None is this case as len(extend_node.ops)&gt;0 and all keys are in extend_node.column_names</span>
             <span class="k">return</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
                 <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">using</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must produce at least one column&quot;</span><span class="p">)</span>
-        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">extend_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="c1"># get set of columns we need from subquery</span>
@@ -1208,7 +1209,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">project_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">project_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">subops</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">op</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span> <span class="ow">in</span> <span class="n">project_node</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">using</span><span class="p">}</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">project_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="p">{</span><span class="n">ci</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">oi</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">ci</span><span class="p">,</span> <span class="n">oi</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subops</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
@@ -1253,7 +1254,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">select_rows_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subsql</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
@@ -1290,7 +1291,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">select_columns_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">column_selection</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">subusing</span>
@@ -1324,7 +1325,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">drop_columns_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subsql</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
@@ -1348,7 +1349,7 @@
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">using_was_None</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">order_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">order_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
             <span class="n">using_was_None</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">order_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">order_node</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">subusing</span><span class="p">]</span>  <span class="c1"># fix order</span>
@@ -1397,7 +1398,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">rename_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subsql</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
@@ -1451,11 +1452,11 @@
                 <span class="s2">&quot;Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)&quot;</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">join_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">by_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">join_node</span><span class="o">.</span><span class="n">by</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">using</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;join must use or select at least one column&quot;</span><span class="p">)</span>
-        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="n">join_node</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">join_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="n">using_left</span><span class="p">,</span> <span class="n">using_right</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">by_set</span><span class="p">))</span>
@@ -1473,7 +1474,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">join_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">using_left</span><span class="p">,</span> <span class="n">sql_left</span><span class="p">,</span> <span class="n">using_right</span><span class="p">,</span> <span class="n">sql_right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_natural_join_sub_queries</span><span class="p">(</span>
             <span class="n">join_node</span><span class="o">=</span><span class="n">join_node</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
@@ -1535,10 +1536,10 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">using</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must select at least one column&quot;</span><span class="p">)</span>
-        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)</span>
@@ -2527,8 +2528,8 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">table_def</span><span class="o">.</span><span class="n">column_set</span>
-        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="n">table_def</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">table_def</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">table_def</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="n">cols_using</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">table_def</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">using</span><span class="p">]</span>
@@ -2565,7 +2566,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">extend_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">using</span> <span class="o">=</span> <span class="n">using</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="n">extend_node</span><span class="o">.</span><span class="n">partition_by</span><span class="p">,</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">order_by</span><span class="p">,</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">reverse</span>
         <span class="p">)</span>
@@ -2574,13 +2575,13 @@
             <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">using</span><span class="p">:</span>
                 <span class="n">subops</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subops</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="c1"># know using was not None is this case as len(extend_node.ops)&gt;0 and all keys are in extend_node.column_set</span>
+            <span class="c1"># using was not None is this case as len(extend_node.ops)&gt;0 and all keys are in extend_node.column_names</span>
             <span class="k">return</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
                 <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">using</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must produce at least one column&quot;</span><span class="p">)</span>
-        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">extend_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="c1"># get set of columns we need from subquery</span>
@@ -2699,7 +2700,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">project_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">project_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">subops</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">op</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span> <span class="ow">in</span> <span class="n">project_node</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">using</span><span class="p">}</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">project_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="p">{</span><span class="n">ci</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">oi</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">ci</span><span class="p">,</span> <span class="n">oi</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subops</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
@@ -2744,7 +2745,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">select_rows_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subsql</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
@@ -2781,7 +2782,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">select_columns_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">column_selection</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">subusing</span>
@@ -2815,7 +2816,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">drop_columns_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subsql</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
@@ -2839,7 +2840,7 @@
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">using_was_None</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">order_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">order_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
             <span class="n">using_was_None</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">order_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">order_node</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">subusing</span><span class="p">]</span>  <span class="c1"># fix order</span>
@@ -2888,7 +2889,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">rename_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subsql</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
@@ -2942,11 +2943,11 @@
                 <span class="s2">&quot;Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)&quot;</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">join_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">by_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">join_node</span><span class="o">.</span><span class="n">by</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">using</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;join must use or select at least one column&quot;</span><span class="p">)</span>
-        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="n">join_node</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">join_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="n">using_left</span><span class="p">,</span> <span class="n">using_right</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">by_set</span><span class="p">))</span>
@@ -2964,7 +2965,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">join_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">using_left</span><span class="p">,</span> <span class="n">sql_left</span><span class="p">,</span> <span class="n">using_right</span><span class="p">,</span> <span class="n">sql_right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_natural_join_sub_queries</span><span class="p">(</span>
             <span class="n">join_node</span><span class="o">=</span><span class="n">join_node</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
@@ -3026,10 +3027,10 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">using</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must select at least one column&quot;</span><span class="p">)</span>
-        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)</span>
@@ -4122,8 +4123,8 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">table_def</span><span class="o">.</span><span class="n">column_set</span>
-        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="n">table_def</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">table_def</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">table_def</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="n">cols_using</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">table_def</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">using</span><span class="p">]</span>
@@ -4183,7 +4184,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">extend_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">using</span> <span class="o">=</span> <span class="n">using</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
             <span class="n">extend_node</span><span class="o">.</span><span class="n">partition_by</span><span class="p">,</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">order_by</span><span class="p">,</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">reverse</span>
         <span class="p">)</span>
@@ -4192,13 +4193,13 @@
             <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">using</span><span class="p">:</span>
                 <span class="n">subops</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subops</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="c1"># know using was not None is this case as len(extend_node.ops)&gt;0 and all keys are in extend_node.column_set</span>
+            <span class="c1"># using was not None is this case as len(extend_node.ops)&gt;0 and all keys are in extend_node.column_names</span>
             <span class="k">return</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
                 <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">using</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must produce at least one column&quot;</span><span class="p">)</span>
-        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="n">extend_node</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">extend_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="c1"># get set of columns we need from subquery</span>
@@ -4340,7 +4341,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">project_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">project_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">subops</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">op</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span> <span class="ow">in</span> <span class="n">project_node</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">using</span><span class="p">}</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">project_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">terms</span> <span class="o">=</span> <span class="p">{</span><span class="n">ci</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">oi</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">ci</span><span class="p">,</span> <span class="n">oi</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subops</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
@@ -4408,7 +4409,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">select_rows_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subsql</span> <span class="o">=</span> <span class="n">select_rows_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
@@ -4468,7 +4469,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">select_columns_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">select_columns_node</span><span class="o">.</span><span class="n">column_selection</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">subusing</span>
@@ -4525,7 +4526,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">drop_columns_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subsql</span> <span class="o">=</span> <span class="n">drop_columns_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
@@ -4572,7 +4573,7 @@
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">using_was_None</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">order_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">order_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
             <span class="n">using_was_None</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">order_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">order_node</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">subusing</span><span class="p">]</span>  <span class="c1"># fix order</span>
@@ -4644,7 +4645,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">rename_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subsql</span> <span class="o">=</span> <span class="n">rename_node</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">subusing</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
@@ -4699,7 +4700,7 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">join_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">join_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">using_left</span><span class="p">,</span> <span class="n">sql_left</span><span class="p">,</span> <span class="n">using_right</span><span class="p">,</span> <span class="n">sql_right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_natural_join_sub_queries</span><span class="p">(</span>
             <span class="n">join_node</span><span class="o">=</span><span class="n">join_node</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
@@ -4784,10 +4785,10 @@
         <span class="k">if</span> <span class="n">temp_id_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp_id_source</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">using</span> <span class="o">=</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">column_set</span>
+            <span class="n">using</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">using</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must select at least one column&quot;</span><span class="p">)</span>
-        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="n">using</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">concat_node</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="n">subusing</span> <span class="o">=</span> <span class="n">concat_node</span><span class="o">.</span><span class="n">columns_used_from_sources</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">)</span>

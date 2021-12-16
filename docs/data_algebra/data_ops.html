@@ -515,7 +515,7 @@
 <span class="kn">from</span> <span class="nn">data_algebra.data_ops_types</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">import</span> <span class="nn">data_algebra.data_ops_utils</span>
 <span class="kn">import</span> <span class="nn">data_algebra.near_sql</span>
-<span class="kn">import</span> <span class="nn">data_algebra.OrderedSet</span>
+<span class="kn">from</span> <span class="nn">data_algebra.OrderedSet</span> <span class="kn">import</span> <span class="n">OrderedSet</span><span class="p">,</span> <span class="n">ordered_intersect</span><span class="p">,</span> <span class="n">ordered_union</span><span class="p">,</span> <span class="n">ordered_diff</span>
 <span class="kn">import</span> <span class="nn">data_algebra.util</span>
 
 
@@ -559,8 +559,6 @@
 <span class="sd">       Abstract base class.&quot;&quot;&quot;</span>
 
     <span class="n">column_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-    <span class="n">column_set</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">OrderedSet</span><span class="o">.</span><span class="n">OrderedSet</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-    <span class="n">column_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">]]</span>
     <span class="n">sources</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span>
         <span class="s2">&quot;ViewRepresentation&quot;</span>
     <span class="p">]</span>  <span class="c1"># https://www.python.org/dev/peps/pep-0484/#forward-references</span>
@@ -569,7 +567,6 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">column_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">sources</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="s2">&quot;ViewRepresentation&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">node_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">):</span>
@@ -581,18 +578,12 @@
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">column_set</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">OrderedSet</span><span class="o">.</span><span class="n">OrderedSet</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_set</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">sources</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sources</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">si</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">si</span> <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">column_types</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">column_types</span> <span class="o">=</span> <span class="n">column_types</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">OperatorPlatform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="n">node_name</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">column_map</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">:</span>
@@ -885,13 +876,12 @@
 
     <span class="c1"># return table representation of self</span>
     <span class="k">def</span> <span class="nf">as_table_description</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_types</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
         <span class="k">return</span> <span class="n">TableDescription</span><span class="p">(</span>
             <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span>
             <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">qualifiers</span><span class="o">=</span><span class="n">qualifiers</span><span class="p">,</span>
-            <span class="n">column_types</span><span class="o">=</span><span class="n">column_types</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="c1"># implement builders for all non-initial ops types on base class</span>
@@ -1147,7 +1137,6 @@
         <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">column_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">head</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">limit_was</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">nrows</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1157,7 +1146,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">]</span>  <span class="c1"># convert to list from other types such as series</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;TableDescription&quot;</span><span class="p">,</span> <span class="n">column_types</span><span class="o">=</span><span class="n">column_types</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;TableDescription&quot;</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">table_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">table_name_was_set_by_user</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1217,7 +1206,6 @@
             <span class="n">table_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">table_name</span><span class="p">,</span>
             <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span>
             <span class="n">qualifiers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">qualifiers</span><span class="p">,</span>
-            <span class="n">column_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_types</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">r</span>
 
@@ -1318,30 +1306,23 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">column_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">row_limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span>
     <span class="n">keep_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">keep_all</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">guess_column_types</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TableDescription</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param d: pandas table to describe</span>
 <span class="sd">    :param table_name: name of table</span>
 <span class="sd">    :param qualifiers: optional, able qualifiers</span>
 <span class="sd">    :param sql_meta: optional, sql meta information map</span>
-<span class="sd">    :param column_types: optional, map of column types</span>
 <span class="sd">    :param row_limit: how many rows to sample</span>
 <span class="sd">    :param keep_sample: logical, if True retain head of table</span>
 <span class="sd">    :param keep_all: logical, if True retain all of table</span>
-<span class="sd">    :param guess_column_types: logical, if True try to infer column types</span>
 <span class="sd">    :return: TableDescription</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">OperatorPlatform</span><span class="p">)</span>
     <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
     <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">column_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">column_types</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">guess_column_types</span><span class="p">:</span>
-            <span class="n">column_types</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_column_types</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
     <span class="n">head</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">nrows</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">keep_all</span><span class="p">:</span>
@@ -1357,7 +1338,6 @@
     <span class="k">return</span> <span class="n">TableDescription</span><span class="p">(</span>
         <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span>
         <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span>
-        <span class="n">column_types</span><span class="o">=</span><span class="n">column_types</span><span class="p">,</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="n">qualifiers</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="n">sql_meta</span><span class="p">,</span>
         <span class="n">head</span><span class="o">=</span><span class="n">head</span><span class="p">,</span>
@@ -1379,7 +1359,6 @@
         <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">column_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">row_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">keep_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">keep_all</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -1401,7 +1380,6 @@
         <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">column_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">row_limit</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
         <span class="n">keep_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">keep_all</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -1460,7 +1438,7 @@
         <span class="n">consumed_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="ow">in</span> <span class="n">parsed_ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">o</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">(</span><span class="n">consumed_cols</span><span class="p">)</span>
-        <span class="n">unknown_cols</span> <span class="o">=</span> <span class="n">consumed_cols</span> <span class="o">-</span> <span class="n">source</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">unknown_cols</span> <span class="o">=</span> <span class="n">consumed_cols</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown_cols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">unknown_cols</span><span class="p">))</span>
         <span class="n">known_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span>
@@ -1489,6 +1467,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;tried to change: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">bad_overwrite</span><span class="p">))</span>
         <span class="c1"># check op arguments are very simple: all arguments are column names</span>
         <span class="k">if</span> <span class="n">windowed_situation</span><span class="p">:</span>
+            <span class="n">source_col_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
             <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">opk</span><span class="p">)</span> <span class="ow">in</span> <span class="n">parsed_ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Expression</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1513,7 +1492,7 @@
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ColumnReference</span><span class="p">):</span>
                         <span class="n">value_name</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_name</span>
-                        <span class="k">if</span> <span class="n">value_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">column_set</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">value_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">source_col_set</span><span class="p">:</span>
                             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">value_name</span> <span class="o">+</span> <span class="s2">&quot; not in source column set&quot;</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">):</span>
@@ -1599,17 +1578,17 @@
                             <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[</span><span class="n">columns_we_take</span><span class="p">]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)]</span>
         <span class="n">subops</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">op</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">using</span><span class="p">}</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subops</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[</span><span class="n">columns_we_take</span><span class="p">]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)]</span>
+        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">using</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partition_by</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_by</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reverse</span><span class="p">)</span>
         <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">columns_we_take</span> <span class="o">-</span> <span class="n">subops</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">o</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">(</span><span class="n">columns_we_take</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">columns_we_take</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">([</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">columns_we_take</span><span class="p">])]</span>
 
     <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">spacer</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span>
@@ -1670,7 +1649,7 @@
             <span class="n">consumed_cols</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="ow">in</span> <span class="n">parsed_ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">o</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">(</span><span class="n">consumed_cols</span><span class="p">)</span>
-        <span class="n">unknown_cols</span> <span class="o">=</span> <span class="n">consumed_cols</span> <span class="o">-</span> <span class="n">source</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">unknown_cols</span> <span class="o">=</span> <span class="n">consumed_cols</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown_cols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">unknown_cols</span><span class="p">))</span>
         <span class="n">known_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span>
@@ -1835,11 +1814,11 @@
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">columns_we_take</span><span class="p">]</span>
-        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">columns_we_take</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">using</span><span class="p">)</span>
-        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">columns_we_take</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decision_columns</span><span class="p">)</span>
+        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">ordered_intersect</span><span class="p">(</span><span class="n">columns_we_take</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span>
+        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">ordered_union</span><span class="p">(</span><span class="n">columns_we_take</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">decision_columns</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">columns_we_take</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -2222,25 +2201,26 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">&quot;Different definition of table object on a/b for: &quot;</span> <span class="o">+</span> <span class="n">k</span>
                 <span class="p">)</span>
-        <span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
         <span class="c1"># check columns</span>
-        <span class="n">column_names</span> <span class="o">=</span> <span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">ci</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="p">:</span>
+        <span class="n">column_names</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">columns_seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ci</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">columns_seen</span><span class="p">:</span>
                 <span class="n">column_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ci</span><span class="p">)</span>
+                <span class="n">columns_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ci</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">by</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">by</span> <span class="o">=</span> <span class="p">[</span><span class="n">by</span><span class="p">]</span>
         <span class="n">by_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">by</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">by</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">by_set</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;duplicate column names in by&quot;</span><span class="p">)</span>
-        <span class="n">missing_left</span> <span class="o">=</span> <span class="n">by_set</span> <span class="o">-</span> <span class="n">a</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">missing_left</span> <span class="o">=</span> <span class="n">by_set</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_left</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;left table missing join keys: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing_left</span><span class="p">))</span>
-        <span class="n">missing_right</span> <span class="o">=</span> <span class="n">by_set</span> <span class="o">-</span> <span class="n">b</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">missing_right</span> <span class="o">=</span> <span class="n">by_set</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_right</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;right table missing join keys: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing_right</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">check_all_common_keys_in_by</span><span class="p">:</span>
-            <span class="n">missing_common</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_set</span><span class="p">)</span> <span class="o">-</span> <span class="n">by_set</span>
+            <span class="n">missing_common</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">))</span> <span class="o">-</span> <span class="n">by_set</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_common</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
                     <span class="s2">&quot;check_all_common_keys_in_by set, and the following common keys are are not in the by-clause: &quot;</span>
@@ -2249,7 +2229,7 @@
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span>
-            <span class="n">sources</span><span class="o">=</span><span class="n">sources</span><span class="p">,</span>
+            <span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">],</span>
             <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">by</span> <span class="o">=</span> <span class="n">by</span>
@@ -2276,9 +2256,9 @@
 
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
         <span class="n">using</span> <span class="o">=</span> <span class="n">using</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">by</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">ordered_intersect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
 
     <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;_0.&quot;</span>
@@ -2343,19 +2323,6 @@
         <span class="k">if</span> <span class="n">id_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">id_column</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;id_column should not be an input table column name&quot;</span><span class="p">)</span>
         <span class="n">column_names</span> <span class="o">=</span> <span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="p">(</span>
-                    <span class="nb">len</span><span class="p">({</span><span class="n">a</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]}</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">b</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]})</span> <span class="o">-</span> <span class="p">{</span><span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)})</span>
-                    <span class="o">&lt;=</span> <span class="mi">1</span>
-                <span class="p">)</span>
         <span class="k">if</span> <span class="n">id_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">id_column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">column_names</span>
             <span class="n">column_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">id_column</span><span class="p">)</span>
@@ -2390,8 +2357,8 @@
 
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
-        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">ordered_intersect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
 
     <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;_0.&quot;</span>
@@ -2660,8 +2627,6 @@
 <span class="sd">       Abstract base class.&quot;&quot;&quot;</span>
 
     <span class="n">column_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-    <span class="n">column_set</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">OrderedSet</span><span class="o">.</span><span class="n">OrderedSet</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-    <span class="n">column_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">]]</span>
     <span class="n">sources</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span>
         <span class="s2">&quot;ViewRepresentation&quot;</span>
     <span class="p">]</span>  <span class="c1"># https://www.python.org/dev/peps/pep-0484/#forward-references</span>
@@ -2670,7 +2635,6 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">column_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">sources</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="s2">&quot;ViewRepresentation&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">node_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">):</span>
@@ -2682,18 +2646,12 @@
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">column_set</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">OrderedSet</span><span class="o">.</span><span class="n">OrderedSet</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_set</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">sources</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sources</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">si</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">si</span> <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">column_types</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">column_types</span> <span class="o">=</span> <span class="n">column_types</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">OperatorPlatform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="n">node_name</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">column_map</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">:</span>
@@ -2986,13 +2944,12 @@
 
     <span class="c1"># return table representation of self</span>
     <span class="k">def</span> <span class="nf">as_table_description</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_types</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
         <span class="k">return</span> <span class="n">TableDescription</span><span class="p">(</span>
             <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span>
             <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">qualifiers</span><span class="o">=</span><span class="n">qualifiers</span><span class="p">,</span>
-            <span class="n">column_types</span><span class="o">=</span><span class="n">column_types</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="c1"># implement builders for all non-initial ops types on base class</span>
@@ -3236,7 +3193,6 @@ Abstract base class.</p>
             <span class="name">ViewRepresentation</span><span class="signature">(
     column_names: Iterable[str],
     *,
-    column_types: Optional[Dict[str, type]] = None,
     sources: Optional[List[<a href="#ViewRepresentation">data_algebra.data_ops.ViewRepresentation</a>]] = None,
     node_name: str
 )</span>
@@ -3248,7 +3204,6 @@ Abstract base class.</p>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">column_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">sources</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="s2">&quot;ViewRepresentation&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">node_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">):</span>
@@ -3260,18 +3215,12 @@ Abstract base class.</p>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">column_set</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">OrderedSet</span><span class="o">.</span><span class="n">OrderedSet</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_set</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">sources</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sources</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">:</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">si</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">si</span> <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">column_types</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">column_types</span> <span class="o">=</span> <span class="n">column_types</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">OperatorPlatform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="n">node_name</span><span class="p">)</span>
 </pre></div>
 
@@ -3819,19 +3768,18 @@ with the using columns (None means all).</p>
 
         
             <span class="def">def</span>
-            <span class="name">as_table_description</span><span class="signature">(self, table_name=None, *, qualifiers=None, column_types=None)</span>:
+            <span class="name">as_table_description</span><span class="signature">(self, table_name=None, *, qualifiers=None)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">as_table_description</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_types</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
         <span class="k">return</span> <span class="n">TableDescription</span><span class="p">(</span>
             <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span>
             <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">qualifiers</span><span class="o">=</span><span class="n">qualifiers</span><span class="p">,</span>
-            <span class="n">column_types</span><span class="o">=</span><span class="n">column_types</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -4332,7 +4280,6 @@ with the using columns (None means all).</p>
         <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">column_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">head</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">limit_was</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">nrows</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4342,7 +4289,7 @@ with the using columns (None means all).</p>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">]</span>  <span class="c1"># convert to list from other types such as series</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;TableDescription&quot;</span><span class="p">,</span> <span class="n">column_types</span><span class="o">=</span><span class="n">column_types</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;TableDescription&quot;</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">table_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">table_name_was_set_by_user</span> <span class="o">=</span> <span class="kc">False</span>
@@ -4402,7 +4349,6 @@ with the using columns (None means all).</p>
             <span class="n">table_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">table_name</span><span class="p">,</span>
             <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span>
             <span class="n">qualifiers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">qualifiers</span><span class="p">,</span>
-            <span class="n">column_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_types</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">r</span>
 
@@ -4518,7 +4464,6 @@ with the using columns (None means all).</p>
     column_names: Iterable[str],
     qualifiers=None,
     sql_meta=None,
-    column_types: Optional[Dict[str, type]] = None,
     head=None,
     limit_was: Optional[int] = None,
     nrows: Optional[int] = None
@@ -4534,7 +4479,6 @@ with the using columns (None means all).</p>
         <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">column_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">head</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">limit_was</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">nrows</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4544,7 +4488,7 @@ with the using columns (None means all).</p>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">]</span>  <span class="c1"># convert to list from other types such as series</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;TableDescription&quot;</span><span class="p">,</span> <span class="n">column_types</span><span class="o">=</span><span class="n">column_types</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;TableDescription&quot;</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">table_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">table_name_was_set_by_user</span> <span class="o">=</span> <span class="kc">False</span>
@@ -4670,7 +4614,6 @@ with the using columns (None means all).</p>
             <span class="n">table_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">table_name</span><span class="p">,</span>
             <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span>
             <span class="n">qualifiers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">qualifiers</span><span class="p">,</span>
-            <span class="n">column_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_types</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">r</span>
 </pre></div>
@@ -4914,11 +4857,9 @@ with the using columns (None means all).</p>
     *,
     qualifiers=None,
     sql_meta=None,
-    column_types=None,
     row_limit: Optional[int] = 7,
     keep_sample=True,
-    keep_all=False,
-    guess_column_types=True
+    keep_all=False
 ) -&gt; <a href="#TableDescription">data_algebra.data_ops.TableDescription</a></span>:
     </div>
 
@@ -4930,30 +4871,23 @@ with the using columns (None means all).</p>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">column_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">row_limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span>
     <span class="n">keep_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">keep_all</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">guess_column_types</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TableDescription</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param d: pandas table to describe</span>
 <span class="sd">    :param table_name: name of table</span>
 <span class="sd">    :param qualifiers: optional, able qualifiers</span>
 <span class="sd">    :param sql_meta: optional, sql meta information map</span>
-<span class="sd">    :param column_types: optional, map of column types</span>
 <span class="sd">    :param row_limit: how many rows to sample</span>
 <span class="sd">    :param keep_sample: logical, if True retain head of table</span>
 <span class="sd">    :param keep_all: logical, if True retain all of table</span>
-<span class="sd">    :param guess_column_types: logical, if True try to infer column types</span>
 <span class="sd">    :return: TableDescription</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">OperatorPlatform</span><span class="p">)</span>
     <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
     <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">column_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">column_types</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">guess_column_types</span><span class="p">:</span>
-            <span class="n">column_types</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_column_types</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
     <span class="n">head</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">nrows</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">keep_all</span><span class="p">:</span>
@@ -4969,7 +4903,6 @@ with the using columns (None means all).</p>
     <span class="k">return</span> <span class="n">TableDescription</span><span class="p">(</span>
         <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span>
         <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span>
-        <span class="n">column_types</span><span class="o">=</span><span class="n">column_types</span><span class="p">,</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="n">qualifiers</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="n">sql_meta</span><span class="p">,</span>
         <span class="n">head</span><span class="o">=</span><span class="n">head</span><span class="p">,</span>
@@ -4984,11 +4917,9 @@ with the using columns (None means all).</p>
 :param table_name: name of table
 :param qualifiers: optional, able qualifiers
 :param sql_meta: optional, sql meta information map
-:param column_types: optional, map of column types
 :param row_limit: how many rows to sample
 :param keep_sample: logical, if True retain head of table
 :param keep_all: logical, if True retain all of table
-:param guess_column_types: logical, if True try to infer column types
 :return: TableDescription</p>
 </div>
 
@@ -5017,7 +4948,6 @@ with the using columns (None means all).</p>
         <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">column_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">row_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">keep_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">keep_all</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -5060,7 +4990,6 @@ with the using columns (None means all).</p>
         <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span>
         <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sql_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">column_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">row_limit</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
         <span class="n">keep_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">keep_all</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -5161,7 +5090,7 @@ with the using columns (None means all).</p>
         <span class="n">consumed_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="ow">in</span> <span class="n">parsed_ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">o</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">(</span><span class="n">consumed_cols</span><span class="p">)</span>
-        <span class="n">unknown_cols</span> <span class="o">=</span> <span class="n">consumed_cols</span> <span class="o">-</span> <span class="n">source</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">unknown_cols</span> <span class="o">=</span> <span class="n">consumed_cols</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown_cols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">unknown_cols</span><span class="p">))</span>
         <span class="n">known_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span>
@@ -5190,6 +5119,7 @@ with the using columns (None means all).</p>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;tried to change: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">bad_overwrite</span><span class="p">))</span>
         <span class="c1"># check op arguments are very simple: all arguments are column names</span>
         <span class="k">if</span> <span class="n">windowed_situation</span><span class="p">:</span>
+            <span class="n">source_col_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
             <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">opk</span><span class="p">)</span> <span class="ow">in</span> <span class="n">parsed_ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Expression</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -5214,7 +5144,7 @@ with the using columns (None means all).</p>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ColumnReference</span><span class="p">):</span>
                         <span class="n">value_name</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_name</span>
-                        <span class="k">if</span> <span class="n">value_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">column_set</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">value_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">source_col_set</span><span class="p">:</span>
                             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">value_name</span> <span class="o">+</span> <span class="s2">&quot; not in source column set&quot;</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">):</span>
@@ -5300,17 +5230,17 @@ with the using columns (None means all).</p>
                             <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[</span><span class="n">columns_we_take</span><span class="p">]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)]</span>
         <span class="n">subops</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">op</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">using</span><span class="p">}</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subops</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[</span><span class="n">columns_we_take</span><span class="p">]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)]</span>
+        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">using</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partition_by</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_by</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reverse</span><span class="p">)</span>
         <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">columns_we_take</span> <span class="o">-</span> <span class="n">subops</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">o</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">(</span><span class="n">columns_we_take</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">columns_we_take</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">([</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">columns_we_take</span><span class="p">])]</span>
 
     <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">spacer</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span>
@@ -5413,7 +5343,7 @@ Abstract base class.</p>
         <span class="n">consumed_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="ow">in</span> <span class="n">parsed_ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">o</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">(</span><span class="n">consumed_cols</span><span class="p">)</span>
-        <span class="n">unknown_cols</span> <span class="o">=</span> <span class="n">consumed_cols</span> <span class="o">-</span> <span class="n">source</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">unknown_cols</span> <span class="o">=</span> <span class="n">consumed_cols</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown_cols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">unknown_cols</span><span class="p">))</span>
         <span class="n">known_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span>
@@ -5442,6 +5372,7 @@ Abstract base class.</p>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;tried to change: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">bad_overwrite</span><span class="p">))</span>
         <span class="c1"># check op arguments are very simple: all arguments are column names</span>
         <span class="k">if</span> <span class="n">windowed_situation</span><span class="p">:</span>
+            <span class="n">source_col_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
             <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">opk</span><span class="p">)</span> <span class="ow">in</span> <span class="n">parsed_ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Expression</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -5466,7 +5397,7 @@ Abstract base class.</p>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">ColumnReference</span><span class="p">):</span>
                         <span class="n">value_name</span> <span class="o">=</span> <span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_name</span>
-                        <span class="k">if</span> <span class="n">value_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">column_set</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">value_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">source_col_set</span><span class="p">:</span>
                             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">value_name</span> <span class="o">+</span> <span class="s2">&quot; not in source column set&quot;</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">):</span>
@@ -5588,17 +5519,17 @@ Abstract base class.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[</span><span class="n">columns_we_take</span><span class="p">]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)]</span>
         <span class="n">subops</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">op</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">using</span><span class="p">}</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subops</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[</span><span class="n">columns_we_take</span><span class="p">]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)]</span>
+        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">using</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partition_by</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_by</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reverse</span><span class="p">)</span>
         <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">columns_we_take</span> <span class="o">-</span> <span class="n">subops</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">o</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">(</span><span class="n">columns_we_take</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">columns_we_take</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">([</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">columns_we_take</span><span class="p">])]</span>
 </pre></div>
 
         </details>
@@ -5782,7 +5713,7 @@ with the using columns (None means all).</p>
             <span class="n">consumed_cols</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="ow">in</span> <span class="n">parsed_ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">o</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">(</span><span class="n">consumed_cols</span><span class="p">)</span>
-        <span class="n">unknown_cols</span> <span class="o">=</span> <span class="n">consumed_cols</span> <span class="o">-</span> <span class="n">source</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">unknown_cols</span> <span class="o">=</span> <span class="n">consumed_cols</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown_cols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">unknown_cols</span><span class="p">))</span>
         <span class="n">known_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span>
@@ -5940,7 +5871,7 @@ Abstract base class.</p>
             <span class="n">consumed_cols</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="ow">in</span> <span class="n">parsed_ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">o</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">(</span><span class="n">consumed_cols</span><span class="p">)</span>
-        <span class="n">unknown_cols</span> <span class="o">=</span> <span class="n">consumed_cols</span> <span class="o">-</span> <span class="n">source</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">unknown_cols</span> <span class="o">=</span> <span class="n">consumed_cols</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown_cols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;referred to unknown columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">unknown_cols</span><span class="p">))</span>
         <span class="n">known_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span>
@@ -6271,11 +6202,11 @@ with the using columns (None means all).</p>
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">columns_we_take</span><span class="p">]</span>
-        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">columns_we_take</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">using</span><span class="p">)</span>
-        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">columns_we_take</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decision_columns</span><span class="p">)</span>
+        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">ordered_intersect</span><span class="p">(</span><span class="n">columns_we_take</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span>
+        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">ordered_union</span><span class="p">(</span><span class="n">columns_we_take</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">decision_columns</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">columns_we_take</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -6382,11 +6313,11 @@ Abstract base class.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">columns_we_take</span><span class="p">]</span>
-        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">columns_we_take</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">using</span><span class="p">)</span>
-        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">columns_we_take</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decision_columns</span><span class="p">)</span>
+        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">ordered_intersect</span><span class="p">(</span><span class="n">columns_we_take</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span>
+        <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">ordered_union</span><span class="p">(</span><span class="n">columns_we_take</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">decision_columns</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">columns_we_take</span><span class="p">]</span>
 </pre></div>
 
@@ -7951,25 +7882,26 @@ with the using columns (None means all).</p>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">&quot;Different definition of table object on a/b for: &quot;</span> <span class="o">+</span> <span class="n">k</span>
                 <span class="p">)</span>
-        <span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
         <span class="c1"># check columns</span>
-        <span class="n">column_names</span> <span class="o">=</span> <span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">ci</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="p">:</span>
+        <span class="n">column_names</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">columns_seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ci</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">columns_seen</span><span class="p">:</span>
                 <span class="n">column_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ci</span><span class="p">)</span>
+                <span class="n">columns_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ci</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">by</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">by</span> <span class="o">=</span> <span class="p">[</span><span class="n">by</span><span class="p">]</span>
         <span class="n">by_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">by</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">by</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">by_set</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;duplicate column names in by&quot;</span><span class="p">)</span>
-        <span class="n">missing_left</span> <span class="o">=</span> <span class="n">by_set</span> <span class="o">-</span> <span class="n">a</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">missing_left</span> <span class="o">=</span> <span class="n">by_set</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_left</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;left table missing join keys: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing_left</span><span class="p">))</span>
-        <span class="n">missing_right</span> <span class="o">=</span> <span class="n">by_set</span> <span class="o">-</span> <span class="n">b</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">missing_right</span> <span class="o">=</span> <span class="n">by_set</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_right</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;right table missing join keys: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing_right</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">check_all_common_keys_in_by</span><span class="p">:</span>
-            <span class="n">missing_common</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_set</span><span class="p">)</span> <span class="o">-</span> <span class="n">by_set</span>
+            <span class="n">missing_common</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">))</span> <span class="o">-</span> <span class="n">by_set</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_common</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
                     <span class="s2">&quot;check_all_common_keys_in_by set, and the following common keys are are not in the by-clause: &quot;</span>
@@ -7978,7 +7910,7 @@ with the using columns (None means all).</p>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span>
-            <span class="n">sources</span><span class="o">=</span><span class="n">sources</span><span class="p">,</span>
+            <span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">],</span>
             <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">by</span> <span class="o">=</span> <span class="n">by</span>
@@ -8005,9 +7937,9 @@ with the using columns (None means all).</p>
 
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
         <span class="n">using</span> <span class="o">=</span> <span class="n">using</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">by</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">ordered_intersect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
 
     <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;_0.&quot;</span>
@@ -8080,25 +8012,26 @@ Abstract base class.</p>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">&quot;Different definition of table object on a/b for: &quot;</span> <span class="o">+</span> <span class="n">k</span>
                 <span class="p">)</span>
-        <span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
         <span class="c1"># check columns</span>
-        <span class="n">column_names</span> <span class="o">=</span> <span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">ci</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="p">:</span>
+        <span class="n">column_names</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">columns_seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ci</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">columns_seen</span><span class="p">:</span>
                 <span class="n">column_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ci</span><span class="p">)</span>
+                <span class="n">columns_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ci</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">by</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">by</span> <span class="o">=</span> <span class="p">[</span><span class="n">by</span><span class="p">]</span>
         <span class="n">by_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">by</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">by</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">by_set</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;duplicate column names in by&quot;</span><span class="p">)</span>
-        <span class="n">missing_left</span> <span class="o">=</span> <span class="n">by_set</span> <span class="o">-</span> <span class="n">a</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">missing_left</span> <span class="o">=</span> <span class="n">by_set</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_left</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;left table missing join keys: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing_left</span><span class="p">))</span>
-        <span class="n">missing_right</span> <span class="o">=</span> <span class="n">by_set</span> <span class="o">-</span> <span class="n">b</span><span class="o">.</span><span class="n">column_set</span>
+        <span class="n">missing_right</span> <span class="o">=</span> <span class="n">by_set</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_right</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;right table missing join keys: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing_right</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">check_all_common_keys_in_by</span><span class="p">:</span>
-            <span class="n">missing_common</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_set</span><span class="p">)</span> <span class="o">-</span> <span class="n">by_set</span>
+            <span class="n">missing_common</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">))</span> <span class="o">-</span> <span class="n">by_set</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_common</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
                     <span class="s2">&quot;check_all_common_keys_in_by set, and the following common keys are are not in the by-clause: &quot;</span>
@@ -8107,7 +8040,7 @@ Abstract base class.</p>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span>
-            <span class="n">sources</span><span class="o">=</span><span class="n">sources</span><span class="p">,</span>
+            <span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">],</span>
             <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">by</span> <span class="o">=</span> <span class="n">by</span>
@@ -8163,9 +8096,9 @@ Abstract base class.</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
         <span class="n">using</span> <span class="o">=</span> <span class="n">using</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">by</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">ordered_intersect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
 </pre></div>
 
         </details>
@@ -8353,19 +8286,6 @@ with the using columns (None means all).</p>
         <span class="k">if</span> <span class="n">id_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">id_column</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;id_column should not be an input table column name&quot;</span><span class="p">)</span>
         <span class="n">column_names</span> <span class="o">=</span> <span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="p">(</span>
-                    <span class="nb">len</span><span class="p">({</span><span class="n">a</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]}</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">b</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]})</span> <span class="o">-</span> <span class="p">{</span><span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)})</span>
-                    <span class="o">&lt;=</span> <span class="mi">1</span>
-                <span class="p">)</span>
         <span class="k">if</span> <span class="n">id_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">id_column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">column_names</span>
             <span class="n">column_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">id_column</span><span class="p">)</span>
@@ -8400,8 +8320,8 @@ with the using columns (None means all).</p>
 
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
-        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">ordered_intersect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
 
     <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;_0.&quot;</span>
@@ -8485,19 +8405,6 @@ Abstract base class.</p>
         <span class="k">if</span> <span class="n">id_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">id_column</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;id_column should not be an input table column name&quot;</span><span class="p">)</span>
         <span class="n">column_names</span> <span class="o">=</span> <span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="p">(</span>
-                    <span class="nb">len</span><span class="p">({</span><span class="n">a</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]}</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">b</span><span class="o">.</span><span class="n">column_types</span><span class="p">[</span><span class="n">c</span><span class="p">]})</span> <span class="o">-</span> <span class="p">{</span><span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)})</span>
-                    <span class="o">&lt;=</span> <span class="mi">1</span>
-                <span class="p">)</span>
         <span class="k">if</span> <span class="n">id_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">id_column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">column_names</span>
             <span class="n">column_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">id_column</span><span class="p">)</span>
@@ -8559,8 +8466,8 @@ Abstract base class.</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
-        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_set</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">ordered_intersect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
 </pre></div>
 
         </details>

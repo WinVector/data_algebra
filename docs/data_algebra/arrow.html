@@ -88,9 +88,6 @@
                                 <a class="function" href="#DataOpArrow.act_on">act_on</a>
                         </li>
                         <li>
-                                <a class="function" href="#DataOpArrow.learn_types">learn_types</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#DataOpArrow.fit">fit</a>
                         </li>
                         <li>
@@ -242,17 +239,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">free_table_key</span> <span class="o">=</span> <span class="n">free_table_key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span> <span class="o">=</span> <span class="n">t_used</span><span class="p">[</span><span class="n">free_table_key</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">disallowed_columns</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">forbidden_columns</span><span class="p">()[</span><span class="n">free_table_key</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">t_used</span><span class="p">[</span><span class="n">free_table_key</span><span class="p">]</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span> <span class="o">=</span> <span class="n">t_used</span><span class="p">[</span><span class="n">free_table_key</span><span class="p">]</span><span class="o">.</span><span class="n">column_types</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="nb">isinstance</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">Arrow</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -282,19 +270,6 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;forbidden incoming columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">excess</span><span class="p">))</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strict</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;extra incoming columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">excess</span><span class="p">))</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">outgoing_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">:</span>
-                <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
-                <span class="n">xt</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">outgoing_types</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">st</span> <span class="o">!=</span> <span class="n">xt</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;column &quot;</span>
-                        <span class="o">+</span> <span class="n">c</span>
-                        <span class="o">+</span> <span class="s2">&quot; self incoming type is &quot;</span>
-                        <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">st</span><span class="p">)</span>
-                        <span class="o">+</span> <span class="s2">&quot;, while b outgoing type is &quot;</span>
-                        <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">xt</span><span class="p">)</span>
-                    <span class="p">)</span>
         <span class="n">new_pipeline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span>
             <span class="n">b</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">free_table_key</span>
         <span class="p">)</span>
@@ -304,8 +279,6 @@
             <span class="n">free_table_key</span><span class="o">=</span><span class="n">b</span><span class="o">.</span><span class="n">free_table_key</span><span class="p">,</span>
             <span class="n">forbidden_to_produce</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">forbidden_to_produce</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">res</span><span class="o">.</span><span class="n">incoming_types</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">incoming_types</span>
-        <span class="n">res</span><span class="o">.</span><span class="n">outgoing_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span>
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
@@ -321,27 +294,17 @@
             <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">act_on</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">learn_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_in</span><span class="p">,</span> <span class="n">data_out</span><span class="p">):</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">data_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">data_in</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="n">types_in</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">data_in</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">}</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span> <span class="o">=</span> <span class="n">types_in</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">data_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">data_out</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="n">types_out</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">data_out</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">}</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span> <span class="o">=</span> <span class="n">types_out</span>
-
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Learn input and output types from example, and return self&quot;&quot;&quot;</span>
         <span class="c1"># assume a pandas.DataFrame compatible object</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">act_on</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">learn_types</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Learn input and output types from example, and return transform.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">learn_types</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">dom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -349,7 +312,6 @@
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
                 <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
-                <span class="n">column_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">)</span>
 
@@ -357,7 +319,6 @@
         <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
             <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
-            <span class="n">column_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">cod</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -365,7 +326,6 @@
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
                 <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
-                <span class="n">column_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">)</span>
 
@@ -373,7 +333,6 @@
         <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
             <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
-            <span class="n">column_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -393,12 +352,9 @@
 
     <span class="c1"># noinspection PyMethodMayBeStatic</span>
     <span class="k">def</span> <span class="nf">format_end_description</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">required_cols</span><span class="p">,</span> <span class="n">col_types</span><span class="p">,</span> <span class="n">forbidden_cols</span><span class="p">,</span> <span class="n">align_right</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">sep_width</span><span class="o">=</span><span class="mi">2</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">required_cols</span><span class="p">,</span> <span class="n">forbidden_cols</span><span class="p">,</span> <span class="n">align_right</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">sep_width</span><span class="o">=</span><span class="mi">2</span>
     <span class="p">):</span>
-        <span class="k">if</span> <span class="n">col_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">in_rep</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">col_types</span><span class="p">[</span><span class="n">c</span><span class="p">])</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">required_cols</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">in_rep</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">required_cols</span><span class="p">]</span>
+        <span class="n">in_rep</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">required_cols</span><span class="p">]</span>
         <span class="n">in_rep</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">flow_text</span><span class="o">.</span><span class="n">flow_text</span><span class="p">(</span>
             <span class="n">in_rep</span><span class="p">,</span> <span class="n">align_right</span><span class="o">=</span><span class="n">align_right</span><span class="p">,</span> <span class="n">sep_width</span><span class="o">=</span><span class="n">sep_width</span>
         <span class="p">)</span>
@@ -416,12 +372,10 @@
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">in_rep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_end_description</span><span class="p">(</span>
             <span class="n">required_cols</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
-            <span class="n">col_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span><span class="p">,</span>
             <span class="n">forbidden_cols</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">disallowed_columns</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">out_rep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_end_description</span><span class="p">(</span>
             <span class="n">required_cols</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
-            <span class="n">col_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span><span class="p">,</span>
             <span class="n">forbidden_cols</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">forbidden_to_produce</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
@@ -440,11 +394,7 @@
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">incoming_types</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">outgoing_types</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">pipeline</span>
 
@@ -826,17 +776,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">free_table_key</span> <span class="o">=</span> <span class="n">free_table_key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span> <span class="o">=</span> <span class="n">t_used</span><span class="p">[</span><span class="n">free_table_key</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">disallowed_columns</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">forbidden_columns</span><span class="p">()[</span><span class="n">free_table_key</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">t_used</span><span class="p">[</span><span class="n">free_table_key</span><span class="p">]</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span> <span class="o">=</span> <span class="n">t_used</span><span class="p">[</span><span class="n">free_table_key</span><span class="p">]</span><span class="o">.</span><span class="n">column_types</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="nb">isinstance</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">Arrow</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -866,19 +807,6 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;forbidden incoming columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">excess</span><span class="p">))</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strict</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;extra incoming columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">excess</span><span class="p">))</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">outgoing_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">:</span>
-                <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
-                <span class="n">xt</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">outgoing_types</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">st</span> <span class="o">!=</span> <span class="n">xt</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;column &quot;</span>
-                        <span class="o">+</span> <span class="n">c</span>
-                        <span class="o">+</span> <span class="s2">&quot; self incoming type is &quot;</span>
-                        <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">st</span><span class="p">)</span>
-                        <span class="o">+</span> <span class="s2">&quot;, while b outgoing type is &quot;</span>
-                        <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">xt</span><span class="p">)</span>
-                    <span class="p">)</span>
         <span class="n">new_pipeline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span>
             <span class="n">b</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">free_table_key</span>
         <span class="p">)</span>
@@ -888,8 +816,6 @@
             <span class="n">free_table_key</span><span class="o">=</span><span class="n">b</span><span class="o">.</span><span class="n">free_table_key</span><span class="p">,</span>
             <span class="n">forbidden_to_produce</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">forbidden_to_produce</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">res</span><span class="o">.</span><span class="n">incoming_types</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">incoming_types</span>
-        <span class="n">res</span><span class="o">.</span><span class="n">outgoing_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span>
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
@@ -905,27 +831,17 @@
             <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">act_on</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">learn_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_in</span><span class="p">,</span> <span class="n">data_out</span><span class="p">):</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">data_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">data_in</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="n">types_in</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">data_in</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">}</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span> <span class="o">=</span> <span class="n">types_in</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">data_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">data_out</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="n">types_out</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">data_out</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">}</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span> <span class="o">=</span> <span class="n">types_out</span>
-
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Learn input and output types from example, and return self&quot;&quot;&quot;</span>
         <span class="c1"># assume a pandas.DataFrame compatible object</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">act_on</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">learn_types</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Learn input and output types from example, and return transform.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">learn_types</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">dom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -933,7 +849,6 @@
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
                 <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
-                <span class="n">column_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">)</span>
 
@@ -941,7 +856,6 @@
         <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
             <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
-            <span class="n">column_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">cod</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -949,7 +863,6 @@
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
                 <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
-                <span class="n">column_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">)</span>
 
@@ -957,7 +870,6 @@
         <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
             <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
-            <span class="n">column_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -977,12 +889,9 @@
 
     <span class="c1"># noinspection PyMethodMayBeStatic</span>
     <span class="k">def</span> <span class="nf">format_end_description</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">required_cols</span><span class="p">,</span> <span class="n">col_types</span><span class="p">,</span> <span class="n">forbidden_cols</span><span class="p">,</span> <span class="n">align_right</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">sep_width</span><span class="o">=</span><span class="mi">2</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">required_cols</span><span class="p">,</span> <span class="n">forbidden_cols</span><span class="p">,</span> <span class="n">align_right</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">sep_width</span><span class="o">=</span><span class="mi">2</span>
     <span class="p">):</span>
-        <span class="k">if</span> <span class="n">col_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">in_rep</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">col_types</span><span class="p">[</span><span class="n">c</span><span class="p">])</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">required_cols</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">in_rep</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">required_cols</span><span class="p">]</span>
+        <span class="n">in_rep</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">required_cols</span><span class="p">]</span>
         <span class="n">in_rep</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">flow_text</span><span class="o">.</span><span class="n">flow_text</span><span class="p">(</span>
             <span class="n">in_rep</span><span class="p">,</span> <span class="n">align_right</span><span class="o">=</span><span class="n">align_right</span><span class="p">,</span> <span class="n">sep_width</span><span class="o">=</span><span class="n">sep_width</span>
         <span class="p">)</span>
@@ -1000,12 +909,10 @@
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">in_rep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_end_description</span><span class="p">(</span>
             <span class="n">required_cols</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
-            <span class="n">col_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span><span class="p">,</span>
             <span class="n">forbidden_cols</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">disallowed_columns</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">out_rep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_end_description</span><span class="p">(</span>
             <span class="n">required_cols</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
-            <span class="n">col_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span><span class="p">,</span>
             <span class="n">forbidden_cols</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">forbidden_to_produce</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
@@ -1024,11 +931,7 @@
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">incoming_types</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">outgoing_types</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">pipeline</span>
 
@@ -1083,17 +986,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">free_table_key</span> <span class="o">=</span> <span class="n">free_table_key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span> <span class="o">=</span> <span class="n">t_used</span><span class="p">[</span><span class="n">free_table_key</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">disallowed_columns</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">forbidden_columns</span><span class="p">()[</span><span class="n">free_table_key</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">t_used</span><span class="p">[</span><span class="n">free_table_key</span><span class="p">]</span><span class="o">.</span><span class="n">column_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span> <span class="o">=</span> <span class="n">t_used</span><span class="p">[</span><span class="n">free_table_key</span><span class="p">]</span><span class="o">.</span><span class="n">column_types</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">column_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="nb">isinstance</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">Arrow</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </pre></div>
 
@@ -1155,19 +1049,6 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;forbidden incoming columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">excess</span><span class="p">))</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strict</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;extra incoming columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">excess</span><span class="p">))</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">outgoing_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">:</span>
-                <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
-                <span class="n">xt</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">outgoing_types</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">st</span> <span class="o">!=</span> <span class="n">xt</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;column &quot;</span>
-                        <span class="o">+</span> <span class="n">c</span>
-                        <span class="o">+</span> <span class="s2">&quot; self incoming type is &quot;</span>
-                        <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">st</span><span class="p">)</span>
-                        <span class="o">+</span> <span class="s2">&quot;, while b outgoing type is &quot;</span>
-                        <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">xt</span><span class="p">)</span>
-                    <span class="p">)</span>
         <span class="n">new_pipeline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span>
             <span class="n">b</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">free_table_key</span>
         <span class="p">)</span>
@@ -1177,8 +1058,6 @@
             <span class="n">free_table_key</span><span class="o">=</span><span class="n">b</span><span class="o">.</span><span class="n">free_table_key</span><span class="p">,</span>
             <span class="n">forbidden_to_produce</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">forbidden_to_produce</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">res</span><span class="o">.</span><span class="n">incoming_types</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">incoming_types</span>
-        <span class="n">res</span><span class="o">.</span><span class="n">outgoing_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span>
         <span class="k">return</span> <span class="n">res</span>
 </pre></div>
 
@@ -1219,30 +1098,6 @@
 
 
                             </div>
-                            <div id="DataOpArrow.learn_types" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#DataOpArrow.learn_types">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">learn_types</span><span class="signature">(self, data_in, data_out)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">learn_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_in</span><span class="p">,</span> <span class="n">data_out</span><span class="p">):</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">data_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">data_in</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="n">types_in</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">data_in</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">}</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span> <span class="o">=</span> <span class="n">types_in</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">data_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">data_out</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="n">types_out</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">data_out</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">}</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span> <span class="o">=</span> <span class="n">types_out</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            </div>
                             <div id="DataOpArrow.fit" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#DataOpArrow.fit">#&nbsp;&nbsp</a>
 
@@ -1257,7 +1112,6 @@
         <span class="sd">&quot;&quot;&quot;Learn input and output types from example, and return self&quot;&quot;&quot;</span>
         <span class="c1"># assume a pandas.DataFrame compatible object</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">act_on</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">learn_types</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 </pre></div>
 
@@ -1281,7 +1135,6 @@
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Learn input and output types from example, and return transform.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">learn_types</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 </pre></div>
 
@@ -1307,7 +1160,6 @@
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
                 <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
-                <span class="n">column_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">)</span>
 </pre></div>
@@ -1333,7 +1185,6 @@
         <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
             <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
-            <span class="n">column_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_types</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -1357,7 +1208,6 @@
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
                 <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
-                <span class="n">column_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">)</span>
 </pre></div>
@@ -1383,7 +1233,6 @@
         <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
             <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
-            <span class="n">column_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_types</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -1435,26 +1284,15 @@
 
         
             <span class="def">def</span>
-            <span class="name">format_end_description</span><span class="signature">(
-    self,
-    *,
-    required_cols,
-    col_types,
-    forbidden_cols,
-    align_right=70,
-    sep_width=2
-)</span>:
+            <span class="name">format_end_description</span><span class="signature">(self, *, required_cols, forbidden_cols, align_right=70, sep_width=2)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">format_end_description</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">required_cols</span><span class="p">,</span> <span class="n">col_types</span><span class="p">,</span> <span class="n">forbidden_cols</span><span class="p">,</span> <span class="n">align_right</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">sep_width</span><span class="o">=</span><span class="mi">2</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">required_cols</span><span class="p">,</span> <span class="n">forbidden_cols</span><span class="p">,</span> <span class="n">align_right</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">sep_width</span><span class="o">=</span><span class="mi">2</span>
     <span class="p">):</span>
-        <span class="k">if</span> <span class="n">col_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">in_rep</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">col_types</span><span class="p">[</span><span class="n">c</span><span class="p">])</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">required_cols</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">in_rep</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">required_cols</span><span class="p">]</span>
+        <span class="n">in_rep</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">required_cols</span><span class="p">]</span>
         <span class="n">in_rep</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">flow_text</span><span class="o">.</span><span class="n">flow_text</span><span class="p">(</span>
             <span class="n">in_rep</span><span class="p">,</span> <span class="n">align_right</span><span class="o">=</span><span class="n">align_right</span><span class="p">,</span> <span class="n">sep_width</span><span class="o">=</span><span class="n">sep_width</span>
         <span class="p">)</span>
