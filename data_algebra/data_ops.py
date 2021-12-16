@@ -1099,18 +1099,17 @@ class ExtendNode(ViewRepresentation):
                             )
 
     def columns_used_from_sources(self, using=None):
-        # TODO: work on order here
-        columns_we_take = set(self.sources[0].column_names)
         if using is None:
-            return [columns_we_take]
+            return [OrderedSet(self.sources[0].column_names)]
         subops = {k: op for (k, op) in self.ops.items() if k in using}
         if len(subops) <= 0:
-            return [columns_we_take]
+            return [OrderedSet(self.sources[0].column_names)]
+        columns_we_take = set(self.sources[0].column_names)
         columns_we_take = using.union(self.partition_by, self.order_by, self.reverse)
         columns_we_take = columns_we_take - subops.keys()
         for (k, o) in subops.items():
             o.get_column_names(columns_we_take)
-        return [columns_we_take]
+        return [OrderedSet([v for v in self.sources[0].column_names if v in columns_we_take])]
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
         spacer = " "
