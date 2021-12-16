@@ -62,7 +62,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
        Abstract base class."""
 
     column_names: List[str]
-    column_set: OrderedSet[str]
     column_types: Optional[Dict[str, type]]
     sources: List[
         "ViewRepresentation"
@@ -84,10 +83,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         assert len(self.column_names) > 0
         for v in self.column_names:
             assert isinstance(v, str)
-        self.column_set = OrderedSet()
-        for c in self.column_names:
-            self.column_set.add(c)
-        assert len(self.column_names) == len(self.column_set)
+        assert len(column_names) == len(set(column_names))
         if sources is None:
             sources = []
         for si in sources:
@@ -1103,7 +1099,8 @@ class ExtendNode(ViewRepresentation):
                             )
 
     def columns_used_from_sources(self, using=None):
-        columns_we_take = self.sources[0].column_set.copy()
+        # TODO: work on order here
+        columns_we_take = set(self.sources[0].column_names)
         if using is None:
             return [columns_we_take]
         subops = {k: op for (k, op) in self.ops.items() if k in using}
