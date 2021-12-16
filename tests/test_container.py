@@ -27,23 +27,23 @@ def test_container_1():
 
     scale = 0.237
 
-    with Pipeline() as (pipeline, _):
+    with Pipeline(describe_table(d, "d")) as (pipeline, _):
         ops2 = (
-            pipeline.start(describe_table(d, "d"))
-            .extend({"probability": (_.assessmentTotal * scale).exp()})
-            .extend({"total": _.probability.sum()}, partition_by="subjectID")
-            .extend({"probability": _.probability / _.total})
-            .extend({"ncat": one.sum()}, partition_by=["subjectID"],)
-            .extend(
-                {"row_number": one.cumsum()},
-                partition_by=["subjectID"],
-                order_by=["probability"],
-                reverse=["probability"],
-            )
-            .select_rows(_.row_number == 1)
-            .select_columns(["subjectID", "surveyCategory", "probability", "ncat"])
-            .rename_columns({"diagnosis": "surveyCategory"})
-            .get_ops()
+            pipeline
+                .extend({"probability": (_.assessmentTotal * scale).exp()})
+                .extend({"total": _.probability.sum()}, partition_by="subjectID")
+                .extend({"probability": _.probability / _.total})
+                .extend({"ncat": one.sum()}, partition_by=["subjectID"],)
+                .extend(
+                    {"row_number": one.cumsum()},
+                    partition_by=["subjectID"],
+                    order_by=["probability"],
+                    reverse=["probability"],
+                )
+                .select_rows(_.row_number == 1)
+                .select_columns(["subjectID", "surveyCategory", "probability", "ncat"])
+                .rename_columns({"diagnosis": "surveyCategory"})
+                .get_ops()
         )
 
     db_handle = data_algebra.MySQL.MySQLModel().db_handle(conn=None)
@@ -83,23 +83,23 @@ def test_container_2():
 
     scale = 0.237
 
-    with Pipeline() as (pipeline, _):
+    with Pipeline(describe_table(d, "d", keep_all=True)) as (pipeline, _):
         res = (
-            pipeline.start(describe_table(d, "d", keep_all=True))
-            .extend({"probability": (_.assessmentTotal * scale).exp()})
-            .extend({"total": _.probability.sum()}, partition_by="subjectID")
-            .extend({"probability": _.probability / _.total})
-            .extend({"ncat": one.sum()}, partition_by=["subjectID"],)
-            .extend(
-                {"row_number": one.cumsum()},
-                partition_by=["subjectID"],
-                order_by=["probability"],
-                reverse=["probability"],
-            )
-            .select_rows(_.row_number == 1)
-            .select_columns(["subjectID", "surveyCategory", "probability", "ncat"])
-            .rename_columns({"diagnosis": "surveyCategory"})
-            .ex()
+            pipeline
+                .extend({"probability": (_.assessmentTotal * scale).exp()})
+                .extend({"total": _.probability.sum()}, partition_by="subjectID")
+                .extend({"probability": _.probability / _.total})
+                .extend({"ncat": one.sum()}, partition_by=["subjectID"],)
+                .extend(
+                    {"row_number": one.cumsum()},
+                    partition_by=["subjectID"],
+                    order_by=["probability"],
+                    reverse=["probability"],
+                )
+                .select_rows(_.row_number == 1)
+                .select_columns(["subjectID", "surveyCategory", "probability", "ncat"])
+                .rename_columns({"diagnosis": "surveyCategory"})
+                .ex()
         )
 
     expect = data_algebra.default_data_model.pd.DataFrame(
@@ -134,20 +134,20 @@ def test_container_2():
 
     # forget to use result
     with pytest.raises(AssertionError):
-        with Pipeline() as (pipeline, _):
+        with Pipeline(describe_table(d, "d", keep_all=True)) as (pipeline, _):
             res = (
-                pipeline.start(describe_table(d, "d", keep_all=True))
-                .extend({"probability": (_.assessmentTotal * scale).exp()})
-                .extend({"total": _.probability.sum()}, partition_by="subjectID")
-                .extend({"probability": _.probability / _.total})
-                .extend({"ncat": one.sum()}, partition_by=["subjectID"],)
-                .extend(
-                    {"row_number": one.cumsum()},
-                    partition_by=["subjectID"],
-                    order_by=["probability"],
-                    reverse=["probability"],
-                )
-                .select_rows(_.row_number == 1)
-                .select_columns(["subjectID", "surveyCategory", "probability", "ncat"])
-                .rename_columns({"diagnosis": "surveyCategory"})
+                pipeline.start()
+                    .extend({"probability": (_.assessmentTotal * scale).exp()})
+                    .extend({"total": _.probability.sum()}, partition_by="subjectID")
+                    .extend({"probability": _.probability / _.total})
+                    .extend({"ncat": one.sum()}, partition_by=["subjectID"],)
+                    .extend(
+                        {"row_number": one.cumsum()},
+                        partition_by=["subjectID"],
+                        order_by=["probability"],
+                        reverse=["probability"],
+                    )
+                    .select_rows(_.row_number == 1)
+                    .select_columns(["subjectID", "surveyCategory", "probability", "ncat"])
+                    .rename_columns({"diagnosis": "surveyCategory"})
             )

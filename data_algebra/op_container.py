@@ -22,11 +22,11 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
     column_namespace: SimpleNamespace  # don't replace the reference, instead mutate (reference shared!)
     used_result: bool
 
-    def __init__(self):
-        self.ops = None
+    def __init__(self, other):
         self.column_namespace = SimpleNamespace()  # allows a dot notation
         self.used_result = False
         data_algebra.data_ops_types.OperatorPlatform.__init__(self, node_name="container")
+        self.set(other)
 
     def set(self, other):
         assert isinstance(other, data_algebra.data_ops.ViewRepresentation)
@@ -36,13 +36,11 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         self.column_namespace.__dict__.update(self.ops.column_map())
         return self
 
-    def start(self, other):
-        assert self.ops is None
-        return self.set(other)
-
     def get_ops(self):
         self.used_result = True
-        return self.ops
+        res = self.ops
+        self.ops = None
+        return res
 
     def ex(self, *, data_model=None, narrow=True, allow_limited_tables=False):
         """
@@ -211,8 +209,8 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
 # pop 0343 context manager
 # https://www.python.org/dev/peps/pep-0343/#use-cases
 class Pipeline:
-    def __init__(self):
-        self.container = OpC()
+    def __init__(self, other):
+        self.container = OpC(other)
 
     def __enter__(self):
         return self.container, self.container.column_namespace
