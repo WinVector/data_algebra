@@ -53,11 +53,28 @@ def _sparksql_coalesce_expr(dbmodel, expression):
     )
 
 
+def _sparksql_db_mapv(dbmodel, expression):
+    if_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    mapping_dict = expression.args[1]
+    default_value_expr = dbmodel.expr_to_sql(expression.args[2], want_inline_parens=True)
+    terms = [
+        "WHEN (" + if_expr + " = " + dbmodel.value_to_sql(k) + ") THEN " + dbmodel.value_to_sql(v) for k, v in mapping_dict.value.items()
+    ]
+    if len(terms) <= 0:
+        return default_value_expr
+    return (
+            "CASE "
+            + " ".join(terms)
+            + " ELSE " + default_value_expr + " END"
+    )
+
+
 # map from op-name to special SQL formatting code
 SparkSQL_formatters = {
     "___": lambda dbmodel, expression: str(expression.to_python()),
     "is_bad": _sparksql_is_bad_expr,
     "coalesce": _sparksql_coalesce_expr,
+    'mapv': _sparksql_db_mapv,
 }
 
 

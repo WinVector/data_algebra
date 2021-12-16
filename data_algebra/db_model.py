@@ -1322,7 +1322,7 @@ class DBModel:
     ) -> data_algebra.near_sql.NearSQL:
         if concat_node.node_name != "ConcatRowsNode":
             raise TypeError(
-                "Expected join_node to be a data_algebra.data_ops.ConcatRowsNode)"
+                "Expected concat_node to be a data_algebra.data_ops.ConcatRowsNode)"
             )
         if temp_id_source is None:
             temp_id_source = [0]
