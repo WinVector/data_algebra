@@ -4,7 +4,7 @@ Package for data processing in Python: https://github.com/WinVector/data_algebra
 """
 
 __docformat__ = "restructuredtext"
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 
 __doc__ = """
 `data_algebra`<https://github.com/WinVector/data_algebra> is a piped data wrangling system
