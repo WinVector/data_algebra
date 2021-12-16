@@ -18,7 +18,7 @@ import data_algebra.expr_rep
 from data_algebra.data_ops_types import *
 import data_algebra.data_ops_utils
 import data_algebra.near_sql
-import data_algebra.OrderedSet
+from data_algebra.OrderedSet import OrderedSet, ordered_intersect, ordered_union, ordered_diff
 import data_algebra.util
 
 
@@ -62,7 +62,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
        Abstract base class."""
 
     column_names: List[str]
-    column_set: data_algebra.OrderedSet.OrderedSet[str]
+    column_set: OrderedSet[str]
     column_types: Optional[Dict[str, type]]
     sources: List[
         "ViewRepresentation"
@@ -84,7 +84,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         assert len(self.column_names) > 0
         for v in self.column_names:
             assert isinstance(v, str)
-        self.column_set = data_algebra.OrderedSet.OrderedSet()
+        self.column_set = OrderedSet()
         for c in self.column_names:
             self.column_set.add(c)
         assert len(self.column_names) == len(self.column_set)
@@ -963,7 +963,7 @@ class ExtendNode(ViewRepresentation):
         consumed_cols = set()
         for (k, o) in parsed_ops.items():
             o.get_column_names(consumed_cols)
-        unknown_cols = consumed_cols - source.column_set
+        unknown_cols = consumed_cols - set(source.column_names)
         if len(unknown_cols) > 0:
             raise KeyError("referred to unknown columns: " + str(unknown_cols))
         known_cols = set(column_names)
@@ -992,6 +992,7 @@ class ExtendNode(ViewRepresentation):
             raise ValueError("tried to change: " + str(bad_overwrite))
         # check op arguments are very simple: all arguments are column names
         if windowed_situation:
+            source_col_set = set(source.column_names)
             for (k, opk) in parsed_ops.items():
                 if not isinstance(opk, data_algebra.expr_rep.Expression):
                     raise ValueError(
@@ -1016,7 +1017,7 @@ class ExtendNode(ViewRepresentation):
                 if len(opk.args) > 0:
                     if isinstance(opk.args[0], data_algebra.expr_rep.ColumnReference):
                         value_name = opk.args[0].column_name
-                        if value_name not in source.column_set:
+                        if value_name not in source_col_set:
                             raise ValueError(value_name + " not in source column set")
                     else:
                         if not isinstance(opk.args[0], data_algebra.expr_rep.Value):
@@ -1173,7 +1174,7 @@ class ProjectNode(ViewRepresentation):
             consumed_cols.add(c)
         for (k, o) in parsed_ops.items():
             o.get_column_names(consumed_cols)
-        unknown_cols = consumed_cols - source.column_set
+        unknown_cols = consumed_cols - set(source.column_names)
         if len(unknown_cols) > 0:
             raise KeyError("referred to unknown columns: " + str(unknown_cols))
         known_cols = set(column_names)
@@ -1338,11 +1339,11 @@ class SelectRowsNode(ViewRepresentation):
         return True
 
     def columns_used_from_sources(self, using=None):
-        columns_we_take = self.sources[0].column_set.copy()
+        columns_we_take = OrderedSet(self.sources[0].column_names)
         if using is None:
             return [columns_we_take]
-        columns_we_take = columns_we_take.intersection(using)
-        columns_we_take = columns_we_take.union(self.decision_columns)
+        columns_we_take = ordered_intersect(columns_we_take, using)
+        columns_we_take = ordered_union(columns_we_take, self.decision_columns)
         return [columns_we_take]
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
@@ -1725,25 +1726,26 @@ class NaturalJoinNode(ViewRepresentation):
                 raise ValueError(
                     "Different definition of table object on a/b for: " + k
                 )
-        sources = [a, b]
         # check columns
-        column_names = sources[0].column_names.copy()
-        for ci in sources[1].column_names:
-            if ci not in sources[0].column_set:
+        column_names = a.column_names.copy()
+        columns_seen = set(column_names)
+        for ci in b.column_names:
+            if ci not in columns_seen:
                 column_names.append(ci)
+                columns_seen.add(ci)
         if isinstance(by, str):
             by = [by]
         by_set = set(by)
         if len(by) != len(by_set):
             raise ValueError("duplicate column names in by")
-        missing_left = by_set - a.column_set
+        missing_left = by_set - set(a.column_names)
         if len(missing_left) > 0:
             raise KeyError("left table missing join keys: " + str(missing_left))
-        missing_right = by_set - b.column_set
+        missing_right = by_set - set(b.column_names)
         if len(missing_right) > 0:
             raise KeyError("right table missing join keys: " + str(missing_right))
         if check_all_common_keys_in_by:
-            missing_common = a.column_set.intersection(b.column_set) - by_set
+            missing_common = set(a.column_names).intersection(set(b.column_names)) - by_set
             if len(missing_common) > 0:
                 raise KeyError(
                     "check_all_common_keys_in_by set, and the following common keys are are not in the by-clause: "
@@ -1752,7 +1754,7 @@ class NaturalJoinNode(ViewRepresentation):
         ViewRepresentation.__init__(
             self,
             column_names=column_names,
-            sources=sources,
+            sources=[a, b],
             node_name="NaturalJoinNode",
         )
         self.by = by
@@ -1779,9 +1781,9 @@ class NaturalJoinNode(ViewRepresentation):
 
     def columns_used_from_sources(self, using=None):
         if using is None:
-            return [self.sources[i].column_set.copy() for i in range(2)]
+            return [OrderedSet(self.sources[i].column_names) for i in range(2)]
         using = using.union(self.by)
-        return [self.sources[i].column_set.intersection(using) for i in range(2)]
+        return [ordered_intersect(self.sources[i].column_names, using) for i in range(2)]
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
         s = "_0."
@@ -1893,8 +1895,8 @@ class ConcatRowsNode(ViewRepresentation):
 
     def columns_used_from_sources(self, using=None):
         if using is None:
-            return [self.sources[i].column_set.copy() for i in range(2)]
-        return [self.sources[i].column_set.intersection(using) for i in range(2)]
+            return [OrderedSet(self.sources[i].column_names) for i in range(2)]
+        return [ordered_intersect(self.sources[i].column_names, using) for i in range(2)]
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
         s = "_0."
