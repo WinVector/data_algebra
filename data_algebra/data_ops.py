@@ -73,6 +73,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
         sources: Optional[Iterable["ViewRepresentation"]] = None,
         node_name: str,
     ):
+        # don't let instances masquarade as iterables
+        assert not isinstance(column_names, str)
+        assert not isinstance(sources, OperatorPlatform)
         if not isinstance(column_names, tuple):
             column_names = tuple(column_names)
         assert len(column_names) > 0
@@ -1730,6 +1733,12 @@ class NaturalJoinNode(ViewRepresentation):
                     "check_all_common_keys_in_by set, and the following common keys are are not in the by-clause: "
                     + str(missing_common)
                 )
+        # try to re-use column names if possible, saves space in deeply nested join trees.
+        column_names = tuple(column_names)
+        if isinstance(a.column_names, tuple) and (set(column_names) == set(a.column_names)):
+            column_names = a.column_names
+        elif isinstance(b.column_names, tuple) and (set(column_names) == set(b.column_names)):
+            column_names = b.column_names
         ViewRepresentation.__init__(
             self,
             column_names=column_names,

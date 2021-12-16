@@ -4,7 +4,7 @@ Realization of data operations.
 
 
 from abc import ABC
-from typing import Iterable, Set, Dict, List, Optional, Union
+from typing import Iterable, Set, Dict, List, Optional, Tuple, Union
 import numbers
 import re
 
@@ -61,8 +61,8 @@ class ViewRepresentation(OperatorPlatform, ABC):
     """Structure to represent the columns of a query or a table.
        Abstract base class."""
 
-    column_names: List[str]
-    sources: List[
+    column_names: Tuple[str]
+    sources: Tuple[
         "ViewRepresentation"
     ]  # https://www.python.org/dev/peps/pep-0484/#forward-references
 
@@ -70,23 +70,27 @@ class ViewRepresentation(OperatorPlatform, ABC):
         self,
         column_names: Iterable[str],
         *,
-        sources: Optional[List["ViewRepresentation"]] = None,
+        sources: Optional[Iterable["ViewRepresentation"]] = None,
         node_name: str,
     ):
-        if isinstance(column_names, str):
-            column_names = [column_names]
-        else:
-            column_names = list(column_names)  # make sure a list and a disjoint copy
-        self.column_names = column_names
-        assert len(self.column_names) > 0
-        for v in self.column_names:
+        # don't let instances masquarade as iterables
+        assert not isinstance(column_names, str)
+        assert not isinstance(sources, OperatorPlatform)
+        if not isinstance(column_names, tuple):
+            column_names = tuple(column_names)
+        assert len(column_names) > 0
+        for v in column_names:
             assert isinstance(v, str)
         assert len(column_names) == len(set(column_names))
+        self.column_names = column_names
         if sources is None:
-            sources = []
+            sources = ()
+        else:
+            if not isinstance(sources, tuple):
+                sources = tuple(sources)
         for si in sources:
             assert isinstance(si, ViewRepresentation)
-        self.sources = [si for si in sources]
+        self.sources = sources
         OperatorPlatform.__init__(self, node_name=node_name)
 
     def column_map(self) -> collections.OrderedDict:
@@ -155,7 +159,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         raise NotImplementedError("base method called")
 
     def columns_produced(self):
-        return self.column_names.copy()
+        return list(self.column_names)
 
     def _columns_used_implementation(self, *, using, columns_currently_using_records):
         self_merged_rep_id = self.merged_rep_id()
@@ -383,7 +387,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
     ):
         return TableDescription(
             table_name=table_name,
-            column_names=self.column_names.copy(),
+            column_names=self.column_names,
             qualifiers=qualifiers,
         )
 
@@ -937,7 +941,7 @@ class ExtendNode(ViewRepresentation):
         if isinstance(reverse, str):
             reverse = [reverse]
         self.reverse = reverse
-        column_names = source.column_names.copy()
+        column_names = list(source.column_names)
         consumed_cols = set()
         for (k, o) in parsed_ops.items():
             o.get_column_names(consumed_cols)
@@ -1547,7 +1551,7 @@ class OrderRowsNode(ViewRepresentation):
         return True
 
     def columns_used_from_sources(self, using=None):
-        cols = set(self.column_names.copy())
+        cols = set(self.column_names)
         if using is None:
             return [cols]
         cols = cols.intersection(using).union(self.order_columns)
@@ -1705,7 +1709,7 @@ class NaturalJoinNode(ViewRepresentation):
                     "Different definition of table object on a/b for: " + k
                 )
         # check columns
-        column_names = a.column_names.copy()
+        column_names = list(a.column_names)
         columns_seen = set(column_names)
         for ci in b.column_names:
             if ci not in columns_seen:
@@ -1729,6 +1733,12 @@ class NaturalJoinNode(ViewRepresentation):
                     "check_all_common_keys_in_by set, and the following common keys are are not in the by-clause: "
                     + str(missing_common)
                 )
+        # try to re-use column names if possible, saves space in deeply nested join trees.
+        column_names = tuple(column_names)
+        if isinstance(a.column_names, tuple) and (set(column_names) == set(a.column_names)):
+            column_names = a.column_names
+        elif isinstance(b.column_names, tuple) and (set(column_names) == set(b.column_names)):
+            column_names = b.column_names
         ViewRepresentation.__init__(
             self,
             column_names=column_names,
@@ -1825,7 +1835,7 @@ class ConcatRowsNode(ViewRepresentation):
             raise ValueError("a and b should have same set of column names")
         if id_column is not None and id_column in sources[0].column_names:
             raise ValueError("id_column should not be an input table column name")
-        column_names = sources[0].column_names.copy()
+        column_names = list(sources[0].column_names)
         if id_column is not None:
             assert id_column not in column_names
             column_names.append(id_column)
