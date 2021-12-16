@@ -62,7 +62,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
        Abstract base class."""
 
     column_names: List[str]
-    column_types: Optional[Dict[str, type]]
     sources: List[
         "ViewRepresentation"
     ]  # https://www.python.org/dev/peps/pep-0484/#forward-references
@@ -71,7 +70,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
         self,
         column_names: Iterable[str],
         *,
-        column_types: Optional[Dict[str, type]] = None,
         sources: Optional[List["ViewRepresentation"]] = None,
         node_name: str,
     ):
@@ -89,9 +87,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
         for si in sources:
             assert isinstance(si, ViewRepresentation)
         self.sources = [si for si in sources]
-        self.column_types = None
-        if column_types is not None:
-            self.column_types = column_types.copy()
         OperatorPlatform.__init__(self, node_name=node_name)
 
     def column_map(self) -> collections.OrderedDict:
@@ -384,13 +379,12 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     # return table representation of self
     def as_table_description(
-        self, table_name=None, *, qualifiers=None, column_types=None
+        self, table_name=None, *, qualifiers=None
     ):
         return TableDescription(
             table_name=table_name,
             column_names=self.column_names.copy(),
             qualifiers=qualifiers,
-            column_types=column_types,
         )
 
     # implement builders for all non-initial ops types on base class
@@ -646,7 +640,6 @@ class TableDescription(ViewRepresentation):
         column_names: Iterable[str],
         qualifiers=None,
         sql_meta=None,
-        column_types: Optional[Dict[str, type]] = None,
         head=None,
         limit_was: Optional[int] = None,
         nrows: Optional[int] = None,
@@ -656,7 +649,7 @@ class TableDescription(ViewRepresentation):
         else:
             column_names = [v for v in column_names]  # convert to list from other types such as series
         ViewRepresentation.__init__(
-            self, column_names=column_names, node_name="TableDescription", column_types=column_types,
+            self, column_names=column_names, node_name="TableDescription"
         )
         if table_name is None:
             self.table_name_was_set_by_user = False
@@ -716,7 +709,6 @@ class TableDescription(ViewRepresentation):
             table_name=self.table_name,
             column_names=self.column_names,
             qualifiers=self.qualifiers,
-            column_types=self.column_types,
         )
         return r
 
@@ -817,30 +809,23 @@ def describe_table(
     *,
     qualifiers=None,
     sql_meta=None,
-    column_types=None,
     row_limit: Optional[int] = 7,
     keep_sample=True,
     keep_all=False,
-    guess_column_types=True,
 ) -> TableDescription:
     """
     :param d: pandas table to describe
     :param table_name: name of table
     :param qualifiers: optional, able qualifiers
     :param sql_meta: optional, sql meta information map
-    :param column_types: optional, map of column types
     :param row_limit: how many rows to sample
     :param keep_sample: logical, if True retain head of table
     :param keep_all: logical, if True retain all of table
-    :param guess_column_types: logical, if True try to infer column types
     :return: TableDescription
     """
     assert not isinstance(d, OperatorPlatform)
     assert not isinstance(d, ViewRepresentation)
     column_names = [c for c in d.columns]
-    if (column_types is None) or (len(column_types) < 1):
-        if guess_column_types:
-            column_types = data_algebra.util.guess_column_types(d)
     head = None
     nrows = d.shape[0]
     if keep_all:
@@ -856,7 +841,6 @@ def describe_table(
     return TableDescription(
         table_name=table_name,
         column_names=column_names,
-        column_types=column_types,
         qualifiers=qualifiers,
         sql_meta=sql_meta,
         head=head,
@@ -878,7 +862,6 @@ def table(d, *, table_name=None):
         table_name=table_name,
         qualifiers=None,
         sql_meta=None,
-        column_types=None,
         row_limit=None,
         keep_sample=True,
         keep_all=True,
@@ -900,7 +883,6 @@ def descr(**kwargs):
         table_name=table_name,
         qualifiers=None,
         sql_meta=None,
-        column_types=None,
         row_limit=7,
         keep_sample=True,
         keep_all=False,
@@ -1844,19 +1826,6 @@ class ConcatRowsNode(ViewRepresentation):
         if id_column is not None and id_column in sources[0].column_names:
             raise ValueError("id_column should not be an input table column name")
         column_names = sources[0].column_names.copy()
-        if (
-            isinstance(a, TableDescription)
-            and (a.column_types is not None)
-            and (len(a.column_types) > 0)
-            and isinstance(b, TableDescription)
-            and (b.column_types is not None)
-            and (len(b.column_types) > 0)
-        ):
-            for c in column_names:
-                assert (
-                    len({a.column_types[c]}.union({b.column_types[c]}) - {type(None)})
-                    <= 1
-                )
         if id_column is not None:
             assert id_column not in column_names
             column_names.append(id_column)

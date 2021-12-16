@@ -108,27 +108,6 @@ def test_arrow1():
         partition_by=["g"],
     )
     a2 = data_algebra.arrow.DataOpArrow(ordered_ops)
-    # print(a2)
-
-    # %%
-
-    # print(a2)
-
-    # %%
-
-    # print(a1 >> a2)
-
-    wrong_example = data_algebra.default_data_model.pd.DataFrame(
-        {"g": ["a"], "v": [1.0], "x": ["b"], "i": [True], "ngroup": [1]}
-    )
-
-    a2.fit(wrong_example)
-    # print(a2)
-
-    # %%
-
-    with pytest.raises(ValueError):
-        a1 >> a2
 
     # %%
 

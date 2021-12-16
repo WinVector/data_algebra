@@ -328,14 +328,6 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         # make an index-free copy of the data to isolate side-effects and not deal with indices
         res = df.loc[:, columns_using]
         res = res.reset_index(drop=True)
-        # check type compatibility
-        if((op.column_types is not None) and (len(op.column_types) > 0)
-                and (res.shape[0] > 0) and (res.shape[1] > 0)):
-            types_seen = data_algebra.util.guess_column_types(res)
-            for c in columns_using:
-                assert data_algebra.util.compatible_types(
-                    {types_seen[c]}.union({op.column_types[c]})
-                )
         return res
 
     def columns_to_frame_(self, cols, *, target_rows=0):

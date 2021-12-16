@@ -192,12 +192,7 @@ def _check_expr_incompatible_types(a, b):
         if isinstance(v, Value):
             return type(v.value)
         if isinstance(v, ColumnReference):
-            if (v.view is None) or (v.view.column_types is None) or (len(v.view.column_types) <= 0):
-                return None
-            try:
-                return v.view.column_types[v.column_name]
-            except KeyError:
-                return None
+            return None
         if isinstance(v, PreTerm):
             return None
         return None  # dunno

@@ -98,17 +98,8 @@ class DataOpArrow(Arrow):
         self.free_table_key = free_table_key
         self.incoming_columns = t_used[free_table_key].column_names.copy()
         self.disallowed_columns = pipeline.forbidden_columns()[free_table_key]
-        self.incoming_types = None
-        if t_used[free_table_key].column_types is not None:
-            self.incoming_types = t_used[free_table_key].column_types.copy()
         self.outgoing_columns = pipeline.column_names.copy()
         self.outgoing_columns.sort()
-        self.outgoing_types = None
-        if (
-            isinstance(pipeline, data_algebra.data_ops.TableDescription)
-            and self.incoming_types is not None
-        ):
-            self.outgoing_types = self.incoming_types.copy()
         Arrow.__init__(self)
 
     def get_feature_names(self, input_features=None):
@@ -138,19 +129,6 @@ class DataOpArrow(Arrow):
                 raise ValueError("forbidden incoming columns: " + str(excess))
             if self.strict:
                 raise ValueError("extra incoming columns: " + str(excess))
-        if (self.incoming_types is not None) and (b.outgoing_types is not None):
-            for c in self.incoming_columns:
-                st = self.incoming_types[c]
-                xt = b.outgoing_types[c]
-                if st != xt:
-                    raise ValueError(
-                        "column "
-                        + c
-                        + " self incoming type is "
-                        + str(st)
-                        + ", while b outgoing type is "
-                        + str(xt)
-                    )
         new_pipeline = self.pipeline.apply_to(
             b.pipeline, target_table_key=self.free_table_key
         )
@@ -160,8 +138,6 @@ class DataOpArrow(Arrow):
             free_table_key=b.free_table_key,
             forbidden_to_produce=self.forbidden_to_produce,
         )
-        res.incoming_types = b.incoming_types
-        res.outgoing_types = self.outgoing_types
         return res
 
     # noinspection PyPep8Naming
@@ -177,27 +153,17 @@ class DataOpArrow(Arrow):
             X = X[self.incoming_columns]
         return self.pipeline.act_on(X)
 
-    def learn_types(self, data_in, data_out):
-        if (data_in is not None) and (data_in.shape[0] > 0):
-            types_in = {k: type(data_in.loc[0, k]) for k in self.incoming_columns}
-            self.incoming_types = types_in
-        if (data_out is not None) and (data_out.shape[0] > 0):
-            types_out = {k: type(data_out.loc[0, k]) for k in self.outgoing_columns}
-            self.outgoing_types = types_out
-
     # noinspection PyPep8Naming
     def fit(self, X, y=None):
         """Learn input and output types from example, and return self"""
         # assume a pandas.DataFrame compatible object
         out = self.act_on(X)
-        self.learn_types(X, out)
         return self
 
     # noinspection PyPep8Naming
     def fit_transform(self, X, y=None):
         """Learn input and output types from example, and return transform."""
         out = self.transform(X)
-        self.learn_types(X, out)
         return self.transform(X)
 
     def dom(self):
@@ -205,7 +171,6 @@ class DataOpArrow(Arrow):
             data_algebra.data_ops.TableDescription(
                 table_name=None,
                 column_names=self.incoming_columns,
-                column_types=self.incoming_types,
             )
         )
 
@@ -213,7 +178,6 @@ class DataOpArrow(Arrow):
         return data_algebra.data_ops.TableDescription(
             table_name=None,
             column_names=self.incoming_columns,
-            column_types=self.incoming_types,
         )
 
     def cod(self):
@@ -221,7 +185,6 @@ class DataOpArrow(Arrow):
             data_algebra.data_ops.TableDescription(
                 table_name=None,
                 column_names=self.outgoing_columns,
-                column_types=self.outgoing_types,
             )
         )
 
@@ -229,7 +192,6 @@ class DataOpArrow(Arrow):
         return data_algebra.data_ops.TableDescription(
             table_name=None,
             column_names=self.outgoing_columns,
-            column_types=self.outgoing_types,
         )
 
     def __repr__(self):
@@ -249,12 +211,9 @@ class DataOpArrow(Arrow):
 
     # noinspection PyMethodMayBeStatic
     def format_end_description(
-        self, *, required_cols, col_types, forbidden_cols, align_right=70, sep_width=2
+        self, *, required_cols, forbidden_cols, align_right=70, sep_width=2
     ):
-        if col_types is not None:
-            in_rep = [str(c) + ": " + str(col_types[c]) for c in required_cols]
-        else:
-            in_rep = [str(c) for c in required_cols]
+        in_rep = [str(c) for c in required_cols]
         in_rep = data_algebra.flow_text.flow_text(
             in_rep, align_right=align_right, sep_width=sep_width
         )
@@ -272,12 +231,10 @@ class DataOpArrow(Arrow):
     def __str__(self):
         in_rep = self.format_end_description(
             required_cols=self.incoming_columns,
-            col_types=self.incoming_types,
             forbidden_cols=self.disallowed_columns,
         )
         out_rep = self.format_end_description(
             required_cols=self.outgoing_columns,
-            col_types=self.outgoing_types,
             forbidden_cols=self.forbidden_to_produce,
         )
         return (
@@ -296,11 +253,7 @@ class DataOpArrow(Arrow):
             return False
         if self.incoming_columns != other.incoming_columns:
             return False
-        if self.incoming_types != other.incoming_types:
-            return False
         if self.outgoing_columns != other.outgoing_columns:
-            return False
-        if self.outgoing_types != other.outgoing_types:
             return False
         return self.pipeline == other.pipeline
 

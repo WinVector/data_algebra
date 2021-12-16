@@ -65,10 +65,3 @@ def test_null_bad_no_compare():
             describe_table(d, table_name='d')
                 .extend({'c': 'x != None'})
         )
-
-    with pytest.raises(Exception):
-        # bad, compare known numeric to string
-        ops = (
-            describe_table(d, table_name='d')
-                .extend({'c': 'x == "None"'})
-        )
