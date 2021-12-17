@@ -90,7 +90,7 @@ data_algebra.__version__
 
 
 
-    '0.8.2'
+    '1.1.1'
 
 
 
@@ -176,7 +176,7 @@ db_handle = data_algebra.BigQuery.example_handle()
 print(db_handle)
 ```
 
-    BigQuery_DBHandle(db_model=BigQueryModel, conn=<google.cloud.bigquery.client.Client object at 0x7fa6a0a4da30>)
+    BigQuery_DBHandle(db_model=BigQueryModel, conn=<google.cloud.bigquery.client.Client object at 0x7fb0c8ab4cd0>)
 
 
 
@@ -353,51 +353,51 @@ print(sql)
     WITH
      `table_reference_0` AS (
       SELECT
-       `surveyCategory` ,
        `subjectID` ,
+       `surveyCategory` ,
        `assessmentTotal`
       FROM
        `data-algebra-test.test_1.d`
-     ),
+     ) ,
      `extend_1` AS (
       SELECT  -- .extend({ 'probability': '(assessmentTotal * 0.237).exp()'})
-       `surveyCategory` ,
        `subjectID` ,
+       `surveyCategory` ,
        EXP(`assessmentTotal` * 0.237) AS `probability`
       FROM
        `table_reference_0`
-     ),
+     ) ,
      `extend_2` AS (
       SELECT  -- .extend({ 'total': 'probability.sum()'}, partition_by=['subjectID'])
-       `surveyCategory` ,
        `subjectID` ,
+       `surveyCategory` ,
        `probability` ,
        SUM(`probability`) OVER ( PARTITION BY `subjectID`  )  AS `total`
       FROM
        `extend_1`
-     ),
+     ) ,
      `extend_3` AS (
       SELECT  -- .extend({ 'probability': 'probability / total'})
-       `probability` / `total` AS `probability` ,
+       `subjectID` ,
        `surveyCategory` ,
-       `subjectID`
+       `probability` / `total` AS `probability`
       FROM
        `extend_2`
-     ),
+     ) ,
      `extend_4` AS (
       SELECT  -- .extend({ 'row_number': '(1).cumsum()'}, partition_by=['subjectID'], order_by=['probability'], reverse=['probability'])
-       `probability` ,
-       `surveyCategory` ,
        `subjectID` ,
+       `surveyCategory` ,
+       `probability` ,
        SUM(1) OVER ( PARTITION BY `subjectID` ORDER BY `probability` DESC  )  AS `row_number`
       FROM
        `extend_3`
-     ),
+     ) ,
      `select_rows_5` AS (
       SELECT  -- .select_rows('row_number == 1')
-       `probability` ,
+       `subjectID` ,
        `surveyCategory` ,
-       `subjectID`
+       `probability`
       FROM
        `extend_4`
       WHERE
@@ -440,15 +440,15 @@ db_handle.read_query(sql)
   <tbody>
     <tr>
       <th>0</th>
-      <td>positive re-framing</td>
-      <td>0.558974</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>1</th>
       <td>withdrawal behavior</td>
       <td>0.670622</td>
       <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>positive re-framing</td>
+      <td>0.558974</td>
+      <td>2</td>
     </tr>
   </tbody>
 </table>
@@ -586,7 +586,7 @@ ops.column_names
 
 
 
-    ['subjectID', 'diagnosis', 'probability']
+    ('subjectID', 'diagnosis', 'probability')
 
 
 
@@ -604,8 +604,7 @@ The `data_algebra` is part of a powerful cross-language and mutli-implementaiton
 db_handle.close()
 ```
 
-Note: as with `SQL` the `data_algebra` assumes the processing pipeline is a [`DAG`](https://en.wikipedia.org/wiki/Directed_acyclic_graph) with only table-nodes used more than once.
-
+Note: `mysql` is not fully supported, as it doesn't name quoted common table expression columns in an obvious way. Also the SQL interface to Spark can not implement the `.mapv()` command, as that SQL miss-guesses a result column type. Likely one could get the correct effect through the Spark object interface. Current primary databases are PostgreSQL, Google Big Query, and SQLite.
 
 
 ```python
