@@ -138,19 +138,20 @@
 
 
 <span class="k">def</span> <span class="nf">_sparksql_db_mapv</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="n">if_expr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">mapping_dict</span> <span class="o">=</span> <span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">default_value_expr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">terms</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;WHEN (&quot;</span> <span class="o">+</span> <span class="n">if_expr</span> <span class="o">+</span> <span class="s2">&quot; = &quot;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;) THEN &quot;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">mapping_dict</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-    <span class="p">]</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">default_value_expr</span>
-    <span class="k">return</span> <span class="p">(</span>
-            <span class="s2">&quot;CASE &quot;</span>
-            <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span>
-            <span class="o">+</span> <span class="s2">&quot; ELSE &quot;</span> <span class="o">+</span> <span class="n">default_value_expr</span> <span class="o">+</span> <span class="s2">&quot; END&quot;</span>
-    <span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;mavp() doensn&#39;t currently work on the Spark SQL interface (defective CASE/WHEN implementation)&quot;</span><span class="p">)</span>
+    <span class="c1"># if_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)</span>
+    <span class="c1"># mapping_dict = expression.args[1]</span>
+    <span class="c1"># default_value_expr = dbmodel.expr_to_sql(expression.args[2], want_inline_parens=True)</span>
+    <span class="c1"># terms = [</span>
+    <span class="c1">#     &quot;WHEN (&quot; + if_expr + &quot; = &quot; + dbmodel.value_to_sql(k) + &quot;) THEN &quot; + dbmodel.value_to_sql(v) for k, v in mapping_dict.value.items()</span>
+    <span class="c1"># ]</span>
+    <span class="c1"># if len(terms) &lt;= 0:</span>
+    <span class="c1">#     return default_value_expr</span>
+    <span class="c1"># return (</span>
+    <span class="c1">#         &quot;CASE &quot;</span>
+    <span class="c1">#         + &quot; &quot;.join(terms)</span>
+    <span class="c1">#         + &quot; ELSE &quot; + default_value_expr + &quot; END&quot;</span>
+    <span class="c1"># )</span>
 
 
 <span class="c1"># map from op-name to special SQL formatting code</span>

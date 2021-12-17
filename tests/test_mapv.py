@@ -1,5 +1,6 @@
 
 import numpy
+import pytest
 
 import data_algebra
 from data_algebra.data_ops import *
@@ -31,9 +32,9 @@ def test_mapv_1():
         })
     assert data_algebra.test_util.equivalent_frames(transformed, expect)
 
-    #db_model = data_algebra.SparkSQL.SparkSQLModel()
-    #sql_str = db_model.to_sql(ops)
-    #assert isinstance(sql_str, str)
+    db_model = data_algebra.SparkSQL.SparkSQLModel()
+    with pytest.raises(ValueError):
+        db_model.to_sql(ops)
 
     data_algebra.test_util.check_transform(
         ops=ops, data=d, expect=expect,
