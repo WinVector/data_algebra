@@ -82,6 +82,7 @@
 <span class="kn">import</span> <span class="nn">hashlib</span>
 
 <span class="c1"># noinspection PyUnresolvedReferences</span>
+<span class="kn">import</span> <span class="nn">data_algebra.db_model</span>
 <span class="kn">import</span> <span class="nn">data_algebra.SQLite</span>
 <span class="kn">import</span> <span class="nn">data_algebra.BigQuery</span>
 <span class="kn">import</span> <span class="nn">data_algebra.PostgreSQL</span>
@@ -236,8 +237,11 @@
         <span class="n">alter_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">test_direct_ops_path</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="k">assert</span> <span class="n">db_handle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_handle</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBHandle</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">):</span>
+        <span class="n">test_direct_ops_path</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">db_handle_key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="p">)</span>
     <span class="n">sql_statements</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sql_statements</span><span class="p">)</span>
     <span class="n">res_db_sql</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">sql_statements</span><span class="p">)</span>

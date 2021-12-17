@@ -12,6 +12,7 @@ import pickle
 import hashlib
 
 # noinspection PyUnresolvedReferences
+import data_algebra.db_model
 import data_algebra.SQLite
 import data_algebra.BigQuery
 import data_algebra.PostgreSQL
@@ -166,8 +167,11 @@ def _run_handle_experiments(
         alter_cache: bool = True,
         test_direct_ops_path = False,
 ):
-    assert db_handle is not None
+    assert isinstance(db_handle, data_algebra.db_model.DBHandle)
+    assert isinstance(db_handle.db_model, data_algebra.db_model.DBModel)
     assert db_handle.conn is not None
+    if isinstance(db_handle.db_model, data_algebra.SQLite.SQLiteModel):
+        test_direct_ops_path = True
     db_handle_key = str(db_handle.db_model)
     sql_statements = list(sql_statements)
     res_db_sql = [None] * len(sql_statements)
