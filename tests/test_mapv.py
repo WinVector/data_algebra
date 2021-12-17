@@ -14,6 +14,7 @@ def test_mapv_1():
         })
     ops = (
         data(d=d)
+            .extend({'x_mapped': '0.0'})  # not deleted, as it is a constant
             .extend({
                 'z': '1 + -3',
                 'x_mapped': 'x.mapv({"a": 1.0, "b": 2.0, "q": -3}, 0.5)'

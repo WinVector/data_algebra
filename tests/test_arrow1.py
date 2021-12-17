@@ -217,7 +217,7 @@ def test_arrow_cod_dom():
 
 def test_arrow_compose_2():
     b1 = DataOpArrow(
-        TableDescription(column_names=["x", "y"], table_name=None).extend({"y": 7})
+        TableDescription(column_names=["x", "y"], table_name=None).extend({"y": "x+1"})
     )
     b2 = DataOpArrow(
         TableDescription(column_names=["x", "y"], table_name=None).extend({"y": 9})
