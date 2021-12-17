@@ -22,10 +22,15 @@ from data_algebra.data_ops import *
 
 
 # controls
-test_PostgreSQL = False  # causes an external dependency
-test_BigQuery = False  # causes an external dependency
-test_MySQL = False  # causes an external dependency
-test_Spark = False  # causes an external dependency
+test_PostgreSQL = True  # causes an external dependency
+test_BigQuery = True  # causes an external dependency
+test_MySQL = True  # causes an external dependency
+test_Spark = True  # causes an external dependency
+
+
+# global test result cache
+global_test_result_cache = None
+
 
 
 def formats_to_self(ops) -> bool:
@@ -158,11 +163,11 @@ def _run_handle_experiments(
         check_row_order: bool = False,
         test_result_cache: Optional[dict] = None,
         alter_cache: bool = True,
+        test_direct_ops_path = False,
 ):
     assert db_handle is not None
     assert db_handle.conn is not None
     db_handle_key = str(db_handle)
-    ops_key = str(ops)
     sql_statements = list(sql_statements)
     res_db_sql = [None] * len(sql_statements)
     res_db_ops = None
@@ -172,16 +177,12 @@ def _run_handle_experiments(
     data_key = ' '.join([k + ':' + hash_data_frame(data[k]) for k in dict_keys])
     # inspect result cache for any prior results
     if test_result_cache is not None:
-        try:
-            res_db_ops = test_result_cache[db_handle_key + " " + ops_key + " " + data_key].copy()
-        except KeyError:
-            pass
         for i in range(len(sql_statements)):
             try:
                 res_db_sql[i] = test_result_cache[db_handle_key + " " + sql_statements[i] + " " + data_key].copy()
             except KeyError:
                 pass
-        need_to_run = (res_db_ops is not None) and numpy.all([resi is not None for resi in res_db_sql])
+        need_to_run = test_direct_ops_path or numpy.any([resi is None for resi in res_db_sql])
     # generate any new needed results
     if need_to_run:
         to_del = set()
@@ -190,15 +191,14 @@ def _run_handle_experiments(
             db_handle.insert_table(v, table_name=k, allow_overwrite=True)
             to_del.add(k)
         try:
-            if res_db_ops is None:
+            if test_direct_ops_path is None:
                 res_db_ops = db_handle.read_query(ops)
-                if alter_cache and (test_result_cache is not None) and (res_db_ops is not None):
-                    test_result_cache[db_handle_key + " " + ops_key + " " + data_key] = res_db_ops.copy()
+                assert res_db_ops is not None
             for i in range(len(sql_statements)):
                 if res_db_sql[i] is None:
                     res_db_sql[i] = db_handle.read_query(sql_statements[i])
                     if alter_cache and (test_result_cache is not None) and (res_db_sql[i] is not None):
-                        test_result_cache[db_handle_key + " " + sql_statements[i] + " " + data_key] = res_db_sql[i]
+                        test_result_cache[db_handle_key + " " + sql_statements[i] + " " + data_key] = res_db_sql[i].copy()
         except Exception as e:
             caught = e
         for k in to_del:
@@ -216,15 +216,16 @@ def _run_handle_experiments(
                 check_row_order=check_row_order,
         ):
             raise ValueError(f"{db_handle} SQL result did not match expect")
-    if not equivalent_frames(
-            res_db_ops,
-            expect,
-            float_tol=float_tol,
-            check_column_order=check_column_order,
-            cols_case_sensitive=cols_case_sensitive,
-            check_row_order=check_row_order,
-    ):
-        raise ValueError(f"{db_handle} ops result did not match expect")
+    if res_db_ops is not None:
+        if not equivalent_frames(
+                res_db_ops,
+                expect,
+                float_tol=float_tol,
+                check_column_order=check_column_order,
+                cols_case_sensitive=cols_case_sensitive,
+                check_row_order=check_row_order,
+        ):
+            raise ValueError(f"{db_handle} ops result did not match expect")
 
 
 # noinspection PyShadowingNames
@@ -335,6 +336,7 @@ def check_transform_on_handles(
             empty_res_i = ops.eval(pm)
             assert set(empty_res_i.columns) == set(res.columns)
     # try any db paths
+    global global_test_result_cache
     if db_handles is not None:
         for db_handle in db_handles:
             sql_statements = set()
@@ -360,7 +362,8 @@ def check_transform_on_handles(
                     check_column_order=check_column_order,
                     cols_case_sensitive=cols_case_sensitive,
                     check_row_order=check_row_order,
-                    test_result_cache=None)
+                    test_result_cache=global_test_result_cache,
+                    alter_cache=True)
 
 
 def get_test_dbs():

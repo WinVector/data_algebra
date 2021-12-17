@@ -604,7 +604,7 @@ The `data_algebra` is part of a powerful cross-language and mutli-implementaiton
 db_handle.close()
 ```
 
-Note: `mysql` is not fully supported, as it doesn't name quoted common table expression columns in an obvious way. Also the SQL interface to Spark can not implement the `.mapv()` command, as that SQL miss-guesses a result column type. Likely one could get the correct effect through the Spark object interface. Current primary databases are PostgreSQL, Google Big Query, and SQLite.
+Note: `mysql` is not fully supported, as it doesn't name quoted common table expression columns in an obvious way. Current primary databases are PostgreSQL, Google Big Query, SparkSQL, and SQLite.
 
 
 ```python

@@ -35,8 +35,34 @@ def test_mapv_1():
     # problems insert None into Spark numeric columns, so use different test for spark
     # also Spark converts the result to strings
     spark_model = data_algebra.SparkSQL.SparkSQLModel()
-    with pytest.raises(ValueError):
-        spark_model.to_sql(ops)
     data_algebra.test_util.check_transform(
         ops=ops, data=d, expect=expect,
         models_to_skip={str(spark_model)})
+
+
+def test_mapv_1_spark():
+    pd = data_algebra.default_data_model.pd
+    d = pd.DataFrame({
+            'x': ['a', 'b', 'c', 'z', 'z', 'b'],
+        })
+    ops = (
+        data(d=d)
+            .extend({'x_mapped': '0.0'})  # not deleted, as it is a constant
+            .extend({
+                'z': '1 + -3',
+                'x_mapped': 'x.mapv({"a": 1.0, "b": 2.0, "q": -3}, 0.5)'
+                })
+        )
+    ops_str = str(ops)
+    assert isinstance(ops_str, str)
+
+    transformed = ops.transform(d)
+    expect = pd.DataFrame({
+        'x': ['a', 'b', 'c', 'z', 'z', 'b'],
+        'z': -2,
+        'x_mapped': [1.0, 2.0, 0.5, 0.5, 0.5, 2.0],
+        })
+    assert data_algebra.test_util.equivalent_frames(transformed, expect)
+
+    data_algebra.test_util.check_transform(
+        ops=ops, data=d, expect=expect)
