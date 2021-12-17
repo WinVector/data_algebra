@@ -14,25 +14,26 @@ except ImportError:
 
 
 def _sparksql_is_bad_expr(dbmodel, expression):
-    subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
-    assert isinstance(subexpr, str)
-    return (
-        "("
-        + subexpr
-        + " IS NULL OR "
-        + subexpr
-        + " >= "
-        + dbmodel.value_to_sql("+infinity")
-        + " OR "
-        + subexpr
-        + " <= "
-        + dbmodel.value_to_sql("-infinity")
-        + " OR "
-        + " isNaN("
-        + subexpr
-        + ")"
-        + ")"
-    )
+    raise ValueError("mavp() doensn't currently work on the Spark SQL interface (defective CASE/WHEN implementation)")
+    # subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    # assert isinstance(subexpr, str)
+    # return (
+    #     "("
+    #     + subexpr
+    #     + " IS NULL OR "
+    #     + subexpr
+    #     + " >= "
+    #     + dbmodel.value_to_sql("+infinity")
+    #     + " OR "
+    #     + subexpr
+    #     + " <= "
+    #     + dbmodel.value_to_sql("-infinity")
+    #     + " OR "
+    #     + " isNaN("
+    #     + subexpr
+    #     + ")"
+    #     + ")"
+    # )
 
 
 # treat NaN as NULL, as Pandas has a hard time distinguishing the two
@@ -54,20 +55,21 @@ def _sparksql_coalesce_expr(dbmodel, expression):
 
 
 def _sparksql_db_mapv(dbmodel, expression):
-    raise ValueError("mavp() doensn't currently work on the Spark SQL interface (defective CASE/WHEN implementation)")
-    # if_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
-    # mapping_dict = expression.args[1]
-    # default_value_expr = dbmodel.expr_to_sql(expression.args[2], want_inline_parens=True)
-    # terms = [
-    #     "WHEN (" + if_expr + " = " + dbmodel.value_to_sql(k) + ") THEN " + dbmodel.value_to_sql(v) for k, v in mapping_dict.value.items()
-    # ]
-    # if len(terms) <= 0:
-    #     return default_value_expr
-    # return (
-    #         "CASE "
-    #         + " ".join(terms)
-    #         + " ELSE " + default_value_expr + " END"
-    # )
+    raise ValueError("Spark returns string column instead of double")
+    # https://spark.apache.org/docs/latest/sql-ref-syntax-qry-select-case.html
+    if_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    mapping_dict = expression.args[1]
+    default_value_expr = dbmodel.expr_to_sql(expression.args[2], want_inline_parens=True)
+    terms = [
+        "WHEN (" + if_expr + " = " + dbmodel.value_to_sql(k) + ") THEN " + dbmodel.value_to_sql(v) for k, v in mapping_dict.value.items()
+    ]
+    if len(terms) <= 0:
+        return default_value_expr
+    return (
+            "CASE "
+            + " ".join(terms)
+            + " ELSE " + default_value_expr + " END"
+    )
 
 
 # map from op-name to special SQL formatting code
@@ -139,10 +141,13 @@ class SparkSQLModel(data_algebra.db_model.DBModel):
                 raise ValueError("table " + table_name + " already exists")
             else:
                 self.drop_table(conn, table_name, check=False)
-        d_spark = conn.spark_session.createDataFrame(d)
-        # https://stackoverflow.com/a/57292987/6901725
-        d_spark.replace(float("nan"), None)  # to get coalesce effects (didn't work)
-        d_spark.createOrReplaceTempView(table_name)  # TODO: non-temps
+        try:
+            d_spark = conn.spark_session.createDataFrame(d)
+            # https://stackoverflow.com/a/57292987/6901725
+            d_spark.replace(float("nan"), None)  # to get coalesce effects (didn't work)
+            d_spark.createOrReplaceTempView(table_name)  # TODO: non-temps
+        except Exception as ex:
+            raise ValueError("Spark problem inserting table, " + str(ex))
 
 
 cached_spark_context = None

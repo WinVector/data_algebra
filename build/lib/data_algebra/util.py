@@ -4,6 +4,7 @@ Basic utilities. Not allowed to import many other modules.
 """
 
 import datetime
+import warnings
 from typing import Dict, Iterable, Optional, Tuple
 
 import numpy
@@ -71,47 +72,49 @@ def _mk_type_coversion_table():
     #   Deprecated in NumPy 1.20; for more details and guidance:
     #   https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
     # (note even numpy.bool_ triggers the above, or the triggering it is in pyspark right now
-    try:
-        type_conversions[numpy.bool_] = bool
-    except Exception:
-        pass
-    try:
-        type_conversions[numpy.bool] = bool
-    except Exception:
-        pass
-    try:
-        type_conversions[numpy.int] = int
-    except Exception:
-        pass
-    try:
-        type_conversions[numpy.int_] = int
-    except Exception:
-        pass
-    try:
-        type_conversions[numpy.int64] = int
-    except Exception:
-        pass
-    try:
-        type_conversions[numpy.float64] = float
-    except Exception:
-        pass
-    try:
-        type_conversions[numpy.float] = float
-    except Exception:
-        pass
-    try:
-        type_conversions[numpy.float_] = float
-    except Exception:
-        pass
-    try:
-        type_conversions[numpy.str] = str
-    except Exception:
-        pass
-    try:
-        type_conversions[numpy.str_] = str
-    except Exception:
-        pass
-    return type_conversions
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        try:
+            type_conversions[numpy.bool_] = bool
+        except Exception:
+            pass
+        try:
+            type_conversions[numpy.bool] = bool
+        except Exception:
+            pass
+        try:
+            type_conversions[numpy.int] = int
+        except Exception:
+            pass
+        try:
+            type_conversions[numpy.int_] = int
+        except Exception:
+            pass
+        try:
+            type_conversions[numpy.int64] = int
+        except Exception:
+            pass
+        try:
+            type_conversions[numpy.float64] = float
+        except Exception:
+            pass
+        try:
+            type_conversions[numpy.float] = float
+        except Exception:
+            pass
+        try:
+            type_conversions[numpy.float_] = float
+        except Exception:
+            pass
+        try:
+            type_conversions[numpy.str] = str
+        except Exception:
+            pass
+        try:
+            type_conversions[numpy.str_] = str
+        except Exception:
+            pass
+        return type_conversions
 
 
 type_conversions = _mk_type_coversion_table()

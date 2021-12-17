@@ -9,6 +9,7 @@ import numpy
 import data_algebra
 
 import pickle
+import hashlib
 
 # noinspection PyUnresolvedReferences
 import data_algebra.SQLite
@@ -133,6 +134,99 @@ def equivalent_frames(
     return True
 
 
+
+def hash_data_frame(d) -> str:
+    """
+    Get a hash code representing a data frame.
+
+    :param d: data frame
+    :return: hash code as a string
+    """
+    return hashlib.sha256(data_algebra.default_data_model.pd.util.hash_pandas_object(d).values).hexdigest()
+
+
+def _run_handle_experiments(
+        *,
+        db_handle,
+        data: Dict,
+        ops: ValueError,
+        sql_statements: Iterable[str],
+        expect,
+        float_tol: float = 1e-8,
+        check_column_order: bool = False,
+        cols_case_sensitive: bool = False,
+        check_row_order: bool = False,
+        test_result_cache: Optional[dict] = None,
+        alter_cache: bool = True,
+):
+    assert db_handle is not None
+    assert db_handle.conn is not None
+    db_handle_key = str(db_handle)
+    ops_key = str(ops)
+    sql_statements = list(sql_statements)
+    res_db_sql = [None] * len(sql_statements)
+    res_db_ops = None
+    need_to_run = True
+    dict_keys = list(data.keys())
+    dict_keys.sort()
+    data_key = ' '.join([k + ':' + hash_data_frame(data[k]) for k in dict_keys])
+    # inspect result cache for any prior results
+    if test_result_cache is not None:
+        try:
+            res_db_ops = test_result_cache[db_handle_key + " " + ops_key + " " + data_key].copy()
+        except KeyError:
+            pass
+        for i in range(len(sql_statements)):
+            try:
+                res_db_sql[i] = test_result_cache[db_handle_key + " " + sql_statements[i] + " " + data_key].copy()
+            except KeyError:
+                pass
+        need_to_run = (res_db_ops is not None) and numpy.all([resi is not None for resi in res_db_sql])
+    # generate any new needed results
+    if need_to_run:
+        to_del = set()
+        caught = None
+        for (k, v) in data.items():
+            db_handle.insert_table(v, table_name=k, allow_overwrite=True)
+            to_del.add(k)
+        try:
+            if res_db_ops is None:
+                res_db_ops = db_handle.read_query(ops)
+                if alter_cache and (test_result_cache is not None) and (res_db_ops is not None):
+                    test_result_cache[db_handle_key + " " + ops_key + " " + data_key] = res_db_ops.copy()
+            for i in range(len(sql_statements)):
+                if res_db_sql[i] is None:
+                    res_db_sql[i] = db_handle.read_query(sql_statements[i])
+                    if alter_cache and (test_result_cache is not None) and (res_db_sql[i] is not None):
+                        test_result_cache[db_handle_key + " " + sql_statements[i] + " " + data_key] = res_db_sql[i]
+        except Exception as e:
+            caught = e
+        for k in to_del:
+            db_handle.drop_table(k)
+        if caught is not None:
+            raise ValueError(f"{db_handle} error in test " + str(caught))
+    # check results
+    for res in res_db_sql:
+        if not equivalent_frames(
+                res,
+                expect,
+                float_tol=float_tol,
+                check_column_order=check_column_order,
+                cols_case_sensitive=cols_case_sensitive,
+                check_row_order=check_row_order,
+        ):
+            raise ValueError(f"{db_handle} SQL result did not match expect")
+    if not equivalent_frames(
+            res_db_ops,
+            expect,
+            float_tol=float_tol,
+            check_column_order=check_column_order,
+            cols_case_sensitive=cols_case_sensitive,
+            check_row_order=check_row_order,
+    ):
+        raise ValueError(f"{db_handle} ops result did not match expect")
+
+
 # noinspection PyShadowingNames
 def check_transform_on_handles(
     *,
@@ -243,57 +337,30 @@ def check_transform_on_handles(
     # try any db paths
     if db_handles is not None:
         for db_handle in db_handles:
-            to_del = set()
-            sql_statements = []
+            sql_statements = set()
             for initial_commas in [True, False]:
                 for use_with in [True, False]:
-                    sql_format_options = data_algebra.db_model.SQLFormatOptions(
-                        use_with=use_with,
-                        annotate=True,
-                        sql_indent=" ",
-                        initial_commas=initial_commas,
-                    )
-                    sql = db_handle.to_sql(ops, sql_format_options=sql_format_options,)
-                    assert isinstance(sql, str)
-                    sql_statements.append(sql)
-                    # print(sql)
+                    for annotate in [True, False]:
+                        sql_format_options = data_algebra.db_model.SQLFormatOptions(
+                            use_with=use_with,
+                            annotate=annotate,
+                            initial_commas=initial_commas,
+                        )
+                        sql = db_handle.to_sql(ops, sql_format_options=sql_format_options,)
+                        assert isinstance(sql, str)
+                        sql_statements.add(sql)
             if db_handle.conn is not None:
-                for (k, v) in data.items():
-                    db_handle.insert_table(v, table_name=k, allow_overwrite=True)
-                    to_del.add(k)
-                caught = None
-                res_db_sql = []
-                res_db_ops = None
-                try:
-                    for sql in sql_statements:
-                        res_db_sql_i = db_handle.read_query(sql)
-                        res_db_sql.append(res_db_sql_i)
-                    res_db_ops = db_handle.read_query(ops)
-                except Exception as e:
-                    caught = e
-                for k in to_del:
-                    db_handle.drop_table(k)
-                if caught is not None:
-                    raise caught
-                for res in res_db_sql:
-                    if not equivalent_frames(
-                        res,
-                        expect,
-                        float_tol=float_tol,
-                        check_column_order=check_column_order,
-                        cols_case_sensitive=cols_case_sensitive,
-                        check_row_order=check_row_order,
-                    ):
-                        raise ValueError(f"{db_handle} SQL result did not match expect")
-                if not equivalent_frames(
-                    res_db_ops,
-                    expect,
+                _run_handle_experiments(
+                    db_handle=db_handle,
+                    data=data,
+                    ops=ops,
+                    sql_statements=sql_statements,
+                    expect=expect,
                     float_tol=float_tol,
                     check_column_order=check_column_order,
                     cols_case_sensitive=cols_case_sensitive,
                     check_row_order=check_row_order,
-                ):
-                    raise ValueError(f"{db_handle} ops result did not match expect")
+                    test_result_cache=None)
 
 
 def get_test_dbs():
@@ -407,4 +474,4 @@ def check_transform(
             pass
 
     if caught is not None:
-        raise caught
+        raise ValueError("testing caught " + str(caught))
