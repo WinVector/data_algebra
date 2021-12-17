@@ -97,6 +97,12 @@
 <span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
 <span class="n">test_Spark</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
 
+<span class="n">run_direct_ops_path_tests</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="c1"># global test result cache</span>
+<span class="n">global_test_result_cache</span> <span class="o">=</span> <span class="kc">None</span>
+
+
 
 <span class="k">def</span> <span class="nf">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -228,11 +234,11 @@
         <span class="n">check_row_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">test_result_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">alter_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">test_direct_ops_path</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="k">assert</span> <span class="n">db_handle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="k">assert</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-    <span class="n">db_handle_key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">db_handle</span><span class="p">)</span>
-    <span class="n">ops_key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
+    <span class="n">db_handle_key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="p">)</span>
     <span class="n">sql_statements</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sql_statements</span><span class="p">)</span>
     <span class="n">res_db_sql</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">sql_statements</span><span class="p">)</span>
     <span class="n">res_db_ops</span> <span class="o">=</span> <span class="kc">None</span>
@@ -240,18 +246,18 @@
     <span class="n">dict_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="n">dict_keys</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
     <span class="n">data_key</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">k</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="n">hash_data_frame</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dict_keys</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">mk_key</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">db_handle_key</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">sql_statements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">data_key</span>
+
     <span class="c1"># inspect result cache for any prior results</span>
     <span class="k">if</span> <span class="n">test_result_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">res_db_ops</span> <span class="o">=</span> <span class="n">test_result_cache</span><span class="p">[</span><span class="n">db_handle_key</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">ops_key</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">data_key</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">pass</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sql_statements</span><span class="p">)):</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">res_db_sql</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_result_cache</span><span class="p">[</span><span class="n">db_handle_key</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">sql_statements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">data_key</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">res_db_sql</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_result_cache</span><span class="p">[</span><span class="n">mk_key</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                 <span class="k">pass</span>
-        <span class="n">need_to_run</span> <span class="o">=</span> <span class="p">(</span><span class="n">res_db_ops</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="n">resi</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">resi</span> <span class="ow">in</span> <span class="n">res_db_sql</span><span class="p">])</span>
+        <span class="n">need_to_run</span> <span class="o">=</span> <span class="n">test_direct_ops_path</span> <span class="ow">or</span> <span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">([</span><span class="n">resi</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">resi</span> <span class="ow">in</span> <span class="n">res_db_sql</span><span class="p">])</span>
     <span class="c1"># generate any new needed results</span>
     <span class="k">if</span> <span class="n">need_to_run</span><span class="p">:</span>
         <span class="n">to_del</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -260,15 +266,14 @@
             <span class="n">db_handle</span><span class="o">.</span><span class="n">insert_table</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">to_del</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">res_db_ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">test_direct_ops_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">res_db_ops</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">alter_cache</span> <span class="ow">and</span> <span class="p">(</span><span class="n">test_result_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">res_db_ops</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-                    <span class="n">test_result_cache</span><span class="p">[</span><span class="n">db_handle_key</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">ops_key</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">data_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">res_db_ops</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="k">assert</span> <span class="n">res_db_ops</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sql_statements</span><span class="p">)):</span>
                 <span class="k">if</span> <span class="n">res_db_sql</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">res_db_sql</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">sql_statements</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                     <span class="k">if</span> <span class="n">alter_cache</span> <span class="ow">and</span> <span class="p">(</span><span class="n">test_result_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">res_db_sql</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-                        <span class="n">test_result_cache</span><span class="p">[</span><span class="n">db_handle_key</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">sql_statements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">data_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">res_db_sql</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                        <span class="n">test_result_cache</span><span class="p">[</span><span class="n">mk_key</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">res_db_sql</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">caught</span> <span class="o">=</span> <span class="n">e</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">to_del</span><span class="p">:</span>
@@ -286,15 +291,16 @@
                 <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
         <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db_handle</span><span class="si">}</span><span class="s2"> SQL result did not match expect&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
-            <span class="n">res_db_ops</span><span class="p">,</span>
-            <span class="n">expect</span><span class="p">,</span>
-            <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
-            <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
-            <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
-            <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db_handle</span><span class="si">}</span><span class="s2"> ops result did not match expect&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">res_db_ops</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
+                <span class="n">res_db_ops</span><span class="p">,</span>
+                <span class="n">expect</span><span class="p">,</span>
+                <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
+                <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
+                <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
+                <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db_handle</span><span class="si">}</span><span class="s2"> ops result did not match expect&quot;</span><span class="p">)</span>
 
 
 <span class="c1"># noinspection PyShadowingNames</span>
@@ -405,6 +411,8 @@
             <span class="n">empty_res_i</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">pm</span><span class="p">)</span>
             <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">empty_res_i</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
     <span class="c1"># try any db paths</span>
+    <span class="k">global</span> <span class="n">global_test_result_cache</span>
+    <span class="k">global</span> <span class="n">run_direct_ops_path_tests</span>
     <span class="k">if</span> <span class="n">db_handles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">db_handle</span> <span class="ow">in</span> <span class="n">db_handles</span><span class="p">:</span>
             <span class="n">sql_statements</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -430,7 +438,9 @@
                     <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
                     <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
                     <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
-                    <span class="n">test_result_cache</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+                    <span class="n">test_result_cache</span><span class="o">=</span><span class="n">global_test_result_cache</span><span class="p">,</span>
+                    <span class="n">alter_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">test_direct_ops_path</span><span class="o">=</span><span class="n">run_direct_ops_path_tests</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">get_test_dbs</span><span class="p">():</span>
@@ -864,6 +874,8 @@ Ignores indexing.</p>
             <span class="n">empty_res_i</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">pm</span><span class="p">)</span>
             <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">empty_res_i</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
     <span class="c1"># try any db paths</span>
+    <span class="k">global</span> <span class="n">global_test_result_cache</span>
+    <span class="k">global</span> <span class="n">run_direct_ops_path_tests</span>
     <span class="k">if</span> <span class="n">db_handles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">db_handle</span> <span class="ow">in</span> <span class="n">db_handles</span><span class="p">:</span>
             <span class="n">sql_statements</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -889,7 +901,9 @@ Ignores indexing.</p>
                     <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
                     <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
                     <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
-                    <span class="n">test_result_cache</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+                    <span class="n">test_result_cache</span><span class="o">=</span><span class="n">global_test_result_cache</span><span class="p">,</span>
+                    <span class="n">alter_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">test_direct_ops_path</span><span class="o">=</span><span class="n">run_direct_ops_path_tests</span><span class="p">)</span>
 </pre></div>
 
         </details>

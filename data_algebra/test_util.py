@@ -22,10 +22,10 @@ from data_algebra.data_ops import *
 
 
 # controls
-test_PostgreSQL = True  # causes an external dependency
-test_BigQuery = True  # causes an external dependency
-test_MySQL = True  # causes an external dependency
-test_Spark = True  # causes an external dependency
+test_PostgreSQL = False  # causes an external dependency
+test_BigQuery = False  # causes an external dependency
+test_MySQL = False  # causes an external dependency
+test_Spark = False  # causes an external dependency
 
 run_direct_ops_path_tests = False
 
@@ -168,7 +168,7 @@ def _run_handle_experiments(
 ):
     assert db_handle is not None
     assert db_handle.conn is not None
-    db_handle_key = str(db_handle)
+    db_handle_key = str(db_handle.db_model)
     sql_statements = list(sql_statements)
     res_db_sql = [None] * len(sql_statements)
     res_db_ops = None
@@ -176,11 +176,15 @@ def _run_handle_experiments(
     dict_keys = list(data.keys())
     dict_keys.sort()
     data_key = ' '.join([k + ':' + hash_data_frame(data[k]) for k in dict_keys])
+
+    def mk_key(i):
+        return db_handle_key + " " + sql_statements[i] + " " + data_key
+
     # inspect result cache for any prior results
     if test_result_cache is not None:
         for i in range(len(sql_statements)):
             try:
-                res_db_sql[i] = test_result_cache[db_handle_key + " " + sql_statements[i] + " " + data_key].copy()
+                res_db_sql[i] = test_result_cache[mk_key(i)].copy()
             except KeyError:
                 pass
         need_to_run = test_direct_ops_path or numpy.any([resi is None for resi in res_db_sql])
@@ -199,7 +203,7 @@ def _run_handle_experiments(
                 if res_db_sql[i] is None:
                     res_db_sql[i] = db_handle.read_query(sql_statements[i])
                     if alter_cache and (test_result_cache is not None) and (res_db_sql[i] is not None):
-                        test_result_cache[db_handle_key + " " + sql_statements[i] + " " + data_key] = res_db_sql[i].copy()
+                        test_result_cache[mk_key(i)] = res_db_sql[i].copy()
         except Exception as e:
             caught = e
         for k in to_del:

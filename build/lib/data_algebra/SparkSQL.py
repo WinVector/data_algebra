@@ -14,26 +14,25 @@ except ImportError:
 
 
 def _sparksql_is_bad_expr(dbmodel, expression):
-    raise ValueError("mavp() doensn't currently work on the Spark SQL interface (defective CASE/WHEN implementation)")
-    # subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
-    # assert isinstance(subexpr, str)
-    # return (
-    #     "("
-    #     + subexpr
-    #     + " IS NULL OR "
-    #     + subexpr
-    #     + " >= "
-    #     + dbmodel.value_to_sql("+infinity")
-    #     + " OR "
-    #     + subexpr
-    #     + " <= "
-    #     + dbmodel.value_to_sql("-infinity")
-    #     + " OR "
-    #     + " isNaN("
-    #     + subexpr
-    #     + ")"
-    #     + ")"
-    # )
+    subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    assert isinstance(subexpr, str)
+    return (
+        "("
+        + subexpr
+        + " IS NULL OR "
+        + subexpr
+        + " >= "
+        + dbmodel.value_to_sql("+infinity")
+        + " OR "
+        + subexpr
+        + " <= "
+        + dbmodel.value_to_sql("-infinity")
+        + " OR "
+        + " isNaN("
+        + subexpr
+        + ")"
+        + ")"
+    )
 
 
 # treat NaN as NULL, as Pandas has a hard time distinguishing the two
@@ -55,7 +54,6 @@ def _sparksql_coalesce_expr(dbmodel, expression):
 
 
 def _sparksql_db_mapv(dbmodel, expression):
-    raise ValueError("Spark returns string column instead of double")
     # https://spark.apache.org/docs/latest/sql-ref-syntax-qry-select-case.html
     if_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     mapping_dict = expression.args[1]
@@ -65,11 +63,16 @@ def _sparksql_db_mapv(dbmodel, expression):
     ]
     if len(terms) <= 0:
         return default_value_expr
-    return (
+    res = (
             "CASE "
             + " ".join(terms)
             + " ELSE " + default_value_expr + " END"
     )
+    if isinstance(expression.args[2].value, float):
+        res = 'DOUBLE(' + res + ')'
+    elif isinstance(expression.args[2].value, int):
+        res = 'INT(' + res + ')'
+    return res
 
 
 # map from op-name to special SQL formatting code

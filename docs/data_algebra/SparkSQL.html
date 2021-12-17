@@ -98,26 +98,25 @@
 
 
 <span class="k">def</span> <span class="nf">_sparksql_is_bad_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;mavp() doensn&#39;t currently work on the Spark SQL interface (defective CASE/WHEN implementation)&quot;</span><span class="p">)</span>
-    <span class="c1"># subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)</span>
-    <span class="c1"># assert isinstance(subexpr, str)</span>
-    <span class="c1"># return (</span>
-    <span class="c1">#     &quot;(&quot;</span>
-    <span class="c1">#     + subexpr</span>
-    <span class="c1">#     + &quot; IS NULL OR &quot;</span>
-    <span class="c1">#     + subexpr</span>
-    <span class="c1">#     + &quot; &gt;= &quot;</span>
-    <span class="c1">#     + dbmodel.value_to_sql(&quot;+infinity&quot;)</span>
-    <span class="c1">#     + &quot; OR &quot;</span>
-    <span class="c1">#     + subexpr</span>
-    <span class="c1">#     + &quot; &lt;= &quot;</span>
-    <span class="c1">#     + dbmodel.value_to_sql(&quot;-infinity&quot;)</span>
-    <span class="c1">#     + &quot; OR &quot;</span>
-    <span class="c1">#     + &quot; isNaN(&quot;</span>
-    <span class="c1">#     + subexpr</span>
-    <span class="c1">#     + &quot;)&quot;</span>
-    <span class="c1">#     + &quot;)&quot;</span>
-    <span class="c1"># )</span>
+    <span class="n">subexpr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subexpr</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;(&quot;</span>
+        <span class="o">+</span> <span class="n">subexpr</span>
+        <span class="o">+</span> <span class="s2">&quot; IS NULL OR &quot;</span>
+        <span class="o">+</span> <span class="n">subexpr</span>
+        <span class="o">+</span> <span class="s2">&quot; &gt;= &quot;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="s2">&quot;+infinity&quot;</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot; OR &quot;</span>
+        <span class="o">+</span> <span class="n">subexpr</span>
+        <span class="o">+</span> <span class="s2">&quot; &lt;= &quot;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="s2">&quot;-infinity&quot;</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot; OR &quot;</span>
+        <span class="o">+</span> <span class="s2">&quot; isNaN(&quot;</span>
+        <span class="o">+</span> <span class="n">subexpr</span>
+        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+    <span class="p">)</span>
 
 
 <span class="c1"># treat NaN as NULL, as Pandas has a hard time distinguishing the two</span>
@@ -139,7 +138,6 @@
 
 
 <span class="k">def</span> <span class="nf">_sparksql_db_mapv</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Spark returns string column instead of double&quot;</span><span class="p">)</span>
     <span class="c1"># https://spark.apache.org/docs/latest/sql-ref-syntax-qry-select-case.html</span>
     <span class="n">if_expr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">mapping_dict</span> <span class="o">=</span> <span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -149,11 +147,16 @@
     <span class="p">]</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">default_value_expr</span>
-    <span class="k">return</span> <span class="p">(</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="p">(</span>
             <span class="s2">&quot;CASE &quot;</span>
             <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot; ELSE &quot;</span> <span class="o">+</span> <span class="n">default_value_expr</span> <span class="o">+</span> <span class="s2">&quot; END&quot;</span>
     <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="s1">&#39;DOUBLE(&#39;</span> <span class="o">+</span> <span class="n">res</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="s1">&#39;INT(&#39;</span> <span class="o">+</span> <span class="n">res</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+    <span class="k">return</span> <span class="n">res</span>
 
 
 <span class="c1"># map from op-name to special SQL formatting code</span>
