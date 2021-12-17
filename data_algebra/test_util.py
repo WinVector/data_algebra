@@ -27,6 +27,7 @@ test_BigQuery = True  # causes an external dependency
 test_MySQL = True  # causes an external dependency
 test_Spark = True  # causes an external dependency
 
+run_direct_ops_path_tests = False
 
 # global test result cache
 global_test_result_cache = None
@@ -337,6 +338,7 @@ def check_transform_on_handles(
             assert set(empty_res_i.columns) == set(res.columns)
     # try any db paths
     global global_test_result_cache
+    global run_direct_ops_path_tests
     if db_handles is not None:
         for db_handle in db_handles:
             sql_statements = set()
@@ -363,7 +365,8 @@ def check_transform_on_handles(
                     cols_case_sensitive=cols_case_sensitive,
                     check_row_order=check_row_order,
                     test_result_cache=global_test_result_cache,
-                    alter_cache=True)
+                    alter_cache=True,
+                    test_direct_ops_path=run_direct_ops_path_tests)
 
 
 def get_test_dbs():

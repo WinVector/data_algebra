@@ -33,4 +33,5 @@ def user_pytest_start(request):
                 data_algebra.test_util.global_test_result_cache,
                 out_f
             )
+
     request.addfinalizer(user_pytest_end)
