@@ -147,7 +147,7 @@ class SparkSQLModel(data_algebra.db_model.DBModel):
         try:
             d_spark = conn.spark_session.createDataFrame(d)
             # https://stackoverflow.com/a/57292987/6901725
-            d_spark.replace(float("nan"), None)  # to get coalesce effects (didn't work)
+            # d_spark.replace(float("nan"), None)  # to get coalesce effects (didn't work)
             d_spark.createOrReplaceTempView(table_name)  # TODO: non-temps
         except Exception as ex:
             raise ValueError("Spark problem inserting table, " + str(ex))

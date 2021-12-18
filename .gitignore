@@ -8,5 +8,5 @@ __pycache__
 .coverage
 htmlcov
 .eggs
-
+.coverage*
 

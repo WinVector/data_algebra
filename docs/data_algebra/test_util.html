@@ -75,13 +75,11 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span>
 
-<span class="c1"># noinspection PyUnresolvedReferences</span>
 <span class="kn">import</span> <span class="nn">data_algebra</span>
 
 <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">import</span> <span class="nn">hashlib</span>
 
-<span class="c1"># noinspection PyUnresolvedReferences</span>
 <span class="kn">import</span> <span class="nn">data_algebra.db_model</span>
 <span class="kn">import</span> <span class="nn">data_algebra.SQLite</span>
 <span class="kn">import</span> <span class="nn">data_algebra.BigQuery</span>
@@ -93,10 +91,10 @@
 
 
 <span class="c1"># controls</span>
-<span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-<span class="n">test_BigQuery</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-<span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
-<span class="n">test_Spark</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># causes an external dependency</span>
+<span class="n">test_PostgreSQL</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># causes an external dependency</span>
+<span class="n">test_BigQuery</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># causes an external dependency</span>
+<span class="n">test_MySQL</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># causes an external dependency</span>
+<span class="n">test_Spark</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># causes an external dependency</span>
 
 <span class="n">run_direct_ops_path_tests</span> <span class="o">=</span> <span class="kc">False</span>
 

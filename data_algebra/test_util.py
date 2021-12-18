@@ -5,13 +5,11 @@ Utils that help with testing. This module is allowed to import many other module
 
 import numpy
 
-# noinspection PyUnresolvedReferences
 import data_algebra
 
 import pickle
 import hashlib
 
-# noinspection PyUnresolvedReferences
 import data_algebra.db_model
 import data_algebra.SQLite
 import data_algebra.BigQuery
@@ -23,10 +21,10 @@ from data_algebra.data_ops import *
 
 
 # controls
-test_PostgreSQL = False  # causes an external dependency
-test_BigQuery = False  # causes an external dependency
-test_MySQL = False  # causes an external dependency
-test_Spark = False  # causes an external dependency
+test_PostgreSQL = True  # causes an external dependency
+test_BigQuery = True  # causes an external dependency
+test_MySQL = True  # causes an external dependency
+test_Spark = True  # causes an external dependency
 
 run_direct_ops_path_tests = False
 

@@ -231,7 +231,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">d_spark</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">spark_session</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
             <span class="c1"># https://stackoverflow.com/a/57292987/6901725</span>
-            <span class="n">d_spark</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># to get coalesce effects (didn&#39;t work)</span>
+            <span class="c1"># d_spark.replace(float(&quot;nan&quot;), None)  # to get coalesce effects (didn&#39;t work)</span>
             <span class="n">d_spark</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>  <span class="c1"># TODO: non-temps</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Spark problem inserting table, &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">))</span>
@@ -398,7 +398,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">d_spark</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">spark_session</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
             <span class="c1"># https://stackoverflow.com/a/57292987/6901725</span>
-            <span class="n">d_spark</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># to get coalesce effects (didn&#39;t work)</span>
+            <span class="c1"># d_spark.replace(float(&quot;nan&quot;), None)  # to get coalesce effects (didn&#39;t work)</span>
             <span class="n">d_spark</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>  <span class="c1"># TODO: non-temps</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Spark problem inserting table, &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">))</span>
@@ -515,7 +515,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">d_spark</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">spark_session</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
             <span class="c1"># https://stackoverflow.com/a/57292987/6901725</span>
-            <span class="n">d_spark</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># to get coalesce effects (didn&#39;t work)</span>
+            <span class="c1"># d_spark.replace(float(&quot;nan&quot;), None)  # to get coalesce effects (didn&#39;t work)</span>
             <span class="n">d_spark</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>  <span class="c1"># TODO: non-temps</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Spark problem inserting table, &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">))</span>

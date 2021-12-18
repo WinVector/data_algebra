@@ -28,13 +28,8 @@ def test_null_bad():
     )
 
     models_to_skip = set()
-    models_to_skip.add(
-        str(data_algebra.MySQL.MySQLModel())
-    )  # can't insert infinity into MySQL
-    models_to_skip.add(
-        str(data_algebra.SparkSQL.SparkSQLModel())
-    )  # None/Null/Non handled differently
-
+    models_to_skip.add(str(data_algebra.MySQL.MySQLModel()))  # can't insert infinity into MySQL
+    models_to_skip.add(str(data_algebra.SparkSQL.SparkSQLModel()))  # None/Null/Non handled differently
     data_algebra.test_util.check_transform(
         ops=ops, data=d, expect=expect, models_to_skip=models_to_skip,
     )

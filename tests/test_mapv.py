@@ -34,10 +34,10 @@ def test_mapv_1():
 
     # problems insert None into Spark numeric columns, so use different test for spark
     # also Spark converts the result to strings
-    spark_model = data_algebra.SparkSQL.SparkSQLModel()
     data_algebra.test_util.check_transform(
         ops=ops, data=d, expect=expect,
-        models_to_skip={str(spark_model)})
+        models_to_skip={str(data_algebra.SparkSQL.SparkSQLModel())},
+    )
 
 
 def test_mapv_1_spark():

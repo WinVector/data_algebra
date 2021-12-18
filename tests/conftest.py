@@ -23,7 +23,7 @@ def load_global_test_cache(fname):
 def user_pytest_start(request):
     dir_path = os.path.dirname(os.path.realpath(__file__))
     data_algebra.test_util.global_test_result_cache = dict()
-    global_test_result_cache_fname = os.path.join(dir_path, 'data_algebra_test_cache.pkl')
+    global_test_result_cache_fname = os.path.join(dir_path, 'data_algebra_test_cache.pkl.gz')
     try:
         load_global_test_cache(global_test_result_cache_fname)
     except FileNotFoundError:
