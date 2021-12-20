@@ -32,7 +32,6 @@ run_direct_ops_path_tests = False
 global_test_result_cache = None
 
 
-
 def formats_to_self(ops) -> bool:
     """
     Check a operator dag formats and parses back to itself.

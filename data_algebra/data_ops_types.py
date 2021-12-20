@@ -89,6 +89,16 @@ class OperatorPlatform:
             return other.apply_to(self)
         raise TypeError("unexpected type: " + str(type(other)))
 
+    # composition
+    def add(self, other):
+        """
+        other.apply_to(self)
+
+        :param other:
+        :return:
+        """
+        return other.apply_to(self)
+
     # imitate a method
     def use(self, user_function, *args, **kwargs):
         """
@@ -100,16 +110,6 @@ class OperatorPlatform:
         :param **kwargs: additional keyword arguments
         """
         return user_function(self, *args, **kwargs)
-
-    # composition
-    def add(self, other):
-        """
-        other.apply_to(self)
-
-        :param other:
-        :return:
-        """
-        return other.apply_to(self)
 
     # convenience
 
