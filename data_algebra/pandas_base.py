@@ -275,6 +275,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
     # utils
 
     def data_frame(self, arg=None):
+        """
+        Build a new emtpy data frame.
+        """
         if arg is None:
             # noinspection PyUnresolvedReferences
             return self.pd.DataFrame()
@@ -282,23 +285,38 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         return self.pd.DataFrame(arg)
 
     def is_appropriate_data_instance(self, df):
+        """
+        Check if df is our type of data frame.
+        """
         # noinspection PyUnresolvedReferences
         return isinstance(df, self.pd.DataFrame)
 
     def can_convert_col_to_numeric(self, x):
+        """
+        Return True if column or value can be converted to numeric type.
+        """
         if isinstance(x, numbers.Number):
             return True
         # noinspection PyUnresolvedReferences
         return self.pd.api.types.is_numeric_dtype(x)
 
     def to_numeric(self, x, *, errors="coerce"):
+        """
+        Convert column to numeric.
+        """
         # noinspection PyUnresolvedReferences
         return self.pd.to_numeric(x, errors="coerce")
 
     def isnull(self, x):
+        """
+        Return vector indicating which entries are null (vectorized).
+        """
         return self.pd.isnull(x)
 
     def bad_column_positions(self, x):
+        """
+        Return vector indicating which entries are bad (null or nan) (vectorized).
+        """
         if self.can_convert_col_to_numeric(x):
             x = numpy.asarray(x + 0, dtype=float)
             return numpy.logical_or(
@@ -309,7 +327,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
     # bigger stuff
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
-    def table_step(self, op, *, data_map, narrow):
+    def table_step(self, op, *, data_map: dict, narrow: bool):
+        """
+        Return data frame from table description and data_map.
+        """
         if op.node_name != "TableDescription":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.TableDescription"
@@ -361,6 +382,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
 
         # agg can return scalars, which then can't be made into a self.pd.DataFrame
         def promote_scalar(vi, *, target_len):
+            """
+            Convert a scalar into a vector.
+            """
             # noinspection PyBroadException
             try:
                 len_v = len(vi)
@@ -379,6 +403,12 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         return self.pd.DataFrame(cols)
 
     def add_data_frame_columns_to_data_frame_(self, res, transient_new_frame):
+        """
+        Add columns from transient_new_frame to res. Res may be altered, and either of res or
+        transient_new_frame may be returned.
+        """
+        if transient_new_frame.shape[1] < 1:
+            return res
         if (res.shape[0] == 0) and (transient_new_frame.shape[0] > 0):
             # scalars get interpreted as single row items, instead of zero row items
             # growing the extension frame
@@ -402,6 +432,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         return res
 
     def extend_step(self, op, *, data_map, narrow):
+        """
+        Execute an extend step, returning a data frame.
+        """
         if op.node_name != "ExtendNode":
             raise TypeError("op was supposed to be a data_algebra.data_ops.ExtendNode")
         window_situation = (
@@ -514,6 +547,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         return res
 
     def project_step(self, op, *, data_map, narrow):
+        """
+        Execute a project step, returning a data frame.
+        """
         if op.node_name != "ProjectNode":
             raise TypeError("op was supposed to be a data_algebra.data_ops.ProjectNode")
         # check these are forms we are prepared to work with, and build an aggregation dictionary
@@ -581,6 +617,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         return res
 
     def select_rows_step(self, op, *, data_map, narrow):
+        """
+        Execute a select rows step, returning a data frame.
+        """
         if op.node_name != "SelectRowsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.SelectRowsNode"
@@ -595,6 +634,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         return res
 
     def select_columns_step(self, op, *, data_map, narrow):
+        """
+        Execute a select columns step, returning a data frame.
+        """
         if op.node_name != "SelectColumnsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.SelectColumnsNode"
@@ -605,6 +647,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         return res[op.column_selection]
 
     def drop_columns_step(self, op, *, data_map, narrow):
+        """
+        Execute a drop columns step, returning a data frame.
+        """
         if op.node_name != "DropColumnsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.DropColumnsNode"
@@ -616,6 +661,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         return res[column_selection]
 
     def order_rows_step(self, op, *, data_map, narrow):
+        """
+        Execute an order rows step, returning a data frame.
+        """
         if op.node_name != "OrderRowsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.OrderRowsNode"
@@ -635,6 +683,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         return res
 
     def rename_columns_step(self, op, *, data_map, narrow):
+        """
+        Execute a rename columns step, returning a data frame.
+        """
         if op.node_name != "RenameColumnsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.RenameColumnsNode"
@@ -646,6 +697,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
 
     # noinspection PyMethodMayBeStatic
     def standardize_join_code(self, jointype):
+        """
+        Map join names to Pandas names.
+        """
         assert isinstance(jointype, str)
         jointype = jointype.lower()
         mp = {
@@ -659,6 +713,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         return jointype
 
     def natural_join_step(self, op, *, data_map, narrow):
+        """
+        Execute a natural join step, returning a data frame.
+        """
         if op.node_name != "NaturalJoinNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.NaturalJoinNode"
@@ -707,6 +764,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         return res
 
     def concat_rows_step(self, op, *, data_map, narrow):
+        """
+        Execute a concat rows step, returning a data frame.
+        """
         if op.node_name != "ConcatRowsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.ConcatRowsNode"
@@ -739,6 +799,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         return res
 
     def convert_records_step(self, op, *, data_map, narrow):
+        """
+        Execute record conversion step, returning a data frame.
+        """
         if op.node_name != "ConvertRecordsNode":
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.ConvertRecordsNode"

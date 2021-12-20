@@ -115,18 +115,18 @@ data_algebra/data_ops_types.py            82     34    59%
 data_algebra/data_ops_utils.py            49      6    88%
 data_algebra/db_model.py                 855     91    89%
 data_algebra/expr_parse.py                35      0   100%
-data_algebra/expr_rep.py                 642    113    82%
+data_algebra/expr_rep.py                 620    102    84%
 data_algebra/flow_text.py                 17      0   100%
 data_algebra/near_sql.py                 179      4    98%
 data_algebra/op_container.py             118     45    62%
-data_algebra/pandas_base.py              416     40    90%
+data_algebra/pandas_base.py              418     41    90%
 data_algebra/pandas_model.py               5      0   100%
 data_algebra/parse_by_lark.py            165     27    84%
 data_algebra/python3_lark.py               1      0   100%
 data_algebra/test_util.py                247     44    82%
 data_algebra/util.py                     139     29    79%
 ----------------------------------------------------------
-TOTAL                                   5137    915    82%
+TOTAL                                   5117    905    82%
 
 
-============================= 229 passed in 21.08s =============================
+============================= 229 passed in 21.31s =============================

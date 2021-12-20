@@ -400,6 +400,9 @@
     <span class="c1"># utils</span>
 
     <span class="k">def</span> <span class="nf">data_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build a new emtpy data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># noinspection PyUnresolvedReferences</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
@@ -407,23 +410,38 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">is_appropriate_data_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if df is our type of data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># noinspection PyUnresolvedReferences</span>
         <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">can_convert_col_to_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return True if column or value can be converted to numeric type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="c1"># noinspection PyUnresolvedReferences</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert column to numeric.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># noinspection PyUnresolvedReferences</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">isnull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return vector indicating which entries are null (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">bad_column_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return vector indicating which entries are bad (null or nan) (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span>
@@ -434,7 +452,10 @@
     <span class="c1"># bigger stuff</span>
 
     <span class="c1"># noinspection PyMethodMayBeStatic,PyUnusedLocal</span>
-    <span class="k">def</span> <span class="nf">table_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">table_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return data frame from table description and data_map.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.TableDescription&quot;</span>
@@ -486,6 +507,9 @@
 
         <span class="c1"># agg can return scalars, which then can&#39;t be made into a self.pd.DataFrame</span>
         <span class="k">def</span> <span class="nf">promote_scalar</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_len</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Convert a scalar into a vector.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="c1"># noinspection PyBroadException</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">len_v</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vi</span><span class="p">)</span>
@@ -504,6 +528,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">add_data_frame_columns_to_data_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">transient_new_frame</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add columns from transient_new_frame to res. Res may be altered, and either of res or</span>
+<span class="sd">        transient_new_frame may be returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">res</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">transient_new_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="c1"># scalars get interpreted as single row items, instead of zero row items</span>
             <span class="c1"># growing the extension frame</span>
@@ -527,6 +557,9 @@
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute an extend step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ExtendNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ExtendNode&quot;</span><span class="p">)</span>
         <span class="n">window_situation</span> <span class="o">=</span> <span class="p">(</span>
@@ -639,6 +672,9 @@
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">project_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a project step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ProjectNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ProjectNode&quot;</span><span class="p">)</span>
         <span class="c1"># check these are forms we are prepared to work with, and build an aggregation dictionary</span>
@@ -706,6 +742,9 @@
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">select_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a select rows step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;SelectRowsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.SelectRowsNode&quot;</span>
@@ -720,6 +759,9 @@
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">select_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a select columns step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;SelectColumnsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.SelectColumnsNode&quot;</span>
@@ -730,6 +772,9 @@
         <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">column_selection</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">drop_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a drop columns step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;DropColumnsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.DropColumnsNode&quot;</span>
@@ -741,6 +786,9 @@
         <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="n">column_selection</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">order_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute an order rows step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;OrderRowsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.OrderRowsNode&quot;</span>
@@ -760,6 +808,9 @@
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">rename_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a rename columns step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;RenameColumnsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.RenameColumnsNode&quot;</span>
@@ -771,6 +822,9 @@
 
     <span class="c1"># noinspection PyMethodMayBeStatic</span>
     <span class="k">def</span> <span class="nf">standardize_join_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jointype</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Map join names to Pandas names.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">jointype</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">jointype</span> <span class="o">=</span> <span class="n">jointype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="n">mp</span> <span class="o">=</span> <span class="p">{</span>
@@ -784,6 +838,9 @@
         <span class="k">return</span> <span class="n">jointype</span>
 
     <span class="k">def</span> <span class="nf">natural_join_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a natural join step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.NaturalJoinNode&quot;</span>
@@ -832,6 +889,9 @@
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">concat_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a concat rows step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ConcatRowsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ConcatRowsNode&quot;</span>
@@ -864,6 +924,9 @@
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">convert_records_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute record conversion step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ConvertRecordsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ConvertRecordsNode&quot;</span>
@@ -1019,6 +1082,9 @@
     <span class="c1"># utils</span>
 
     <span class="k">def</span> <span class="nf">data_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build a new emtpy data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># noinspection PyUnresolvedReferences</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
@@ -1026,23 +1092,38 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">is_appropriate_data_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if df is our type of data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># noinspection PyUnresolvedReferences</span>
         <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">can_convert_col_to_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return True if column or value can be converted to numeric type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="c1"># noinspection PyUnresolvedReferences</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert column to numeric.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># noinspection PyUnresolvedReferences</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">isnull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return vector indicating which entries are null (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">bad_column_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return vector indicating which entries are bad (null or nan) (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span>
@@ -1053,7 +1134,10 @@
     <span class="c1"># bigger stuff</span>
 
     <span class="c1"># noinspection PyMethodMayBeStatic,PyUnusedLocal</span>
-    <span class="k">def</span> <span class="nf">table_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">table_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return data frame from table description and data_map.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.TableDescription&quot;</span>
@@ -1105,6 +1189,9 @@
 
         <span class="c1"># agg can return scalars, which then can&#39;t be made into a self.pd.DataFrame</span>
         <span class="k">def</span> <span class="nf">promote_scalar</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_len</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Convert a scalar into a vector.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="c1"># noinspection PyBroadException</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">len_v</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vi</span><span class="p">)</span>
@@ -1123,6 +1210,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">add_data_frame_columns_to_data_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">transient_new_frame</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add columns from transient_new_frame to res. Res may be altered, and either of res or</span>
+<span class="sd">        transient_new_frame may be returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">res</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">transient_new_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="c1"># scalars get interpreted as single row items, instead of zero row items</span>
             <span class="c1"># growing the extension frame</span>
@@ -1146,6 +1239,9 @@
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute an extend step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ExtendNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ExtendNode&quot;</span><span class="p">)</span>
         <span class="n">window_situation</span> <span class="o">=</span> <span class="p">(</span>
@@ -1258,6 +1354,9 @@
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">project_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a project step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ProjectNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ProjectNode&quot;</span><span class="p">)</span>
         <span class="c1"># check these are forms we are prepared to work with, and build an aggregation dictionary</span>
@@ -1325,6 +1424,9 @@
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">select_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a select rows step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;SelectRowsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.SelectRowsNode&quot;</span>
@@ -1339,6 +1441,9 @@
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">select_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a select columns step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;SelectColumnsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.SelectColumnsNode&quot;</span>
@@ -1349,6 +1454,9 @@
         <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">column_selection</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">drop_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a drop columns step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;DropColumnsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.DropColumnsNode&quot;</span>
@@ -1360,6 +1468,9 @@
         <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="n">column_selection</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">order_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute an order rows step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;OrderRowsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.OrderRowsNode&quot;</span>
@@ -1379,6 +1490,9 @@
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">rename_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a rename columns step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;RenameColumnsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.RenameColumnsNode&quot;</span>
@@ -1390,6 +1504,9 @@
 
     <span class="c1"># noinspection PyMethodMayBeStatic</span>
     <span class="k">def</span> <span class="nf">standardize_join_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jointype</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Map join names to Pandas names.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">jointype</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">jointype</span> <span class="o">=</span> <span class="n">jointype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="n">mp</span> <span class="o">=</span> <span class="p">{</span>
@@ -1403,6 +1520,9 @@
         <span class="k">return</span> <span class="n">jointype</span>
 
     <span class="k">def</span> <span class="nf">natural_join_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a natural join step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.NaturalJoinNode&quot;</span>
@@ -1451,6 +1571,9 @@
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">concat_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a concat rows step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ConcatRowsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ConcatRowsNode&quot;</span>
@@ -1483,6 +1606,9 @@
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">convert_records_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute record conversion step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ConvertRecordsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ConvertRecordsNode&quot;</span>
@@ -1533,6 +1659,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">data_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build a new emtpy data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># noinspection PyUnresolvedReferences</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
@@ -1542,7 +1671,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Build a new emtpy data frame.</p>
+</div>
+
 
                             </div>
                             <div id="PandasModelBase.is_appropriate_data_instance" class="classattr">
@@ -1556,13 +1687,18 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">is_appropriate_data_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if df is our type of data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># noinspection PyUnresolvedReferences</span>
         <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Check if df is our type of data frame.</p>
+</div>
+
 
                             </div>
                             <div id="PandasModelBase.can_convert_col_to_numeric" class="classattr">
@@ -1576,6 +1712,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">can_convert_col_to_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return True if column or value can be converted to numeric type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="c1"># noinspection PyUnresolvedReferences</span>
@@ -1584,7 +1723,7 @@
 
         </details>
 
-            <div class="docstring"><p>check if non-empty vector can convert to numeric</p>
+            <div class="docstring"><p>Return True if column or value can be converted to numeric type.</p>
 </div>
 
 
@@ -1600,13 +1739,18 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert column to numeric.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># noinspection PyUnresolvedReferences</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Convert column to numeric.</p>
+</div>
+
 
                             </div>
                             <div id="PandasModelBase.isnull" class="classattr">
@@ -1620,12 +1764,17 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">isnull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return vector indicating which entries are null (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Return vector indicating which entries are null (vectorized).</p>
+</div>
+
 
                             </div>
                             <div id="PandasModelBase.bad_column_positions" class="classattr">
@@ -1639,6 +1788,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">bad_column_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return vector indicating which entries are bad (null or nan) (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_convert_col_to_numeric</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span>
@@ -1649,7 +1801,7 @@
 
         </details>
 
-            <div class="docstring"><p>for numeric vector x, return logical vector of positions that are null, NaN, infinite</p>
+            <div class="docstring"><p>Return vector indicating which entries are bad (null or nan) (vectorized).</p>
 </div>
 
 
@@ -1659,12 +1811,15 @@
 
         
             <span class="def">def</span>
-            <span class="name">table_step</span><span class="signature">(self, op, *, data_map, narrow)</span>:
+            <span class="name">table_step</span><span class="signature">(self, op, *, data_map: dict, narrow: bool)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">table_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">table_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return data frame from table description and data_map.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.TableDescription&quot;</span>
@@ -1697,12 +1852,7 @@
 
         </details>
 
-            <div class="docstring"><p>Represents a data input.</p>
-
-<p>:param op:
-:param data_map:
-:param narrow:
-:return:</p>
+            <div class="docstring"><p>Return data frame from table description and data_map.</p>
 </div>
 
 
@@ -1739,6 +1889,9 @@
 
         <span class="c1"># agg can return scalars, which then can&#39;t be made into a self.pd.DataFrame</span>
         <span class="k">def</span> <span class="nf">promote_scalar</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_len</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Convert a scalar into a vector.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="c1"># noinspection PyBroadException</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">len_v</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vi</span><span class="p">)</span>
@@ -1779,6 +1932,12 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">add_data_frame_columns_to_data_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">transient_new_frame</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add columns from transient_new_frame to res. Res may be altered, and either of res or</span>
+<span class="sd">        transient_new_frame may be returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">transient_new_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">res</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">transient_new_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="c1"># scalars get interpreted as single row items, instead of zero row items</span>
             <span class="c1"># growing the extension frame</span>
@@ -1804,7 +1963,10 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Add columns from transient_new_frame to res. Res may be altered, and either of res or
+transient_new_frame may be returned.</p>
+</div>
+
 
                             </div>
                             <div id="PandasModelBase.extend_step" class="classattr">
@@ -1818,6 +1980,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute an extend step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ExtendNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ExtendNode&quot;</span><span class="p">)</span>
         <span class="n">window_situation</span> <span class="o">=</span> <span class="p">(</span>
@@ -1932,7 +2097,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Execute an extend step, returning a data frame.</p>
+</div>
+
 
                             </div>
                             <div id="PandasModelBase.project_step" class="classattr">
@@ -1946,6 +2113,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">project_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a project step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ProjectNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ProjectNode&quot;</span><span class="p">)</span>
         <span class="c1"># check these are forms we are prepared to work with, and build an aggregation dictionary</span>
@@ -2015,7 +2185,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Execute a project step, returning a data frame.</p>
+</div>
+
 
                             </div>
                             <div id="PandasModelBase.select_rows_step" class="classattr">
@@ -2029,6 +2201,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">select_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a select rows step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;SelectRowsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.SelectRowsNode&quot;</span>
@@ -2045,7 +2220,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Execute a select rows step, returning a data frame.</p>
+</div>
+
 
                             </div>
                             <div id="PandasModelBase.select_columns_step" class="classattr">
@@ -2059,6 +2236,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">select_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a select columns step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;SelectColumnsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.SelectColumnsNode&quot;</span>
@@ -2071,7 +2251,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Execute a select columns step, returning a data frame.</p>
+</div>
+
 
                             </div>
                             <div id="PandasModelBase.drop_columns_step" class="classattr">
@@ -2085,6 +2267,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">drop_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a drop columns step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;DropColumnsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.DropColumnsNode&quot;</span>
@@ -2098,7 +2283,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Execute a drop columns step, returning a data frame.</p>
+</div>
+
 
                             </div>
                             <div id="PandasModelBase.order_rows_step" class="classattr">
@@ -2112,6 +2299,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">order_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute an order rows step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;OrderRowsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.OrderRowsNode&quot;</span>
@@ -2133,7 +2323,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Execute an order rows step, returning a data frame.</p>
+</div>
+
 
                             </div>
                             <div id="PandasModelBase.rename_columns_step" class="classattr">
@@ -2147,6 +2339,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">rename_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a rename columns step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;RenameColumnsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.RenameColumnsNode&quot;</span>
@@ -2159,7 +2354,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Execute a rename columns step, returning a data frame.</p>
+</div>
+
 
                             </div>
                             <div id="PandasModelBase.standardize_join_code" class="classattr">
@@ -2173,6 +2370,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">standardize_join_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jointype</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Map join names to Pandas names.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">jointype</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">jointype</span> <span class="o">=</span> <span class="n">jointype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="n">mp</span> <span class="o">=</span> <span class="p">{</span>
@@ -2188,7 +2388,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Map join names to Pandas names.</p>
+</div>
+
 
                             </div>
                             <div id="PandasModelBase.natural_join_step" class="classattr">
@@ -2202,6 +2404,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">natural_join_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a natural join step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.NaturalJoinNode&quot;</span>
@@ -2252,7 +2457,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Execute a natural join step, returning a data frame.</p>
+</div>
+
 
                             </div>
                             <div id="PandasModelBase.concat_rows_step" class="classattr">
@@ -2266,6 +2473,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">concat_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a concat rows step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ConcatRowsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ConcatRowsNode&quot;</span>
@@ -2300,7 +2510,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Execute a concat rows step, returning a data frame.</p>
+</div>
+
 
                             </div>
                             <div id="PandasModelBase.convert_records_step" class="classattr">
@@ -2314,6 +2526,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">convert_records_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute record conversion step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;ConvertRecordsNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ConvertRecordsNode&quot;</span>
@@ -2326,7 +2541,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Execute record conversion step, returning a data frame.</p>
+</div>
+
 
                             </div>
                 </section>

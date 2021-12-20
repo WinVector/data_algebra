@@ -1,5 +1,5 @@
 """
-Base clase for SQL adapters for data algebra.
+Base class for SQL adapters for data algebra.
 """
 
 import math
@@ -600,6 +600,9 @@ class DBModel:
         return DBHandle(db_model=self, conn=conn, db_engine=db_engine)
 
     def prepare_connection(self, conn):
+        """
+        Do any augmentation or preperation of a database connection. Example: adding stored procedures.
+        """
         pass
 
     # database helpers
@@ -636,6 +639,9 @@ class DBModel:
         return r
 
     def table_exists(self, conn, table_name: str) -> bool:
+        """
+        Return true if table exists.
+        """
         assert isinstance(table_name, str)
         q_table_name = self.quote_table_name(table_name)
         table_exists = True
@@ -647,6 +653,9 @@ class DBModel:
         return table_exists
 
     def drop_table(self, conn, table_name: str, *, check: bool = True) -> None:
+        """
+        Remove a table.
+        """
         if (not check) or self.table_exists(conn, table_name):
             q_table_name = self.quote_table_name(table_name)
             self.execute(conn, self.drop_text + " " + q_table_name)
@@ -679,6 +688,9 @@ class DBModel:
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def read_table(self, conn, table_name: str, *, qualifiers=None, limit=None):
+        """
+        Return table contents as a Pandas data frame.
+        """
         assert isinstance(table_name, str)
         q_table_name = self.quote_table_name(table_name)
         sql = "SELECT * FROM " + q_table_name
@@ -687,6 +699,9 @@ class DBModel:
         return self.read_query(conn, sql)
 
     def read(self, conn, table):
+        """
+        Return table as a pandas data frame for table description.
+        """
         if table.node_name != "TableDescription":
             raise TypeError(
                 "Expect table to be a data_algebra.data_ops.TableDescription"
@@ -696,6 +711,9 @@ class DBModel:
         )
 
     def quote_identifier(self, identifier: str) -> str:
+        """
+        Quote identifier.
+        """
         assert isinstance(identifier, str)
         if self.identifier_quote in identifier:
             raise ValueError(
@@ -704,6 +722,9 @@ class DBModel:
         return self.identifier_quote + identifier + self.identifier_quote
 
     def quote_table_name(self, table_description) -> str:
+        """
+        Quote a table name.
+        """
         if not isinstance(table_description, str):
             try:
                 if table_description.node_name == "TableDescription":
@@ -719,6 +740,9 @@ class DBModel:
         return self.quote_identifier(table_description)
 
     def quote_string(self, string: str) -> str:
+        """
+        Quote a string value.
+        """
         assert isinstance(string, str)
         # replace all string with doubled string quotes
         return (
@@ -728,6 +752,9 @@ class DBModel:
         )
 
     def value_to_sql(self, v) -> str:
+        """
+        Convert a value to valid SQL.
+        """
         if v is None:
             return "NULL"
         if isinstance(v, data_algebra.expr_rep.ListTerm):
@@ -754,6 +781,9 @@ class DBModel:
     def table_values_to_sql_str_list(
         self, v, *, result_name: str = "table_values"
     ) -> List[str]:
+        """
+        Convert a table of values to a SQL. Only for small tables.
+        """
         assert v is not None
         m = v.shape[0]
         assert m > 0
@@ -763,6 +793,7 @@ class DBModel:
         qv = self.value_to_sql
 
         def q_row(i):
+            """quote row"""
             return (
                 self.union_all_term_start
                 + "SELECT "
@@ -783,6 +814,9 @@ class DBModel:
         return sql
 
     def expr_to_sql(self, expression, *, want_inline_parens: bool = False) -> str:
+        """
+        Convert an expression to SQL.
+        """
         if isinstance(expression, str):
             return expression
         assert isinstance(expression, data_algebra.expr_rep.PreTerm)
@@ -846,6 +880,9 @@ class DBModel:
     def table_def_to_near_sql(
         self, table_def, *, using=None, temp_id_source=None, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert a table description to NearSQL.
+        """
         if table_def.node_name != "TableDescription":
             raise TypeError(
                 "Expected table_def to be a data_algebra.data_ops.TableDescription)"
@@ -885,6 +922,9 @@ class DBModel:
     def extend_to_near_sql(
         self, extend_node, *, using=None, temp_id_source=None, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert an extend step into NearSQL.
+        """
         if extend_node.node_name != "ExtendNode":
             raise TypeError(
                 "Expected extend_node to be a data_algebra.data_ops.ExtendNode)"
@@ -961,6 +1001,7 @@ class DBModel:
         ):
             # check detailed merge conditions
             def non_trivial_terms(*, dep_dict, term_dict):
+                """pickout non-trivial terms"""
                 return [
                     ki
                     for ki, vi in dep_dict.items()
@@ -1020,6 +1061,9 @@ class DBModel:
     def project_to_near_sql(
         self, project_node, *, using=None, temp_id_source=None, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert a project step to NearSQL
+        """
         if project_node.node_name != "ProjectNode":
             raise TypeError(
                 "Expected project_node to be a data_algebra.data_ops.ProjectNode)"
@@ -1063,6 +1107,9 @@ class DBModel:
         temp_id_source=None,
         sql_format_options=None,
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert select rows into NearSQL
+        """
         if select_rows_node.node_name != "SelectRowsNode":
             raise TypeError(
                 "Expected select_rows_node to be a data_algebra.data_ops.SelectRowsNode)"
@@ -1106,6 +1153,9 @@ class DBModel:
         temp_id_source=None,
         sql_format_options=None,
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert select columns to NearSQL.
+        """
         if select_columns_node.node_name != "SelectColumnsNode":
             raise TypeError(
                 "Expected select_columns_to_near_sql to be a data_algebra.data_ops.SelectColumnsNode)"
@@ -1140,6 +1190,9 @@ class DBModel:
         temp_id_source=None,
         sql_format_options=None,
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert drop columns to NearSQL
+        """
         if drop_columns_node.node_name != "DropColumnsNode":
             raise TypeError(
                 "Expected drop_columns_node to be a data_algebra.data_ops.DropColumnsNode)"
@@ -1163,6 +1216,9 @@ class DBModel:
     def order_to_near_sql(
         self, order_node, *, using=None, temp_id_source=None, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert order rows to NearSQL.
+        """
         if order_node.node_name != "OrderRowsNode":
             raise TypeError(
                 "Expected order_node to be a data_algebra.data_ops.OrderRowsNode)"
@@ -1214,6 +1270,9 @@ class DBModel:
     def rename_to_near_sql(
         self, rename_node, *, using=None, temp_id_source=None, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert rename columns to NearSQL.
+        """
         if rename_node.node_name != "RenameColumnsNode":
             raise TypeError(
                 "Expected rename_node to be a data_algebra.data_ops.RenameColumnsNode)"
@@ -1251,6 +1310,9 @@ class DBModel:
         coalesce_formatter = self.sql_formatters["coalesce"]
 
         class PseudoExpression:
+            """
+            Class to carry info into a method expecting an actual expression type.
+            """
             def __init__(self, args):
                 self.args = args.copy()
 
@@ -1301,6 +1363,9 @@ class DBModel:
         sql_format_options=None,
         left_is_first=True,
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert natural join into NearSQL.
+        """
         if temp_id_source is None:
             temp_id_source = [0]
         if using is None:
@@ -1360,6 +1425,9 @@ class DBModel:
     def concat_rows_to_near_sql(
         self, concat_node, *, using=None, temp_id_source=None, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert concat rows into NearSQL.
+        """
         if concat_node.node_name != "ConcatRowsNode":
             raise TypeError(
                 "Expected concat_node to be a data_algebra.data_ops.ConcatRowsNode)"
@@ -1415,6 +1483,9 @@ class DBModel:
         return near_sql
 
     def to_sql(self, ops, *, sql_format_options=None,) -> str:
+        """
+        Convert ViewRepresentation into SQL string.
+        """
         assert isinstance(self, DBModel)
         assert isinstance(ops, data_algebra.data_ops.ViewRepresentation)
         if sql_format_options is None:
@@ -1480,6 +1551,9 @@ class DBModel:
     def row_recs_to_blocks_query_str_list_pair(
         self, record_spec
     ) -> Tuple[List[str], List[str]]:
+        """
+        Convert row recs to blocks transformation into structures to help with SQL conversion.
+        """
         control_value_cols = [
             c
             for c in record_spec.control_table.columns
@@ -1546,6 +1620,9 @@ class DBModel:
     def blocks_to_row_recs_query_str_list_pair(
         self, record_spec
     ) -> Tuple[List[str], List[str]]:
+        """
+        Convert blocks to row recs transform into structures to help with SQL translation.
+        """
         assert record_spec.control_table.shape[0] >= 1
         col_stmts = []
         for c in record_spec.record_keys:
@@ -1615,6 +1692,9 @@ class DBModel:
 
     # encode and name a term for use in a SQL expression
     def enc_term_(self, k, *, terms) -> str:
+        """
+        encode and name a term for use in a SQL expression
+        """
         v = None
         try:
             v = terms[k]
@@ -1627,6 +1707,9 @@ class DBModel:
     def convert_nearsql_container_subsql_(
         self, nearsql_container, *, sql_format_options=None
     ) -> List[str]:
+        """
+        Convert sub-SQL into list of SQL string lines.
+        """
         assert isinstance(nearsql_container, data_algebra.near_sql.NearSQLContainer)
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
@@ -1662,6 +1745,9 @@ class DBModel:
         constants=None,
         sql_format_options=None,
     ) -> List[str]:
+        """
+        Convert SQL common table expression to list of SQL string lines.
+        """
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLCommonTableExpression)
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
@@ -1684,6 +1770,9 @@ class DBModel:
         constants=None,
         sql_format_options=None,
     ) -> List[str]:
+        """
+        Convert SQL table description to list of SQL string lines.
+        """
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLTable)
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
@@ -1724,6 +1813,9 @@ class DBModel:
         constants=None,
         sql_format_options=None,
     ) -> List[str]:
+        """
+        Convert SQL unary operation to list of SQL string lines.
+        """
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLUnaryStep)
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
@@ -1768,6 +1860,9 @@ class DBModel:
     def nearsqlrawq_to_sql_str_list_(
         self, near_sql, *, sql_format_options=None, add_select=True,
     ) -> List[str]:
+        """
+        Convert user SQL query to list of SQL string lines.
+        """
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLRawQStep)
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
@@ -1799,6 +1894,9 @@ class DBModel:
         sql_format_options=None,
         quoted_query_name=None,
     ) -> List[str]:
+        """
+        Convert SQL binary operation to list of SQL string lines.
+        """
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLBinaryStep)
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
@@ -1887,11 +1985,17 @@ class DBHandle:
         self.close()
 
     def read_query(self, q):
+        """
+        Return results of query as a Pandas table.
+        """
         return self.db_model.read_query(conn=self.conn, q=q)
 
     def describe_table(
         self, table_name: str, *, qualifiers=None, row_limit: Optional[int] = 7
     ):
+        """
+        Return a description of a database table.
+        """
         head = self.read_query(
             q="SELECT * FROM "
             + self.db_model.quote_table_name(table_name)
@@ -1903,27 +2007,45 @@ class DBHandle:
         )
 
     def execute(self, q) -> None:
+        """
+        Execute a SQL query.
+        """
         self.db_model.execute(conn=self.conn, q=q)
 
     def drop_table(self, table_name: str) -> None:
+        """
+        Remove a table.
+        """
         self.db_model.drop_table(self.conn, table_name)
 
     def insert_table(self, d, *, table_name: str, allow_overwrite: bool = False):
+        """
+        Insert a table into the database.
+        """
         self.db_model.insert_table(
             conn=self.conn, d=d, table_name=table_name, allow_overwrite=allow_overwrite
         )
         return self.describe_table(table_name)
 
     def to_sql(self, ops, *, sql_format_options=None,) -> str:
+        """
+        Convert operations into SQL
+        """
         return self.db_model.to_sql(ops=ops, sql_format_options=sql_format_options,)
 
     def query_to_csv(self, q, *, res_name: str) -> None:
+        """
+        Execute a query and save the results as a CSV file.
+        """
         d = self.read_query(q)
         d.to_csv(res_name, index=False)
 
     def table_values_to_sql_str_list(
         self, v, *, result_name: str = "table_values"
     ) -> List[str]:
+        """
+        Convert a table of values to a SQL. Only for small tables.
+        """
         return self.db_model.table_values_to_sql_str_list(v, result_name=result_name)
 
     def __str__(self):
@@ -1941,6 +2063,9 @@ class DBHandle:
         return self.__str__()
 
     def close(self) -> None:
+        """
+        Dispose of engine, or close connection.
+        """
         if self.conn is not None:
             caught = None
             if self.db_engine is not None:
