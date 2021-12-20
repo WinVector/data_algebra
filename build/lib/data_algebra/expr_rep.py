@@ -612,7 +612,7 @@ class Term(PreTerm, ABC):
             "mapv", x=value_map, y=default_value, inline=False, method=True
         )
 
-    # fns that had been in bigquery_user_fns
+    # additional fns
 
     def as_int64(self):
         return self.__uop_expr__("as_int64")

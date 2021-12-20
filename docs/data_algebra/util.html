@@ -114,6 +114,7 @@
 
 <span class="k">def</span> <span class="nf">table_is_keyed_by_columns</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if a table is keyed by a given list of column names.</span>
 
 <span class="sd">    :param table: pandas DataFrame</span>
 <span class="sd">    :param column_names: list of column names</span>
@@ -138,6 +139,11 @@
 
 <span class="c1"># noinspection PyBroadException</span>
 <span class="k">def</span> <span class="nf">_mk_type_conversion_table</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build up conversion from type aliases we do not want into standard types. Eat any errors or warnings during table</span>
+<span class="sd">    construction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">type_conversions_table</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="c1"># DeprecationWarning: `np.bool` is a deprecated alias for the builtin `bool`.</span>
     <span class="c1"># To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe.</span>
@@ -385,6 +391,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">table_is_keyed_by_columns</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">column_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if a table is keyed by a given list of column names.</span>
 
 <span class="sd">    :param table: pandas DataFrame</span>
 <span class="sd">    :param column_names: list of column names</span>
@@ -409,7 +416,9 @@
 
         </details>
 
-            <div class="docstring"><p>:param table: pandas DataFrame
+            <div class="docstring"><p>Check if a table is keyed by a given list of column names.</p>
+
+<p>:param table: pandas DataFrame
 :param column_names: list of column names
 :return: True if rows are uniquely keyed by values in named columns</p>
 </div>

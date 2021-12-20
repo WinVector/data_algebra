@@ -61,10 +61,17 @@
                     <h1 class="modulename">
 <a href="./../data_algebra.html">data_algebra</a><wbr>.MySQL    </h1>
 
-                
+                        <div class="docstring"><p>Partial adapter of data algebra for MySQL. Not all data algebra operations are supported on this database at this time.</p>
+</div>
+
                         <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">data_algebra.data_ops</span>
+            <div class="codehilite"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Partial adapter of data algebra for MySQL. Not all data algebra operations are supported on this database at this time.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">data_algebra.data_ops</span>
 <span class="kn">import</span> <span class="nn">data_algebra.db_model</span>
 
 
@@ -120,7 +127,7 @@
 <span class="sd">       Assuming we are using a sqlalchemy engine as our connection.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">supports_with</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">string_type</span><span class="o">=</span><span class="s2">&quot;CHAR&quot;</span><span class="p">,</span>
@@ -146,9 +153,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: parameterize this</span>
     <span class="k">assert</span> <span class="n">have_sqlalchemy</span>
-    <span class="n">db_handle</span> <span class="o">=</span> <span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span>
-        <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="s2">&quot;mysql+pymysql://jmount@localhost/jmount&quot;</span><span class="p">)</span>
-    <span class="p">)</span>
+    <span class="n">db_engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="s2">&quot;mysql+pymysql://jmount@localhost/jmount&quot;</span><span class="p">)</span>
+    <span class="n">db_handle</span> <span class="o">=</span> <span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">conn</span><span class="o">=</span><span class="n">db_engine</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
     <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">db_handle</span>
 </pre></div>
@@ -172,7 +178,7 @@
 <span class="sd">       Assuming we are using a sqlalchemy engine as our connection.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">supports_with</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">string_type</span><span class="o">=</span><span class="s2">&quot;CHAR&quot;</span><span class="p">,</span>
@@ -202,12 +208,12 @@ Assuming we are using a sqlalchemy engine as our connection.</p>
                                         <div class="attr function"><a class="headerlink" href="#MySQLModel.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">MySQLModel</span><span class="signature">(*, supports_with=False)</span>
+            <span class="name">MySQLModel</span><span class="signature">()</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">supports_with</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">string_type</span><span class="o">=</span><span class="s2">&quot;CHAR&quot;</span><span class="p">,</span>
@@ -307,9 +313,8 @@ Assuming we are using a sqlalchemy engine as our connection.</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: parameterize this</span>
     <span class="k">assert</span> <span class="n">have_sqlalchemy</span>
-    <span class="n">db_handle</span> <span class="o">=</span> <span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span>
-        <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="s2">&quot;mysql+pymysql://jmount@localhost/jmount&quot;</span><span class="p">)</span>
-    <span class="p">)</span>
+    <span class="n">db_engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="s2">&quot;mysql+pymysql://jmount@localhost/jmount&quot;</span><span class="p">)</span>
+    <span class="n">db_handle</span> <span class="o">=</span> <span class="n">MySQLModel</span><span class="p">()</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">conn</span><span class="o">=</span><span class="n">db_engine</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
     <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">db_handle</span>
 </pre></div>

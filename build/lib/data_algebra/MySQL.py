@@ -1,3 +1,8 @@
+"""
+Partial adapter of data algebra for MySQL. Not all data algebra operations are supported on this database at this time.
+"""
+
+
 import data_algebra.data_ops
 import data_algebra.db_model
 
@@ -54,7 +59,7 @@ class MySQLModel(data_algebra.db_model.DBModel):
        Assuming we are using a sqlalchemy engine as our connection.
     """
 
-    def __init__(self, *, supports_with=False):
+    def __init__(self):
         data_algebra.db_model.DBModel.__init__(
             self,
             string_type="CHAR",
@@ -80,8 +85,7 @@ def example_handle():
     """
     # TODO: parameterize this
     assert have_sqlalchemy
-    db_handle = MySQLModel().db_handle(
-        sqlalchemy.engine.create_engine("mysql+pymysql://jmount@localhost/jmount")
-    )
+    db_engine = sqlalchemy.engine.create_engine("mysql+pymysql://jmount@localhost/jmount")
+    db_handle = MySQLModel().db_handle(conn=db_engine, db_engine=db_engine)
     db_handle.db_model.prepare_connection(db_handle.conn)
     return db_handle

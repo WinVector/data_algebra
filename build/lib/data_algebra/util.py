@@ -40,6 +40,7 @@ def pandas_to_example_str(obj, *, local_data_model=None) -> str:
 
 def table_is_keyed_by_columns(table, column_names: Iterable[str]) -> bool:
     """
+    Check if a table is keyed by a given list of column names.
 
     :param table: pandas DataFrame
     :param column_names: list of column names
@@ -64,6 +65,11 @@ def table_is_keyed_by_columns(table, column_names: Iterable[str]) -> bool:
 
 # noinspection PyBroadException
 def _mk_type_conversion_table():
+    """
+    Build up conversion from type aliases we do not want into standard types. Eat any errors or warnings during table
+    construction.
+    """
+
     type_conversions_table = dict()
     # DeprecationWarning: `np.bool` is a deprecated alias for the builtin `bool`.
     # To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe.

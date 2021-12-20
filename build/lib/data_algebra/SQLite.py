@@ -1,3 +1,8 @@
+
+"""
+Adapt data_algebra to SQLite database.
+"""
+
 import math
 import copy
 import numpy
@@ -19,6 +24,10 @@ from data_algebra.data_ops import *
 # at least capture to is_bad, which appears to not be implemented
 # unless we call prepare connection
 def _sqlite_is_bad_expr(dbmodel, expression):
+    """
+    Return SQL to check for bad values.
+    """
+
     return (
         "is_bad("
         + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
@@ -32,6 +41,10 @@ SQLite_formatters = {
 
 
 def _check_scalar_bad(x):
+    """
+    Return 1 if scalar value is none or nan, else 0.
+    """
+
     if x is None:
         return 1
     if not isinstance(x, numbers.Number):
@@ -42,13 +55,23 @@ def _check_scalar_bad(x):
 
 
 class MedianAgg:
+    """
+    Aggregate as median. SQLite user class.
+    """
+
     def __init__(self):
         self.collection = []
 
     def step(self, value):
+        """
+        Observe value
+        """
         self.collection.append(value)
 
     def finalize(self):
+        """
+        Return result.
+        """
         return numpy.median(self.collection)
 
 
@@ -75,6 +98,9 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         return res
 
     def prepare_connection(self, conn):
+        """
+        Insert user functions into db.
+        """
         # https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.create_function
         conn.create_function("is_bad", 1, _check_scalar_bad)
         saw = set()
@@ -262,6 +288,9 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         sql_format_options=None,
         left_is_first=True
     ):
+        """
+        Translate a join into SQL, converting right and full joins to replacement code (as SQLite doesn't have these).
+        """
         if join_node.node_name != "NaturalJoinNode":
             raise TypeError(
                 "Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)"

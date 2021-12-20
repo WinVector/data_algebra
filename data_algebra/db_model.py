@@ -1,3 +1,7 @@
+"""
+Base clase for SQL adapters for data algebra.
+"""
+
 import math
 import re
 from collections import OrderedDict
@@ -53,6 +57,7 @@ class SQLFormatOptions(SimpleNamespace):
     def __str__(self):
         return self.__repr__()
 
+    # noinspection PyUnusedLocal
     def _repr_pretty_(self, p, cycle):
         """
         IPython pretty print, used at implicit print time
@@ -103,6 +108,7 @@ def _db_mean_expr(dbmodel, expression):
     )
 
 
+# noinspection PyUnusedLocal
 def _db_size_expr(dbmodel, expression):
     return "SUM(1)"
 
@@ -306,9 +312,6 @@ def _db_nunique_expr(dbmodel, expression):
     )
 
 
-# fns that had been in bigquery_user_fns
-
-
 def _as_int64(dbmodel, expression):
     return (
         "CAST("
@@ -487,7 +490,7 @@ db_expr_formatters = {
     "**": _db_pow_expr,
     "nunique": _db_nunique_expr,
     "mapv": _db_mapv,
-    # fns that had been in bigquery_user_fns
+    # additional fns
     "as_int64": _as_int64,
     "as_str": _as_str,
     "trimstr": _trimstr,
@@ -588,8 +591,13 @@ class DBModel:
         self.union_all_term_start = union_all_term_start
         self.union_all_term_end = union_all_term_end
 
-    def db_handle(self, conn):
-        return DBHandle(db_model=self, conn=conn)
+    def db_handle(self, conn, db_engine=None):
+        """
+
+        :param conn: database connection
+        :param db_engine: optional sqlalchemy style engine (for closing)
+        """
+        return DBHandle(db_model=self, conn=conn, db_engine=db_engine)
 
     def prepare_connection(self, conn):
         pass
@@ -630,8 +638,8 @@ class DBModel:
     def table_exists(self, conn, table_name: str) -> bool:
         assert isinstance(table_name, str)
         q_table_name = self.quote_table_name(table_name)
-        # noinspection PyBroadException
         table_exists = True
+        # noinspection PyBroadException
         try:
             self.read_query(conn, "SELECT * FROM " + q_table_name + " LIMIT 1")
         except Exception:
@@ -1856,9 +1864,19 @@ class DBModel:
 
 
 class DBHandle:
-    def __init__(self, *, db_model: DBModel, conn):
+    """
+    Container for database connection handles.
+    """
+    def __init__(self, *, db_model: DBModel, conn, db_engine=None):
+        """
+
+        :param db_model: associated database model
+        :param conn: database connection
+        :param db_engine: optional sqlalchemy style engine (for closing)
+        """
         assert isinstance(db_model, DBModel)
         self.db_model = db_model
+        self.db_engine = db_engine
         self.conn = conn
 
     def __enter__(self):
@@ -1924,8 +1942,21 @@ class DBHandle:
 
     def close(self) -> None:
         if self.conn is not None:
-            try:
-                self.conn.close()
-            except Exception:
-                pass
+            caught = None
+            if self.db_engine is not None:
+                # sqlalchemy style handle
+                # noinspection PyBroadException
+                try:
+                    self.db_engine.dispose()
+                except Exception as ex:
+                    caught = ex
+            else:
+                # noinspection PyBroadException
+                try:
+                    self.conn.close()
+                except Exception as ex:
+                    caught = ex
+            self.db_engine = None
             self.conn = None
+            if caught is not None:
+                raise ValueError('close caught: ' + str(caught))

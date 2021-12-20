@@ -82,10 +82,16 @@
                     <h1 class="modulename">
 <a href="./../data_algebra.html">data_algebra</a><wbr>.SQLite    </h1>
 
-                
+                        <div class="docstring"><p>Adapt data_algebra to SQLite database.</p>
+</div>
+
                         <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+            <div class="codehilite"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Adapt data_algebra to SQLite database.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">numbers</span>
@@ -106,6 +112,10 @@
 <span class="c1"># at least capture to is_bad, which appears to not be implemented</span>
 <span class="c1"># unless we call prepare connection</span>
 <span class="k">def</span> <span class="nf">_sqlite_is_bad_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return SQL to check for bad values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">return</span> <span class="p">(</span>
         <span class="s2">&quot;is_bad(&quot;</span>
         <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -119,6 +129,10 @@
 
 
 <span class="k">def</span> <span class="nf">_check_scalar_bad</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return 1 if scalar value is none or nan, else 0.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">1</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">):</span>
@@ -129,13 +143,23 @@
 
 
 <span class="k">class</span> <span class="nc">MedianAgg</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Aggregate as median. SQLite user class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Observe value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return result.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span>
 
 
@@ -162,6 +186,9 @@
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">prepare_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Insert user functions into db.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.create_function</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_bad&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_bad</span><span class="p">)</span>
         <span class="n">saw</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -349,6 +376,9 @@
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">left_is_first</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Translate a join into SQL, converting right and full joins to replacement code (as SQLite doesn&#39;t have these).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)&quot;</span>
@@ -406,19 +436,31 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">MedianAgg</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Aggregate as median. SQLite user class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Observe value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return result.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Aggregate as median. SQLite user class.</p>
+</div>
+
 
                             <div id="MedianAgg.__init__" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#MedianAgg.__init__">#&nbsp;&nbsp</a>
@@ -449,12 +491,17 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Observe value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Observe value</p>
+</div>
+
 
                             </div>
                             <div id="MedianAgg.finalize" class="classattr">
@@ -468,12 +515,17 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return result.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Return result.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -511,6 +563,9 @@
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">prepare_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Insert user functions into db.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.create_function</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_bad&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_bad</span><span class="p">)</span>
         <span class="n">saw</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -698,6 +753,9 @@
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">left_is_first</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Translate a join into SQL, converting right and full joins to replacement code (as SQLite doesn&#39;t have these).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)&quot;</span>
@@ -773,6 +831,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">prepare_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Insert user functions into db.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.create_function</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;is_bad&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_check_scalar_bad</span><span class="p">)</span>
         <span class="n">saw</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -869,7 +930,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Insert user functions into db.</p>
+</div>
+
 
                             </div>
                             <div id="SQLiteModel.insert_table" class="classattr">
@@ -952,6 +1015,9 @@
         <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">left_is_first</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Translate a join into SQL, converting right and full joins to replacement code (as SQLite doesn&#39;t have these).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">join_node</span><span class="o">.</span><span class="n">node_name</span> <span class="o">!=</span> <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)&quot;</span>
@@ -986,7 +1052,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Translate a join into SQL, converting right and full joins to replacement code (as SQLite doesn't have these).</p>
+</div>
+
 
                             </div>
                             <div class="inherited">

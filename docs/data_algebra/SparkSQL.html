@@ -79,10 +79,16 @@
                     <h1 class="modulename">
 <a href="./../data_algebra.html">data_algebra</a><wbr>.SparkSQL    </h1>
 
-                
+                        <div class="docstring"><p>SparkSQL adapter for the data algebra.</p>
+</div>
+
                         <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">data_algebra.data_ops</span>
+            <div class="codehilite"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">SparkSQL adapter for the data algebra.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">data_algebra.data_ops</span>
 <span class="kn">import</span> <span class="nn">data_algebra.db_model</span>
 
 
@@ -120,8 +126,14 @@
 
 
 <span class="c1"># treat NaN as NULL, as Pandas has a hard time distinguishing the two</span>
-<span class="k">def</span> <span class="nf">_sparksql_coalesce_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">coalesce_step</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_sparksql_coalesce_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return coalesce expression.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">coalesce_step</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return one caes of coalesce.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot; WHEN (</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> IS NOT NULL) AND (NOT isNaN(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)) THEN </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> &quot;</span>
 
@@ -173,6 +185,9 @@
 
 
 <span class="k">class</span> <span class="nc">SparkConnection</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Holder for spark conext and session as a connection (defines close).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">spark_context</span><span class="p">,</span> <span class="n">spark_session</span><span class="p">):</span>
         <span class="k">assert</span> <span class="n">have_Spark</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spark_context</span><span class="p">,</span> <span class="n">pyspark</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">SparkContext</span><span class="p">)</span>
@@ -181,6 +196,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">spark_session</span> <span class="o">=</span> <span class="n">spark_session</span>
 
     <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stop context and release reference to context and session.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_context</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spark_context</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>  <span class="c1"># probably only for local demos</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spark_context</span> <span class="o">=</span> <span class="kc">None</span>
@@ -279,6 +297,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">SparkConnection</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Holder for spark conext and session as a connection (defines close).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">spark_context</span><span class="p">,</span> <span class="n">spark_session</span><span class="p">):</span>
         <span class="k">assert</span> <span class="n">have_Spark</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spark_context</span><span class="p">,</span> <span class="n">pyspark</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">SparkContext</span><span class="p">)</span>
@@ -287,6 +308,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">spark_session</span> <span class="o">=</span> <span class="n">spark_session</span>
 
     <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stop context and release reference to context and session.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_context</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spark_context</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>  <span class="c1"># probably only for local demos</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spark_context</span> <span class="o">=</span> <span class="kc">None</span>
@@ -296,7 +320,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Holder for spark conext and session as a connection (defines close).</p>
+</div>
+
 
                             <div id="SparkConnection.__init__" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#SparkConnection.__init__">#&nbsp;&nbsp</a>
@@ -331,6 +357,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stop context and release reference to context and session.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_context</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spark_context</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>  <span class="c1"># probably only for local demos</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spark_context</span> <span class="o">=</span> <span class="kc">None</span>
@@ -340,7 +369,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Stop context and release reference to context and session.</p>
+</div>
+
 
                             </div>
                 </section>

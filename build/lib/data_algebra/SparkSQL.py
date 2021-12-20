@@ -1,3 +1,8 @@
+
+"""
+SparkSQL adapter for the data algebra.
+"""
+
 import data_algebra.data_ops
 import data_algebra.db_model
 
@@ -36,8 +41,14 @@ def _sparksql_is_bad_expr(dbmodel, expression):
 
 
 # treat NaN as NULL, as Pandas has a hard time distinguishing the two
-def _sparksql_coalesce_expr(dbmodel, expression):
-    def coalesce_step(x):
+def _sparksql_coalesce_expr(dbmodel, expression) -> str:
+    """
+    Return coalesce expression.
+    """
+    def coalesce_step(x: str) -> str:
+        """
+        Return one caes of coalesce.
+        """
         assert isinstance(x, str)
         return f" WHEN ({x} IS NOT NULL) AND (NOT isNaN({x})) THEN {x} "
 
@@ -89,6 +100,9 @@ SparkSQL_formatters = {
 
 
 class SparkConnection:
+    """
+    Holder for spark conext and session as a connection (defines close).
+    """
     def __init__(self, *, spark_context, spark_session):
         assert have_Spark
         assert isinstance(spark_context, pyspark.context.SparkContext)
@@ -97,6 +111,9 @@ class SparkConnection:
         self.spark_session = spark_session
 
     def close(self):
+        """
+        Stop context and release reference to context and session.
+        """
         if self.spark_context is not None:
             self.spark_context.stop()  # probably only for local demos
             self.spark_context = None

@@ -227,13 +227,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="c1"># noinspection PyBroadException</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span>
                     <span class="n">conn</span><span class="p">,</span>
                     <span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">prepped_table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
@@ -310,6 +310,7 @@
     <span class="c1"># assert os.path.isfile(credential_file)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">credential_file</span>
     <span class="c1"># os.environ[&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;]  # trigger key error if not present</span>
+    <span class="c1"># noinspection PyBroadException</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">data_catalog</span> <span class="o">=</span> <span class="s2">&quot;data-algebra-test&quot;</span>
         <span class="n">data_schema</span> <span class="o">=</span> <span class="s2">&quot;test_1&quot;</span>
@@ -318,7 +319,7 @@
         <span class="p">)</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">google</span><span class="o">.</span><span class="n">cloud</span><span class="o">.</span><span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">())</span>
         <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">db_handle</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
 </pre></div>
 
@@ -418,13 +419,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="c1"># noinspection PyBroadException</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span>
                     <span class="n">conn</span><span class="p">,</span>
                     <span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">prepped_table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
@@ -615,13 +616,13 @@ connection should be google.cloud.bigquery.client.Client</p>
             <span class="bp">self</span><span class="o">.</span><span class="n">drop_table</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="c1"># noinspection PyBroadException</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span>
                     <span class="n">conn</span><span class="p">,</span>
                     <span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">prepped_table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
@@ -658,7 +659,10 @@ connection should be google.cloud.bigquery.client.Client</p>
 
         </details>
 
-    
+            <div class="docstring"><p>:param conn: database connection
+:param db_engine: optional sqlalchemy style engine (for closing)</p>
+</div>
+
 
                             </div>
                             <div class="inherited">
@@ -766,7 +770,9 @@ connection should be google.cloud.bigquery.client.Client</p>
 
         </details>
 
-    
+            <div class="docstring"><p>Container for database connection handles.</p>
+</div>
+
 
                             <div id="BigQuery_DBHandle.__init__" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#BigQuery_DBHandle.__init__">#&nbsp;&nbsp</a>
@@ -784,7 +790,11 @@ connection should be google.cloud.bigquery.client.Client</p>
 
         </details>
 
-    
+            <div class="docstring"><p>:param db_model: associated database model
+:param conn: database connection
+:param db_engine: optional sqlalchemy style engine (for closing)</p>
+</div>
+
 
                             </div>
                             <div id="BigQuery_DBHandle.describe_bq_table" class="classattr">
@@ -906,6 +916,7 @@ connection should be google.cloud.bigquery.client.Client</p>
     <span class="c1"># assert os.path.isfile(credential_file)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">credential_file</span>
     <span class="c1"># os.environ[&quot;GOOGLE_APPLICATION_CREDENTIALS&quot;]  # trigger key error if not present</span>
+    <span class="c1"># noinspection PyBroadException</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">data_catalog</span> <span class="o">=</span> <span class="s2">&quot;data-algebra-test&quot;</span>
         <span class="n">data_schema</span> <span class="o">=</span> <span class="s2">&quot;test_1&quot;</span>
@@ -914,7 +925,7 @@ connection should be google.cloud.bigquery.client.Client</p>
         <span class="p">)</span><span class="o">.</span><span class="n">db_handle</span><span class="p">(</span><span class="n">google</span><span class="o">.</span><span class="n">cloud</span><span class="o">.</span><span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">())</span>
         <span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">db_handle</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
 </pre></div>
 

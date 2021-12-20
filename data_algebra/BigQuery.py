@@ -131,13 +131,13 @@ class BigQueryModel(data_algebra.db_model.DBModel):
             self.drop_table(conn, table_name)
         else:
             table_exists = True
+            # noinspection PyBroadException
             try:
                 self.read_query(
                     conn,
                     "SELECT * FROM " + self.quote_table_name(table_name) + " LIMIT 1",
                 )
-                table_exists = True
-            except Exception as e:
+            except Exception:
                 table_exists = False
             if table_exists:
                 raise ValueError("table " + prepped_table_name + " already exists")
@@ -214,6 +214,7 @@ def example_handle():
     # assert os.path.isfile(credential_file)
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credential_file
     # os.environ["GOOGLE_APPLICATION_CREDENTIALS"]  # trigger key error if not present
+    # noinspection PyBroadException
     try:
         data_catalog = "data-algebra-test"
         data_schema = "test_1"
@@ -222,5 +223,5 @@ def example_handle():
         ).db_handle(google.cloud.bigquery.Client())
         db_handle.db_model.prepare_connection(db_handle.conn)
         return db_handle
-    except Exception as e:
+    except Exception:
         return None

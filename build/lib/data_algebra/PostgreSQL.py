@@ -43,8 +43,7 @@ def example_handle():
     """
     # TODO: parameterize this
     assert have_sqlalchemy
-    db_handle = PostgreSQLModel().db_handle(
-        sqlalchemy.engine.create_engine(r"postgresql://johnmount@localhost/johnmount")
-    )
+    db_engine = sqlalchemy.engine.create_engine(r"postgresql://johnmount@localhost/johnmount")
+    db_handle = PostgreSQLModel().db_handle(conn=db_engine, db_engine=db_engine)
     db_handle.db_model.prepare_connection(db_handle.conn)
     return db_handle

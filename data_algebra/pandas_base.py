@@ -1,5 +1,5 @@
 """
-Base clas for adapters for Pandas-like APIs
+Base class for adapters for Pandas-like APIs
 """
 
 from abc import ABC
@@ -206,7 +206,7 @@ def populate_impl_map(data_model):
             a, b
         ),
         "mapv": _map_v,
-        # fns that had been in bigquery_user_fns
+        # additonal fns
         # x is a pandas Series
         "as_int64": lambda x: x.astype("int64").copy(),
         "as_str": lambda x: x.astype("str").copy(),

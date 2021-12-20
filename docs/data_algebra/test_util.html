@@ -224,7 +224,7 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">db_handle</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
-    <span class="n">ops</span><span class="p">:</span> <span class="ne">ValueError</span><span class="p">,</span>
+    <span class="n">ops</span><span class="p">:</span> <span class="n">ViewRepresentation</span><span class="p">,</span>
     <span class="n">sql_statements</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">expect</span><span class="p">,</span>
     <span class="n">float_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
@@ -235,14 +235,18 @@
     <span class="n">alter_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">test_direct_ops_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run ops and sql_statements on db_handle, checking if result matches expect.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_handle</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBHandle</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">db_model</span><span class="o">.</span><span class="n">DBModel</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">ViewRepresentation</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">db_handle</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">SQLite</span><span class="o">.</span><span class="n">SQLiteModel</span><span class="p">):</span>
         <span class="n">test_direct_ops_path</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">db_handle_key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">db_handle</span><span class="o">.</span><span class="n">db_model</span><span class="p">)</span>
     <span class="n">sql_statements</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sql_statements</span><span class="p">)</span>
-    <span class="n">res_db_sql</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">sql_statements</span><span class="p">)</span>
+    <span class="n">res_db_sql</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">sql_statements</span><span class="p">))</span>  <span class="c1"># extra list() wrapper for PyCharm&#39;s type checker</span>
     <span class="n">res_db_ops</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">need_to_run</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">dict_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -263,7 +267,7 @@
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                 <span class="k">pass</span>
         <span class="n">need_to_run</span> <span class="o">=</span> <span class="n">test_direct_ops_path</span> <span class="ow">or</span> <span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">resi</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">resi</span> <span class="ow">in</span> <span class="n">res_db_sql</span><span class="p">]</span>
+            <span class="p">[</span><span class="n">result_i</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">result_i</span> <span class="ow">in</span> <span class="n">res_db_sql</span><span class="p">]</span>
         <span class="p">)</span>
     <span class="c1"># generate any new needed results</span>
     <span class="k">if</span> <span class="n">need_to_run</span><span class="p">:</span>
@@ -293,6 +297,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">db_handle</span><span class="si">}</span><span class="s2"> error in test &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">caught</span><span class="p">))</span>
     <span class="c1"># check results</span>
     <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">res_db_sql</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">res</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
             <span class="n">res</span><span class="p">,</span>
             <span class="n">expect</span><span class="p">,</span>

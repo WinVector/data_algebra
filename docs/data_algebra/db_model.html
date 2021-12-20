@@ -205,10 +205,16 @@
                     <h1 class="modulename">
 <a href="./../data_algebra.html">data_algebra</a><wbr>.db_model    </h1>
 
-                
+                        <div class="docstring"><p>Base clase for SQL adapters for data algebra.</p>
+</div>
+
                         <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+            <div class="codehilite"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Base clase for SQL adapters for data algebra.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
@@ -263,6 +269,7 @@
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
 
+    <span class="c1"># noinspection PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">_repr_pretty_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">cycle</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        IPython pretty print, used at implicit print time</span>
@@ -313,6 +320,7 @@
     <span class="p">)</span>
 
 
+<span class="c1"># noinspection PyUnusedLocal</span>
 <span class="k">def</span> <span class="nf">_db_size_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="k">return</span> <span class="s2">&quot;SUM(1)&quot;</span>
 
@@ -516,9 +524,6 @@
     <span class="p">)</span>
 
 
-<span class="c1"># fns that had been in bigquery_user_fns</span>
-
-
 <span class="k">def</span> <span class="nf">_as_int64</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="s2">&quot;CAST(&quot;</span>
@@ -697,7 +702,7 @@
     <span class="s2">&quot;**&quot;</span><span class="p">:</span> <span class="n">_db_pow_expr</span><span class="p">,</span>
     <span class="s2">&quot;nunique&quot;</span><span class="p">:</span> <span class="n">_db_nunique_expr</span><span class="p">,</span>
     <span class="s2">&quot;mapv&quot;</span><span class="p">:</span> <span class="n">_db_mapv</span><span class="p">,</span>
-    <span class="c1"># fns that had been in bigquery_user_fns</span>
+    <span class="c1"># additional fns</span>
     <span class="s2">&quot;as_int64&quot;</span><span class="p">:</span> <span class="n">_as_int64</span><span class="p">,</span>
     <span class="s2">&quot;as_str&quot;</span><span class="p">:</span> <span class="n">_as_str</span><span class="p">,</span>
     <span class="s2">&quot;trimstr&quot;</span><span class="p">:</span> <span class="n">_trimstr</span><span class="p">,</span>
@@ -798,8 +803,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_start</span> <span class="o">=</span> <span class="n">union_all_term_start</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_end</span> <span class="o">=</span> <span class="n">union_all_term_end</span>
 
-    <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">DBHandle</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="n">conn</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param conn: database connection</span>
+<span class="sd">        :param db_engine: optional sqlalchemy style engine (for closing)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">DBHandle</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">prepare_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
         <span class="k">pass</span>
@@ -840,8 +850,8 @@
     <span class="k">def</span> <span class="nf">table_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">q_table_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
-        <span class="c1"># noinspection PyBroadException</span>
         <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># noinspection PyBroadException</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">q_table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
@@ -2066,9 +2076,19 @@
 
 
 <span class="k">class</span> <span class="nc">DBHandle</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="n">DBModel</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Container for database connection handles.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="n">DBModel</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param db_model: associated database model</span>
+<span class="sd">        :param conn: database connection</span>
+<span class="sd">        :param db_engine: optional sqlalchemy style engine (for closing)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">DBModel</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span> <span class="o">=</span> <span class="n">db_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_engine</span> <span class="o">=</span> <span class="n">db_engine</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">conn</span>
 
     <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -2134,11 +2154,24 @@
 
     <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="k">pass</span>
+            <span class="n">caught</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_engine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># sqlalchemy style handle</span>
+                <span class="c1"># noinspection PyBroadException</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">db_engine</span><span class="o">.</span><span class="n">dispose</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                    <span class="n">caught</span> <span class="o">=</span> <span class="n">ex</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># noinspection PyBroadException</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                    <span class="n">caught</span> <span class="o">=</span> <span class="n">ex</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db_engine</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">caught</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;close caught: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">caught</span><span class="p">))</span>
 </pre></div>
 
         </details>
@@ -2182,6 +2215,7 @@
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
 
+    <span class="c1"># noinspection PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">_repr_pretty_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">cycle</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        IPython pretty print, used at implicit print time</span>
@@ -2312,8 +2346,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_start</span> <span class="o">=</span> <span class="n">union_all_term_start</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">union_all_term_end</span> <span class="o">=</span> <span class="n">union_all_term_end</span>
 
-    <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">DBHandle</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="n">conn</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param conn: database connection</span>
+<span class="sd">        :param db_engine: optional sqlalchemy style engine (for closing)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">DBHandle</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">prepare_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
         <span class="k">pass</span>
@@ -2354,8 +2393,8 @@
     <span class="k">def</span> <span class="nf">table_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">q_table_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
-        <span class="c1"># noinspection PyBroadException</span>
         <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># noinspection PyBroadException</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">q_table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
@@ -3670,18 +3709,26 @@
 
         
             <span class="def">def</span>
-            <span class="name">db_handle</span><span class="signature">(self, conn)</span>:
+            <span class="name">db_handle</span><span class="signature">(self, conn, db_engine=None)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">DBHandle</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="n">conn</span><span class="p">)</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">db_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param conn: database connection</span>
+<span class="sd">        :param db_engine: optional sqlalchemy style engine (for closing)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">DBHandle</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="n">db_engine</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>:param conn: database connection
+:param db_engine: optional sqlalchemy style engine (for closing)</p>
+</div>
+
 
                             </div>
                             <div id="DBModel.prepare_connection" class="classattr">
@@ -3785,8 +3832,8 @@
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">table_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">q_table_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_table_name</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
-        <span class="c1"># noinspection PyBroadException</span>
         <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># noinspection PyBroadException</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">q_table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
@@ -5556,9 +5603,19 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">DBHandle</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="n">DBModel</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Container for database connection handles.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="n">DBModel</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param db_model: associated database model</span>
+<span class="sd">        :param conn: database connection</span>
+<span class="sd">        :param db_engine: optional sqlalchemy style engine (for closing)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">DBModel</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span> <span class="o">=</span> <span class="n">db_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_engine</span> <span class="o">=</span> <span class="n">db_engine</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">conn</span>
 
     <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -5624,35 +5681,61 @@
 
     <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="k">pass</span>
+            <span class="n">caught</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_engine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># sqlalchemy style handle</span>
+                <span class="c1"># noinspection PyBroadException</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">db_engine</span><span class="o">.</span><span class="n">dispose</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                    <span class="n">caught</span> <span class="o">=</span> <span class="n">ex</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># noinspection PyBroadException</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                    <span class="n">caught</span> <span class="o">=</span> <span class="n">ex</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db_engine</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">caught</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;close caught: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">caught</span><span class="p">))</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Container for database connection handles.</p>
+</div>
+
 
                             <div id="DBHandle.__init__" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#DBHandle.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">DBHandle</span><span class="signature">(*, db_model: <a href="#DBModel">data_algebra.db_model.DBModel</a>, conn)</span>
+            <span class="name">DBHandle</span><span class="signature">(*, db_model: <a href="#DBModel">data_algebra.db_model.DBModel</a>, conn, db_engine=None)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="n">DBModel</span><span class="p">,</span> <span class="n">conn</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">db_model</span><span class="p">:</span> <span class="n">DBModel</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">db_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param db_model: associated database model</span>
+<span class="sd">        :param conn: database connection</span>
+<span class="sd">        :param db_engine: optional sqlalchemy style engine (for closing)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_model</span><span class="p">,</span> <span class="n">DBModel</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db_model</span> <span class="o">=</span> <span class="n">db_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_engine</span> <span class="o">=</span> <span class="n">db_engine</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">conn</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>:param db_model: associated database model
+:param conn: database connection
+:param db_engine: optional sqlalchemy style engine (for closing)</p>
+</div>
+
 
                             </div>
                             <div id="DBHandle.read_query" class="classattr">
@@ -5841,11 +5924,24 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="k">pass</span>
+            <span class="n">caught</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_engine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># sqlalchemy style handle</span>
+                <span class="c1"># noinspection PyBroadException</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">db_engine</span><span class="o">.</span><span class="n">dispose</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                    <span class="n">caught</span> <span class="o">=</span> <span class="n">ex</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># noinspection PyBroadException</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                    <span class="n">caught</span> <span class="o">=</span> <span class="n">ex</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db_engine</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">caught</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;close caught: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">caught</span><span class="p">))</span>
 </pre></div>
 
         </details>

@@ -153,7 +153,7 @@ def _run_handle_experiments(
     *,
     db_handle,
     data: Dict,
-    ops: ValueError,
+    ops: ViewRepresentation,
     sql_statements: Iterable[str],
     expect,
     float_tol: float = 1e-8,
@@ -164,14 +164,18 @@ def _run_handle_experiments(
     alter_cache: bool = True,
     test_direct_ops_path=False,
 ):
+    """
+    Run ops and sql_statements on db_handle, checking if result matches expect.
+    """
     assert isinstance(db_handle, data_algebra.db_model.DBHandle)
     assert isinstance(db_handle.db_model, data_algebra.db_model.DBModel)
+    assert isinstance(ops, ViewRepresentation)
     assert db_handle.conn is not None
     if isinstance(db_handle.db_model, data_algebra.SQLite.SQLiteModel):
         test_direct_ops_path = True
     db_handle_key = str(db_handle.db_model)
     sql_statements = list(sql_statements)
-    res_db_sql = [None] * len(sql_statements)
+    res_db_sql = list([None] * len(sql_statements))  # extra list() wrapper for PyCharm's type checker
     res_db_ops = None
     need_to_run = True
     dict_keys = list(data.keys())
@@ -192,7 +196,7 @@ def _run_handle_experiments(
             except KeyError:
                 pass
         need_to_run = test_direct_ops_path or numpy.any(
-            [resi is None for resi in res_db_sql]
+            [result_i is None for result_i in res_db_sql]
         )
     # generate any new needed results
     if need_to_run:
@@ -222,6 +226,7 @@ def _run_handle_experiments(
             raise ValueError(f"{db_handle} error in test " + str(caught))
     # check results
     for res in res_db_sql:
+        assert res is not None
         if not equivalent_frames(
             res,
             expect,
