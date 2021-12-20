@@ -2,10 +2,6 @@
 Type defs for data operations.
 """
 
-
-from typing import List
-import collections
-
 import data_algebra.expr_rep
 import data_algebra.cdata
 import data_algebra.OrderedSet
@@ -127,8 +123,11 @@ class OperatorPlatform:
     # characterization
 
     def get_tables(self):
-        """Get a dictionary of all tables used in an operator DAG,
-        raise an exception if the values are not consistent."""
+        """
+        Get a dictionary of all tables used in an operator DAG,
+        raise an exception if the values are not consistent.
+        """
+
         raise NotImplementedError("base class called")
 
     # info

@@ -1,3 +1,7 @@
+"""
+PostgreSQL database adapter for data algebra.
+"""
+
 import data_algebra.data_ops
 import data_algebra.db_model
 

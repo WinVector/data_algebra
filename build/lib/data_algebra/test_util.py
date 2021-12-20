@@ -47,7 +47,7 @@ def formats_to_self(ops) -> bool:
             "pd": data_algebra.default_data_model.pd
         },  # make our definition of pandas available
     )
-    str2 = repr(ops2)
+    # str2 = repr(ops2)
     # strings_match = str1 == str2  # probably too strict
     ops_match = ops == ops2
     assert ops_match
@@ -178,8 +178,11 @@ def _run_handle_experiments(
     dict_keys.sort()
     data_key = " ".join([k + ":" + hash_data_frame(data[k]) for k in dict_keys])
 
-    def mk_key(i):
-        return db_handle_key + " " + sql_statements[i] + " " + data_key
+    def mk_key(ii):
+        """
+        Build sql statement key.
+        """
+        return db_handle_key + " " + sql_statements[ii] + " " + data_key
 
     # inspect result cache for any prior results
     if test_result_cache is not None:

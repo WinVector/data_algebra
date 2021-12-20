@@ -63,8 +63,8 @@ def table_is_keyed_by_columns(table, column_names: Iterable[str]) -> bool:
 
 
 # noinspection PyBroadException
-def _mk_type_coversion_table():
-    type_conversions = dict()
+def _mk_type_conversion_table():
+    type_conversions_table = dict()
     # DeprecationWarning: `np.bool` is a deprecated alias for the builtin `bool`.
     # To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe.
     # If you specifically wanted the numpy scalar type, use `np.bool_` here.
@@ -74,49 +74,49 @@ def _mk_type_coversion_table():
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         try:
-            type_conversions[numpy.bool_] = bool
+            type_conversions_table[numpy.bool_] = bool
         except Exception:
             pass
         try:
-            type_conversions[numpy.bool] = bool
+            type_conversions_table[numpy.bool] = bool
         except Exception:
             pass
         try:
-            type_conversions[numpy.int] = int
+            type_conversions_table[numpy.int] = int
         except Exception:
             pass
         try:
-            type_conversions[numpy.int_] = int
+            type_conversions_table[numpy.int_] = int
         except Exception:
             pass
         try:
-            type_conversions[numpy.int64] = int
+            type_conversions_table[numpy.int64] = int
         except Exception:
             pass
         try:
-            type_conversions[numpy.float64] = float
+            type_conversions_table[numpy.float64] = float
         except Exception:
             pass
         try:
-            type_conversions[numpy.float] = float
+            type_conversions_table[numpy.float] = float
         except Exception:
             pass
         try:
-            type_conversions[numpy.float_] = float
+            type_conversions_table[numpy.float_] = float
         except Exception:
             pass
         try:
-            type_conversions[numpy.str] = str
+            type_conversions_table[numpy.str] = str
         except Exception:
             pass
         try:
-            type_conversions[numpy.str_] = str
+            type_conversions_table[numpy.str_] = str
         except Exception:
             pass
-        return type_conversions
+    return type_conversions_table
 
 
-type_conversions = _mk_type_coversion_table()
+type_conversions = _mk_type_conversion_table()
 
 
 def map_type_to_canonical(v: type) -> type:

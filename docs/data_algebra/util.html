@@ -137,8 +137,8 @@
 
 
 <span class="c1"># noinspection PyBroadException</span>
-<span class="k">def</span> <span class="nf">_mk_type_coversion_table</span><span class="p">():</span>
-    <span class="n">type_conversions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">_mk_type_conversion_table</span><span class="p">():</span>
+    <span class="n">type_conversions_table</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="c1"># DeprecationWarning: `np.bool` is a deprecated alias for the builtin `bool`.</span>
     <span class="c1"># To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe.</span>
     <span class="c1"># If you specifically wanted the numpy scalar type, use `np.bool_` here.</span>
@@ -148,49 +148,49 @@
     <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">type_conversions</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">bool_</span><span class="p">]</span> <span class="o">=</span> <span class="nb">bool</span>
+            <span class="n">type_conversions_table</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">bool_</span><span class="p">]</span> <span class="o">=</span> <span class="nb">bool</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">type_conversions</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">bool</span><span class="p">]</span> <span class="o">=</span> <span class="nb">bool</span>
+            <span class="n">type_conversions_table</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">bool</span><span class="p">]</span> <span class="o">=</span> <span class="nb">bool</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">type_conversions</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span>
+            <span class="n">type_conversions_table</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">type_conversions</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">int_</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span>
+            <span class="n">type_conversions_table</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">int_</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">type_conversions</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span>
+            <span class="n">type_conversions_table</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">type_conversions</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span>
+            <span class="n">type_conversions_table</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">type_conversions</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">float</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span>
+            <span class="n">type_conversions_table</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">float</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">type_conversions</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">float_</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span>
+            <span class="n">type_conversions_table</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">float_</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">type_conversions</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span>
+            <span class="n">type_conversions_table</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">type_conversions</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">str_</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span>
+            <span class="n">type_conversions_table</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">str_</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
-        <span class="k">return</span> <span class="n">type_conversions</span>
+    <span class="k">return</span> <span class="n">type_conversions_table</span>
 
 
-<span class="n">type_conversions</span> <span class="o">=</span> <span class="n">_mk_type_coversion_table</span><span class="p">()</span>
+<span class="n">type_conversions</span> <span class="o">=</span> <span class="n">_mk_type_conversion_table</span><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">map_type_to_canonical</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>

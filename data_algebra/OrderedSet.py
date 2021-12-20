@@ -99,7 +99,7 @@ def ordered_intersect(a: Iterable, b: Iterable) -> OrderedSet:
 
 def ordered_union(a: Iterable, b: Iterable) -> OrderedSet:
     """
-    Untion of two iterables, ordered by a first, then b.
+    Union of two iterables, ordered by a first, then b.
     """
     a = OrderedSet(a)
     for v in b:
@@ -110,7 +110,7 @@ def ordered_union(a: Iterable, b: Iterable) -> OrderedSet:
 
 def ordered_diff(a: Iterable, b: Iterable) -> OrderedSet:
     """
-    a with b removed
+    a with b removed, a order preserved.
     """
     b = set(b)
     a = OrderedSet([v for v in a if v not in b])

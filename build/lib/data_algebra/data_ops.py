@@ -4,6 +4,7 @@ Realization of data operations.
 
 
 from abc import ABC
+import collections
 from typing import Iterable, Set, Dict, List, Optional, Tuple, Union
 import numbers
 import re
@@ -22,7 +23,6 @@ from data_algebra.OrderedSet import (
     OrderedSet,
     ordered_intersect,
     ordered_union,
-    ordered_diff,
 )
 import data_algebra.util
 
@@ -76,7 +76,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         sources: Optional[Iterable["ViewRepresentation"]] = None,
         node_name: str,
     ):
-        # don't let instances masquarade as iterables
+        # don't let instances masquerade as iterables
         assert not isinstance(column_names, str)
         assert not isinstance(sources, OperatorPlatform)
         if not isinstance(column_names, tuple):
@@ -1099,7 +1099,6 @@ class ExtendNode(ViewRepresentation):
         subops = {k: op for (k, op) in self.ops.items() if k in using}
         if len(subops) <= 0:
             return [OrderedSet(self.sources[0].column_names)]
-        columns_we_take = set(self.sources[0].column_names)
         columns_we_take = using.union(self.partition_by, self.order_by, self.reverse)
         columns_we_take = columns_we_take - subops.keys()
         for (k, o) in subops.items():

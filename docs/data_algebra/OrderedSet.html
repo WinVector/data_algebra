@@ -208,7 +208,7 @@
 
 <span class="k">def</span> <span class="nf">ordered_union</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OrderedSet</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Untion of two iterables, ordered by a first, then b.</span>
+<span class="sd">    Union of two iterables, ordered by a first, then b.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">b</span><span class="p">:</span>
@@ -219,7 +219,7 @@
 
 <span class="k">def</span> <span class="nf">ordered_diff</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OrderedSet</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    a with b removed</span>
+<span class="sd">    a with b removed, a order preserved.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">b</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">([</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">a</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">b</span><span class="p">])</span>
@@ -589,7 +589,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">ordered_union</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OrderedSet</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Untion of two iterables, ordered by a first, then b.</span>
+<span class="sd">    Union of two iterables, ordered by a first, then b.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">b</span><span class="p">:</span>
@@ -600,7 +600,7 @@
 
         </details>
 
-            <div class="docstring"><p>Untion of two iterables, ordered by a first, then b.</p>
+            <div class="docstring"><p>Union of two iterables, ordered by a first, then b.</p>
 </div>
 
 
@@ -620,7 +620,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">ordered_diff</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OrderedSet</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    a with b removed</span>
+<span class="sd">    a with b removed, a order preserved.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">b</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">([</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">a</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">b</span><span class="p">])</span>
@@ -629,7 +629,7 @@
 
         </details>
 
-            <div class="docstring"><p>a with b removed</p>
+            <div class="docstring"><p>a with b removed, a order preserved.</p>
 </div>
 
 

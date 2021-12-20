@@ -70,7 +70,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         # good enough
         assert s.startswith(self.identifier_quote)
         assert s.endswith(self.identifier_quote)
-        res = s[1 : (len(s) - 1)]
+        res = s[1:(len(s) - 1)]
         assert self.identifier_quote not in res
         return res
 
