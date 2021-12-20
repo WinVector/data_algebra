@@ -24,7 +24,7 @@ def test_bigquery_user_fns_integrated():
             "parse_date_col": ["2000-03-01", "2020-04-05"],
             "input_datetime_col_0": pd.to_datetime(
                 pd.Series(["2010-01-01 12:13:21", "2030-04-05 14:03:00"]),
-                format=date_format,
+                format=datetime_format,
             ),
             "input_datetime_col_1": pd.to_datetime(
                 pd.Series(["2010-01-01 12:11:21", "2030-04-06 14:03:00"]),
