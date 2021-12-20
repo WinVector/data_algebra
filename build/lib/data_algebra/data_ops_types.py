@@ -89,6 +89,16 @@ class OperatorPlatform:
             return other.apply_to(self)
         raise TypeError("unexpected type: " + str(type(other)))
 
+    # composition
+    def add(self, other):
+        """
+        other.apply_to(self)
+
+        :param other:
+        :return:
+        """
+        return other.apply_to(self)
+
     # imitate a method
     def use(self, user_function, *args, **kwargs):
         """
@@ -100,16 +110,6 @@ class OperatorPlatform:
         :param **kwargs: additional keyword arguments
         """
         return user_function(self, *args, **kwargs)
-
-    # composition
-    def add(self, other):
-        """
-        other.apply_to(self)
-
-        :param other:
-        :return:
-        """
-        return other.apply_to(self)
 
     # convenience
 
@@ -188,9 +188,7 @@ class OperatorPlatform:
         if (blocks_in is None) and (blocks_out is None):
             return self  # NO-OP, return source ops
         return self.convert_records(
-            data_algebra.cdata.RecordMap(
-                blocks_in=blocks_in, blocks_out=blocks_out
-            ),
+            data_algebra.cdata.RecordMap(blocks_in=blocks_in, blocks_out=blocks_out),
         )
 
     # sklearn step style interface

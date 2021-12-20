@@ -10,6 +10,7 @@ class RecordSpecification:
     """
     Class to represent a multi-row data record.
     """
+
     def __init__(
         self,
         control_table,
@@ -51,7 +52,9 @@ class RecordSpecification:
             control_table_keys = [control_table_keys]
         if strict and (self.control_table.shape[0] > 1):
             if len(control_table_keys) <= 0:
-                raise ValueError("multi-row records must have at least one control table key")
+                raise ValueError(
+                    "multi-row records must have at least one control table key"
+                )
         self.control_table_keys = [k for k in control_table_keys]
         unknown = set(self.control_table_keys) - set(control_table.columns)
         if len(unknown) > 0:

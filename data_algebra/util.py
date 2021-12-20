@@ -1,4 +1,3 @@
-
 """
 Basic utilities. Not allowed to import many other modules.
 """
@@ -144,22 +143,36 @@ def guess_carried_scalar_type(col) -> type:
     """
     # check for scalars first
     ct = map_type_to_canonical(type(col))
-    if ct in {str, int, float, bool, type(None), numpy.int64, numpy.float64,
-              datetime.datetime, datetime.date, datetime.timedelta}:
+    if ct in {
+        str,
+        int,
+        float,
+        bool,
+        type(None),
+        numpy.int64,
+        numpy.float64,
+        datetime.datetime,
+        datetime.date,
+        datetime.timedelta,
+    }:
         return ct
     # look at a list or Series
     if isinstance(col, data_algebra.default_data_model.pd.core.series.Series):
         col = col.values
     if len(col) < 1:
         return type(None)
-    good_idx = numpy.where(numpy.logical_not(data_algebra.default_data_model.pd.isna(col)))[0]
+    good_idx = numpy.where(
+        numpy.logical_not(data_algebra.default_data_model.pd.isna(col))
+    )[0]
     test_idx = 0
     if len(good_idx) > 0:
         test_idx = good_idx[0]
     return map_type_to_canonical(type(col[test_idx]))
 
 
-def guess_column_types(d, *, columns: Optional[Iterable[str]] = None) -> Dict[str, type]:
+def guess_column_types(
+    d, *, columns: Optional[Iterable[str]] = None
+) -> Dict[str, type]:
     """
     Guess column types as type of first non-missing value.
     Will not return series types, as some pandas data frames with non-trivial indexing report this type.
@@ -178,7 +191,11 @@ def guess_column_types(d, *, columns: Optional[Iterable[str]] = None) -> Dict[st
     res = dict()
     for c in columns:
         gt = guess_carried_scalar_type(d[c])
-        if (gt is None) or (not isinstance(gt, type)) or gt == data_algebra.default_data_model.pd.core.series.Series:
+        if (
+            (gt is None)
+            or (not isinstance(gt, type))
+            or gt == data_algebra.default_data_model.pd.core.series.Series
+        ):
             # pandas.concat() poisons types with Series, don't allow that
             return dict()
         res[c] = gt
@@ -198,8 +215,9 @@ def compatible_types(types_seen: Iterable[type]) -> bool:
     return True
 
 
-def check_columns_appear_compatible(d_left, d_right, *, columns: Optional[Iterable[str]] = None
-                                    ) -> Optional[Dict[str, Tuple[type, type]]]:
+def check_columns_appear_compatible(
+    d_left, d_right, *, columns: Optional[Iterable[str]] = None
+) -> Optional[Dict[str, Tuple[type, type]]]:
     """
     Check if columns have compatible types
 

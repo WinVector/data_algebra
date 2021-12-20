@@ -141,21 +141,25 @@
     <span class="c1"># https://spark.apache.org/docs/latest/sql-ref-syntax-qry-select-case.html</span>
     <span class="n">if_expr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">mapping_dict</span> <span class="o">=</span> <span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">default_value_expr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">default_value_expr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span>
+        <span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
     <span class="n">terms</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;WHEN (&quot;</span> <span class="o">+</span> <span class="n">if_expr</span> <span class="o">+</span> <span class="s2">&quot; = &quot;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;) THEN &quot;</span> <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">mapping_dict</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="s2">&quot;WHEN (&quot;</span>
+        <span class="o">+</span> <span class="n">if_expr</span>
+        <span class="o">+</span> <span class="s2">&quot; = &quot;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot;) THEN &quot;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">value_to_sql</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">mapping_dict</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
     <span class="p">]</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">default_value_expr</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;CASE &quot;</span>
-            <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span>
-            <span class="o">+</span> <span class="s2">&quot; ELSE &quot;</span> <span class="o">+</span> <span class="n">default_value_expr</span> <span class="o">+</span> <span class="s2">&quot; END&quot;</span>
-    <span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="s2">&quot;CASE &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; ELSE &quot;</span> <span class="o">+</span> <span class="n">default_value_expr</span> <span class="o">+</span> <span class="s2">&quot; END&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="s1">&#39;DOUBLE(&#39;</span> <span class="o">+</span> <span class="n">res</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="s2">&quot;DOUBLE(&quot;</span> <span class="o">+</span> <span class="n">res</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="s1">&#39;INT(&#39;</span> <span class="o">+</span> <span class="n">res</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="s2">&quot;INT(&quot;</span> <span class="o">+</span> <span class="n">res</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
     <span class="k">return</span> <span class="n">res</span>
 
 
@@ -164,7 +168,7 @@
     <span class="s2">&quot;___&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">to_python</span><span class="p">()),</span>
     <span class="s2">&quot;is_bad&quot;</span><span class="p">:</span> <span class="n">_sparksql_is_bad_expr</span><span class="p">,</span>
     <span class="s2">&quot;coalesce&quot;</span><span class="p">:</span> <span class="n">_sparksql_coalesce_expr</span><span class="p">,</span>
-    <span class="s1">&#39;mapv&#39;</span><span class="p">:</span> <span class="n">_sparksql_db_mapv</span><span class="p">,</span>
+    <span class="s2">&quot;mapv&quot;</span><span class="p">:</span> <span class="n">_sparksql_db_mapv</span><span class="p">,</span>
 <span class="p">}</span>
 
 

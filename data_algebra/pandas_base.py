@@ -108,13 +108,17 @@ def _type_safe_is_in(a, b):
 def _map_v(a, value_map, default_value):
     if len(value_map) > 0:
         type_a = data_algebra.util.guess_carried_scalar_type(a)
-        type_k = {data_algebra.util.map_type_to_canonical(type(v)) for v in value_map.keys()}
+        type_k = {
+            data_algebra.util.map_type_to_canonical(type(v)) for v in value_map.keys()
+        }
         if not data_algebra.util.compatible_types(type_k):
             raise TypeError(f"multiple types in dictionary keys: {type_k} in mapv()")
         type_k = list(type_k)[0]
         if not data_algebra.util.compatible_types([type_a, type_k]):
             raise TypeError(f"can't map {type_a} from a dict of {type_k}'s in mapv()")
-        type_v = {data_algebra.util.map_type_to_canonical(type(v)) for v in value_map.values()}
+        type_v = {
+            data_algebra.util.map_type_to_canonical(type(v)) for v in value_map.values()
+        }
         if not data_algebra.util.compatible_types(type_v):
             raise TypeError(f"multiple types in dictionary values: {type_v} in mapv()")
         type_v = list(type_v)[0]
@@ -123,7 +127,7 @@ def _map_v(a, value_map, default_value):
             raise TypeError(f"default is {type_d} for {type_v} values in mapv()'s")
     # https://pandas.pydata.org/docs/reference/api/pandas.Series.map.html
     a = data_algebra.default_data_model.pd.Series(a)
-    a = a.map(value_map, na_action='ignore')
+    a = a.map(value_map, na_action="ignore")
     a[data_algebra.default_data_model.bad_column_positions(a)] = default_value
     return numpy.array(a.values)
 
@@ -259,6 +263,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
     """
     Base class for implementing the data algebra on pandas-like APIs
     """
+
     def __init__(self, *, pd: types.ModuleType, presentation_model_name: str):
         assert isinstance(pd, types.ModuleType)
         data_algebra.data_model.DataModel.__init__(
@@ -312,12 +317,16 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         if (data_map is not None) and (len(data_map) > 0):
             df = data_map[op.table_name]
             if not self.is_appropriate_data_instance(df):
-                raise ValueError("data_map[" + op.table_name + "] was not the right type")
+                raise ValueError(
+                    "data_map[" + op.table_name + "] was not the right type"
+                )
         else:
             df = op.head
             assert df is not None
             if not self.is_appropriate_data_instance(df):
-                raise ValueError("Unnamed TableDescription stored was not the right type")
+                raise ValueError(
+                    "Unnamed TableDescription stored was not the right type"
+                )
         # check all columns we expect are present
         columns_using = op.column_names
         if not narrow:

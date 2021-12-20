@@ -49,10 +49,10 @@
                                 <a class="function" href="#OperatorPlatform.apply_to">apply_to</a>
                         </li>
                         <li>
-                                <a class="function" href="#OperatorPlatform.use">use</a>
+                                <a class="function" href="#OperatorPlatform.add">add</a>
                         </li>
                         <li>
-                                <a class="function" href="#OperatorPlatform.add">add</a>
+                                <a class="function" href="#OperatorPlatform.use">use</a>
                         </li>
                         <li>
                                 <a class="function" href="#OperatorPlatform.ex">ex</a>
@@ -241,6 +241,16 @@
             <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;unexpected type: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)))</span>
 
+    <span class="c1"># composition</span>
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        other.apply_to(self)</span>
+
+<span class="sd">        :param other:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
     <span class="c1"># imitate a method</span>
     <span class="k">def</span> <span class="nf">use</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_function</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -252,16 +262,6 @@
 <span class="sd">        :param **kwargs: additional keyword arguments</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">user_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-    <span class="c1"># composition</span>
-    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        other.apply_to(self)</span>
-
-<span class="sd">        :param other:</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="c1"># convenience</span>
 
@@ -340,9 +340,7 @@
         <span class="k">if</span> <span class="p">(</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span>  <span class="c1"># NO-OP, return source ops</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span>
-            <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordMap</span><span class="p">(</span>
-                <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span>
-            <span class="p">),</span>
+            <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">),</span>
         <span class="p">)</span>
 
     <span class="c1"># sklearn step style interface</span>
@@ -466,6 +464,16 @@
             <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;unexpected type: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)))</span>
 
+    <span class="c1"># composition</span>
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        other.apply_to(self)</span>
+
+<span class="sd">        :param other:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
     <span class="c1"># imitate a method</span>
     <span class="k">def</span> <span class="nf">use</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_function</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -477,16 +485,6 @@
 <span class="sd">        :param **kwargs: additional keyword arguments</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">user_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-    <span class="c1"># composition</span>
-    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        other.apply_to(self)</span>
-
-<span class="sd">        :param other:</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="c1"># convenience</span>
 
@@ -565,9 +563,7 @@
         <span class="k">if</span> <span class="p">(</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span>  <span class="c1"># NO-OP, return source ops</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span>
-            <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordMap</span><span class="p">(</span>
-                <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span>
-            <span class="p">),</span>
+            <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">),</span>
         <span class="p">)</span>
 
     <span class="c1"># sklearn step style interface</span>
@@ -756,6 +752,36 @@
 
 
                             </div>
+                            <div id="OperatorPlatform.add" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OperatorPlatform.add">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">add</span><span class="signature">(self, other)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        other.apply_to(self)</span>
+
+<span class="sd">        :param other:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>other.apply_to(self)</p>
+
+<p>:param other:
+:return:</p>
+</div>
+
+
+                            </div>
                             <div id="OperatorPlatform.use" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#OperatorPlatform.use">#&nbsp;&nbsp</a>
 
@@ -786,36 +812,6 @@ Defined as return f(self, <em>args, *</em>kwargs).</p>
 <p>:param user_function: function to apply
 :param <em>args: additional positional arguments
 :param *</em>kwargs: additional keyword arguments</p>
-</div>
-
-
-                            </div>
-                            <div id="OperatorPlatform.add" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#OperatorPlatform.add">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">add</span><span class="signature">(self, other)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        other.apply_to(self)</span>
-
-<span class="sd">        :param other:</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>other.apply_to(self)</p>
-
-<p>:param other:
-:return:</p>
 </div>
 
 
@@ -1179,9 +1175,7 @@ raise an exception if the values are not consistent.</p>
         <span class="k">if</span> <span class="p">(</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span>  <span class="c1"># NO-OP, return source ops</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span>
-            <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordMap</span><span class="p">(</span>
-                <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span>
-            <span class="p">),</span>
+            <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">),</span>
         <span class="p">)</span>
 </pre></div>
 

@@ -10,6 +10,7 @@ class DataModel(ABC):
     """
     Interface for realizing the data algebra as a sequence of steps over an object.
     """
+
     def __init__(self, presentation_model_name: str):
         assert isinstance(presentation_model_name, str)
         self.presentation_model_name = presentation_model_name

@@ -1,4 +1,3 @@
-
 import math
 import copy
 import numpy
@@ -71,7 +70,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         # good enough
         assert s.startswith(self.identifier_quote)
         assert s.endswith(self.identifier_quote)
-        res = s[1:(len(s) - 1)]
+        res = s[1 : (len(s) - 1)]
         assert self.identifier_quote not in res
         return res
 
@@ -205,10 +204,10 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         self, join_node, *, using=None, temp_id_source, sql_format_options=None
     ):
         assert join_node.node_name == "NaturalJoinNode"
-        assert join_node.jointype == 'RIGHT'
+        assert join_node.jointype == "RIGHT"
         # convert to left to avoid SQLite not having a right jone
         join_node_copy_right = copy.copy(join_node)
-        join_node_copy_right.jointype = 'LEFT'
+        join_node_copy_right.jointype = "LEFT"
         join_node_copy_right.sources = [join_node.sources[1], join_node.sources[0]]
         near_sql_right = data_algebra.db_model.DBModel.natural_join_to_near_sql(
             self,
@@ -225,7 +224,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
     ):
         # this is an example how to tree-rewrite the operator platform before emitting SQL.
         assert join_node.node_name == "NaturalJoinNode"
-        assert join_node.jointype == 'FULL'
+        assert join_node.jointype == "FULL"
         assert len(join_node.by) > 0  # could special case zero case later
         if temp_id_source is None:
             temp_id_source = [0]
@@ -236,35 +235,32 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         right_descr = join_node.sources[1]
         ops_simulate = (
             # get shared key set
-            left_descr
-                .project({}, group_by=join_columns)
-                .concat_rows(
-                    b=right_descr
-                        .project({}, group_by=join_columns),
-                    id_column=None,
-                )
-                .project({}, group_by=join_columns)
-                # simulate full join with left joins
-                .natural_join(
-                    b=left_descr,
-                    by=join_columns,
-                    jointype='left')
-                .natural_join(
-                    b=right_descr,
-                    by=join_columns,
-                    jointype='left')
+            left_descr.project({}, group_by=join_columns)
+            .concat_rows(
+                b=right_descr.project({}, group_by=join_columns), id_column=None,
+            )
+            .project({}, group_by=join_columns)
+            # simulate full join with left joins
+            .natural_join(b=left_descr, by=join_columns, jointype="left")
+            .natural_join(b=right_descr, by=join_columns, jointype="left")
         )
         assert isinstance(ops_simulate, NaturalJoinNode)
         simulate_near_sql = self.natural_join_to_near_sql(
             join_node=ops_simulate,
             using=using,
             temp_id_source=temp_id_source,
-            sql_format_options=sql_format_options
+            sql_format_options=sql_format_options,
         )
         return simulate_near_sql
 
     def natural_join_to_near_sql(
-        self, join_node, *, using=None, temp_id_source=None, sql_format_options=None, left_is_first=True
+        self,
+        join_node,
+        *,
+        using=None,
+        temp_id_source=None,
+        sql_format_options=None,
+        left_is_first=True
     ):
         if join_node.node_name != "NaturalJoinNode":
             raise TypeError(
@@ -273,18 +269,20 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         assert left_is_first
         if temp_id_source is None:
             temp_id_source = [0]
-        if join_node.jointype == 'RIGHT':
+        if join_node.jointype == "RIGHT":
             return self._emit_right_join_as_left_join(
                 join_node,
                 using=using,
                 temp_id_source=temp_id_source,
-                sql_format_options=sql_format_options)
-        if join_node.jointype == 'FULL':
+                sql_format_options=sql_format_options,
+            )
+        if join_node.jointype == "FULL":
             return self._emit_full_join_as_complex(
                 join_node,
                 using=using,
                 temp_id_source=temp_id_source,
-                sql_format_options=sql_format_options)
+                sql_format_options=sql_format_options,
+            )
         # delegate back to parent class
         return data_algebra.db_model.DBModel.natural_join_to_near_sql(
             self,

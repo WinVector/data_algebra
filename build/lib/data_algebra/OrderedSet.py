@@ -17,6 +17,7 @@ class OrderedSet(collections.OrderedDict, collections.abc.MutableSet):
     """
     Ordered set to enhance presentation of column names.
     """
+
     def __init__(self, v: Optional[Iterable] = None):
         collections.OrderedDict.__init__(self)
         if v is not None:

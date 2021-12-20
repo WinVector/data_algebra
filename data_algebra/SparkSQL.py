@@ -57,21 +57,25 @@ def _sparksql_db_mapv(dbmodel, expression):
     # https://spark.apache.org/docs/latest/sql-ref-syntax-qry-select-case.html
     if_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     mapping_dict = expression.args[1]
-    default_value_expr = dbmodel.expr_to_sql(expression.args[2], want_inline_parens=True)
+    default_value_expr = dbmodel.expr_to_sql(
+        expression.args[2], want_inline_parens=True
+    )
     terms = [
-        "WHEN (" + if_expr + " = " + dbmodel.value_to_sql(k) + ") THEN " + dbmodel.value_to_sql(v) for k, v in mapping_dict.value.items()
+        "WHEN ("
+        + if_expr
+        + " = "
+        + dbmodel.value_to_sql(k)
+        + ") THEN "
+        + dbmodel.value_to_sql(v)
+        for k, v in mapping_dict.value.items()
     ]
     if len(terms) <= 0:
         return default_value_expr
-    res = (
-            "CASE "
-            + " ".join(terms)
-            + " ELSE " + default_value_expr + " END"
-    )
+    res = "CASE " + " ".join(terms) + " ELSE " + default_value_expr + " END"
     if isinstance(expression.args[2].value, float):
-        res = 'DOUBLE(' + res + ')'
+        res = "DOUBLE(" + res + ")"
     elif isinstance(expression.args[2].value, int):
-        res = 'INT(' + res + ')'
+        res = "INT(" + res + ")"
     return res
 
 
@@ -80,7 +84,7 @@ SparkSQL_formatters = {
     "___": lambda dbmodel, expression: str(expression.to_python()),
     "is_bad": _sparksql_is_bad_expr,
     "coalesce": _sparksql_coalesce_expr,
-    'mapv': _sparksql_db_mapv,
+    "mapv": _sparksql_db_mapv,
 }
 
 

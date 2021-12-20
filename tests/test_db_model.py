@@ -39,7 +39,7 @@ def test_db_model_table_def_values_sql():
     )
     td = descr(d2=d2)
     sql_list = td.example_values_to_sql_str_list(db_handle.db_model)
-    sql = '\n'.join(sql_list)
+    sql = "\n".join(sql_list)
     db_handle.read_query(sql)
     back = db_handle.read_query(sql)
     db_handle.close()

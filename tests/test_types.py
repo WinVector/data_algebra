@@ -1,9 +1,6 @@
-
-
 from data_algebra.data_ops import *
 import data_algebra.util
 import data_algebra.test_util
-
 
 
 def test_types_concat_good():

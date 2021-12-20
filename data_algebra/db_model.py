@@ -1,4 +1,3 @@
-
 import math
 import re
 from collections import OrderedDict
@@ -26,12 +25,18 @@ from data_algebra.OrderedSet import OrderedSet
 # Note: near sql has a bound/unbound variation treating the top layer differently than
 # subordinate nodes.
 
+
 class SQLFormatOptions(SimpleNamespace):
     """
     Simple class for holding SQL formatting options
     """
+
     def __init__(
-        self, use_with: bool = True, annotate: bool = True, sql_indent: str = " ", initial_commas: bool = False,
+        self,
+        use_with: bool = True,
+        annotate: bool = True,
+        sql_indent: str = " ",
+        initial_commas: bool = False,
     ):
         assert isinstance(use_with, bool)
         assert isinstance(annotate, bool)
@@ -61,7 +66,7 @@ def _list_join_expecting_list(joiner: str, str_list: List[str]) -> List[str]:
     assert isinstance(str_list, list)
     assert all([isinstance(vi, str) for vi in str_list])
     n = len(str_list)
-    return [' ' + str_list[i] + (joiner if i < (n - 1) else '') for i in range(n)]
+    return [" " + str_list[i] + (joiner if i < (n - 1) else "") for i in range(n)]
 
 
 def _clean_annotation(annotation: Optional[str]) -> Optional[str]:
@@ -154,16 +159,24 @@ def _db_if_else_expr(dbmodel, expression):
 def _db_mapv(dbmodel, expression):
     if_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     mapping_dict = expression.args[1]
-    default_value_expr = dbmodel.expr_to_sql(expression.args[2], want_inline_parens=True)
+    default_value_expr = dbmodel.expr_to_sql(
+        expression.args[2], want_inline_parens=True
+    )
     terms = [
-        "WHEN " + dbmodel.value_to_sql(k) + " THEN " + dbmodel.value_to_sql(v) for k, v in mapping_dict.value.items()
+        "WHEN " + dbmodel.value_to_sql(k) + " THEN " + dbmodel.value_to_sql(v)
+        for k, v in mapping_dict.value.items()
     ]
     if len(terms) <= 0:
         return default_value_expr
     return (
-            "CASE" + " " + if_expr + " "
-            + " ".join(terms)
-            + " ELSE " + default_value_expr + " END"
+        "CASE"
+        + " "
+        + if_expr
+        + " "
+        + " ".join(terms)
+        + " ELSE "
+        + default_value_expr
+        + " END"
     )
 
 
@@ -730,7 +743,9 @@ class DBModel:
             return "(" + ", ".join([self.value_to_sql(vi) for vi in v]) + ")"
         return str(v)
 
-    def table_values_to_sql_str_list(self, v, *, result_name: str = 'table_values') -> List[str]:
+    def table_values_to_sql_str_list(
+        self, v, *, result_name: str = "table_values"
+    ) -> List[str]:
         assert v is not None
         m = v.shape[0]
         assert m > 0
@@ -755,7 +770,7 @@ class DBModel:
         sql = (
             ["SELECT", " *", "FROM ("]
             + ["    " + ("" if (i < 1) else "UNION ALL ") + q_row(i) for i in range(m)]
-            + [f') {qi(result_name)}']
+            + [f") {qi(result_name)}"]
         )
         return sql
 
@@ -797,7 +812,9 @@ class DBModel:
             return self.value_to_sql(expression.value)
         raise TypeError("unexpected type: " + str(type(expression)))
 
-    def _indent_and_sep_terms(self, terms, *, sep: str = ",", sql_format_options=None) -> List[str]:
+    def _indent_and_sep_terms(
+        self, terms, *, sep: str = ",", sql_format_options=None
+    ) -> List[str]:
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
         n = len(terms)
@@ -923,9 +940,9 @@ class DBModel:
             oi.get_column_names(cols_used_in_term)
             cols_used_in_term.update(window_vars)
             declared_term_dependencies[ci] = cols_used_in_term
-        annotation = str(extend_node.to_python_implementation(
-            print_sources=False, indent=-1
-        ))
+        annotation = str(
+            extend_node.to_python_implementation(print_sources=False, indent=-1)
+        )
         # TODO: see if we can merge with subsql instead of building a new one
         if (
             self.allow_extend_merges
@@ -1024,9 +1041,9 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
-            annotation=str(project_node.to_python_implementation(
-                print_sources=False, indent=-1
-            )),
+            annotation=str(
+                project_node.to_python_implementation(print_sources=False, indent=-1)
+            ),
         )
         return near_sql
 
@@ -1065,9 +1082,11 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
-            annotation=str(select_rows_node.to_python_implementation(
-                print_sources=False, indent=-1
-            )),
+            annotation=str(
+                select_rows_node.to_python_implementation(
+                    print_sources=False, indent=-1
+                )
+            ),
         )
         return near_sql
 
@@ -1178,9 +1197,9 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
-            annotation=str(order_node.to_python_implementation(
-                print_sources=False, indent=-1
-            )),
+            annotation=str(
+                order_node.to_python_implementation(print_sources=False, indent=-1)
+            ),
         )
         return near_sql
 
@@ -1214,9 +1233,9 @@ class DBModel:
             query_name=view_name,
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
-            annotation=str(rename_node.to_python_implementation(
-                print_sources=False, indent=-1
-            )),
+            annotation=str(
+                rename_node.to_python_implementation(print_sources=False, indent=-1)
+            ),
         )
         return near_sql
 
@@ -1241,9 +1260,7 @@ class DBModel:
         }
         return terms
 
-    def _natural_join_sub_queries(
-            self,  *, join_node, using, temp_id_source
-    ):
+    def _natural_join_sub_queries(self, *, join_node, using, temp_id_source):
         if join_node.node_name != "NaturalJoinNode":
             raise TypeError(
                 "Expected join_node to be a data_algebra.data_ops.NaturalJoinNode)"
@@ -1256,7 +1273,9 @@ class DBModel:
         missing = using - set(join_node.column_names)
         if len(missing) > 0:
             raise KeyError("referred to unknown columns: " + str(missing))
-        using_left, using_right = join_node.columns_used_from_sources(using=using.union(by_set))
+        using_left, using_right = join_node.columns_used_from_sources(
+            using=using.union(by_set)
+        )
         sql_left = join_node.sources[0].to_near_sql_implementation(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
@@ -1266,7 +1285,13 @@ class DBModel:
         return using_left, sql_left, using_right, sql_right
 
     def natural_join_to_near_sql(
-        self, join_node, *, using=None, temp_id_source=None, sql_format_options=None, left_is_first=True
+        self,
+        join_node,
+        *,
+        using=None,
+        temp_id_source=None,
+        sql_format_options=None,
+        left_is_first=True,
     ) -> data_algebra.near_sql.NearSQL:
         if temp_id_source is None:
             temp_id_source = [0]
@@ -1318,9 +1343,9 @@ class DBModel:
             joiner=join_node.jointype + " JOIN",
             sub_sql2=sql_right.to_bound_near_sql(columns=using_right, force_sql=False),
             suffix=on_terms,
-            annotation=str(join_node.to_python_implementation(
-                print_sources=False, indent=-1
-            )),
+            annotation=str(
+                join_node.to_python_implementation(print_sources=False, indent=-1)
+            ),
         )
         return near_sql
 
@@ -1375,15 +1400,13 @@ class DBModel:
             sub_sql2=sql_right.to_bound_near_sql(
                 columns=using_left, force_sql=True, constants=constants_right,
             ),
-            annotation=str(concat_node.to_python_implementation(
-                print_sources=False, indent=-1
-            )),
+            annotation=str(
+                concat_node.to_python_implementation(print_sources=False, indent=-1)
+            ),
         )
         return near_sql
 
-    def to_sql(
-        self, ops, *, sql_format_options=None,
-    ) -> str:
+    def to_sql(self, ops, *, sql_format_options=None,) -> str:
         assert isinstance(self, DBModel)
         assert isinstance(ops, data_algebra.data_ops.ViewRepresentation)
         if sql_format_options is None:
@@ -1446,7 +1469,9 @@ class DBModel:
         sql_str_list = [v for v in sql_str_list if len(v) > 0]
         return "\n".join(sql_str_list) + "\n"
 
-    def row_recs_to_blocks_query_str_list_pair(self, record_spec) -> Tuple[List[str], List[str]]:
+    def row_recs_to_blocks_query_str_list_pair(
+        self, record_spec
+    ) -> Tuple[List[str], List[str]]:
         control_value_cols = [
             c
             for c in record_spec.control_table.columns
@@ -1496,10 +1521,9 @@ class DBModel:
             cstmt = cstmt + " ELSE NULL END AS " + self.quote_identifier(result_col)
             col_stmts.append(cstmt)
         ctab_sql = self.table_values_to_sql_str_list(record_spec.control_table)
-        sql_prefix = (
-            _list_join_expecting_list(",", col_stmts)
-            + ["FROM ( SELECT * FROM "]
-        )
+        sql_prefix = _list_join_expecting_list(",", col_stmts) + [
+            "FROM ( SELECT * FROM "
+        ]
         sql_suffix = (
             [" ) a"]
             + ["CROSS JOIN ("]
@@ -1511,7 +1535,9 @@ class DBModel:
         return sql_prefix, sql_suffix
 
     # noinspection PyUnusedLocal
-    def blocks_to_row_recs_query_str_list_pair(self, record_spec) -> Tuple[List[str], List[str]]:
+    def blocks_to_row_recs_query_str_list_pair(
+        self, record_spec
+    ) -> Tuple[List[str], List[str]]:
         assert record_spec.control_table.shape[0] >= 1
         col_stmts = []
         for c in record_spec.record_keys:
@@ -1524,15 +1550,15 @@ class DBModel:
                 if cc not in record_spec.control_table_keys:
                     cc0 = record_spec.control_table[cc][0]
                     col_stmts.append(
-                        " " + self.quote_identifier(cc) + " AS " + self.quote_identifier(cc0)
+                        " "
+                        + self.quote_identifier(cc)
+                        + " AS "
+                        + self.quote_identifier(cc0)
                     )
-            sql_prefix = (
-                    _list_join_expecting_list(',', col_stmts)
-                    + ["FROM ( SELECT * FROM "]
-            )
-            sql_suffix = (
-                [" ) a"]
-            )
+            sql_prefix = _list_join_expecting_list(",", col_stmts) + [
+                "FROM ( SELECT * FROM "
+            ]
+            sql_suffix = [" ) a"]
             return sql_prefix, sql_suffix
         control_value_cols = [
             c
@@ -1567,16 +1593,15 @@ class DBModel:
                         + self.quote_identifier(col[i])
                     )
                     col_stmts.append(cstmt)
-        sql_prefix = (
-                _list_join_expecting_list(',', col_stmts)
-                + ["FROM ( SELECT * FROM "]
-        )
+        sql_prefix = _list_join_expecting_list(",", col_stmts) + [
+            "FROM ( SELECT * FROM "
+        ]
         sql_suffix = (
-                [" ) a"]
-                + ["GROUP BY"]
-                + _list_join_expecting_list(',', control_cols)
-                + ["ORDER BY "]  # order by not required, but nice to have
-                + _list_join_expecting_list(',', control_cols)
+            [" ) a"]
+            + ["GROUP BY"]
+            + _list_join_expecting_list(",", control_cols)
+            + ["ORDER BY "]  # order by not required, but nice to have
+            + _list_join_expecting_list(",", control_cols)
         )
         return sql_prefix, sql_suffix
 
@@ -1598,7 +1623,9 @@ class DBModel:
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
         assert isinstance(sql_format_options, SQLFormatOptions)
-        sub_sql = nearsql_container.to_sql_str_list(self, sql_format_options=sql_format_options)
+        sub_sql = nearsql_container.to_sql_str_list(
+            self, sql_format_options=sql_format_options
+        )
         assert isinstance(sub_sql, list)
         if isinstance(nearsql_container.near_sql, data_algebra.near_sql.NearSQLTable):
             sql = sub_sql
@@ -1669,9 +1696,7 @@ class DBModel:
                     for (k, v) in constants.items()
                 ]
             if len(terms_strs) < 1:
-                terms_strs = [
-                    '*'
-                ]
+                terms_strs = ["*"]
             return (
                 ["SELECT"]
                 + self._indent_and_sep_terms(
@@ -1707,9 +1732,7 @@ class DBModel:
                     for (k, v) in constants.items()
                 ]
             if len(terms_strs) < 1:
-                terms_strs = [
-                    '*'
-                ]
+                terms_strs = ["*"]
         sql_start = "SELECT"
         if (
             sql_format_options.annotate
@@ -1735,11 +1758,7 @@ class DBModel:
         return sql
 
     def nearsqlrawq_to_sql_str_list_(
-        self,
-        near_sql,
-        *,
-        sql_format_options=None,
-        add_select=True,
+        self, near_sql, *, sql_format_options=None, add_select=True,
     ) -> List[str]:
         assert isinstance(near_sql, data_algebra.near_sql.NearSQLRawQStep)
         if sql_format_options is None:
@@ -1750,7 +1769,7 @@ class DBModel:
             sql = sql + ["-- " + _clean_annotation(near_sql.annotation)]
         if add_select:
             sql = sql + ["SELECT"]
-        sql = sql + [' ' + v for v in near_sql.prefix]
+        sql = sql + [" " + v for v in near_sql.prefix]
         if near_sql.sub_sql is not None:
             sql = sql + [
                 sql_format_options.sql_indent + si
@@ -1759,7 +1778,7 @@ class DBModel:
                 )
             ]
         if (near_sql.suffix is not None) and (len(near_sql.suffix) > 0):
-            sql = sql + [' ' + v for v in near_sql.suffix]
+            sql = sql + [" " + v for v in near_sql.suffix]
         return sql
 
     def nearsqlbinary_to_sql_str_list_(
@@ -1783,9 +1802,7 @@ class DBModel:
             terms.update(constants)
         terms_strs = [self.enc_term_(k, terms=terms) for k in columns]
         if len(terms_strs) < 1:
-            terms_strs = [
-                '*'
-            ]
+            terms_strs = ["*"]
         is_union = "union" in near_sql.joiner.lower()
         sql_start = "SELECT"
         if (
@@ -1854,7 +1871,9 @@ class DBHandle:
     def read_query(self, q):
         return self.db_model.read_query(conn=self.conn, q=q)
 
-    def describe_table(self, table_name: str, *, qualifiers=None, row_limit: Optional[int] = 7):
+    def describe_table(
+        self, table_name: str, *, qualifiers=None, row_limit: Optional[int] = 7
+    ):
         head = self.read_query(
             q="SELECT * FROM "
             + self.db_model.quote_table_name(table_name)
@@ -1877,16 +1896,16 @@ class DBHandle:
         )
         return self.describe_table(table_name)
 
-    def to_sql(
-        self, ops, *, sql_format_options=None,
-    ) -> str:
+    def to_sql(self, ops, *, sql_format_options=None,) -> str:
         return self.db_model.to_sql(ops=ops, sql_format_options=sql_format_options,)
 
     def query_to_csv(self, q, *, res_name: str) -> None:
         d = self.read_query(q)
         d.to_csv(res_name, index=False)
 
-    def table_values_to_sql_str_list(self, v, *, result_name: str = 'table_values') -> List[str]:
+    def table_values_to_sql_str_list(
+        self, v, *, result_name: str = "table_values"
+    ) -> List[str]:
         return self.db_model.table_values_to_sql_str_list(v, result_name=result_name)
 
     def __str__(self):

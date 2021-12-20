@@ -217,22 +217,36 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># check for scalars first</span>
     <span class="n">ct</span> <span class="o">=</span> <span class="n">map_type_to_canonical</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">ct</span> <span class="ow">in</span> <span class="p">{</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
-              <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">}:</span>
+    <span class="k">if</span> <span class="n">ct</span> <span class="ow">in</span> <span class="p">{</span>
+        <span class="nb">str</span><span class="p">,</span>
+        <span class="nb">int</span><span class="p">,</span>
+        <span class="nb">float</span><span class="p">,</span>
+        <span class="nb">bool</span><span class="p">,</span>
+        <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+        <span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+        <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+        <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span>
+        <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">,</span>
+        <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">,</span>
+    <span class="p">}:</span>
         <span class="k">return</span> <span class="n">ct</span>
     <span class="c1"># look at a list or Series</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">series</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
         <span class="n">col</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">values</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-    <span class="n">good_idx</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">col</span><span class="p">)))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">good_idx</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
+    <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">test_idx</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">good_idx</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">test_idx</span> <span class="o">=</span> <span class="n">good_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">map_type_to_canonical</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">col</span><span class="p">[</span><span class="n">test_idx</span><span class="p">]))</span>
 
 
-<span class="k">def</span> <span class="nf">guess_column_types</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">guess_column_types</span><span class="p">(</span>
+    <span class="n">d</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Guess column types as type of first non-missing value.</span>
 <span class="sd">    Will not return series types, as some pandas data frames with non-trivial indexing report this type.</span>
@@ -251,7 +265,11 @@
     <span class="n">res</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
         <span class="n">gt</span> <span class="o">=</span> <span class="n">guess_carried_scalar_type</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">c</span><span class="p">])</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">gt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gt</span><span class="p">,</span> <span class="nb">type</span><span class="p">))</span> <span class="ow">or</span> <span class="n">gt</span> <span class="o">==</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">series</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">gt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gt</span><span class="p">,</span> <span class="nb">type</span><span class="p">))</span>
+            <span class="ow">or</span> <span class="n">gt</span> <span class="o">==</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">series</span><span class="o">.</span><span class="n">Series</span>
+        <span class="p">):</span>
             <span class="c1"># pandas.concat() poisons types with Series, don&#39;t allow that</span>
             <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">gt</span>
@@ -271,8 +289,9 @@
     <span class="k">return</span> <span class="kc">True</span>
 
 
-<span class="k">def</span> <span class="nf">check_columns_appear_compatible</span><span class="p">(</span><span class="n">d_left</span><span class="p">,</span> <span class="n">d_right</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
-                                    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="nb">type</span><span class="p">]]]:</span>
+<span class="k">def</span> <span class="nf">check_columns_appear_compatible</span><span class="p">(</span>
+    <span class="n">d_left</span><span class="p">,</span> <span class="n">d_right</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="nb">type</span><span class="p">]]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check if columns have compatible types</span>
 
@@ -451,15 +470,27 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># check for scalars first</span>
     <span class="n">ct</span> <span class="o">=</span> <span class="n">map_type_to_canonical</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">ct</span> <span class="ow">in</span> <span class="p">{</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
-              <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">}:</span>
+    <span class="k">if</span> <span class="n">ct</span> <span class="ow">in</span> <span class="p">{</span>
+        <span class="nb">str</span><span class="p">,</span>
+        <span class="nb">int</span><span class="p">,</span>
+        <span class="nb">float</span><span class="p">,</span>
+        <span class="nb">bool</span><span class="p">,</span>
+        <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+        <span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+        <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+        <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span>
+        <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">,</span>
+        <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">,</span>
+    <span class="p">}:</span>
         <span class="k">return</span> <span class="n">ct</span>
     <span class="c1"># look at a list or Series</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">series</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
         <span class="n">col</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">values</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-    <span class="n">good_idx</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">col</span><span class="p">)))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">good_idx</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
+    <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">test_idx</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">good_idx</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">test_idx</span> <span class="o">=</span> <span class="n">good_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -486,7 +517,9 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">guess_column_types</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">]:</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">guess_column_types</span><span class="p">(</span>
+    <span class="n">d</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Guess column types as type of first non-missing value.</span>
 <span class="sd">    Will not return series types, as some pandas data frames with non-trivial indexing report this type.</span>
@@ -505,7 +538,11 @@
     <span class="n">res</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
         <span class="n">gt</span> <span class="o">=</span> <span class="n">guess_carried_scalar_type</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">c</span><span class="p">])</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">gt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gt</span><span class="p">,</span> <span class="nb">type</span><span class="p">))</span> <span class="ow">or</span> <span class="n">gt</span> <span class="o">==</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">series</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">gt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gt</span><span class="p">,</span> <span class="nb">type</span><span class="p">))</span>
+            <span class="ow">or</span> <span class="n">gt</span> <span class="o">==</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">series</span><span class="o">.</span><span class="n">Series</span>
+        <span class="p">):</span>
             <span class="c1"># pandas.concat() poisons types with Series, don&#39;t allow that</span>
             <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">gt</span>
@@ -572,8 +609,9 @@ Will not return series types, as some pandas data frames with non-trivial indexi
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">check_columns_appear_compatible</span><span class="p">(</span><span class="n">d_left</span><span class="p">,</span> <span class="n">d_right</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
-                                    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="nb">type</span><span class="p">]]]:</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">check_columns_appear_compatible</span><span class="p">(</span>
+    <span class="n">d_left</span><span class="p">,</span> <span class="n">d_right</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="nb">type</span><span class="p">]]]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check if columns have compatible types</span>
 

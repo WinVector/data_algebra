@@ -169,7 +169,6 @@ def test_cdata1():
     sql = db_model.to_sql(source_table.map_records(blocks_out=record_spec))
     waste_str = str(sql)
 
-
     # %%
 
     db_model.insert_table(conn, iris, "iris")

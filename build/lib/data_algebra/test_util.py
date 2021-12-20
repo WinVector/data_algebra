@@ -1,4 +1,3 @@
-
 """
 Utils that help with testing. This module is allowed to import many other modules.
 """
@@ -21,16 +20,15 @@ from data_algebra.data_ops import *
 
 
 # controls
-test_PostgreSQL = True  # causes an external dependency
-test_BigQuery = True  # causes an external dependency
-test_MySQL = True  # causes an external dependency
-test_Spark = True  # causes an external dependency
+test_PostgreSQL = False  # causes an external dependency
+test_BigQuery = False  # causes an external dependency
+test_MySQL = False  # causes an external dependency
+test_Spark = False  # causes an external dependency
 
 run_direct_ops_path_tests = False
 
 # global test result cache
 global_test_result_cache = None
-
 
 
 def formats_to_self(ops) -> bool:
@@ -139,7 +137,6 @@ def equivalent_frames(
     return True
 
 
-
 def hash_data_frame(d) -> str:
     """
     Get a hash code representing a data frame.
@@ -147,23 +144,25 @@ def hash_data_frame(d) -> str:
     :param d: data frame
     :return: hash code as a string
     """
-    return hashlib.sha256(data_algebra.default_data_model.pd.util.hash_pandas_object(d).values).hexdigest()
+    return hashlib.sha256(
+        data_algebra.default_data_model.pd.util.hash_pandas_object(d).values
+    ).hexdigest()
 
 
 def _run_handle_experiments(
-        *,
-        db_handle,
-        data: Dict,
-        ops: ValueError,
-        sql_statements: Iterable[str],
-        expect,
-        float_tol: float = 1e-8,
-        check_column_order: bool = False,
-        cols_case_sensitive: bool = False,
-        check_row_order: bool = False,
-        test_result_cache: Optional[dict] = None,
-        alter_cache: bool = True,
-        test_direct_ops_path = False,
+    *,
+    db_handle,
+    data: Dict,
+    ops: ValueError,
+    sql_statements: Iterable[str],
+    expect,
+    float_tol: float = 1e-8,
+    check_column_order: bool = False,
+    cols_case_sensitive: bool = False,
+    check_row_order: bool = False,
+    test_result_cache: Optional[dict] = None,
+    alter_cache: bool = True,
+    test_direct_ops_path=False,
 ):
     assert isinstance(db_handle, data_algebra.db_model.DBHandle)
     assert isinstance(db_handle.db_model, data_algebra.db_model.DBModel)
@@ -177,7 +176,7 @@ def _run_handle_experiments(
     need_to_run = True
     dict_keys = list(data.keys())
     dict_keys.sort()
-    data_key = ' '.join([k + ':' + hash_data_frame(data[k]) for k in dict_keys])
+    data_key = " ".join([k + ":" + hash_data_frame(data[k]) for k in dict_keys])
 
     def mk_key(i):
         return db_handle_key + " " + sql_statements[i] + " " + data_key
@@ -189,7 +188,9 @@ def _run_handle_experiments(
                 res_db_sql[i] = test_result_cache[mk_key(i)].copy()
             except KeyError:
                 pass
-        need_to_run = test_direct_ops_path or numpy.any([resi is None for resi in res_db_sql])
+        need_to_run = test_direct_ops_path or numpy.any(
+            [resi is None for resi in res_db_sql]
+        )
     # generate any new needed results
     if need_to_run:
         to_del = set()
@@ -204,7 +205,11 @@ def _run_handle_experiments(
             for i in range(len(sql_statements)):
                 if res_db_sql[i] is None:
                     res_db_sql[i] = db_handle.read_query(sql_statements[i])
-                    if alter_cache and (test_result_cache is not None) and (res_db_sql[i] is not None):
+                    if (
+                        alter_cache
+                        and (test_result_cache is not None)
+                        and (res_db_sql[i] is not None)
+                    ):
                         test_result_cache[mk_key(i)] = res_db_sql[i].copy()
         except Exception as e:
             caught = e
@@ -215,22 +220,22 @@ def _run_handle_experiments(
     # check results
     for res in res_db_sql:
         if not equivalent_frames(
-                res,
-                expect,
-                float_tol=float_tol,
-                check_column_order=check_column_order,
-                cols_case_sensitive=cols_case_sensitive,
-                check_row_order=check_row_order,
+            res,
+            expect,
+            float_tol=float_tol,
+            check_column_order=check_column_order,
+            cols_case_sensitive=cols_case_sensitive,
+            check_row_order=check_row_order,
         ):
             raise ValueError(f"{db_handle} SQL result did not match expect")
     if res_db_ops is not None:
         if not equivalent_frames(
-                res_db_ops,
-                expect,
-                float_tol=float_tol,
-                check_column_order=check_column_order,
-                cols_case_sensitive=cols_case_sensitive,
-                check_row_order=check_row_order,
+            res_db_ops,
+            expect,
+            float_tol=float_tol,
+            check_column_order=check_column_order,
+            cols_case_sensitive=cols_case_sensitive,
+            check_row_order=check_row_order,
         ):
             raise ValueError(f"{db_handle} ops result did not match expect")
 
@@ -318,7 +323,10 @@ def check_transform_on_handles(
         ):
             raise ValueError("Pandas transform result did not match expect")
     # try on empty inputs
-    empty_map = {k: v.iloc[range(0), :].reset_index(drop=True, inplace=False) for k, v in data.items()}
+    empty_map = {
+        k: v.iloc[range(0), :].reset_index(drop=True, inplace=False)
+        for k, v in data.items()
+    }
     empty_res = ops.eval(empty_map)
     assert local_data_model.is_appropriate_data_instance(empty_res)
     assert set(empty_res.columns) == set(res.columns)
@@ -356,7 +364,9 @@ def check_transform_on_handles(
                             annotate=annotate,
                             initial_commas=initial_commas,
                         )
-                        sql = db_handle.to_sql(ops, sql_format_options=sql_format_options,)
+                        sql = db_handle.to_sql(
+                            ops, sql_format_options=sql_format_options,
+                        )
                         assert isinstance(sql, str)
                         sql_statements.add(sql)
             if db_handle.conn is not None:
@@ -372,7 +382,8 @@ def check_transform_on_handles(
                     check_row_order=check_row_order,
                     test_result_cache=global_test_result_cache,
                     alter_cache=True,
-                    test_direct_ops_path=run_direct_ops_path_tests)
+                    test_direct_ops_path=run_direct_ops_path_tests,
+                )
 
 
 def get_test_dbs():

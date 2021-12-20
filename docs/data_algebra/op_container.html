@@ -173,14 +173,18 @@
 <span class="k">class</span> <span class="nc">OpC</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Container that redirects to another to non-quoted notation.&quot;&quot;&quot;</span>
 
-    <span class="n">ops</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">]</span>  <span class="c1"># this reference gets replaced</span>
+    <span class="n">ops</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span>
+        <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span>
+    <span class="p">]</span>  <span class="c1"># this reference gets replaced</span>
     <span class="n">column_namespace</span><span class="p">:</span> <span class="n">SimpleNamespace</span>  <span class="c1"># don&#39;t replace the reference, instead mutate (reference shared!)</span>
     <span class="n">used_result</span><span class="p">:</span> <span class="nb">bool</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">column_namespace</span> <span class="o">=</span> <span class="n">SimpleNamespace</span><span class="p">()</span>  <span class="c1"># allows a dot notation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">used_result</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;container&quot;</span><span class="p">)</span>
+        <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;container&quot;</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -337,12 +341,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">map_records</span><span class="p">(</span>
-            <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span>
-            <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">,</span>
+            <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
@@ -393,14 +394,18 @@
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">OpC</span><span class="p">(</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Container that redirects to another to non-quoted notation.&quot;&quot;&quot;</span>
 
-    <span class="n">ops</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">]</span>  <span class="c1"># this reference gets replaced</span>
+    <span class="n">ops</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span>
+        <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span>
+    <span class="p">]</span>  <span class="c1"># this reference gets replaced</span>
     <span class="n">column_namespace</span><span class="p">:</span> <span class="n">SimpleNamespace</span>  <span class="c1"># don&#39;t replace the reference, instead mutate (reference shared!)</span>
     <span class="n">used_result</span><span class="p">:</span> <span class="nb">bool</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">column_namespace</span> <span class="o">=</span> <span class="n">SimpleNamespace</span><span class="p">()</span>  <span class="c1"># allows a dot notation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">used_result</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;container&quot;</span><span class="p">)</span>
+        <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;container&quot;</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -557,12 +562,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">map_records</span><span class="p">(</span>
-            <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span>
-            <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">,</span>
+            <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
@@ -599,7 +601,9 @@
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">column_namespace</span> <span class="o">=</span> <span class="n">SimpleNamespace</span><span class="p">()</span>  <span class="c1"># allows a dot notation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">used_result</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;container&quot;</span><span class="p">)</span>
+        <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops_types</span><span class="o">.</span><span class="n">OperatorPlatform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;container&quot;</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 </pre></div>
 
@@ -1180,12 +1184,9 @@ raise an exception if the values are not consistent.</p>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span>
-    <span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">map_records</span><span class="p">(</span>
-            <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span>
-            <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">,</span>
+            <span class="n">blocks_in</span><span class="o">=</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="n">blocks_out</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 </pre></div>

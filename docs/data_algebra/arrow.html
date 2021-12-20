@@ -310,29 +310,25 @@
     <span class="k">def</span> <span class="nf">dom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DataOpArrow</span><span class="p">(</span>
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
-                <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
+                <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">dom_as_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
-            <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
+            <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">cod</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DataOpArrow</span><span class="p">(</span>
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
-                <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
+                <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">cod_as_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
-            <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
+            <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -371,8 +367,7 @@
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">in_rep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_end_description</span><span class="p">(</span>
-            <span class="n">required_cols</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
-            <span class="n">forbidden_cols</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">disallowed_columns</span><span class="p">,</span>
+            <span class="n">required_cols</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span> <span class="n">forbidden_cols</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">disallowed_columns</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">out_rep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_end_description</span><span class="p">(</span>
             <span class="n">required_cols</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
@@ -847,29 +842,25 @@
     <span class="k">def</span> <span class="nf">dom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DataOpArrow</span><span class="p">(</span>
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
-                <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
+                <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">dom_as_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
-            <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
+            <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">cod</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DataOpArrow</span><span class="p">(</span>
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
-                <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
+                <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">cod_as_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
-            <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
+            <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -908,8 +899,7 @@
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">in_rep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_end_description</span><span class="p">(</span>
-            <span class="n">required_cols</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
-            <span class="n">forbidden_cols</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">disallowed_columns</span><span class="p">,</span>
+            <span class="n">required_cols</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span> <span class="n">forbidden_cols</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">disallowed_columns</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">out_rep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_end_description</span><span class="p">(</span>
             <span class="n">required_cols</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
@@ -1158,8 +1148,7 @@
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">dom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DataOpArrow</span><span class="p">(</span>
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
-                <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
+                <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">)</span>
 </pre></div>
@@ -1183,8 +1172,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">dom_as_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
-            <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
+            <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">incoming_columns</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -1206,8 +1194,7 @@
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">cod</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DataOpArrow</span><span class="p">(</span>
             <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
-                <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
+                <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">)</span>
 </pre></div>
@@ -1231,8 +1218,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">cod_as_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">TableDescription</span><span class="p">(</span>
-            <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
+            <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outgoing_columns</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
 

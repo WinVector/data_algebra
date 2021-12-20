@@ -1,5 +1,3 @@
-
-
 from data_algebra.data_ops import *
 import data_algebra.SQLite
 import data_algebra.test_util
@@ -11,40 +9,34 @@ def test_user_sql():
 
     # %%
 
-    d1 = data_algebra.default_data_model.pd.DataFrame({
-        'g': ['a', 'a', 'b', 'b'],
-        'v1': [1, 2, 3, 4],
-        'v2': [5, 6, 7, 8],
-    })
+    d1 = data_algebra.default_data_model.pd.DataFrame(
+        {"g": ["a", "a", "b", "b"], "v1": [1, 2, 3, 4], "v2": [5, 6, 7, 8],}
+    )
 
     # %%
 
     sqlite_handle = data_algebra.SQLite.example_handle()
-    sqlite_handle.insert_table(d1, table_name='d1')
+    sqlite_handle.insert_table(d1, table_name="d1")
 
     # %%
 
-    ops = (
-        SQLNode(
-            sql="""
+    ops = SQLNode(
+        sql="""
               SELECT
                 *,
                 v1 * v2 AS v3
               FROM
                 d1
             """,
-            column_names=['g', 'v1', 'v2', 'v3'],
-            view_name='derived_results'
-            )
-            .extend({'v4': 'v3 + v1'})
-    )
-
+        column_names=["g", "v1", "v2", "v3"],
+        view_name="derived_results",
+    ).extend({"v4": "v3 + v1"})
 
     # %%
 
     expect = d1.copy()
-    expect['v3'] = expect['v1'] * expect['v2']
-    expect['v4'] = expect['v3'] + expect['v1']
+    expect["v3"] = expect["v1"] * expect["v2"]
+    expect["v4"] = expect["v3"] + expect["v1"]
 
     # %%
 
@@ -57,9 +49,9 @@ def test_user_sql():
     # %%
 
     dr = d1.copy()
-    dr['v3'] = dr['v1'] * dr['v2']
+    dr["v3"] = dr["v1"] * dr["v2"]
 
-    res_pandas = ops.eval({'derived_results': dr})
+    res_pandas = ops.eval({"derived_results": dr})
 
     # %%
 

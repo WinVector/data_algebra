@@ -8,7 +8,7 @@ import data_algebra.test_util
 
 
 def test_ex_example_ex_descr():
-    ops = TableDescription(table_name='d', column_names=['x']).extend({'z': 'x + 1'})
+    ops = TableDescription(table_name="d", column_names=["x"]).extend({"z": "x + 1"})
     with pytest.raises(Exception):
         ops.ex()
 
@@ -78,7 +78,9 @@ def test_ex_examples_join_catch_partial():
     )
 
     ops = describe_table(d1, table_name="d1", row_limit=2).natural_join(
-        b=describe_table(d2, table_name="d2", row_limit=2), by=["x", "y"], jointype="inner"
+        b=describe_table(d2, table_name="d2", row_limit=2),
+        by=["x", "y"],
+        jointype="inner",
     )
 
     # failed to explicitly capture all rows
@@ -132,10 +134,7 @@ def test_ex_examples_fn_notation_1():
         {"x": [1, 1, 2], "y": [5, 4, 3], "z": [6, 7, 8],}
     )
 
-    res = ex(
-        data(d=d)
-            .drop_columns(['z'])
-    )
+    res = ex(data(d=d).drop_columns(["z"]))
 
     expect = data_algebra.default_data_model.pd.DataFrame(
         {"x": [1, 1, 2], "y": [5, 4, 3],}
@@ -149,10 +148,7 @@ def test_ex_examples_fn_notation_1_unnamed():
         {"x": [1, 1, 2], "y": [5, 4, 3], "z": [6, 7, 8],}
     )
 
-    res = ex(
-        data(d)
-            .drop_columns(['z'])
-    )
+    res = ex(data(d).drop_columns(["z"]))
 
     expect = data_algebra.default_data_model.pd.DataFrame(
         {"x": [1, 1, 2], "y": [5, 4, 3],}
@@ -162,30 +158,18 @@ def test_ex_examples_fn_notation_1_unnamed():
 
 
 def test_ex_examples_fn_notation_1_cant_ex_short_descr():
-    d = data_algebra.default_data_model.pd.DataFrame(
-        {"x": range(20),  "z": 7,}
-    )
+    d = data_algebra.default_data_model.pd.DataFrame({"x": range(20), "z": 7,})
 
     with pytest.raises(Exception):
-        res = ex(
-            descr(d=d)
-                .drop_columns(['z'])
-        )
+        res = ex(descr(d=d).drop_columns(["z"]))
 
 
 def test_ex_examples_fn_notation_1_short_descr():
-    d = data_algebra.default_data_model.pd.DataFrame(
-        {"x": range(20),  "z": 7,}
-    )
+    d = data_algebra.default_data_model.pd.DataFrame({"x": range(20), "z": 7,})
 
-    ops = (
-        descr(d=d)
-            .drop_columns(['z'])
-    )
+    ops = descr(d=d).drop_columns(["z"])
     res = ops.transform(d)
-    expect = d = data_algebra.default_data_model.pd.DataFrame(
-        {"x": range(20)}
-    )
+    expect = d = data_algebra.default_data_model.pd.DataFrame({"x": range(20)})
     assert data_algebra.test_util.equivalent_frames(expect, res)
 
 
@@ -197,14 +181,7 @@ def test_ex_examples_fn_notation_data_named():
         {"x": [1, 1, 2], "y": [5, 4, 3], "q": [10, 11, 12]}
     )
 
-    res = ex(
-        data(d1=d1)
-            .natural_join(
-                b=data(d2=d2),
-                by=['x', 'y'],
-                jointype='inner',
-            )
-    )
+    res = ex(data(d1=d1).natural_join(b=data(d2=d2), by=["x", "y"], jointype="inner",))
 
     expect = data_algebra.default_data_model.pd.DataFrame(
         {"x": [1, 1, 2], "y": [5, 4, 3], "z": [6, 7, 8], "q": [10, 11, 12]}

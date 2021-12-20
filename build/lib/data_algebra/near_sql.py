@@ -17,19 +17,32 @@ class SQLWithList:
     """
     Carry an ordered sequence of SQL steps for use with a SQL WITH statement.
     """
-    def __init__(self, *, last_step: 'NearSQL', previous_steps: List[Tuple[str, 'NearSQLContainer']]):
+
+    def __init__(
+        self,
+        *,
+        last_step: "NearSQL",
+        previous_steps: List[Tuple[str, "NearSQLContainer"]],
+    ):
         assert isinstance(last_step, NearSQL)
         assert isinstance(previous_steps, List)
-        assert all([isinstance(vi, Tuple)
-                    and (len(vi) == 2)
-                    and isinstance(vi[0], str)
-                    and isinstance(vi[1], NearSQLContainer) for vi in previous_steps])
+        assert all(
+            [
+                isinstance(vi, Tuple)
+                and (len(vi) == 2)
+                and isinstance(vi[0], str)
+                and isinstance(vi[1], NearSQLContainer)
+                for vi in previous_steps
+            ]
+        )
         # check no table like entities in previous steps
         assert not any([v.near_sql.is_table for k, v in previous_steps])
         # check keying is unique
         previous_keys = {k for k, v in previous_steps}
         if len(previous_keys) != len(previous_steps):
-            assert len(previous_keys) == len(previous_steps)  # so we can set a breakpoint
+            assert len(previous_keys) == len(
+                previous_steps
+            )  # so we can set a breakpoint
         # check we are not coming up on a duplication
         if not last_step.is_table:
             assert last_step.quoted_query_name not in previous_keys
@@ -49,13 +62,14 @@ class NearSQL(ABC):
     annotation: Optional[str] = None
 
     def __init__(
-            self,
-            *,
-            terms: Optional[dict],
-            query_name: Optional[str] = None,
-            quoted_query_name: str,
-            is_table: bool = False,
-            annotation: Optional[str] = None):
+        self,
+        *,
+        terms: Optional[dict],
+        query_name: Optional[str] = None,
+        quoted_query_name: str,
+        is_table: bool = False,
+        annotation: Optional[str] = None,
+    ):
         assert isinstance(terms, (dict, type(None)))
         assert isinstance(query_name, (str, type(None)))
         assert isinstance(quoted_query_name, str)
@@ -132,7 +146,9 @@ class NearSQLContainer:
 
     # sequence: a list where last element is a NearSQLContainer previous elements are (name, NearSQLContainer) pairs
     # stub the replacement common table expression in a NearSQLContainer
-    def to_with_form_stub(self) -> Tuple['NearSQLContainer', List[Tuple[str, 'NearSQLContainer']]]:
+    def to_with_form_stub(
+        self,
+    ) -> Tuple["NearSQLContainer", List[Tuple[str, "NearSQLContainer"]]]:
         if self.near_sql.is_table:
             return self, []
         in_with_form = self.near_sql.to_with_form()
@@ -141,13 +157,12 @@ class NearSQLContainer:
         if not stub.is_table:
             # replace step with a reference
             if stub.quoted_query_name not in {k for k, v in sequence}:
-                sequence.append((
-                    stub.quoted_query_name,
-                    NearSQLContainer(
-                        near_sql=stub,
-                        force_sql=self.force_sql,
+                sequence.append(
+                    (
+                        stub.quoted_query_name,
+                        NearSQLContainer(near_sql=stub, force_sql=self.force_sql,),
                     )
-                ))
+                )
             stub = NearSQLContainer(
                 near_sql=NearSQLCommonTableExpression(
                     query_name=stub.query_name,
@@ -171,15 +186,23 @@ class NearSQLNamedEntity(NearSQL):
     def to_with_form(self) -> SQLWithList:
         return SQLWithList(last_step=self, previous_steps=[])
 
-    def to_sql_str_list(self, *,
-                        columns=None, force_sql=False, constants=None, db_model, sql_format_options=None
-                        ) -> List[str]:
+    def to_sql_str_list(
+        self,
+        *,
+        columns=None,
+        force_sql=False,
+        constants=None,
+        db_model,
+        sql_format_options=None,
+    ) -> List[str]:
         raise NotImplementedError("abstract class method called")
 
 
 class NearSQLCommonTableExpression(NearSQLNamedEntity):
     def __init__(self, *, query_name, quoted_query_name):
-        NearSQLNamedEntity.__init__(self, terms=None, query_name=query_name, quoted_query_name=quoted_query_name)
+        NearSQLNamedEntity.__init__(
+            self, terms=None, query_name=query_name, quoted_query_name=quoted_query_name
+        )
 
     def to_sql_str_list(
         self,
@@ -201,7 +224,12 @@ class NearSQLCommonTableExpression(NearSQLNamedEntity):
 
 class NearSQLTable(NearSQLNamedEntity):
     def __init__(self, *, terms, table_name, quoted_table_name):
-        NearSQLNamedEntity.__init__(self, terms=terms, query_name=table_name, quoted_query_name=quoted_table_name)
+        NearSQLNamedEntity.__init__(
+            self,
+            terms=terms,
+            query_name=table_name,
+            quoted_query_name=quoted_table_name,
+        )
         self.table_name = table_name
         self.quoted_table_name = quoted_table_name
 

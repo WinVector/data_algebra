@@ -515,7 +515,12 @@
 <span class="kn">from</span> <span class="nn">data_algebra.data_ops_types</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">import</span> <span class="nn">data_algebra.data_ops_utils</span>
 <span class="kn">import</span> <span class="nn">data_algebra.near_sql</span>
-<span class="kn">from</span> <span class="nn">data_algebra.OrderedSet</span> <span class="kn">import</span> <span class="n">OrderedSet</span><span class="p">,</span> <span class="n">ordered_intersect</span><span class="p">,</span> <span class="n">ordered_union</span><span class="p">,</span> <span class="n">ordered_diff</span>
+<span class="kn">from</span> <span class="nn">data_algebra.OrderedSet</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">OrderedSet</span><span class="p">,</span>
+    <span class="n">ordered_intersect</span><span class="p">,</span>
+    <span class="n">ordered_union</span><span class="p">,</span>
+    <span class="n">ordered_diff</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">import</span> <span class="nn">data_algebra.util</span>
 
 
@@ -549,9 +554,7 @@
         <span class="n">t1</span> <span class="o">=</span> <span class="n">tm1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="n">t2</span> <span class="o">=</span> <span class="n">tm2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">t1</span><span class="o">.</span><span class="n">same_table</span><span class="p">(</span><span class="n">t2</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Table &quot;</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot; has two incompatible representations&quot;</span>
-            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Table &quot;</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot; has two incompatible representations&quot;</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">ViewRepresentation</span><span class="p">(</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
@@ -879,9 +882,7 @@
         <span class="k">return</span> <span class="kc">False</span>
 
     <span class="c1"># return table representation of self</span>
-    <span class="k">def</span> <span class="nf">as_table_description</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">as_table_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TableDescription</span><span class="p">(</span>
             <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span>
             <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span>
@@ -960,7 +961,9 @@
             <span class="n">order_by</span> <span class="o">=</span> <span class="p">[</span><span class="n">order_by</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reverse</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">reverse</span> <span class="o">=</span> <span class="p">[</span><span class="n">reverse</span><span class="p">]</span>
-        <span class="n">parsed_ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span><span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">parsed_ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span>
+            <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">extend_parsed</span><span class="p">(</span>
             <span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span>
             <span class="n">partition_by</span><span class="o">=</span><span class="n">partition_by</span><span class="p">,</span>
@@ -987,7 +990,9 @@
             <span class="n">group_by</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="p">((</span><span class="n">ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">group_by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must have ops or group_by&quot;</span><span class="p">)</span>
-        <span class="n">parsed_ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span><span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">parsed_ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span>
+            <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_parsed</span><span class="p">(</span><span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">natural_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">by</span><span class="p">,</span> <span class="n">jointype</span><span class="p">,</span> <span class="n">check_all_common_keys_in_by</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -1046,11 +1051,13 @@
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">expr</span> <span class="o">=</span> <span class="n">expr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">expr</span> <span class="o">=</span> <span class="s1">&#39; &amp; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="n">vi</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span> <span class="k">for</span> <span class="n">vi</span> <span class="ow">in</span> <span class="n">expr</span><span class="p">])</span>
+                <span class="n">expr</span> <span class="o">=</span> <span class="s2">&quot; &amp; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">vi</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span> <span class="k">for</span> <span class="n">vi</span> <span class="ow">in</span> <span class="n">expr</span><span class="p">])</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">PreTerm</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_trivial_when_intermediate</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">select_rows</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
-        <span class="n">ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span><span class="n">ops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;expr&quot;</span><span class="p">:</span> <span class="n">expr</span><span class="p">},</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span>
+            <span class="n">ops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;expr&quot;</span><span class="p">:</span> <span class="n">expr</span><span class="p">},</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span>
+        <span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">r_walk_expr</span><span class="p">(</span><span class="n">opv</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opv</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Expression</span><span class="p">):</span>
@@ -1110,9 +1117,7 @@
             <span class="k">return</span> <span class="bp">self</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_trivial_when_intermediate</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">ConvertRecordsNode</span><span class="p">(</span>
-            <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">ConvertRecordsNode</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">)</span>
 
 
 <span class="c1"># Could also have general query as starting ops, but don&#39;t see a lot of point to</span>
@@ -1148,7 +1153,9 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">column_names</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">]</span>  <span class="c1"># convert to list from other types such as series</span>
+            <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">column_names</span>
+            <span class="p">]</span>  <span class="c1"># convert to list from other types such as series</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;TableDescription&quot;</span>
         <span class="p">)</span>
@@ -1263,7 +1270,9 @@
 
     <span class="k">def</span> <span class="nf">example_values_to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">table_values_to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">,</span> <span class="n">result_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">table_values_to_sql_str_list</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">,</span> <span class="n">result_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">table_name</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;get a dictionary of all tables used in an operator DAG,</span>
@@ -1592,7 +1601,11 @@
         <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">columns_we_take</span> <span class="o">-</span> <span class="n">subops</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">o</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">(</span><span class="n">columns_we_take</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">([</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">columns_we_take</span><span class="p">])]</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">OrderedSet</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">columns_we_take</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">spacer</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span>
@@ -2224,7 +2237,9 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_right</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;right table missing join keys: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing_right</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">check_all_common_keys_in_by</span><span class="p">:</span>
-            <span class="n">missing_common</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">))</span> <span class="o">-</span> <span class="n">by_set</span>
+            <span class="n">missing_common</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">))</span> <span class="o">-</span> <span class="n">by_set</span>
+            <span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_common</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
                     <span class="s2">&quot;check_all_common_keys_in_by set, and the following common keys are are not in the by-clause: &quot;</span>
@@ -2232,9 +2247,13 @@
                 <span class="p">)</span>
         <span class="c1"># try to re-use column names if possible, saves space in deeply nested join trees.</span>
         <span class="n">column_names</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="p">):</span>
             <span class="n">column_names</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">column_names</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">)):</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="p">):</span>
             <span class="n">column_names</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">column_names</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -2268,7 +2287,9 @@
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
         <span class="n">using</span> <span class="o">=</span> <span class="n">using</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">by</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">ordered_intersect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">ordered_intersect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;_0.&quot;</span>
@@ -2368,7 +2389,9 @@
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">ordered_intersect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">ordered_intersect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;_0.&quot;</span>
@@ -2516,7 +2539,9 @@
 
 
 <span class="k">class</span> <span class="nc">SQLNode</span><span class="p">(</span><span class="n">ViewRepresentation</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sql</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">column_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">view_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sql</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">column_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">view_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">splitlines</span><span class="p">(</span><span class="n">keepends</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">sql</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sql</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
@@ -2527,9 +2552,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">view_name</span> <span class="o">=</span> <span class="n">view_name</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span>
-            <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;SQLNode&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;SQLNode&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -2554,10 +2577,14 @@
 
     <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="s2">&quot;SQLNode(sql=&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="p">)</span>
-                <span class="o">+</span> <span class="s2">&quot;, column_names=&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
-                <span class="o">+</span> <span class="s2">&quot;, view_name=&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_name</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
-                <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+            <span class="s2">&quot;SQLNode(sql=&quot;</span>
+            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;, column_names=&quot;</span>
+            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;, view_name=&quot;</span>
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_name</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
+            <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="n">s</span>
 
     <span class="k">def</span> <span class="nf">to_near_sql_implementation</span><span class="p">(</span>
@@ -2589,7 +2616,9 @@
 <span class="sd">    :param allow_limited_tables: logical, if True allow execution on non-complete tables</span>
 <span class="sd">    :return: table result</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">d</span><span class="o">.</span><span class="n">ex</span><span class="p">(</span><span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,</span> <span class="n">allow_limited_tables</span><span class="o">=</span><span class="n">allow_limited_tables</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">d</span><span class="o">.</span><span class="n">ex</span><span class="p">(</span>
+        <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,</span> <span class="n">allow_limited_tables</span><span class="o">=</span><span class="n">allow_limited_tables</span>
+    <span class="p">)</span>
 </pre></div>
 
         </details>
@@ -2959,9 +2988,7 @@
         <span class="k">return</span> <span class="kc">False</span>
 
     <span class="c1"># return table representation of self</span>
-    <span class="k">def</span> <span class="nf">as_table_description</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">as_table_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TableDescription</span><span class="p">(</span>
             <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span>
             <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span>
@@ -3040,7 +3067,9 @@
             <span class="n">order_by</span> <span class="o">=</span> <span class="p">[</span><span class="n">order_by</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reverse</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">reverse</span> <span class="o">=</span> <span class="p">[</span><span class="n">reverse</span><span class="p">]</span>
-        <span class="n">parsed_ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span><span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">parsed_ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span>
+            <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">extend_parsed</span><span class="p">(</span>
             <span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span>
             <span class="n">partition_by</span><span class="o">=</span><span class="n">partition_by</span><span class="p">,</span>
@@ -3067,7 +3096,9 @@
             <span class="n">group_by</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="p">((</span><span class="n">ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">group_by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must have ops or group_by&quot;</span><span class="p">)</span>
-        <span class="n">parsed_ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span><span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">parsed_ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span>
+            <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_parsed</span><span class="p">(</span><span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">natural_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">by</span><span class="p">,</span> <span class="n">jointype</span><span class="p">,</span> <span class="n">check_all_common_keys_in_by</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -3126,11 +3157,13 @@
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">expr</span> <span class="o">=</span> <span class="n">expr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">expr</span> <span class="o">=</span> <span class="s1">&#39; &amp; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="n">vi</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span> <span class="k">for</span> <span class="n">vi</span> <span class="ow">in</span> <span class="n">expr</span><span class="p">])</span>
+                <span class="n">expr</span> <span class="o">=</span> <span class="s2">&quot; &amp; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">vi</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span> <span class="k">for</span> <span class="n">vi</span> <span class="ow">in</span> <span class="n">expr</span><span class="p">])</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">PreTerm</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_trivial_when_intermediate</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">select_rows</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
-        <span class="n">ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span><span class="n">ops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;expr&quot;</span><span class="p">:</span> <span class="n">expr</span><span class="p">},</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span>
+            <span class="n">ops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;expr&quot;</span><span class="p">:</span> <span class="n">expr</span><span class="p">},</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span>
+        <span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">r_walk_expr</span><span class="p">(</span><span class="n">opv</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opv</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Expression</span><span class="p">):</span>
@@ -3190,9 +3223,7 @@
             <span class="k">return</span> <span class="bp">self</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_trivial_when_intermediate</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">ConvertRecordsNode</span><span class="p">(</span>
-            <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">ConvertRecordsNode</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -3793,9 +3824,7 @@ with the using columns (None means all).</p>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">as_table_description</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span>
-    <span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">as_table_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TableDescription</span><span class="p">(</span>
             <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span>
             <span class="n">column_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span>
@@ -3905,7 +3934,9 @@ with the using columns (None means all).</p>
             <span class="n">order_by</span> <span class="o">=</span> <span class="p">[</span><span class="n">order_by</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reverse</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">reverse</span> <span class="o">=</span> <span class="p">[</span><span class="n">reverse</span><span class="p">]</span>
-        <span class="n">parsed_ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span><span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">parsed_ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span>
+            <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">extend_parsed</span><span class="p">(</span>
             <span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span>
             <span class="n">partition_by</span><span class="o">=</span><span class="n">partition_by</span><span class="p">,</span>
@@ -3964,7 +3995,9 @@ with the using columns (None means all).</p>
             <span class="n">group_by</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="p">((</span><span class="n">ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">group_by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must have ops or group_by&quot;</span><span class="p">)</span>
-        <span class="n">parsed_ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span><span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">parsed_ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span>
+            <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_parsed</span><span class="p">(</span><span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">)</span>
 </pre></div>
 
@@ -4093,11 +4126,13 @@ with the using columns (None means all).</p>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">expr</span> <span class="o">=</span> <span class="n">expr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">expr</span> <span class="o">=</span> <span class="s1">&#39; &amp; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="n">vi</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span> <span class="k">for</span> <span class="n">vi</span> <span class="ow">in</span> <span class="n">expr</span><span class="p">])</span>
+                <span class="n">expr</span> <span class="o">=</span> <span class="s2">&quot; &amp; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">vi</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span> <span class="k">for</span> <span class="n">vi</span> <span class="ow">in</span> <span class="n">expr</span><span class="p">])</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">PreTerm</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_trivial_when_intermediate</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">select_rows</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
-        <span class="n">ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span><span class="n">ops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;expr&quot;</span><span class="p">:</span> <span class="n">expr</span><span class="p">},</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span>
+            <span class="n">ops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;expr&quot;</span><span class="p">:</span> <span class="n">expr</span><span class="p">},</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span>
+        <span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">r_walk_expr</span><span class="p">(</span><span class="n">opv</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opv</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Expression</span><span class="p">):</span>
@@ -4237,9 +4272,7 @@ with the using columns (None means all).</p>
             <span class="k">return</span> <span class="bp">self</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_trivial_when_intermediate</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span><span class="n">record_map</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">ConvertRecordsNode</span><span class="p">(</span>
-            <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">ConvertRecordsNode</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="o">=</span><span class="n">record_map</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -4253,8 +4286,8 @@ with the using columns (None means all).</p>
                                     <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="ViewRepresentation.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
                 <dd id="ViewRepresentation.apply_to" class="function"><a href="data_ops_types.html#OperatorPlatform.apply_to">apply_to</a></dd>
-                <dd id="ViewRepresentation.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="ViewRepresentation.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="ViewRepresentation.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="ViewRepresentation.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="ViewRepresentation.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="ViewRepresentation.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -4307,7 +4340,9 @@ with the using columns (None means all).</p>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">column_names</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">]</span>  <span class="c1"># convert to list from other types such as series</span>
+            <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">column_names</span>
+            <span class="p">]</span>  <span class="c1"># convert to list from other types such as series</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;TableDescription&quot;</span>
         <span class="p">)</span>
@@ -4422,7 +4457,9 @@ with the using columns (None means all).</p>
 
     <span class="k">def</span> <span class="nf">example_values_to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">table_values_to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">,</span> <span class="n">result_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">table_values_to_sql_str_list</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">,</span> <span class="n">result_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">table_name</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;get a dictionary of all tables used in an operator DAG,</span>
@@ -4506,7 +4543,9 @@ with the using columns (None means all).</p>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">column_names</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">]</span>  <span class="c1"># convert to list from other types such as series</span>
+            <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">column_names</span>
+            <span class="p">]</span>  <span class="c1"># convert to list from other types such as series</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;TableDescription&quot;</span>
         <span class="p">)</span>
@@ -4712,7 +4751,9 @@ with the using columns (None means all).</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">example_values_to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">table_values_to_sql_str_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">,</span> <span class="n">result_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">db_model</span><span class="o">.</span><span class="n">table_values_to_sql_str_list</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">,</span> <span class="n">result_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">table_name</span>
+        <span class="p">)</span>
 </pre></div>
 
         </details>
@@ -4852,8 +4893,8 @@ with the using columns (None means all).</p>
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="TableDescription.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
-                <dd id="TableDescription.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="TableDescription.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="TableDescription.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="TableDescription.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="TableDescription.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="TableDescription.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -5260,7 +5301,11 @@ with the using columns (None means all).</p>
         <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">columns_we_take</span> <span class="o">-</span> <span class="n">subops</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">o</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">(</span><span class="n">columns_we_take</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">([</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">columns_we_take</span><span class="p">])]</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">OrderedSet</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">columns_we_take</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">spacer</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span>
@@ -5549,7 +5594,11 @@ Abstract base class.</p>
         <span class="n">columns_we_take</span> <span class="o">=</span> <span class="n">columns_we_take</span> <span class="o">-</span> <span class="n">subops</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">o</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">(</span><span class="n">columns_we_take</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">([</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">columns_we_take</span><span class="p">])]</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">OrderedSet</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">columns_we_take</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
 </pre></div>
 
         </details>
@@ -5693,8 +5742,8 @@ with the using columns (None means all).</p>
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="ExtendNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
-                <dd id="ExtendNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="ExtendNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="ExtendNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="ExtendNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="ExtendNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="ExtendNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -6161,8 +6210,8 @@ with the using columns (None means all).</p>
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="ProjectNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
-                <dd id="ProjectNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="ProjectNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="ProjectNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="ProjectNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="ProjectNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="ProjectNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -6465,8 +6514,8 @@ with the using columns (None means all).</p>
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="SelectRowsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
-                <dd id="SelectRowsNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="SelectRowsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="SelectRowsNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="SelectRowsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="SelectRowsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="SelectRowsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -6797,8 +6846,8 @@ with the using columns (None means all).</p>
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="SelectColumnsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
-                <dd id="SelectColumnsNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="SelectColumnsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="SelectColumnsNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="SelectColumnsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="SelectColumnsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="SelectColumnsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -7129,8 +7178,8 @@ with the using columns (None means all).</p>
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="DropColumnsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
-                <dd id="DropColumnsNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="DropColumnsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="DropColumnsNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="DropColumnsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="DropColumnsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="DropColumnsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -7486,8 +7535,8 @@ with the using columns (None means all).</p>
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="OrderRowsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
-                <dd id="OrderRowsNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="OrderRowsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="OrderRowsNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="OrderRowsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="OrderRowsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="OrderRowsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -7858,8 +7907,8 @@ with the using columns (None means all).</p>
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="RenameColumnsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
-                <dd id="RenameColumnsNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="RenameColumnsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="RenameColumnsNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="RenameColumnsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="RenameColumnsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="RenameColumnsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -7921,7 +7970,9 @@ with the using columns (None means all).</p>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_right</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;right table missing join keys: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing_right</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">check_all_common_keys_in_by</span><span class="p">:</span>
-            <span class="n">missing_common</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">))</span> <span class="o">-</span> <span class="n">by_set</span>
+            <span class="n">missing_common</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">))</span> <span class="o">-</span> <span class="n">by_set</span>
+            <span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_common</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
                     <span class="s2">&quot;check_all_common_keys_in_by set, and the following common keys are are not in the by-clause: &quot;</span>
@@ -7929,9 +7980,13 @@ with the using columns (None means all).</p>
                 <span class="p">)</span>
         <span class="c1"># try to re-use column names if possible, saves space in deeply nested join trees.</span>
         <span class="n">column_names</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="p">):</span>
             <span class="n">column_names</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">column_names</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">)):</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="p">):</span>
             <span class="n">column_names</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">column_names</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -7965,7 +8020,9 @@ with the using columns (None means all).</p>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
         <span class="n">using</span> <span class="o">=</span> <span class="n">using</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">by</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">ordered_intersect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">ordered_intersect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;_0.&quot;</span>
@@ -8057,7 +8114,9 @@ Abstract base class.</p>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_right</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;right table missing join keys: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing_right</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">check_all_common_keys_in_by</span><span class="p">:</span>
-            <span class="n">missing_common</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">))</span> <span class="o">-</span> <span class="n">by_set</span>
+            <span class="n">missing_common</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">))</span> <span class="o">-</span> <span class="n">by_set</span>
+            <span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_common</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
                     <span class="s2">&quot;check_all_common_keys_in_by set, and the following common keys are are not in the by-clause: &quot;</span>
@@ -8065,9 +8124,13 @@ Abstract base class.</p>
                 <span class="p">)</span>
         <span class="c1"># try to re-use column names if possible, saves space in deeply nested join trees.</span>
         <span class="n">column_names</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="p">):</span>
             <span class="n">column_names</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">column_names</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">)):</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="nb">set</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="p">):</span>
             <span class="n">column_names</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">column_names</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -8130,7 +8193,9 @@ Abstract base class.</p>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
         <span class="n">using</span> <span class="o">=</span> <span class="n">using</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">by</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">ordered_intersect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">ordered_intersect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">]</span>
 </pre></div>
 
         </details>
@@ -8270,8 +8335,8 @@ with the using columns (None means all).</p>
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="NaturalJoinNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
-                <dd id="NaturalJoinNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="NaturalJoinNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="NaturalJoinNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="NaturalJoinNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="NaturalJoinNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="NaturalJoinNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -8353,7 +8418,9 @@ with the using columns (None means all).</p>
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">ordered_intersect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">ordered_intersect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;_0.&quot;</span>
@@ -8499,7 +8566,9 @@ Abstract base class.</p>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">using</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">OrderedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">ordered_intersect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">ordered_intersect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span> <span class="n">using</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">]</span>
 </pre></div>
 
         </details>
@@ -8645,8 +8714,8 @@ with the using columns (None means all).</p>
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="ConcatRowsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
-                <dd id="ConcatRowsNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="ConcatRowsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="ConcatRowsNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="ConcatRowsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="ConcatRowsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="ConcatRowsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -9012,8 +9081,8 @@ with the using columns (None means all).</p>
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="ConvertRecordsNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
-                <dd id="ConvertRecordsNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="ConvertRecordsNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="ConvertRecordsNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="ConvertRecordsNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="ConvertRecordsNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="ConvertRecordsNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -9038,7 +9107,9 @@ with the using columns (None means all).</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">SQLNode</span><span class="p">(</span><span class="n">ViewRepresentation</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sql</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">column_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">view_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sql</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">column_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">view_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">splitlines</span><span class="p">(</span><span class="n">keepends</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">sql</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sql</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
@@ -9049,9 +9120,7 @@ with the using columns (None means all).</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">view_name</span> <span class="o">=</span> <span class="n">view_name</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span>
-            <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;SQLNode&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;SQLNode&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -9076,10 +9145,14 @@ with the using columns (None means all).</p>
 
     <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="s2">&quot;SQLNode(sql=&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="p">)</span>
-                <span class="o">+</span> <span class="s2">&quot;, column_names=&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
-                <span class="o">+</span> <span class="s2">&quot;, view_name=&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_name</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
-                <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+            <span class="s2">&quot;SQLNode(sql=&quot;</span>
+            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;, column_names=&quot;</span>
+            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;, view_name=&quot;</span>
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_name</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
+            <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="n">s</span>
 
     <span class="k">def</span> <span class="nf">to_near_sql_implementation</span><span class="p">(</span>
@@ -9122,7 +9195,9 @@ Abstract base class.</p>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sql</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">column_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">view_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sql</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">column_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">view_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">splitlines</span><span class="p">(</span><span class="n">keepends</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">sql</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sql</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
@@ -9133,9 +9208,7 @@ Abstract base class.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">view_name</span> <span class="o">=</span> <span class="n">view_name</span>
         <span class="n">ViewRepresentation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span>
-            <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;SQLNode&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">node_name</span><span class="o">=</span><span class="s2">&quot;SQLNode&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 </pre></div>
 
@@ -9225,10 +9298,14 @@ with the using columns (None means all).</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_python_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_sources</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="s2">&quot;SQLNode(sql=&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="p">)</span>
-                <span class="o">+</span> <span class="s2">&quot;, column_names=&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
-                <span class="o">+</span> <span class="s2">&quot;, view_name=&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_name</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
-                <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+            <span class="s2">&quot;SQLNode(sql=&quot;</span>
+            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;, column_names=&quot;</span>
+            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;, view_name=&quot;</span>
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_name</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
+            <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="n">s</span>
 </pre></div>
 
@@ -9328,8 +9405,8 @@ with the using columns (None means all).</p>
             </div>
             <div><dt><a href="data_ops_types.html#OperatorPlatform">data_algebra.data_ops_types.OperatorPlatform</a></dt>
                                 <dd id="SQLNode.act_on" class="function"><a href="data_ops_types.html#OperatorPlatform.act_on">act_on</a></dd>
-                <dd id="SQLNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="SQLNode.add" class="function"><a href="data_ops_types.html#OperatorPlatform.add">add</a></dd>
+                <dd id="SQLNode.use" class="function"><a href="data_ops_types.html#OperatorPlatform.use">use</a></dd>
                 <dd id="SQLNode.map_records" class="function"><a href="data_ops_types.html#OperatorPlatform.map_records">map_records</a></dd>
                 <dd id="SQLNode.fit" class="function"><a href="data_ops_types.html#OperatorPlatform.fit">fit</a></dd>
                 <dd id="SQLNode.fit_transform" class="function"><a href="data_ops_types.html#OperatorPlatform.fit_transform">fit_transform</a></dd>
@@ -9362,7 +9439,9 @@ with the using columns (None means all).</p>
 <span class="sd">    :param allow_limited_tables: logical, if True allow execution on non-complete tables</span>
 <span class="sd">    :return: table result</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">d</span><span class="o">.</span><span class="n">ex</span><span class="p">(</span><span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,</span> <span class="n">allow_limited_tables</span><span class="o">=</span><span class="n">allow_limited_tables</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">d</span><span class="o">.</span><span class="n">ex</span><span class="p">(</span>
+        <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,</span> <span class="n">allow_limited_tables</span><span class="o">=</span><span class="n">allow_limited_tables</span>
+    <span class="p">)</span>
 </pre></div>
 
         </details>

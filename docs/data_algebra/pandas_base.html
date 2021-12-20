@@ -233,13 +233,17 @@
 <span class="k">def</span> <span class="nf">_map_v</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">value_map</span><span class="p">,</span> <span class="n">default_value</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value_map</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">type_a</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">guess_carried_scalar_type</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-        <span class="n">type_k</span> <span class="o">=</span> <span class="p">{</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">map_type_to_canonical</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value_map</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+        <span class="n">type_k</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">map_type_to_canonical</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value_map</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="p">}</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">(</span><span class="n">type_k</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;multiple types in dictionary keys: </span><span class="si">{</span><span class="n">type_k</span><span class="si">}</span><span class="s2"> in mapv()&quot;</span><span class="p">)</span>
         <span class="n">type_k</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">type_k</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">([</span><span class="n">type_a</span><span class="p">,</span> <span class="n">type_k</span><span class="p">]):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;can&#39;t map </span><span class="si">{</span><span class="n">type_a</span><span class="si">}</span><span class="s2"> from a dict of </span><span class="si">{</span><span class="n">type_k</span><span class="si">}</span><span class="s2">&#39;s in mapv()&quot;</span><span class="p">)</span>
-        <span class="n">type_v</span> <span class="o">=</span> <span class="p">{</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">map_type_to_canonical</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value_map</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span>
+        <span class="n">type_v</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">map_type_to_canonical</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value_map</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="p">}</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">(</span><span class="n">type_v</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;multiple types in dictionary values: </span><span class="si">{</span><span class="n">type_v</span><span class="si">}</span><span class="s2"> in mapv()&quot;</span><span class="p">)</span>
         <span class="n">type_v</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">type_v</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -248,7 +252,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;default is </span><span class="si">{</span><span class="n">type_d</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">type_v</span><span class="si">}</span><span class="s2"> values in mapv()&#39;s&quot;</span><span class="p">)</span>
     <span class="c1"># https://pandas.pydata.org/docs/reference/api/pandas.Series.map.html</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-    <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">value_map</span><span class="p">,</span> <span class="n">na_action</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">value_map</span><span class="p">,</span> <span class="n">na_action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
     <span class="n">a</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">bad_column_positions</span><span class="p">(</span><span class="n">a</span><span class="p">)]</span> <span class="o">=</span> <span class="n">default_value</span>
     <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 
@@ -384,6 +388,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for implementing the data algebra on pandas-like APIs</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">pd</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pd</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">)</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -437,12 +442,16 @@
         <span class="k">if</span> <span class="p">(</span><span class="n">data_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_map</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">data_map</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">table_name</span><span class="p">]</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data_map[&quot;</span> <span class="o">+</span> <span class="n">op</span><span class="o">.</span><span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot;] was not the right type&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;data_map[&quot;</span> <span class="o">+</span> <span class="n">op</span><span class="o">.</span><span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot;] was not the right type&quot;</span>
+                <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">head</span>
             <span class="k">assert</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unnamed TableDescription stored was not the right type&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Unnamed TableDescription stored was not the right type&quot;</span>
+                <span class="p">)</span>
         <span class="c1"># check all columns we expect are present</span>
         <span class="n">columns_using</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">column_names</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">narrow</span><span class="p">:</span>
@@ -998,6 +1007,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for implementing the data algebra on pandas-like APIs</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">pd</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pd</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">)</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -1051,12 +1061,16 @@
         <span class="k">if</span> <span class="p">(</span><span class="n">data_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_map</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">data_map</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">table_name</span><span class="p">]</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data_map[&quot;</span> <span class="o">+</span> <span class="n">op</span><span class="o">.</span><span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot;] was not the right type&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;data_map[&quot;</span> <span class="o">+</span> <span class="n">op</span><span class="o">.</span><span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot;] was not the right type&quot;</span>
+                <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">head</span>
             <span class="k">assert</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unnamed TableDescription stored was not the right type&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Unnamed TableDescription stored was not the right type&quot;</span>
+                <span class="p">)</span>
         <span class="c1"># check all columns we expect are present</span>
         <span class="n">columns_using</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">column_names</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">narrow</span><span class="p">:</span>
@@ -1658,12 +1672,16 @@
         <span class="k">if</span> <span class="p">(</span><span class="n">data_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_map</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">data_map</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">table_name</span><span class="p">]</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data_map[&quot;</span> <span class="o">+</span> <span class="n">op</span><span class="o">.</span><span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot;] was not the right type&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;data_map[&quot;</span> <span class="o">+</span> <span class="n">op</span><span class="o">.</span><span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot;] was not the right type&quot;</span>
+                <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">head</span>
             <span class="k">assert</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unnamed TableDescription stored was not the right type&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Unnamed TableDescription stored was not the right type&quot;</span>
+                <span class="p">)</span>
         <span class="c1"># check all columns we expect are present</span>
         <span class="n">columns_using</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">column_names</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">narrow</span><span class="p">:</span>

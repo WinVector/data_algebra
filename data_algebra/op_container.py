@@ -18,14 +18,18 @@ one = data_algebra.expr_rep.Value(1)
 class OpC(data_algebra.data_ops_types.OperatorPlatform):
     """Container that redirects to another to non-quoted notation."""
 
-    ops: typing.Optional[data_algebra.data_ops.ViewRepresentation]  # this reference gets replaced
+    ops: typing.Optional[
+        data_algebra.data_ops.ViewRepresentation
+    ]  # this reference gets replaced
     column_namespace: SimpleNamespace  # don't replace the reference, instead mutate (reference shared!)
     used_result: bool
 
     def __init__(self, other):
         self.column_namespace = SimpleNamespace()  # allows a dot notation
         self.used_result = False
-        data_algebra.data_ops_types.OperatorPlatform.__init__(self, node_name="container")
+        data_algebra.data_ops_types.OperatorPlatform.__init__(
+            self, node_name="container"
+        )
         self.set(other)
 
     def set(self, other):
@@ -182,12 +186,9 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         self.ops.convert_records(record_map=record_map)
         return self
 
-    def map_records(
-        self, blocks_in=None, blocks_out=None
-    ):
+    def map_records(self, blocks_in=None, blocks_out=None):
         self.ops.map_records(
-            blocks_in=blocks_in,
-            blocks_out=blocks_out,
+            blocks_in=blocks_in, blocks_out=blocks_out,
         )
         return self
 

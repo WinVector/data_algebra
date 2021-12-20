@@ -19,6 +19,7 @@ class PythonText:
     Class for holding text representation of Python, with possible additional annotations.
     str() method returns only the text for interoperability.
     """
+
     def __init__(self, s: str, *, is_in_parens: bool = False):
         assert isinstance(s, str)
         assert isinstance(is_in_parens, bool)
@@ -233,7 +234,8 @@ class Term(PreTerm, ABC):
                 raise TypeError(
                     f"trying to combine incompatible values:"
                     + f" {self}:{obvious_type_problem[0]}"
-                    + f" and {other}:{obvious_type_problem[0]} with {op}")
+                    + f" and {other}:{obvious_type_problem[0]} with {op}"
+                )
         return Expression(op, (self, other), inline=inline, method=method)
 
     def __rop_expr__(self, op, other):
@@ -582,11 +584,15 @@ class Term(PreTerm, ABC):
         return self.__triop_expr__("if_else", x, y, method=True)
 
     def is_in(self, x):
-        return self.__op_expr__("is_in", x, inline=False, method=True, check_types=False,)
+        return self.__op_expr__(
+            "is_in", x, inline=False, method=True, check_types=False,
+        )
 
     def concat(self, x):
         # TODO: see if we can format back to infix notation
-        return self.__op_expr__("concat", x, inline=False, method=True, check_types=False,)
+        return self.__op_expr__(
+            "concat", x, inline=False, method=True, check_types=False,
+        )
 
     def coalesce(self, x):
         # TODO: see if we can format back to infix notation
@@ -632,26 +638,38 @@ class Term(PreTerm, ABC):
             format = Value("%Y-%m-%d %H:%M:%S")
         assert isinstance(format, Value)
         return self.__op_expr__(
-            "parse_datetime", other=format, inline=False, method=True, check_types=False,
+            "parse_datetime",
+            other=format,
+            inline=False,
+            method=True,
+            check_types=False,
         )
 
     def parse_date(self, format=None):
         if format is None:
             format = Value("%Y-%m-%d")
-        return self.__op_expr__("parse_date", other=format, inline=False, method=True, check_types=False,)
+        return self.__op_expr__(
+            "parse_date", other=format, inline=False, method=True, check_types=False,
+        )
 
     def format_datetime(self, format=None):
         if format is None:
             format = Value("%Y-%m-%d %H:%M:%S")
         assert isinstance(format, Value)
         return self.__op_expr__(
-            "format_datetime", other=format, inline=False, method=True, check_types=False,
+            "format_datetime",
+            other=format,
+            inline=False,
+            method=True,
+            check_types=False,
         )
 
     def format_date(self, format=None):
         if format is None:
             format = Value("%Y-%m-%d")
-        return self.__op_expr__("format_date", other=format, inline=False, method=True, check_types=False,)
+        return self.__op_expr__(
+            "format_date", other=format, inline=False, method=True, check_types=False,
+        )
 
     def dayofweek(self):
         return self.__uop_expr__("dayofweek")
@@ -678,7 +696,9 @@ class Term(PreTerm, ABC):
         return self.__op_expr__("timestamp_diff", other, inline=False, method=True)
 
     def date_diff(self, other):
-        return self.__op_expr__("date_diff", other, inline=False, method=True, check_types=False,)
+        return self.__op_expr__(
+            "date_diff", other, inline=False, method=True, check_types=False,
+        )
 
     # noinspection PyPep8Naming
     def base_Sunday(self):
@@ -695,7 +715,8 @@ def kop_expr(op, args, inline=False, method=False):
 class Value(Term):
     def __init__(self, value):
         allowed = {
-            data_algebra.util.map_type_to_canonical(t) for t in [int, float, str, bool, type(None)]
+            data_algebra.util.map_type_to_canonical(t)
+            for t in [int, float, str, bool, type(None)]
         }
         disallowed = {data_algebra.util.map_type_to_canonical(type(value))} - allowed
         if len(disallowed) != 0:
@@ -787,7 +808,10 @@ class ListTerm(PreTerm):
             except AttributeError:
                 return str(value)  # TODO: check if this should be repr?
 
-        return PythonText("[" + ", ".join([li_to_python(ai) for ai in self.value]) + "]", is_in_parens=False)
+        return PythonText(
+            "[" + ", ".join([li_to_python(ai) for ai in self.value]) + "]",
+            is_in_parens=False,
+        )
 
     def get_column_names(self, columns_seen):
         for ti in self.value:
@@ -825,7 +849,9 @@ class DictTerm(PreTerm):
             except AttributeError:
                 return value.__repr__()
 
-        terms = [li_to_python(k) + ': ' + li_to_python(v) for k, v in self.value.items()]
+        terms = [
+            li_to_python(k) + ": " + li_to_python(v) for k, v in self.value.items()
+        ]
         return PythonText("{" + ", ".join(terms) + "}", is_in_parens=False)
 
     def get_column_names(self, columns_seen):
@@ -1040,27 +1066,37 @@ class Expression(Term):
             if self.inline:
                 if sub_0.is_in_parens:
                     return PythonText(self.op + str(sub_0), is_in_parens=False)
-                return PythonText(self.op + '(' + str(sub_0) + ')', is_in_parens=False)
+                return PythonText(self.op + "(" + str(sub_0) + ")", is_in_parens=False)
             if self.method:
                 if sub_0.is_in_parens or isinstance(self.args[0], ColumnReference):
-                    return PythonText(str(sub_0) + "." + self.op + "()", is_in_parens=False)
-                return PythonText("(" + str(sub_0) + ")." + self.op + "()", is_in_parens=False)
+                    return PythonText(
+                        str(sub_0) + "." + self.op + "()", is_in_parens=False
+                    )
+                return PythonText(
+                    "(" + str(sub_0) + ")." + self.op + "()", is_in_parens=False
+                )
         if self.inline:
             subs = [str(ai.to_python(want_inline_parens=True)) for ai in self.args]
             result = (" " + self.op + " ").join(subs)
             if want_inline_parens:
-                return PythonText('(' + result + ')', is_in_parens=True)
+                return PythonText("(" + result + ")", is_in_parens=True)
             return PythonText(result, is_in_parens=False)
         subs = [ai.to_python(want_inline_parens=False) for ai in self.args]
         subs_0 = subs[0]
         subs = [str(si) for si in subs]
         if self.method:
             if subs_0.is_in_parens or isinstance(self.args[0], ColumnReference):
-                return PythonText(subs[0] + "." + self.op + "(" + ", ".join(subs[1:]) + ")", is_in_parens=False)
+                return PythonText(
+                    subs[0] + "." + self.op + "(" + ", ".join(subs[1:]) + ")",
+                    is_in_parens=False,
+                )
             else:
-                return PythonText("(" + subs[0] + ")." + self.op + "(" + ", ".join(subs[1:]) + ")", is_in_parens=False)
+                return PythonText(
+                    "(" + subs[0] + ")." + self.op + "(" + ", ".join(subs[1:]) + ")",
+                    is_in_parens=False,
+                )
         # treat as fn call
-        return PythonText(self.op + '(' + ", ".join(subs) + ')', is_in_parens=False)
+        return PythonText(self.op + "(" + ", ".join(subs) + ")", is_in_parens=False)
 
 
 # define with def so function has usable __name__

@@ -1,4 +1,3 @@
-
 import re
 import io
 import sqlite3
@@ -9,6 +8,7 @@ from data_algebra.cdata import *
 import data_algebra.SQLite
 from data_algebra.data_ops import *
 import data_algebra.util
+
 
 def test_cdata_wvpy_case():
     # use case of wvpy.util.threshold_plot
@@ -30,69 +30,127 @@ threshold,count,fraction,precision,true_positive_rate,false_positive_rate,true_n
     )
     to_plot = data_algebra.default_data_model.pd.read_csv(buf)
 
-    plotvars = ['sensitivity', 'specificity']
+    plotvars = ["sensitivity", "specificity"]
     reshaper = RecordMap(
         blocks_out=RecordSpecification(
-            data_algebra.default_data_model.pd.DataFrame({"measure": plotvars, "value": plotvars}),
-            control_table_keys=['measure'],
+            data_algebra.default_data_model.pd.DataFrame(
+                {"measure": plotvars, "value": plotvars}
+            ),
+            control_table_keys=["measure"],
             record_keys=["threshold"],
         )
     )
     prtlong = reshaper.transform(to_plot)
-    expect = data_algebra.default_data_model.pd.DataFrame({
-        'threshold': [0.999999, 0.999999, 1.0, 1.0, 2.0, 2.0, 3.0, 3.0, 4.0, 4.0, 5.0, 5.0, 5.000001, 5.000001],
-        'measure': ['sensitivity', 'specificity', 'sensitivity', 'specificity', 'sensitivity', 'specificity',
-                    'sensitivity', 'specificity', 'sensitivity', 'specificity', 'sensitivity', 'specificity',
-                    'sensitivity', 'specificity'],
-        'value': [1.0, 0.0, 1.0, 0.0, 1.0, 0.3333333333333333, 1.0, 0.6666666666666667, 0.5, 0.6666666666666667, 0.0,
-                  0.6666666666666667, 0.0, 1.0],
-    })
+    expect = data_algebra.default_data_model.pd.DataFrame(
+        {
+            "threshold": [
+                0.999999,
+                0.999999,
+                1.0,
+                1.0,
+                2.0,
+                2.0,
+                3.0,
+                3.0,
+                4.0,
+                4.0,
+                5.0,
+                5.0,
+                5.000001,
+                5.000001,
+            ],
+            "measure": [
+                "sensitivity",
+                "specificity",
+                "sensitivity",
+                "specificity",
+                "sensitivity",
+                "specificity",
+                "sensitivity",
+                "specificity",
+                "sensitivity",
+                "specificity",
+                "sensitivity",
+                "specificity",
+                "sensitivity",
+                "specificity",
+            ],
+            "value": [
+                1.0,
+                0.0,
+                1.0,
+                0.0,
+                1.0,
+                0.3333333333333333,
+                1.0,
+                0.6666666666666667,
+                0.5,
+                0.6666666666666667,
+                0.0,
+                0.6666666666666667,
+                0.0,
+                1.0,
+            ],
+        }
+    )
     assert data_algebra.test_util.equivalent_frames(expect, prtlong)
     back = reshaper.inverse_transform(prtlong)
-    assert data_algebra.test_util.equivalent_frames(to_plot.loc[:, ['threshold'] + plotvars], back)
+    assert data_algebra.test_util.equivalent_frames(
+        to_plot.loc[:, ["threshold"] + plotvars], back
+    )
     back2 = reshaper.inverse().transform(prtlong)
-    assert data_algebra.test_util.equivalent_frames(to_plot.loc[:, ['threshold'] + plotvars], back2)
-    pipe1 = (
-                descr(to_plot=to_plot)
-                    .convert_records(reshaper)
+    assert data_algebra.test_util.equivalent_frames(
+        to_plot.loc[:, ["threshold"] + plotvars], back2
     )
+    pipe1 = descr(to_plot=to_plot).convert_records(reshaper)
     data_algebra.test_util.check_transform(ops=pipe1, data=to_plot, expect=prtlong)
-    pipe2 = (
-                descr(prtlong=prtlong)
-                    .convert_records(reshaper.inverse())
+    pipe2 = descr(prtlong=prtlong).convert_records(reshaper.inverse())
+    data_algebra.test_util.check_transform(
+        ops=pipe2, data=prtlong, expect=to_plot.loc[:, ["threshold"] + plotvars]
     )
-    data_algebra.test_util.check_transform(ops=pipe2, data=prtlong, expect=to_plot.loc[:, ['threshold'] + plotvars])
     # TODO: should we get measure back?
     # TODO: should we be strict that isn't in technically an invertible transform.
 
-    plotvars = ['sensitivity']
+    plotvars = ["sensitivity"]
     reshaper = RecordMap(
         blocks_out=RecordSpecification(
-            data_algebra.default_data_model.pd.DataFrame({"measure": plotvars, "value": plotvars}),
-            control_table_keys=['measure'],
+            data_algebra.default_data_model.pd.DataFrame(
+                {"measure": plotvars, "value": plotvars}
+            ),
+            control_table_keys=["measure"],
             record_keys=["threshold"],
         )
     )
     prtlong = reshaper.transform(to_plot)
-    expect = data_algebra.default_data_model.pd.DataFrame({
-        'threshold': [0.999999, 1.0, 2.0, 3.0, 4.0, 5.0, 5.000001],
-        'measure': ['sensitivity', 'sensitivity', 'sensitivity', 'sensitivity', 'sensitivity', 'sensitivity', 'sensitivity'],
-        'value': [1.0, 1.0, 1.0, 1.0, 0.5, 0.0, 0.0],
-        })
+    expect = data_algebra.default_data_model.pd.DataFrame(
+        {
+            "threshold": [0.999999, 1.0, 2.0, 3.0, 4.0, 5.0, 5.000001],
+            "measure": [
+                "sensitivity",
+                "sensitivity",
+                "sensitivity",
+                "sensitivity",
+                "sensitivity",
+                "sensitivity",
+                "sensitivity",
+            ],
+            "value": [1.0, 1.0, 1.0, 1.0, 0.5, 0.0, 0.0],
+        }
+    )
     assert data_algebra.test_util.equivalent_frames(expect, prtlong)
     back = reshaper.inverse_transform(prtlong)
-    assert data_algebra.test_util.equivalent_frames(to_plot.loc[:, ['threshold'] + plotvars], back)
+    assert data_algebra.test_util.equivalent_frames(
+        to_plot.loc[:, ["threshold"] + plotvars], back
+    )
     back2 = reshaper.inverse().transform(prtlong)
-    assert data_algebra.test_util.equivalent_frames(to_plot.loc[:, ['threshold'] + plotvars], back2)
-    pipe1 = (
-                descr(to_plot=to_plot)
-                    .convert_records(reshaper)
+    assert data_algebra.test_util.equivalent_frames(
+        to_plot.loc[:, ["threshold"] + plotvars], back2
     )
+    pipe1 = descr(to_plot=to_plot).convert_records(reshaper)
     data_algebra.test_util.check_transform(ops=pipe1, data=to_plot, expect=prtlong)
-    pipe2 = (
-                descr(prtlong=prtlong)
-                    .convert_records(reshaper.inverse())
+    pipe2 = descr(prtlong=prtlong).convert_records(reshaper.inverse())
+    data_algebra.test_util.check_transform(
+        ops=pipe2, data=prtlong, expect=to_plot.loc[:, ["threshold"] + plotvars]
     )
-    data_algebra.test_util.check_transform(ops=pipe2, data=prtlong, expect=to_plot.loc[:, ['threshold'] + plotvars])
     # TODO: should we get measure back?
     # TODO: should we be strict that isn't in technically an invertible transform.

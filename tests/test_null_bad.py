@@ -28,8 +28,12 @@ def test_null_bad():
     )
 
     models_to_skip = set()
-    models_to_skip.add(str(data_algebra.MySQL.MySQLModel()))  # can't insert infinity into MySQL
-    models_to_skip.add(str(data_algebra.SparkSQL.SparkSQLModel()))  # None/Null/Non handled differently
+    models_to_skip.add(
+        str(data_algebra.MySQL.MySQLModel())
+    )  # can't insert infinity into MySQL
+    models_to_skip.add(
+        str(data_algebra.SparkSQL.SparkSQLModel())
+    )  # None/Null/Non handled differently
     data_algebra.test_util.check_transform(
         ops=ops, data=d, expect=expect, models_to_skip=models_to_skip,
     )
@@ -43,20 +47,11 @@ def test_null_bad_no_compare():
     )
 
     # good, compare x to number
-    ops = (
-        describe_table(d, table_name='d')
-            .extend({'c': 'x == 5'})
-    )
+    ops = describe_table(d, table_name="d").extend({"c": "x == 5"})
 
     # good, check if x is missing
-    ops = (
-        describe_table(d, table_name='d')
-            .extend({'c': 'x.is_null()'})
-    )
+    ops = describe_table(d, table_name="d").extend({"c": "x.is_null()"})
 
     with pytest.raises(Exception):
         # bad, compare to None
-        ops = (
-            describe_table(d, table_name='d')
-                .extend({'c': 'x != None'})
-        )
+        ops = describe_table(d, table_name="d").extend({"c": "x != None"})

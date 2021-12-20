@@ -169,29 +169,25 @@ class DataOpArrow(Arrow):
     def dom(self):
         return DataOpArrow(
             data_algebra.data_ops.TableDescription(
-                table_name=None,
-                column_names=self.incoming_columns,
+                table_name=None, column_names=self.incoming_columns,
             )
         )
 
     def dom_as_table(self):
         return data_algebra.data_ops.TableDescription(
-            table_name=None,
-            column_names=self.incoming_columns,
+            table_name=None, column_names=self.incoming_columns,
         )
 
     def cod(self):
         return DataOpArrow(
             data_algebra.data_ops.TableDescription(
-                table_name=None,
-                column_names=self.outgoing_columns,
+                table_name=None, column_names=self.outgoing_columns,
             )
         )
 
     def cod_as_table(self):
         return data_algebra.data_ops.TableDescription(
-            table_name=None,
-            column_names=self.outgoing_columns,
+            table_name=None, column_names=self.outgoing_columns,
         )
 
     def __repr__(self):
@@ -230,8 +226,7 @@ class DataOpArrow(Arrow):
 
     def __str__(self):
         in_rep = self.format_end_description(
-            required_cols=self.incoming_columns,
-            forbidden_cols=self.disallowed_columns,
+            required_cols=self.incoming_columns, forbidden_cols=self.disallowed_columns,
         )
         out_rep = self.format_end_description(
             required_cols=self.outgoing_columns,

@@ -1,4 +1,3 @@
-
 # import packages
 import string
 import numpy
@@ -24,49 +23,44 @@ def test_compare_data_frames():
     n_obs = 100
     symbols = list(string.ascii_lowercase)
 
-    d1 = data_algebra.default_data_model.pd.DataFrame({
-        'group': numpy.random.choice(symbols, size=n_obs, replace=True),
-    })
+    d1 = data_algebra.default_data_model.pd.DataFrame(
+        {"group": numpy.random.choice(symbols, size=n_obs, replace=True),}
+    )
 
-    d2 = data_algebra.default_data_model.pd.DataFrame({
-        'group': numpy.random.choice(symbols, size=n_obs, replace=True),
-    })
+    d2 = data_algebra.default_data_model.pd.DataFrame(
+        {"group": numpy.random.choice(symbols, size=n_obs, replace=True),}
+    )
 
     # which columns we consider to be row keys
     # can be more than one column
-    grouping_columns = ['group']
+    grouping_columns = ["group"]
 
     summary_ops = (
         descr(d1=d1)
-            .project(
-                {'d1_count': '(1).sum()'},
-                group_by=grouping_columns)
-            .natural_join(
-                b=descr(d2=d2)
-                    .project(
-                        {'d2_count': '(1).sum()'},
-                        group_by=grouping_columns),
-                by=grouping_columns,
-                jointype='full')
-            .extend({
-                'd1_count': 'd1_count.coalesce(0)',
-                'd2_count': 'd2_count.coalesce(0)',
-                })
+        .project({"d1_count": "(1).sum()"}, group_by=grouping_columns)
+        .natural_join(
+            b=descr(d2=d2).project(
+                {"d2_count": "(1).sum()"}, group_by=grouping_columns
+            ),
+            by=grouping_columns,
+            jointype="full",
+        )
+        .extend(
+            {"d1_count": "d1_count.coalesce(0)", "d2_count": "d2_count.coalesce(0)",}
+        )
     )
 
-    summary_table = summary_ops.eval({'d1': d1, 'd2': d2})
+    summary_table = summary_ops.eval({"d1": d1, "d2": d2})
 
     res = ex(
         data(summary_table)
-            .select_rows('(d1_count <= 0) | (d2_count <= 0)')
-            .order_rows(grouping_columns)
+        .select_rows("(d1_count <= 0) | (d2_count <= 0)")
+        .order_rows(grouping_columns)
     )
 
-    expect = data_algebra.default_data_model.pd.DataFrame({
-        'group': ['u', 'w'],
-        'd1_count': [0.0, 4.0],
-        'd2_count': [3.0, 0.0],
-        })
+    expect = data_algebra.default_data_model.pd.DataFrame(
+        {"group": ["u", "w"], "d1_count": [0.0, 4.0], "d2_count": [3.0, 0.0],}
+    )
 
     assert data_algebra.test_util.equivalent_frames(res, expect)
 
@@ -74,12 +68,12 @@ def test_compare_data_frames():
     # print(sqlite_handle.to_sql(summary_ops))
     # sqlite_handle.close()
 
-    ops2 = (
-        summary_ops
-            .select_rows('(d1_count <= 0) | (d2_count <= 0)')
-            .order_rows(grouping_columns)
+    ops2 = summary_ops.select_rows("(d1_count <= 0) | (d2_count <= 0)").order_rows(
+        grouping_columns
     )
     data_algebra.test_util.check_transform(
-        ops=ops2, data={"d1": d1, "d2": d2}, expect=expect,
+        ops=ops2,
+        data={"d1": d1, "d2": d2},
+        expect=expect,
         models_to_skip={str(data_algebra.MySQL.MySQLModel())},
     )

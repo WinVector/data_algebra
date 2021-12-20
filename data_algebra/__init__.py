@@ -1,4 +1,3 @@
-
 """
 Package for data processing in Python: https://github.com/WinVector/data_algebra
 """

@@ -184,7 +184,7 @@ def _walk_lark_tree(op, *, data_def=None) -> data_algebra.expr_rep.Term:
                     return method(*args)
                 else:
                     if op_name.startswith("_"):  # TODO: get rid of underbar aliases
-                        op_name = op_name[1: len(op_name)]
+                        op_name = op_name[1 : len(op_name)]
                     return data_algebra.expr_rep.Expression(op=op_name, args=args)
             if r_op.data in {"or_test", "or_test_sym", "and_test", "and_test_sym"}:
                 if len(r_op.children) < 2:
@@ -220,7 +220,7 @@ def _walk_lark_tree(op, *, data_def=None) -> data_algebra.expr_rep.Term:
                 ]
                 assert data_algebra.util.compatible_types(observed_types)
                 return data_algebra.expr_rep.ListTerm(op_values)
-            if r_op.data == 'dict':
+            if r_op.data == "dict":
                 assert len(r_op.children) == 1
                 op_values = [_r_walk_lark_tree(vi) for vi in r_op.children[0].children]
                 combined = dict()
@@ -228,14 +228,24 @@ def _walk_lark_tree(op, *, data_def=None) -> data_algebra.expr_rep.Term:
                     for k, v in s.value.items():
                         assert k is not None
                         combined[k] = v
-                type_k = {data_algebra.util.map_type_to_canonical(type(v)) for v in combined.keys()}
+                type_k = {
+                    data_algebra.util.map_type_to_canonical(type(v))
+                    for v in combined.keys()
+                }
                 if not data_algebra.util.compatible_types(type_k):
-                    raise TypeError(f"multiple types in dictionary keys: {type_k} in dict")
-                type_v = {data_algebra.util.map_type_to_canonical(type(v)) for v in combined.values()}
+                    raise TypeError(
+                        f"multiple types in dictionary keys: {type_k} in dict"
+                    )
+                type_v = {
+                    data_algebra.util.map_type_to_canonical(type(v))
+                    for v in combined.values()
+                }
                 if not data_algebra.util.compatible_types(type_v):
-                    raise TypeError(f"multiple types in dictionary values: {type_v} in dict")
+                    raise TypeError(
+                        f"multiple types in dictionary values: {type_v} in dict"
+                    )
                 return data_algebra.expr_rep.DictTerm(combined)
-            if r_op.data == 'key_value':
+            if r_op.data == "key_value":
                 assert len(r_op.children) == 2
                 k = _r_walk_lark_tree(r_op.children[0])
                 assert k is not None

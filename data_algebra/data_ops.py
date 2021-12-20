@@ -18,7 +18,12 @@ import data_algebra.expr_rep
 from data_algebra.data_ops_types import *
 import data_algebra.data_ops_utils
 import data_algebra.near_sql
-from data_algebra.OrderedSet import OrderedSet, ordered_intersect, ordered_union, ordered_diff
+from data_algebra.OrderedSet import (
+    OrderedSet,
+    ordered_intersect,
+    ordered_union,
+    ordered_diff,
+)
 import data_algebra.util
 
 
@@ -52,9 +57,7 @@ def _assert_tables_defs_consistent(tm1: Dict, tm2: Dict):
         t1 = tm1[k]
         t2 = tm2[k]
         if not t1.same_table(t2):
-            raise ValueError(
-                "Table " + k + " has two incompatible representations"
-            )
+            raise ValueError("Table " + k + " has two incompatible representations")
 
 
 class ViewRepresentation(OperatorPlatform, ABC):
@@ -382,9 +385,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         return False
 
     # return table representation of self
-    def as_table_description(
-        self, table_name=None, *, qualifiers=None
-    ):
+    def as_table_description(self, table_name=None, *, qualifiers=None):
         return TableDescription(
             table_name=table_name,
             column_names=self.column_names,
@@ -463,7 +464,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
             order_by = [order_by]
         if isinstance(reverse, str):
             reverse = [reverse]
-        parsed_ops = data_algebra.expr_parse.parse_assignments_in_context(ops=ops, view=self)
+        parsed_ops = data_algebra.expr_parse.parse_assignments_in_context(
+            ops=ops, view=self
+        )
         return self.extend_parsed(
             parsed_ops=parsed_ops,
             partition_by=partition_by,
@@ -490,7 +493,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
             group_by = []
         if ((ops is None) or (len(ops) < 1)) and (len(group_by) < 1):
             raise ValueError("must have ops or group_by")
-        parsed_ops = data_algebra.expr_parse.parse_assignments_in_context(ops=ops, view=self)
+        parsed_ops = data_algebra.expr_parse.parse_assignments_in_context(
+            ops=ops, view=self
+        )
         return self.project_parsed(parsed_ops=parsed_ops, group_by=group_by)
 
     def natural_join(self, b, *, by, jointype, check_all_common_keys_in_by=False):
@@ -549,11 +554,13 @@ class ViewRepresentation(OperatorPlatform, ABC):
             elif len(expr) == 1:
                 expr = expr[0]
             else:
-                expr = ' & '.join(['(' + vi + ')' for vi in expr])
+                expr = " & ".join(["(" + vi + ")" for vi in expr])
         assert isinstance(expr, (str, data_algebra.expr_rep.PreTerm))
         if self.is_trivial_when_intermediate():
             return self.sources[0].select_rows(expr)
-        ops = data_algebra.expr_parse.parse_assignments_in_context(ops={"expr": expr}, view=self)
+        ops = data_algebra.expr_parse.parse_assignments_in_context(
+            ops={"expr": expr}, view=self
+        )
 
         def r_walk_expr(opv):
             if not isinstance(opv, data_algebra.expr_rep.Expression):
@@ -613,9 +620,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             return self
         if self.is_trivial_when_intermediate():
             return self.sources[0].convert_records(record_map)
-        return ConvertRecordsNode(
-            source=self, record_map=record_map
-        )
+        return ConvertRecordsNode(source=self, record_map=record_map)
 
 
 # Could also have general query as starting ops, but don't see a lot of point to
@@ -651,7 +656,9 @@ class TableDescription(ViewRepresentation):
         if isinstance(column_names, str):
             column_names = [column_names]
         else:
-            column_names = [v for v in column_names]  # convert to list from other types such as series
+            column_names = [
+                v for v in column_names
+            ]  # convert to list from other types such as series
         ViewRepresentation.__init__(
             self, column_names=column_names, node_name="TableDescription"
         )
@@ -766,7 +773,9 @@ class TableDescription(ViewRepresentation):
 
     def example_values_to_sql_str_list(self, db_model) -> List[str]:
         assert self.head is not None
-        return db_model.table_values_to_sql_str_list(self.head, result_name=self.table_name)
+        return db_model.table_values_to_sql_str_list(
+            self.head, result_name=self.table_name
+        )
 
     def get_tables(self):
         """get a dictionary of all tables used in an operator DAG,
@@ -1095,7 +1104,11 @@ class ExtendNode(ViewRepresentation):
         columns_we_take = columns_we_take - subops.keys()
         for (k, o) in subops.items():
             o.get_column_names(columns_we_take)
-        return [OrderedSet([v for v in self.sources[0].column_names if v in columns_we_take])]
+        return [
+            OrderedSet(
+                [v for v in self.sources[0].column_names if v in columns_we_take]
+            )
+        ]
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
         spacer = " "
@@ -1727,7 +1740,9 @@ class NaturalJoinNode(ViewRepresentation):
         if len(missing_right) > 0:
             raise KeyError("right table missing join keys: " + str(missing_right))
         if check_all_common_keys_in_by:
-            missing_common = set(a.column_names).intersection(set(b.column_names)) - by_set
+            missing_common = (
+                set(a.column_names).intersection(set(b.column_names)) - by_set
+            )
             if len(missing_common) > 0:
                 raise KeyError(
                     "check_all_common_keys_in_by set, and the following common keys are are not in the by-clause: "
@@ -1735,9 +1750,13 @@ class NaturalJoinNode(ViewRepresentation):
                 )
         # try to re-use column names if possible, saves space in deeply nested join trees.
         column_names = tuple(column_names)
-        if isinstance(a.column_names, tuple) and (set(column_names) == set(a.column_names)):
+        if isinstance(a.column_names, tuple) and (
+            set(column_names) == set(a.column_names)
+        ):
             column_names = a.column_names
-        elif isinstance(b.column_names, tuple) and (set(column_names) == set(b.column_names)):
+        elif isinstance(b.column_names, tuple) and (
+            set(column_names) == set(b.column_names)
+        ):
             column_names = b.column_names
         ViewRepresentation.__init__(
             self,
@@ -1771,7 +1790,9 @@ class NaturalJoinNode(ViewRepresentation):
         if using is None:
             return [OrderedSet(self.sources[i].column_names) for i in range(2)]
         using = using.union(self.by)
-        return [ordered_intersect(self.sources[i].column_names, using) for i in range(2)]
+        return [
+            ordered_intersect(self.sources[i].column_names, using) for i in range(2)
+        ]
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
         s = "_0."
@@ -1871,7 +1892,9 @@ class ConcatRowsNode(ViewRepresentation):
     def columns_used_from_sources(self, using=None):
         if using is None:
             return [OrderedSet(self.sources[i].column_names) for i in range(2)]
-        return [ordered_intersect(self.sources[i].column_names, using) for i in range(2)]
+        return [
+            ordered_intersect(self.sources[i].column_names, using) for i in range(2)
+        ]
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
         s = "_0."
@@ -2019,7 +2042,9 @@ class ConvertRecordsNode(ViewRepresentation):
 
 
 class SQLNode(ViewRepresentation):
-    def __init__(self, *, sql: Union[str, List[str]], column_names: List[str], view_name: str):
+    def __init__(
+        self, *, sql: Union[str, List[str]], column_names: List[str], view_name: str
+    ):
         if isinstance(sql, str):
             sql = sql.splitlines(keepends=False)
             sql = [v for v in sql if len(v.strip()) > 0]
@@ -2030,9 +2055,7 @@ class SQLNode(ViewRepresentation):
         self.sql = sql.copy()
         self.view_name = view_name
         ViewRepresentation.__init__(
-            self,
-            column_names=column_names,
-            node_name="SQLNode",
+            self, column_names=column_names, node_name="SQLNode",
         )
 
     def apply_to(self, a, *, target_table_key=None):
@@ -2057,10 +2080,14 @@ class SQLNode(ViewRepresentation):
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
         s = (
-                "SQLNode(sql=" + str(self.sql)
-                + ", column_names=" + str(self.column_names)
-                + ", view_name=" + self.view_name.__repr__()
-                + ")")
+            "SQLNode(sql="
+            + str(self.sql)
+            + ", column_names="
+            + str(self.column_names)
+            + ", view_name="
+            + self.view_name.__repr__()
+            + ")"
+        )
         return s
 
     def to_near_sql_implementation(
@@ -2092,4 +2119,6 @@ def ex(d, *, data_model=None, narrow=True, allow_limited_tables=False):
     :param allow_limited_tables: logical, if True allow execution on non-complete tables
     :return: table result
     """
-    return d.ex(data_model=data_model, narrow=narrow, allow_limited_tables=allow_limited_tables)
+    return d.ex(
+        data_model=data_model, narrow=narrow, allow_limited_tables=allow_limited_tables
+    )

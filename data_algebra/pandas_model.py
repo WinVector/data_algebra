@@ -12,7 +12,6 @@ class PandasModel(PandasModelBase):
     """
     Realize the data algebra over pandas.
     """
+
     def __init__(self):
-        PandasModelBase.__init__(
-            self, pd=pd, presentation_model_name='pd'
-        )
+        PandasModelBase.__init__(self, pd=pd, presentation_model_name="pd")
