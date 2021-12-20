@@ -6,6 +6,7 @@ from abc import ABC
 import datetime
 import types
 import numbers
+import warnings
 
 import numpy
 
@@ -448,7 +449,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             data_map=data_map, data_model=self, narrow=narrow
         )
         if not window_situation:
-            new_cols = {k: opk.evaluate(res) for k, opk in op.ops.items()}
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")  # out of range things like arccosh were warning
+                new_cols = {k: opk.evaluate(res) for k, opk in op.ops.items()}
             # for k, v in new_cols.items():
             #     res[k] = v
             new_frame = self.columns_to_frame_(new_cols, target_rows=res.shape[0])
