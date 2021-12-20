@@ -16,35 +16,6 @@ def test_expression_expectations_1():
     datetime_format = "%Y-%m-%d %H:%M:%S"
     date_format = "%Y-%m-%d"
 
-    d = pd.DataFrame({
-        'row_id': [0, 1, 2, 3],
-        'a': [False, False, True, True],
-        'b': [False, True, False, True],
-        'x': [.1, .2, .3, .4],
-        'y': [2.4, 1.33, 1.2, 1.1],
-        'z': [1.6, None, -2.1, 0],
-        'g': ['a', 'a', 'b', 'ccc'],
-        "str_datetime_col": ["2000-01-01 12:13:21", "2020-04-05 14:03:00", "2000-01-01 12:13:21",
-                             "2020-04-05 14:03:00"],
-        "str_date_col": ["2000-03-01", "2020-04-05", "2000-03-01", "2020-04-05"],
-        "datetime_col_0": pd.to_datetime(
-            pd.Series(["2010-01-01 12:13:21", "2030-04-05 14:03:00", "2010-01-01 12:13:21", "2030-04-05 14:03:00"]),
-            format=datetime_format,
-        ),
-        "datetime_col_1": pd.to_datetime(
-            pd.Series(["2010-01-01 12:11:21", "2030-04-06 14:03:00", "2010-01-01 12:11:21", "2030-04-06 14:03:00"]),
-            format=date_format,
-        ),
-        "date_col_0": pd.to_datetime(
-            pd.Series(["2000-01-02", "2035-04-05", "2000-01-02", "2035-04-05"]),
-            format=date_format
-        ).dt.date,
-        "date_col_1": pd.to_datetime(
-            pd.Series(["2000-01-02", "2035-05-05", "2000-01-02", "2035-05-05"]),
-            format=date_format
-        ).dt.date,
-    })
-
     def f(expression):
         return ex(
             data(d=d)
@@ -69,6 +40,7 @@ def test_expression_expectations_1():
     )
     with gzip.open(expectation_path, 'rb') as in_f:
         expectation_map = pickle.load(in_f)
+    d = expectation_map['d']
     f_expectations = expectation_map['f_expectations']
     w_expectations = expectation_map['w_expectations']
 
