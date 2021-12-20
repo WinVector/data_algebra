@@ -20,8 +20,8 @@ def load_global_test_cache(fname):
 # cache results to speed up re-testing in some situations
 @pytest.fixture(scope="session", autouse=True)
 def user_pytest_start(request):
-    dir_path = os.path.dirname(os.path.realpath(__file__))
     data_algebra.test_util.global_test_result_cache = dict()
+    dir_path = os.path.dirname(os.path.realpath(__file__))
     global_test_result_cache_fname = os.path.join(
         dir_path, "data_algebra_test_cache.pkl.gz"
     )
