@@ -17,18 +17,13 @@ import data_algebra.python3_lark
 
 
 # set up parser
-parser = None
-# noinspection PyBroadException
-try:
-    parser = lark.Lark(
-        data_algebra.python3_lark.grammar,
-        parser="lalr",
-        # start='single_input',
-        start="test",  # In the lark Python grammar test falls through to expression, making it a good entry point
-        # propagate_positions=True,
-    )
-except:
-    parser = None
+parser = lark.Lark(
+    data_algebra.python3_lark.grammar,
+    parser="lalr",
+    # start='single_input',
+    start="test",  # In the lark Python grammar test falls through to expression, making it a good entry point
+    # propagate_positions=True,
+)
 
 
 # set up tree walker, including re-mapped names
