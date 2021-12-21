@@ -13,7 +13,7 @@ op,expression,op_class,Pandas,SQLiteModel,BigQueryModel,PostgreSQLModel,MySQLMod
 ==,x == y,e,y,y,y,y,y
 >,x > y,e,y,y,y,y,y
 >=,x >= y,e,y,y,y,y,y
-abs,z.abs(),e,y,n,y,y,y
+abs,z.abs(),e,y,y,y,y,y
 and,a & b,e,y,y,y,y,y
 and,a and b,e,y,y,y,y,y
 arccos,x.arccos(),e,y,y,n,n,n
