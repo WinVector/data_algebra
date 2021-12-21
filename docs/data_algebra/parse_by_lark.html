@@ -73,18 +73,13 @@
 
 
 <span class="c1"># set up parser</span>
-<span class="n">parser</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="c1"># noinspection PyBroadException</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">parser</span> <span class="o">=</span> <span class="n">lark</span><span class="o">.</span><span class="n">Lark</span><span class="p">(</span>
-        <span class="n">data_algebra</span><span class="o">.</span><span class="n">python3_lark</span><span class="o">.</span><span class="n">grammar</span><span class="p">,</span>
-        <span class="n">parser</span><span class="o">=</span><span class="s2">&quot;lalr&quot;</span><span class="p">,</span>
-        <span class="c1"># start=&#39;single_input&#39;,</span>
-        <span class="n">start</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span>  <span class="c1"># In the lark Python grammar test falls through to expression, making it a good entry point</span>
-        <span class="c1"># propagate_positions=True,</span>
-    <span class="p">)</span>
-<span class="k">except</span><span class="p">:</span>
-    <span class="n">parser</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">parser</span> <span class="o">=</span> <span class="n">lark</span><span class="o">.</span><span class="n">Lark</span><span class="p">(</span>
+    <span class="n">data_algebra</span><span class="o">.</span><span class="n">python3_lark</span><span class="o">.</span><span class="n">grammar</span><span class="p">,</span>
+    <span class="n">parser</span><span class="o">=</span><span class="s2">&quot;lalr&quot;</span><span class="p">,</span>
+    <span class="c1"># start=&#39;single_input&#39;,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span>  <span class="c1"># In the lark Python grammar test falls through to expression, making it a good entry point</span>
+    <span class="c1"># propagate_positions=True,</span>
+<span class="p">)</span>
 
 
 <span class="c1"># set up tree walker, including re-mapped names</span>
