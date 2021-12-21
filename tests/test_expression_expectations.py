@@ -57,7 +57,7 @@ def test_expression_expectations_1():
     w_expectations = expectation_map['w_expectations']
 
     ops_list = f_expectations + g_expectations + w_expectations
-    for op, exp, ops, expect in ops_list:
+    for op, op_class, exp, ops, expect in ops_list:
         res = ops.transform(d)
         assert data_algebra.test_util.equivalent_frames(res, expect)
 
