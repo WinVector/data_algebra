@@ -60,16 +60,3 @@ def test_expression_expectations_1():
     for op, op_class, exp, ops, expect in ops_list:
         res = ops.transform(d)
         assert data_algebra.test_util.equivalent_frames(res, expect)
-
-    # # test on db
-    # failures = []
-    # db_handle = data_algebra.BigQuery.example_handle()
-    # db_handle.insert_table(d, table_name='d', allow_overwrite=True)
-    # for exp, ops, expect in ops_list:
-    #     try:
-    #         res = db_handle.read_query(ops)
-    #         assert data_algebra.test_util.equivalent_frames(res, expect)
-    #     except Exception:
-    #         failures.append(exp)
-    # db_handle.close()
-    # print(failures)
