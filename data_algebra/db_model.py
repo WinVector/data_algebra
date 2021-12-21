@@ -294,6 +294,16 @@ def _db_ceil_expr(dbmodel, expression):
     )
 
 
+def _db_int_divide_expr(dbmodel, expression):
+    return (
+        "FLOOR("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+        + " / "
+        + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
+        + ")"
+    )
+
+
 def _db_pow_expr(dbmodel, expression):
     return (
         "POWER("
@@ -487,6 +497,7 @@ db_expr_formatters = {
     "round": _db_round_expr,
     "floor": _db_floor_expr,
     "ceil": _db_ceil_expr,
+    "//": _db_int_divide_expr,
     "**": _db_pow_expr,
     "nunique": _db_nunique_expr,
     "mapv": _db_mapv,

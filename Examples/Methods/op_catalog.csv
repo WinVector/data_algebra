@@ -1,7 +1,7 @@
 op,expression,op_class,Pandas,SQLiteModel,BigQueryModel,PostgreSQLModel,MySQLModel
 +,x + y,e,y,y,y,y,y
 -,x - y,e,y,y,y,y,y
-//,row_id // q,e,y,n,n,n,n
+//,row_id // q,e,y,y,y,y,y
 /,x / y,e,y,y,y,y,y
 *,x * y,e,y,y,y,y,y
 **,x ** y,e,y,y,y,y,y
