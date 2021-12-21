@@ -1,99 +1,99 @@
-op,op_class,Pandas,SQLiteModel,BigQueryModel,PostgreSQLModel,MySQLModel
-+,e,y,y,y,y,y
--,e,y,y,y,y,y
-//,e,y,n,n,n,n
-/,e,y,y,y,y,y
-*,e,y,y,y,y,y
-**,e,y,y,y,y,y
-==,e,y,y,y,y,y
->,e,y,y,y,y,y
->=,e,y,y,y,y,y
-<,e,y,y,y,y,y
-<=,e,y,y,y,y,y
-!=,e,y,y,y,y,y
-==,e,y,y,y,y,y
-and,e,y,y,y,y,y
-or,e,y,y,y,y,y
-sign,e,y,n,y,y,y
-sum,e,y,y,y,y,y
-sum,e,y,y,y,y,y
-sin,e,y,y,y,y,y
-cos,e,y,y,y,y,y
-arcsin,e,y,y,n,n,n
-arccos,e,y,y,n,n,n
-arctan,e,y,y,n,n,n
-arctan2,e,y,n,n,n,n
-sinh,e,y,y,y,y,n
-cosh,e,y,y,y,y,n
-tanh,e,y,y,y,y,n
-arcsinh,e,y,y,n,n,n
-arccosh,e,y,w,n,n,n
-arctanh,e,y,y,n,n,n
-floor,e,y,n,y,y,y
-ceil,e,y,n,y,y,y
-sum,e,y,y,y,y,y
-exp,e,y,y,y,y,y
-expm1,e,y,y,n,n,n
-log,e,y,y,y,w,y
-log10,e,y,y,y,y,y
-log1p,e,y,y,n,n,n
-mod,e,y,n,n,n,y
-remainder,e,y,n,n,n,n
-sqrt,e,y,y,y,y,y
-abs,e,y,n,y,y,y
-maximum,e,y,y,y,y,y
-minimum,e,y,y,y,y,y
-fmax,e,y,n,n,n,n
-fmin,e,y,n,n,n,n
-round,e,y,y,y,y,y
-around,e,y,n,n,n,n
-is_null,e,y,y,y,y,y
-is_bad,e,y,y,y,y,y
-count,e,y,w,w,w,w
-if_else,e,y,w,n,n,w
-is_in,e,y,y,y,y,y
-concat,e,y,w,w,w,w
-concat,e,y,w,w,w,w
-coalesce,e,y,y,y,y,y
-coalesce,e,y,y,y,y,y
-coalesce,e,y,y,y,y,y
-mapv,e,y,y,y,y,y
-as_int64,e,y,y,y,n,n
-as_str,e,y,y,y,y,y
-trimstr,e,y,y,y,y,y
-datetime_to_date,e,y,w,y,y,y
-parse_date,e,y,n,y,n,n
-parse_datetime,e,y,n,y,n,n
-format_datetime,e,y,n,y,n,n
-format_date,e,y,n,y,n,n
-dayofweek,e,y,n,y,n,n
-dayofyear,e,y,n,y,n,n
-dayofmonth,e,y,n,y,y,y
-weekofyear,e,y,n,y,w,y
-month,e,y,n,y,y,y
-quarter,e,y,n,y,y,y
-year,e,y,n,y,y,y
-timestamp_diff,e,y,n,y,n,n
-date_diff,e,y,n,y,n,n
-base_Sunday,e,y,n,y,n,n
-all,g,y,n,n,n,n
-any,g,y,n,n,n,n
-max,g,y,y,y,y,y
-mean,g,y,y,y,y,y
-median,g,y,n,y,n,n
-min,g,y,y,y,y,y
-ngroup,g,y,n,n,n,n
-nunique,g,y,n,y,n,n
-size,g,y,y,y,y,y
-std,g,y,n,n,n,w
-var,g,y,n,n,n,n
-bfill,w,y,n,n,n,n
-ffill,w,y,n,n,n,n
-last,w,y,n,n,n,n
-rank,w,y,n,n,n,n
-cumprod,w,y,n,n,n,n
-cumsum,w,y,y,y,y,y
-cumcount,w,y,n,n,n,n
-cummax,w,y,n,n,n,n
-cummin,w,y,n,n,n,n
-shift,w,y,y,y,y,y
+op,expression,op_class,Pandas,SQLiteModel,BigQueryModel,PostgreSQLModel,MySQLModel
++,x + y,e,y,y,y,y,y
+-,x - y,e,y,y,y,y,y
+//,row_id // q,e,y,n,n,n,n
+/,x / y,e,y,y,y,y,y
+*,x * y,e,y,y,y,y,y
+**,x ** y,e,y,y,y,y,y
+==,x == y,e,y,y,y,y,y
+>,x > y,e,y,y,y,y,y
+>=,x >= y,e,y,y,y,y,y
+<,x < y,e,y,y,y,y,y
+<=,x <= y,e,y,y,y,y,y
+!=,x != y,e,y,y,y,y,y
+==,not a,e,y,y,y,y,y
+and,a & b,e,y,y,y,y,y
+or,a | b,e,y,y,y,y,y
+sign,z.sign(),e,y,n,y,y,y
+sin,x.sin(),e,y,y,y,y,y
+cos,x.cos(),e,y,y,y,y,y
+arcsin,x.arcsin(),e,y,y,n,n,n
+arccos,x.arccos(),e,y,y,n,n,n
+arctan,x.arctan(),e,y,y,n,n,n
+arctan2,x.arctan2(y),e,y,n,n,n,n
+sinh,x.sinh(),e,y,y,y,y,n
+cosh,x.cosh(),e,y,y,y,y,n
+tanh,x.tanh(),e,y,y,y,y,n
+arcsinh,x.arcsinh(),e,y,y,n,n,n
+arccosh,x.arccosh(),e,y,w,n,n,n
+arctanh,x.arctanh(),e,y,y,n,n,n
+floor,z.floor(),e,y,n,y,y,y
+ceil,z.ceil(),e,y,n,y,y,y
+sum,x.sum(),e,y,y,y,y,y
+exp,x.exp(),e,y,y,y,y,y
+expm1,y.expm1(),e,y,y,n,n,n
+log,x.log(),e,y,y,y,w,y
+log10,x.log10(),e,y,y,y,y,y
+log1p,x.log1p(),e,y,y,n,n,n
+mod,y.mod(0.5),e,y,n,n,n,y
+remainder,y.remainder(0.5),e,y,n,n,n,n
+sqrt,x.sqrt(),e,y,y,y,y,y
+abs,z.abs(),e,y,n,y,y,y
+maximum,row_id.maximum(x),e,y,y,y,y,y
+minimum,row_id.minimum(x),e,y,y,y,y,y
+fmax,row_id.fmax(x),e,y,n,n,n,n
+fmin,row_id.fmin(x),e,y,n,n,n,n
+round,y.round(),e,y,y,y,y,y
+around,y.around(2),e,y,n,n,n,n
+is_null,z.is_null(),e,y,y,y,y,y
+is_bad,z.is_bad(),e,y,y,y,y,y
+count,z.count(),e,y,w,w,w,w
+if_else,"z.if_else(x, y)",e,y,w,n,n,w
+is_in,"row_id.is_in({1, 3})",e,y,y,y,y,y
+concat,g.concat(a),e,y,w,w,w,w
+concat,"g %+% ""_"" %+% a",e,y,w,w,w,w
+coalesce,z.coalesce(2),e,y,y,y,y,y
+coalesce,z %?% 2,e,y,y,y,y,y
+coalesce,z.coalesce_0(),e,y,y,y,y,y
+mapv,"g.mapv({""a"": 1, ""b"": 2, ""z"": 26}, 0)",e,y,y,y,y,y
+as_int64,y.as_int64(),e,y,y,y,n,n
+as_str,y.as_str(),e,y,y,y,y,y
+trimstr,"g.trimstr(0, 2)",e,y,y,y,y,y
+datetime_to_date,datetime_col_0.datetime_to_date(),e,y,w,y,y,y
+parse_date,str_date_col.parse_date(),e,y,n,y,n,n
+parse_datetime,str_datetime_col.parse_datetime(),e,y,n,y,n,n
+format_datetime,datetime_col_0.format_datetime(),e,y,n,y,n,n
+format_date,date_col_0.format_date(),e,y,n,y,n,n
+dayofweek,date_col_0.dayofweek(),e,y,n,y,n,n
+dayofyear,date_col_0.dayofyear(),e,y,n,y,n,n
+dayofmonth,date_col_0.dayofmonth(),e,y,n,y,y,y
+weekofyear,date_col_0.weekofyear(),e,y,n,y,w,y
+month,date_col_0.month(),e,y,n,y,y,y
+quarter,date_col_0.quarter(),e,y,n,y,y,y
+year,date_col_0.year(),e,y,n,y,y,y
+timestamp_diff,datetime_col_0.timestamp_diff(datetime_col_1),e,y,n,y,n,n
+date_diff,date_col_0.date_diff(date_col_1),e,y,n,y,n,n
+base_Sunday,date_col_1.base_Sunday(),e,y,n,y,n,n
+sum,x.sum(),g,y,y,y,y,y
+sum,(1).sum(),g,y,y,y,y,y
+all,a.all(),g,y,n,n,n,n
+any,a.any(),g,y,n,n,n,n
+max,x.max(),g,y,y,y,y,y
+mean,x.mean(),g,y,y,y,y,y
+median,x.median(),g,y,n,y,n,n
+min,x.min(),g,y,y,y,y,y
+ngroup,x.ngroup(),g,y,n,n,n,n
+nunique,x.nunique(),g,y,n,y,n,n
+size,x.size(),g,y,y,y,y,y
+std,x.std(),g,y,n,n,n,w
+var,x.var(),g,y,n,n,n,n
+bfill,z.bfill(),w,y,n,n,n,n
+ffill,z.ffill(),w,y,n,n,n,n
+last,x.last(),w,y,n,n,n,n
+rank,x.rank(),w,y,n,n,n,n
+cumprod,x.cumprod(),w,y,n,n,n,n
+cumsum,x.cumsum(),w,y,y,y,y,y
+cumcount,z.cumcount(),w,y,n,n,n,n
+cummax,x.cummax(),w,y,n,n,n,n
+cummin,x.cummin(),w,y,n,n,n,n
+shift,x.shift(),w,y,y,y,y,y
