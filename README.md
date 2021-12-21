@@ -90,7 +90,7 @@ data_algebra.__version__
 
 
 
-    '1.1.1'
+    '1.1.2'
 
 
 
@@ -114,7 +114,19 @@ d_local
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -176,19 +188,19 @@ db_handle = data_algebra.BigQuery.example_handle()
 print(db_handle)
 ```
 
-    BigQuery_DBHandle(db_model=BigQueryModel, conn=<google.cloud.bigquery.client.Client object at 0x7fb0c8ab4cd0>)
+    BigQuery_DBHandle(db_model=BigQueryModel, conn=<google.cloud.bigquery.client.Client object at 0x7ff3390df2e0>)
 
 
 
 
 
 ```python
-remote_table_desciption = db_handle.insert_table(
+remote_table_description = db_handle.insert_table(
     d_local, 
     table_name='d', 
     allow_overwrite=True)
 
-remote_table_desciption.head
+remote_table_description.head
 
 ```
 
@@ -196,7 +208,19 @@ remote_table_desciption.head
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -248,8 +272,7 @@ remote_table_desciption.head
 
 
 
-Normally one does not read data back from a database, but instead materializes results in the database with `SQL` commands such as `CREATE TABLE tablename AS SELECT ...`.
-Also note: case in columns is a bit of nightmare.  It is often best to lower-case them all.
+Normally one does not read data back from a database, but instead materializes results in the database with `SQL` commands such as `CREATE TABLE tablename AS SELECT ...`. Also note: case in columns is a bit of nightmare. It is often best to lower-case them all.
 
 ### Back to the `data_algebra`
 
@@ -282,6 +305,8 @@ ops = (
 We are deliberately writing a longer pipeline of simple steps, so we can use the same pipeline locally with Pandas, and (potentially) great scale with `PostgreSQL` or Apache `Spark`.  A more concise variation of this pipeline can be found in the R example [here](https://github.com/WinVector/rquery).
 
 The intent is: the user can build up very sophisticated processing pipelines using a small number of primitive steps.  The pipelines tend to be long, but can still be very efficient- as they are well suited for use with `Pandas` and with `SQL` query optimizers.  Most of the heavy lifting is performed by the  very powerful "window functions" (triggered by use of `partition_by` and `order_by`) available on the `extend()` step.  Multiple statements can be combined into extend steps, but only when they have the same window-structure, and don't create and use the same value name in the same statement (except for replacement, which is shown in this example).  Many conditions are checked and enforced during pipeline construction, making debugging very easy.
+
+The question is: what operators (or major steps) are supported by the data algebra, and what methods (operations on columns) are supported. The operators are documented [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Introduction/data_algebra_Introduction.ipynb), and which methods can be used in which contexts is linsted [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Methods/op_catalog.csv). Also, please check the [README](https://github.com/WinVector/data_algebra/blob/main/README.md) for news.
 
 For a more Pythonic way of writing the same pipeline we can show how the code would have been formatted by [`black`](https://github.com/psf/black).
 
@@ -405,8 +430,8 @@ print(sql)
      )
     SELECT  -- .rename_columns({'diagnosis': 'surveyCategory'})
      `surveyCategory` AS `diagnosis` ,
-     `probability` ,
-     `subjectID`
+     `subjectID` ,
+     `probability`
     FROM
      `select_rows_5`
     
@@ -427,28 +452,40 @@ db_handle.read_query(sql)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
       <th>diagnosis</th>
-      <th>probability</th>
       <th>subjectID</th>
+      <th>probability</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>withdrawal behavior</td>
-      <td>0.670622</td>
-      <td>1</td>
+      <td>positive re-framing</td>
+      <td>2</td>
+      <td>0.558974</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>positive re-framing</td>
-      <td>0.558974</td>
-      <td>2</td>
+      <td>withdrawal behavior</td>
+      <td>1</td>
+      <td>0.670622</td>
     </tr>
   </tbody>
 </table>
@@ -476,7 +513,19 @@ ops.eval({'d': d_local})
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -519,7 +568,19 @@ ops.transform(d_local)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -610,4 +671,3 @@ Note: `mysql` is not fully supported, as it doesn't name quoted common table exp
 ```python
 
 ```
-
