@@ -244,7 +244,11 @@ def _db_is_in_expr(dbmodel, expression):
 
 # noinspection PyUnusedLocal
 def _db_count_expr(dbmodel, expression):
-    return "SUM(1)"
+    """Count number of non-null entries (as in Pandas)"""
+    if len(expression.args) != 1:
+        return "SUM(1)"
+    e0 = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    return f"SUM(CASE WHEN {e0} IS NOT NULL THEN 1 ELSE 0 END)"
 
 
 def _db_concat_expr(dbmodel, expression):
@@ -290,6 +294,16 @@ def _db_ceil_expr(dbmodel, expression):
     return (
         "CEILING("
         + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
+    )
+
+
+def _db_int_divide_expr(dbmodel, expression):
+    return (
+        "FLOOR("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+        + " / "
+        + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
         + ")"
     )
 
@@ -487,6 +501,7 @@ db_expr_formatters = {
     "round": _db_round_expr,
     "floor": _db_floor_expr,
     "ceil": _db_ceil_expr,
+    "//": _db_int_divide_expr,
     "**": _db_pow_expr,
     "nunique": _db_nunique_expr,
     "mapv": _db_mapv,

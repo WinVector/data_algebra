@@ -245,6 +245,8 @@ def _db_is_in_expr(dbmodel, expression):
 # noinspection PyUnusedLocal
 def _db_count_expr(dbmodel, expression):
     """Count number of non-null entries (as in Pandas)"""
+    if len(expression.args) != 1:
+        return "SUM(1)"
     e0 = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     return f"SUM(CASE WHEN {e0} IS NOT NULL THEN 1 ELSE 0 END)"
 

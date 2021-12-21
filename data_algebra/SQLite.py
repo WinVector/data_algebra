@@ -54,6 +54,15 @@ def _check_scalar_bad(x):
     return 0
 
 
+def _sign_fn(x):
+    if _check_scalar_bad(x):
+        return numpy.nan
+    if x > 0:
+        return 1.0
+    if x < 0:
+        return -1.0
+    return 0.0
+
 class MedianAgg:
     """
     Aggregate as median. SQLite user class.
@@ -136,7 +145,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             "log2": math.log2,
             "modf": math.modf,
             "radians": math.radians,
-            "sign": numpy.sign,
+            "sign": _sign_fn,
             "sin": math.sin,
             "sinh": math.sinh,
             "sqrt": math.sqrt,

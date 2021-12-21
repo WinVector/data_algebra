@@ -456,7 +456,11 @@
 
 <span class="c1"># noinspection PyUnusedLocal</span>
 <span class="k">def</span> <span class="nf">_db_count_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="k">return</span> <span class="s2">&quot;SUM(1)&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Count number of non-null entries (as in Pandas)&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;SUM(1)&quot;</span>
+    <span class="n">e0</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;SUM(CASE WHEN </span><span class="si">{</span><span class="n">e0</span><span class="si">}</span><span class="s2"> IS NOT NULL THEN 1 ELSE 0 END)&quot;</span>
 
 
 <span class="k">def</span> <span class="nf">_db_concat_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
@@ -502,6 +506,16 @@
     <span class="k">return</span> <span class="p">(</span>
         <span class="s2">&quot;CEILING(&quot;</span>
         <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_db_int_divide_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;FLOOR(&quot;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot; / &quot;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
     <span class="p">)</span>
 
@@ -699,6 +713,7 @@
     <span class="s2">&quot;round&quot;</span><span class="p">:</span> <span class="n">_db_round_expr</span><span class="p">,</span>
     <span class="s2">&quot;floor&quot;</span><span class="p">:</span> <span class="n">_db_floor_expr</span><span class="p">,</span>
     <span class="s2">&quot;ceil&quot;</span><span class="p">:</span> <span class="n">_db_ceil_expr</span><span class="p">,</span>
+    <span class="s2">&quot;//&quot;</span><span class="p">:</span> <span class="n">_db_int_divide_expr</span><span class="p">,</span>
     <span class="s2">&quot;**&quot;</span><span class="p">:</span> <span class="n">_db_pow_expr</span><span class="p">,</span>
     <span class="s2">&quot;nunique&quot;</span><span class="p">:</span> <span class="n">_db_nunique_expr</span><span class="p">,</span>
     <span class="s2">&quot;mapv&quot;</span><span class="p">:</span> <span class="n">_db_mapv</span><span class="p">,</span>
