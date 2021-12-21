@@ -35,7 +35,7 @@ ceil,z.ceil(),e,y,n,y,y,y
 sum,x.sum(),e,y,y,y,y,y
 exp,x.exp(),e,y,y,y,y,y
 expm1,y.expm1(),e,y,y,n,n,n
-log,x.log(),e,y,y,y,w,y
+log,x.log(),e,y,y,y,y,y
 log10,x.log10(),e,y,y,y,y,y
 log1p,x.log1p(),e,y,y,n,n,n
 mod,y.mod(0.5),e,y,n,n,n,y
