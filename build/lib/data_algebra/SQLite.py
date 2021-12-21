@@ -63,6 +63,15 @@ def _sign_fn(x):
         return -1.0
     return 0.0
 
+
+def _abs_fn(x):
+    if _check_scalar_bad(x):
+        return numpy.nan
+    if x >= 0:
+        return x
+    return -x
+
+
 class MedianAgg:
     """
     Aggregate as median. SQLite user class.
@@ -146,6 +155,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
             "modf": math.modf,
             "radians": math.radians,
             "sign": _sign_fn,
+            "abs": _abs_fn,
             "sin": math.sin,
             "sinh": math.sinh,
             "sqrt": math.sqrt,
@@ -174,26 +184,27 @@ class SQLiteModel(data_algebra.db_model.DBModel):
                 saw.add(k)
         # numpy fns
         numpy_fns = {
-            "abs": numpy.abs,
-            "arccos": numpy.arccos,
-            "arccosh": numpy.arccosh,
-            "arcsin": numpy.arcsin,
-            "arcsinh": numpy.arcsinh,
-            "arctan": numpy.arctan,
-            "arctanh": numpy.arctanh,
-            "ceil": numpy.ceil,
-            "cos": numpy.cos,
-            "cosh": numpy.cosh,
-            "exp": numpy.exp,
-            "expm1": numpy.expm1,
-            "floor": numpy.floor,
-            "log": numpy.log,
-            "log10": numpy.log10,
-            "log1p": numpy.log1p,
-            "sin": numpy.sin,
-            "sinh": numpy.sinh,
-            "sqrt": numpy.sqrt,
-            "tanh": numpy.tanh,
+            # string being passed to numpy
+            "abs": lambda x: numpy.abs([x])[0],
+            "arccos": lambda x: numpy.arccos([x])[0],
+            "arccosh": lambda x: numpy.arccosh([x])[0],
+            "arcsin": lambda x: numpy.arcsin([x])[0],
+            "arcsinh": lambda x: numpy.arcsinh([x])[0],
+            "arctan": lambda x: numpy.arctan([x])[0],
+            "arctanh": lambda x: numpy.arctanh([x])[0],
+            "ceil": lambda x: numpy.ceil([x])[0],
+            "cos": lambda x: numpy.cos([x])[0],
+            "cosh": lambda x: numpy.cosh([x])[0],
+            "exp": lambda x: numpy.exp([x])[0],
+            "expm1": lambda x: numpy.expm1([x])[0],
+            "floor": lambda x: numpy.floor([x])[0],
+            "log": lambda x: numpy.log([x])[0],
+            "log10": lambda x: numpy.log10([x])[0],
+            "log1p": lambda x: numpy.log1p([x])[0],
+            "sin": lambda x: numpy.sin([x])[0],
+            "sinh": lambda x: numpy.sinh([x])[0],
+            "sqrt": lambda x: numpy.sqrt([x])[0],
+            "tanh": lambda x: numpy.tanh([x])[0],
         }
         for k, f in numpy_fns.items():
             if k not in saw:

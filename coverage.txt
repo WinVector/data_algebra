@@ -104,7 +104,7 @@ data_algebra/BigQuery.py                 108     67    38%
 data_algebra/MySQL.py                     28     10    64%
 data_algebra/OrderedSet.py                68      8    88%
 data_algebra/PostgreSQL.py                20      7    65%
-data_algebra/SQLite.py                   117     17    85%
+data_algebra/SQLite.py                   123     19    85%
 data_algebra/SparkSQL.py                  81     45    44%
 data_algebra/__init__.py                   5      0   100%
 data_algebra/arrow.py                    141     32    77%
@@ -127,7 +127,7 @@ data_algebra/python3_lark.py               1      0   100%
 data_algebra/test_util.py                247     44    82%
 data_algebra/util.py                     139     29    79%
 ----------------------------------------------------------
-TOTAL                                   5131    899    82%
+TOTAL                                   5137    901    82%
 
 
-============================= 231 passed in 22.88s =============================
+============================= 231 passed in 22.46s =============================
