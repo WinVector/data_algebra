@@ -50,7 +50,7 @@ round,y.round(),e,y,y,y,y,y
 around,y.around(2),e,y,n,n,n,n
 is_null,z.is_null(),e,y,y,y,y,y
 is_bad,z.is_bad(),e,y,y,y,y,y
-count,z.count(),e,y,w,w,w,w
+count,z.count(),e,y,y,y,y,y
 if_else,"a.if_else(x, y)",e,y,y,y,y,y
 is_in,"row_id.is_in({1, 3})",e,y,y,y,y,y
 concat,g.concat(s2),e,y,y,y,y,y
