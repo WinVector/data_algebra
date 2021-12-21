@@ -29,6 +29,16 @@ def test_expression_expectations_1():
             data(d=d)
                 .extend(
                 {'new_column': expression},
+                partition_by=['g'])
+                .select_columns(['g', 'row_id', 'new_column'])
+                .order_rows(['g', 'row_id'])
+        )
+
+    def fw(expression):
+        return ex(
+            data(d=d)
+                .extend(
+                {'new_column': expression},
                 partition_by=['g'],
                 order_by=['row_id'])
                 .select_columns(['g', 'row_id', 'new_column'])
@@ -42,14 +52,19 @@ def test_expression_expectations_1():
         expectation_map = pickle.load(in_f)
     d = expectation_map['d']
     f_expectations = expectation_map['f_expectations']
+    g_expectations = expectation_map['g_expectations']
     w_expectations = expectation_map['w_expectations']
 
     for exp, expect in f_expectations.items():
         res = f(exp)
         assert data_algebra.test_util.equivalent_frames(res, expect)
 
-    for exp, expect in w_expectations.items():
+    for exp, expect in g_expectations.items():
         res = fg(exp)
+        assert data_algebra.test_util.equivalent_frames(res, expect)
+
+    for exp, expect in w_expectations.items():
+        res = fw(exp)
         assert data_algebra.test_util.equivalent_frames(res, expect)
 
     # TODO: test on db
