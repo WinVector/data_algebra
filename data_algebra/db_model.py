@@ -192,6 +192,25 @@ def _db_maximum_expr(dbmodel, expression):
     return (
         "CASE"
         + " WHEN "
+        + "((" + y_expr + " IS NULL) OR "
+        + "(" + x_expr + ") >= (" + y_expr + "))"
+        + " THEN "
+        + x_expr
+        + " WHEN "
+        + "((" + x_expr + " IS NULL) OR "
+        + "(" + y_expr + ") >= (" + x_expr + "))"
+        + " THEN "
+        + y_expr
+        + " ELSE NULL END"
+    )
+
+
+def _db_fmax_expr(dbmodel, expression):
+    x_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    y_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
+    return (
+        "CASE"
+        + " WHEN "
         + "("
         + x_expr
         + ") >= ("
@@ -212,6 +231,25 @@ def _db_maximum_expr(dbmodel, expression):
 
 
 def _db_minimum_expr(dbmodel, expression):
+    x_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    y_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
+    return (
+        "CASE"
+        + " WHEN "
+        + "((" + y_expr + " IS NULL) OR "
+        + "(" + x_expr + ") <= (" + y_expr + "))"
+        + " THEN "
+        + x_expr
+        + " WHEN "
+        + "((" + x_expr + " IS NULL) OR "
+        + "(" + y_expr + ") <= (" + x_expr + "))"
+        + " THEN "
+        + y_expr
+        + " ELSE NULL END"
+    )
+
+
+def _db_fmin_expr(dbmodel, expression):
     x_expr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     y_expr = dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
     return (
@@ -494,7 +532,9 @@ db_expr_formatters = {
     "if_else": _db_if_else_expr,
     "is_in": _db_is_in_expr,
     "maximum": _db_maximum_expr,
+    "fmax": _db_fmax_expr,
     "minimum": _db_minimum_expr,
+    "fmin": _db_fmin_expr,
     "count": _db_count_expr,
     "concat": _db_concat_expr,
     "coalesce": _db_coalesce_expr,

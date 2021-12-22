@@ -1060,25 +1060,25 @@
 
     <span class="k">def</span> <span class="nf">maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return per row maximum of items and other (vectorized).</span>
+<span class="sd">        Return per row maximum of items and other (propogate missing, vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;maximum&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return per row minimum of items and other (vectorized).</span>
+<span class="sd">        Return per row minimum of items and other (propogate missing, vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;minimum&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">fmax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return per row fmax of items and other (vectorized).</span>
+<span class="sd">        Return per row fmax of items and other (ignore missing, vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;fmax&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">fmin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return per row fmin of items and other (vectorized).</span>
+<span class="sd">        Return per row fmin of items and other (ignore missing, vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;fmin&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
@@ -2721,25 +2721,25 @@ str() method returns only the text for interoperability.</p>
 
     <span class="k">def</span> <span class="nf">maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return per row maximum of items and other (vectorized).</span>
+<span class="sd">        Return per row maximum of items and other (propogate missing, vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;maximum&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return per row minimum of items and other (vectorized).</span>
+<span class="sd">        Return per row minimum of items and other (propogate missing, vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;minimum&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">fmax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return per row fmax of items and other (vectorized).</span>
+<span class="sd">        Return per row fmax of items and other (ignore missing, vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;fmax&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">fmin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return per row fmin of items and other (vectorized).</span>
+<span class="sd">        Return per row fmin of items and other (ignore missing, vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;fmin&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
@@ -3792,14 +3792,14 @@ str() method returns only the text for interoperability.</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return per row maximum of items and other (vectorized).</span>
+<span class="sd">        Return per row maximum of items and other (propogate missing, vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;maximum&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Return per row maximum of items and other (vectorized).</p>
+            <div class="docstring"><p>Return per row maximum of items and other (propogate missing, vectorized).</p>
 </div>
 
 
@@ -3816,14 +3816,14 @@ str() method returns only the text for interoperability.</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return per row minimum of items and other (vectorized).</span>
+<span class="sd">        Return per row minimum of items and other (propogate missing, vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;minimum&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Return per row minimum of items and other (vectorized).</p>
+            <div class="docstring"><p>Return per row minimum of items and other (propogate missing, vectorized).</p>
 </div>
 
 
@@ -3840,14 +3840,14 @@ str() method returns only the text for interoperability.</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">fmax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return per row fmax of items and other (vectorized).</span>
+<span class="sd">        Return per row fmax of items and other (ignore missing, vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;fmax&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Return per row fmax of items and other (vectorized).</p>
+            <div class="docstring"><p>Return per row fmax of items and other (ignore missing, vectorized).</p>
 </div>
 
 
@@ -3864,14 +3864,14 @@ str() method returns only the text for interoperability.</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">fmin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return per row fmin of items and other (vectorized).</span>
+<span class="sd">        Return per row fmin of items and other (ignore missing, vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;fmin&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Return per row fmin of items and other (vectorized).</p>
+            <div class="docstring"><p>Return per row fmin of items and other (ignore missing, vectorized).</p>
 </div>
 
 

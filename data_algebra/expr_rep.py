@@ -563,25 +563,25 @@ class Term(PreTerm, ABC):
 
     def maximum(self, other):
         """
-        Return per row maximum of items and other (vectorized).
+        Return per row maximum of items and other (propogate missing, vectorized).
         """
         return self.__op_expr__("maximum", other, method=True, inline=False)
 
     def minimum(self, other):
         """
-        Return per row minimum of items and other (vectorized).
+        Return per row minimum of items and other (propogate missing, vectorized).
         """
         return self.__op_expr__("minimum", other, method=True, inline=False)
 
     def fmax(self, other):
         """
-        Return per row fmax of items and other (vectorized).
+        Return per row fmax of items and other (ignore missing, vectorized).
         """
         return self.__op_expr__("fmax", other, inline=False)
 
     def fmin(self, other):
         """
-        Return per row fmin of items and other (vectorized).
+        Return per row fmin of items and other (ignore missing, vectorized).
         """
         return self.__op_expr__("fmin", other, inline=False)
 

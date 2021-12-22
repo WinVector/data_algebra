@@ -404,6 +404,25 @@
     <span class="k">return</span> <span class="p">(</span>
         <span class="s2">&quot;CASE&quot;</span>
         <span class="o">+</span> <span class="s2">&quot; WHEN &quot;</span>
+        <span class="o">+</span> <span class="s2">&quot;((&quot;</span> <span class="o">+</span> <span class="n">y_expr</span> <span class="o">+</span> <span class="s2">&quot; IS NULL) OR &quot;</span>
+        <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">x_expr</span> <span class="o">+</span> <span class="s2">&quot;) &gt;= (&quot;</span> <span class="o">+</span> <span class="n">y_expr</span> <span class="o">+</span> <span class="s2">&quot;))&quot;</span>
+        <span class="o">+</span> <span class="s2">&quot; THEN &quot;</span>
+        <span class="o">+</span> <span class="n">x_expr</span>
+        <span class="o">+</span> <span class="s2">&quot; WHEN &quot;</span>
+        <span class="o">+</span> <span class="s2">&quot;((&quot;</span> <span class="o">+</span> <span class="n">x_expr</span> <span class="o">+</span> <span class="s2">&quot; IS NULL) OR &quot;</span>
+        <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">y_expr</span> <span class="o">+</span> <span class="s2">&quot;) &gt;= (&quot;</span> <span class="o">+</span> <span class="n">x_expr</span> <span class="o">+</span> <span class="s2">&quot;))&quot;</span>
+        <span class="o">+</span> <span class="s2">&quot; THEN &quot;</span>
+        <span class="o">+</span> <span class="n">y_expr</span>
+        <span class="o">+</span> <span class="s2">&quot; ELSE NULL END&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_db_fmax_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="n">x_expr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">y_expr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;CASE&quot;</span>
+        <span class="o">+</span> <span class="s2">&quot; WHEN &quot;</span>
         <span class="o">+</span> <span class="s2">&quot;(&quot;</span>
         <span class="o">+</span> <span class="n">x_expr</span>
         <span class="o">+</span> <span class="s2">&quot;) &gt;= (&quot;</span>
@@ -424,6 +443,25 @@
 
 
 <span class="k">def</span> <span class="nf">_db_minimum_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="n">x_expr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">y_expr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;CASE&quot;</span>
+        <span class="o">+</span> <span class="s2">&quot; WHEN &quot;</span>
+        <span class="o">+</span> <span class="s2">&quot;((&quot;</span> <span class="o">+</span> <span class="n">y_expr</span> <span class="o">+</span> <span class="s2">&quot; IS NULL) OR &quot;</span>
+        <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">x_expr</span> <span class="o">+</span> <span class="s2">&quot;) &lt;= (&quot;</span> <span class="o">+</span> <span class="n">y_expr</span> <span class="o">+</span> <span class="s2">&quot;))&quot;</span>
+        <span class="o">+</span> <span class="s2">&quot; THEN &quot;</span>
+        <span class="o">+</span> <span class="n">x_expr</span>
+        <span class="o">+</span> <span class="s2">&quot; WHEN &quot;</span>
+        <span class="o">+</span> <span class="s2">&quot;((&quot;</span> <span class="o">+</span> <span class="n">x_expr</span> <span class="o">+</span> <span class="s2">&quot; IS NULL) OR &quot;</span>
+        <span class="o">+</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">y_expr</span> <span class="o">+</span> <span class="s2">&quot;) &lt;= (&quot;</span> <span class="o">+</span> <span class="n">x_expr</span> <span class="o">+</span> <span class="s2">&quot;))&quot;</span>
+        <span class="o">+</span> <span class="s2">&quot; THEN &quot;</span>
+        <span class="o">+</span> <span class="n">y_expr</span>
+        <span class="o">+</span> <span class="s2">&quot; ELSE NULL END&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_db_fmin_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="n">x_expr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">y_expr</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span>
@@ -706,7 +744,9 @@
     <span class="s2">&quot;if_else&quot;</span><span class="p">:</span> <span class="n">_db_if_else_expr</span><span class="p">,</span>
     <span class="s2">&quot;is_in&quot;</span><span class="p">:</span> <span class="n">_db_is_in_expr</span><span class="p">,</span>
     <span class="s2">&quot;maximum&quot;</span><span class="p">:</span> <span class="n">_db_maximum_expr</span><span class="p">,</span>
+    <span class="s2">&quot;fmax&quot;</span><span class="p">:</span> <span class="n">_db_fmax_expr</span><span class="p">,</span>
     <span class="s2">&quot;minimum&quot;</span><span class="p">:</span> <span class="n">_db_minimum_expr</span><span class="p">,</span>
+    <span class="s2">&quot;fmin&quot;</span><span class="p">:</span> <span class="n">_db_fmin_expr</span><span class="p">,</span>
     <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="n">_db_count_expr</span><span class="p">,</span>
     <span class="s2">&quot;concat&quot;</span><span class="p">:</span> <span class="n">_db_concat_expr</span><span class="p">,</span>
     <span class="s2">&quot;coalesce&quot;</span><span class="p">:</span> <span class="n">_db_coalesce_expr</span><span class="p">,</span>

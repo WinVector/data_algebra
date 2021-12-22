@@ -44,8 +44,8 @@ dayofyear,date_col_0.dayofyear(),e,y,n,y,n,n
 exp,x.exp(),e,y,y,y,y,y
 expm1,y.expm1(),e,y,y,n,n,n
 floor,z.floor(),e,y,y,y,y,y
-fmax,row_id.fmax(x),e,y,n,n,n,n
-fmin,row_id.fmin(x),e,y,n,n,n,n
+fmax,row_id.fmax(x),e,y,y,y,y,y
+fmin,row_id.fmin(x),e,y,y,y,y,y
 format_date,date_col_0.format_date(),e,y,n,y,n,n
 format_datetime,datetime_col_0.format_datetime(),e,y,n,y,n,n
 if_else,"a.if_else(x, y)",e,y,y,y,y,y
