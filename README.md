@@ -19,7 +19,8 @@ Install `data_algebra` with `pip install data_algebra`
 
 # Announcement
 
-This article introduces the [`data_algebra`](https://github.com/WinVector/data_algebra) project: a data processing tool family available in `R` and `Python`.  These tools are designed to transform data either in-memory or on remote databases.  For an example (with video) of using `data_algebra` to re-arrange data layout please see [here](https://github.com/WinVector/data_algebra/blob/master/Examples/cdata/ranking_pivot_example.md).
+This article introduces the [`data_algebra`](https://github.com/WinVector/data_algebra) project: a data processing tool family available in `R` and `Python`.  These tools are designed to transform data either in-memory or on remote databases.  For an example (with video) of using `data_algebra` to re-arrange data layout please see [here](https://github.com/WinVector/data_algebra/blob/master/Examples/cdata/ranking_pivot_example.md). The key question is: what operators (or major steps) are supported by the data algebra, and what methods (operations on columns) are supported. The operators are documented [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Introduction/data_algebra_Introduction.ipynb), and which methods can be used in which contexts is linsted [here](https://github.com/WinVector/data_algebra/blob/main/Examples/Methods/op_catalog.csv). Also, please check the [README](https://github.com/WinVector/data_algebra/blob/main/README.md) for news.
+
 
 In particular, we will discuss the `Python` implementation (also called `data_algebra`) and its relation to the mature `R` implementations (`rquery` and `rqdatatable`).
 
