@@ -27,7 +27,7 @@ around,y.around(2),e,y,n,n,n,n
 as_int64,y.as_int64(),e,y,y,y,n,n
 as_str,y.as_str(),e,y,y,y,y,y
 base_Sunday,date_col_1.base_Sunday(),e,y,n,y,n,n
-ceil,z.ceil(),e,y,n,y,y,y
+ceil,z.ceil(),e,y,y,y,y,y
 coalesce,z %?% 2,e,y,y,y,y,y
 coalesce,z.coalesce(2),e,y,y,y,y,y
 coalesce,z.coalesce_0(),e,y,y,y,y,y
@@ -43,7 +43,7 @@ dayofweek,date_col_0.dayofweek(),e,y,n,y,n,n
 dayofyear,date_col_0.dayofyear(),e,y,n,y,n,n
 exp,x.exp(),e,y,y,y,y,y
 expm1,y.expm1(),e,y,y,n,n,n
-floor,z.floor(),e,y,n,y,y,y
+floor,z.floor(),e,y,y,y,y,y
 fmax,row_id.fmax(x),e,y,n,n,n,n
 fmin,row_id.fmin(x),e,y,n,n,n,n
 format_date,date_col_0.format_date(),e,y,n,y,n,n

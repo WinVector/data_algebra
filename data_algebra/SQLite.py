@@ -3,10 +3,12 @@
 Adapt data_algebra to SQLite database.
 """
 
+import functools
 import math
 import copy
 import numpy
 import numbers
+import warnings
 
 import sqlite3
 
@@ -55,13 +57,17 @@ def _check_scalar_bad(x):
 
 
 def _sign_fn(x):
-    if _check_scalar_bad(x):
+    # noinspection PyBroadException
+    try:
+        if _check_scalar_bad(x):
+            return numpy.nan
+        if x > 0:
+            return 1.0
+        if x < 0:
+            return -1.0
+        return 0.0
+    except Exception:
         return numpy.nan
-    if x > 0:
-        return 1.0
-    if x < 0:
-        return -1.0
-    return 0.0
 
 
 def _abs_fn(x):
@@ -70,6 +76,30 @@ def _abs_fn(x):
     if x >= 0:
         return x
     return -x
+
+
+def _wrap_scalar_fn(f, x):
+    if _check_scalar_bad(x):
+        return numpy.nan
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        return f(x)
+
+
+def _wrap_scalar_fn2(f, x, y):
+    if _check_scalar_bad(x) or _check_scalar_bad(y):
+        return numpy.nan
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        return f(x, y)
+
+
+def _wrap_numpy_fn(f, x):
+    if _check_scalar_bad(x):
+        return numpy.nan
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        return f([x])[0]
 
 
 class MedianAgg:
@@ -84,12 +114,15 @@ class MedianAgg:
         """
         Observe value
         """
-        self.collection.append(value)
+        if not _check_scalar_bad(value):
+            self.collection.append(value)
 
     def finalize(self):
         """
         Return result.
         """
+        if len(self.collection) < 1:
+            return numpy.nan
         return numpy.median(self.collection)
 
 
@@ -124,59 +157,59 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         saw = set()
         # math fns
         math_fns = {
-            "acos": math.acos,
-            "acosh": math.acosh,
-            "asin": math.asin,
-            "asinh": math.asinh,
-            "atan": math.atan,
-            "atanh": math.atanh,
-            "ceil": math.ceil,
-            "ceiling": math.ceil,
-            "cos": math.cos,
-            "cosh": math.cosh,
-            "degrees": math.degrees,
-            "erf": math.erf,
-            "erfc": math.erfc,
-            "exp": math.exp,
-            "expm1": math.expm1,
-            "fabs": math.fabs,
-            "factorial": math.factorial,
-            "floor": math.floor,
-            "frexp": math.frexp,
-            "gamma": math.gamma,
-            "isfinite": math.isfinite,
-            "isinf": math.isinf,
-            "isnan": math.isnan,
-            "lgamma": math.lgamma,
-            "log": math.log,
-            "log10": math.log10,
-            "log1p": math.log1p,
-            "log2": math.log2,
-            "modf": math.modf,
-            "radians": math.radians,
+            "acos": functools.partial(_wrap_scalar_fn, math.acos),
+            "acosh": functools.partial(_wrap_scalar_fn, math.acosh),
+            "asin": functools.partial(_wrap_scalar_fn, math.asin),
+            "asinh": functools.partial(_wrap_scalar_fn, math.asinh),
+            "atan": functools.partial(_wrap_scalar_fn, math.atan),
+            "atanh": functools.partial(_wrap_scalar_fn, math.atanh),
+            "ceil": functools.partial(_wrap_scalar_fn, math.ceil),
+            "ceiling": functools.partial(_wrap_scalar_fn, math.ceil),
+            "cos": functools.partial(_wrap_scalar_fn, math.cos),
+            "cosh": functools.partial(_wrap_scalar_fn, math.cosh),
+            "degrees": functools.partial(_wrap_scalar_fn, math.degrees),
+            "erf": functools.partial(_wrap_scalar_fn, math.erf),
+            "erfc": functools.partial(_wrap_scalar_fn, math.erfc),
+            "exp": functools.partial(_wrap_scalar_fn, math.exp),
+            "expm1": functools.partial(_wrap_scalar_fn, math.expm1),
+            "fabs": functools.partial(_wrap_scalar_fn, math.fabs),
+            "factorial": functools.partial(_wrap_scalar_fn, math.factorial),
+            "floor": functools.partial(_wrap_scalar_fn, math.floor),
+            "frexp": functools.partial(_wrap_scalar_fn, math.frexp),
+            "gamma": functools.partial(_wrap_scalar_fn, math.gamma),
+            "isfinite": functools.partial(_wrap_scalar_fn, math.isfinite),
+            "isinf": functools.partial(_wrap_scalar_fn, math.isinf),
+            "isnan": functools.partial(_wrap_scalar_fn, math.isnan),
+            "lgamma": functools.partial(_wrap_scalar_fn, math.lgamma),
+            "log": functools.partial(_wrap_scalar_fn, math.log),
+            "log10": functools.partial(_wrap_scalar_fn, math.log10),
+            "log1p": functools.partial(_wrap_scalar_fn, math.log1p),
+            "log2": functools.partial(_wrap_scalar_fn, math.log2),
+            "modf": functools.partial(_wrap_scalar_fn, math.modf),
+            "radians": functools.partial(_wrap_scalar_fn, math.radians),
             "sign": _sign_fn,
             "abs": _abs_fn,
-            "sin": math.sin,
-            "sinh": math.sinh,
-            "sqrt": math.sqrt,
-            "tan": math.tan,
-            "tanh": math.tanh,
-            "trunc": math.trunc,
+            "sin": functools.partial(_wrap_scalar_fn, math.sin),
+            "sinh": functools.partial(_wrap_scalar_fn, math.sinh),
+            "sqrt": functools.partial(_wrap_scalar_fn, math.sqrt),
+            "tan": functools.partial(_wrap_scalar_fn, math.tan),
+            "tanh": functools.partial(_wrap_scalar_fn, math.tanh),
+            "trunc": functools.partial(_wrap_scalar_fn, math.trunc),
         }
         for k, f in math_fns.items():
             if k not in saw:
                 conn.create_function(k, 1, f)
                 saw.add(k)
         math_fns_2 = {
-            "atan2": math.atan2,
-            "copysign": math.copysign,
-            "fmod": math.fmod,
-            "gcd": math.gcd,
-            "hypot": math.hypot,
-            "isclose": math.isclose,
-            "ldexp": math.ldexp,
-            "pow": math.pow,
-            "power": math.pow,
+            "atan2": functools.partial(_wrap_scalar_fn2, math.atan2),
+            "copysign": functools.partial(_wrap_scalar_fn2, math.copysign),
+            "fmod": functools.partial(_wrap_scalar_fn2, math.fmod),
+            "gcd": functools.partial(_wrap_scalar_fn2, math.gcd),
+            "hypot": functools.partial(_wrap_scalar_fn2, math.hypot),
+            "isclose": functools.partial(_wrap_scalar_fn2, math.isclose),
+            "ldexp": functools.partial(_wrap_scalar_fn2, math.ldexp),
+            "pow": functools.partial(_wrap_scalar_fn2, math.pow),
+            "power": functools.partial(_wrap_scalar_fn2, math.pow),
         }
         for k, f in math_fns_2.items():
             if k not in saw:
@@ -185,26 +218,26 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         # numpy fns
         numpy_fns = {
             # string being passed to numpy
-            "abs": lambda x: numpy.abs([x])[0],
-            "arccos": lambda x: numpy.arccos([x])[0],
-            "arccosh": lambda x: numpy.arccosh([x])[0],
-            "arcsin": lambda x: numpy.arcsin([x])[0],
-            "arcsinh": lambda x: numpy.arcsinh([x])[0],
-            "arctan": lambda x: numpy.arctan([x])[0],
-            "arctanh": lambda x: numpy.arctanh([x])[0],
-            "ceil": lambda x: numpy.ceil([x])[0],
-            "cos": lambda x: numpy.cos([x])[0],
-            "cosh": lambda x: numpy.cosh([x])[0],
-            "exp": lambda x: numpy.exp([x])[0],
-            "expm1": lambda x: numpy.expm1([x])[0],
-            "floor": lambda x: numpy.floor([x])[0],
-            "log": lambda x: numpy.log([x])[0],
-            "log10": lambda x: numpy.log10([x])[0],
-            "log1p": lambda x: numpy.log1p([x])[0],
-            "sin": lambda x: numpy.sin([x])[0],
-            "sinh": lambda x: numpy.sinh([x])[0],
-            "sqrt": lambda x: numpy.sqrt([x])[0],
-            "tanh": lambda x: numpy.tanh([x])[0],
+            "abs": functools.partial(_wrap_numpy_fn, numpy.abs),
+            "arccos": functools.partial(_wrap_numpy_fn, numpy.arccos),
+            "arccosh": functools.partial(_wrap_numpy_fn, numpy.arccosh),
+            "arcsin": functools.partial(_wrap_numpy_fn, numpy.arcsin),
+            "arcsinh": functools.partial(_wrap_numpy_fn, numpy.arcsinh),
+            "arctan": functools.partial(_wrap_numpy_fn, numpy.arctan),
+            "arctanh": functools.partial(_wrap_numpy_fn, numpy.arctanh),
+            "ceil": functools.partial(_wrap_numpy_fn, numpy.ceil),
+            "cos": functools.partial(_wrap_numpy_fn, numpy.cos),
+            "cosh": functools.partial(_wrap_numpy_fn, numpy.cosh),
+            "exp": functools.partial(_wrap_numpy_fn, numpy.exp),
+            "expm1": functools.partial(_wrap_numpy_fn, numpy.expm1),
+            "floor": functools.partial(_wrap_numpy_fn, numpy.floor),
+            "log": functools.partial(_wrap_numpy_fn, numpy.log),
+            "log10": functools.partial(_wrap_numpy_fn, numpy.log10),
+            "log1p": functools.partial(_wrap_numpy_fn, numpy.log1p),
+            "sin": functools.partial(_wrap_numpy_fn, numpy.sin),
+            "sinh": functools.partial(_wrap_numpy_fn, numpy.sinh),
+            "sqrt": functools.partial(_wrap_numpy_fn, numpy.sqrt),
+            "tanh": functools.partial(_wrap_numpy_fn, numpy.tanh),
         }
         for k, f in numpy_fns.items():
             if k not in saw:
