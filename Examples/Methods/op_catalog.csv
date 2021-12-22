@@ -17,7 +17,7 @@ abs,z.abs(),e,y,y,y,y,y
 and,a & b,e,y,y,y,y,y
 and,a and b,e,y,y,y,y,y
 arccos,x.arccos(),e,y,y,n,n,n
-arccosh,x.arccosh(),e,y,w,n,n,n
+arccosh,x.arccosh(),e,y,y,n,n,n
 arcsin,x.arcsin(),e,y,y,n,n,n
 arcsinh,x.arcsinh(),e,y,y,n,n,n
 arctan,x.arctan(),e,y,y,n,n,n

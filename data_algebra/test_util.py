@@ -68,7 +68,7 @@ def equivalent_frames(
     local_data_model=None,
 ) -> bool:
     """return False if the frames are equivalent (up to column re-ordering and possible row-reordering).
-    Ignores indexing."""
+    Ignores indexing. None and nan are considered equivalent in numeric contexts."""
     # leave in extra checks as this is usually used by test code
     if local_data_model is None:
         local_data_model = data_algebra.default_data_model
@@ -96,11 +96,6 @@ def equivalent_frames(
         # re-order b into a's column order
         b = b[a_columns]
         b = b.reset_index(drop=True)
-    for c in a_columns:
-        if local_data_model.can_convert_col_to_numeric(
-            a[c]
-        ) != local_data_model.can_convert_col_to_numeric(b[c]):
-            return False
     if a.shape[0] < 1:
         return True
     if not check_row_order:
@@ -125,6 +120,8 @@ def equivalent_frames(
             if not numpy.all(ca_null):
                 ca = ca[ca_null == False]
                 cb = cb[cb_null == False]
+                if local_data_model.can_convert_col_to_numeric(ca) != local_data_model.can_convert_col_to_numeric(cb):
+                    return False
                 if local_data_model.can_convert_col_to_numeric(a[c]):
                     ca = numpy.asarray(ca, dtype=float)
                     cb = numpy.asarray(cb, dtype=float)

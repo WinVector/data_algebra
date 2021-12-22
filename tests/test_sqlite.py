@@ -203,3 +203,19 @@ def test_sqlite_sign():
     )
     sqlite_handle.read_query(ops)
     sqlite_handle.close()
+
+
+def test_sqlite_arccosh():
+    sqlite_handle = data_algebra.SQLite.example_handle()
+    d = data_algebra.default_data_model.pd.DataFrame({
+        'x': [.1, .2, .3, .4],
+    })
+    sqlite_handle.insert_table(d, table_name='d', allow_overwrite=True)
+    ops = (
+        descr(d=d)
+            .extend({'xs': 'x.arccosh()'})
+    )
+    res_db = sqlite_handle.read_query(ops)
+    sqlite_handle.close()
+    res_pandas = ops.transform(d)
+    assert data_algebra.test_util.equivalent_frames(res_db, res_pandas)
