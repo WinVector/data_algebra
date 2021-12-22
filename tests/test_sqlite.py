@@ -219,3 +219,29 @@ def test_sqlite_arccosh():
     sqlite_handle.close()
     res_pandas = ops.transform(d)
     assert data_algebra.test_util.equivalent_frames(res_db, res_pandas)
+
+
+def test_sqlite_median():
+    d = data_algebra.default_data_model.pd.DataFrame({
+        'x': [.1, .2, .3, .4],
+        'g': ['a', 'a', 'a', 'b'],
+    })
+    ops = (
+        descr(d=d)
+            .project(
+                {'xs': 'x.median()'},
+                group_by=['g'],
+            )
+    )
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        'xs': [0.2, 0.4],
+        'g': ['a', 'b'],
+        })
+    res_pandas = ops.transform(d)
+    assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
+    sqlite_handle = data_algebra.SQLite.example_handle()
+    sqlite_handle.insert_table(d, table_name='d', allow_overwrite=True)
+    res_db = sqlite_handle.read_query(ops)
+    sqlite_handle.close()
+    assert data_algebra.test_util.equivalent_frames(expect, res_db)
+
