@@ -7,6 +7,7 @@ import data_algebra
 import data_algebra.db_model
 import data_algebra.test_util
 from data_algebra.data_ops import *  # https://github.com/WinVector/data_algebra
+import data_algebra.SparkSQL
 import data_algebra.SQLite
 import data_algebra.util
 
@@ -404,3 +405,25 @@ def test_sqlite_any_all_extend():
     # res_db = sqlite_handle.read_query(ops)
     # sqlite_handle.close()
     # assert data_algebra.test_util.equivalent_frames(expect, res_db)
+
+
+def test_sqlite_floor():
+    d = data_algebra.default_data_model.pd.DataFrame({
+        'z': [1.6, None, -2.1, 0],
+    })
+    ops = (
+        descr(d=d)
+            .extend({'r': 'z.floor()'},)
+    )
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        'z': [1.6, None, -2.1, 0],
+        'r': [1, None, -3, 0],
+    })
+    res_pandas = ops.transform(d)
+    assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
+    db_handle = data_algebra.SQLite.example_handle()
+    # db_handle = data_algebra.SparkSQL.example_handle()
+    db_handle.insert_table(d, table_name='d', allow_overwrite=True)
+    res_db = db_handle.read_query(ops)
+    db_handle.close()
+    assert data_algebra.test_util.equivalent_frames(expect, res_db)
