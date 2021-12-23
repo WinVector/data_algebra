@@ -492,23 +492,12 @@
     <span class="k">return</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="n">is_in_expr</span> <span class="o">+</span> <span class="s2">&quot; IN &quot;</span> <span class="o">+</span> <span class="n">x_expr</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
 
 
-<span class="c1"># noinspection PyUnusedLocal</span>
 <span class="k">def</span> <span class="nf">_db_count_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Count number of non-null entries (as in Pandas)&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;SUM(1)&quot;</span>
     <span class="n">e0</span> <span class="o">=</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;SUM(CASE WHEN </span><span class="si">{</span><span class="n">e0</span><span class="si">}</span><span class="s2"> IS NOT NULL THEN 1 ELSE 0 END)&quot;</span>
-
-
-<span class="k">def</span> <span class="nf">_db_concat_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="s2">&quot;(&quot;</span>  <span class="c1"># TODO: cast each to char on way in</span>
-        <span class="o">+</span> <span class="s2">&quot; || &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">ai</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
-        <span class="p">)</span>
-        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
-    <span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_db_coalesce_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
@@ -524,12 +513,32 @@
     <span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">_db_pow_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;POWER(&quot;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot;, &quot;</span>
+        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+    <span class="p">)</span>
+
+
 <span class="k">def</span> <span class="nf">_db_round_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="s2">&quot;ROUND(&quot;</span>
         <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
     <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_db_around_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(),</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">mult</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span><span class="o">.</span><span class="fm">__pow__</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">derived</span> <span class="o">=</span> <span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">mult</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">()</span> <span class="o">/</span> <span class="n">mult</span>
+    <span class="k">return</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">derived</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_db_floor_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
@@ -549,23 +558,9 @@
 
 
 <span class="k">def</span> <span class="nf">_db_int_divide_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="s2">&quot;FLOOR(&quot;</span>
-        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="o">+</span> <span class="s2">&quot; / &quot;</span>
-        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
-    <span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_db_pow_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="s2">&quot;POWER(&quot;</span>
-        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="o">+</span> <span class="s2">&quot;, &quot;</span>
-        <span class="o">+</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
-    <span class="p">)</span>
+    <span class="c1"># example of a derived expression</span>
+    <span class="n">ratio</span> <span class="o">=</span> <span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">floor</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">ratio</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_db_nunique_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
@@ -594,6 +589,16 @@
     <span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">_db_concat_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;(&quot;</span>
+        <span class="o">+</span> <span class="s2">&quot; || &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">ai</span><span class="o">.</span><span class="n">as_str</span><span class="p">(),</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">ai</span> <span class="ow">in</span> <span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+    <span class="p">)</span>
+
+
 <span class="k">def</span> <span class="nf">_trimstr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="s2">&quot;SUBSTR(&quot;</span>
@@ -605,6 +610,18 @@
         <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
     <span class="p">)</span>
 
+
+<span class="k">def</span> <span class="nf">_any_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="n">derived</span> <span class="o">=</span> <span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">derived</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_all_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+    <span class="n">derived</span> <span class="o">=</span> <span class="n">expression</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_rep</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dbmodel</span><span class="o">.</span><span class="n">expr_to_sql</span><span class="p">(</span><span class="n">derived</span><span class="p">,</span> <span class="n">want_inline_parens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="c1"># date/time fns</span>
 
 <span class="k">def</span> <span class="nf">_datetime_to_date</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span>
@@ -751,6 +768,7 @@
     <span class="s2">&quot;concat&quot;</span><span class="p">:</span> <span class="n">_db_concat_expr</span><span class="p">,</span>
     <span class="s2">&quot;coalesce&quot;</span><span class="p">:</span> <span class="n">_db_coalesce_expr</span><span class="p">,</span>
     <span class="s2">&quot;round&quot;</span><span class="p">:</span> <span class="n">_db_round_expr</span><span class="p">,</span>
+    <span class="s2">&quot;around&quot;</span><span class="p">:</span> <span class="n">_db_around_expr</span><span class="p">,</span>
     <span class="s2">&quot;floor&quot;</span><span class="p">:</span> <span class="n">_db_floor_expr</span><span class="p">,</span>
     <span class="s2">&quot;ceil&quot;</span><span class="p">:</span> <span class="n">_db_ceil_expr</span><span class="p">,</span>
     <span class="s2">&quot;//&quot;</span><span class="p">:</span> <span class="n">_db_int_divide_expr</span><span class="p">,</span>
@@ -761,6 +779,8 @@
     <span class="s2">&quot;as_int64&quot;</span><span class="p">:</span> <span class="n">_as_int64</span><span class="p">,</span>
     <span class="s2">&quot;as_str&quot;</span><span class="p">:</span> <span class="n">_as_str</span><span class="p">,</span>
     <span class="s2">&quot;trimstr&quot;</span><span class="p">:</span> <span class="n">_trimstr</span><span class="p">,</span>
+    <span class="s2">&quot;any&quot;</span><span class="p">:</span> <span class="n">_any_expr</span><span class="p">,</span>
+    <span class="s2">&quot;all&quot;</span><span class="p">:</span> <span class="n">_all_expr</span><span class="p">,</span>
     <span class="s2">&quot;datetime_to_date&quot;</span><span class="p">:</span> <span class="n">_datetime_to_date</span><span class="p">,</span>
     <span class="s2">&quot;parse_datetime&quot;</span><span class="p">:</span> <span class="n">_parse_datetime</span><span class="p">,</span>
     <span class="s2">&quot;parse_date&quot;</span><span class="p">:</span> <span class="n">_parse_date</span><span class="p">,</span>

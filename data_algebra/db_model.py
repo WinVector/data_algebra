@@ -399,6 +399,18 @@ def _trimstr(dbmodel, expression):
     )
 
 
+def _any_expr(dbmodel, expression):
+    derived = expression.args[0].max() >= data_algebra.expr_rep.Value(1)
+    return dbmodel.expr_to_sql(derived, want_inline_parens=True)
+
+
+def _all_expr(dbmodel, expression):
+    derived = expression.args[0].min() >= data_algebra.expr_rep.Value(1)
+    return dbmodel.expr_to_sql(derived, want_inline_parens=True)
+
+
+# date/time fns
+
 def _datetime_to_date(dbmodel, expression):
     return (
         "DATE("
@@ -555,6 +567,8 @@ db_expr_formatters = {
     "as_int64": _as_int64,
     "as_str": _as_str,
     "trimstr": _trimstr,
+    "any": _any_expr,
+    "all": _all_expr,
     "datetime_to_date": _datetime_to_date,
     "parse_datetime": _parse_datetime,
     "parse_date": _parse_date,

@@ -317,3 +317,90 @@ def test_sqlite_around():
     res_db = sqlite_handle.read_query(ops)
     sqlite_handle.close()
     assert data_algebra.test_util.equivalent_frames(expect, res_db)
+
+
+def test_sqlite_any_all_project():
+    d = data_algebra.default_data_model.pd.DataFrame({
+        'x0': [False, False],
+        'x1': [False, True],
+        'x2': [True, False],
+        'x3': [True, True],
+    })
+    ops = (
+        descr(d=d)
+            .project({
+                'r0n': 'x0.any()',
+                'r0l': 'x0.all()',
+                'r1n': 'x1.any()',
+                'r1l': 'x1.all()',
+                'r2n': 'x2.any()',
+                'r2l': 'x2.all()',
+                'r3n': 'x3.any()',
+                'r3l': 'x3.all()',
+              },
+            group_by=[])
+    )
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        'r0n': [False],
+        'r0l': [False],
+        'r1n': [True],
+        'r1l': [False],
+        'r2n': [True],
+        'r2l': [False],
+        'r3n': [True],
+        'r3l': [True],
+    })
+    res_pandas = ops.transform(d)
+    assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
+    sqlite_handle = data_algebra.SQLite.example_handle()
+    sqlite_handle.insert_table(d, table_name='d', allow_overwrite=True)
+    res_db = sqlite_handle.read_query(ops)
+    sqlite_handle.close()
+    assert data_algebra.test_util.equivalent_frames(expect, res_db)
+
+
+def test_sqlite_any_all_extend():
+    d = data_algebra.default_data_model.pd.DataFrame({
+        'x0': [False, False],
+        'x1': [False, True],
+        'x2': [True, False],
+        'x3': [True, True],
+        'g': 'a',
+    })
+    ops = (
+        descr(d=d)
+            .extend({
+                'r0n': 'x0.any()',
+                'r0l': 'x0.all()',
+                'r1n': 'x1.any()',
+                'r1l': 'x1.all()',
+                'r2n': 'x2.any()',
+                'r2l': 'x2.all()',
+                'r3n': 'x3.any()',
+                'r3l': 'x3.all()',
+              },
+            partition_by=['g'])
+    )
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        'x0': [False, False],
+        'x1': [False, True],
+        'x2': [True, False],
+        'x3': [True, True],
+        'g': 'a',
+        'r0n': False,
+        'r0l': False,
+        'r1n': True,
+        'r1l': False,
+        'r2n': True,
+        'r2l': False,
+        'r3n': True,
+        'r3l': True,
+    })
+    res_pandas = ops.transform(d)
+    assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
+    # # not a workable direction (composite expression in aggregate issue?)
+    # sqlite_handle = data_algebra.SQLite.example_handle()
+    # sqlite_handle.insert_table(d, table_name='d', allow_overwrite=True)
+    # res_db = sqlite_handle.read_query(ops)
+    # sqlite_handle.close()
+    # assert data_algebra.test_util.equivalent_frames(expect, res_db)
