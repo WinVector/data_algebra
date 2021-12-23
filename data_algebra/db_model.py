@@ -337,13 +337,9 @@ def _db_ceil_expr(dbmodel, expression):
 
 
 def _db_int_divide_expr(dbmodel, expression):
-    return (
-        "FLOOR("
-        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
-        + " / "
-        + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=True)
-        + ")"
-    )
+    # example of a derived expression
+    ratio = (expression.args[0] / expression.args[1]).floor()
+    return dbmodel.expr_to_sql(ratio, want_inline_parens=False)
 
 
 def _db_pow_expr(dbmodel, expression):
