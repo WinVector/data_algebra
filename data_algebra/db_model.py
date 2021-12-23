@@ -289,16 +289,6 @@ def _db_count_expr(dbmodel, expression):
     return f"SUM(CASE WHEN {e0} IS NOT NULL THEN 1 ELSE 0 END)"
 
 
-def _db_concat_expr(dbmodel, expression):
-    return (
-        "("  # TODO: cast each to char on way in
-        + " || ".join(
-            [dbmodel.expr_to_sql(ai, want_inline_parens=True) for ai in expression.args]
-        )
-        + ")"
-    )
-
-
 def _db_coalesce_expr(dbmodel, expression):
     return (
         "COALESCE("
@@ -374,6 +364,16 @@ def _as_str(dbmodel, expression):
         + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
         + " AS "
         + dbmodel.string_type
+        + ")"
+    )
+
+
+def _db_concat_expr(dbmodel, expression):
+    return (
+        "("
+        + " || ".join(
+            [dbmodel.expr_to_sql(ai.as_str(), want_inline_parens=True) for ai in expression.args]
+        )
         + ")"
     )
 

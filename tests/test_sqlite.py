@@ -267,3 +267,26 @@ def test_sqlite_int_div():
     res_db = sqlite_handle.read_query(ops)
     sqlite_handle.close()
     assert data_algebra.test_util.equivalent_frames(expect, res_db)
+
+
+def test_sqlite_concat():
+    d = data_algebra.default_data_model.pd.DataFrame({
+        'x': [1, 2, 3, 5],
+        'y': [2, 2, 3, 3],
+    })
+    ops = (
+        descr(d=d)
+            .extend({'r': 'x %+% "_" %+% y'},)
+    )
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        'x': [1, 2, 3, 5],
+        'y': [2, 2, 3, 3],
+        'r': ['1_2', '2_2', '3_3', '5_3'],
+    })
+    res_pandas = ops.transform(d)
+    assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
+    sqlite_handle = data_algebra.SQLite.example_handle()
+    sqlite_handle.insert_table(d, table_name='d', allow_overwrite=True)
+    res_db = sqlite_handle.read_query(ops)
+    sqlite_handle.close()
+    assert data_algebra.test_util.equivalent_frames(expect, res_db)
