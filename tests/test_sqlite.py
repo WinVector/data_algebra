@@ -290,3 +290,30 @@ def test_sqlite_concat():
     res_db = sqlite_handle.read_query(ops)
     sqlite_handle.close()
     assert data_algebra.test_util.equivalent_frames(expect, res_db)
+
+
+def test_sqlite_around():
+    d = data_algebra.default_data_model.pd.DataFrame({
+        'x': [1.11, 2.22, 3.33, 5.55],
+    })
+    ops = (
+        descr(d=d)
+            .extend({
+                'r0': 'x.around(0)',
+                'r1': 'x.around(1)',
+                'r2': 'x.around(2)',
+              })
+    )
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        'x': [1.11, 2.22, 3.33, 5.55],
+        'r0': [1.0, 2.0, 3.0, 6.0],
+        'r1': [1.1, 2.2, 3.3, 5.6],
+        'r2': [1.11, 2.22, 3.33, 5.55],
+    })
+    res_pandas = ops.transform(d)
+    assert data_algebra.test_util.equivalent_frames(expect, res_pandas)
+    sqlite_handle = data_algebra.SQLite.example_handle()
+    sqlite_handle.insert_table(d, table_name='d', allow_overwrite=True)
+    res_db = sqlite_handle.read_query(ops)
+    sqlite_handle.close()
+    assert data_algebra.test_util.equivalent_frames(expect, res_db)

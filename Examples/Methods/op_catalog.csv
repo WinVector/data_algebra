@@ -23,7 +23,7 @@ arcsinh,x.arcsinh(),e,y,y,n,n,n,n
 arctan,x.arctan(),e,y,y,n,n,n,n
 arctan2,x.arctan2(y),e,y,n,n,n,n,n
 arctanh,x.arctanh(),e,y,y,n,n,n,n
-around,y.around(2),e,y,n,n,n,n,n
+around,y.around(2),e,y,y,y,y,y,y
 as_int64,y.as_int64(),e,y,y,y,n,n,n
 as_str,y.as_str(),e,y,y,y,y,y,y
 base_Sunday,date_col_1.base_Sunday(),e,y,n,y,n,n,n

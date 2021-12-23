@@ -280,7 +280,6 @@ def _db_is_in_expr(dbmodel, expression):
     return "(" + is_in_expr + " IN " + x_expr + ")"
 
 
-# noinspection PyUnusedLocal
 def _db_count_expr(dbmodel, expression):
     """Count number of non-null entries (as in Pandas)"""
     if len(expression.args) != 1:
@@ -302,12 +301,32 @@ def _db_coalesce_expr(dbmodel, expression):
     )
 
 
+def _db_pow_expr(dbmodel, expression):
+    if isinstance(expression.args[1], data_algebra.expr_rep.Value) and (expression.args[1].value == 1):
+        return dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
+    return (
+        "POWER("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ", "
+        + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
+        + ")"
+    )
+
+
 def _db_round_expr(dbmodel, expression):
     return (
         "ROUND("
         + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
         + ")"
     )
+
+
+def _db_around_expr(dbmodel, expression):
+    if isinstance(expression.args[1], data_algebra.expr_rep.Value) and (expression.args[1].value == 0):
+        return dbmodel.expr_to_sql(expression.args[0].round(), want_inline_parens=False)
+    mult = data_algebra.expr_rep.Value(10.0).__pow__(expression.args[1])
+    derived = (expression.args[0] * mult).round() / mult
+    return dbmodel.expr_to_sql(derived, want_inline_parens=True)
 
 
 def _db_floor_expr(dbmodel, expression):
@@ -330,16 +349,6 @@ def _db_int_divide_expr(dbmodel, expression):
     # example of a derived expression
     ratio = (expression.args[0] / expression.args[1]).floor()
     return dbmodel.expr_to_sql(ratio, want_inline_parens=False)
-
-
-def _db_pow_expr(dbmodel, expression):
-    return (
-        "POWER("
-        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
-        + ", "
-        + dbmodel.expr_to_sql(expression.args[1], want_inline_parens=False)
-        + ")"
-    )
 
 
 def _db_nunique_expr(dbmodel, expression):
@@ -535,6 +544,7 @@ db_expr_formatters = {
     "concat": _db_concat_expr,
     "coalesce": _db_coalesce_expr,
     "round": _db_round_expr,
+    "around": _db_around_expr,
     "floor": _db_floor_expr,
     "ceil": _db_ceil_expr,
     "//": _db_int_divide_expr,
