@@ -64,16 +64,19 @@
                                 <a class="function" href="#OperatorPlatform.columns_produced">columns_produced</a>
                         </li>
                         <li>
-                                <a class="function" href="#OperatorPlatform.to_near_sql_implementation">to_near_sql_implementation</a>
+                                <a class="function" href="#OperatorPlatform.to_near_sql_implementation_">to_near_sql_implementation_</a>
                         </li>
                         <li>
-                                <a class="function" href="#OperatorPlatform.extend_parsed">extend_parsed</a>
+                                <a class="function" href="#OperatorPlatform.extend_parsed_">extend_parsed_</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#OperatorPlatform.project_parsed_">project_parsed_</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#OperatorPlatform.select_rows_parsed_">select_rows_parsed_</a>
                         </li>
                         <li>
                                 <a class="function" href="#OperatorPlatform.extend">extend</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#OperatorPlatform.project_parsed">project_parsed</a>
                         </li>
                         <li>
                                 <a class="function" href="#OperatorPlatform.project">project</a>
@@ -83,9 +86,6 @@
                         </li>
                         <li>
                                 <a class="function" href="#OperatorPlatform.concat_rows">concat_rows</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#OperatorPlatform.select_rows_parsed">select_rows_parsed</a>
                         </li>
                         <li>
                                 <a class="function" href="#OperatorPlatform.select_rows">select_rows</a>
@@ -154,6 +154,7 @@
 <span class="sd">Type defs for data operations.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 <span class="kn">import</span> <span class="nn">data_algebra.expr_rep</span>
 <span class="kn">import</span> <span class="nn">data_algebra.cdata</span>
 <span class="kn">import</span> <span class="nn">data_algebra.OrderedSet</span>
@@ -254,8 +255,8 @@
 <span class="sd">        Defined as return f(self, *args, **kwargs).</span>
 
 <span class="sd">        :param user_function: function to apply</span>
-<span class="sd">        :param *args: additional positional arguments</span>
-<span class="sd">        :param **kwargs: additional keyword arguments</span>
+<span class="sd">        :param args: additional positional arguments</span>
+<span class="sd">        :param kwargs: additional keyword arguments</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">user_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -285,57 +286,173 @@
     <span class="c1"># info</span>
 
     <span class="k">def</span> <span class="nf">columns_produced</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return list of columns produced by pipeline.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="c1"># query generation</span>
 
-    <span class="k">def</span> <span class="nf">to_near_sql_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert to NearSQL as a step in converting to a SQL string. Internal method.</span>
+
+<span class="sd">        :param db_model: database model</span>
+<span class="sd">        :param using: optional column restriction</span>
+<span class="sd">        :param temp_id_source: temporary id source.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
-    <span class="c1"># define builders for all non-initial ops types on base class</span>
-
-    <span class="k">def</span> <span class="nf">extend_parsed</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">extend_parsed_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">partition_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add new derived columns, can replace existing columns for parsed operations. Internal method.</span>
+
+<span class="sd">        :param parsed_ops: dictionary of calculations to perform.</span>
+<span class="sd">        :param partition_by: optional window partition specification.</span>
+<span class="sd">        :param order_by: optional window ordering specification.</span>
+<span class="sd">        :param reverse: optional order reversal specification.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">project_parsed_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute projection, or grouped calculation for parsed ops. Internal method.</span>
+
+<span class="sd">        :param parsed_ops: dictionary of calculations to perform, can be empty.</span>
+<span class="sd">        :param group_by: optional group key(s) specification.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">select_rows_parsed_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_expr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Select rows matching parsed expr criteria. Internal method.</span>
+
+<span class="sd">        :param parsed_expr: logical expression specifying desired rows.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+
+    <span class="c1"># main API</span>
 
     <span class="k">def</span> <span class="nf">extend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">partition_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add new derived columns, can replace existing columns.</span>
 
-    <span class="k">def</span> <span class="nf">project_parsed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="sd">        :param ops: dictionary of calculations to perform.</span>
+<span class="sd">        :param partition_by: optional window partition specification.</span>
+<span class="sd">        :param order_by: optional window ordering specification.</span>
+<span class="sd">        :param reverse: optional order reversal specification.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute projection, or grouped calculation.</span>
+
+<span class="sd">        :param ops: dictionary of calculations to perform, can be empty.</span>
+<span class="sd">        :param group_by: optional group key(s) specification.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">natural_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">by</span><span class="p">,</span> <span class="n">jointype</span><span class="p">,</span> <span class="n">check_all_common_keys_in_by</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Join self (left) results with b (right).</span>
+
+<span class="sd">        :param b: second or right table to join to.</span>
+<span class="sd">        :param by: list of join key column names.</span>
+<span class="sd">        :param jointype: name of join type.</span>
+<span class="sd">        :param check_all_common_keys_in_by: if True, raise if any non-key columns are common to tables.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">concat_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">id_column</span><span class="o">=</span><span class="s2">&quot;source_name&quot;</span><span class="p">,</span> <span class="n">a_name</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">b_name</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Union or concatenate rows of self with rows of b.</span>
 
-    <span class="k">def</span> <span class="nf">select_rows_parsed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_expr</span><span class="p">):</span>
+<span class="sd">        :param b: table with rows to add.</span>
+<span class="sd">        :param id_column: optional name for new source identification column.</span>
+<span class="sd">        :param a_name: source annotation to use for self/a.</span>
+<span class="sd">        :param b_name: source annotation to use for b.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">select_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Select rows matching expr criteria.</span>
+
+<span class="sd">        :param expr: logical expression specifying desired rows.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">drop_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_deletions</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove columns from result.</span>
+
+<span class="sd">        :param column_deletions: list of columns to remove.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">select_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Narrow to columns in result.</span>
+
+<span class="sd">        :param columns: list of columns to keep.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">rename_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_remapping</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">rename_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_remapping</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Rename columns.</span>
+
+<span class="sd">        :param column_remapping: dictionary mapping new column names to old column sources (same</span>
+<span class="sd">                                 direction as extend).</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">order_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Order rows by column set.</span>
+
+<span class="sd">        :param columns: columns to order by.</span>
+<span class="sd">        :param reverse: optional columns to reverse order.</span>
+<span class="sd">        :param limit: optional row limit to impose on result.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordMap</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply a record mapping taking blocks_in to blocks_out structures.</span>
+
+<span class="sd">        :param record_map: data_algebra.cdata.RecordMap transform specification</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">blocks_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">blocks_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply a record mapping taking blocks_in to blocks_out structures.</span>
+
+<span class="sd">        :param blocks_in: Optional incoming record specification</span>
+<span class="sd">        :param blocks_out: Optional incoming record specification</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span>  <span class="c1"># NO-OP, return source ops</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span>
@@ -346,28 +463,35 @@
 
     <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;sklearn interface, fit() is a noop&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
     <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;sklearn interface, fit() is a noop&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;sklearn interface, return columns&quot;&quot;&quot;</span>
         <span class="n">cp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">input_features</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">cp</span> <span class="o">=</span> <span class="n">cp</span> <span class="o">+</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">input_features</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cp</span><span class="p">]</span>
+            <span class="n">cp_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
+            <span class="n">cp</span> <span class="o">=</span> <span class="n">cp</span> <span class="o">+</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">input_features</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cp_set</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">cp</span>
 
     <span class="c1"># noinspection PyUnusedLocal,PyMethodMayBeStatic</span>
     <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;sklearn interface, noop&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;sklearn interface, noop&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;sklearn interface, raise&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;data_algebra does not support inverse_transform&quot;</span><span class="p">)</span>
 </pre></div>
 
@@ -480,8 +604,8 @@
 <span class="sd">        Defined as return f(self, *args, **kwargs).</span>
 
 <span class="sd">        :param user_function: function to apply</span>
-<span class="sd">        :param *args: additional positional arguments</span>
-<span class="sd">        :param **kwargs: additional keyword arguments</span>
+<span class="sd">        :param args: additional positional arguments</span>
+<span class="sd">        :param kwargs: additional keyword arguments</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">user_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -511,57 +635,173 @@
     <span class="c1"># info</span>
 
     <span class="k">def</span> <span class="nf">columns_produced</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return list of columns produced by pipeline.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="c1"># query generation</span>
 
-    <span class="k">def</span> <span class="nf">to_near_sql_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert to NearSQL as a step in converting to a SQL string. Internal method.</span>
+
+<span class="sd">        :param db_model: database model</span>
+<span class="sd">        :param using: optional column restriction</span>
+<span class="sd">        :param temp_id_source: temporary id source.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
-    <span class="c1"># define builders for all non-initial ops types on base class</span>
-
-    <span class="k">def</span> <span class="nf">extend_parsed</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">extend_parsed_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">partition_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add new derived columns, can replace existing columns for parsed operations. Internal method.</span>
+
+<span class="sd">        :param parsed_ops: dictionary of calculations to perform.</span>
+<span class="sd">        :param partition_by: optional window partition specification.</span>
+<span class="sd">        :param order_by: optional window ordering specification.</span>
+<span class="sd">        :param reverse: optional order reversal specification.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">project_parsed_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute projection, or grouped calculation for parsed ops. Internal method.</span>
+
+<span class="sd">        :param parsed_ops: dictionary of calculations to perform, can be empty.</span>
+<span class="sd">        :param group_by: optional group key(s) specification.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">select_rows_parsed_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_expr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Select rows matching parsed expr criteria. Internal method.</span>
+
+<span class="sd">        :param parsed_expr: logical expression specifying desired rows.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+
+    <span class="c1"># main API</span>
 
     <span class="k">def</span> <span class="nf">extend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">partition_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add new derived columns, can replace existing columns.</span>
 
-    <span class="k">def</span> <span class="nf">project_parsed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="sd">        :param ops: dictionary of calculations to perform.</span>
+<span class="sd">        :param partition_by: optional window partition specification.</span>
+<span class="sd">        :param order_by: optional window ordering specification.</span>
+<span class="sd">        :param reverse: optional order reversal specification.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute projection, or grouped calculation.</span>
+
+<span class="sd">        :param ops: dictionary of calculations to perform, can be empty.</span>
+<span class="sd">        :param group_by: optional group key(s) specification.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">natural_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">by</span><span class="p">,</span> <span class="n">jointype</span><span class="p">,</span> <span class="n">check_all_common_keys_in_by</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Join self (left) results with b (right).</span>
+
+<span class="sd">        :param b: second or right table to join to.</span>
+<span class="sd">        :param by: list of join key column names.</span>
+<span class="sd">        :param jointype: name of join type.</span>
+<span class="sd">        :param check_all_common_keys_in_by: if True, raise if any non-key columns are common to tables.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">concat_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">id_column</span><span class="o">=</span><span class="s2">&quot;source_name&quot;</span><span class="p">,</span> <span class="n">a_name</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">b_name</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Union or concatenate rows of self with rows of b.</span>
 
-    <span class="k">def</span> <span class="nf">select_rows_parsed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_expr</span><span class="p">):</span>
+<span class="sd">        :param b: table with rows to add.</span>
+<span class="sd">        :param id_column: optional name for new source identification column.</span>
+<span class="sd">        :param a_name: source annotation to use for self/a.</span>
+<span class="sd">        :param b_name: source annotation to use for b.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">select_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Select rows matching expr criteria.</span>
+
+<span class="sd">        :param expr: logical expression specifying desired rows.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">drop_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_deletions</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove columns from result.</span>
+
+<span class="sd">        :param column_deletions: list of columns to remove.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">select_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Narrow to columns in result.</span>
+
+<span class="sd">        :param columns: list of columns to keep.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">rename_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_remapping</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">rename_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_remapping</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Rename columns.</span>
+
+<span class="sd">        :param column_remapping: dictionary mapping new column names to old column sources (same</span>
+<span class="sd">                                 direction as extend).</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">order_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Order rows by column set.</span>
+
+<span class="sd">        :param columns: columns to order by.</span>
+<span class="sd">        :param reverse: optional columns to reverse order.</span>
+<span class="sd">        :param limit: optional row limit to impose on result.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordMap</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply a record mapping taking blocks_in to blocks_out structures.</span>
+
+<span class="sd">        :param record_map: data_algebra.cdata.RecordMap transform specification</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">blocks_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">blocks_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply a record mapping taking blocks_in to blocks_out structures.</span>
+
+<span class="sd">        :param blocks_in: Optional incoming record specification</span>
+<span class="sd">        :param blocks_out: Optional incoming record specification</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span>  <span class="c1"># NO-OP, return source ops</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span>
@@ -572,28 +812,35 @@
 
     <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;sklearn interface, fit() is a noop&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
     <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;sklearn interface, fit() is a noop&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;sklearn interface, return columns&quot;&quot;&quot;</span>
         <span class="n">cp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">input_features</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">cp</span> <span class="o">=</span> <span class="n">cp</span> <span class="o">+</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">input_features</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cp</span><span class="p">]</span>
+            <span class="n">cp_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
+            <span class="n">cp</span> <span class="o">=</span> <span class="n">cp</span> <span class="o">+</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">input_features</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cp_set</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">cp</span>
 
     <span class="c1"># noinspection PyUnusedLocal,PyMethodMayBeStatic</span>
     <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;sklearn interface, noop&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;sklearn interface, noop&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;sklearn interface, raise&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;data_algebra does not support inverse_transform&quot;</span><span class="p">)</span>
 </pre></div>
 
@@ -800,8 +1047,8 @@
 <span class="sd">        Defined as return f(self, *args, **kwargs).</span>
 
 <span class="sd">        :param user_function: function to apply</span>
-<span class="sd">        :param *args: additional positional arguments</span>
-<span class="sd">        :param **kwargs: additional keyword arguments</span>
+<span class="sd">        :param args: additional positional arguments</span>
+<span class="sd">        :param kwargs: additional keyword arguments</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">user_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
@@ -812,8 +1059,8 @@
 Defined as return f(self, <em>args, *</em>kwargs).</p>
 
 <p>:param user_function: function to apply
-:param <em>args: additional positional arguments
-:param *</em>kwargs: additional keyword arguments</p>
+:param args: additional positional arguments
+:param kwargs: additional keyword arguments</p>
 </div>
 
 
@@ -890,52 +1137,151 @@ raise an exception if the values are not consistent.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">columns_produced</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return list of columns produced by pipeline.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Return list of columns produced by pipeline.</p>
+</div>
+
 
                             </div>
-                            <div id="OperatorPlatform.to_near_sql_implementation" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#OperatorPlatform.to_near_sql_implementation">#&nbsp;&nbsp</a>
+                            <div id="OperatorPlatform.to_near_sql_implementation_" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OperatorPlatform.to_near_sql_implementation_">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">to_near_sql_implementation</span><span class="signature">(self, db_model, *, using, temp_id_source)</span>:
+            <span class="name">to_near_sql_implementation_</span><span class="signature">(self, db_model, *, using, temp_id_source)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_near_sql_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert to NearSQL as a step in converting to a SQL string. Internal method.</span>
+
+<span class="sd">        :param db_model: database model</span>
+<span class="sd">        :param using: optional column restriction</span>
+<span class="sd">        :param temp_id_source: temporary id source.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Convert to NearSQL as a step in converting to a SQL string. Internal method.</p>
+
+<p>:param db_model: database model
+:param using: optional column restriction
+:param temp_id_source: temporary id source.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
-                            <div id="OperatorPlatform.extend_parsed" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#OperatorPlatform.extend_parsed">#&nbsp;&nbsp</a>
+                            <div id="OperatorPlatform.extend_parsed_" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OperatorPlatform.extend_parsed_">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">extend_parsed</span><span class="signature">(self, parsed_ops, *, partition_by=None, order_by=None, reverse=None)</span>:
+            <span class="name">extend_parsed_</span><span class="signature">(self, parsed_ops, *, partition_by=None, order_by=None, reverse=None)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">extend_parsed</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">extend_parsed_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">partition_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add new derived columns, can replace existing columns for parsed operations. Internal method.</span>
+
+<span class="sd">        :param parsed_ops: dictionary of calculations to perform.</span>
+<span class="sd">        :param partition_by: optional window partition specification.</span>
+<span class="sd">        :param order_by: optional window ordering specification.</span>
+<span class="sd">        :param reverse: optional order reversal specification.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Add new derived columns, can replace existing columns for parsed operations. Internal method.</p>
+
+<p>:param parsed_ops: dictionary of calculations to perform.
+:param partition_by: optional window partition specification.
+:param order_by: optional window ordering specification.
+:param reverse: optional order reversal specification.
+:return: compose operator directed acyclic graph</p>
+</div>
+
+
+                            </div>
+                            <div id="OperatorPlatform.project_parsed_" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OperatorPlatform.project_parsed_">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">project_parsed_</span><span class="signature">(self, parsed_ops=None, *, group_by=None)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">project_parsed_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute projection, or grouped calculation for parsed ops. Internal method.</span>
+
+<span class="sd">        :param parsed_ops: dictionary of calculations to perform, can be empty.</span>
+<span class="sd">        :param group_by: optional group key(s) specification.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Compute projection, or grouped calculation for parsed ops. Internal method.</p>
+
+<p>:param parsed_ops: dictionary of calculations to perform, can be empty.
+:param group_by: optional group key(s) specification.
+:return: compose operator directed acyclic graph</p>
+</div>
+
+
+                            </div>
+                            <div id="OperatorPlatform.select_rows_parsed_" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OperatorPlatform.select_rows_parsed_">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">select_rows_parsed_</span><span class="signature">(self, parsed_expr)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">select_rows_parsed_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_expr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Select rows matching parsed expr criteria. Internal method.</span>
+
+<span class="sd">        :param parsed_expr: logical expression specifying desired rows.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Select rows matching parsed expr criteria. Internal method.</p>
+
+<p>:param parsed_expr: logical expression specifying desired rows.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OperatorPlatform.extend" class="classattr">
@@ -949,31 +1295,29 @@ raise an exception if the values are not consistent.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">extend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">partition_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add new derived columns, can replace existing columns.</span>
+
+<span class="sd">        :param ops: dictionary of calculations to perform.</span>
+<span class="sd">        :param partition_by: optional window partition specification.</span>
+<span class="sd">        :param order_by: optional window ordering specification.</span>
+<span class="sd">        :param reverse: optional order reversal specification.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Add new derived columns, can replace existing columns.</p>
 
-                            </div>
-                            <div id="OperatorPlatform.project_parsed" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#OperatorPlatform.project_parsed">#&nbsp;&nbsp</a>
+<p>:param ops: dictionary of calculations to perform.
+:param partition_by: optional window partition specification.
+:param order_by: optional window ordering specification.
+:param reverse: optional order reversal specification.
+:return: compose operator directed acyclic graph</p>
+</div>
 
-        
-            <span class="def">def</span>
-            <span class="name">project_parsed</span><span class="signature">(self, parsed_ops=None, *, group_by=None)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">project_parsed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-    
 
                             </div>
                             <div id="OperatorPlatform.project" class="classattr">
@@ -987,12 +1331,25 @@ raise an exception if the values are not consistent.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute projection, or grouped calculation.</span>
+
+<span class="sd">        :param ops: dictionary of calculations to perform, can be empty.</span>
+<span class="sd">        :param group_by: optional group key(s) specification.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Compute projection, or grouped calculation.</p>
+
+<p>:param ops: dictionary of calculations to perform, can be empty.
+:param group_by: optional group key(s) specification.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OperatorPlatform.natural_join" class="classattr">
@@ -1006,12 +1363,29 @@ raise an exception if the values are not consistent.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">natural_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">by</span><span class="p">,</span> <span class="n">jointype</span><span class="p">,</span> <span class="n">check_all_common_keys_in_by</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Join self (left) results with b (right).</span>
+
+<span class="sd">        :param b: second or right table to join to.</span>
+<span class="sd">        :param by: list of join key column names.</span>
+<span class="sd">        :param jointype: name of join type.</span>
+<span class="sd">        :param check_all_common_keys_in_by: if True, raise if any non-key columns are common to tables.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Join self (left) results with b (right).</p>
+
+<p>:param b: second or right table to join to.
+:param by: list of join key column names.
+:param jointype: name of join type.
+:param check_all_common_keys_in_by: if True, raise if any non-key columns are common to tables.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OperatorPlatform.concat_rows" class="classattr">
@@ -1025,31 +1399,29 @@ raise an exception if the values are not consistent.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">concat_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">id_column</span><span class="o">=</span><span class="s2">&quot;source_name&quot;</span><span class="p">,</span> <span class="n">a_name</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">b_name</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Union or concatenate rows of self with rows of b.</span>
+
+<span class="sd">        :param b: table with rows to add.</span>
+<span class="sd">        :param id_column: optional name for new source identification column.</span>
+<span class="sd">        :param a_name: source annotation to use for self/a.</span>
+<span class="sd">        :param b_name: source annotation to use for b.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Union or concatenate rows of self with rows of b.</p>
 
-                            </div>
-                            <div id="OperatorPlatform.select_rows_parsed" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#OperatorPlatform.select_rows_parsed">#&nbsp;&nbsp</a>
+<p>:param b: table with rows to add.
+:param id_column: optional name for new source identification column.
+:param a_name: source annotation to use for self/a.
+:param b_name: source annotation to use for b.
+:return: compose operator directed acyclic graph</p>
+</div>
 
-        
-            <span class="def">def</span>
-            <span class="name">select_rows_parsed</span><span class="signature">(self, parsed_expr)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">select_rows_parsed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_expr</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-    
 
                             </div>
                             <div id="OperatorPlatform.select_rows" class="classattr">
@@ -1063,12 +1435,23 @@ raise an exception if the values are not consistent.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">select_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Select rows matching expr criteria.</span>
+
+<span class="sd">        :param expr: logical expression specifying desired rows.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Select rows matching expr criteria.</p>
+
+<p>:param expr: logical expression specifying desired rows.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OperatorPlatform.drop_columns" class="classattr">
@@ -1082,12 +1465,23 @@ raise an exception if the values are not consistent.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">drop_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_deletions</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove columns from result.</span>
+
+<span class="sd">        :param column_deletions: list of columns to remove.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Remove columns from result.</p>
+
+<p>:param column_deletions: list of columns to remove.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OperatorPlatform.select_columns" class="classattr">
@@ -1101,12 +1495,23 @@ raise an exception if the values are not consistent.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">select_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Narrow to columns in result.</span>
+
+<span class="sd">        :param columns: list of columns to keep.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Narrow to columns in result.</p>
+
+<p>:param columns: list of columns to keep.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OperatorPlatform.rename_columns" class="classattr">
@@ -1114,18 +1519,31 @@ raise an exception if the values are not consistent.</p>
 
         
             <span class="def">def</span>
-            <span class="name">rename_columns</span><span class="signature">(self, column_remapping)</span>:
+            <span class="name">rename_columns</span><span class="signature">(self, column_remapping: Dict[str, str])</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">rename_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_remapping</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">rename_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_remapping</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Rename columns.</span>
+
+<span class="sd">        :param column_remapping: dictionary mapping new column names to old column sources (same</span>
+<span class="sd">                                 direction as extend).</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Rename columns.</p>
+
+<p>:param column_remapping: dictionary mapping new column names to old column sources (same
+                         direction as extend).
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OperatorPlatform.order_rows" class="classattr">
@@ -1139,12 +1557,27 @@ raise an exception if the values are not consistent.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">order_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Order rows by column set.</span>
+
+<span class="sd">        :param columns: columns to order by.</span>
+<span class="sd">        :param reverse: optional columns to reverse order.</span>
+<span class="sd">        :param limit: optional row limit to impose on result.</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Order rows by column set.</p>
+
+<p>:param columns: columns to order by.
+:param reverse: optional columns to reverse order.
+:param limit: optional row limit to impose on result.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OperatorPlatform.convert_records" class="classattr">
@@ -1152,18 +1585,29 @@ raise an exception if the values are not consistent.</p>
 
         
             <span class="def">def</span>
-            <span class="name">convert_records</span><span class="signature">(self, record_map)</span>:
+            <span class="name">convert_records</span><span class="signature">(self, record_map: <a href="cdata.html#RecordMap">data_algebra.cdata.RecordMap</a>)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">convert_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_map</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordMap</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply a record mapping taking blocks_in to blocks_out structures.</span>
+
+<span class="sd">        :param record_map: data_algebra.cdata.RecordMap transform specification</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Apply a record mapping taking blocks_in to blocks_out structures.</p>
+
+<p>:param record_map: <a href="cdata.html#RecordMap">data_algebra.cdata.RecordMap</a> transform specification
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OperatorPlatform.map_records" class="classattr">
@@ -1171,12 +1615,26 @@ raise an exception if the values are not consistent.</p>
 
         
             <span class="def">def</span>
-            <span class="name">map_records</span><span class="signature">(self, blocks_in=None, blocks_out=None)</span>:
+            <span class="name">map_records</span><span class="signature">(
+    self,
+    blocks_in: Optional[<a href="cdata.html#RecordSpecification">data_algebra.cdata.RecordSpecification</a>] = None,
+    blocks_out: Optional[<a href="cdata.html#RecordSpecification">data_algebra.cdata.RecordSpecification</a>] = None
+)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">map_records</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">blocks_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">blocks_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply a record mapping taking blocks_in to blocks_out structures.</span>
+
+<span class="sd">        :param blocks_in: Optional incoming record specification</span>
+<span class="sd">        :param blocks_out: Optional incoming record specification</span>
+<span class="sd">        :return: compose operator directed acyclic graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span>  <span class="c1"># NO-OP, return source ops</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_records</span><span class="p">(</span>
@@ -1186,7 +1644,13 @@ raise an exception if the values are not consistent.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>Apply a record mapping taking blocks_in to blocks_out structures.</p>
+
+<p>:param blocks_in: Optional incoming record specification
+:param blocks_out: Optional incoming record specification
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OperatorPlatform.fit" class="classattr">
@@ -1200,12 +1664,15 @@ raise an exception if the values are not consistent.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;sklearn interface, fit() is a noop&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>sklearn interface, fit() is a noop</p>
+</div>
+
 
                             </div>
                             <div id="OperatorPlatform.fit_transform" class="classattr">
@@ -1219,13 +1686,16 @@ raise an exception if the values are not consistent.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;sklearn interface, fit() is a noop&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>sklearn interface, fit() is a noop</p>
+</div>
+
 
                             </div>
                             <div id="OperatorPlatform.get_feature_names" class="classattr">
@@ -1239,15 +1709,19 @@ raise an exception if the values are not consistent.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;sklearn interface, return columns&quot;&quot;&quot;</span>
         <span class="n">cp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">input_features</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">cp</span> <span class="o">=</span> <span class="n">cp</span> <span class="o">+</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">input_features</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cp</span><span class="p">]</span>
+            <span class="n">cp_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
+            <span class="n">cp</span> <span class="o">=</span> <span class="n">cp</span> <span class="o">+</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">input_features</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cp_set</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">cp</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>sklearn interface, return columns</p>
+</div>
+
 
                             </div>
                             <div id="OperatorPlatform.get_params" class="classattr">
@@ -1261,12 +1735,15 @@ raise an exception if the values are not consistent.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;sklearn interface, noop&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>sklearn interface, noop</p>
+</div>
+
 
                             </div>
                             <div id="OperatorPlatform.set_params" class="classattr">
@@ -1280,12 +1757,15 @@ raise an exception if the values are not consistent.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;sklearn interface, noop&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>sklearn interface, noop</p>
+</div>
+
 
                             </div>
                             <div id="OperatorPlatform.inverse_transform" class="classattr">
@@ -1299,12 +1779,15 @@ raise an exception if the values are not consistent.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;sklearn interface, raise&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;data_algebra does not support inverse_transform&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>sklearn interface, raise</p>
+</div>
+
 
                             </div>
                 </section>

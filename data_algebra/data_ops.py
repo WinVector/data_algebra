@@ -166,9 +166,13 @@ class ViewRepresentation(OperatorPlatform, ABC):
                     visit_stack.append(s)
         return tables
 
-    def columns_used_from_sources(self, using=None):
-        """Get column names used from direct source nodes when this ops is executed
-        with the using columns (None means all)."""
+    def columns_used_from_sources(self, using: Optional[set] = None) -> List:
+        """
+        Get columns used from sources. Internal method.
+
+        :param using: optional column restriction.
+        :return: list of order sets (list parallel to sources).
+        """
         raise NotImplementedError("base method called")
 
     def columns_produced(self):
@@ -971,7 +975,13 @@ class TableDescription(ViewRepresentation):
             raise ValueError("Expected data_model to not be None")
         return data_model.table_step(op=self, data_map=data_map, narrow=narrow)
 
-    def columns_used_from_sources(self, using=None):
+    def columns_used_from_sources(self, using: Optional[set] = None) -> List:
+        """
+        Get columns used from sources. Internal method.
+
+        :param using: optional column restriction.
+        :return: list of order sets (list parallel to sources).
+        """
         return []  # no inputs to table description
 
     def to_near_sql_implementation_(
@@ -1113,6 +1123,9 @@ def data(*args, **kwargs):
 
 
 class ExtendNode(ViewRepresentation):
+    """
+    Class representation of .extend() method/step.
+    """
     def __init__(
         self, *, source, parsed_ops, partition_by=None, order_by=None, reverse=None
     ):
@@ -1267,7 +1280,10 @@ class ExtendNode(ViewRepresentation):
                 return False
         return True
 
-    def check_extend_window_fns(self):
+    def check_extend_window_fns_(self):
+        """
+        Confirm extend functions are all compatible with windowing in Pandas. Internal function.
+        """
         window_situation = (len(self.partition_by) > 0) or (len(self.order_by) > 0)
         if window_situation:
             # check these are forms we are prepared to work with
@@ -1293,7 +1309,13 @@ class ExtendNode(ViewRepresentation):
                                 + str(opk)
                             )
 
-    def columns_used_from_sources(self, using=None):
+    def columns_used_from_sources(self, using: Optional[set] = None) -> List:
+        """
+        Get columns used from sources. Internal method.
+
+        :param using: optional column restriction.
+        :return: list of order sets (list parallel to sources).
+        """
         if using is None:
             return [OrderedSet(self.sources[0].column_names)]
         subops = {k: op for (k, op) in self.ops.items() if k in using}
@@ -1378,6 +1400,9 @@ class ExtendNode(ViewRepresentation):
 
 
 class ProjectNode(ViewRepresentation):
+    """
+    Class representation of .project() method/step.
+    """
     # TODO: should project to take an optional order for last() style calculations?
     def __init__(self, *, source, parsed_ops, group_by=None):
         self.ops = parsed_ops
@@ -1481,7 +1506,13 @@ class ProjectNode(ViewRepresentation):
                 return False
         return True
 
-    def columns_used_from_sources(self, using=None):
+    def columns_used_from_sources(self, using: Optional[set] = None) -> List:
+        """
+        Get columns used from sources. Internal method.
+
+        :param using: optional column restriction.
+        :return: list of order sets (list parallel to sources).
+        """
         if using is None:
             subops = self.ops
         else:
@@ -1560,6 +1591,9 @@ class ProjectNode(ViewRepresentation):
 
 
 class SelectRowsNode(ViewRepresentation):
+    """
+    Class representation of .select() method/step.
+    """
     expr: data_algebra.expr_rep.Expression
     decision_columns: Set[str]
 
@@ -1601,7 +1635,13 @@ class SelectRowsNode(ViewRepresentation):
             return False
         return True
 
-    def columns_used_from_sources(self, using=None):
+    def columns_used_from_sources(self, using: Optional[set] = None) -> List:
+        """
+        Get columns used from sources. Internal method.
+
+        :param using: optional column restriction.
+        :return: list of order sets (list parallel to sources).
+        """
         columns_we_take = OrderedSet(self.sources[0].column_names)
         if using is None:
             return [columns_we_take]
@@ -1661,6 +1701,9 @@ class SelectRowsNode(ViewRepresentation):
 
 
 class SelectColumnsNode(ViewRepresentation):
+    """
+    Class representation of .select_columns() method/step.
+    """
     column_selection: List[str]
 
     def __init__(self, source, columns):
@@ -1715,7 +1758,13 @@ class SelectColumnsNode(ViewRepresentation):
             return False
         return True
 
-    def columns_used_from_sources(self, using=None):
+    def columns_used_from_sources(self, using: Optional[set] = None) -> List:
+        """
+        Get columns used from sources. Internal method.
+
+        :param using: optional column restriction.
+        :return: list of order sets (list parallel to sources).
+        """
         cols = set(self.column_selection.copy())
         if using is None:
             return [cols]
@@ -1773,6 +1822,9 @@ class SelectColumnsNode(ViewRepresentation):
 
 
 class DropColumnsNode(ViewRepresentation):
+    """
+    Class representation of .drop_columns() method/step.
+    """
     column_deletions: List[str]
 
     def __init__(self, source, column_deletions):
@@ -1828,7 +1880,13 @@ class DropColumnsNode(ViewRepresentation):
             return False
         return True
 
-    def columns_used_from_sources(self, using=None):
+    def columns_used_from_sources(self, using: Optional[set] = None) -> List:
+        """
+        Get columns used from sources. Internal method.
+
+        :param using: optional column restriction.
+        :return: list of order sets (list parallel to sources).
+        """
         if using is None:
             using = set(self.sources[0].column_names)
         return [set([c for c in using if c not in self.column_deletions])]
@@ -1885,6 +1943,9 @@ class DropColumnsNode(ViewRepresentation):
 
 
 class OrderRowsNode(ViewRepresentation):
+    """
+    Class representation of .order_rows() method/step.
+    """
     order_columns: List[str]
     reverse: List[str]
 
@@ -1938,7 +1999,13 @@ class OrderRowsNode(ViewRepresentation):
             return False
         return True
 
-    def columns_used_from_sources(self, using=None):
+    def columns_used_from_sources(self, using: Optional[set] = None) -> List:
+        """
+        Get columns used from sources. Internal method.
+
+        :param using: optional column restriction.
+        :return: list of order sets (list parallel to sources).
+        """
         cols = set(self.column_names)
         if using is None:
             return [cols]
@@ -2010,6 +2077,9 @@ class OrderRowsNode(ViewRepresentation):
 
 
 class RenameColumnsNode(ViewRepresentation):
+    """
+    Class representation of .rename_columns() method/step.
+    """
     column_remapping: Dict[str, str]
     reverse_mapping: Dict[str, str]
     mapped_columns: Set[str]
@@ -2082,14 +2152,20 @@ class RenameColumnsNode(ViewRepresentation):
             return False
         return True
 
-    def columns_used_from_sources(self, using=None):
+    def columns_used_from_sources(self, using: Optional[set] = None) -> List:
+        """
+        Get columns used from sources. Internal method.
+
+        :param using: optional column restriction.
+        :return: list of order sets (list parallel to sources).
+        """
         if using is None:
             using = self.column_names
         cols = [
             (k if k not in self.column_remapping.keys() else self.column_remapping[k])
             for k in using
         ]
-        return [set(cols)]
+        return [OrderedSet(cols)]
 
     def to_python_src_(self, *, indent=0, strict=True, print_sources=True):
         """
@@ -2143,6 +2219,9 @@ class RenameColumnsNode(ViewRepresentation):
 
 
 class NaturalJoinNode(ViewRepresentation):
+    """
+    Class representation of .natural_join() method/step.
+    """
     by: List[str]
     jointype: str
 
@@ -2233,7 +2312,13 @@ class NaturalJoinNode(ViewRepresentation):
             return False
         return True
 
-    def columns_used_from_sources(self, using=None):
+    def columns_used_from_sources(self, using: Optional[set] = None) -> List:
+        """
+        Get columns used from sources. Internal method.
+
+        :param using: optional column restriction.
+        :return: list of order sets (list parallel to sources).
+        """
         if using is None:
             return [OrderedSet(self.sources[i].column_names) for i in range(2)]
         using = using.union(self.by)
@@ -2306,6 +2391,9 @@ class NaturalJoinNode(ViewRepresentation):
 
 
 class ConcatRowsNode(ViewRepresentation):
+    """
+    Class representation of .concat_rows() method/step.
+    """
     id_column: Union[str, None]
 
     def __init__(self, a, b, *, id_column="table_name", a_name="a", b_name="b"):
@@ -2367,7 +2455,13 @@ class ConcatRowsNode(ViewRepresentation):
             return False
         return True
 
-    def columns_used_from_sources(self, using=None):
+    def columns_used_from_sources(self, using: Optional[set] = None) -> List:
+        """
+        Get columns used from sources. Internal method.
+
+        :param using: optional column restriction.
+        :return: list of order sets (list parallel to sources).
+        """
         if using is None:
             return [OrderedSet(self.sources[i].column_names) for i in range(2)]
         return [
@@ -2445,6 +2539,9 @@ class ConcatRowsNode(ViewRepresentation):
 
 
 class ConvertRecordsNode(ViewRepresentation):
+    """
+    Class representation of .convert_records() method/step.
+    """
     def __init__(self, *, source, record_map):
         sources = [source]
         self.record_map = record_map
@@ -2478,7 +2575,13 @@ class ConvertRecordsNode(ViewRepresentation):
             return False
         return True
 
-    def columns_used_from_sources(self, using=None):
+    def columns_used_from_sources(self, using: Optional[set] = None) -> List:
+        """
+        Get columns used from sources. Internal method.
+
+        :param using: optional column restriction.
+        :return: list of order sets (list parallel to sources).
+        """
         return [self.record_map.columns_needed]
 
     def to_python_src_(self, *, indent=0, strict=True, print_sources=True):
@@ -2575,6 +2678,9 @@ class ConvertRecordsNode(ViewRepresentation):
 
 
 class SQLNode(ViewRepresentation):
+    """
+    Class representation of user SQL step in pipeline. Can be used to start a pipeline instead of a TableDescription.
+    """
     def __init__(
         self, *, sql: Union[str, List[str]], column_names: List[str], view_name: str
     ):
@@ -2613,9 +2719,17 @@ class SQLNode(ViewRepresentation):
         return True
 
     def get_tables(self):
+        """Get a dictionary of all tables used in an operator DAG,
+        raise an exception if the values are not consistent."""
         return dict()
 
-    def columns_used_from_sources(self, using=None):
+    def columns_used_from_sources(self, using: Optional[set] = None) -> List:
+        """
+        Get columns used from sources. Internal method.
+
+        :param using: optional column restriction.
+        :return: list of order sets (list parallel to sources).
+        """
         return []
 
     def to_python_src_(self, *, indent=0, strict=True, print_sources=True):

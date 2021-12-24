@@ -67,16 +67,16 @@
                                 <a class="function" href="#OpC.columns_produced">columns_produced</a>
                         </li>
                         <li>
-                                <a class="function" href="#OpC.to_near_sql_implementation">to_near_sql_implementation</a>
+                                <a class="function" href="#OpC.to_near_sql_implementation_">to_near_sql_implementation_</a>
                         </li>
                         <li>
-                                <a class="function" href="#OpC.extend_parsed">extend_parsed</a>
+                                <a class="function" href="#OpC.extend_parsed_">extend_parsed_</a>
                         </li>
                         <li>
                                 <a class="function" href="#OpC.extend">extend</a>
                         </li>
                         <li>
-                                <a class="function" href="#OpC.project_parsed">project_parsed</a>
+                                <a class="function" href="#OpC.project_parsed_">project_parsed_</a>
                         </li>
                         <li>
                                 <a class="function" href="#OpC.project">project</a>
@@ -88,7 +88,7 @@
                                 <a class="function" href="#OpC.concat_rows">concat_rows</a>
                         </li>
                         <li>
-                                <a class="function" href="#OpC.select_rows_parsed">select_rows_parsed</a>
+                                <a class="function" href="#OpC.select_rows_parsed_">select_rows_parsed_</a>
                         </li>
                         <li>
                                 <a class="function" href="#OpC.select_rows">select_rows</a>
@@ -260,18 +260,18 @@
 
     <span class="c1"># query generation</span>
 
-    <span class="k">def</span> <span class="nf">to_near_sql_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">to_near_sql_implementation_</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
 
     <span class="c1"># define builders for all non-initial ops types on base class</span>
 
-    <span class="k">def</span> <span class="nf">extend_parsed</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">extend_parsed_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">partition_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">extend_parsed</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">extend_parsed_</span><span class="p">(</span>
                 <span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span>
                 <span class="n">partition_by</span><span class="o">=</span><span class="n">partition_by</span><span class="p">,</span>
                 <span class="n">order_by</span><span class="o">=</span><span class="n">order_by</span><span class="p">,</span>
@@ -288,8 +288,8 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">project_parsed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">project_parsed</span><span class="p">(</span><span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">project_parsed_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">project_parsed_</span><span class="p">(</span><span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -313,8 +313,8 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">select_rows_parsed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_expr</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">select_rows_parsed</span><span class="p">(</span><span class="n">parsed_expr</span><span class="o">=</span><span class="n">parsed_expr</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">select_rows_parsed_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_expr</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">select_rows_parsed_</span><span class="p">(</span><span class="n">parsed_expr</span><span class="o">=</span><span class="n">parsed_expr</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">select_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">):</span>
@@ -481,18 +481,18 @@
 
     <span class="c1"># query generation</span>
 
-    <span class="k">def</span> <span class="nf">to_near_sql_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">to_near_sql_implementation_</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
 
     <span class="c1"># define builders for all non-initial ops types on base class</span>
 
-    <span class="k">def</span> <span class="nf">extend_parsed</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">extend_parsed_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">partition_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">extend_parsed</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">extend_parsed_</span><span class="p">(</span>
                 <span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span>
                 <span class="n">partition_by</span><span class="o">=</span><span class="n">partition_by</span><span class="p">,</span>
                 <span class="n">order_by</span><span class="o">=</span><span class="n">order_by</span><span class="p">,</span>
@@ -509,8 +509,8 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">project_parsed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">project_parsed</span><span class="p">(</span><span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">project_parsed_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">project_parsed_</span><span class="p">(</span><span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -534,8 +534,8 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">select_rows_parsed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_expr</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">select_rows_parsed</span><span class="p">(</span><span class="n">parsed_expr</span><span class="o">=</span><span class="n">parsed_expr</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">select_rows_parsed_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_expr</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">select_rows_parsed_</span><span class="p">(</span><span class="n">parsed_expr</span><span class="o">=</span><span class="n">parsed_expr</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">select_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">):</span>
@@ -868,45 +868,54 @@ raise an exception if the values are not consistent.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>Return list of columns produced by pipeline.</p>
+</div>
+
 
                             </div>
-                            <div id="OpC.to_near_sql_implementation" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#OpC.to_near_sql_implementation">#&nbsp;&nbsp</a>
+                            <div id="OpC.to_near_sql_implementation_" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OpC.to_near_sql_implementation_">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">to_near_sql_implementation</span><span class="signature">(self, db_model, *, using, temp_id_source)</span>:
+            <span class="name">to_near_sql_implementation_</span><span class="signature">(self, db_model, *, using, temp_id_source)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_near_sql_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">to_near_sql_implementation</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_near_sql_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">to_near_sql_implementation_</span><span class="p">(</span>
             <span class="n">db_model</span><span class="o">=</span><span class="n">db_model</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">using</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span>
         <span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Convert to NearSQL as a step in converting to a SQL string. Internal method.</p>
+
+<p>:param db_model: database model
+:param using: optional column restriction
+:param temp_id_source: temporary id source.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
-                            <div id="OpC.extend_parsed" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#OpC.extend_parsed">#&nbsp;&nbsp</a>
+                            <div id="OpC.extend_parsed_" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OpC.extend_parsed_">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">extend_parsed</span><span class="signature">(self, parsed_ops, *, partition_by=None, order_by=None, reverse=None)</span>:
+            <span class="name">extend_parsed_</span><span class="signature">(self, parsed_ops, *, partition_by=None, order_by=None, reverse=None)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">extend_parsed</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">extend_parsed_</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">partition_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">extend_parsed</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">extend_parsed_</span><span class="p">(</span>
                 <span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span>
                 <span class="n">partition_by</span><span class="o">=</span><span class="n">partition_by</span><span class="p">,</span>
                 <span class="n">order_by</span><span class="o">=</span><span class="n">order_by</span><span class="p">,</span>
@@ -918,7 +927,15 @@ raise an exception if the values are not consistent.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>Add new derived columns, can replace existing columns for parsed operations. Internal method.</p>
+
+<p>:param parsed_ops: dictionary of calculations to perform.
+:param partition_by: optional window partition specification.
+:param order_by: optional window ordering specification.
+:param reverse: optional order reversal specification.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OpC.extend" class="classattr">
@@ -942,27 +959,41 @@ raise an exception if the values are not consistent.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>Add new derived columns, can replace existing columns.</p>
+
+<p>:param ops: dictionary of calculations to perform.
+:param partition_by: optional window partition specification.
+:param order_by: optional window ordering specification.
+:param reverse: optional order reversal specification.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
-                            <div id="OpC.project_parsed" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#OpC.project_parsed">#&nbsp;&nbsp</a>
+                            <div id="OpC.project_parsed_" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OpC.project_parsed_">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">project_parsed</span><span class="signature">(self, parsed_ops=None, *, group_by=None)</span>:
+            <span class="name">project_parsed_</span><span class="signature">(self, parsed_ops=None, *, group_by=None)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">project_parsed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">project_parsed</span><span class="p">(</span><span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">))</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">project_parsed_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">project_parsed_</span><span class="p">(</span><span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Compute projection, or grouped calculation for parsed ops. Internal method.</p>
+
+<p>:param parsed_ops: dictionary of calculations to perform, can be empty.
+:param group_by: optional group key(s) specification.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OpC.project" class="classattr">
@@ -982,7 +1013,13 @@ raise an exception if the values are not consistent.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>Compute projection, or grouped calculation.</p>
+
+<p>:param ops: dictionary of calculations to perform, can be empty.
+:param group_by: optional group key(s) specification.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OpC.natural_join" class="classattr">
@@ -1009,7 +1046,15 @@ raise an exception if the values are not consistent.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>Join self (left) results with b (right).</p>
+
+<p>:param b: second or right table to join to.
+:param by: list of join key column names.
+:param jointype: name of join type.
+:param check_all_common_keys_in_by: if True, raise if any non-key columns are common to tables.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OpC.concat_rows" class="classattr">
@@ -1031,27 +1076,40 @@ raise an exception if the values are not consistent.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>Union or concatenate rows of self with rows of b.</p>
+
+<p>:param b: table with rows to add.
+:param id_column: optional name for new source identification column.
+:param a_name: source annotation to use for self/a.
+:param b_name: source annotation to use for b.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
-                            <div id="OpC.select_rows_parsed" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#OpC.select_rows_parsed">#&nbsp;&nbsp</a>
+                            <div id="OpC.select_rows_parsed_" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OpC.select_rows_parsed_">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">select_rows_parsed</span><span class="signature">(self, parsed_expr)</span>:
+            <span class="name">select_rows_parsed_</span><span class="signature">(self, parsed_expr)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">select_rows_parsed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_expr</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">select_rows_parsed</span><span class="p">(</span><span class="n">parsed_expr</span><span class="o">=</span><span class="n">parsed_expr</span><span class="p">))</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">select_rows_parsed_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_expr</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">select_rows_parsed_</span><span class="p">(</span><span class="n">parsed_expr</span><span class="o">=</span><span class="n">parsed_expr</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Select rows matching parsed expr criteria. Internal method.</p>
+
+<p>:param parsed_expr: logical expression specifying desired rows.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OpC.select_rows" class="classattr">
@@ -1071,7 +1129,12 @@ raise an exception if the values are not consistent.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>Select rows matching expr criteria.</p>
+
+<p>:param expr: logical expression specifying desired rows.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OpC.drop_columns" class="classattr">
@@ -1091,7 +1154,12 @@ raise an exception if the values are not consistent.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>Remove columns from result.</p>
+
+<p>:param column_deletions: list of columns to remove.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OpC.select_columns" class="classattr">
@@ -1111,7 +1179,12 @@ raise an exception if the values are not consistent.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>Narrow to columns in result.</p>
+
+<p>:param columns: list of columns to keep.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OpC.rename_columns" class="classattr">
@@ -1131,7 +1204,13 @@ raise an exception if the values are not consistent.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>Rename columns.</p>
+
+<p>:param column_remapping: dictionary mapping new column names to old column sources (same
+                         direction as extend).
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OpC.order_rows" class="classattr">
@@ -1151,7 +1230,14 @@ raise an exception if the values are not consistent.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>Order rows by column set.</p>
+
+<p>:param columns: columns to order by.
+:param reverse: optional columns to reverse order.
+:param limit: optional row limit to impose on result.
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OpC.convert_records" class="classattr">
@@ -1171,7 +1257,12 @@ raise an exception if the values are not consistent.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>Apply a record mapping taking blocks_in to blocks_out structures.</p>
+
+<p>:param record_map: <a href="cdata.html#RecordMap">data_algebra.cdata.RecordMap</a> transform specification
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OpC.map_records" class="classattr">
@@ -1193,7 +1284,13 @@ raise an exception if the values are not consistent.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>Apply a record mapping taking blocks_in to blocks_out structures.</p>
+
+<p>:param blocks_in: Optional incoming record specification
+:param blocks_out: Optional incoming record specification
+:return: compose operator directed acyclic graph</p>
+</div>
+
 
                             </div>
                             <div id="OpC.fit" class="classattr">
@@ -1213,7 +1310,9 @@ raise an exception if the values are not consistent.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>sklearn interface, fit() is a noop</p>
+</div>
+
 
                             </div>
                             <div id="OpC.fit_transform" class="classattr">
@@ -1232,7 +1331,9 @@ raise an exception if the values are not consistent.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>sklearn interface, fit() is a noop</p>
+</div>
+
 
                             </div>
                             <div id="OpC.get_feature_names" class="classattr">
@@ -1251,7 +1352,9 @@ raise an exception if the values are not consistent.</p>
 
         </details>
 
-    
+            <div class="docstring"><p>sklearn interface, return columns</p>
+</div>
+
 
                             </div>
                             <div class="inherited">

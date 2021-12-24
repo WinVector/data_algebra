@@ -105,18 +105,18 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
 
     # query generation
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
-        return self.ops.to_near_sql_implementation(
+    def to_near_sql_implementation_(self, db_model, *, using, temp_id_source):
+        return self.ops.to_near_sql_implementation_(
             db_model=db_model, using=using, temp_id_source=temp_id_source
         )
 
     # define builders for all non-initial ops types on base class
 
-    def extend_parsed(
+    def extend_parsed_(
         self, parsed_ops, *, partition_by=None, order_by=None, reverse=None
     ):
         self.set(
-            self.ops.extend_parsed(
+            self.ops.extend_parsed_(
                 parsed_ops=parsed_ops,
                 partition_by=partition_by,
                 order_by=order_by,
@@ -133,8 +133,8 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         )
         return self
 
-    def project_parsed(self, parsed_ops=None, *, group_by=None):
-        self.set(self.ops.project_parsed(parsed_ops=parsed_ops, group_by=group_by))
+    def project_parsed_(self, parsed_ops=None, *, group_by=None):
+        self.set(self.ops.project_parsed_(parsed_ops=parsed_ops, group_by=group_by))
         return self
 
     def project(self, ops=None, *, group_by=None):
@@ -158,8 +158,8 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         )
         return self
 
-    def select_rows_parsed(self, parsed_expr):
-        self.set(self.ops.select_rows_parsed(parsed_expr=parsed_expr))
+    def select_rows_parsed_(self, parsed_expr):
+        self.set(self.ops.select_rows_parsed_(parsed_expr=parsed_expr))
         return self
 
     def select_rows(self, expr):

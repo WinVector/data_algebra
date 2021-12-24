@@ -444,7 +444,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             or (len(op.order_by) > 0)
         )
         if window_situation:
-            op.check_extend_window_fns()
+            op.check_extend_window_fns_()
         res = op.sources[0].eval_implementation_(
             data_map=data_map, data_model=self, narrow=narrow
         )

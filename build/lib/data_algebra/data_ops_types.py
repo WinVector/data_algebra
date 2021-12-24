@@ -2,6 +2,7 @@
 Type defs for data operations.
 """
 
+from typing import Dict, Optional
 import data_algebra.expr_rep
 import data_algebra.cdata
 import data_algebra.OrderedSet
@@ -102,8 +103,8 @@ class OperatorPlatform:
         Defined as return f(self, *args, **kwargs).
 
         :param user_function: function to apply
-        :param *args: additional positional arguments
-        :param **kwargs: additional keyword arguments
+        :param args: additional positional arguments
+        :param kwargs: additional keyword arguments
         """
         return user_function(self, *args, **kwargs)
 
@@ -133,57 +134,173 @@ class OperatorPlatform:
     # info
 
     def columns_produced(self):
+        """
+        Return list of columns produced by pipeline.
+        """
         raise NotImplementedError("base class called")
 
     # query generation
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
+    def to_near_sql_implementation_(self, db_model, *, using, temp_id_source):
+        """
+        Convert to NearSQL as a step in converting to a SQL string. Internal method.
+
+        :param db_model: database model
+        :param using: optional column restriction
+        :param temp_id_source: temporary id source.
+        :return: compose operator directed acyclic graph
+        """
         raise NotImplementedError("base method called")
 
-    # define builders for all non-initial ops types on base class
-
-    def extend_parsed(
+    def extend_parsed_(
         self, parsed_ops, *, partition_by=None, order_by=None, reverse=None
     ):
+        """
+        Add new derived columns, can replace existing columns for parsed operations. Internal method.
+
+        :param parsed_ops: dictionary of calculations to perform.
+        :param partition_by: optional window partition specification.
+        :param order_by: optional window ordering specification.
+        :param reverse: optional order reversal specification.
+        :return: compose operator directed acyclic graph
+        """
         raise NotImplementedError("base class called")
+
+    def project_parsed_(self, parsed_ops=None, *, group_by=None):
+        """
+        Compute projection, or grouped calculation for parsed ops. Internal method.
+
+        :param parsed_ops: dictionary of calculations to perform, can be empty.
+        :param group_by: optional group key(s) specification.
+        :return: compose operator directed acyclic graph
+        """
+        raise NotImplementedError("base class called")
+
+    def select_rows_parsed_(self, parsed_expr):
+        """
+        Select rows matching parsed expr criteria. Internal method.
+
+        :param parsed_expr: logical expression specifying desired rows.
+        :return: compose operator directed acyclic graph
+        """
+        raise NotImplementedError("base class called")
+
+    # main API
 
     def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
-        raise NotImplementedError("base class called")
+        """
+        Add new derived columns, can replace existing columns.
 
-    def project_parsed(self, parsed_ops=None, *, group_by=None):
+        :param ops: dictionary of calculations to perform.
+        :param partition_by: optional window partition specification.
+        :param order_by: optional window ordering specification.
+        :param reverse: optional order reversal specification.
+        :return: compose operator directed acyclic graph
+        """
         raise NotImplementedError("base class called")
 
     def project(self, ops=None, *, group_by=None):
+        """
+        Compute projection, or grouped calculation.
+
+        :param ops: dictionary of calculations to perform, can be empty.
+        :param group_by: optional group key(s) specification.
+        :return: compose operator directed acyclic graph
+        """
         raise NotImplementedError("base class called")
 
     def natural_join(self, b, *, by, jointype, check_all_common_keys_in_by=False):
+        """
+        Join self (left) results with b (right).
+
+        :param b: second or right table to join to.
+        :param by: list of join key column names.
+        :param jointype: name of join type.
+        :param check_all_common_keys_in_by: if True, raise if any non-key columns are common to tables.
+        :return: compose operator directed acyclic graph
+        """
         raise NotImplementedError("base class called")
 
     def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):
-        raise NotImplementedError("base class called")
+        """
+        Union or concatenate rows of self with rows of b.
 
-    def select_rows_parsed(self, parsed_expr):
+        :param b: table with rows to add.
+        :param id_column: optional name for new source identification column.
+        :param a_name: source annotation to use for self/a.
+        :param b_name: source annotation to use for b.
+        :return: compose operator directed acyclic graph
+        """
         raise NotImplementedError("base class called")
 
     def select_rows(self, expr):
+        """
+        Select rows matching expr criteria.
+
+        :param expr: logical expression specifying desired rows.
+        :return: compose operator directed acyclic graph
+        """
         raise NotImplementedError("base class called")
 
     def drop_columns(self, column_deletions):
+        """
+        Remove columns from result.
+
+        :param column_deletions: list of columns to remove.
+        :return: compose operator directed acyclic graph
+        """
         raise NotImplementedError("base class called")
 
     def select_columns(self, columns):
+        """
+        Narrow to columns in result.
+
+        :param columns: list of columns to keep.
+        :return: compose operator directed acyclic graph
+        """
         raise NotImplementedError("base class called")
 
-    def rename_columns(self, column_remapping):
+    def rename_columns(self, column_remapping: Dict[str, str]):
+        """
+        Rename columns.
+
+        :param column_remapping: dictionary mapping new column names to old column sources (same
+                                 direction as extend).
+        :return: compose operator directed acyclic graph
+        """
         raise NotImplementedError("base class called")
 
     def order_rows(self, columns, *, reverse=None, limit=None):
+        """
+        Order rows by column set.
+
+        :param columns: columns to order by.
+        :param reverse: optional columns to reverse order.
+        :param limit: optional row limit to impose on result.
+        :return: compose operator directed acyclic graph
+        """
         raise NotImplementedError("base class called")
 
-    def convert_records(self, record_map):
+    def convert_records(self, record_map: data_algebra.cdata.RecordMap):
+        """
+        Apply a record mapping taking blocks_in to blocks_out structures.
+
+        :param record_map: data_algebra.cdata.RecordMap transform specification
+        :return: compose operator directed acyclic graph
+        """
         raise NotImplementedError("base class called")
 
-    def map_records(self, blocks_in=None, blocks_out=None):
+    def map_records(
+            self,
+            blocks_in: Optional[data_algebra.cdata.RecordSpecification] = None,
+            blocks_out: Optional[data_algebra.cdata.RecordSpecification] = None):
+        """
+        Apply a record mapping taking blocks_in to blocks_out structures.
+
+        :param blocks_in: Optional incoming record specification
+        :param blocks_out: Optional incoming record specification
+        :return: compose operator directed acyclic graph
+        """
         if (blocks_in is None) and (blocks_out is None):
             return self  # NO-OP, return source ops
         return self.convert_records(
@@ -194,26 +311,33 @@ class OperatorPlatform:
 
     # noinspection PyPep8Naming, PyUnusedLocal
     def fit(self, X, y=None):
+        """sklearn interface, fit() is a noop"""
         pass
 
     # noinspection PyPep8Naming, PyUnusedLocal
     def fit_transform(self, X, y=None):
+        """sklearn interface, fit() is a noop"""
         self.fit(X, y=y)
         return self.transform(X)
 
     def get_feature_names(self, input_features=None):
+        """sklearn interface, return columns"""
         cp = self.columns_produced()
         if input_features is not None:
-            cp = cp + [f for f in input_features if f not in cp]
+            cp_set = set(cp)
+            cp = cp + [f for f in input_features if f not in cp_set]
         return cp
 
     # noinspection PyUnusedLocal,PyMethodMayBeStatic
     def get_params(self, deep=False):
+        """sklearn interface, noop"""
         return dict()
 
     def set_params(self, **params):
+        """sklearn interface, noop"""
         pass
 
     # noinspection PyPep8Naming
     def inverse_transform(self, X):
+        """sklearn interface, raise"""
         raise TypeError("data_algebra does not support inverse_transform")
