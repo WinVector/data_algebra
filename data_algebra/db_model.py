@@ -1017,7 +1017,7 @@ class DBModel:
                 subops[k] = op
         if len(subops) <= 0:
             # using was not None is this case as len(extend_node.ops)>0 and all keys are in extend_node.column_names
-            return extend_node.sources[0].to_near_sql_implementation(
+            return extend_node.sources[0].to_near_sql_implementation_(
                 db_model=self, using=using, temp_id_source=temp_id_source
             )
         if len(using) < 1:
@@ -1027,7 +1027,7 @@ class DBModel:
             raise KeyError("referred to unknown columns: " + str(missing))
         # get set of columns we need from subquery
         subusing = extend_node.columns_used_from_sources(using=using)[0]
-        subsql = extend_node.sources[0].to_near_sql_implementation(
+        subsql = extend_node.sources[0].to_near_sql_implementation_(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
         window_term = ""
@@ -1064,7 +1064,7 @@ class DBModel:
             cols_used_in_term.update(window_vars)
             declared_term_dependencies[ci] = cols_used_in_term
         annotation = str(
-            extend_node.to_python_implementation(print_sources=False, indent=-1)
+            extend_node.to_python_src_(print_sources=False, indent=-1)
         )
         # TODO: see if we can merge with subsql instead of building a new one
         if (
@@ -1151,7 +1151,7 @@ class DBModel:
         subusing = project_node.columns_used_from_sources(using=using)[0]
         terms = {ci: self.expr_to_sql(oi) for (ci, oi) in subops.items()}
         terms.update({g: None for g in project_node.group_by})
-        subsql = project_node.sources[0].to_near_sql_implementation(
+        subsql = project_node.sources[0].to_near_sql_implementation_(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
         view_name = "project_" + str(temp_id_source[0])
@@ -1169,7 +1169,7 @@ class DBModel:
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
             annotation=str(
-                project_node.to_python_implementation(print_sources=False, indent=-1)
+                project_node.to_python_src_(print_sources=False, indent=-1)
             ),
         )
         return near_sql
@@ -1197,7 +1197,7 @@ class DBModel:
         if using is None:
             using = OrderedSet(select_rows_node.column_names)
         subusing = select_rows_node.columns_used_from_sources(using=using)[0]
-        subsql = select_rows_node.sources[0].to_near_sql_implementation(
+        subsql = select_rows_node.sources[0].to_near_sql_implementation_(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
         view_name = "select_rows_" + str(temp_id_source[0])
@@ -1213,7 +1213,7 @@ class DBModel:
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
             annotation=str(
-                select_rows_node.to_python_implementation(
+                select_rows_node.to_python_src_(
                     print_sources=False, indent=-1
                 )
             ),
@@ -1243,7 +1243,7 @@ class DBModel:
         subusing = [
             c for c in select_columns_node.column_selection if c in subusing
         ]  # fix order
-        subsql = select_columns_node.sources[0].to_near_sql_implementation(
+        subsql = select_columns_node.sources[0].to_near_sql_implementation_(
             db_model=self, using=set(subusing), temp_id_source=temp_id_source
         )
         # order/limit columns
@@ -1277,7 +1277,7 @@ class DBModel:
         if using is None:
             using = OrderedSet(drop_columns_node.column_names)
         subusing = drop_columns_node.columns_used_from_sources(using=using)[0]
-        subsql = drop_columns_node.sources[0].to_near_sql_implementation(
+        subsql = drop_columns_node.sources[0].to_near_sql_implementation_(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
         # /limit columns
@@ -1306,7 +1306,7 @@ class DBModel:
             using_was_None = True
         subusing = order_node.columns_used_from_sources(using=using)[0]
         subusing = [c for c in order_node.column_names if c in subusing]  # fix order
-        subsql = order_node.sources[0].to_near_sql_implementation(
+        subsql = order_node.sources[0].to_near_sql_implementation_(
             db_model=self, using=set(subusing), temp_id_source=temp_id_source
         )
         view_name = "order_rows_" + str(temp_id_source[0])
@@ -1337,7 +1337,7 @@ class DBModel:
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             suffix=suffix,
             annotation=str(
-                order_node.to_python_implementation(print_sources=False, indent=-1)
+                order_node.to_python_src_(print_sources=False, indent=-1)
             ),
         )
         return near_sql
@@ -1357,7 +1357,7 @@ class DBModel:
         if using is None:
             using = OrderedSet(rename_node.column_names)
         subusing = rename_node.columns_used_from_sources(using=using)[0]
-        subsql = rename_node.sources[0].to_near_sql_implementation(
+        subsql = rename_node.sources[0].to_near_sql_implementation_(
             db_model=self, using=subusing, temp_id_source=temp_id_source
         )
         view_name = "rename_" + str(temp_id_source[0])
@@ -1376,7 +1376,7 @@ class DBModel:
             quoted_query_name=self.quote_identifier(view_name),
             sub_sql=subsql.to_bound_near_sql(columns=subusing),
             annotation=str(
-                rename_node.to_python_implementation(print_sources=False, indent=-1)
+                rename_node.to_python_src_(print_sources=False, indent=-1)
             ),
         )
         return near_sql
@@ -1421,10 +1421,10 @@ class DBModel:
         using_left, using_right = join_node.columns_used_from_sources(
             using=using.union(by_set)
         )
-        sql_left = join_node.sources[0].to_near_sql_implementation(
+        sql_left = join_node.sources[0].to_near_sql_implementation_(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
-        sql_right = join_node.sources[1].to_near_sql_implementation(
+        sql_right = join_node.sources[1].to_near_sql_implementation_(
             db_model=self, using=using_right, temp_id_source=temp_id_source
         )
         return using_left, sql_left, using_right, sql_right
@@ -1492,7 +1492,7 @@ class DBModel:
             sub_sql2=sql_right.to_bound_near_sql(columns=using_right, force_sql=False),
             suffix=on_terms,
             annotation=str(
-                join_node.to_python_implementation(print_sources=False, indent=-1)
+                join_node.to_python_src_(print_sources=False, indent=-1)
             ),
         )
         return near_sql
@@ -1521,10 +1521,10 @@ class DBModel:
         using_right = subusing[1]
         if set(using_left) != set(using_right):
             raise ValueError("left/right usings did not match")
-        sql_left = concat_node.sources[0].to_near_sql_implementation(
+        sql_left = concat_node.sources[0].to_near_sql_implementation_(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
-        sql_right = concat_node.sources[1].to_near_sql_implementation(
+        sql_right = concat_node.sources[1].to_near_sql_implementation_(
             db_model=self, using=using_left, temp_id_source=temp_id_source
         )
         view_name = "concat_rows_" + str(temp_id_source[0])
@@ -1552,7 +1552,7 @@ class DBModel:
                 columns=using_left, force_sql=True, constants=constants_right,
             ),
             annotation=str(
-                concat_node.to_python_implementation(print_sources=False, indent=-1)
+                concat_node.to_python_src_(print_sources=False, indent=-1)
             ),
         )
         return near_sql
@@ -1568,7 +1568,7 @@ class DBModel:
         assert isinstance(sql_format_options, SQLFormatOptions)
         ops.columns_used()  # for table consistency check/raise
         temp_id_source = [0]
-        near_sql = ops.to_near_sql_implementation(
+        near_sql = ops.to_near_sql_implementation_(
             db_model=self, using=None, temp_id_source=temp_id_source
         )
         assert isinstance(near_sql, data_algebra.near_sql.NearSQL)

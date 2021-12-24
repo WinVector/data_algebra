@@ -105,18 +105,18 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
 
     # query generation
 
-    def to_near_sql_implementation(self, db_model, *, using, temp_id_source):
-        return self.ops.to_near_sql_implementation(
+    def to_near_sql_implementation_(self, db_model, *, using, temp_id_source):
+        return self.ops.to_near_sql_implementation_(
             db_model=db_model, using=using, temp_id_source=temp_id_source
         )
 
     # define builders for all non-initial ops types on base class
 
-    def extend_parsed(
+    def extend_parsed_(
         self, parsed_ops, *, partition_by=None, order_by=None, reverse=None
     ):
         self.set(
-            self.ops.extend_parsed(
+            self.ops.extend_parsed_(
                 parsed_ops=parsed_ops,
                 partition_by=partition_by,
                 order_by=order_by,

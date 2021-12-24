@@ -232,23 +232,32 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     # printing
 
-    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+    def to_python_src_(self, *, indent=0, strict=True, print_sources=True):
         """
-        Return text representing operations.
+        Return text representing operations. Internal method, allows skipping of sources.
 
         :param indent: additional indent to apply in formatting.
+        :param strict: if False allow eliding of columns names and other long structures.
         :param print_sources: logical, print children.
         """
         return "ViewRepresentation(" + self.column_names.__repr__() + ")"
 
     # noinspection PyBroadException
     def to_python(self, *, indent=0, strict=True, pretty=False, black_mode=None):
+        """
+        Return Python source code for operations.
+
+        :param indent: extra indent.
+        :param strict: if False allow eliding of columns names and other long structures.
+        :param pretty: if True re-format result with black.
+        :param black_mode: black formatter parameters.
+        """
         self.columns_used()  # for table consistency check/raise
         if pretty:
             strict = True
         python_str = (
             "(\n"
-            + self.to_python_implementation(
+            + self.to_python_src_(
                 indent=indent, strict=strict, print_sources=True
             )
             + "\n)\n"
@@ -293,14 +302,30 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     # query generation
 
-    def to_near_sql_implementation(
+    def to_near_sql_implementation_(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert operator dag into NearSQL type for translation to SQL string.
+
+        :param db_model: database model
+        :param using: optional column restriction set
+        :param temp_id_source: source of temporary ids
+        :param sql_format_options: options for sql formatting
+        :return: data_algebra.near_sql.NearSQL
+        """
         raise NotImplementedError("base method called")
 
     def to_sql(
         self, db_model, *, sql_format_options=None,
-    ):
+    ) -> str:
+        """
+        Convert operator dag to SQL.
+
+        :param db_model: database model
+        :param sql_format_options: options for sql formatting
+        :return: string representation of SQL query
+        """
         if isinstance(db_model, data_algebra.db_model.DBHandle):
             db_model = db_model.db_model
         assert isinstance(db_model, data_algebra.db_model.DBModel)
@@ -310,7 +335,15 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     # Pandas realization
 
-    def eval_implementation(self, *, data_map, data_model, narrow):
+    def eval_implementation_(self, *, data_map, data_model, narrow):
+        """
+        Implementation of Pandas evaluation of operators. Internal method.
+
+        :param data_map: dictionary of data sources
+        :param data_model: Pandas data model adaptor
+        :param narrow: if True narrow results to only columns anticipated
+        :return: Pandas data frame
+        """
         raise NotImplementedError("base method called")
 
     def check_constraints(self, data_model, *, strict=True):
@@ -368,7 +401,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
                 else:
                     if not data_model.is_appropriate_data_instance(data_map[k]):
                         raise ValueError("data_map[" + k + "] was not a usable type")
-        return self.eval_implementation(
+        return self.eval_implementation_(
             data_map=data_map, data_model=data_model, narrow=narrow
         )
 
@@ -399,11 +432,20 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     # composition (used to eliminate intermediate order nodes)
 
-    def is_trivial_when_intermediate(self):
+    def is_trivial_when_intermediate_(self) -> bool:
+        """
+        Return if True if operator can be eliminated from interior chain.
+        """
         return False
 
     # return table representation of self
-    def as_table_description(self, table_name=None, *, qualifiers=None):
+    def as_table_description(self, table_name: str, *, qualifiers=None):
+        """
+        Return representation of operator as a table description.
+
+        :param table_name: table name to use.
+        :param qualifiers: db qualifiers to annotate
+        """
         return TableDescription(
             table_name=table_name,
             column_names=self.column_names,
@@ -411,7 +453,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         )
 
     # implement builders for all non-initial ops types on base class
-    def extend_parsed(
+    def extend_parsed_(
         self, parsed_ops, *, partition_by=None, order_by=None, reverse=None
     ):
         if (parsed_ops is None) or (len(parsed_ops) < 1):
@@ -430,8 +472,8 @@ class ViewRepresentation(OperatorPlatform, ABC):
             raise ValueError("must not change partition_by columns")
         if len(set(reverse).difference(order_by)) > 0:
             raise ValueError("all columns in reverse must be in order_by")
-        if self.is_trivial_when_intermediate():
-            return self.sources[0].extend_parsed(
+        if self.is_trivial_when_intermediate_():
+            return self.sources[0].extend_parsed_(
                 parsed_ops=parsed_ops,
                 partition_by=partition_by,
                 order_by=order_by,
@@ -485,7 +527,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         parsed_ops = data_algebra.expr_parse.parse_assignments_in_context(
             ops=ops, view=self
         )
-        return self.extend_parsed(
+        return self.extend_parsed_(
             parsed_ops=parsed_ops,
             partition_by=partition_by,
             order_by=order_by,
@@ -500,7 +542,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         new_cols_produced_in_calc = set([k for k in parsed_ops.keys()])
         if len(new_cols_produced_in_calc.intersection(group_by)):
             raise ValueError("can not alter grouping columns")
-        if self.is_trivial_when_intermediate():
+        if self.is_trivial_when_intermediate_():
             return self.sources[0].project_parsed(parsed_ops, group_by=group_by)
         return ProjectNode(source=self, parsed_ops=parsed_ops, group_by=group_by)
 
@@ -529,7 +571,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         if isinstance(by, str):
             by = [by]
         assert isinstance(jointype, str)
-        if self.is_trivial_when_intermediate():
+        if self.is_trivial_when_intermediate_():
             return self.sources[0].natural_join(b, by=by, jointype=jointype)
         return NaturalJoinNode(
             a=self,
@@ -546,7 +588,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         assert isinstance(id_column, (str, type(None)))
         assert isinstance(a_name, str)
         assert isinstance(b_name, str)
-        if self.is_trivial_when_intermediate():
+        if self.is_trivial_when_intermediate_():
             return self.sources[0].concat_rows(
                 b, id_column=id_column, a_name=a_name, b_name=b_name
             )
@@ -557,7 +599,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
     def select_rows_parsed(self, parsed_expr):
         if parsed_expr is None:
             return self
-        if self.is_trivial_when_intermediate():
+        if self.is_trivial_when_intermediate_():
             return self.sources[0].select_rows_parsed(parsed_expr=parsed_expr)
         return SelectRowsNode(source=self, ops=parsed_expr)
 
@@ -574,7 +616,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             else:
                 expr = " & ".join(["(" + vi + ")" for vi in expr])
         assert isinstance(expr, (str, data_algebra.expr_rep.PreTerm))
-        if self.is_trivial_when_intermediate():
+        if self.is_trivial_when_intermediate_():
             return self.sources[0].select_rows(expr)
         ops = data_algebra.expr_parse.parse_assignments_in_context(
             ops={"expr": expr}, view=self
@@ -595,7 +637,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             column_deletions = [column_deletions]
         if (column_deletions is None) or (len(column_deletions) < 1):
             return self
-        if self.is_trivial_when_intermediate():
+        if self.is_trivial_when_intermediate_():
             return self.sources[0].drop_columns(column_deletions)
         return DropColumnsNode(source=self, column_deletions=column_deletions)
 
@@ -606,7 +648,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             raise ValueError("must select at least one column")
         if columns == self.column_names:
             return self
-        if self.is_trivial_when_intermediate():
+        if self.is_trivial_when_intermediate_():
             return self.sources[0].select_columns(columns)
         if isinstance(self, SelectColumnsNode):
             return self.sources[0].select_columns(columns)
@@ -618,7 +660,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         if (column_remapping is None) or (len(column_remapping) < 1):
             return self
         assert isinstance(column_remapping, dict)
-        if self.is_trivial_when_intermediate():
+        if self.is_trivial_when_intermediate_():
             return self.sources[0].rename_columns(column_remapping)
         return RenameColumnsNode(source=self, column_remapping=column_remapping)
 
@@ -629,14 +671,14 @@ class ViewRepresentation(OperatorPlatform, ABC):
             reverse = [reverse]
         if ((columns is None) or (len(columns) < 1)) and (limit is None):
             return self
-        if self.is_trivial_when_intermediate():
+        if self.is_trivial_when_intermediate_():
             return self.sources[0].order_rows(columns, reverse=reverse, limit=limit)
         return OrderRowsNode(source=self, columns=columns, reverse=reverse, limit=limit)
 
     def convert_records(self, record_map):
         if record_map is None:
             return self
-        if self.is_trivial_when_intermediate():
+        if self.is_trivial_when_intermediate_():
             return self.sources[0].convert_records(record_map)
         return ConvertRecordsNode(source=self, record_map=record_map)
 
@@ -757,7 +799,14 @@ class TableDescription(ViewRepresentation):
             return False
         return True
 
-    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+    def to_python_src_(self, *, indent=0, strict=True, print_sources=True):
+        """
+        Return text representing operations.
+
+        :param indent: additional indent to apply in formatting.
+        :param strict: if False allow eliding of columns names and other long structures.
+        :param print_sources: logical, print children.
+        """
         spacer = " "
         if indent >= 0:
             spacer = "\n " + " " * indent
@@ -803,7 +852,15 @@ class TableDescription(ViewRepresentation):
         raise an exception if the values are not consistent"""
         return {self.key: self}
 
-    def eval_implementation(self, *, data_map, data_model, narrow):
+    def eval_implementation_(self, *, data_map, data_model, narrow):
+        """
+        Implementation of Pandas evaluation of operators. Internal method.
+
+        :param data_map: dictionary of data sources
+        :param data_model: Pandas data model adaptor
+        :param narrow: if True narrow results to only columns anticipated
+        :return: Pandas data frame
+        """
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.table_step(op=self, data_map=data_map, narrow=narrow)
@@ -811,9 +868,18 @@ class TableDescription(ViewRepresentation):
     def columns_used_from_sources(self, using=None):
         return []  # no inputs to table description
 
-    def to_near_sql_implementation(
+    def to_near_sql_implementation_(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert operator dag into NearSQL type for translation to SQL string.
+
+        :param db_model: database model
+        :param using: optional column restriction set
+        :param temp_id_source: source of temporary ids
+        :param sql_format_options: options for sql formatting
+        :return: data_algebra.near_sql.NearSQL
+        """
         return db_model.table_def_to_near_sql(
             self,
             using=using,
@@ -1063,7 +1129,7 @@ class ExtendNode(ViewRepresentation):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
-        return new_sources[0].extend_parsed(
+        return new_sources[0].extend_parsed_(
             parsed_ops=self.ops,
             partition_by=self.partition_by,
             order_by=self.order_by,
@@ -1130,14 +1196,21 @@ class ExtendNode(ViewRepresentation):
             )
         ]
 
-    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+    def to_python_src_(self, *, indent=0, strict=True, print_sources=True):
+        """
+        Return text representing operations.
+
+        :param indent: additional indent to apply in formatting.
+        :param strict: if False allow eliding of columns names and other long structures.
+        :param print_sources: logical, print children.
+        """
         spacer = " "
         if indent >= 0:
             spacer = "\n   " + " " * indent
         s = ""
         if print_sources:
             s = (
-                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                self.sources[0].to_python_src_(indent=indent, strict=strict)
                 + spacer
             )
         ops = [
@@ -1158,9 +1231,18 @@ class ExtendNode(ViewRepresentation):
         s = s + ")"
         return s
 
-    def to_near_sql_implementation(
+    def to_near_sql_implementation_(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert operator dag into NearSQL type for translation to SQL string.
+
+        :param db_model: database model
+        :param using: optional column restriction set
+        :param temp_id_source: source of temporary ids
+        :param sql_format_options: options for sql formatting
+        :return: data_algebra.near_sql.NearSQL
+        """
         return db_model.extend_to_near_sql(
             self,
             using=using,
@@ -1168,7 +1250,15 @@ class ExtendNode(ViewRepresentation):
             sql_format_options=sql_format_options,
         )
 
-    def eval_implementation(self, *, data_map, data_model, narrow):
+    def eval_implementation_(self, *, data_map, data_model, narrow):
+        """
+        Implementation of Pandas evaluation of operators. Internal method.
+
+        :param data_map: dictionary of data sources
+        :param data_model: Pandas data model adaptor
+        :param narrow: if True narrow results to only columns anticipated
+        :return: Pandas data frame
+        """
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.extend_step(op=self, data_map=data_map, narrow=narrow)
@@ -1274,14 +1364,21 @@ class ProjectNode(ViewRepresentation):
             o.get_column_names(columns_we_take)
         return [columns_we_take]
 
-    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+    def to_python_src_(self, *, indent=0, strict=True, print_sources=True):
+        """
+        Return text representing operations.
+
+        :param indent: additional indent to apply in formatting.
+        :param strict: if False allow eliding of columns names and other long structures.
+        :param print_sources: logical, print children.
+        """
         spacer = " "
         if indent >= 0:
             spacer = "\n   " + " " * indent
         s = ""
         if print_sources:
             s = (
-                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                self.sources[0].to_python_src_(indent=indent, strict=strict)
                 + "\n"
                 + " " * (max(indent, 0) + 3)
             )
@@ -1302,9 +1399,18 @@ class ProjectNode(ViewRepresentation):
         s = s + ")"
         return s
 
-    def to_near_sql_implementation(
+    def to_near_sql_implementation_(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert operator dag into NearSQL type for translation to SQL string.
+
+        :param db_model: database model
+        :param using: optional column restriction set
+        :param temp_id_source: source of temporary ids
+        :param sql_format_options: options for sql formatting
+        :return: data_algebra.near_sql.NearSQL
+        """
         return db_model.project_to_near_sql(
             self,
             using=using,
@@ -1312,7 +1418,15 @@ class ProjectNode(ViewRepresentation):
             sql_format_options=sql_format_options,
         )
 
-    def eval_implementation(self, *, data_map, data_model, narrow):
+    def eval_implementation_(self, *, data_map, data_model, narrow):
+        """
+        Implementation of Pandas evaluation of operators. Internal method.
+
+        :param data_map: dictionary of data sources
+        :param data_model: Pandas data model adaptor
+        :param narrow: if True narrow results to only columns anticipated
+        :return: Pandas data frame
+        """
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.project_step(op=self, data_map=data_map, narrow=narrow)
@@ -1361,20 +1475,36 @@ class SelectRowsNode(ViewRepresentation):
         columns_we_take = ordered_union(columns_we_take, self.decision_columns)
         return [columns_we_take]
 
-    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+    def to_python_src_(self, *, indent=0, strict=True, print_sources=True):
+        """
+        Return text representing operations.
+
+        :param indent: additional indent to apply in formatting.
+        :param strict: if False allow eliding of columns names and other long structures.
+        :param print_sources: logical, print children.
+        """
         s = ""
         if print_sources:
             s = (
-                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                self.sources[0].to_python_src_(indent=indent, strict=strict)
                 + "\n"
                 + " " * (max(indent, 0) + 3)
             )
         s = s + (".select_rows(" + self.expr.to_python().__repr__() + ")")
         return s
 
-    def to_near_sql_implementation(
+    def to_near_sql_implementation_(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert operator dag into NearSQL type for translation to SQL string.
+
+        :param db_model: database model
+        :param using: optional column restriction set
+        :param temp_id_source: source of temporary ids
+        :param sql_format_options: options for sql formatting
+        :return: data_algebra.near_sql.NearSQL
+        """
         return db_model.select_rows_to_near_sql(
             self,
             using=using,
@@ -1382,7 +1512,15 @@ class SelectRowsNode(ViewRepresentation):
             sql_format_options=sql_format_options,
         )
 
-    def eval_implementation(self, *, data_map, data_model, narrow):
+    def eval_implementation_(self, *, data_map, data_model, narrow):
+        """
+        Implementation of Pandas evaluation of operators. Internal method.
+
+        :param data_map: dictionary of data sources
+        :param data_model: Pandas data model adaptor
+        :param narrow: if True narrow results to only columns anticipated
+        :return: Pandas data frame
+        """
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.select_rows_step(op=self, data_map=data_map, narrow=narrow)
@@ -1435,20 +1573,36 @@ class SelectColumnsNode(ViewRepresentation):
             return [cols]
         return [cols.intersection(using)]
 
-    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+    def to_python_src_(self, *, indent=0, strict=True, print_sources=True):
+        """
+        Return text representing operations.
+
+        :param indent: additional indent to apply in formatting.
+        :param strict: if False allow eliding of columns names and other long structures.
+        :param print_sources: logical, print children.
+        """
         s = ""
         if print_sources:
             s = (
-                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                self.sources[0].to_python_src_(indent=indent, strict=strict)
                 + "\n"
                 + " " * (max(indent, 0) + 3)
             )
         s = s + (".select_columns(" + self.column_selection.__repr__() + ")")
         return s
 
-    def to_near_sql_implementation(
+    def to_near_sql_implementation_(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert operator dag into NearSQL type for translation to SQL string.
+
+        :param db_model: database model
+        :param using: optional column restriction set
+        :param temp_id_source: source of temporary ids
+        :param sql_format_options: options for sql formatting
+        :return: data_algebra.near_sql.NearSQL
+        """
         return db_model.select_columns_to_near_sql(
             self,
             using=using,
@@ -1456,7 +1610,15 @@ class SelectColumnsNode(ViewRepresentation):
             sql_format_options=sql_format_options,
         )
 
-    def eval_implementation(self, *, data_map, data_model, narrow):
+    def eval_implementation_(self, *, data_map, data_model, narrow):
+        """
+        Implementation of Pandas evaluation of operators. Internal method.
+
+        :param data_map: dictionary of data sources
+        :param data_model: Pandas data model adaptor
+        :param narrow: if True narrow results to only columns anticipated
+        :return: Pandas data frame
+        """
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.select_columns_step(op=self, data_map=data_map, narrow=narrow)
@@ -1509,20 +1671,36 @@ class DropColumnsNode(ViewRepresentation):
             using = set(self.sources[0].column_names)
         return [set([c for c in using if c not in self.column_deletions])]
 
-    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+    def to_python_src_(self, *, indent=0, strict=True, print_sources=True):
+        """
+        Return text representing operations.
+
+        :param indent: additional indent to apply in formatting.
+        :param strict: if False allow eliding of columns names and other long structures.
+        :param print_sources: logical, print children.
+        """
         s = ""
         if print_sources:
             s = (
-                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                self.sources[0].to_python_src_(indent=indent, strict=strict)
                 + "\n"
                 + " " * (max(indent, 0) + 3)
             )
         s = s + (".drop_columns(" + self.column_deletions.__repr__() + ")")
         return s
 
-    def to_near_sql_implementation(
+    def to_near_sql_implementation_(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert operator dag into NearSQL type for translation to SQL string.
+
+        :param db_model: database model
+        :param using: optional column restriction set
+        :param temp_id_source: source of temporary ids
+        :param sql_format_options: options for sql formatting
+        :return: data_algebra.near_sql.NearSQL
+        """
         return db_model.drop_columns_to_near_sql(
             self,
             using=using,
@@ -1530,7 +1708,15 @@ class DropColumnsNode(ViewRepresentation):
             sql_format_options=sql_format_options,
         )
 
-    def eval_implementation(self, *, data_map, data_model, narrow):
+    def eval_implementation_(self, *, data_map, data_model, narrow):
+        """
+        Implementation of Pandas evaluation of operators. Internal method.
+
+        :param data_map: dictionary of data sources
+        :param data_model: Pandas data model adaptor
+        :param narrow: if True narrow results to only columns anticipated
+        :return: Pandas data frame
+        """
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.drop_columns_step(op=self, data_map=data_map, narrow=narrow)
@@ -1590,11 +1776,18 @@ class OrderRowsNode(ViewRepresentation):
         cols = cols.intersection(using).union(self.order_columns)
         return [cols]
 
-    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+    def to_python_src_(self, *, indent=0, strict=True, print_sources=True):
+        """
+        Return text representing operations.
+
+        :param indent: additional indent to apply in formatting.
+        :param strict: if False allow eliding of columns names and other long structures.
+        :param print_sources: logical, print children.
+        """
         s = ""
         if print_sources:
             s = (
-                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                self.sources[0].to_python_src_(indent=indent, strict=strict)
                 + "\n"
                 + " " * (max(indent, 0) + 3)
             )
@@ -1606,9 +1799,18 @@ class OrderRowsNode(ViewRepresentation):
         s = s + ")"
         return s
 
-    def to_near_sql_implementation(
+    def to_near_sql_implementation_(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert operator dag into NearSQL type for translation to SQL string.
+
+        :param db_model: database model
+        :param using: optional column restriction set
+        :param temp_id_source: source of temporary ids
+        :param sql_format_options: options for sql formatting
+        :return: data_algebra.near_sql.NearSQL
+        """
         return db_model.order_to_near_sql(
             self,
             using=using,
@@ -1616,14 +1818,25 @@ class OrderRowsNode(ViewRepresentation):
             sql_format_options=sql_format_options,
         )
 
-    def eval_implementation(self, *, data_map, data_model, narrow):
+    def eval_implementation_(self, *, data_map, data_model, narrow):
+        """
+        Implementation of Pandas evaluation of operators. Internal method.
+
+        :param data_map: dictionary of data sources
+        :param data_model: Pandas data model adaptor
+        :param narrow: if True narrow results to only columns anticipated
+        :return: Pandas data frame
+        """
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.order_rows_step(op=self, data_map=data_map, narrow=narrow)
 
     # short-cut main interface
 
-    def is_trivial_when_intermediate(self):
+    def is_trivial_when_intermediate_(self) -> bool:
+        """
+        Return if True if operator can be eliminated from interior of chain.
+        """
         return self.limit is None
 
 
@@ -1695,20 +1908,36 @@ class RenameColumnsNode(ViewRepresentation):
         ]
         return [set(cols)]
 
-    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+    def to_python_src_(self, *, indent=0, strict=True, print_sources=True):
+        """
+        Return text representing operations.
+
+        :param indent: additional indent to apply in formatting.
+        :param strict: if False allow eliding of columns names and other long structures.
+        :param print_sources: logical, print children.
+        """
         s = ""
         if print_sources:
             s = (
-                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                self.sources[0].to_python_src_(indent=indent, strict=strict)
                 + "\n"
                 + " " * (max(indent, 0) + 3)
             )
         s = s + (".rename_columns(" + self.column_remapping.__repr__() + ")")
         return s
 
-    def to_near_sql_implementation(
+    def to_near_sql_implementation_(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert operator dag into NearSQL type for translation to SQL string.
+
+        :param db_model: database model
+        :param using: optional column restriction set
+        :param temp_id_source: source of temporary ids
+        :param sql_format_options: options for sql formatting
+        :return: data_algebra.near_sql.NearSQL
+        """
         return db_model.rename_to_near_sql(
             self,
             using=using,
@@ -1716,7 +1945,15 @@ class RenameColumnsNode(ViewRepresentation):
             sql_format_options=sql_format_options,
         )
 
-    def eval_implementation(self, *, data_map, data_model, narrow):
+    def eval_implementation_(self, *, data_map, data_model, narrow):
+        """
+        Implementation of Pandas evaluation of operators. Internal method.
+
+        :param data_map: dictionary of data sources
+        :param data_model: Pandas data model adaptor
+        :param narrow: if True narrow results to only columns anticipated
+        :return: Pandas data frame
+        """
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.rename_columns_step(op=self, data_map=data_map, narrow=narrow)
@@ -1814,18 +2051,25 @@ class NaturalJoinNode(ViewRepresentation):
             ordered_intersect(self.sources[i].column_names, using) for i in range(2)
         ]
 
-    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+    def to_python_src_(self, *, indent=0, strict=True, print_sources=True):
+        """
+        Return text representing operations.
+
+        :param indent: additional indent to apply in formatting.
+        :param strict: if False allow eliding of columns names and other long structures.
+        :param print_sources: logical, print children.
+        """
         s = "_0."
         if print_sources:
             s = (
-                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                self.sources[0].to_python_src_(indent=indent, strict=strict)
                 + "\n"
                 + " " * (max(indent, 0) + 3)
             )
         s = s + (".natural_join(b=\n" + " " * (indent + 6))
         if print_sources:
             s = s + (
-                self.sources[1].to_python_implementation(
+                self.sources[1].to_python_src_(
                     indent=max(indent, 0) + 6, strict=strict
                 )
                 + ",\n"
@@ -1838,9 +2082,18 @@ class NaturalJoinNode(ViewRepresentation):
         )
         return s
 
-    def to_near_sql_implementation(
+    def to_near_sql_implementation_(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert operator dag into NearSQL type for translation to SQL string.
+
+        :param db_model: database model
+        :param using: optional column restriction set
+        :param temp_id_source: source of temporary ids
+        :param sql_format_options: options for sql formatting
+        :return: data_algebra.near_sql.NearSQL
+        """
         return db_model.natural_join_to_near_sql(
             self,
             using=using,
@@ -1848,7 +2101,15 @@ class NaturalJoinNode(ViewRepresentation):
             sql_format_options=sql_format_options,
         )
 
-    def eval_implementation(self, *, data_map, data_model, narrow):
+    def eval_implementation_(self, *, data_map, data_model, narrow):
+        """
+        Implementation of Pandas evaluation of operators. Internal method.
+
+        :param data_map: dictionary of data sources
+        :param data_model: Pandas data model adaptor
+        :param narrow: if True narrow results to only columns anticipated
+        :return: Pandas data frame
+        """
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.natural_join_step(op=self, data_map=data_map, narrow=narrow)
@@ -1916,18 +2177,25 @@ class ConcatRowsNode(ViewRepresentation):
             ordered_intersect(self.sources[i].column_names, using) for i in range(2)
         ]
 
-    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+    def to_python_src_(self, *, indent=0, strict=True, print_sources=True):
+        """
+        Return text representing operations.
+
+        :param indent: additional indent to apply in formatting.
+        :param strict: if False allow eliding of columns names and other long structures.
+        :param print_sources: logical, print children.
+        """
         s = "_0."
         if print_sources:
             s = (
-                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                self.sources[0].to_python_src_(indent=indent, strict=strict)
                 + "\n"
                 + " " * (max(indent, 0) + 3)
             )
         s = s + (".concat_rows(b=\n" + " " * (indent + 6))
         if print_sources:
             s = s + (
-                self.sources[1].to_python_implementation(
+                self.sources[1].to_python_src_(
                     indent=max(indent, 0) + 6, strict=strict
                 )
                 + ",\n"
@@ -1946,9 +2214,18 @@ class ConcatRowsNode(ViewRepresentation):
         )
         return s
 
-    def to_near_sql_implementation(
+    def to_near_sql_implementation_(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert operator dag into NearSQL type for translation to SQL string.
+
+        :param db_model: database model
+        :param using: optional column restriction set
+        :param temp_id_source: source of temporary ids
+        :param sql_format_options: options for sql formatting
+        :return: data_algebra.near_sql.NearSQL
+        """
         return db_model.concat_rows_to_near_sql(
             self,
             using=using,
@@ -1956,7 +2233,15 @@ class ConcatRowsNode(ViewRepresentation):
             sql_format_options=sql_format_options,
         )
 
-    def eval_implementation(self, *, data_map, data_model, narrow):
+    def eval_implementation_(self, *, data_map, data_model, narrow):
+        """
+        Implementation of Pandas evaluation of operators. Internal method.
+
+        :param data_map: dictionary of data sources
+        :param data_model: Pandas data model adaptor
+        :param narrow: if True narrow results to only columns anticipated
+        :return: Pandas data frame
+        """
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.concat_rows_step(op=self, data_map=data_map, narrow=narrow)
@@ -1992,11 +2277,18 @@ class ConvertRecordsNode(ViewRepresentation):
     def columns_used_from_sources(self, using=None):
         return [self.record_map.columns_needed]
 
-    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+    def to_python_src_(self, *, indent=0, strict=True, print_sources=True):
+        """
+        Return text representing operations.
+
+        :param indent: additional indent to apply in formatting.
+        :param strict: if False allow eliding of columns names and other long structures.
+        :param print_sources: logical, print children.
+        """
         s = ""
         if print_sources:
             s = (
-                self.sources[0].to_python_implementation(indent=indent, strict=strict)
+                self.sources[0].to_python_src_(indent=indent, strict=strict)
                 + "\n"
                 + " " * (max(indent, 0) + 3)
             )
@@ -2006,14 +2298,23 @@ class ConvertRecordsNode(ViewRepresentation):
         s = s + ")"
         return s
 
-    def to_near_sql_implementation(
+    def to_near_sql_implementation_(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert operator dag into NearSQL type for translation to SQL string.
+
+        :param db_model: database model
+        :param using: optional column restriction set
+        :param temp_id_source: source of temporary ids
+        :param sql_format_options: options for sql formatting
+        :return: data_algebra.near_sql.NearSQL
+        """
         if temp_id_source is None:
             temp_id_source = [0]
         # TODO: narrow to what we are using
         # TODO: use nearsql instead of strings / lists of strings
-        near_sql = self.sources[0].to_near_sql_implementation(
+        near_sql = self.sources[0].to_near_sql_implementation_(
             db_model=db_model,
             using=None,
             temp_id_source=temp_id_source,
@@ -2053,7 +2354,15 @@ class ConvertRecordsNode(ViewRepresentation):
             assert isinstance(near_sql, data_algebra.near_sql.NearSQL)
         return near_sql
 
-    def eval_implementation(self, *, data_map, data_model, narrow):
+    def eval_implementation_(self, *, data_map, data_model, narrow):
+        """
+        Implementation of Pandas evaluation of operators. Internal method.
+
+        :param data_map: dictionary of data sources
+        :param data_model: Pandas data model adaptor
+        :param narrow: if True narrow results to only columns anticipated
+        :return: Pandas data frame
+        """
         if data_model is None:
             raise ValueError("Expected data_model to not be None")
         return data_model.convert_records_step(
@@ -2098,7 +2407,14 @@ class SQLNode(ViewRepresentation):
     def columns_used_from_sources(self, using=None):
         return []
 
-    def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+    def to_python_src_(self, *, indent=0, strict=True, print_sources=True):
+        """
+        Return text representing operations.
+
+        :param indent: additional indent to apply in formatting.
+        :param strict: if False allow eliding of columns names and other long structures.
+        :param print_sources: logical, print children.
+        """
         s = (
             "SQLNode(sql="
             + str(self.sql)
@@ -2110,9 +2426,18 @@ class SQLNode(ViewRepresentation):
         )
         return s
 
-    def to_near_sql_implementation(
+    def to_near_sql_implementation_(
         self, db_model, *, using, temp_id_source, sql_format_options=None
     ) -> data_algebra.near_sql.NearSQL:
+        """
+        Convert operator dag into NearSQL type for translation to SQL string.
+
+        :param db_model: database model
+        :param using: optional column restriction set
+        :param temp_id_source: source of temporary ids
+        :param sql_format_options: options for sql formatting
+        :return: data_algebra.near_sql.NearSQL
+        """
         quoted_query_name = db_model.quote_identifier(self.view_name)
         near_sql = data_algebra.near_sql.NearSQLRawQStep(
             prefix=self.sql,
@@ -2125,7 +2450,15 @@ class SQLNode(ViewRepresentation):
         )
         return near_sql
 
-    def eval_implementation(self, *, data_map, data_model, narrow):
+    def eval_implementation_(self, *, data_map, data_model, narrow):
+        """
+        Implementation of Pandas evaluation of operators. Internal method.
+
+        :param data_map: dictionary of data sources
+        :param data_model: Pandas data model adaptor
+        :param narrow: if True narrow results to only columns anticipated
+        :return: Pandas data frame
+        """
         return data_map[self.view_name]
 
 
