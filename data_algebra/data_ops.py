@@ -534,7 +534,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             reverse=reverse,
         )
 
-    def project_parsed(self, parsed_ops=None, *, group_by=None):
+    def project_parsed_(self, parsed_ops=None, *, group_by=None):
         if group_by is None:
             group_by = []
         if ((parsed_ops is None) or (len(parsed_ops) < 1)) and (len(group_by) < 1):
@@ -543,7 +543,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         if len(new_cols_produced_in_calc.intersection(group_by)):
             raise ValueError("can not alter grouping columns")
         if self.is_trivial_when_intermediate_():
-            return self.sources[0].project_parsed(parsed_ops, group_by=group_by)
+            return self.sources[0].project_parsed_(parsed_ops, group_by=group_by)
         return ProjectNode(source=self, parsed_ops=parsed_ops, group_by=group_by)
 
     def project(self, ops=None, *, group_by=None):
@@ -556,7 +556,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         parsed_ops = data_algebra.expr_parse.parse_assignments_in_context(
             ops=ops, view=self
         )
-        return self.project_parsed(parsed_ops=parsed_ops, group_by=group_by)
+        return self.project_parsed_(parsed_ops=parsed_ops, group_by=group_by)
 
     def natural_join(self, b, *, by, jointype, check_all_common_keys_in_by=False):
         """
@@ -596,11 +596,11 @@ class ViewRepresentation(OperatorPlatform, ABC):
             a=self, b=b, id_column=id_column, a_name=a_name, b_name=b_name
         )
 
-    def select_rows_parsed(self, parsed_expr):
+    def select_rows_parsed_(self, parsed_expr):
         if parsed_expr is None:
             return self
         if self.is_trivial_when_intermediate_():
-            return self.sources[0].select_rows_parsed(parsed_expr=parsed_expr)
+            return self.sources[0].select_rows_parsed_(parsed_expr=parsed_expr)
         return SelectRowsNode(source=self, ops=parsed_expr)
 
     def select_rows(self, expr):
@@ -630,7 +630,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
         for op in ops.values():
             r_walk_expr(op)
-        return self.select_rows_parsed(parsed_expr=ops)
+        return self.select_rows_parsed_(parsed_expr=ops)
 
     def drop_columns(self, column_deletions):
         if isinstance(column_deletions, str):
@@ -1338,7 +1338,7 @@ class ProjectNode(ViewRepresentation):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
-        return new_sources[0].project_parsed(
+        return new_sources[0].project_parsed_(
             parsed_ops=self.ops, group_by=self.group_by
         )
 
@@ -1456,7 +1456,7 @@ class SelectRowsNode(ViewRepresentation):
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
-        return new_sources[0].select_rows_parsed(parsed_ops=self.ops)
+        return new_sources[0].select_rows_parsed_(parsed_ops=self.ops)
 
     def _equiv_nodes(self, other):
         if not isinstance(other, SelectRowsNode):
