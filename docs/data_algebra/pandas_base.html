@@ -88,7 +88,7 @@
                                 <a class="function" href="#PandasModelBase.rename_columns_step">rename_columns_step</a>
                         </li>
                         <li>
-                                <a class="function" href="#PandasModelBase.standardize_join_code">standardize_join_code</a>
+                                <a class="function" href="#PandasModelBase.standardize_join_code_">standardize_join_code_</a>
                         </li>
                         <li>
                                 <a class="function" href="#PandasModelBase.natural_join_step">natural_join_step</a>
@@ -403,6 +403,9 @@
     <span class="k">def</span> <span class="nf">data_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build a new emtpy data frame.</span>
+
+<span class="sd">        :param arg&quot; optional argument passed to constructor.</span>
+<span class="sd">        :return: data frame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># noinspection PyUnresolvedReferences</span>
@@ -824,9 +827,9 @@
         <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">op</span><span class="o">.</span><span class="n">reverse_mapping</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyMethodMayBeStatic</span>
-    <span class="k">def</span> <span class="nf">standardize_join_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jointype</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">standardize_join_code_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jointype</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Map join names to Pandas names.</span>
+<span class="sd">        Map join names to Pandas names. Internal method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">jointype</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">jointype</span> <span class="o">=</span> <span class="n">jointype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
@@ -875,7 +878,7 @@
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
             <span class="n">left</span><span class="o">=</span><span class="n">left</span><span class="p">,</span>
             <span class="n">right</span><span class="o">=</span><span class="n">right</span><span class="p">,</span>
-            <span class="n">how</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">standardize_join_code</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">jointype</span><span class="p">),</span>
+            <span class="n">how</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">standardize_join_code_</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">jointype</span><span class="p">),</span>
             <span class="n">on</span><span class="o">=</span><span class="n">by</span><span class="p">,</span>
             <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">suffixes</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;_tmp_right_col&quot;</span><span class="p">),</span>
@@ -1087,6 +1090,9 @@
     <span class="k">def</span> <span class="nf">data_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build a new emtpy data frame.</span>
+
+<span class="sd">        :param arg&quot; optional argument passed to constructor.</span>
+<span class="sd">        :return: data frame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># noinspection PyUnresolvedReferences</span>
@@ -1508,9 +1514,9 @@
         <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">op</span><span class="o">.</span><span class="n">reverse_mapping</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyMethodMayBeStatic</span>
-    <span class="k">def</span> <span class="nf">standardize_join_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jointype</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">standardize_join_code_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jointype</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Map join names to Pandas names.</span>
+<span class="sd">        Map join names to Pandas names. Internal method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">jointype</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">jointype</span> <span class="o">=</span> <span class="n">jointype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
@@ -1559,7 +1565,7 @@
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
             <span class="n">left</span><span class="o">=</span><span class="n">left</span><span class="p">,</span>
             <span class="n">right</span><span class="o">=</span><span class="n">right</span><span class="p">,</span>
-            <span class="n">how</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">standardize_join_code</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">jointype</span><span class="p">),</span>
+            <span class="n">how</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">standardize_join_code_</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">jointype</span><span class="p">),</span>
             <span class="n">on</span><span class="o">=</span><span class="n">by</span><span class="p">,</span>
             <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">suffixes</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;_tmp_right_col&quot;</span><span class="p">),</span>
@@ -1666,6 +1672,9 @@
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">data_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build a new emtpy data frame.</span>
+
+<span class="sd">        :param arg&quot; optional argument passed to constructor.</span>
+<span class="sd">        :return: data frame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># noinspection PyUnresolvedReferences</span>
@@ -1677,6 +1686,9 @@
         </details>
 
             <div class="docstring"><p>Build a new emtpy data frame.</p>
+
+<p>:param arg" optional argument passed to constructor.
+:return: data frame</p>
 </div>
 
 
@@ -2366,19 +2378,19 @@ transient_new_frame may be returned.</p>
 
 
                             </div>
-                            <div id="PandasModelBase.standardize_join_code" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#PandasModelBase.standardize_join_code">#&nbsp;&nbsp</a>
+                            <div id="PandasModelBase.standardize_join_code_" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#PandasModelBase.standardize_join_code_">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">standardize_join_code</span><span class="signature">(self, jointype)</span>:
+            <span class="name">standardize_join_code_</span><span class="signature">(self, jointype)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">standardize_join_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jointype</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">standardize_join_code_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jointype</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Map join names to Pandas names.</span>
+<span class="sd">        Map join names to Pandas names. Internal method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">jointype</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">jointype</span> <span class="o">=</span> <span class="n">jointype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
@@ -2395,7 +2407,7 @@ transient_new_frame may be returned.</p>
 
         </details>
 
-            <div class="docstring"><p>Map join names to Pandas names.</p>
+            <div class="docstring"><p>Map join names to Pandas names. Internal method.</p>
 </div>
 
 
@@ -2445,7 +2457,7 @@ transient_new_frame may be returned.</p>
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
             <span class="n">left</span><span class="o">=</span><span class="n">left</span><span class="p">,</span>
             <span class="n">right</span><span class="o">=</span><span class="n">right</span><span class="p">,</span>
-            <span class="n">how</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">standardize_join_code</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">jointype</span><span class="p">),</span>
+            <span class="n">how</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">standardize_join_code_</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">jointype</span><span class="p">),</span>
             <span class="n">on</span><span class="o">=</span><span class="n">by</span><span class="p">,</span>
             <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">suffixes</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;_tmp_right_col&quot;</span><span class="p">),</span>

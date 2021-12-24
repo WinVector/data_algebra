@@ -278,6 +278,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
     def data_frame(self, arg=None):
         """
         Build a new emtpy data frame.
+
+        :param arg" optional argument passed to constructor.
+        :return: data frame
         """
         if arg is None:
             # noinspection PyUnresolvedReferences
@@ -699,9 +702,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         return res.rename(columns=op.reverse_mapping)
 
     # noinspection PyMethodMayBeStatic
-    def standardize_join_code(self, jointype):
+    def standardize_join_code_(self, jointype):
         """
-        Map join names to Pandas names.
+        Map join names to Pandas names. Internal method.
         """
         assert isinstance(jointype, str)
         jointype = jointype.lower()
@@ -750,7 +753,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = self.pd.merge(
             left=left,
             right=right,
-            how=self.standardize_join_code(op.jointype),
+            how=self.standardize_join_code_(op.jointype),
             on=by,
             sort=False,
             suffixes=("", "_tmp_right_col"),

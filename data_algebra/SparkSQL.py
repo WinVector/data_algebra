@@ -15,7 +15,7 @@ try:
 
     have_Spark = True
 except ImportError:
-    have_Spark = False
+    pass
 
 
 def _sparksql_is_bad_expr(dbmodel, expression):
@@ -138,11 +138,17 @@ class SparkSQLModel(data_algebra.db_model.DBModel):
 
     # noinspection PyMethodMayBeStatic
     def execute(self, conn, q):
+        """
+        Execute a SQL query or operator dag.
+        """
         assert isinstance(conn, SparkConnection)
         assert isinstance(q, str)
         conn.spark_session.sql(q)
 
     def read_query(self, conn, q):
+        """
+        Execute a SQL query or operator dag, return result as Pandas data frame.
+        """
         assert isinstance(conn, SparkConnection)
         if isinstance(q, data_algebra.data_ops.ViewRepresentation):
             q = q.to_sql(db_model=self)
@@ -156,6 +162,7 @@ class SparkSQLModel(data_algebra.db_model.DBModel):
     def insert_table(
         self, conn, d, table_name, *, qualifiers=None, allow_overwrite=False
     ):
+        """Insert table into database."""
         assert isinstance(conn, SparkConnection)
         assert isinstance(table_name, str)
         if qualifiers is not None:

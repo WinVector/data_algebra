@@ -121,7 +121,7 @@
 
 <span class="k">class</span> <span class="nc">DataModel</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Interface for realizing the data algebra as a sequence of steps over an object.</span>
+<span class="sd">    Interface for realizing the data algebra as a sequence of steps over a Pandas like object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
@@ -132,66 +132,115 @@
     <span class="c1"># helper functions</span>
 
     <span class="k">def</span> <span class="nf">data_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build a new emtpy data frame.</span>
+
+<span class="sd">        :param arg&quot; optional argument passed to constructor.</span>
+<span class="sd">        :return: data frame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">is_appropriate_data_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if df is our type of data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">can_convert_col_to_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;check if non-empty vector can convert to numeric&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return True if column or value can be converted to numeric type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert column to numeric.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">isnull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return vector indicating which entries are null (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">bad_column_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; for numeric vector x, return logical vector of positions that are null, NaN, infinite&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return vector indicating which entries are bad (null or nan) (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="c1"># operation implementations</span>
 
     <span class="k">def</span> <span class="nf">table_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Represents a data input.</span>
+<span class="sd">        Return data frame from table description and data_map.</span>
 
-<span class="sd">        :param op:</span>
-<span class="sd">        :param data_map:</span>
-<span class="sd">        :param narrow:</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :param op: operation</span>
+<span class="sd">        :param data_map: map from tables to values</span>
+<span class="sd">        :param narrow: optional columns to narrow to.</span>
+<span class="sd">        :return: transformed table</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute an extend step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">project_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a project step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">select_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a select rows step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">select_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a select columns step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">drop_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a drop columns step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">order_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute an order rows step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">rename_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a rename columns step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">natural_join_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a natural join step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">concat_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a concat rows step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">convert_records_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute record conversion step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 </pre></div>
 
@@ -211,7 +260,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">DataModel</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Interface for realizing the data algebra as a sequence of steps over an object.</span>
+<span class="sd">    Interface for realizing the data algebra as a sequence of steps over a Pandas like object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
@@ -222,72 +271,121 @@
     <span class="c1"># helper functions</span>
 
     <span class="k">def</span> <span class="nf">data_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build a new emtpy data frame.</span>
+
+<span class="sd">        :param arg&quot; optional argument passed to constructor.</span>
+<span class="sd">        :return: data frame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">is_appropriate_data_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if df is our type of data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">can_convert_col_to_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;check if non-empty vector can convert to numeric&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return True if column or value can be converted to numeric type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert column to numeric.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">isnull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return vector indicating which entries are null (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">bad_column_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; for numeric vector x, return logical vector of positions that are null, NaN, infinite&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return vector indicating which entries are bad (null or nan) (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="c1"># operation implementations</span>
 
     <span class="k">def</span> <span class="nf">table_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Represents a data input.</span>
+<span class="sd">        Return data frame from table description and data_map.</span>
 
-<span class="sd">        :param op:</span>
-<span class="sd">        :param data_map:</span>
-<span class="sd">        :param narrow:</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :param op: operation</span>
+<span class="sd">        :param data_map: map from tables to values</span>
+<span class="sd">        :param narrow: optional columns to narrow to.</span>
+<span class="sd">        :return: transformed table</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute an extend step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">project_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a project step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">select_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a select rows step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">select_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a select columns step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">drop_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a drop columns step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">order_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute an order rows step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">rename_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a rename columns step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">natural_join_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a natural join step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">concat_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a concat rows step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">convert_records_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute record conversion step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Interface for realizing the data algebra as a sequence of steps over an object.</p>
+            <div class="docstring"><p>Interface for realizing the data algebra as a sequence of steps over a Pandas like object.</p>
 </div>
 
 
@@ -322,12 +420,23 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">data_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build a new emtpy data frame.</span>
+
+<span class="sd">        :param arg&quot; optional argument passed to constructor.</span>
+<span class="sd">        :return: data frame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Build a new emtpy data frame.</p>
+
+<p>:param arg" optional argument passed to constructor.
+:return: data frame</p>
+</div>
+
 
                             </div>
                             <div id="DataModel.is_appropriate_data_instance" class="classattr">
@@ -341,12 +450,17 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">is_appropriate_data_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if df is our type of data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Check if df is our type of data frame.</p>
+</div>
+
 
                             </div>
                             <div id="DataModel.can_convert_col_to_numeric" class="classattr">
@@ -360,13 +474,15 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">can_convert_col_to_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;check if non-empty vector can convert to numeric&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return True if column or value can be converted to numeric type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>check if non-empty vector can convert to numeric</p>
+            <div class="docstring"><p>Return True if column or value can be converted to numeric type.</p>
 </div>
 
 
@@ -382,12 +498,17 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">to_numeric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert column to numeric.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Convert column to numeric.</p>
+</div>
+
 
                             </div>
                             <div id="DataModel.isnull" class="classattr">
@@ -401,12 +522,17 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">isnull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return vector indicating which entries are null (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Return vector indicating which entries are null (vectorized).</p>
+</div>
+
 
                             </div>
                             <div id="DataModel.bad_column_positions" class="classattr">
@@ -420,13 +546,15 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">bad_column_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; for numeric vector x, return logical vector of positions that are null, NaN, infinite&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return vector indicating which entries are bad (null or nan) (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>for numeric vector x, return logical vector of positions that are null, NaN, infinite</p>
+            <div class="docstring"><p>Return vector indicating which entries are bad (null or nan) (vectorized).</p>
 </div>
 
 
@@ -443,24 +571,24 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">table_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Represents a data input.</span>
+<span class="sd">        Return data frame from table description and data_map.</span>
 
-<span class="sd">        :param op:</span>
-<span class="sd">        :param data_map:</span>
-<span class="sd">        :param narrow:</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :param op: operation</span>
+<span class="sd">        :param data_map: map from tables to values</span>
+<span class="sd">        :param narrow: optional columns to narrow to.</span>
+<span class="sd">        :return: transformed table</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Represents a data input.</p>
+            <div class="docstring"><p>Return data frame from table description and data_map.</p>
 
-<p>:param op:
-:param data_map:
-:param narrow:
-:return:</p>
+<p>:param op: operation
+:param data_map: map from tables to values
+:param narrow: optional columns to narrow to.
+:return: transformed table</p>
 </div>
 
 
@@ -476,12 +604,17 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute an extend step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Execute an extend step, returning a data frame.</p>
+</div>
+
 
                             </div>
                             <div id="DataModel.project_step" class="classattr">
@@ -495,12 +628,17 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">project_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a project step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Execute a project step, returning a data frame.</p>
+</div>
+
 
                             </div>
                             <div id="DataModel.select_rows_step" class="classattr">
@@ -514,12 +652,17 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">select_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a select rows step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Execute a select rows step, returning a data frame.</p>
+</div>
+
 
                             </div>
                             <div id="DataModel.select_columns_step" class="classattr">
@@ -533,12 +676,17 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">select_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a select columns step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Execute a select columns step, returning a data frame.</p>
+</div>
+
 
                             </div>
                             <div id="DataModel.drop_columns_step" class="classattr">
@@ -552,12 +700,17 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">drop_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a drop columns step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Execute a drop columns step, returning a data frame.</p>
+</div>
+
 
                             </div>
                             <div id="DataModel.order_rows_step" class="classattr">
@@ -571,12 +724,17 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">order_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute an order rows step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Execute an order rows step, returning a data frame.</p>
+</div>
+
 
                             </div>
                             <div id="DataModel.rename_columns_step" class="classattr">
@@ -590,12 +748,17 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">rename_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a rename columns step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Execute a rename columns step, returning a data frame.</p>
+</div>
+
 
                             </div>
                             <div id="DataModel.natural_join_step" class="classattr">
@@ -609,12 +772,17 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">natural_join_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a natural join step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Execute a natural join step, returning a data frame.</p>
+</div>
+
 
                             </div>
                             <div id="DataModel.concat_rows_step" class="classattr">
@@ -628,12 +796,17 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">concat_rows_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a concat rows step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Execute a concat rows step, returning a data frame.</p>
+</div>
+
 
                             </div>
                             <div id="DataModel.convert_records_step" class="classattr">
@@ -647,12 +820,17 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">convert_records_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute record conversion step, returning a data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Execute record conversion step, returning a data frame.</p>
+</div>
+
 
                             </div>
                 </section>

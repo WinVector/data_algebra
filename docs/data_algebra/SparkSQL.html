@@ -100,7 +100,7 @@
 
     <span class="n">have_Spark</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">have_Spark</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">pass</span>
 
 
 <span class="k">def</span> <span class="nf">_sparksql_is_bad_expr</span><span class="p">(</span><span class="n">dbmodel</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
@@ -223,11 +223,17 @@
 
     <span class="c1"># noinspection PyMethodMayBeStatic</span>
     <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a SQL query or operator dag.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">spark_session</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">read_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a SQL query or operator dag, return result as Pandas data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">):</span>
             <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
@@ -241,6 +247,7 @@
     <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Insert table into database.&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">qualifiers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -403,11 +410,17 @@
 
     <span class="c1"># noinspection PyMethodMayBeStatic</span>
     <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a SQL query or operator dag.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">spark_session</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">read_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a SQL query or operator dag, return result as Pandas data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">):</span>
             <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
@@ -421,6 +434,7 @@
     <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Insert table into database.&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">qualifiers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -482,6 +496,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a SQL query or operator dag.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">spark_session</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
@@ -489,8 +506,7 @@
 
         </details>
 
-            <div class="docstring"><p>:param conn: database connectionex
-:param q: sql query</p>
+            <div class="docstring"><p>Execute a SQL query or operator dag.</p>
 </div>
 
 
@@ -506,6 +522,9 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">read_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a SQL query or operator dag, return result as Pandas data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_ops</span><span class="o">.</span><span class="n">ViewRepresentation</span><span class="p">):</span>
             <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">db_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
@@ -518,9 +537,7 @@
 
         </details>
 
-            <div class="docstring"><p>:param conn: database connection
-:param q: sql query
-:return: query results as table</p>
+            <div class="docstring"><p>Execute a SQL query or operator dag, return result as Pandas data frame.</p>
 </div>
 
 
@@ -538,6 +555,7 @@
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Insert table into database.&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">SparkConnection</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">qualifiers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -558,13 +576,7 @@
 
         </details>
 
-            <div class="docstring"><p>Insert a table.</p>
-
-<p>:param conn: a database connection
-:param d: a Pandas table
-:param table_name: name to give write to
-:param qualifiers: schema and such
-:param allow_overwrite logical, if True drop previous table</p>
+            <div class="docstring"><p>Insert table into database.</p>
 </div>
 
 

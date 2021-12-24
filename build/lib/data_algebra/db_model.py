@@ -2083,7 +2083,7 @@ class DBHandle:
 
     def execute(self, q) -> None:
         """
-        Execute a SQL query.
+        Execute a SQL query or operator dag.
         """
         self.db_model.execute(conn=self.conn, q=q)
 
