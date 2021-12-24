@@ -63,7 +63,7 @@ def _assert_tables_defs_consistent(tm1: Dict, tm2: Dict):
     for k in common_keys:
         t1 = tm1[k]
         t2 = tm2[k]
-        if not t1.same_table(t2):
+        if not t1.same_table_description_(t2):
             raise ValueError("Table " + k + " has two incompatible representations")
 
 
@@ -155,7 +155,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
                 k = cursor.key
                 v = cursor
                 if k in tables.keys():
-                    if not v.same_table(tables[k]):
+                    if not v.same_table_description_(tables[k]):
                         raise ValueError(
                             "Table " + k + " has two incompatible representations"
                         )
@@ -214,8 +214,14 @@ class ViewRepresentation(OperatorPlatform, ABC):
             columns_used[k] = vi.copy()
         return columns_used
 
-    def forbidden_columns(self, *, forbidden=None):
-        """Determine which columns should not be in source tables"""
+    def forbidden_columns(self, *, forbidden: Optional[Set[str]] = None) -> Dict[str, Set[str]]:
+        """
+        Determine which columns should not be in source tables
+        (were not in declared structure, and interfere with column production).
+
+        :param forbidden: optional incoming forbids.
+        :return: dictionary operator keys to forbidden sets.
+        """
         if forbidden is None:
             forbidden = set()
         res = dict()
@@ -456,6 +462,15 @@ class ViewRepresentation(OperatorPlatform, ABC):
     def extend_parsed_(
         self, parsed_ops, *, partition_by=None, order_by=None, reverse=None
     ):
+        """
+        Add new derived columns, can replace existing columns for parsed operations. Internal method.
+
+        :param parsed_ops: dictionary of calculations to perform.
+        :param partition_by: optional window partition specification.
+        :param order_by: optional window ordering specification.
+        :param reverse: optional order reversal specification.
+        :return: compose operator directed acyclic graph
+        """
         if (parsed_ops is None) or (len(parsed_ops) < 1):
             return self
         if partition_by is None:
@@ -516,6 +531,15 @@ class ViewRepresentation(OperatorPlatform, ABC):
         )
 
     def extend(self, ops, *, partition_by=None, order_by=None, reverse=None):
+        """
+        Add new derived columns, can replace existing columns.
+
+        :param ops: dictionary of calculations to perform.
+        :param partition_by: optional window partition specification.
+        :param order_by: optional window ordering specification.
+        :param reverse: optional order reversal specification.
+        :return: compose operator directed acyclic graph
+        """
         if (ops is None) or (len(ops) < 1):
             return self
         if isinstance(partition_by, str):
@@ -535,6 +559,13 @@ class ViewRepresentation(OperatorPlatform, ABC):
         )
 
     def project_parsed_(self, parsed_ops=None, *, group_by=None):
+        """
+        Compute projection, or grouped calculation for parsed ops. Internal method.
+
+        :param parsed_ops: dictionary of calculations to perform, can be empty.
+        :param group_by: optional group key(s) specification.
+        :return: compose operator directed acyclic graph
+        """
         if group_by is None:
             group_by = []
         if ((parsed_ops is None) or (len(parsed_ops) < 1)) and (len(group_by) < 1):
@@ -547,6 +578,13 @@ class ViewRepresentation(OperatorPlatform, ABC):
         return ProjectNode(source=self, parsed_ops=parsed_ops, group_by=group_by)
 
     def project(self, ops=None, *, group_by=None):
+        """
+        Compute projection, or grouped calculation.
+
+        :param ops: dictionary of calculations to perform, can be empty.
+        :param group_by: optional group key(s) specification.
+        :return: compose operator directed acyclic graph
+        """
         if isinstance(group_by, str):
             group_by = [group_by]
         if group_by is None:
@@ -560,12 +598,13 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     def natural_join(self, b, *, by, jointype, check_all_common_keys_in_by=False):
         """
+        Join self (left) results with b (right).
 
-        :param b: right table
-        :param by: list of keys to join by
-        :param jointype: one of 'INNER', 'LEFT', 'RIGHT', 'OUTER', 'FULL', 'CROSS' (case insensitive)
-        :param check_all_common_keys_in_by: logical if True don't allow shared column names that are not in by-term
-        :return: ops describing join
+        :param b: second or right table to join to.
+        :param by: list of join key column names.
+        :param jointype: name of join type.
+        :param check_all_common_keys_in_by: if True, raise if any non-key columns are common to tables.
+        :return: compose operator directed acyclic graph
         """
         assert isinstance(b, ViewRepresentation)
         if isinstance(by, str):
@@ -582,6 +621,15 @@ class ViewRepresentation(OperatorPlatform, ABC):
         )
 
     def concat_rows(self, b, *, id_column="source_name", a_name="a", b_name="b"):
+        """
+        Union or concatenate rows of self with rows of b.
+
+        :param b: table with rows to add.
+        :param id_column: optional name for new source identification column.
+        :param a_name: source annotation to use for self/a.
+        :param b_name: source annotation to use for b.
+        :return: compose operator directed acyclic graph
+        """
         if b is None:
             return self
         assert isinstance(b, ViewRepresentation)
@@ -597,6 +645,12 @@ class ViewRepresentation(OperatorPlatform, ABC):
         )
 
     def select_rows_parsed_(self, parsed_expr):
+        """
+        Select rows matching parsed expr criteria. Internal method.
+
+        :param parsed_expr: logical expression specifying desired rows.
+        :return: compose operator directed acyclic graph
+        """
         if parsed_expr is None:
             return self
         if self.is_trivial_when_intermediate_():
@@ -604,6 +658,12 @@ class ViewRepresentation(OperatorPlatform, ABC):
         return SelectRowsNode(source=self, ops=parsed_expr)
 
     def select_rows(self, expr):
+        """
+        Select rows matching expr criteria.
+
+        :param expr: logical expression specifying desired rows.
+        :return: compose operator directed acyclic graph
+        """
         if expr is None:
             return self
         if isinstance(expr, (list, tuple)):
@@ -623,6 +683,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         )
 
         def r_walk_expr(opv):
+            """recursively inspect expression types"""
             if not isinstance(opv, data_algebra.expr_rep.Expression):
                 return
             for oi in opv.args:
@@ -633,6 +694,12 @@ class ViewRepresentation(OperatorPlatform, ABC):
         return self.select_rows_parsed_(parsed_expr=ops)
 
     def drop_columns(self, column_deletions):
+        """
+        Remove columns from result.
+
+        :param column_deletions: list of columns to remove.
+        :return: compose operator directed acyclic graph
+        """
         if isinstance(column_deletions, str):
             column_deletions = [column_deletions]
         if (column_deletions is None) or (len(column_deletions) < 1):
@@ -642,6 +709,12 @@ class ViewRepresentation(OperatorPlatform, ABC):
         return DropColumnsNode(source=self, column_deletions=column_deletions)
 
     def select_columns(self, columns):
+        """
+        Narrow to columns in result.
+
+        :param columns: list of columns to keep.
+        :return: compose operator directed acyclic graph
+        """
         if isinstance(columns, str):
             columns = [columns]
         if (columns is None) or (len(columns) < 1):
@@ -657,6 +730,13 @@ class ViewRepresentation(OperatorPlatform, ABC):
         return SelectColumnsNode(source=self, columns=columns)
 
     def rename_columns(self, column_remapping):
+        """
+        Rename columns.
+
+        :param column_remapping: dictionary mapping new column names to old column sources (same
+                                 direction as extend).
+        :return: compose operator directed acyclic graph
+        """
         if (column_remapping is None) or (len(column_remapping) < 1):
             return self
         assert isinstance(column_remapping, dict)
@@ -665,6 +745,14 @@ class ViewRepresentation(OperatorPlatform, ABC):
         return RenameColumnsNode(source=self, column_remapping=column_remapping)
 
     def order_rows(self, columns, *, reverse=None, limit=None):
+        """
+        Order rows by column set.
+
+        :param columns: columns to order by.
+        :param reverse: optional columns to reverse order.
+        :param limit: optional row limit to impose on result.
+        :return: compose operator directed acyclic graph
+        """
         if isinstance(columns, str):
             columns = [columns]
         if isinstance(reverse, str):
@@ -676,6 +764,12 @@ class ViewRepresentation(OperatorPlatform, ABC):
         return OrderRowsNode(source=self, columns=columns, reverse=reverse, limit=limit)
 
     def convert_records(self, record_map):
+        """
+        Apply a record mapping taking blocks_in to blocks_out structures.
+
+        :param record_map: data_algebra.cdata.RecordMap transform specification
+        :return: compose operator directed acyclic graph
+        """
         if record_map is None:
             return self
         if self.is_trivial_when_intermediate_():
@@ -688,7 +782,8 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
 
 class TableDescription(ViewRepresentation):
-    """Describe columns, and qualifiers, of a table.
+    """
+        Describe columns, and qualifiers, of a table.
 
        Example:
            from data_algebra.data_ops import *
@@ -747,7 +842,10 @@ class TableDescription(ViewRepresentation):
         if self.table_name is not None:
             self.key = self.table_name
 
-    def same_table(self, other):
+    def same_table_description_(self, other):
+        """
+        Return true if other is a description of the same table. Internal method, ingores data.
+        """
         if not isinstance(other, data_algebra.data_ops.TableDescription):
             return False
         if self.table_name_was_set_by_user != other.table_name_was_set_by_user:
@@ -769,12 +867,26 @@ class TableDescription(ViewRepresentation):
         """
         return "table_" + str(self.key)
 
-    def forbidden_columns(self, *, forbidden=None):
+    def forbidden_columns(self, *, forbidden: Optional[Set[str]] = None) -> Dict[str, Set[str]]:
+        """
+        Determine which columns should not be in source tables
+        (were not in declared structure, and interfere with column production).
+
+        :param forbidden: optional incoming forbids.
+        :return: dictionary operator keys to forbidden sets.
+        """
         if forbidden is None:
             forbidden = set()
         return {self.key: set(forbidden)}
 
     def apply_to(self, a, *, target_table_key=None):
+        """
+        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+
+        :param a: operators to apply to
+        :param target_table_key: table key to replace with self, None counts as "match all"
+        :return: new operator DAG
+        """
         if (target_table_key is None) or (target_table_key == self.key):
             # replace table with a
             return a
@@ -840,12 +952,6 @@ class TableDescription(ViewRepresentation):
             s = s + "," + spacer + "qualifiers=" + self.qualifiers.__repr__()
         s = s + ")"
         return s
-
-    def example_values_to_sql_str_list(self, db_model) -> List[str]:
-        assert self.head is not None
-        return db_model.table_values_to_sql_str_list(
-            self.head, result_name=self.table_name
-        )
 
     def get_tables(self):
         """get a dictionary of all tables used in an operator DAG,
@@ -1126,6 +1232,13 @@ class ExtendNode(ViewRepresentation):
         )
 
     def apply_to(self, a, *, target_table_key=None):
+        """
+        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+
+        :param a: operators to apply to
+        :param target_table_key: table key to replace with self, None counts as "match all"
+        :return: new operator DAG
+        """
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
@@ -1328,13 +1441,27 @@ class ProjectNode(ViewRepresentation):
             # TODO: check op is in list of aggregators
             # Note: non-aggregators making through will be caught by table shape check
 
-    def forbidden_columns(self, *, forbidden=None):
+    def forbidden_columns(self, *, forbidden: Optional[Set[str]] = None) -> Dict[str, Set[str]]:
+        """
+        Determine which columns should not be in source tables
+        (were not in declared structure, and interfere with column production).
+
+        :param forbidden: optional incoming forbids.
+        :return: dictionary operator keys to forbidden sets.
+        """
         if forbidden is None:
             forbidden = set()
         forbidden = set(forbidden).intersection(self.column_names)
         return self.sources[0].forbidden_columns(forbidden=forbidden)
 
     def apply_to(self, a, *, target_table_key=None):
+        """
+        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+
+        :param a: operators to apply to
+        :param target_table_key: table key to replace with self, None counts as "match all"
+        :return: new operator DAG
+        """
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
@@ -1453,6 +1580,13 @@ class SelectRowsNode(ViewRepresentation):
         )
 
     def apply_to(self, a, *, target_table_key=None):
+        """
+        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+
+        :param a: operators to apply to
+        :param target_table_key: table key to replace with self, None counts as "match all"
+        :return: new operator DAG
+        """
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
@@ -1548,13 +1682,27 @@ class SelectColumnsNode(ViewRepresentation):
             node_name="SelectColumnsNode",
         )
 
-    def forbidden_columns(self, *, forbidden=None):
+    def forbidden_columns(self, *, forbidden: Optional[Set[str]] = None) -> Dict[str, Set[str]]:
+        """
+        Determine which columns should not be in source tables
+        (were not in declared structure, and interfere with column production).
+
+        :param forbidden: optional incoming forbids.
+        :return: dictionary operator keys to forbidden sets.
+        """
         if forbidden is None:
             forbidden = set()
         forbidden = set(forbidden).intersection(self.column_selection)
         return self.sources[0].forbidden_columns(forbidden=forbidden)
 
     def apply_to(self, a, *, target_table_key=None):
+        """
+        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+
+        :param a: operators to apply to
+        :param target_table_key: table key to replace with self, None counts as "match all"
+        :return: new operator DAG
+        """
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
@@ -1647,13 +1795,27 @@ class DropColumnsNode(ViewRepresentation):
             node_name="DropColumnsNode",
         )
 
-    def forbidden_columns(self, *, forbidden=None):
+    def forbidden_columns(self, *, forbidden: Optional[Set[str]] = None) -> Dict[str, Set[str]]:
+        """
+        Determine which columns should not be in source tables
+        (were not in declared structure, and interfere with column production).
+
+        :param forbidden: optional incoming forbids.
+        :return: dictionary operator keys to forbidden sets.
+        """
         if forbidden is None:
             forbidden = set()
         forbidden = set(forbidden) - set(self.column_deletions)
         return self.sources[0].forbidden_columns(forbidden=forbidden)
 
     def apply_to(self, a, *, target_table_key=None):
+        """
+        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+
+        :param a: operators to apply to
+        :param target_table_key: table key to replace with self, None counts as "match all"
+        :return: new operator DAG
+        """
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
@@ -1751,6 +1913,13 @@ class OrderRowsNode(ViewRepresentation):
         )
 
     def apply_to(self, a, *, target_table_key=None):
+        """
+        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+
+        :param a: operators to apply to
+        :param target_table_key: table key to replace with self, None counts as "match all"
+        :return: new operator DAG
+        """
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
@@ -1878,7 +2047,14 @@ class RenameColumnsNode(ViewRepresentation):
             node_name="RenameColumnsNode",
         )
 
-    def forbidden_columns(self, *, forbidden=None):
+    def forbidden_columns(self, *, forbidden: Optional[Set[str]] = None) -> Dict[str, Set[str]]:
+        """
+        Determine which columns should not be in source tables
+        (were not in declared structure, and interfere with column production).
+
+        :param forbidden: optional incoming forbids.
+        :return: dictionary operator keys to forbidden sets.
+        """
         # this is where forbidden columns are introduced
         if forbidden is None:
             forbidden = set()
@@ -1887,6 +2063,13 @@ class RenameColumnsNode(ViewRepresentation):
         return self.sources[0].forbidden_columns(forbidden=new_forbidden)
 
     def apply_to(self, a, *, target_table_key=None):
+        """
+        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+
+        :param a: operators to apply to
+        :param target_table_key: table key to replace with self, None counts as "match all"
+        :return: new operator DAG
+        """
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
@@ -1974,7 +2157,7 @@ class NaturalJoinNode(ViewRepresentation):
             )
         common_table_keys = set(a_tables.keys()).intersection(b_tables.keys())
         for k in common_table_keys:
-            if not a_tables[k].same_table(b_tables[k]):
+            if not a_tables[k].same_table_description_(b_tables[k]):
                 raise ValueError(
                     "Different definition of table object on a/b for: " + k
                 )
@@ -2027,6 +2210,13 @@ class NaturalJoinNode(ViewRepresentation):
             raise ValueError("CROSS joins must have an empty 'by' list")
 
     def apply_to(self, a, *, target_table_key=None):
+        """
+        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+
+        :param a: operators to apply to
+        :param target_table_key: table key to replace with self, None counts as "match all"
+        :return: new operator DAG
+        """
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
@@ -2127,7 +2317,7 @@ class ConcatRowsNode(ViewRepresentation):
         _assert_tables_defs_consistent(a_tables, b_tables)
         common_keys = set(a_tables.keys()).intersection(b_tables.keys())
         for k in common_keys:
-            if not a_tables[k].same_table(b_tables[k]):
+            if not a_tables[k].same_table_description_(b_tables[k]):
                 raise ValueError(
                     "Different definition of table object on a/b for: " + k
                 )
@@ -2149,6 +2339,13 @@ class ConcatRowsNode(ViewRepresentation):
         self.b_name = b_name
 
     def apply_to(self, a, *, target_table_key=None):
+        """
+        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+
+        :param a: operators to apply to
+        :param target_table_key: table key to replace with self, None counts as "match all"
+        :return: new operator DAG
+        """
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
@@ -2262,6 +2459,13 @@ class ConvertRecordsNode(ViewRepresentation):
         )
 
     def apply_to(self, a, *, target_table_key=None):
+        """
+        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+
+        :param a: operators to apply to
+        :param target_table_key: table key to replace with self, None counts as "match all"
+        :return: new operator DAG
+        """
         new_sources = [
             s.apply_to(a, target_table_key=target_table_key) for s in self.sources
         ]
@@ -2388,6 +2592,13 @@ class SQLNode(ViewRepresentation):
         )
 
     def apply_to(self, a, *, target_table_key=None):
+        """
+        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+
+        :param a: operators to apply to
+        :param target_table_key: table key to replace with self, None counts as "match all"
+        :return: new operator DAG
+        """
         return self
 
     def _equiv_nodes(self, other):

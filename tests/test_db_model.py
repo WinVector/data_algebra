@@ -31,16 +31,3 @@ def test_db_model_base():
 
     conn.close()
 
-
-def test_db_model_table_def_values_sql():
-    db_handle = data_algebra.SQLite.example_handle()
-    d2 = data_algebra.default_data_model.pd.DataFrame(
-        {"col1": [1, 2, 3], "col2": [3, 4, None], "col3": [4, 5, 7]}
-    )
-    td = descr(d2=d2)
-    sql_list = td.example_values_to_sql_str_list(db_handle.db_model)
-    sql = "\n".join(sql_list)
-    db_handle.read_query(sql)
-    back = db_handle.read_query(sql)
-    db_handle.close()
-    assert data_algebra.test_util.equivalent_frames(d2, back)
