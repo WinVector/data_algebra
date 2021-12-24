@@ -39,6 +39,13 @@ except ImportError:
 
 # noinspection PyBroadException
 def pretty_format_python(python_str: str, *, black_mode=None) -> str:
+    """
+    Format Python code, using black.
+
+    :param python_str: Python code
+    :param black_mode: options for black
+    :return: formatted Python code
+    """
     assert isinstance(python_str, str)
     formatted_python = python_str
     if _have_black:
@@ -106,6 +113,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
         return res
 
     def merged_rep_id(self) -> str:
+        """
+        String key for lookups.
+        """
         return "ops+ " + str(id(self))
 
     # convenience
@@ -162,9 +172,11 @@ class ViewRepresentation(OperatorPlatform, ABC):
         raise NotImplementedError("base method called")
 
     def columns_produced(self):
+        """Return list of columns produced by operator dag."""
         return list(self.column_names)
 
-    def _columns_used_implementation(self, *, using, columns_currently_using_records):
+    def columns_used_implementation_(self, *, using, columns_currently_using_records):
+        """Implementation of columns used calculation, internal method."""
         self_merged_rep_id = self.merged_rep_id()
         try:
             crec = columns_currently_using_records[self_merged_rep_id]
@@ -180,7 +192,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
             crec.update(using)
         cu_list = self.columns_used_from_sources(crec.copy())
         for i in range(len(self.sources)):
-            self.sources[i]._columns_used_implementation(
+            self.sources[i].columns_used_implementation_(
                 using=cu_list[i],
                 columns_currently_using_records=columns_currently_using_records,
             )
@@ -192,7 +204,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         columns_currently_using_records = {
             v.merged_rep_id(): set() for v in tables.values()
         }
-        self._columns_used_implementation(
+        self.columns_used_implementation_(
             using=using, columns_currently_using_records=columns_currently_using_records
         )
         columns_used = dict()
@@ -221,6 +233,12 @@ class ViewRepresentation(OperatorPlatform, ABC):
     # printing
 
     def to_python_implementation(self, *, indent=0, strict=True, print_sources=True):
+        """
+        Return text representing operations.
+
+        :param indent: additional indent to apply in formatting.
+        :param print_sources: logical, print children.
+        """
         return "ViewRepresentation(" + self.column_names.__repr__() + ")"
 
     # noinspection PyBroadException
@@ -703,7 +721,10 @@ class TableDescription(ViewRepresentation):
         # ignore head and limit_was, as they are just advisory
         return True
 
-    def merged_rep_id(self):
+    def merged_rep_id(self) -> str:
+        """
+        String key for lookups.
+        """
         return "table_" + str(self.key)
 
     def forbidden_columns(self, *, forbidden=None):
