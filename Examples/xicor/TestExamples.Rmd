@@ -1,0 +1,29 @@
+---
+title: "Make XICOR Test Examples"
+output: github_document
+---
+
+```{r}
+library(XICOR)
+library(yaml)
+
+mk_vec <- function() {
+  # sample.int(n=10, size = 20, replace = TRUE)  # calculation seems unstable in tie breaking
+  runif(n = 20)
+}
+
+mk_example <- function(...) {
+  a <- mk_vec()
+  b <- mk_vec()
+  xicor <- calculateXI(a, b, seed=NULL)
+  list(a = a, b = b, xicor = xicor)
+}
+
+examples <- lapply(1:20, mk_example)
+
+examples
+
+f <- file("examples.yaml")
+writeLines(as.yaml(examples), f)
+close(f)
+```
