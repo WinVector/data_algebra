@@ -589,7 +589,7 @@ db_expr_formatters = {
 
 db_default_op_replacements = {
     "==": "=",
-    "cumsum": "sum",
+    "cumsum": "SUM",
     "and": "AND",
     "&": "AND",
     "&&": "AND",
@@ -598,6 +598,12 @@ db_default_op_replacements = {
     "||": "OR",
     "!": "NOT",
     "~": "NOT",
+    "_count": "COUNT",
+    "_ngroup": "NGROUP",
+    "_row_number": "ROW_NUMBER",
+    "_size": "SIZE",
+    "_connected_components": "CONNECTED_COMPONENTS",
+    "_uniform": "RAND",
 }
 
 
@@ -903,8 +909,12 @@ class DBModel:
             op = expression.op
             if op in self.op_replacements.keys():
                 op = self.op_replacements[op]
+            elif op.lower() in  self.op_replacements.keys():
+                op = self.op_replacements[op.lower()]
             if op in self.sql_formatters.keys():
                 return self.sql_formatters[op](self, expression)
+            if op.lower() in self.sql_formatters.keys():
+                return self.sql_formatters[op.lower()](self, expression)
             if (len(expression.args) > 1) and expression.inline:
                 subs = [
                     self.expr_to_sql(ai, want_inline_parens=True)

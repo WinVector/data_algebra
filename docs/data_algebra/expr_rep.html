@@ -220,9 +220,6 @@
                                 <a class="function" href="#Term.min">min</a>
                         </li>
                         <li>
-                                <a class="function" href="#Term.ngroup">ngroup</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#Term.nunique">nunique</a>
                         </li>
                         <li>
@@ -558,6 +555,7 @@
     <span class="s2">&quot;median&quot;</span><span class="p">,</span>
     <span class="s2">&quot;min&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ngroup&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;_ngroup&quot;</span><span class="p">,</span>
     <span class="s2">&quot;nlargest&quot;</span><span class="p">,</span>
     <span class="s2">&quot;nsmallest&quot;</span><span class="p">,</span>
     <span class="s2">&quot;nth&quot;</span><span class="p">,</span>
@@ -593,6 +591,7 @@
 <span class="c1"># noinspection SpellCheckingInspection</span>
 <span class="n">fn_names_not_allowed_in_project</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;ngroup&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;_ngroup&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -856,19 +855,6 @@
     <span class="k">def</span> <span class="fm">__pos__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span>  <span class="c1"># Treat as a no-op</span>
 
-    <span class="c1"># # TODO: need to work out how to send to Pandas and SQL</span>
-    <span class="c1"># def __lshift__(self, other):</span>
-    <span class="c1">#     return self.__op_expr__(&quot;&lt;&lt;&quot;, other)</span>
-    <span class="c1">#</span>
-    <span class="c1"># def __rlshift__(self, other):</span>
-    <span class="c1">#     return self.__rop_expr__(&quot;&lt;&lt;&quot;, other)</span>
-    <span class="c1">#</span>
-    <span class="c1"># def __rshift__(self, other):</span>
-    <span class="c1">#     return self.__op_expr__(&quot;&gt;&gt;&quot;, other)</span>
-    <span class="c1">#</span>
-    <span class="c1"># def __rrshift__(self, other):</span>
-    <span class="c1">#     return self.__rop_expr__(&quot;&gt;&gt;&quot;, other)</span>
-
     <span class="k">def</span> <span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
@@ -894,7 +880,7 @@
     <span class="c1"># math functions</span>
     <span class="c1"># https://docs.scipy.org/doc/numpy-1.13.0/reference/routines.math.html</span>
 
-    <span class="c1"># TODO: double check https://docs.python.org/3/library/operator.html</span>
+    <span class="c1"># Python operators: https://docs.python.org/3/library/operator.html</span>
 
     <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1188,12 +1174,6 @@
 <span class="sd">        Return min (vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;min&quot;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">ngroup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return number of groups (vectorized).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;ngroup&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">nunique</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1749,14 +1729,11 @@
     <span class="c1"># from populate_specials</span>
     <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">{</span>
         <span class="s2">&quot;_count&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;count&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;row_number&quot;</span><span class="p">,</span>
         <span class="s2">&quot;_row_number&quot;</span><span class="p">,</span>
         <span class="s2">&quot;_size&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;size&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;connected_components&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_connected_components&quot;</span><span class="p">,</span>
         <span class="s2">&quot;_ngroup&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ngroup&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_uniform&quot;</span><span class="p">,</span>
     <span class="p">}:</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="c1"># check user fns</span>
@@ -1889,6 +1866,12 @@
             <span class="k">return</span> <span class="n">method_to_call</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">pass</span>
+        <span class="c1"># special zero argument functions</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;_uniform&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">data_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;zero-argument function </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
         <span class="c1"># now see if argument (usually Pandas) can do this</span>
         <span class="c1"># doubt we hit in this, as most exposed methods are window methods</span>
         <span class="k">try</span><span class="p">:</span>
@@ -2517,19 +2500,6 @@ str() method returns only the text for interoperability.</p>
     <span class="k">def</span> <span class="fm">__pos__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span>  <span class="c1"># Treat as a no-op</span>
 
-    <span class="c1"># # TODO: need to work out how to send to Pandas and SQL</span>
-    <span class="c1"># def __lshift__(self, other):</span>
-    <span class="c1">#     return self.__op_expr__(&quot;&lt;&lt;&quot;, other)</span>
-    <span class="c1">#</span>
-    <span class="c1"># def __rlshift__(self, other):</span>
-    <span class="c1">#     return self.__rop_expr__(&quot;&lt;&lt;&quot;, other)</span>
-    <span class="c1">#</span>
-    <span class="c1"># def __rshift__(self, other):</span>
-    <span class="c1">#     return self.__op_expr__(&quot;&gt;&gt;&quot;, other)</span>
-    <span class="c1">#</span>
-    <span class="c1"># def __rrshift__(self, other):</span>
-    <span class="c1">#     return self.__rop_expr__(&quot;&gt;&gt;&quot;, other)</span>
-
     <span class="k">def</span> <span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__op_expr__</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
@@ -2555,7 +2525,7 @@ str() method returns only the text for interoperability.</p>
     <span class="c1"># math functions</span>
     <span class="c1"># https://docs.scipy.org/doc/numpy-1.13.0/reference/routines.math.html</span>
 
-    <span class="c1"># TODO: double check https://docs.python.org/3/library/operator.html</span>
+    <span class="c1"># Python operators: https://docs.python.org/3/library/operator.html</span>
 
     <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -2849,12 +2819,6 @@ str() method returns only the text for interoperability.</p>
 <span class="sd">        Return min (vectorized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;min&quot;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">ngroup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return number of groups (vectorized).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;ngroup&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">nunique</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -4285,30 +4249,6 @@ str() method returns only the text for interoperability.</p>
 
 
                             </div>
-                            <div id="Term.ngroup" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#Term.ngroup">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">ngroup</span><span class="signature">(self)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">ngroup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return number of groups (vectorized).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__uop_expr__</span><span class="p">(</span><span class="s2">&quot;ngroup&quot;</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Return number of groups (vectorized).</p>
-</div>
-
-
-                            </div>
                             <div id="Term.nunique" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#Term.nunique">#&nbsp;&nbsp</a>
 
@@ -5483,7 +5423,6 @@ str() method returns only the text for interoperability.</p>
                 <dd id="Value.mean" class="function"><a href="#Term.mean">mean</a></dd>
                 <dd id="Value.median" class="function"><a href="#Term.median">median</a></dd>
                 <dd id="Value.min" class="function"><a href="#Term.min">min</a></dd>
-                <dd id="Value.ngroup" class="function"><a href="#Term.ngroup">ngroup</a></dd>
                 <dd id="Value.nunique" class="function"><a href="#Term.nunique">nunique</a></dd>
                 <dd id="Value.rank" class="function"><a href="#Term.rank">rank</a></dd>
                 <dd id="Value.size" class="function"><a href="#Term.size">size</a></dd>
@@ -6486,7 +6425,6 @@ str() method returns only the text for interoperability.</p>
                 <dd id="ColumnReference.mean" class="function"><a href="#Term.mean">mean</a></dd>
                 <dd id="ColumnReference.median" class="function"><a href="#Term.median">median</a></dd>
                 <dd id="ColumnReference.min" class="function"><a href="#Term.min">min</a></dd>
-                <dd id="ColumnReference.ngroup" class="function"><a href="#Term.ngroup">ngroup</a></dd>
                 <dd id="ColumnReference.nunique" class="function"><a href="#Term.nunique">nunique</a></dd>
                 <dd id="ColumnReference.rank" class="function"><a href="#Term.rank">rank</a></dd>
                 <dd id="ColumnReference.size" class="function"><a href="#Term.size">size</a></dd>
@@ -6637,6 +6575,12 @@ str() method returns only the text for interoperability.</p>
             <span class="k">return</span> <span class="n">method_to_call</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">pass</span>
+        <span class="c1"># special zero argument functions</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;_uniform&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">data_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;zero-argument function </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
         <span class="c1"># now see if argument (usually Pandas) can do this</span>
         <span class="c1"># doubt we hit in this, as most exposed methods are window methods</span>
         <span class="k">try</span><span class="p">:</span>
@@ -6900,6 +6844,12 @@ str() method returns only the text for interoperability.</p>
             <span class="k">return</span> <span class="n">method_to_call</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">pass</span>
+        <span class="c1"># special zero argument functions</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;_uniform&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">data_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;zero-argument function </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
         <span class="c1"># now see if argument (usually Pandas) can do this</span>
         <span class="c1"># doubt we hit in this, as most exposed methods are window methods</span>
         <span class="k">try</span><span class="p">:</span>
@@ -7049,7 +6999,6 @@ str() method returns only the text for interoperability.</p>
                 <dd id="Expression.mean" class="function"><a href="#Term.mean">mean</a></dd>
                 <dd id="Expression.median" class="function"><a href="#Term.median">median</a></dd>
                 <dd id="Expression.min" class="function"><a href="#Term.min">min</a></dd>
-                <dd id="Expression.ngroup" class="function"><a href="#Term.ngroup">ngroup</a></dd>
                 <dd id="Expression.nunique" class="function"><a href="#Term.nunique">nunique</a></dd>
                 <dd id="Expression.rank" class="function"><a href="#Term.rank">rank</a></dd>
                 <dd id="Expression.size" class="function"><a href="#Term.size">size</a></dd>

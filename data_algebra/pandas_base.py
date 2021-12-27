@@ -525,7 +525,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                             zero_op
                         )  # Pandas transform, not data_algebra
                     else:
-                        raise KeyError("not implemented: " + str(k) + ": " + str(opk))
+                        raise KeyError("not implemented in windowed situation: " + str(k) + ": " + str(opk))
                 else:
                     transform_args = []
                     if len(opk.args) > 1:
