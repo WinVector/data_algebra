@@ -507,16 +507,22 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             # perform calculations
             for (k, opk) in op.ops.items():
                 # work on a slice of the data frame
-                # TODO: document exactly which of these are available
-                # TODO: check if need any of these in project
+                # Availability roughly documented in:
+                # https://github.com/WinVector/data_algebra/blob/main/Examples/Methods/data_algebra_catalog.ipynb
+                # (essentially none but _ngroup)
                 if len(opk.args) <= 0:
-                    if opk.op in {"row_number", "_row_number", "count", "_count"}:
+                    # check for and remove initial underbar
+                    assert isinstance(opk.op, str)
+                    assert len(opk.op) > 1
+                    assert opk.op[0] == '_'
+                    zero_op = opk.op[1:]
+                    if zero_op in {"row_number", "count"}:
                         subframe[k] = opframe.cumcount() + 1
-                    elif opk.op in {"ngroup", "_ngroup"}:
+                    elif zero_op in {"ngroup"}:
                         subframe[k] = opframe.ngroup()
-                    elif opk.op in {"size", "_size"}:
+                    elif zero_op in {"size"}:
                         subframe[k] = opframe[standin_name].transform(
-                            opk.op
+                            zero_op
                         )  # Pandas transform, not data_algebra
                     else:
                         raise KeyError("not implemented: " + str(k) + ": " + str(opk))
@@ -604,7 +610,11 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
                 if len(opk.args) > 0:
                     vk = res[value_name].agg(opk.op)
                 else:
-                    vk = res["_data_table_temp_col"].agg(opk.op)
+                    # expect and strip off initial underbar
+                    assert isinstance(opk.op, str)
+                    assert len(opk.op) > 1
+                    assert opk.op[0] == '_'
+                    vk = res["_data_table_temp_col"].agg(opk.op[1:])
                 cols[k] = vk
         else:
             cols = {"_data_table_temp_col": res["_data_table_temp_col"].agg("sum")}

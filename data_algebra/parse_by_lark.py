@@ -178,8 +178,6 @@ def _walk_lark_tree(op, *, data_def=None) -> data_algebra.expr_rep.Term:
                     method = getattr(var, op_name)
                     return method(*args)
                 else:
-                    if op_name.startswith("_"):  # TODO: get rid of underbar aliases
-                        op_name = op_name[1:len(op_name)]
                     return data_algebra.expr_rep.Expression(op=op_name, args=args)
             if r_op.data in {"or_test", "or_test_sym", "and_test", "and_test_sym"}:
                 if len(r_op.children) < 2:

@@ -61,6 +61,7 @@ fn_names_that_imply_windowed_situation = {
     "median",
     "min",
     "ngroup",
+    "_ngroup",
     "nlargest",
     "nsmallest",
     "nth",
@@ -96,6 +97,7 @@ fn_names_that_imply_ordered_windowed_situation = {
 # noinspection SpellCheckingInspection
 fn_names_not_allowed_in_project = {
     "ngroup",
+    "_ngroup",
 }
 
 
@@ -359,19 +361,6 @@ class Term(PreTerm, ABC):
     def __pos__(self):
         return self  # Treat as a no-op
 
-    # # TODO: need to work out how to send to Pandas and SQL
-    # def __lshift__(self, other):
-    #     return self.__op_expr__("<<", other)
-    #
-    # def __rlshift__(self, other):
-    #     return self.__rop_expr__("<<", other)
-    #
-    # def __rshift__(self, other):
-    #     return self.__op_expr__(">>", other)
-    #
-    # def __rrshift__(self, other):
-    #     return self.__rop_expr__(">>", other)
-
     def __and__(self, other):
         return self.__op_expr__("&", other)
 
@@ -397,7 +386,7 @@ class Term(PreTerm, ABC):
     # math functions
     # https://docs.scipy.org/doc/numpy-1.13.0/reference/routines.math.html
 
-    # TODO: double check https://docs.python.org/3/library/operator.html
+    # Python operators: https://docs.python.org/3/library/operator.html
 
     def sign(self):
         """
@@ -691,12 +680,6 @@ class Term(PreTerm, ABC):
         Return min (vectorized).
         """
         return self.__uop_expr__("min")
-
-    def ngroup(self):
-        """
-        Return number of groups (vectorized).
-        """
-        return self.__uop_expr__("ngroup")
 
     def nunique(self):
         """
@@ -1252,14 +1235,11 @@ def _can_find_method_by_name(op):
     # from populate_specials
     if op in {
         "_count",
-        "count",
-        "row_number",
         "_row_number",
         "_size",
-        "size",
-        "connected_components",
+        "_connected_components",
         "_ngroup",
-        "ngroup",
+        "_uniform",
     }:
         return True
     # check user fns

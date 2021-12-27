@@ -79,13 +79,13 @@ timestamp_diff,datetime_col_0.timestamp_diff(datetime_col_1),e,y,n,y,n,n,n,1.1.3
 trimstr,"g.trimstr(0, 2)",e,y,y,y,y,y,y,1.1.3
 weekofyear,date_col_0.weekofyear(),e,y,n,y,w,w,y,1.1.3
 year,date_col_0.year(),e,y,n,y,y,y,y,1.1.3
+_ngroup,_ngroup(),g,y,n,n,n,n,n,1.1.3
 all,a.all(),g,y,n,n,n,n,n,1.1.3
 any,a.any(),g,y,n,n,n,n,n,1.1.3
 max,x.max(),g,y,y,y,y,y,y,1.1.3
 mean,x.mean(),g,y,y,y,y,y,y,1.1.3
 median,x.median(),g,y,n,y,n,n,n,1.1.3
 min,x.min(),g,y,y,y,y,y,y,1.1.3
-ngroup,x.ngroup(),g,y,n,n,n,n,n,1.1.3
 nunique,x.nunique(),g,y,n,y,n,n,n,1.1.3
 size,x.size(),g,y,y,y,y,y,y,1.1.3
 std,x.std(),g,y,n,n,n,y,w,1.1.3

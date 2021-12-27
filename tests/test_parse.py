@@ -184,3 +184,25 @@ def test_parse_14():
     )
     recovered = ops.ops["z"]
     assert str(recovered) == "(1).sum()"
+
+
+def test_parse_row_number():
+    td = TableDescription(table_name="d", column_names=["row_number", "x"])
+
+    ops = td.extend({'ng': '_row_number()'})
+    ops_str = str(ops)
+    assert "_row_number" in ops_str
+
+    with pytest.raises(KeyError):
+        ops = td.extend({'ng': 'row_number()'})
+
+
+def test_parse_ngroup():
+    td = TableDescription(table_name="d", column_names=["ngroup", "x"])
+
+    ops = td.extend({'ng': '_ngroup()'})
+    ops_str = str(ops)
+    assert "_ngroup" in ops_str
+
+    with pytest.raises(KeyError):
+        ops = td.extend({'ng': 'ngroup()'})
