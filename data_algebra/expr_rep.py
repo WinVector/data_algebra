@@ -1372,6 +1372,12 @@ class Expression(Term):
             return method_to_call(*args)
         except KeyError:
             pass
+        # special zero argument functions
+        if len(args) == 0:
+            if self.op == '_uniform':
+                return numpy.random.uniform(size=data_frame.shape[0])
+            else:
+                KeyError(f"zero-argument function {self.op} not found")
         # now see if argument (usually Pandas) can do this
         # doubt we hit in this, as most exposed methods are window methods
         try:

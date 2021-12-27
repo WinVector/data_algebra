@@ -30,6 +30,7 @@ class PostgreSQLModel(data_algebra.db_model.DBModel):
     def __init__(self):
         op_replacements = data_algebra.db_model.db_default_op_replacements.copy()
         op_replacements['log'] = 'LN'
+        op_replacements['_uniform'] = 'RANDOM'
         data_algebra.db_model.DBModel.__init__(
             self,
             identifier_quote='"',

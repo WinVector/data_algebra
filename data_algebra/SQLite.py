@@ -37,8 +37,20 @@ def _sqlite_is_bad_expr(dbmodel, expression):
     )
 
 
+def _sqlite_RAND_expr(dbmodel, expression):
+    """
+    Return independent uniform numbers in the range [0, 1]
+    # ref: https://www.sqlite.org/lang_corefunc.html#random
+    """
+
+    return (
+        "(1.0 + random() / 9223372036854775808.0) / 2.0"
+    )
+
+
 SQLite_formatters = {
     "is_bad": _sqlite_is_bad_expr,
+    "rand": _sqlite_RAND_expr,
 }
 
 
