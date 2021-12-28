@@ -8,6 +8,7 @@ import data_algebra
 
 import pickle
 import hashlib
+import traceback
 
 import data_algebra.db_model
 import data_algebra.SQLite
@@ -120,12 +121,24 @@ def equivalent_frames(
             if not numpy.all(ca_null):
                 ca = ca[ca_null == False]
                 cb = cb[cb_null == False]
-                if local_data_model.can_convert_col_to_numeric(ca) != local_data_model.can_convert_col_to_numeric(cb):
+                ca_can_be_numeric = False
+                ca_n = None
+                try:
+                    ca_n = numpy.asarray(ca, dtype=float)
+                    ca_can_be_numeric = True
+                except Exception:
+                    pass
+                cb_can_be_numeric = False
+                cb_n = None
+                try:
+                    cb_n = numpy.asarray(cb, dtype=float)
+                    cb_can_be_numeric = True
+                except Exception:
+                    pass
+                if ca_can_be_numeric != cb_can_be_numeric:
                     return False
-                if local_data_model.can_convert_col_to_numeric(a[c]):
-                    ca = numpy.asarray(ca, dtype=float)
-                    cb = numpy.asarray(cb, dtype=float)
-                    dif = numpy.abs(ca - cb) / numpy.maximum(numpy.maximum(ca, cb), 1)
+                if ca_can_be_numeric and cb_can_be_numeric:
+                    dif = numpy.abs(ca_n - cb_n) / numpy.maximum(numpy.maximum(numpy.abs(ca_n), numpy.abs(cb_n)), 1.0)
                     if numpy.max(dif) > float_tol:
                         return False
                 else:
@@ -491,6 +504,8 @@ def check_transform(
             db_handles=db_handles,
             empty_produces_empty=empty_produces_empty,
         )
+    except AssertionError:
+        traceback.print_exc()
     except Exception as exc:
         caught = exc
 

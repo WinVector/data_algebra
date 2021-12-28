@@ -8,18 +8,26 @@ library(XICOR)
 library(yaml)
 
 mk_vec <- function() {
-  # sample.int(n=10, size = 20, replace = TRUE)  # calculation seems unstable in tie breaking
-  runif(n = 20)
+  if(runif(1) < 0.5) {
+    return(sample.int(n = 10, size = 20, replace = TRUE))
+  } else {
+    return(runif(n = 20))
+  }
 }
 
 mk_example <- function(...) {
   a <- mk_vec()
   b <- mk_vec()
-  xicor <- calculateXI(a, b, seed=NULL)
+  
+  f <- function(...) {
+    calculateXI(a, b, seed=NULL)
+  }
+  
+  xicor <- vapply(1:100, f, numeric(1))
   list(a = a, b = b, xicor = xicor)
 }
 
-examples <- lapply(1:20, mk_example)
+examples <- lapply(1:50, mk_example)
 
 examples
 
