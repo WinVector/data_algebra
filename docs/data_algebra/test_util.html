@@ -385,8 +385,8 @@
     <span class="k">if</span> <span class="n">check_parse</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ops did not round-trip format&quot;</span><span class="p">)</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
     <span class="c1"># try pandas path</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="s2">&quot;expected res to be local_data_model.pd.DataFrame, got: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">res</span><span class="p">))</span>
@@ -401,7 +401,7 @@
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pandas eval result did not match expect&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">res_t</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">res_t</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">],</span> <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
             <span class="n">res_t</span><span class="p">,</span>
             <span class="n">expect</span><span class="p">,</span>
@@ -867,8 +867,8 @@ Ignores indexing. None and nan are considered equivalent in numeric contexts.</p
     <span class="k">if</span> <span class="n">check_parse</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ops did not round-trip format&quot;</span><span class="p">)</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
     <span class="c1"># try pandas path</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="s2">&quot;expected res to be local_data_model.pd.DataFrame, got: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">res</span><span class="p">))</span>
@@ -883,7 +883,7 @@ Ignores indexing. None and nan are considered equivalent in numeric contexts.</p
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pandas eval result did not match expect&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">res_t</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">res_t</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">],</span> <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
             <span class="n">res_t</span><span class="p">,</span>
             <span class="n">expect</span><span class="p">,</span>
