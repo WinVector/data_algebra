@@ -384,13 +384,14 @@ class ViewRepresentation(OperatorPlatform, ABC):
                         "Table " + k + " has forbidden columns: " + str(excess)
                     )
 
-    def eval(self, data_map, *, data_model=None, narrow=True):
+    def eval(self, data_map, *, data_model=None, narrow: bool = True, check_incoming_data_constraints: bool = False):
         """
          Evaluate operators with respect to Pandas data frames.
 
          :param data_map: map from table names to data frames
          :param data_model: adaptor to data dialect (Pandas for now)
-         :param narrow logical, if True don't copy unexpected columns
+         :param narrow: logical, if True don't copy unexpected columns
+         :param check_incoming_data_constraints: logical, if True check incoming data meets constraints
          :return: table result
          """
 
@@ -399,7 +400,8 @@ class ViewRepresentation(OperatorPlatform, ABC):
         if data_model is None:
             data_model = data_algebra.default_data_model
         assert isinstance(data_model, data_algebra.data_model.DataModel)
-        if (data_map is not None) and (len(data_map) > 0):
+
+        if check_incoming_data_constraints and (data_map is not None) and (len(data_map) > 0):
             self.columns_used()  # for table consistency check/raise
             tables = self.get_tables()
             self.check_constraints(
@@ -416,13 +418,15 @@ class ViewRepresentation(OperatorPlatform, ABC):
         )
 
     # noinspection PyPep8Naming
-    def transform(self, X, *, data_model=None, narrow=True):
+    def transform(self, X, *, data_model=None, narrow: bool = True, check_incoming_data_constraints: bool = False):
         """
         Apply data transform to a table
 
         :param X: tale to apply to
         :param data_model: data model for Pandas execution
         :param narrow: logical, if True narrow number of result columns to specification
+        :param check_incoming_data_constraints: logical, if True check incoming data meets constraints
+        :return: transformed data frame
         """
         if data_model is None:
             data_model = data_algebra.default_data_model
@@ -437,7 +441,11 @@ class ViewRepresentation(OperatorPlatform, ABC):
         # noinspection PyUnresolvedReferences
         if isinstance(X, data_model.pd.DataFrame):
             data_map = {k: X}
-            return self.eval(data_map=data_map, data_model=data_model, narrow=narrow,)
+            return self.eval(
+                data_map=data_map,
+                data_model=data_model,
+                narrow=narrow,
+                check_incoming_data_constraints=check_incoming_data_constraints)
         raise TypeError("can not apply transform() to type " + str(type(X)))
 
     # composition (used to eliminate intermediate order nodes)

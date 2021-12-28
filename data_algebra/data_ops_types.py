@@ -29,14 +29,15 @@ class OperatorPlatform:
         raise NotImplementedError("base class called")
 
     # noinspection PyPep8Naming
-    def transform(self, X, *, data_model=None, narrow=True):
+    def transform(self, X, *, data_model=None, narrow: bool = True, check_incoming_data_constraints: bool = False):
         """
         apply self to data frame X, may or may not commute with composition
 
         :param X: input data frame
-        :param data_model implementation to use
-        :param narrow logical, if True don't copy unexpected columns
-        :return: transformed dataframe
+        :param data_model: implementation to use
+        :param narrow: logical, if True don't copy unexpected columns
+        :param check_incoming_data_constraints: logical, if True check incoming data meets constraints
+        :return: transformed data frame
         """
         raise NotImplementedError("base class called")
 
@@ -49,7 +50,7 @@ class OperatorPlatform:
         :param data_model implementation to use
         :return: transformed dataframe
         """
-        return self.transform(X=X, data_model=data_model, narrow=False)
+        return self.transform(X=X, data_model=data_model, narrow=False, check_incoming_data_constraints=True)
 
     def apply_to(self, a, *, target_table_key=None):
         """
