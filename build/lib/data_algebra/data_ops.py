@@ -495,6 +495,8 @@ class ViewRepresentation(OperatorPlatform, ABC):
         if (partition_by != 1) and (len(partition_by) > 0):
             if len(new_cols_produced_in_calc.intersection(partition_by)) > 0:
                 raise ValueError("must not change partition_by columns")
+            if (order_by != 1) and len(set(partition_by).intersection(set(order_by))) > 0:
+               raise ValueError("order_by and partition_by columns must be disjoint")
         if len(new_cols_produced_in_calc.intersection(order_by)) > 0:
             raise ValueError("must not change partition_by columns")
         if len(set(reverse).difference(order_by)) > 0:
