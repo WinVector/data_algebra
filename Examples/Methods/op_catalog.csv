@@ -104,6 +104,7 @@ std,x.std(),p,y,n,n,n,y,w,1.2.0
 sum,(1).sum(),p,y,y,y,y,y,y,1.2.0
 sum,x.sum(),p,y,y,y,y,y,y,1.2.0
 var,x.var(),p,y,n,n,n,n,n,1.2.0
+_uniform,_uniform(),u,y,y,y,y,y,y,1.2.0
 bfill,z.bfill(),w,y,n,n,n,n,n,1.2.0
 cumcount,z.cumcount(),w,y,n,n,n,n,n,1.2.0
 cummax,x.cummax(),w,y,n,n,n,n,n,1.2.0

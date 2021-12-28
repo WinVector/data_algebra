@@ -51,11 +51,14 @@ def test_expression_expectations_1():
     with gzip.open(expectation_path, 'rb') as in_f:
         expectation_map = pickle.load(in_f)
     d = expectation_map['d']
-    f_expectations = expectation_map['f_expectations']
+    e_expectations = expectation_map['e_expectations']
     g_expectations = expectation_map['g_expectations']
     w_expectations = expectation_map['w_expectations']
+    u_results = expectation_map['u_results']
 
-    ops_list = f_expectations + g_expectations + w_expectations
+    ops_list = e_expectations + g_expectations + w_expectations
     for op, op_class, exp, ops, expect in ops_list:
         res = ops.transform(d)
         assert data_algebra.test_util.equivalent_frames(res, expect)
+    for op, op_class, exp, ops, expect in u_results:
+        res = ops.transform(d)
