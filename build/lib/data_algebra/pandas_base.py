@@ -455,8 +455,6 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")  # out of range things like arccosh were warning
                 new_cols = {k: opk.evaluate(res) for k, opk in op.ops.items()}
-            # for k, v in new_cols.items():
-            #     res[k] = v
             new_frame = self.columns_to_frame_(new_cols, target_rows=res.shape[0])
             res = self.add_data_frame_columns_to_data_frame_(res, new_frame)
         else:

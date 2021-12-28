@@ -181,14 +181,15 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
-    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        apply self to data frame X, may or may not commute with composition</span>
 
 <span class="sd">        :param X: input data frame</span>
-<span class="sd">        :param data_model implementation to use</span>
-<span class="sd">        :param narrow logical, if True don&#39;t copy unexpected columns</span>
-<span class="sd">        :return: transformed dataframe</span>
+<span class="sd">        :param data_model: implementation to use</span>
+<span class="sd">        :param narrow: logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">        :param check_incoming_data_constraints: logical, if True check incoming data meets constraints</span>
+<span class="sd">        :return: transformed data frame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
@@ -201,7 +202,7 @@
 <span class="sd">        :param data_model implementation to use</span>
 <span class="sd">        :return: transformed dataframe</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -530,14 +531,15 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
-    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        apply self to data frame X, may or may not commute with composition</span>
 
 <span class="sd">        :param X: input data frame</span>
-<span class="sd">        :param data_model implementation to use</span>
-<span class="sd">        :param narrow logical, if True don&#39;t copy unexpected columns</span>
-<span class="sd">        :return: transformed dataframe</span>
+<span class="sd">        :param data_model: implementation to use</span>
+<span class="sd">        :param narrow: logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">        :param check_incoming_data_constraints: logical, if True check incoming data meets constraints</span>
+<span class="sd">        :return: transformed data frame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 
@@ -550,7 +552,7 @@
 <span class="sd">        :param data_model implementation to use</span>
 <span class="sd">        :return: transformed dataframe</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -908,19 +910,27 @@
 
         
             <span class="def">def</span>
-            <span class="name">transform</span><span class="signature">(self, X, *, data_model=None, narrow=True)</span>:
+            <span class="name">transform</span><span class="signature">(
+    self,
+    X,
+    *,
+    data_model=None,
+    narrow: bool = True,
+    check_incoming_data_constraints: bool = False
+)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        apply self to data frame X, may or may not commute with composition</span>
 
 <span class="sd">        :param X: input data frame</span>
-<span class="sd">        :param data_model implementation to use</span>
-<span class="sd">        :param narrow logical, if True don&#39;t copy unexpected columns</span>
-<span class="sd">        :return: transformed dataframe</span>
+<span class="sd">        :param data_model: implementation to use</span>
+<span class="sd">        :param narrow: logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">        :param check_incoming_data_constraints: logical, if True check incoming data meets constraints</span>
+<span class="sd">        :return: transformed data frame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base class called&quot;</span><span class="p">)</span>
 </pre></div>
@@ -930,9 +940,10 @@
             <div class="docstring"><p>apply self to data frame X, may or may not commute with composition</p>
 
 <p>:param X: input data frame
-:param data_model implementation to use
-:param narrow logical, if True don't copy unexpected columns
-:return: transformed dataframe</p>
+:param data_model: implementation to use
+:param narrow: logical, if True don't copy unexpected columns
+:param check_incoming_data_constraints: logical, if True check incoming data meets constraints
+:return: transformed data frame</p>
 </div>
 
 
@@ -955,7 +966,7 @@
 <span class="sd">        :param data_model implementation to use</span>
 <span class="sd">        :return: transformed dataframe</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 
         </details>

@@ -881,13 +881,14 @@
                         <span class="s2">&quot;Table &quot;</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot; has forbidden columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">excess</span><span class="p">)</span>
                     <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">         Evaluate operators with respect to Pandas data frames.</span>
 
 <span class="sd">         :param data_map: map from table names to data frames</span>
 <span class="sd">         :param data_model: adaptor to data dialect (Pandas for now)</span>
-<span class="sd">         :param narrow logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">         :param narrow: logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">         :param check_incoming_data_constraints: logical, if True check incoming data meets constraints</span>
 <span class="sd">         :return: table result</span>
 <span class="sd">         &quot;&quot;&quot;</span>
 
@@ -896,7 +897,8 @@
         <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">data_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_map</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">check_incoming_data_constraints</span> <span class="ow">and</span> <span class="p">(</span><span class="n">data_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_map</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>  <span class="c1"># for table consistency check/raise</span>
             <span class="n">tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">check_constraints</span><span class="p">(</span>
@@ -913,13 +915,15 @@
         <span class="p">)</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
-    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply data transform to a table</span>
 
 <span class="sd">        :param X: tale to apply to</span>
 <span class="sd">        :param data_model: data model for Pandas execution</span>
 <span class="sd">        :param narrow: logical, if True narrow number of result columns to specification</span>
+<span class="sd">        :param check_incoming_data_constraints: logical, if True check incoming data meets constraints</span>
+<span class="sd">        :return: transformed data frame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
@@ -934,7 +938,11 @@
         <span class="c1"># noinspection PyUnresolvedReferences</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
             <span class="n">data_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">X</span><span class="p">}</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span>
+                <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span>
+                <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span>
+                <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,</span>
+                <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="n">check_incoming_data_constraints</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;can not apply transform() to type &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">X</span><span class="p">)))</span>
 
     <span class="c1"># composition (used to eliminate intermediate order nodes)</span>
@@ -3671,13 +3679,14 @@
                         <span class="s2">&quot;Table &quot;</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot; has forbidden columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">excess</span><span class="p">)</span>
                     <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">         Evaluate operators with respect to Pandas data frames.</span>
 
 <span class="sd">         :param data_map: map from table names to data frames</span>
 <span class="sd">         :param data_model: adaptor to data dialect (Pandas for now)</span>
-<span class="sd">         :param narrow logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">         :param narrow: logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">         :param check_incoming_data_constraints: logical, if True check incoming data meets constraints</span>
 <span class="sd">         :return: table result</span>
 <span class="sd">         &quot;&quot;&quot;</span>
 
@@ -3686,7 +3695,8 @@
         <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">data_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_map</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">check_incoming_data_constraints</span> <span class="ow">and</span> <span class="p">(</span><span class="n">data_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_map</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>  <span class="c1"># for table consistency check/raise</span>
             <span class="n">tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">check_constraints</span><span class="p">(</span>
@@ -3703,13 +3713,15 @@
         <span class="p">)</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
-    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply data transform to a table</span>
 
 <span class="sd">        :param X: tale to apply to</span>
 <span class="sd">        :param data_model: data model for Pandas execution</span>
 <span class="sd">        :param narrow: logical, if True narrow number of result columns to specification</span>
+<span class="sd">        :param check_incoming_data_constraints: logical, if True check incoming data meets constraints</span>
+<span class="sd">        :return: transformed data frame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
@@ -3724,7 +3736,11 @@
         <span class="c1"># noinspection PyUnresolvedReferences</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
             <span class="n">data_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">X</span><span class="p">}</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span>
+                <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span>
+                <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span>
+                <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,</span>
+                <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="n">check_incoming_data_constraints</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;can not apply transform() to type &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">X</span><span class="p">)))</span>
 
     <span class="c1"># composition (used to eliminate intermediate order nodes)</span>
@@ -4679,18 +4695,26 @@ raise an exception if the values are not consistent.</p>
 
         
             <span class="def">def</span>
-            <span class="name">eval</span><span class="signature">(self, data_map, *, data_model=None, narrow=True)</span>:
+            <span class="name">eval</span><span class="signature">(
+    self,
+    data_map,
+    *,
+    data_model=None,
+    narrow: bool = True,
+    check_incoming_data_constraints: bool = False
+)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">         Evaluate operators with respect to Pandas data frames.</span>
 
 <span class="sd">         :param data_map: map from table names to data frames</span>
 <span class="sd">         :param data_model: adaptor to data dialect (Pandas for now)</span>
-<span class="sd">         :param narrow logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">         :param narrow: logical, if True don&#39;t copy unexpected columns</span>
+<span class="sd">         :param check_incoming_data_constraints: logical, if True check incoming data meets constraints</span>
 <span class="sd">         :return: table result</span>
 <span class="sd">         &quot;&quot;&quot;</span>
 
@@ -4699,7 +4723,8 @@ raise an exception if the values are not consistent.</p>
         <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_model</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">data_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_map</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">check_incoming_data_constraints</span> <span class="ow">and</span> <span class="p">(</span><span class="n">data_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_map</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">columns_used</span><span class="p">()</span>  <span class="c1"># for table consistency check/raise</span>
             <span class="n">tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">check_constraints</span><span class="p">(</span>
@@ -4722,7 +4747,8 @@ raise an exception if the values are not consistent.</p>
 
 <p>:param data_map: map from table names to data frames
 :param data_model: adaptor to data dialect (Pandas for now)
-:param narrow logical, if True don't copy unexpected columns
+:param narrow: logical, if True don't copy unexpected columns
+:param check_incoming_data_constraints: logical, if True check incoming data meets constraints
 :return: table result</p>
 </div>
 
@@ -4733,18 +4759,27 @@ raise an exception if the values are not consistent.</p>
 
         
             <span class="def">def</span>
-            <span class="name">transform</span><span class="signature">(self, X, *, data_model=None, narrow=True)</span>:
+            <span class="name">transform</span><span class="signature">(
+    self,
+    X,
+    *,
+    data_model=None,
+    narrow: bool = True,
+    check_incoming_data_constraints: bool = False
+)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply data transform to a table</span>
 
 <span class="sd">        :param X: tale to apply to</span>
 <span class="sd">        :param data_model: data model for Pandas execution</span>
 <span class="sd">        :param narrow: logical, if True narrow number of result columns to specification</span>
+<span class="sd">        :param check_incoming_data_constraints: logical, if True check incoming data meets constraints</span>
+<span class="sd">        :return: transformed data frame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
@@ -4759,7 +4794,11 @@ raise an exception if the values are not consistent.</p>
         <span class="c1"># noinspection PyUnresolvedReferences</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
             <span class="n">data_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">X</span><span class="p">}</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span>
+                <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span>
+                <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span>
+                <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,</span>
+                <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="n">check_incoming_data_constraints</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;can not apply transform() to type &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">X</span><span class="p">)))</span>
 </pre></div>
 
@@ -4769,7 +4808,9 @@ raise an exception if the values are not consistent.</p>
 
 <p>:param X: tale to apply to
 :param data_model: data model for Pandas execution
-:param narrow: logical, if True narrow number of result columns to specification</p>
+:param narrow: logical, if True narrow number of result columns to specification
+:param check_incoming_data_constraints: logical, if True check incoming data meets constraints
+:return: transformed data frame</p>
 </div>
 
 
