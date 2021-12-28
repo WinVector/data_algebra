@@ -1,4 +1,10 @@
+"""
+Class for representing record structure transformations.
+"""
+
+
 import re
+from typing import List, Optional
 
 import numpy
 
@@ -100,7 +106,13 @@ class RecordSpecification:
         self.content_keys = cvs
         self.row_columns = self.record_keys + cvs
 
-    def row_version(self, *, include_record_keys=True):
+    def row_version(self, *, include_record_keys: bool = True) -> List[str]:
+        """
+        Return copy of record as a row record.
+
+        :param include_record_keys: logical, if True include record keys as columns
+        :return: column list
+        """
         cols = []
         if include_record_keys:
             cols = cols + self.record_keys
@@ -168,8 +180,16 @@ class RecordSpecification:
         return RecordMap(blocks_out=self)
 
 
-def blocks_to_rowrecs(data, *, blocks_in, local_data_model=None):
-    assert isinstance(blocks_in, data_algebra.cdata.RecordSpecification)
+def blocks_to_rowrecs(data, *, blocks_in: RecordSpecification, local_data_model=None):
+    """
+    Convert a block record (record spanning multiple rows) into a rowrecord (record in a single row).
+
+    :param data: data frame to be transformed
+    :param blocks_in: record specification
+    :param local_data_model: pandas model.
+    :return: transformed data frame
+    """
+    assert isinstance(blocks_in, RecordSpecification)
     ck = [k for k in blocks_in.content_keys if k is not None]
     if len(ck) != len(set(ck)):
         raise ValueError("blocks_in can not have duplicate content keys")
@@ -244,9 +264,22 @@ def blocks_to_rowrecs(data, *, blocks_in, local_data_model=None):
 
 
 def rowrecs_to_blocks(
-    data, *, blocks_out, check_blocks_out_keying=False, local_data_model=None
+    data,
+    *,
+    blocks_out: RecordSpecification,
+    check_blocks_out_keying: bool = False,
+    local_data_model=None
 ):
-    assert isinstance(blocks_out, data_algebra.cdata.RecordSpecification)
+    """
+    Convert rowrecs (single row records) into block records (multiple row records).
+
+    :param data: data frame to transform.
+    :param blocks_out: record specification.
+    :param check_blocks_out_keying: logical, if True confirm keying
+    :param local_data_model: pandas data model
+    :return: transformed data frame
+    """
+    assert isinstance(blocks_out, RecordSpecification)
     if local_data_model is None:
         local_data_model = data_algebra.default_data_model
     data = data.reset_index(drop=True)
@@ -319,14 +352,27 @@ def rowrecs_to_blocks(
 
 
 class RecordMap:
-    def __init__(self, *, blocks_in=None, blocks_out=None):
+    """
+    Class for specifying general record to record transforms.
+    """
+    def __init__(
+            self,
+            *,
+            blocks_in: Optional[RecordSpecification] = None,
+            blocks_out: Optional[RecordSpecification] = None):
+        """
+        Build the transform specification. At least one of blocks_in or blocks_out must not be None.
+
+        :param blocks_in: incoming record specification, None for row-records.
+        :param blocks_out: outgoing record specification, None for row-records.
+        """
         if blocks_in is not None:
-            assert isinstance(blocks_in, data_algebra.cdata.RecordSpecification)
+            assert isinstance(blocks_in, RecordSpecification)
             ck = [k for k in blocks_in.content_keys if k is not None]
             if len(ck) != len(set(ck)):
                 raise ValueError("blocks_in can not have duplicate content keys")
         if blocks_out is not None:
-            assert isinstance(blocks_out, data_algebra.cdata.RecordSpecification)
+            assert isinstance(blocks_out, RecordSpecification)
         if (blocks_in is None) and (blocks_out is None):
             raise ValueError(
                 "At least one of blocks_in or blocks_out should not be None"
@@ -366,6 +412,7 @@ class RecordMap:
         return True
 
     def record_keys(self):
+        """Return keys specifying which set of rows are in a record."""
         if self.blocks_in is not None:
             return self.blocks_in.record_keys.copy()
         if self.blocks_out is not None:
@@ -373,6 +420,12 @@ class RecordMap:
         return None
 
     def example_input(self, *, local_data_model=None):
+        """
+        Return example output record.
+
+        :param local_data_model: optional Pandas data model.
+        :return: example result data frame.
+        """
         if local_data_model is None:
             local_data_model = data_algebra.default_data_model
         if self.blocks_in is not None:
@@ -389,7 +442,20 @@ class RecordMap:
         return None
 
     # noinspection PyPep8Naming
-    def transform(self, X, *, check_blocks_out_keying=False, local_data_model=None):
+    def transform(
+            self,
+            X,
+            *,
+            check_blocks_out_keying: bool = False,
+            local_data_model=None):
+        """
+        Transform X records.
+
+        :param X: data frame to be transformed.
+        :param check_blocks_out_keying: logical, if True check output key constraints.
+        :param local_data_model: pandas data model.
+        :return: transformed data frame.
+        """
         unknown = set(self.columns_needed) - set(X.columns)
         if len(unknown) > 0:
             raise ValueError("missing required columns: " + str(unknown))
@@ -434,7 +500,7 @@ class RecordMap:
                 return None
             else:
                 return RecordMap(
-                    blocks_out=data_algebra.cdata.RecordSpecification(
+                    blocks_out=RecordSpecification(
                         control_table=rso,
                         record_keys=rk,
                         control_table_keys=s2.blocks_out.control_table_keys,
@@ -443,7 +509,7 @@ class RecordMap:
         else:
             if out.shape[0] < 2:
                 return RecordMap(
-                    blocks_in=data_algebra.cdata.RecordSpecification(
+                    blocks_in=RecordSpecification(
                         control_table=rsi,
                         record_keys=rk,
                         control_table_keys=s1.blocks_in.control_table_keys,
@@ -451,12 +517,12 @@ class RecordMap:
                 )
             else:
                 return RecordMap(
-                    blocks_in=data_algebra.cdata.RecordSpecification(
+                    blocks_in=RecordSpecification(
                         control_table=rsi,
                         record_keys=rk,
                         control_table_keys=s1.blocks_in.control_table_keys,
                     ),
-                    blocks_out=data_algebra.cdata.RecordSpecification(
+                    blocks_out=RecordSpecification(
                         control_table=rso,
                         record_keys=rk,
                         control_table_keys=s2.blocks_out.control_table_keys,
@@ -473,9 +539,13 @@ class RecordMap:
         return self.transform(other)
 
     def inverse(self):
+        """
+        Return inverse transform.
+        """
         return RecordMap(blocks_in=self.blocks_out, blocks_out=self.blocks_in)
 
-    def fmt(self):
+    def fmt(self) -> str:
+        """Format for informal presentation."""
         if (self.blocks_in is None) and (self.blocks_out is None):
             return "RecordMap(no-op)"
         if (self.blocks_in is not None) and (self.blocks_out is not None):
@@ -532,25 +602,31 @@ class RecordMap:
 
     # noinspection PyPep8Naming, PyUnusedLocal
     def fit(self, X, y=None):
+        """No-op (sklearn pipeline interface)"""
         pass
 
     # noinspection PyPep8Naming, PyUnusedLocal
     def fit_transform(self, X, y=None):
+        """transform() (sklearn pipeline interface)"""
         return self.transform(X)
 
     # noinspection PyUnusedLocal
     def get_feature_names(self, input_features=None):
+        """Return columns produced (sklearn pipeline interface)"""
         return self.columns_produced.copy()
 
     # noinspection PyUnusedLocal,PyMethodMayBeStatic
     def get_params(self, deep=False):
+        """Return emtpy dictionary (sklearn pipeline interface)"""
         return dict()
 
     def set_params(self, **params):
+        """No-op (sklearn pipeline interface)"""
         pass
 
     # noinspection PyPep8Naming
     def inverse_transform(self, X):
+        """Perform inverse transform (sklearn pipeline interface)"""
         return self.inverse().transform(X)
 
 

@@ -124,10 +124,18 @@
                     <h1 class="modulename">
 <a href="./../data_algebra.html">data_algebra</a><wbr>.cdata    </h1>
 
-                
+                        <div class="docstring"><p>Class for representing record structure transformations.</p>
+</div>
+
                         <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+            <div class="codehilite"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Class for representing record structure transformations.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span>
 
@@ -229,7 +237,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">content_keys</span> <span class="o">=</span> <span class="n">cvs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">row_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_keys</span> <span class="o">+</span> <span class="n">cvs</span>
 
-    <span class="k">def</span> <span class="nf">row_version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">include_record_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">row_version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">include_record_keys</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return copy of record as a row record.</span>
+
+<span class="sd">        :param include_record_keys: logical, if True include record keys as columns</span>
+<span class="sd">        :return: column list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cols</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">include_record_keys</span><span class="p">:</span>
             <span class="n">cols</span> <span class="o">=</span> <span class="n">cols</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_keys</span>
@@ -297,8 +311,16 @@
         <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_out</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">blocks_to_rowrecs</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">blocks_to_rowrecs</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="p">:</span> <span class="n">RecordSpecification</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a block record (record spanning multiple rows) into a rowrecord (record in a single row).</span>
+
+<span class="sd">    :param data: data frame to be transformed</span>
+<span class="sd">    :param blocks_in: record specification</span>
+<span class="sd">    :param local_data_model: pandas model.</span>
+<span class="sd">    :return: transformed data frame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">RecordSpecification</span><span class="p">)</span>
     <span class="n">ck</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">blocks_in</span><span class="o">.</span><span class="n">content_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ck</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">ck</span><span class="p">)):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;blocks_in can not have duplicate content keys&quot;</span><span class="p">)</span>
@@ -373,9 +395,22 @@
 
 
 <span class="k">def</span> <span class="nf">rowrecs_to_blocks</span><span class="p">(</span>
-    <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_out</span><span class="p">,</span> <span class="n">check_blocks_out_keying</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">blocks_out</span><span class="p">:</span> <span class="n">RecordSpecification</span><span class="p">,</span>
+    <span class="n">check_blocks_out_keying</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">):</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_out</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert rowrecs (single row records) into block records (multiple row records).</span>
+
+<span class="sd">    :param data: data frame to transform.</span>
+<span class="sd">    :param blocks_out: record specification.</span>
+<span class="sd">    :param check_blocks_out_keying: logical, if True confirm keying</span>
+<span class="sd">    :param local_data_model: pandas data model</span>
+<span class="sd">    :return: transformed data frame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_out</span><span class="p">,</span> <span class="n">RecordSpecification</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -448,14 +483,27 @@
 
 
 <span class="k">class</span> <span class="nc">RecordMap</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for specifying general record to record transforms.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="o">*</span><span class="p">,</span>
+            <span class="n">blocks_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">blocks_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build the transform specification. At least one of blocks_in or blocks_out must not be None.</span>
+
+<span class="sd">        :param blocks_in: incoming record specification, None for row-records.</span>
+<span class="sd">        :param blocks_out: outgoing record specification, None for row-records.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">RecordSpecification</span><span class="p">)</span>
             <span class="n">ck</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">blocks_in</span><span class="o">.</span><span class="n">content_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ck</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">ck</span><span class="p">)):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;blocks_in can not have duplicate content keys&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_out</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_out</span><span class="p">,</span> <span class="n">RecordSpecification</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;At least one of blocks_in or blocks_out should not be None&quot;</span>
@@ -495,6 +543,7 @@
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">record_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return keys specifying which set of rows are in a record.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">record_keys</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -502,6 +551,12 @@
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">example_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return example output record.</span>
+
+<span class="sd">        :param local_data_model: optional Pandas data model.</span>
+<span class="sd">        :return: example result data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -518,7 +573,20 @@
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
-    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">check_blocks_out_keying</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">X</span><span class="p">,</span>
+            <span class="o">*</span><span class="p">,</span>
+            <span class="n">check_blocks_out_keying</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transform X records.</span>
+
+<span class="sd">        :param X: data frame to be transformed.</span>
+<span class="sd">        :param check_blocks_out_keying: logical, if True check output key constraints.</span>
+<span class="sd">        :param local_data_model: pandas data model.</span>
+<span class="sd">        :return: transformed data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">unknown</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_needed</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;missing required columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">unknown</span><span class="p">))</span>
@@ -563,7 +631,7 @@
                 <span class="k">return</span> <span class="kc">None</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span>
-                    <span class="n">blocks_out</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">(</span>
+                    <span class="n">blocks_out</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
                         <span class="n">control_table</span><span class="o">=</span><span class="n">rso</span><span class="p">,</span>
                         <span class="n">record_keys</span><span class="o">=</span><span class="n">rk</span><span class="p">,</span>
                         <span class="n">control_table_keys</span><span class="o">=</span><span class="n">s2</span><span class="o">.</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">control_table_keys</span><span class="p">,</span>
@@ -572,7 +640,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span>
-                    <span class="n">blocks_in</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">(</span>
+                    <span class="n">blocks_in</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
                         <span class="n">control_table</span><span class="o">=</span><span class="n">rsi</span><span class="p">,</span>
                         <span class="n">record_keys</span><span class="o">=</span><span class="n">rk</span><span class="p">,</span>
                         <span class="n">control_table_keys</span><span class="o">=</span><span class="n">s1</span><span class="o">.</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">control_table_keys</span><span class="p">,</span>
@@ -580,12 +648,12 @@
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span>
-                    <span class="n">blocks_in</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">(</span>
+                    <span class="n">blocks_in</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
                         <span class="n">control_table</span><span class="o">=</span><span class="n">rsi</span><span class="p">,</span>
                         <span class="n">record_keys</span><span class="o">=</span><span class="n">rk</span><span class="p">,</span>
                         <span class="n">control_table_keys</span><span class="o">=</span><span class="n">s1</span><span class="o">.</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">control_table_keys</span><span class="p">,</span>
                     <span class="p">),</span>
-                    <span class="n">blocks_out</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">(</span>
+                    <span class="n">blocks_out</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
                         <span class="n">control_table</span><span class="o">=</span><span class="n">rso</span><span class="p">,</span>
                         <span class="n">record_keys</span><span class="o">=</span><span class="n">rk</span><span class="p">,</span>
                         <span class="n">control_table_keys</span><span class="o">=</span><span class="n">s2</span><span class="o">.</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">control_table_keys</span><span class="p">,</span>
@@ -602,9 +670,13 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return inverse transform.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">fmt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">fmt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Format for informal presentation.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">return</span> <span class="s2">&quot;RecordMap(no-op)&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
@@ -661,25 +733,31 @@
 
     <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;No-op (sklearn pipeline interface)&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
     <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;transform() (sklearn pipeline interface)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return columns produced (sklearn pipeline interface)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="c1"># noinspection PyUnusedLocal,PyMethodMayBeStatic</span>
     <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return emtpy dictionary (sklearn pipeline interface)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;No-op (sklearn pipeline interface)&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform inverse transform (sklearn pipeline interface)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">inverse</span><span class="p">()</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
 
@@ -863,7 +941,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">content_keys</span> <span class="o">=</span> <span class="n">cvs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">row_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_keys</span> <span class="o">+</span> <span class="n">cvs</span>
 
-    <span class="k">def</span> <span class="nf">row_version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">include_record_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">row_version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">include_record_keys</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return copy of record as a row record.</span>
+
+<span class="sd">        :param include_record_keys: logical, if True include record keys as columns</span>
+<span class="sd">        :return: column list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cols</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">include_record_keys</span><span class="p">:</span>
             <span class="n">cols</span> <span class="o">=</span> <span class="n">cols</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_keys</span>
@@ -1061,12 +1145,18 @@
 
         
             <span class="def">def</span>
-            <span class="name">row_version</span><span class="signature">(self, *, include_record_keys=True)</span>:
+            <span class="name">row_version</span><span class="signature">(self, *, include_record_keys: bool = True) -&gt; List[str]</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">row_version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">include_record_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">row_version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">include_record_keys</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return copy of record as a row record.</span>
+
+<span class="sd">        :param include_record_keys: logical, if True include record keys as columns</span>
+<span class="sd">        :return: column list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cols</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">include_record_keys</span><span class="p">:</span>
             <span class="n">cols</span> <span class="o">=</span> <span class="n">cols</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_keys</span>
@@ -1076,7 +1166,12 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Return copy of record as a row record.</p>
+
+<p>:param include_record_keys: logical, if True include record keys as columns
+:return: column list</p>
+</div>
+
 
                             </div>
                             <div id="RecordSpecification.fmt" class="classattr">
@@ -1184,13 +1279,26 @@
 
         
             <span class="def">def</span>
-            <span class="name">blocks_to_rowrecs</span><span class="signature">(data, *, blocks_in, local_data_model=None)</span>:
+            <span class="name">blocks_to_rowrecs</span><span class="signature">(
+    data,
+    *,
+    blocks_in: <a href="#RecordSpecification">data_algebra.cdata.RecordSpecification</a>,
+    local_data_model=None
+)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">blocks_to_rowrecs</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">)</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">blocks_to_rowrecs</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="p">:</span> <span class="n">RecordSpecification</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a block record (record spanning multiple rows) into a rowrecord (record in a single row).</span>
+
+<span class="sd">    :param data: data frame to be transformed</span>
+<span class="sd">    :param blocks_in: record specification</span>
+<span class="sd">    :param local_data_model: pandas model.</span>
+<span class="sd">    :return: transformed data frame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">RecordSpecification</span><span class="p">)</span>
     <span class="n">ck</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">blocks_in</span><span class="o">.</span><span class="n">content_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ck</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">ck</span><span class="p">)):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;blocks_in can not have duplicate content keys&quot;</span><span class="p">)</span>
@@ -1266,7 +1374,14 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Convert a block record (record spanning multiple rows) into a rowrecord (record in a single row).</p>
+
+<p>:param data: data frame to be transformed
+:param blocks_in: record specification
+:param local_data_model: pandas model.
+:return: transformed data frame</p>
+</div>
+
 
                 </section>
                 <section id="rowrecs_to_blocks">
@@ -1277,8 +1392,8 @@
             <span class="name">rowrecs_to_blocks</span><span class="signature">(
     data,
     *,
-    blocks_out,
-    check_blocks_out_keying=False,
+    blocks_out: <a href="#RecordSpecification">data_algebra.cdata.RecordSpecification</a>,
+    check_blocks_out_keying: bool = False,
     local_data_model=None
 )</span>:
     </div>
@@ -1286,9 +1401,22 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">rowrecs_to_blocks</span><span class="p">(</span>
-    <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_out</span><span class="p">,</span> <span class="n">check_blocks_out_keying</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">blocks_out</span><span class="p">:</span> <span class="n">RecordSpecification</span><span class="p">,</span>
+    <span class="n">check_blocks_out_keying</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">):</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_out</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert rowrecs (single row records) into block records (multiple row records).</span>
+
+<span class="sd">    :param data: data frame to transform.</span>
+<span class="sd">    :param blocks_out: record specification.</span>
+<span class="sd">    :param check_blocks_out_keying: logical, if True confirm keying</span>
+<span class="sd">    :param local_data_model: pandas data model</span>
+<span class="sd">    :return: transformed data frame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_out</span><span class="p">,</span> <span class="n">RecordSpecification</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1362,7 +1490,15 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Convert rowrecs (single row records) into block records (multiple row records).</p>
+
+<p>:param data: data frame to transform.
+:param blocks_out: record specification.
+:param check_blocks_out_keying: logical, if True confirm keying
+:param local_data_model: pandas data model
+:return: transformed data frame</p>
+</div>
+
 
                 </section>
                 <section id="RecordMap">
@@ -1377,14 +1513,27 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">RecordMap</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for specifying general record to record transforms.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="o">*</span><span class="p">,</span>
+            <span class="n">blocks_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">blocks_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build the transform specification. At least one of blocks_in or blocks_out must not be None.</span>
+
+<span class="sd">        :param blocks_in: incoming record specification, None for row-records.</span>
+<span class="sd">        :param blocks_out: outgoing record specification, None for row-records.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">RecordSpecification</span><span class="p">)</span>
             <span class="n">ck</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">blocks_in</span><span class="o">.</span><span class="n">content_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ck</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">ck</span><span class="p">)):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;blocks_in can not have duplicate content keys&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_out</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_out</span><span class="p">,</span> <span class="n">RecordSpecification</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;At least one of blocks_in or blocks_out should not be None&quot;</span>
@@ -1424,6 +1573,7 @@
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">record_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return keys specifying which set of rows are in a record.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">record_keys</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1431,6 +1581,12 @@
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">example_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return example output record.</span>
+
+<span class="sd">        :param local_data_model: optional Pandas data model.</span>
+<span class="sd">        :return: example result data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1447,7 +1603,20 @@
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
-    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">check_blocks_out_keying</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">X</span><span class="p">,</span>
+            <span class="o">*</span><span class="p">,</span>
+            <span class="n">check_blocks_out_keying</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transform X records.</span>
+
+<span class="sd">        :param X: data frame to be transformed.</span>
+<span class="sd">        :param check_blocks_out_keying: logical, if True check output key constraints.</span>
+<span class="sd">        :param local_data_model: pandas data model.</span>
+<span class="sd">        :return: transformed data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">unknown</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_needed</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;missing required columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">unknown</span><span class="p">))</span>
@@ -1492,7 +1661,7 @@
                 <span class="k">return</span> <span class="kc">None</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span>
-                    <span class="n">blocks_out</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">(</span>
+                    <span class="n">blocks_out</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
                         <span class="n">control_table</span><span class="o">=</span><span class="n">rso</span><span class="p">,</span>
                         <span class="n">record_keys</span><span class="o">=</span><span class="n">rk</span><span class="p">,</span>
                         <span class="n">control_table_keys</span><span class="o">=</span><span class="n">s2</span><span class="o">.</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">control_table_keys</span><span class="p">,</span>
@@ -1501,7 +1670,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span>
-                    <span class="n">blocks_in</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">(</span>
+                    <span class="n">blocks_in</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
                         <span class="n">control_table</span><span class="o">=</span><span class="n">rsi</span><span class="p">,</span>
                         <span class="n">record_keys</span><span class="o">=</span><span class="n">rk</span><span class="p">,</span>
                         <span class="n">control_table_keys</span><span class="o">=</span><span class="n">s1</span><span class="o">.</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">control_table_keys</span><span class="p">,</span>
@@ -1509,12 +1678,12 @@
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span>
-                    <span class="n">blocks_in</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">(</span>
+                    <span class="n">blocks_in</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
                         <span class="n">control_table</span><span class="o">=</span><span class="n">rsi</span><span class="p">,</span>
                         <span class="n">record_keys</span><span class="o">=</span><span class="n">rk</span><span class="p">,</span>
                         <span class="n">control_table_keys</span><span class="o">=</span><span class="n">s1</span><span class="o">.</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">control_table_keys</span><span class="p">,</span>
                     <span class="p">),</span>
-                    <span class="n">blocks_out</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">(</span>
+                    <span class="n">blocks_out</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
                         <span class="n">control_table</span><span class="o">=</span><span class="n">rso</span><span class="p">,</span>
                         <span class="n">record_keys</span><span class="o">=</span><span class="n">rk</span><span class="p">,</span>
                         <span class="n">control_table_keys</span><span class="o">=</span><span class="n">s2</span><span class="o">.</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">control_table_keys</span><span class="p">,</span>
@@ -1531,9 +1700,13 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return inverse transform.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">fmt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">fmt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Format for informal presentation.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">return</span> <span class="s2">&quot;RecordMap(no-op)&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
@@ -1590,49 +1763,71 @@
 
     <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;No-op (sklearn pipeline interface)&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
     <span class="c1"># noinspection PyPep8Naming, PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;transform() (sklearn pipeline interface)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyUnusedLocal</span>
     <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return columns produced (sklearn pipeline interface)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="c1"># noinspection PyUnusedLocal,PyMethodMayBeStatic</span>
     <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return emtpy dictionary (sklearn pipeline interface)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;No-op (sklearn pipeline interface)&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform inverse transform (sklearn pipeline interface)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">inverse</span><span class="p">()</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Class for specifying general record to record transforms.</p>
+</div>
+
 
                             <div id="RecordMap.__init__" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#RecordMap.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">RecordMap</span><span class="signature">(*, blocks_in=None, blocks_out=None)</span>
+            <span class="name">RecordMap</span><span class="signature">(
+    *,
+    blocks_in: Optional[<a href="#RecordSpecification">data_algebra.cdata.RecordSpecification</a>] = None,
+    blocks_out: Optional[<a href="#RecordSpecification">data_algebra.cdata.RecordSpecification</a>] = None
+)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">blocks_in</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="o">*</span><span class="p">,</span>
+            <span class="n">blocks_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">blocks_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RecordSpecification</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build the transform specification. At least one of blocks_in or blocks_out must not be None.</span>
+
+<span class="sd">        :param blocks_in: incoming record specification, None for row-records.</span>
+<span class="sd">        :param blocks_out: outgoing record specification, None for row-records.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_in</span><span class="p">,</span> <span class="n">RecordSpecification</span><span class="p">)</span>
             <span class="n">ck</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">blocks_in</span><span class="o">.</span><span class="n">content_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ck</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">ck</span><span class="p">)):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;blocks_in can not have duplicate content keys&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_out</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blocks_out</span><span class="p">,</span> <span class="n">RecordSpecification</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;At least one of blocks_in or blocks_out should not be None&quot;</span>
@@ -1659,7 +1854,12 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Build the transform specification. At least one of blocks_in or blocks_out must not be None.</p>
+
+<p>:param blocks_in: incoming record specification, None for row-records.
+:param blocks_out: outgoing record specification, None for row-records.</p>
+</div>
+
 
                             </div>
                             <div id="RecordMap.record_keys" class="classattr">
@@ -1673,6 +1873,7 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">record_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return keys specifying which set of rows are in a record.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">record_keys</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1682,7 +1883,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Return keys specifying which set of rows are in a record.</p>
+</div>
+
 
                             </div>
                             <div id="RecordMap.example_input" class="classattr">
@@ -1696,6 +1899,12 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">example_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return example output record.</span>
+
+<span class="sd">        :param local_data_model: optional Pandas data model.</span>
+<span class="sd">        :return: example result data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">local_data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">local_data_model</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1714,7 +1923,12 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Return example output record.</p>
+
+<p>:param local_data_model: optional Pandas data model.
+:return: example result data frame.</p>
+</div>
+
 
                             </div>
                             <div id="RecordMap.transform" class="classattr">
@@ -1722,12 +1936,31 @@
 
         
             <span class="def">def</span>
-            <span class="name">transform</span><span class="signature">(self, X, *, check_blocks_out_keying=False, local_data_model=None)</span>:
+            <span class="name">transform</span><span class="signature">(
+    self,
+    X,
+    *,
+    check_blocks_out_keying: bool = False,
+    local_data_model=None
+)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">check_blocks_out_keying</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">X</span><span class="p">,</span>
+            <span class="o">*</span><span class="p">,</span>
+            <span class="n">check_blocks_out_keying</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transform X records.</span>
+
+<span class="sd">        :param X: data frame to be transformed.</span>
+<span class="sd">        :param check_blocks_out_keying: logical, if True check output key constraints.</span>
+<span class="sd">        :param local_data_model: pandas data model.</span>
+<span class="sd">        :return: transformed data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">unknown</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_needed</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;missing required columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">unknown</span><span class="p">))</span>
@@ -1750,7 +1983,14 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Transform X records.</p>
+
+<p>:param X: data frame to be transformed.
+:param check_blocks_out_keying: logical, if True check output key constraints.
+:param local_data_model: pandas data model.
+:return: transformed data frame.</p>
+</div>
+
 
                             </div>
                             <div id="RecordMap.compose" class="classattr">
@@ -1788,7 +2028,7 @@
                 <span class="k">return</span> <span class="kc">None</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span>
-                    <span class="n">blocks_out</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">(</span>
+                    <span class="n">blocks_out</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
                         <span class="n">control_table</span><span class="o">=</span><span class="n">rso</span><span class="p">,</span>
                         <span class="n">record_keys</span><span class="o">=</span><span class="n">rk</span><span class="p">,</span>
                         <span class="n">control_table_keys</span><span class="o">=</span><span class="n">s2</span><span class="o">.</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">control_table_keys</span><span class="p">,</span>
@@ -1797,7 +2037,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span>
-                    <span class="n">blocks_in</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">(</span>
+                    <span class="n">blocks_in</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
                         <span class="n">control_table</span><span class="o">=</span><span class="n">rsi</span><span class="p">,</span>
                         <span class="n">record_keys</span><span class="o">=</span><span class="n">rk</span><span class="p">,</span>
                         <span class="n">control_table_keys</span><span class="o">=</span><span class="n">s1</span><span class="o">.</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">control_table_keys</span><span class="p">,</span>
@@ -1805,12 +2045,12 @@
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span>
-                    <span class="n">blocks_in</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">(</span>
+                    <span class="n">blocks_in</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
                         <span class="n">control_table</span><span class="o">=</span><span class="n">rsi</span><span class="p">,</span>
                         <span class="n">record_keys</span><span class="o">=</span><span class="n">rk</span><span class="p">,</span>
                         <span class="n">control_table_keys</span><span class="o">=</span><span class="n">s1</span><span class="o">.</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">control_table_keys</span><span class="p">,</span>
                     <span class="p">),</span>
-                    <span class="n">blocks_out</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">cdata</span><span class="o">.</span><span class="n">RecordSpecification</span><span class="p">(</span>
+                    <span class="n">blocks_out</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
                         <span class="n">control_table</span><span class="o">=</span><span class="n">rso</span><span class="p">,</span>
                         <span class="n">record_keys</span><span class="o">=</span><span class="n">rk</span><span class="p">,</span>
                         <span class="n">control_table_keys</span><span class="o">=</span><span class="n">s2</span><span class="o">.</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">control_table_keys</span><span class="p">,</span>
@@ -1840,12 +2080,17 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return inverse transform.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">RecordMap</span><span class="p">(</span><span class="n">blocks_in</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span><span class="p">,</span> <span class="n">blocks_out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Return inverse transform.</p>
+</div>
+
 
                             </div>
                             <div id="RecordMap.fmt" class="classattr">
@@ -1853,12 +2098,13 @@
 
         
             <span class="def">def</span>
-            <span class="name">fmt</span><span class="signature">(self)</span>:
+            <span class="name">fmt</span><span class="signature">(self) -&gt; str</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">fmt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">fmt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Format for informal presentation.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">return</span> <span class="s2">&quot;RecordMap(no-op)&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
@@ -1900,7 +2146,9 @@
 
         </details>
 
-    
+            <div class="docstring"><p>Format for informal presentation.</p>
+</div>
+
 
                             </div>
                             <div id="RecordMap.fit" class="classattr">
@@ -1914,12 +2162,15 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;No-op (sklearn pipeline interface)&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>No-op (sklearn pipeline interface)</p>
+</div>
+
 
                             </div>
                             <div id="RecordMap.fit_transform" class="classattr">
@@ -1933,12 +2184,15 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;transform() (sklearn pipeline interface)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>transform() (sklearn pipeline interface)</p>
+</div>
+
 
                             </div>
                             <div id="RecordMap.get_feature_names" class="classattr">
@@ -1952,12 +2206,15 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return columns produced (sklearn pipeline interface)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Return columns produced (sklearn pipeline interface)</p>
+</div>
+
 
                             </div>
                             <div id="RecordMap.get_params" class="classattr">
@@ -1971,12 +2228,15 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return emtpy dictionary (sklearn pipeline interface)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Return emtpy dictionary (sklearn pipeline interface)</p>
+</div>
+
 
                             </div>
                             <div id="RecordMap.set_params" class="classattr">
@@ -1990,12 +2250,15 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;No-op (sklearn pipeline interface)&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>No-op (sklearn pipeline interface)</p>
+</div>
+
 
                             </div>
                             <div id="RecordMap.inverse_transform" class="classattr">
@@ -2009,12 +2272,15 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform inverse transform (sklearn pipeline interface)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">inverse</span><span class="p">()</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-    
+            <div class="docstring"><p>Perform inverse transform (sklearn pipeline interface)</p>
+</div>
+
 
                             </div>
                 </section>

@@ -20,10 +20,9 @@ def xicor_query(*, x_name: str = 'x', y_name: str = 'y'):
     assert isinstance(x_name, str)
     assert isinstance(y_name, str)
     x_tie_breaker = x_name + "_tie_breaker"
-    y_tie_breaker = y_name + "_tie_breaker"
     y_str = y_name + "_str"
     names = [
-        x_name, y_name, x_tie_breaker, y_tie_breaker, y_str,
+        x_name, y_name, x_tie_breaker, y_str,
         'l', 'n', 'r',
         'rplus', 'rdiff', 'lterm', 'num_sum', 'den_sum',
         'xicor'
@@ -32,21 +31,20 @@ def xicor_query(*, x_name: str = 'x', y_name: str = 'y'):
     ops = (
         TableDescription(column_names=[x_name, y_name])
             .extend({y_str: f'{y_name}.as_str()'})
-            .extend(  # add in some tie breaking columns
+            .extend(  # convert types, and add in tie breaking column
                 {
                     x_name: f'1.0 * {x_name}',
                     y_name: f'1.0 * {y_name}',
                     x_tie_breaker: '_uniform()',
-                    y_tie_breaker: '_uniform()',
                 })
-            .extend({'n': '(1).sum()'}) # annotate in number of rows
+            .extend({'n': '(1).sum()'})  # annotate in number of rows
             .extend(
                 {'r': '(1).cumsum()'},  # compute y ranks, that we will use to compare rank changes wrt x
-                order_by=[y_name, y_tie_breaker])
+                order_by=[y_name])
             .extend(
                 {'l': '(1).cumsum()'},  # compute reverse y ranks, used to normalize for ties in denominator
-                order_by=[y_name, y_tie_breaker],
-                reverse=[y_name, y_tie_breaker])
+                order_by=[y_name],
+                reverse=[y_name])
             .extend(  # go to max rank of group tie breaking
                 {
                     'l': 'l.max()',
@@ -70,7 +68,7 @@ def xicor_query(*, x_name: str = 'x', y_name: str = 'y'):
                     'n': 'n.max()',  # pseudo-aggregation, column is constant
                 }
                 )
-            .extend({'xicor': '1.0 - n * num_sum / ( 2.0 * den_sum)'})  #  actual xicor formula
+            .extend({'xicor': '1.0 - n * num_sum / ( 2.0 * den_sum)'})  # actual xicor formula
             .select_columns('xicor')
     )
     return ops
