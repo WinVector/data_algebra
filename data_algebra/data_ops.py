@@ -72,15 +72,15 @@ def _assert_tables_defs_consistent(tm1: Dict, tm2: Dict):
 
 def _work_col_group_arg(arg, *, arg_name: str, columns: Iterable[str]):
     """convert column list to standard form"""
-    col_set = set(columns)
     if arg is None:
         return []
     elif isinstance(arg, str):
-        assert arg in col_set
+        assert arg in set(columns)
         return [arg]
     elif isinstance(arg, Iterable):
         res = list(arg)
         assert len(res) == len(set(res))
+        col_set = set(columns)
         assert numpy.all([col in col_set for col in arg])
         return res
     elif arg == 1:
