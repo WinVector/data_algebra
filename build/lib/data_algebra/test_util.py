@@ -32,13 +32,9 @@ run_direct_ops_path_tests = False
 global_test_result_cache = None
 
 
-def formats_to_self(ops) -> bool:
+def re_parse(ops):
     """
-    Check a operator dag formats and parses back to itself.
-    Can raise exceptions. Also checks pickling.
-
-    :param ops: data_algebra.data_ops.ViewRepresentation
-    :return: logical, True if formats and evals back to self
+    Return copy of object made by dumpint to string via repr() and then evaluating that string.
     """
     str1 = repr(ops)
     ops2 = eval(
@@ -48,8 +44,18 @@ def formats_to_self(ops) -> bool:
             "pd": data_algebra.default_data_model.pd
         },  # make our definition of pandas available
     )
-    # str2 = repr(ops2)
-    # strings_match = str1 == str2  # probably too strict
+    return ops2
+
+
+def formats_to_self(ops) -> bool:
+    """
+    Check a operator dag formats and parses back to itself.
+    Can raise exceptions. Also checks pickling.
+
+    :param ops: data_algebra.data_ops.ViewRepresentation
+    :return: logical, True if formats and evals back to self
+    """
+    ops2 = re_parse(ops)
     ops_match = ops == ops2
     assert ops_match
     pickle_string = pickle.dumps(ops)
@@ -311,9 +317,6 @@ def check_transform_on_handles(
     for k in cols_used.keys():
         v = data[k]
         assert local_data_model.is_appropriate_data_instance(v)
-    if check_parse:
-        if not formats_to_self(ops):
-            raise ValueError("ops did not round-trip format")
     # try pandas path
     res = ops.eval(data_map=data, check_incoming_data_constraints=True)
     if not local_data_model.is_appropriate_data_instance(res):
@@ -329,6 +332,24 @@ def check_transform_on_handles(
         check_row_order=check_row_order,
     ):
         raise ValueError("Pandas eval result did not match expect")
+    if check_parse:
+        if not formats_to_self(ops):
+            raise ValueError("ops did not round-trip format")
+        ops_2 = re_parse(ops)
+        res_2 = ops_2.eval(data_map=data, check_incoming_data_constraints=True)
+        if not local_data_model.is_appropriate_data_instance(res_2):
+            raise ValueError(
+                "(reparse) expected res to be local_data_model.pd.DataFrame, got: " + str(type(res_2))
+            )
+        if not equivalent_frames(
+            res_2,
+            expect,
+            float_tol=float_tol,
+            check_column_order=check_column_order,
+            cols_case_sensitive=cols_case_sensitive,
+            check_row_order=check_row_order,
+        ):
+            raise ValueError("(reparse) Pandas eval result did not match expect")
     if len(data) == 1:
         res_t = ops.transform(list(data.values())[0], check_incoming_data_constraints=True)
         if not equivalent_frames(

@@ -501,10 +501,13 @@
 
 
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">import</span> <span class="nn">numbers</span>
 <span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
 
 <span class="kn">import</span> <span class="nn">data_algebra</span>
 <span class="kn">import</span> <span class="nn">data_algebra.expr_parse</span>
@@ -562,6 +565,24 @@
         <span class="n">t2</span> <span class="o">=</span> <span class="n">tm2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">t1</span><span class="o">.</span><span class="n">same_table_description_</span><span class="p">(</span><span class="n">t2</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Table &quot;</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot; has two incompatible representations&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_work_col_group_arg</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;convert column list to standard form&quot;&quot;&quot;</span>
+    <span class="n">col_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">col_set</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">arg</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="n">col</span> <span class="ow">in</span> <span class="n">col_set</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">res</span>
+    <span class="k">elif</span> <span class="n">arg</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Need </span><span class="si">{</span><span class="n">arg_name</span><span class="si">}</span><span class="s2"> to be a list of strings or 1, got </span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">ViewRepresentation</span><span class="p">(</span><span class="n">OperatorPlatform</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
@@ -975,25 +996,23 @@
 <span class="sd">        Add new derived columns, can replace existing columns for parsed operations. Internal method.</span>
 
 <span class="sd">        :param parsed_ops: dictionary of calculations to perform.</span>
-<span class="sd">        :param partition_by: optional window partition specification.</span>
-<span class="sd">        :param order_by: optional window ordering specification.</span>
+<span class="sd">        :param partition_by: optional window partition specification, or 1.</span>
+<span class="sd">        :param order_by: optional window ordering specification, or 1.</span>
 <span class="sd">        :param reverse: optional order reversal specification.</span>
 <span class="sd">        :return: compose operator directed acyclic graph</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">parsed_ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">parsed_ops</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span>
-        <span class="k">if</span> <span class="n">partition_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">partition_by</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">order_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">order_by</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">reverse</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">reverse</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">partition_by</span> <span class="o">=</span> <span class="n">_work_col_group_arg</span><span class="p">(</span><span class="n">partition_by</span><span class="p">,</span> <span class="n">arg_name</span><span class="o">=</span><span class="s1">&#39;partition_by&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="n">order_by</span> <span class="o">=</span> <span class="n">_work_col_group_arg</span><span class="p">(</span><span class="n">order_by</span><span class="p">,</span> <span class="n">arg_name</span><span class="o">=</span><span class="s1">&#39;order_by&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="n">reverse</span> <span class="o">=</span> <span class="n">_work_col_group_arg</span><span class="p">(</span><span class="n">reverse</span><span class="p">,</span> <span class="n">arg_name</span><span class="o">=</span><span class="s1">&#39;reverse&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">reverse</span> <span class="o">!=</span> <span class="mi">1</span>
         <span class="n">new_cols_produced_in_calc</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">parsed_ops</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">partition_by</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">partition_by</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_cols_produced_in_calc</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">partition_by</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must not change partition_by columns&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">order_by</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">partition_by</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">order_by</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-               <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;order_by and partition_by columns must be disjoint&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;order_by and partition_by columns must be disjoint&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_cols_produced_in_calc</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">order_by</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must not change partition_by columns&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">reverse</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">order_by</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -1046,19 +1065,11 @@
 <span class="sd">        Add new derived columns, can replace existing columns.</span>
 
 <span class="sd">        :param ops: dictionary of calculations to perform.</span>
-<span class="sd">        :param partition_by: optional window partition specification.</span>
-<span class="sd">        :param order_by: optional window ordering specification.</span>
+<span class="sd">        :param partition_by: optional window partition specification, or 1.</span>
+<span class="sd">        :param order_by: optional window ordering specification, or 1.</span>
 <span class="sd">        :param reverse: optional order reversal specification.</span>
 <span class="sd">        :return: compose operator directed acyclic graph</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">self</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">partition_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">partition_by</span> <span class="o">=</span> <span class="p">[</span><span class="n">partition_by</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">order_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">order_by</span> <span class="o">=</span> <span class="p">[</span><span class="n">order_by</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reverse</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">reverse</span> <span class="o">=</span> <span class="p">[</span><span class="n">reverse</span><span class="p">]</span>
         <span class="n">parsed_ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span>
             <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span>
         <span class="p">)</span>
@@ -1077,13 +1088,14 @@
 <span class="sd">        :param group_by: optional group key(s) specification.</span>
 <span class="sd">        :return: compose operator directed acyclic graph</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">group_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">group_by</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">group_by</span> <span class="o">=</span> <span class="n">_work_col_group_arg</span><span class="p">(</span><span class="n">group_by</span><span class="p">,</span> <span class="n">arg_name</span><span class="o">=</span><span class="s1">&#39;group_by&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">group_by</span> <span class="o">!=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="p">((</span><span class="n">parsed_ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">parsed_ops</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">group_by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must have ops or group_by&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;project must have ops or group_by&quot;</span><span class="p">)</span>
         <span class="n">new_cols_produced_in_calc</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">parsed_ops</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_cols_produced_in_calc</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">group_by</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;can not alter grouping columns&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;project can not alter grouping columns&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_trivial_when_intermediate_</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">project_parsed_</span><span class="p">(</span><span class="n">parsed_ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ProjectNode</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">)</span>
@@ -1096,12 +1108,6 @@
 <span class="sd">        :param group_by: optional group key(s) specification.</span>
 <span class="sd">        :return: compose operator directed acyclic graph</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">group_by</span> <span class="o">=</span> <span class="p">[</span><span class="n">group_by</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">group_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">group_by</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="p">((</span><span class="n">ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">group_by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must have ops or group_by&quot;</span><span class="p">)</span>
         <span class="n">parsed_ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span>
             <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span>
         <span class="p">)</span>
@@ -3775,25 +3781,23 @@
 <span class="sd">        Add new derived columns, can replace existing columns for parsed operations. Internal method.</span>
 
 <span class="sd">        :param parsed_ops: dictionary of calculations to perform.</span>
-<span class="sd">        :param partition_by: optional window partition specification.</span>
-<span class="sd">        :param order_by: optional window ordering specification.</span>
+<span class="sd">        :param partition_by: optional window partition specification, or 1.</span>
+<span class="sd">        :param order_by: optional window ordering specification, or 1.</span>
 <span class="sd">        :param reverse: optional order reversal specification.</span>
 <span class="sd">        :return: compose operator directed acyclic graph</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">parsed_ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">parsed_ops</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span>
-        <span class="k">if</span> <span class="n">partition_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">partition_by</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">order_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">order_by</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">reverse</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">reverse</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">partition_by</span> <span class="o">=</span> <span class="n">_work_col_group_arg</span><span class="p">(</span><span class="n">partition_by</span><span class="p">,</span> <span class="n">arg_name</span><span class="o">=</span><span class="s1">&#39;partition_by&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="n">order_by</span> <span class="o">=</span> <span class="n">_work_col_group_arg</span><span class="p">(</span><span class="n">order_by</span><span class="p">,</span> <span class="n">arg_name</span><span class="o">=</span><span class="s1">&#39;order_by&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="n">reverse</span> <span class="o">=</span> <span class="n">_work_col_group_arg</span><span class="p">(</span><span class="n">reverse</span><span class="p">,</span> <span class="n">arg_name</span><span class="o">=</span><span class="s1">&#39;reverse&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">reverse</span> <span class="o">!=</span> <span class="mi">1</span>
         <span class="n">new_cols_produced_in_calc</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">parsed_ops</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">partition_by</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">partition_by</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_cols_produced_in_calc</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">partition_by</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must not change partition_by columns&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">order_by</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">partition_by</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">order_by</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-               <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;order_by and partition_by columns must be disjoint&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;order_by and partition_by columns must be disjoint&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_cols_produced_in_calc</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">order_by</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must not change partition_by columns&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">reverse</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">order_by</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -3846,19 +3850,11 @@
 <span class="sd">        Add new derived columns, can replace existing columns.</span>
 
 <span class="sd">        :param ops: dictionary of calculations to perform.</span>
-<span class="sd">        :param partition_by: optional window partition specification.</span>
-<span class="sd">        :param order_by: optional window ordering specification.</span>
+<span class="sd">        :param partition_by: optional window partition specification, or 1.</span>
+<span class="sd">        :param order_by: optional window ordering specification, or 1.</span>
 <span class="sd">        :param reverse: optional order reversal specification.</span>
 <span class="sd">        :return: compose operator directed acyclic graph</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">self</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">partition_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">partition_by</span> <span class="o">=</span> <span class="p">[</span><span class="n">partition_by</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">order_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">order_by</span> <span class="o">=</span> <span class="p">[</span><span class="n">order_by</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reverse</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">reverse</span> <span class="o">=</span> <span class="p">[</span><span class="n">reverse</span><span class="p">]</span>
         <span class="n">parsed_ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span>
             <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span>
         <span class="p">)</span>
@@ -3877,13 +3873,14 @@
 <span class="sd">        :param group_by: optional group key(s) specification.</span>
 <span class="sd">        :return: compose operator directed acyclic graph</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">group_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">group_by</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">group_by</span> <span class="o">=</span> <span class="n">_work_col_group_arg</span><span class="p">(</span><span class="n">group_by</span><span class="p">,</span> <span class="n">arg_name</span><span class="o">=</span><span class="s1">&#39;group_by&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">group_by</span> <span class="o">!=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="p">((</span><span class="n">parsed_ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">parsed_ops</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">group_by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must have ops or group_by&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;project must have ops or group_by&quot;</span><span class="p">)</span>
         <span class="n">new_cols_produced_in_calc</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">parsed_ops</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_cols_produced_in_calc</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">group_by</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;can not alter grouping columns&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;project can not alter grouping columns&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_trivial_when_intermediate_</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">project_parsed_</span><span class="p">(</span><span class="n">parsed_ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ProjectNode</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">)</span>
@@ -3896,12 +3893,6 @@
 <span class="sd">        :param group_by: optional group key(s) specification.</span>
 <span class="sd">        :return: compose operator directed acyclic graph</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">group_by</span> <span class="o">=</span> <span class="p">[</span><span class="n">group_by</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">group_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">group_by</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="p">((</span><span class="n">ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">group_by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must have ops or group_by&quot;</span><span class="p">)</span>
         <span class="n">parsed_ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span>
             <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span>
         <span class="p">)</span>
@@ -4894,25 +4885,23 @@ raise an exception if the values are not consistent.</p>
 <span class="sd">        Add new derived columns, can replace existing columns for parsed operations. Internal method.</span>
 
 <span class="sd">        :param parsed_ops: dictionary of calculations to perform.</span>
-<span class="sd">        :param partition_by: optional window partition specification.</span>
-<span class="sd">        :param order_by: optional window ordering specification.</span>
+<span class="sd">        :param partition_by: optional window partition specification, or 1.</span>
+<span class="sd">        :param order_by: optional window ordering specification, or 1.</span>
 <span class="sd">        :param reverse: optional order reversal specification.</span>
 <span class="sd">        :return: compose operator directed acyclic graph</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">parsed_ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">parsed_ops</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span>
-        <span class="k">if</span> <span class="n">partition_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">partition_by</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">order_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">order_by</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">reverse</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">reverse</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">partition_by</span> <span class="o">=</span> <span class="n">_work_col_group_arg</span><span class="p">(</span><span class="n">partition_by</span><span class="p">,</span> <span class="n">arg_name</span><span class="o">=</span><span class="s1">&#39;partition_by&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="n">order_by</span> <span class="o">=</span> <span class="n">_work_col_group_arg</span><span class="p">(</span><span class="n">order_by</span><span class="p">,</span> <span class="n">arg_name</span><span class="o">=</span><span class="s1">&#39;order_by&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="n">reverse</span> <span class="o">=</span> <span class="n">_work_col_group_arg</span><span class="p">(</span><span class="n">reverse</span><span class="p">,</span> <span class="n">arg_name</span><span class="o">=</span><span class="s1">&#39;reverse&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">reverse</span> <span class="o">!=</span> <span class="mi">1</span>
         <span class="n">new_cols_produced_in_calc</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">parsed_ops</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">partition_by</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">partition_by</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_cols_produced_in_calc</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">partition_by</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must not change partition_by columns&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">order_by</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">partition_by</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">order_by</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-               <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;order_by and partition_by columns must be disjoint&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;order_by and partition_by columns must be disjoint&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_cols_produced_in_calc</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">order_by</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must not change partition_by columns&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">reverse</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">order_by</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -4966,8 +4955,8 @@ raise an exception if the values are not consistent.</p>
             <div class="docstring"><p>Add new derived columns, can replace existing columns for parsed operations. Internal method.</p>
 
 <p>:param parsed_ops: dictionary of calculations to perform.
-:param partition_by: optional window partition specification.
-:param order_by: optional window ordering specification.
+:param partition_by: optional window partition specification, or 1.
+:param order_by: optional window ordering specification, or 1.
 :param reverse: optional order reversal specification.
 :return: compose operator directed acyclic graph</p>
 </div>
@@ -4989,19 +4978,11 @@ raise an exception if the values are not consistent.</p>
 <span class="sd">        Add new derived columns, can replace existing columns.</span>
 
 <span class="sd">        :param ops: dictionary of calculations to perform.</span>
-<span class="sd">        :param partition_by: optional window partition specification.</span>
-<span class="sd">        :param order_by: optional window ordering specification.</span>
+<span class="sd">        :param partition_by: optional window partition specification, or 1.</span>
+<span class="sd">        :param order_by: optional window ordering specification, or 1.</span>
 <span class="sd">        :param reverse: optional order reversal specification.</span>
 <span class="sd">        :return: compose operator directed acyclic graph</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">self</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">partition_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">partition_by</span> <span class="o">=</span> <span class="p">[</span><span class="n">partition_by</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">order_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">order_by</span> <span class="o">=</span> <span class="p">[</span><span class="n">order_by</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reverse</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">reverse</span> <span class="o">=</span> <span class="p">[</span><span class="n">reverse</span><span class="p">]</span>
         <span class="n">parsed_ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span>
             <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span>
         <span class="p">)</span>
@@ -5018,8 +4999,8 @@ raise an exception if the values are not consistent.</p>
             <div class="docstring"><p>Add new derived columns, can replace existing columns.</p>
 
 <p>:param ops: dictionary of calculations to perform.
-:param partition_by: optional window partition specification.
-:param order_by: optional window ordering specification.
+:param partition_by: optional window partition specification, or 1.
+:param order_by: optional window ordering specification, or 1.
 :param reverse: optional order reversal specification.
 :return: compose operator directed acyclic graph</p>
 </div>
@@ -5044,13 +5025,14 @@ raise an exception if the values are not consistent.</p>
 <span class="sd">        :param group_by: optional group key(s) specification.</span>
 <span class="sd">        :return: compose operator directed acyclic graph</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">group_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">group_by</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">group_by</span> <span class="o">=</span> <span class="n">_work_col_group_arg</span><span class="p">(</span><span class="n">group_by</span><span class="p">,</span> <span class="n">arg_name</span><span class="o">=</span><span class="s1">&#39;group_by&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">group_by</span> <span class="o">!=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="p">((</span><span class="n">parsed_ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">parsed_ops</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">group_by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must have ops or group_by&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;project must have ops or group_by&quot;</span><span class="p">)</span>
         <span class="n">new_cols_produced_in_calc</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">parsed_ops</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_cols_produced_in_calc</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">group_by</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;can not alter grouping columns&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;project can not alter grouping columns&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_trivial_when_intermediate_</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">project_parsed_</span><span class="p">(</span><span class="n">parsed_ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ProjectNode</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_ops</span><span class="o">=</span><span class="n">parsed_ops</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">group_by</span><span class="p">)</span>
@@ -5085,12 +5067,6 @@ raise an exception if the values are not consistent.</p>
 <span class="sd">        :param group_by: optional group key(s) specification.</span>
 <span class="sd">        :return: compose operator directed acyclic graph</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">group_by</span> <span class="o">=</span> <span class="p">[</span><span class="n">group_by</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">group_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">group_by</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="p">((</span><span class="n">ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">group_by</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must have ops or group_by&quot;</span><span class="p">)</span>
         <span class="n">parsed_ops</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">expr_parse</span><span class="o">.</span><span class="n">parse_assignments_in_context</span><span class="p">(</span>
             <span class="n">ops</span><span class="o">=</span><span class="n">ops</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="bp">self</span>
         <span class="p">)</span>

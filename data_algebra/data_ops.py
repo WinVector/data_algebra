@@ -10,6 +10,8 @@ from typing import Iterable, Set, Dict, List, Optional, Tuple, Union
 import numbers
 import re
 
+import numpy
+
 import data_algebra
 import data_algebra.expr_parse
 import data_algebra.flow_text
@@ -66,6 +68,24 @@ def _assert_tables_defs_consistent(tm1: Dict, tm2: Dict):
         t2 = tm2[k]
         if not t1.same_table_description_(t2):
             raise ValueError("Table " + k + " has two incompatible representations")
+
+
+def _work_col_group_arg(arg, *, arg_name: str, columns: Iterable[str]):
+    """convert column list to standard form"""
+    col_set = set(columns)
+    if arg is None:
+        return []
+    elif isinstance(arg, str):
+        assert arg in col_set
+        return [arg]
+    elif isinstance(arg, Iterable):
+        res = list(arg)
+        assert len(res) == len(set(res))
+        assert numpy.all([col in col_set for col in arg])
+        return res
+    elif arg == 1:
+        return 1
+    assert ValueError(f"Need {arg_name} to be a list of strings or 1, got {arg}")
 
 
 class ViewRepresentation(OperatorPlatform, ABC):
@@ -486,31 +506,16 @@ class ViewRepresentation(OperatorPlatform, ABC):
         """
         if (parsed_ops is None) or (len(parsed_ops) < 1):
             return self
-
-        def work_col_group_arg(arg, *, arg_name: str):
-            """convert column list to standard form"""
-            if arg is None:
-                return []
-            elif isinstance(arg, str):
-                return [arg]
-            elif isinstance(arg, Iterable):
-                res = list(arg)
-                assert len(res) == len(set(res))
-                return res
-            elif arg == 1:
-                return 1
-            assert ValueError(f"Need {arg_name} to be a list of strings or 1, got {arg}")
-
-        partition_by = work_col_group_arg(partition_by, arg_name='partition_by')
-        order_by = work_col_group_arg(order_by, arg_name='order_by')
-        reverse = work_col_group_arg(reverse, arg_name='reverse')
+        partition_by = _work_col_group_arg(partition_by, arg_name='partition_by', columns=self.column_names)
+        order_by = _work_col_group_arg(order_by, arg_name='order_by', columns=self.column_names)
+        reverse = _work_col_group_arg(reverse, arg_name='reverse', columns=self.column_names)
         assert reverse != 1
         new_cols_produced_in_calc = set([k for k in parsed_ops.keys()])
         if (partition_by != 1) and (len(partition_by) > 0):
             if len(new_cols_produced_in_calc.intersection(partition_by)) > 0:
                 raise ValueError("must not change partition_by columns")
             if (order_by != 1) and len(set(partition_by).intersection(set(order_by))) > 0:
-               raise ValueError("order_by and partition_by columns must be disjoint")
+                raise ValueError("order_by and partition_by columns must be disjoint")
         if len(new_cols_produced_in_calc.intersection(order_by)) > 0:
             raise ValueError("must not change partition_by columns")
         if len(set(reverse).difference(order_by)) > 0:
@@ -568,8 +573,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
         :param reverse: optional order reversal specification.
         :return: compose operator directed acyclic graph
         """
-        if (ops is None) or (len(ops) < 1):
-            return self
         parsed_ops = data_algebra.expr_parse.parse_assignments_in_context(
             ops=ops, view=self
         )
@@ -588,13 +591,14 @@ class ViewRepresentation(OperatorPlatform, ABC):
         :param group_by: optional group key(s) specification.
         :return: compose operator directed acyclic graph
         """
-        if group_by is None:
-            group_by = []
+
+        group_by = _work_col_group_arg(group_by, arg_name='group_by', columns=self.column_names)
+        assert group_by != 1
         if ((parsed_ops is None) or (len(parsed_ops) < 1)) and (len(group_by) < 1):
-            raise ValueError("must have ops or group_by")
+            raise ValueError("project must have ops or group_by")
         new_cols_produced_in_calc = set([k for k in parsed_ops.keys()])
         if len(new_cols_produced_in_calc.intersection(group_by)):
-            raise ValueError("can not alter grouping columns")
+            raise ValueError("project can not alter grouping columns")
         if self.is_trivial_when_intermediate_():
             return self.sources[0].project_parsed_(parsed_ops, group_by=group_by)
         return ProjectNode(source=self, parsed_ops=parsed_ops, group_by=group_by)
@@ -607,12 +611,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
         :param group_by: optional group key(s) specification.
         :return: compose operator directed acyclic graph
         """
-        if isinstance(group_by, str):
-            group_by = [group_by]
-        if group_by is None:
-            group_by = []
-        if ((ops is None) or (len(ops) < 1)) and (len(group_by) < 1):
-            raise ValueError("must have ops or group_by")
         parsed_ops = data_algebra.expr_parse.parse_assignments_in_context(
             ops=ops, view=self
         )

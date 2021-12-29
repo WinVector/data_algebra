@@ -31,6 +31,9 @@
                     <h2>API Documentation</h2>
                         <ul class="memberlist">
             <li>
+                    <a class="function" href="#re_parse">re_parse</a>
+            </li>
+            <li>
                     <a class="function" href="#formats_to_self">formats_to_self</a>
             </li>
             <li>
@@ -103,13 +106,9 @@
 <span class="n">global_test_result_cache</span> <span class="o">=</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">re_parse</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Check a operator dag formats and parses back to itself.</span>
-<span class="sd">    Can raise exceptions. Also checks pickling.</span>
-
-<span class="sd">    :param ops: data_algebra.data_ops.ViewRepresentation</span>
-<span class="sd">    :return: logical, True if formats and evals back to self</span>
+<span class="sd">    Return copy of object made by dumpint to string via repr() and then evaluating that string.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">str1</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
     <span class="n">ops2</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span>
@@ -119,8 +118,18 @@
             <span class="s2">&quot;pd&quot;</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span>
         <span class="p">},</span>  <span class="c1"># make our definition of pandas available</span>
     <span class="p">)</span>
-    <span class="c1"># str2 = repr(ops2)</span>
-    <span class="c1"># strings_match = str1 == str2  # probably too strict</span>
+    <span class="k">return</span> <span class="n">ops2</span>
+
+
+<span class="k">def</span> <span class="nf">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check a operator dag formats and parses back to itself.</span>
+<span class="sd">    Can raise exceptions. Also checks pickling.</span>
+
+<span class="sd">    :param ops: data_algebra.data_ops.ViewRepresentation</span>
+<span class="sd">    :return: logical, True if formats and evals back to self</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ops2</span> <span class="o">=</span> <span class="n">re_parse</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
     <span class="n">ops_match</span> <span class="o">=</span> <span class="n">ops</span> <span class="o">==</span> <span class="n">ops2</span>
     <span class="k">assert</span> <span class="n">ops_match</span>
     <span class="n">pickle_string</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
@@ -382,9 +391,6 @@
     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cols_used</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
         <span class="n">v</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="k">assert</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">check_parse</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ops did not round-trip format&quot;</span><span class="p">)</span>
     <span class="c1"># try pandas path</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
@@ -400,6 +406,24 @@
         <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pandas eval result did not match expect&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">check_parse</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ops did not round-trip format&quot;</span><span class="p">)</span>
+        <span class="n">ops_2</span> <span class="o">=</span> <span class="n">re_parse</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
+        <span class="n">res_2</span> <span class="o">=</span> <span class="n">ops_2</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res_2</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;(reparse) expected res to be local_data_model.pd.DataFrame, got: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">res_2</span><span class="p">))</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
+            <span class="n">res_2</span><span class="p">,</span>
+            <span class="n">expect</span><span class="p">,</span>
+            <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
+            <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
+            <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
+            <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;(reparse) Pandas eval result did not match expect&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">res_t</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">],</span> <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
@@ -594,6 +618,38 @@
         </details>
 
             </section>
+                <section id="re_parse">
+                            <div class="attr function"><a class="headerlink" href="#re_parse">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">re_parse</span><span class="signature">(ops)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">re_parse</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return copy of object made by dumpint to string via repr() and then evaluating that string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">str1</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
+    <span class="n">ops2</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span>
+        <span class="n">str1</span><span class="p">,</span>
+        <span class="nb">globals</span><span class="p">(),</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;pd&quot;</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span>
+        <span class="p">},</span>  <span class="c1"># make our definition of pandas available</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">ops2</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Return copy of object made by dumpint to string via repr() and then evaluating that string.</p>
+</div>
+
+
+                </section>
                 <section id="formats_to_self">
                             <div class="attr function"><a class="headerlink" href="#formats_to_self">#&nbsp;&nbsp</a>
 
@@ -612,16 +668,7 @@
 <span class="sd">    :param ops: data_algebra.data_ops.ViewRepresentation</span>
 <span class="sd">    :return: logical, True if formats and evals back to self</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">str1</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
-    <span class="n">ops2</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span>
-        <span class="n">str1</span><span class="p">,</span>
-        <span class="nb">globals</span><span class="p">(),</span>
-        <span class="p">{</span>
-            <span class="s2">&quot;pd&quot;</span><span class="p">:</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span>
-        <span class="p">},</span>  <span class="c1"># make our definition of pandas available</span>
-    <span class="p">)</span>
-    <span class="c1"># str2 = repr(ops2)</span>
-    <span class="c1"># strings_match = str1 == str2  # probably too strict</span>
+    <span class="n">ops2</span> <span class="o">=</span> <span class="n">re_parse</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
     <span class="n">ops_match</span> <span class="o">=</span> <span class="n">ops</span> <span class="o">==</span> <span class="n">ops2</span>
     <span class="k">assert</span> <span class="n">ops_match</span>
     <span class="n">pickle_string</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
@@ -864,9 +911,6 @@ Ignores indexing. None and nan are considered equivalent in numeric contexts.</p
     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cols_used</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
         <span class="n">v</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="k">assert</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">check_parse</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ops did not round-trip format&quot;</span><span class="p">)</span>
     <span class="c1"># try pandas path</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
@@ -882,6 +926,24 @@ Ignores indexing. None and nan are considered equivalent in numeric contexts.</p
         <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pandas eval result did not match expect&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">check_parse</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">formats_to_self</span><span class="p">(</span><span class="n">ops</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ops did not round-trip format&quot;</span><span class="p">)</span>
+        <span class="n">ops_2</span> <span class="o">=</span> <span class="n">re_parse</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
+        <span class="n">res_2</span> <span class="o">=</span> <span class="n">ops_2</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">res_2</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;(reparse) expected res to be local_data_model.pd.DataFrame, got: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">res_2</span><span class="p">))</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
+            <span class="n">res_2</span><span class="p">,</span>
+            <span class="n">expect</span><span class="p">,</span>
+            <span class="n">float_tol</span><span class="o">=</span><span class="n">float_tol</span><span class="p">,</span>
+            <span class="n">check_column_order</span><span class="o">=</span><span class="n">check_column_order</span><span class="p">,</span>
+            <span class="n">cols_case_sensitive</span><span class="o">=</span><span class="n">cols_case_sensitive</span><span class="p">,</span>
+            <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;(reparse) Pandas eval result did not match expect&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">res_t</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">],</span> <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">equivalent_frames</span><span class="p">(</span>
