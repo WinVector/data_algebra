@@ -20,37 +20,39 @@ def xicor_query(*, x_name: str = 'x', y_name: str = 'y'):
     assert isinstance(x_name, str)
     assert isinstance(y_name, str)
     x_tie_breaker = x_name + "_tie_breaker"
-    y_str = y_name + "_str"
+    y_group = y_name + "_group"
     names = [
-        x_name, y_name, x_tie_breaker, y_str,
+        x_name, y_name, x_tie_breaker, y_group,
         'l', 'n', 'r',
         'rplus', 'rdiff', 'lterm', 'num_sum', 'den_sum',
         'xicor'
         ]
     assert(len(names) == len(set(names)))
     ops = (
-        TableDescription(table_name="data_frame", column_names=["x", "y"])
-            .extend({"y_str": "y.as_str()"})  # Google BigQuery won't group by float
+        TableDescription(table_name="data_frame", column_names=[x_name, y_name])
+            .extend({y_group: f"{y_name}.as_str()"})  # Google BigQuery won't group by float
             .extend({    # convert types, and add in tie breaking column
-                "x": "1.0 * x",
-                "y": "1.0 * y",
-                "x_tie_breaker": "_uniform()"})
+                x_name: f"1.0 * {x_name}",
+                y_name: f"1.0 * {y_name}",
+                x_tie_breaker: "_uniform()"})
             .extend({"n": "(1).sum()"})  # annotate in number of rows
             .extend(  # compute y ranks, that we will use to compare rank changes wrt x
-                {"r": "(1).cumsum()"}, order_by=["y"])
+                {"r": "(1).cumsum()"}, order_by=[y_name])
             .extend(  # compute reverse y ranks, used to normalize for ties in denominator
-                {"l": "(1).cumsum()"}, order_by=["y"], reverse=["y"])
+                {"l": "(1).cumsum()"}, order_by=[y_name], reverse=[y_name])
             .extend(  # go to max rank of group tie breaking
-                {"l": "l.max()", "r": "r.max()"}, partition_by=["y_str"])
+                {"l": "l.max()", "r": "r.max()"}, partition_by=[y_group])
             .extend(  # get y rank and y rank of next x-item into same row so we can take a difference
                 {"rplus": "r.shift(1)"},
-                order_by=["x", "x_tie_breaker"],
-                reverse=["x", "x_tie_breaker"],
+                order_by=[x_name, x_tie_breaker],
+                reverse=[x_name, x_tie_breaker],
             )
             .extend(  # compute numerator and denominator terms
                 {"rdiff": "((rplus - r).abs()).coalesce(0)", "lterm": "l * (n - l)"})
             .project(   # aggregate to compute sums in xicor definition
-                {"num_sum": "rdiff.sum()", "den_sum": "lterm.sum()", "n": "n.max()"})
+                {"num_sum": "rdiff.sum()", "den_sum": "lterm.sum()",
+                 "n": "n.max()"  # pseudo-aggregation n is constant across rows
+                 })
             .extend(  # actual xicor formula
                 {"xicor": "1.0 - ((n * num_sum) / (2.0 * den_sum))"})
             .select_columns(["xicor"])
