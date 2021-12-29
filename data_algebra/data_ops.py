@@ -4,6 +4,7 @@ Realization of data operations.
 
 
 from abc import ABC
+from collections.abc import Iterable
 import collections
 from typing import Iterable, Set, Dict, List, Optional, Tuple, Union
 import numbers
@@ -478,19 +479,32 @@ class ViewRepresentation(OperatorPlatform, ABC):
         Add new derived columns, can replace existing columns for parsed operations. Internal method.
 
         :param parsed_ops: dictionary of calculations to perform.
-        :param partition_by: optional window partition specification.
-        :param order_by: optional window ordering specification.
+        :param partition_by: optional window partition specification, or 1.
+        :param order_by: optional window ordering specification, or 1.
         :param reverse: optional order reversal specification.
         :return: compose operator directed acyclic graph
         """
         if (parsed_ops is None) or (len(parsed_ops) < 1):
             return self
-        if partition_by is None:
-            partition_by = []
-        if order_by is None:
-            order_by = []
-        if reverse is None:
-            reverse = []
+
+        def work_col_group_arg(arg, *, arg_name: str):
+            """convert column list to standard form"""
+            if arg is None:
+                return []
+            elif isinstance(arg, str):
+                return [arg]
+            elif isinstance(arg, Iterable):
+                res = list(arg)
+                assert len(res) == len(set(res))
+                return res
+            elif arg == 1:
+                return 1
+            assert ValueError(f"Need {arg_name} to be a list of strings or 1, got {arg}")
+
+        partition_by = work_col_group_arg(partition_by, arg_name='partition_by')
+        order_by = work_col_group_arg(order_by, arg_name='order_by')
+        reverse = work_col_group_arg(reverse, arg_name='reverse')
+        assert reverse != 1
         new_cols_produced_in_calc = set([k for k in parsed_ops.keys()])
         if (partition_by != 1) and (len(partition_by) > 0):
             if len(new_cols_produced_in_calc.intersection(partition_by)) > 0:
@@ -549,19 +563,13 @@ class ViewRepresentation(OperatorPlatform, ABC):
         Add new derived columns, can replace existing columns.
 
         :param ops: dictionary of calculations to perform.
-        :param partition_by: optional window partition specification.
-        :param order_by: optional window ordering specification.
+        :param partition_by: optional window partition specification, or 1.
+        :param order_by: optional window ordering specification, or 1.
         :param reverse: optional order reversal specification.
         :return: compose operator directed acyclic graph
         """
         if (ops is None) or (len(ops) < 1):
             return self
-        if isinstance(partition_by, str):
-            partition_by = [partition_by]
-        if isinstance(order_by, str):
-            order_by = [order_by]
-        if isinstance(reverse, str):
-            reverse = [reverse]
         parsed_ops = data_algebra.expr_parse.parse_assignments_in_context(
             ops=ops, view=self
         )
