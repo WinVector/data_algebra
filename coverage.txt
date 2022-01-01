@@ -104,12 +104,12 @@ tests/test_xicor.py .                                                    [100%]
 ---------- coverage: platform darwin, python 3.9.7-final-0 -----------
 Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
-data_algebra/BigQuery.py                 108     67    38%
-data_algebra/MySQL.py                     28     10    64%
+data_algebra/BigQuery.py                 108     35    68%
+data_algebra/MySQL.py                     28      5    82%
 data_algebra/OrderedSet.py                68      8    88%
-data_algebra/PostgreSQL.py                21      7    67%
+data_algebra/PostgreSQL.py                21      2    90%
 data_algebra/SQLite.py                   151     21    86%
-data_algebra/SparkSQL.py                  81     45    44%
+data_algebra/SparkSQL.py                  81     15    81%
 data_algebra/__init__.py                   5      0   100%
 data_algebra/arrow.py                    141     32    77%
 data_algebra/cdata.py                    340     66    81%
@@ -118,7 +118,7 @@ data_algebra/data_model.py                40     17    58%
 data_algebra/data_ops.py                1228    205    83%
 data_algebra/data_ops_types.py            84     35    58%
 data_algebra/data_ops_utils.py            49      5    90%
-data_algebra/db_model.py                 887     99    89%
+data_algebra/db_model.py                 887     89    90%
 data_algebra/expr_parse.py                35      0   100%
 data_algebra/expr_rep.py                 622     96    85%
 data_algebra/flow_text.py                 17      0   100%
@@ -128,10 +128,10 @@ data_algebra/pandas_base.py              428     40    91%
 data_algebra/pandas_model.py               5      0   100%
 data_algebra/parse_by_lark.py            159     25    84%
 data_algebra/python3_lark.py               1      0   100%
-data_algebra/test_util.py                270     49    82%
+data_algebra/test_util.py                270     33    88%
 data_algebra/util.py                     139     29    79%
 ----------------------------------------------------------
-TOTAL                                   5226    905    83%
+TOTAL                                   5226    807    85%
 
 
-============================= 249 passed in 27.49s =============================
+======================= 249 passed in 214.95s (0:03:34) ========================
