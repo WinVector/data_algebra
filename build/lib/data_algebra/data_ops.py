@@ -92,9 +92,9 @@ class ViewRepresentation(OperatorPlatform, ABC):
     """Structure to represent the columns of a query or a table.
        Abstract base class."""
 
-    column_names: Tuple[str]
+    column_names: Tuple[str, ...]
     sources: Tuple[
-        "ViewRepresentation"
+        "ViewRepresentation", ...
     ]  # https://www.python.org/dev/peps/pep-0484/#forward-references
 
     def __init__(
@@ -813,7 +813,7 @@ class TableDescription(ViewRepresentation):
     """
 
     table_name: str
-    column_names: Tuple[str]
+    column_names: Tuple[str, ...]
     qualifiers: Dict[str, str]
     key: str
     table_name_was_set_by_user: bool

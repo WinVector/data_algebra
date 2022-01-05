@@ -1326,6 +1326,7 @@
             <span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">contention</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="c1"># merge our stuff into subsql</span>
+                <span class="k">assert</span> <span class="n">subsql</span><span class="o">.</span><span class="n">terms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># type hint</span>
                 <span class="k">if</span> <span class="n">subsql</span><span class="o">.</span><span class="n">annotation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">subsql</span><span class="o">.</span><span class="n">annotation</span> <span class="o">=</span> <span class="n">annotation</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -2206,7 +2207,7 @@
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">terms</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+            <span class="n">terms</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">terms</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span>
         <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -3010,6 +3011,7 @@
             <span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">contention</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="c1"># merge our stuff into subsql</span>
+                <span class="k">assert</span> <span class="n">subsql</span><span class="o">.</span><span class="n">terms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># type hint</span>
                 <span class="k">if</span> <span class="n">subsql</span><span class="o">.</span><span class="n">annotation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">subsql</span><span class="o">.</span><span class="n">annotation</span> <span class="o">=</span> <span class="n">annotation</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -3890,7 +3892,7 @@
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">terms</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+            <span class="n">terms</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">terms</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span>
         <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -4784,6 +4786,7 @@
             <span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">contention</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="c1"># merge our stuff into subsql</span>
+                <span class="k">assert</span> <span class="n">subsql</span><span class="o">.</span><span class="n">terms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># type hint</span>
                 <span class="k">if</span> <span class="n">subsql</span><span class="o">.</span><span class="n">annotation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">subsql</span><span class="o">.</span><span class="n">annotation</span> <span class="o">=</span> <span class="n">annotation</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -6034,7 +6037,7 @@
             <span class="n">sql_format_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_SQL_format_options</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sql_format_options</span><span class="p">,</span> <span class="n">SQLFormatOptions</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">terms</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+            <span class="n">terms</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">terms</span> <span class="o">=</span> <span class="n">near_sql</span><span class="o">.</span><span class="n">terms</span>
         <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

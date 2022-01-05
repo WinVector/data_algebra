@@ -3,7 +3,7 @@ Representation for operations that are nearly translated into SQL.
 """
 
 from abc import ABC
-from typing import Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 
 import numpy
 
@@ -57,7 +57,7 @@ class NearSQL(ABC):
     Represent SQL queries in a mostly string-form
     """
 
-    terms: Optional[dict]
+    terms: Optional[Dict[str, Optional[str]]]
     query_name: Optional[str]
     quoted_query_name: str
     is_table: bool = False
@@ -66,7 +66,7 @@ class NearSQL(ABC):
     def __init__(
         self,
         *,
-        terms: Optional[dict],
+        terms: Optional[Dict[str, Optional[str]]],
         query_name: Optional[str] = None,
         quoted_query_name: str,
         is_table: bool = False,

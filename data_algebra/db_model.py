@@ -1114,6 +1114,7 @@ class DBModel:
             )
             if len(contention) == 0:
                 # merge our stuff into subsql
+                assert subsql.terms is not None  # type hint
                 if subsql.annotation is None:
                     subsql.annotation = annotation
                 else:
@@ -1994,7 +1995,7 @@ class DBModel:
             sql_format_options = self.default_SQL_format_options
         assert isinstance(sql_format_options, SQLFormatOptions)
         if near_sql.terms is None:
-            terms = OrderedDict()
+            terms: Dict[str, Optional[str]] = OrderedDict()
         else:
             terms = near_sql.terms
         if columns is None:

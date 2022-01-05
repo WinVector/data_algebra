@@ -589,9 +589,9 @@
     <span class="sd">&quot;&quot;&quot;Structure to represent the columns of a query or a table.</span>
 <span class="sd">       Abstract base class.&quot;&quot;&quot;</span>
 
-    <span class="n">column_names</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">column_names</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
     <span class="n">sources</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span>
-        <span class="s2">&quot;ViewRepresentation&quot;</span>
+        <span class="s2">&quot;ViewRepresentation&quot;</span><span class="p">,</span> <span class="o">...</span>
     <span class="p">]</span>  <span class="c1"># https://www.python.org/dev/peps/pep-0484/#forward-references</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -1310,7 +1310,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">column_names</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">column_names</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
     <span class="n">qualifiers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
     <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">table_name_was_set_by_user</span><span class="p">:</span> <span class="nb">bool</span>
@@ -3373,9 +3373,9 @@
     <span class="sd">&quot;&quot;&quot;Structure to represent the columns of a query or a table.</span>
 <span class="sd">       Abstract base class.&quot;&quot;&quot;</span>
 
-    <span class="n">column_names</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">column_names</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
     <span class="n">sources</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span>
-        <span class="s2">&quot;ViewRepresentation&quot;</span>
+        <span class="s2">&quot;ViewRepresentation&quot;</span><span class="p">,</span> <span class="o">...</span>
     <span class="p">]</span>  <span class="c1"># https://www.python.org/dev/peps/pep-0484/#forward-references</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -5504,7 +5504,7 @@ raise an exception if the values are not consistent.</p>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">column_names</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">column_names</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
     <span class="n">qualifiers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
     <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">table_name_was_set_by_user</span><span class="p">:</span> <span class="nb">bool</span>
