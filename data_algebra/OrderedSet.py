@@ -13,13 +13,15 @@ from typing import Optional
 # https://stackoverflow.com/a/1653978
 
 
-class OrderedSet(collections.OrderedDict, collections.abc.MutableSet):
+class OrderedSet(collections.abc.MutableSet):
     """
     Ordered set to enhance presentation of column names.
     """
 
+    impl: collections.OrderedDict
+
     def __init__(self, v: Optional[Iterable] = None):
-        collections.OrderedDict.__init__(self)
+        self.impl = collections.OrderedDict()
         if v is not None:
             for val in v:
                 self.add(val)
@@ -35,11 +37,17 @@ class OrderedSet(collections.OrderedDict, collections.abc.MutableSet):
 
     def add(self, elem):
         """add an element"""
-        self[elem] = None
+        self.impl[elem] = None
 
     def discard(self, elem):
         """delete an element"""
-        self.pop(elem, None)
+        self.impl.pop(elem, None)
+
+    def __copy__(self):
+        return OrderedSet(self.impl.keys())
+
+    def copy(self):
+        return OrderedSet(self.impl.keys())
 
     def __le__(self, other):
         return all(e in other for e in self)
@@ -54,10 +62,10 @@ class OrderedSet(collections.OrderedDict, collections.abc.MutableSet):
         return self >= other and self != other
 
     def __repr__(self):
-        return "OrderedSet([%s])" % (", ".join(map(repr, self.keys())))
+        return "OrderedSet([%s])" % (", ".join(map(repr, self.impl.keys())))
 
     def __str__(self):
-        return "{%s}" % (", ".join(map(repr, self.keys())))
+        return "{%s}" % (", ".join(map(repr, self.impl.keys())))
 
     difference = property(lambda self: self.__sub__)
     difference_update = property(lambda self: self.__isub__)
@@ -69,18 +77,18 @@ class OrderedSet(collections.OrderedDict, collections.abc.MutableSet):
     symmetric_difference_update = property(lambda self: self.__ixor__)
 
     def __len__(self):
-        return len(self.keys())
+        return len(self.impl)
 
     def __iter__(self):
-        return iter(self.keys())
+        return iter(self.impl.keys())
 
     def __contains__(self, item):
-        return item in self.keys()
+        return item in self.impl.keys()
 
     def union(self, *args):
         """create new set union"""
         res = OrderedSet()
-        for k in self.keys():
+        for k in self.impl.keys():
             res.add(k)
         for other in args:
             for k in other:

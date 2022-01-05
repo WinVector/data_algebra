@@ -4,12 +4,16 @@ Interface for realizing the data algebra as a sequence of steps over an object.
 
 
 from abc import ABC
+from typing import Callable, Dict
 
 
 class DataModel(ABC):
     """
     Interface for realizing the data algebra as a sequence of steps over a Pandas like object.
     """
+
+    presentation_model_name : str
+    user_fun_map : Dict[str, Callable]
 
     def __init__(self, presentation_model_name: str):
         assert isinstance(presentation_model_name, str)

@@ -190,7 +190,9 @@ def guess_column_types(
     if (d.shape[0] <= 0) or (d.shape[1] <= 0):
         return dict()
     if columns is None:
-        columns = d.columns.copy()
+        columns = list(d.columns)
+    else:
+        columns = list(columns)
     assert len(set(columns) - set(d.columns)) == 0
     if len(columns) <= 0:
         return dict()
