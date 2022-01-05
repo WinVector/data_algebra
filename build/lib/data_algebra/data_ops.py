@@ -249,7 +249,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         """
         if forbidden is None:
             forbidden = set()
-        res = dict()
+        res: Dict[str, Set[str]] = dict()
         for source in self.sources:
             forbidden_i = source.forbidden_columns(forbidden=forbidden)
             for (tk, f) in forbidden_i.items():
@@ -460,14 +460,15 @@ class ViewRepresentation(OperatorPlatform, ABC):
             )
         k = [k for k in tables.keys()][0]
         # noinspection PyUnresolvedReferences
-        if isinstance(X, data_model.pd.DataFrame):
-            data_map = {k: X}
-            return self.eval(
-                data_map=data_map,
-                data_model=data_model,
-                narrow=narrow,
-                check_incoming_data_constraints=check_incoming_data_constraints)
-        raise TypeError("can not apply transform() to type " + str(type(X)))
+        if not data_model.is_appropriate_data_instance(X):
+            raise TypeError("can not apply transform() to type " + str(type(X)))
+        data_map = {k: X}
+        return self.eval(
+            data_map=data_map,
+            data_model=data_model,
+            narrow=narrow,
+            check_incoming_data_constraints=check_incoming_data_constraints)
+
 
     # composition (used to eliminate intermediate order nodes)
 
@@ -812,7 +813,7 @@ class TableDescription(ViewRepresentation):
     """
 
     table_name: str
-    column_names: List[str]
+    column_names: Tuple[str]
     qualifiers: Dict[str, str]
     key: str
     table_name_was_set_by_user: bool
@@ -829,11 +830,9 @@ class TableDescription(ViewRepresentation):
         nrows: Optional[int] = None,
     ):
         if isinstance(column_names, str):
-            column_names = [column_names]
+            column_names = (column_names, )
         else:
-            column_names = [
-                v for v in column_names
-            ]  # convert to list from other types such as series
+            column_names = tuple(column_names)  # convert to tuple from other types such as series
         ViewRepresentation.__init__(
             self, column_names=column_names, node_name="TableDescription"
         )
@@ -851,9 +850,7 @@ class TableDescription(ViewRepresentation):
         self.sql_meta = sql_meta
         self.table_name = table_name
         self.nrows = nrows
-        if isinstance(column_names, str):
-            column_names = [column_names]
-        self.column_names = [c for c in column_names]
+        self.column_names = column_names
         if qualifiers is None:
             qualifiers = {}
         assert isinstance(qualifiers, dict)
@@ -1060,7 +1057,7 @@ def describe_table(
     column_names = [c for c in d.columns]
     head = None
     nrows = d.shape[0]
-    if keep_all:
+    if keep_all or (row_limit is None):
         row_limit = None
         head = d.copy()
         head.reset_index(drop=True, inplace=True)
@@ -2176,10 +2173,12 @@ class RenameColumnsNode(ViewRepresentation):
         :return: list of order sets (list parallel to sources).
         """
         if using is None:
-            using = self.column_names
+            using_tuple = self.column_names
+        else:
+            using_tuple = tuple(using)
         cols = [
             (k if k not in self.column_remapping.keys() else self.column_remapping[k])
-            for k in using
+            for k in using_tuple
         ]
         return [OrderedSet(cols)]
 

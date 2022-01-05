@@ -106,32 +106,32 @@ Name                                   Stmts   Miss  Cover
 ----------------------------------------------------------
 data_algebra/BigQuery.py                 108     67    38%
 data_algebra/MySQL.py                     28     10    64%
-data_algebra/OrderedSet.py                68      8    88%
+data_algebra/OrderedSet.py                73      9    88%
 data_algebra/PostgreSQL.py                21      7    67%
 data_algebra/SQLite.py                   151     21    86%
 data_algebra/SparkSQL.py                  81     45    44%
 data_algebra/__init__.py                   5      0   100%
 data_algebra/arrow.py                    141     32    77%
-data_algebra/cdata.py                    340     66    81%
+data_algebra/cdata.py                    342     66    81%
 data_algebra/connected_components.py      22      0   100%
-data_algebra/data_model.py                40     17    58%
-data_algebra/data_ops.py                1228    205    83%
+data_algebra/data_model.py                43     17    60%
+data_algebra/data_ops.py                1227    204    83%
 data_algebra/data_ops_types.py            84     35    58%
 data_algebra/data_ops_utils.py            49      5    90%
-data_algebra/db_model.py                 887     99    89%
+data_algebra/db_model.py                 897    101    89%
 data_algebra/expr_parse.py                35      0   100%
-data_algebra/expr_rep.py                 622     96    85%
+data_algebra/expr_rep.py                 624     96    85%
 data_algebra/flow_text.py                 17      0   100%
-data_algebra/near_sql.py                 179      4    98%
-data_algebra/op_container.py             118     45    62%
+data_algebra/near_sql.py                 188      4    98%
+data_algebra/op_container.py             120     46    62%
 data_algebra/pandas_base.py              428     40    91%
 data_algebra/pandas_model.py               5      0   100%
 data_algebra/parse_by_lark.py            159     25    84%
 data_algebra/python3_lark.py               1      0   100%
-data_algebra/test_util.py                270     54    80%
-data_algebra/util.py                     139     29    79%
+data_algebra/test_util.py                273     56    79%
+data_algebra/util.py                     140     29    79%
 ----------------------------------------------------------
-TOTAL                                   5226    910    83%
+TOTAL                                   5262    915    83%
 
 
-============================= 249 passed in 27.02s =============================
+============================= 249 passed in 26.03s =============================

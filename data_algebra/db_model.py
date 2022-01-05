@@ -7,7 +7,7 @@ import re
 from collections import OrderedDict
 from typing import List, Optional
 from types import SimpleNamespace
-from typing import Tuple
+from typing import Dict, Set, Tuple
 
 import pandas.io.sql
 
@@ -996,7 +996,7 @@ class DBModel:
                 terms[k] = k  # these get quoted later
             view_name = "table_reference_" + str(temp_id_source[0])
             temp_id_source[0] = temp_id_source[0] + 1
-            near_sql = data_algebra.near_sql.NearSQLUnaryStep(
+            return data_algebra.near_sql.NearSQLUnaryStep(
                 terms=terms,
                 query_name=view_name,
                 quoted_query_name=self.quote_identifier(view_name),
@@ -1061,7 +1061,7 @@ class DBModel:
                 window_term = window_term + "ORDER BY " + ", ".join(rt) + " "
                 window_vars.update(extend_node.order_by)
             window_term = window_term + " ) "
-        terms = OrderedDict()
+        terms: Dict[str, Optional[str]] = OrderedDict()
         declared_term_dependencies = OrderedDict()
         origcols = [k for k in using if k not in subops.keys()]
         for k in origcols:
@@ -1069,7 +1069,7 @@ class DBModel:
             declared_term_dependencies[k] = {k}
         for (ci, oi) in subops.items():
             terms[ci] = self.expr_to_sql(oi) + window_term
-            cols_used_in_term = set()
+            cols_used_in_term: Set[str] = set()
             oi.get_column_names(cols_used_in_term)
             cols_used_in_term.update(window_vars)
             declared_term_dependencies[ci] = cols_used_in_term
@@ -1114,7 +1114,10 @@ class DBModel:
             )
             if len(contention) == 0:
                 # merge our stuff into subsql
-                subsql.annotation = subsql.annotation + "." + annotation
+                if subsql.annotation is None:
+                    subsql.annotation = annotation
+                else:
+                    subsql.annotation = subsql.annotation + "." + annotation
                 for k in our_non_trivial_terms:
                     subsql.terms[k] = terms[k]
                     subsql.declared_term_dependencies[k] = declared_term_dependencies[k]
@@ -1324,7 +1327,7 @@ class DBModel:
         terms = None
         if not using_was_None:
             terms = {ci: None for ci in subusing}
-        suffix = []
+        suffix: List[str] = []
         if len(order_node.order_columns) > 0:
             suffix = (
                 suffix
@@ -1588,7 +1591,7 @@ class DBModel:
             len_sequence = len(sequence.previous_steps)
             # can fall back to the non-with path
             if len(sequence.previous_steps) >= 1:
-                sql_sequence = []
+                sql_sequence: List[str] = []
                 for i in range(len_sequence):
                     nmi = sequence.previous_steps[i][0]  # already quoted
                     sqli = sequence.previous_steps[i][1].to_sql_str_list(
@@ -1924,7 +1927,9 @@ class DBModel:
             and (near_sql.annotation is not None)
             and (len(near_sql.annotation) > 0)
         ):
-            sql_start = "SELECT  -- " + _clean_annotation(near_sql.annotation)
+            clean_anno = _clean_annotation(near_sql.annotation)
+            if clean_anno is not None:
+                sql_start = "SELECT  -- " + clean_anno
         sql = (
             [sql_start]
             + self._indent_and_sep_terms(
@@ -1952,9 +1957,11 @@ class DBModel:
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
         assert isinstance(sql_format_options, SQLFormatOptions)
-        sql = []
+        sql: List[str] = []
         if near_sql.annotation is not None:
-            sql = sql + ["-- " + _clean_annotation(near_sql.annotation)]
+            clean_anno = _clean_annotation(near_sql.annotation)
+            if clean_anno is not None:
+                sql = sql + ["-- " + clean_anno]
         if add_select:
             sql = sql + ["SELECT"]
         sql = sql + [" " + v for v in near_sql.prefix]
@@ -1986,9 +1993,12 @@ class DBModel:
         if sql_format_options is None:
             sql_format_options = self.default_SQL_format_options
         assert isinstance(sql_format_options, SQLFormatOptions)
+        if near_sql.terms is None:
+            terms = OrderedDict()
+        else:
+            terms = near_sql.terms
         if columns is None:
-            columns = [k for k in near_sql.terms.keys()]
-        terms = near_sql.terms
+            columns = [k for k in terms.keys()]
         if (constants is not None) and (len(constants) > 0):
             terms.update(constants)
         terms_strs = [self.enc_term_(k, terms=terms) for k in columns]
@@ -2001,7 +2011,9 @@ class DBModel:
             and (near_sql.annotation is not None)
             and (len(near_sql.annotation) > 0)
         ):
-            sql_start = "SELECT  -- " + _clean_annotation(near_sql.annotation)
+            clean_anno = _clean_annotation(near_sql.annotation)
+            if clean_anno is not None:
+                sql_start = "SELECT  -- " + clean_anno
         if is_union:
             substr_1 = near_sql.sub_sql1.to_sql_str_list(
                 db_model=self, sql_format_options=sql_format_options

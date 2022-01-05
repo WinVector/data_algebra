@@ -30,9 +30,10 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
         data_algebra.data_ops_types.OperatorPlatform.__init__(
             self, node_name="container"
         )
+        self.ops = None
         self.set(other)
 
-    def set(self, other):
+    def set(self, other: data_algebra.data_ops.ViewRepresentation):
         assert isinstance(other, data_algebra.data_ops.ViewRepresentation)
         assert not isinstance(other, OpC)  # don't allow deep nesting
         self.ops = other
@@ -68,6 +69,7 @@ class OpC(data_algebra.data_ops_types.OperatorPlatform):
 
     # noinspection PyPep8Naming
     def transform(self, X, *, data_model=None, narrow: bool = True, check_incoming_data_constraints: bool = False):
+        assert isinstance(self.ops, data_algebra.data_ops.ViewRepresentation)
         return self.ops.transform(
             X=X,
             data_model=data_model,

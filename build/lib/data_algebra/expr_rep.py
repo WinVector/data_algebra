@@ -3,7 +3,7 @@ Represent data processing expressions.
 """
 
 from abc import ABC
-from typing import Optional, Union
+from typing import Any, List, Optional, Union
 
 import numpy
 
@@ -23,6 +23,9 @@ class PythonText:
     Class for holding text representation of Python, with possible additional annotations.
     str() method returns only the text for interoperability.
     """
+
+    s: str
+    is_in_parens: bool
 
     def __init__(self, s: str, *, is_in_parens: bool = False):
         assert isinstance(s, str)
@@ -1163,7 +1166,7 @@ def enc_value(value):
 class ColumnReference(Term):
     """class to represent referring to a column"""
 
-    view: Optional["data_algebra.data_ops.ViewRepresentation"]
+    view: Optional[Any]
     column_name: str
 
     def __init__(self, view, column_name):
@@ -1420,27 +1423,27 @@ class Expression(Term):
                     "(" + str(sub_0) + ")." + self.op + "()", is_in_parens=False
                 )
         if self.inline:
-            subs = [str(ai.to_python(want_inline_parens=True)) for ai in self.args]
-            result = (" " + self.op + " ").join(subs)
+            subs_strs = [str(ai.to_python(want_inline_parens=True)) for ai in self.args]
+            result = (" " + self.op + " ").join(subs_strs)
             if want_inline_parens:
                 return PythonText("(" + result + ")", is_in_parens=True)
             return PythonText(result, is_in_parens=False)
-        subs = [ai.to_python(want_inline_parens=False) for ai in self.args]
+        subs: List[PythonText] = [ai.to_python(want_inline_parens=False) for ai in self.args]
         subs_0 = subs[0]
-        subs = [str(si) for si in subs]
+        subs_strs = [str(si) for si in subs]
         if self.method:
             if subs_0.is_in_parens or isinstance(self.args[0], ColumnReference):
                 return PythonText(
-                    subs[0] + "." + self.op + "(" + ", ".join(subs[1:]) + ")",
+                    subs_strs[0] + "." + self.op + "(" + ", ".join(subs_strs[1:]) + ")",
                     is_in_parens=False,
                 )
             else:
                 return PythonText(
-                    "(" + subs[0] + ")." + self.op + "(" + ", ".join(subs[1:]) + ")",
+                    "(" + subs_strs[0] + ")." + self.op + "(" + ", ".join(subs_strs[1:]) + ")",
                     is_in_parens=False,
                 )
         # treat as fn call
-        return PythonText(self.op + "(" + ", ".join(subs) + ")", is_in_parens=False)
+        return PythonText(self.op + "(" + ", ".join(subs_strs) + ")", is_in_parens=False)
 
 
 # define with def so function has usable __name__

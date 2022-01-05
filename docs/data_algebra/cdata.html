@@ -244,7 +244,7 @@
 <span class="sd">        :param include_record_keys: logical, if True include record keys as columns</span>
 <span class="sd">        :return: column list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">cols</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">cols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">include_record_keys</span><span class="p">:</span>
             <span class="n">cols</span> <span class="o">=</span> <span class="n">cols</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_keys</span>
         <span class="n">cols</span> <span class="o">=</span> <span class="n">cols</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">content_keys</span>
@@ -520,10 +520,12 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">columns_needed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">block_columns</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># type hint</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">columns_needed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">row_columns</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">block_columns</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># type hint</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">row_columns</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fmt_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt</span><span class="p">()</span>
 
@@ -948,7 +950,7 @@
 <span class="sd">        :param include_record_keys: logical, if True include record keys as columns</span>
 <span class="sd">        :return: column list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">cols</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">cols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">include_record_keys</span><span class="p">:</span>
             <span class="n">cols</span> <span class="o">=</span> <span class="n">cols</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_keys</span>
         <span class="n">cols</span> <span class="o">=</span> <span class="n">cols</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">content_keys</span>
@@ -1157,7 +1159,7 @@
 <span class="sd">        :param include_record_keys: logical, if True include record keys as columns</span>
 <span class="sd">        :return: column list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">cols</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">cols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">include_record_keys</span><span class="p">:</span>
             <span class="n">cols</span> <span class="o">=</span> <span class="n">cols</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_keys</span>
         <span class="n">cols</span> <span class="o">=</span> <span class="n">cols</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">content_keys</span>
@@ -1550,10 +1552,12 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">columns_needed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">block_columns</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># type hint</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">columns_needed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">row_columns</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">block_columns</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># type hint</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">row_columns</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fmt_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt</span><span class="p">()</span>
 
@@ -1844,10 +1848,12 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">columns_needed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">block_columns</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># type hint</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">columns_needed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">row_columns</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_out</span><span class="o">.</span><span class="n">block_columns</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># type hint</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">columns_produced</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks_in</span><span class="o">.</span><span class="n">row_columns</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fmt_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt</span><span class="p">()</span>
 </pre></div>

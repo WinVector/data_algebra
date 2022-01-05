@@ -128,14 +128,16 @@ def equivalent_frames(
                 ca = ca[ca_null == False]
                 cb = cb[cb_null == False]
                 ca_can_be_numeric = False
-                ca_n = None
+                ca_n = numpy.asarray([0.0])  # just a typing hint
+                # noinspection PyBroadException
                 try:
                     ca_n = numpy.asarray(ca, dtype=float)
                     ca_can_be_numeric = True
                 except Exception:
                     pass
                 cb_can_be_numeric = False
-                cb_n = None
+                cb_n = numpy.asarray([0.0])   # just a typing hint
+                # noinspection PyBroadException
                 try:
                     cb_n = numpy.asarray(cb, dtype=float)
                     cb_can_be_numeric = True
@@ -144,6 +146,8 @@ def equivalent_frames(
                 if ca_can_be_numeric != cb_can_be_numeric:
                     return False
                 if ca_can_be_numeric and cb_can_be_numeric:
+                    if len(ca_n) != len(cb_n):
+                        return False
                     dif = numpy.abs(ca_n - cb_n) / numpy.maximum(numpy.maximum(numpy.abs(ca_n), numpy.abs(cb_n)), 1.0)
                     if numpy.max(dif) > float_tol:
                         return False
@@ -227,13 +231,14 @@ def _run_handle_experiments(
                 assert res_db_ops is not None
             for i in range(len(sql_statements)):
                 if res_db_sql[i] is None:
-                    res_db_sql[i] = db_handle.read_query(sql_statements[i])
+                    res_db_sql_i = db_handle.read_query(sql_statements[i])
+                    res_db_sql[i] = res_db_sql_i
                     if (
                         alter_cache
                         and (test_result_cache is not None)
-                        and (res_db_sql[i] is not None)
+                        and (res_db_sql_i is not None)
                     ):
-                        test_result_cache[mk_key(i)] = res_db_sql[i].copy()
+                        test_result_cache[mk_key(i)] = res_db_sql_i.copy()
         except Exception as e:
             caught = e
         for k in to_del:

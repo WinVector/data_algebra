@@ -3,7 +3,9 @@ Representation for operations that are nearly translated into SQL.
 """
 
 from abc import ABC
-from typing import List, Optional, Tuple
+from typing import Iterable, List, Optional, Tuple
+
+import numpy
 
 import data_algebra.OrderedSet
 
@@ -18,23 +20,23 @@ class SQLWithList:
     Carry an ordered sequence of SQL steps for use with a SQL WITH statement.
     """
 
+    last_step: "NearSQL"
+    previous_steps: List[Tuple[str, "NearSQLContainer"]]
+
     def __init__(
         self,
         *,
         last_step: "NearSQL",
-        previous_steps: List[Tuple[str, "NearSQLContainer"]],
+        previous_steps: Iterable[Tuple[str, "NearSQLContainer"]],
     ):
         assert isinstance(last_step, NearSQL)
+        previous_steps = list(previous_steps)
         assert isinstance(previous_steps, List)
-        assert all(
-            [
-                isinstance(vi, Tuple)
-                and (len(vi) == 2)
-                and isinstance(vi[0], str)
-                and isinstance(vi[1], NearSQLContainer)
-                for vi in previous_steps
-            ]
-        )
+        for vi in previous_steps:
+            assert isinstance(vi, tuple)
+            assert len(vi) == 2
+            assert isinstance(vi[0], str)
+            assert isinstance(vi[1], NearSQLContainer)
         # check no table like entities in previous steps
         assert not any([v.near_sql.is_table for k, v in previous_steps])
         # check keying is unique
@@ -459,6 +461,7 @@ class NearSQLRawQStep(NearSQL):
             return SQLWithList(last_step=self, previous_steps=[])
         # non-trivial sequence
         stub, sequence = self.sub_sql.to_with_form_stub()
+        assert isinstance(self.query_name, str)  # type hint
         stubbed_step = NearSQLRawQStep(
             prefix=self.prefix,
             query_name=self.query_name,

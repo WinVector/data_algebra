@@ -113,7 +113,7 @@ class RecordSpecification:
         :param include_record_keys: logical, if True include record keys as columns
         :return: column list
         """
-        cols = []
+        cols: List[str] = []
         if include_record_keys:
             cols = cols + self.record_keys
         cols = cols + self.content_keys
@@ -389,10 +389,12 @@ class RecordMap:
         if self.blocks_in is not None:
             self.columns_needed = self.blocks_in.block_columns
         else:
+            assert self.blocks_out is not None  # type hint
             self.columns_needed = self.blocks_out.row_columns
         if self.blocks_out is not None:
             self.columns_produced = self.blocks_out.block_columns
         else:
+            assert self.blocks_in is not None  # type hint
             self.columns_produced = self.blocks_in.row_columns
         self.fmt_string = self.fmt()
 
