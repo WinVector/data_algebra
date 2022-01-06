@@ -64,7 +64,7 @@ def table_is_keyed_by_columns(table, column_names: Iterable[str]) -> bool:
 
 
 # noinspection PyBroadException
-def _mk_type_conversion_table():
+def _mk_type_conversion_table() -> Dict[type, type]:
     """
     Build up conversion from type aliases we do not want into standard types. Eat any errors or warnings during table
     construction.
@@ -133,7 +133,6 @@ def map_type_to_canonical(v: type) -> type:
     :return: type
     """
     try:
-        # noinspection PyTypeChecker
         return type_conversions[v]
     except KeyError:
         pass
