@@ -70,7 +70,7 @@ def _mk_type_conversion_table() -> Dict[type, type]:
     construction.
     """
 
-    type_conversions_table = dict()
+    type_conversions_table: Dict[type, type] = dict()
     # DeprecationWarning: `np.bool` is a deprecated alias for the builtin `bool`.
     # To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe.
     # If you specifically wanted the numpy scalar type, use `np.bool_` here.
