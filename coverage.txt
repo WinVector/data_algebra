@@ -2,7 +2,7 @@
 platform darwin -- Python 3.9.7, pytest-6.2.4, py-1.10.0, pluggy-0.13.1
 rootdir: /Users/johnmount/Documents/work/data_algebra
 plugins: cov-2.12.1, anyio-2.2.0, typeguard-2.13.0
-collected 249 items
+collected 250 items
 
 tests/test_OrderedSet.py ....                                            [  1%]
 tests/test_agg.py .                                                      [  2%]
@@ -60,7 +60,7 @@ tests/test_one_row_cdata_convert.py .                                    [ 47%]
 tests/test_ops.py .                                                      [ 48%]
 tests/test_ops_eq.py .                                                   [ 48%]
 tests/test_or.py .....                                                   [ 50%]
-tests/test_order_limit.py .                                              [ 51%]
+tests/test_order_limit.py .                                              [ 50%]
 tests/test_ordered_agg_group.py .                                        [ 51%]
 tests/test_parse.py ..........................                           [ 61%]
 tests/test_project.py .....                                              [ 63%]
@@ -68,33 +68,34 @@ tests/test_ranked_example.py .                                           [ 64%]
 tests/test_readme_example.py .                                           [ 64%]
 tests/test_ref_detect.py ..                                              [ 65%]
 tests/test_rename.py .                                                   [ 65%]
-tests/test_round.py ...                                                  [ 67%]
+tests/test_round.py ...                                                  [ 66%]
 tests/test_scalar_columns.py .                                           [ 67%]
 tests/test_scatter_example.py .                                          [ 67%]
 tests/test_scoring_example.py .                                          [ 68%]
 tests/test_select.py ...                                                 [ 69%]
 tests/test_select_stacking.py .                                          [ 69%]
 tests/test_select_values.py ..                                           [ 70%]
-tests/test_set_quoting.py ......                                         [ 73%]
+tests/test_set_quoting.py ......                                         [ 72%]
 tests/test_shorten.py .                                                  [ 73%]
 tests/test_sign_parse.py ..                                              [ 74%]
 tests/test_simple.py ....                                                [ 75%]
 tests/test_simple_expr.py .                                              [ 76%]
-tests/test_simplification.py ..                                          [ 77%]
+tests/test_simplification.py ..                                          [ 76%]
 tests/test_spark_sql.py .                                                [ 77%]
 tests/test_sql_extend_shortening.py ..                                   [ 78%]
 tests/test_sqlite.py .............                                       [ 83%]
 tests/test_sqlite_joins.py ...                                           [ 84%]
 tests/test_strat_example.py ..                                           [ 85%]
 tests/test_sum_cumsum.py .                                               [ 85%]
+tests/test_sum_one.py .                                                  [ 86%]
 tests/test_t_test_example.py .                                           [ 86%]
 tests/test_table_is_key_by_columns.py .                                  [ 86%]
 tests/test_table_q.py .                                                  [ 87%]
 tests/test_transform_examples.py ...........                             [ 91%]
-tests/test_types.py .                                                    [ 91%]
+tests/test_types.py .                                                    [ 92%]
 tests/test_uniform.py ..                                                 [ 92%]
 tests/test_use.py ..                                                     [ 93%]
-tests/test_user_sql.py .                                                 [ 93%]
+tests/test_user_sql.py .                                                 [ 94%]
 tests/test_value_behaves_like_column.py ....                             [ 95%]
 tests/test_window2.py ...                                                [ 96%]
 tests/test_window_fns.py .....                                           [ 98%]
@@ -108,7 +109,7 @@ data_algebra/BigQuery.py                 108     67    38%
 data_algebra/MySQL.py                     28     10    64%
 data_algebra/OrderedSet.py                73      9    88%
 data_algebra/PostgreSQL.py                21      7    67%
-data_algebra/SQLite.py                   151     20    87%
+data_algebra/SQLite.py                   151     21    86%
 data_algebra/SparkSQL.py                  81     45    44%
 data_algebra/__init__.py                   5      0   100%
 data_algebra/arrow.py                    141     32    77%
@@ -131,7 +132,7 @@ data_algebra/python3_lark.py               1      0   100%
 data_algebra/test_util.py                273     50    82%
 data_algebra/util.py                     140     29    79%
 ----------------------------------------------------------
-TOTAL                                   5263    908    83%
+TOTAL                                   5263    909    83%
 
 
-============================= 249 passed in 27.37s =============================
+============================= 250 passed in 27.40s =============================
