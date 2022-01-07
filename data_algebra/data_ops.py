@@ -1259,7 +1259,7 @@ class ExtendNode(ViewRepresentation):
 
     def apply_to(self, a, *, target_table_key=None):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
 
         :param a: operators to apply to
         :param target_table_key: table key to replace with self, None counts as "match all"

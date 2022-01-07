@@ -3,6 +3,7 @@ Base class for adapters for Pandas-like APIs
 """
 
 from abc import ABC
+from typing import Callable, Dict
 import datetime
 import types
 import numbers
@@ -161,7 +162,7 @@ def _k_mul(*args):
     return res
 
 
-def populate_impl_map(data_model):
+def populate_impl_map(data_model) -> Dict[str, Callable]:
     """
     Map symbols to implementations.
     """
@@ -264,6 +265,9 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
     """
     Base class for implementing the data algebra on pandas-like APIs
     """
+
+    pd: types.ModuleType
+    impl_map: Dict[str, Callable]
 
     def __init__(self, *, pd: types.ModuleType, presentation_model_name: str):
         assert isinstance(pd, types.ModuleType)
