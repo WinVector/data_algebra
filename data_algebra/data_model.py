@@ -13,12 +13,10 @@ class DataModel(ABC):
     """
 
     presentation_model_name: str
-    user_fun_map: Dict[str, Callable]
 
     def __init__(self, presentation_model_name: str):
         assert isinstance(presentation_model_name, str)
         self.presentation_model_name = presentation_model_name
-        self.user_fun_map = dict()
 
     # helper functions
 
@@ -26,7 +24,7 @@ class DataModel(ABC):
         """
         Build a new emtpy data frame.
 
-        :param arg" optional argument passed to constructor.
+        :param arg: optional argument passed to constructor.
         :return: data frame
         """
         raise NotImplementedError("base method called")

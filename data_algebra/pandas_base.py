@@ -268,6 +268,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
 
     pd: types.ModuleType
     impl_map: Dict[str, Callable]
+    user_fun_map: Dict[str, Callable]
     _method_dispatch_table: Dict[str, Callable]
 
     def __init__(self, *, pd: types.ModuleType, presentation_model_name: str):
@@ -277,6 +278,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         )
         self.pd = pd
         self.impl_map = populate_impl_map(data_model=self)
+        self.user_fun_map = dict()
         self._method_dispatch_table = {
             "ConcatRowsNode": self.concat_rows_step,
             "ConvertRecordsNode": self.convert_records_step,
