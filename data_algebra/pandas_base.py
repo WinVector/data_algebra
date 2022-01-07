@@ -268,6 +268,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
 
     pd: types.ModuleType
     impl_map: Dict[str, Callable]
+    _method_dispatch_table: Dict[str, Callable]
 
     def __init__(self, *, pd: types.ModuleType, presentation_model_name: str):
         assert isinstance(pd, types.ModuleType)
@@ -276,6 +277,20 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         )
         self.pd = pd
         self.impl_map = populate_impl_map(data_model=self)
+        self._method_dispatch_table = {
+            "ConcatRowsNode": self.concat_rows_step,
+            "ConvertRecordsNode": self.convert_records_step,
+            "DropColumnsNode": self.drop_columns_step,
+            "ExtendNode": self.extend_step,
+            "NaturalJoinNode": self.natural_join_step,
+            "OrderRowsNode": self.order_rows_step,
+            "ProjectNode": self.project_step,
+            "RenameColumnsNode": self.rename_columns_step,
+            "SelectColumnsNode": self.select_columns_step,
+            "SelectRowsNode": self.select_rows_step,
+            "SQLNode": self._sql_proxy_step,
+            "TableDescription": self.table_step,
+        }
 
     # utils
 
@@ -368,6 +383,13 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = res.reset_index(drop=True)
         return res
 
+    def _sql_proxy_step(self, op, *, data_map: dict, narrow: bool):
+        """
+        replace user sql with view from data map
+        """
+        assert op.node_name == "SQLNode"
+        return data_map[op.view_name]
+
     def columns_to_frame_(self, cols, *, target_rows=0):
         """
         Convert a dictionary of column names to series-like objects and scalars into a Pandas data frame.
@@ -439,11 +461,22 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             res[c] = transient_new_frame[c]
         return res
 
+    def eval(self, *, op, data_map: dict, narrow: bool):
+        """
+        Implementation of Pandas evaluation of operators
+
+        :param op: ViewRepresentation to evaluate
+        :param data_map: dictionary mapping table and view names to data frames
+        :param narrow: if True narrow results to only columns anticipated
+        :return: data frame result
+        """
+        return self._eval_value_source(s=op, data_map=data_map, narrow=narrow)
+
     def _eval_value_source(self, s, *, data_map: dict, narrow: bool):
         """
         Evaluate an incoming (or value source) node.
         """
-        return s.eval_implementation_(data_map=data_map, data_model=self, narrow=narrow)
+        return self._method_dispatch_table[s.node_name](op=s, data_map=data_map, narrow=narrow)
 
     def extend_step(self, op, *, data_map, narrow):
         """
