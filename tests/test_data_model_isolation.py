@@ -22,7 +22,7 @@ class SQLiteDFModel(data_algebra.data_model.DataModel):
 
     def data_frame(self, arg=None) -> data_algebra.data_ops.TableDescription:
         """
-        Build a new emtpy data frame.
+        Build a new emtpy data frame. Inserts table as a side effect.
 
         :param arg: optional argument passed to constructor.
         :return: data frame
@@ -47,7 +47,7 @@ class SQLiteDFModel(data_algebra.data_model.DataModel):
 
     def eval(self, op, *, data_map: Optional[Dict] = None, narrow: bool = False):
         """
-        Implementation of Pandas evaluation of operators
+        Implementation of Pandas evaluation of operators. Inserts tables as a side-effect.
 
         :param op: ViewRepresentation to evaluate
         :param data_map: must map names to existing table descriptions with same name
@@ -55,12 +55,21 @@ class SQLiteDFModel(data_algebra.data_model.DataModel):
         :return: data frame result
         """
         assert not narrow
+
+        tables_used = op.get_tables()
         if data_map is not None:
-            tables_used = op.get_tables()
-            for k, v in tables_used.keys():
+            for k in tables_used.keys():
+                v = data_map[k]
                 assert isinstance(v, data_algebra.data_ops.TableDescription)
                 assert k == v.table_name
                 assert self.is_appropriate_data_instance(v)
+            for k, v in data_map.items():
+                self._db_handle.insert_table(d=v, table_name=k, allow_overwrite=True)
+        for k, v in tables_used.items():
+            assert isinstance(v, data_algebra.data_ops.TableDescription)
+            assert k == v.table_name
+            assert self.is_appropriate_data_instance(v)
+
         return self._db_handle.read_query(op)
 
 
