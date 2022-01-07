@@ -4,7 +4,6 @@ Interface for realizing the data algebra as a sequence of steps over an object.
 
 
 from abc import ABC
-from typing import Callable, Dict
 
 
 class DataModel(ABC):
@@ -29,7 +28,7 @@ class DataModel(ABC):
         """
         raise NotImplementedError("base method called")
 
-    def is_appropriate_data_instance(self, df):
+    def is_appropriate_data_instance(self, df) -> bool:
         """
         Check if df is our type of data frame.
         """

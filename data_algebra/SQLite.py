@@ -388,7 +388,7 @@ class SQLiteModel(data_algebra.db_model.DBModel):
         )
 
 
-def example_handle():
+def example_handle() -> data_algebra.db_model.DBHandle:
     """
     Return an example db handle for testing. Returns None if helper packages not present.
 
