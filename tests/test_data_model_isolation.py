@@ -1,7 +1,9 @@
 
 """test data model isolation"""
 
+from typing import Dict, Optional
 import data_algebra
+import data_algebra.data_ops
 import data_algebra.data_model
 import data_algebra.db_model
 import data_algebra.SQLite
@@ -9,7 +11,7 @@ import data_algebra.test_util
 
 
 class SQLiteDFModel(data_algebra.data_model.DataModel):
-    """Implement tables in a private db"""
+    """Implement tables in a private db. Like sqldf from R."""
     _next_id: int
     _db_handle: data_algebra.db_model.DBHandle
 
@@ -18,7 +20,7 @@ class SQLiteDFModel(data_algebra.data_model.DataModel):
         self._next_id = 0
         self._db_handle = data_algebra.SQLite.example_handle()
 
-    def data_frame(self, arg=None):
+    def data_frame(self, arg=None) -> data_algebra.data_ops.TableDescription:
         """
         Build a new emtpy data frame.
 
@@ -34,8 +36,8 @@ class SQLiteDFModel(data_algebra.data_model.DataModel):
         """
         Check if df is our type of data frame.
         """
-        assert isinstance(df, str)
-        quote_name = self._db_handle.db_model.quote_table_name(df)
+        assert isinstance(df, data_algebra.data_ops.TableDescription)
+        quote_name = self._db_handle.db_model.quote_table_name(df.table_name)
         # noinspection PyBroadException
         try:
             self._db_handle.read_query(f'SELECT * FROM {quote_name} LIMIT 1')
@@ -43,15 +45,22 @@ class SQLiteDFModel(data_algebra.data_model.DataModel):
         except Exception:
             return False
 
-    def eval(self, *, op, data_map: dict, narrow: bool):
+    def eval(self, op, *, data_map: Optional[Dict] = None, narrow: bool = False):
         """
         Implementation of Pandas evaluation of operators
 
         :param op: ViewRepresentation to evaluate
-        :param data_map: (ignored)
-        :param narrow: (ignored)
+        :param data_map: must map names to existing table descriptions with same name
+        :param narrow: must be False
         :return: data frame result
         """
+        assert not narrow
+        if data_map is not None:
+            tables_used = op.get_tables()
+            for k, v in tables_used.keys():
+                assert isinstance(v, data_algebra.data_ops.TableDescription)
+                assert k == v.table_name
+                assert self.is_appropriate_data_instance(v)
         return self._db_handle.read_query(op)
 
 
@@ -62,7 +71,7 @@ def test_data_model_isolation():
     ops = (
         t0.extend({'y': 'x + 1'})
     )
-    res = sql_df_model.eval(op=ops, data_map=None, narrow=False)
+    res = sql_df_model.eval(ops)
     expect = pd.DataFrame({
         'x': [1, 2, 3],
         'y': [2, 3, 4],

@@ -4,6 +4,7 @@ Interface for realizing the data algebra as a sequence of steps over an object.
 
 
 from abc import ABC
+from typing import Dict, Optional
 
 
 class DataModel(ABC):
@@ -36,7 +37,7 @@ class DataModel(ABC):
 
     # evaluate
 
-    def eval(self, *, op, data_map: dict, narrow: bool):
+    def eval(self, op, *, data_map: Optional[Dict] = None, narrow: bool = False):
         """
         Implementation of Pandas evaluation of operators
 

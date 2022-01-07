@@ -3,7 +3,7 @@ Base class for adapters for Pandas-like APIs
 """
 
 from abc import ABC
-from typing import Callable, Dict
+from typing import Callable, Dict, Optional
 import datetime
 import types
 import numbers
@@ -463,7 +463,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             res[c] = transient_new_frame[c]
         return res
 
-    def eval(self, *, op, data_map: dict, narrow: bool):
+    def eval(self, op, *, data_map: Optional[Dict] = None, narrow: bool = False):
         """
         Implementation of Pandas evaluation of operators
 
@@ -472,6 +472,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         :param narrow: if True narrow results to only columns anticipated
         :return: data frame result
         """
+        assert data_map is not None  # type hint/enforcement
         return self._eval_value_source(s=op, data_map=data_map, narrow=narrow)
 
     def _eval_value_source(self, s, *, data_map: dict, narrow: bool):

@@ -151,6 +151,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
         :return: table result
         """
         tables = self.get_tables()
+        data_map = dict()
         for tv in tables.values():
             assert isinstance(tv, TableDescription)
             assert tv.head is not None
@@ -158,7 +159,8 @@ class ViewRepresentation(OperatorPlatform, ABC):
                 assert tv.table_name_was_set_by_user
             if not allow_limited_tables:
                 assert tv.nrows == tv.head.shape[0]
-        return self.eval(data_map=None, data_model=data_model, narrow=narrow)
+            data_map[tv.table_name] = tv.head
+        return self.eval(data_map=data_map, data_model=data_model, narrow=narrow)
 
     # characterization
 
