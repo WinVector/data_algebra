@@ -3,7 +3,7 @@ Base class for adapters for Pandas-like APIs
 """
 
 from abc import ABC
-from typing import Callable, Dict
+from typing import Callable, Dict, Optional
 import datetime
 import types
 import numbers
@@ -268,6 +268,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
 
     pd: types.ModuleType
     impl_map: Dict[str, Callable]
+    user_fun_map: Dict[str, Callable]
     _method_dispatch_table: Dict[str, Callable]
 
     def __init__(self, *, pd: types.ModuleType, presentation_model_name: str):
@@ -277,6 +278,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         )
         self.pd = pd
         self.impl_map = populate_impl_map(data_model=self)
+        self.user_fun_map = dict()
         self._method_dispatch_table = {
             "ConcatRowsNode": self.concat_rows_step,
             "ConvertRecordsNode": self.convert_records_step,
@@ -461,7 +463,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             res[c] = transient_new_frame[c]
         return res
 
-    def eval(self, *, op, data_map: dict, narrow: bool):
+    def eval(self, op, *, data_map: Optional[Dict] = None, narrow: bool = False):
         """
         Implementation of Pandas evaluation of operators
 
@@ -470,6 +472,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         :param narrow: if True narrow results to only columns anticipated
         :return: data frame result
         """
+        assert data_map is not None  # type hint/enforcement
         return self._eval_value_source(s=op, data_map=data_map, narrow=narrow)
 
     def _eval_value_source(self, s, *, data_map: dict, narrow: bool):

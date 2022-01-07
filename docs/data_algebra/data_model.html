@@ -75,7 +75,7 @@
 
 
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
 
 <span class="k">class</span> <span class="nc">DataModel</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
@@ -84,12 +84,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">presentation_model_name</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">user_fun_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">presentation_model_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">presentation_model_name</span> <span class="o">=</span> <span class="n">presentation_model_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">user_fun_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
     <span class="c1"># helper functions</span>
 
@@ -97,12 +95,12 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build a new emtpy data frame.</span>
 
-<span class="sd">        :param arg&quot; optional argument passed to constructor.</span>
+<span class="sd">        :param arg: optional argument passed to constructor.</span>
 <span class="sd">        :return: data frame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">is_appropriate_data_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">is_appropriate_data_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if df is our type of data frame.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -110,7 +108,7 @@
 
     <span class="c1"># evaluate</span>
 
-    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Implementation of Pandas evaluation of operators</span>
 
@@ -142,12 +140,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">presentation_model_name</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">user_fun_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">presentation_model_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">presentation_model_name</span> <span class="o">=</span> <span class="n">presentation_model_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">user_fun_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
     <span class="c1"># helper functions</span>
 
@@ -155,12 +151,12 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build a new emtpy data frame.</span>
 
-<span class="sd">        :param arg&quot; optional argument passed to constructor.</span>
+<span class="sd">        :param arg: optional argument passed to constructor.</span>
 <span class="sd">        :return: data frame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">is_appropriate_data_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">is_appropriate_data_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if df is our type of data frame.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -168,7 +164,7 @@
 
     <span class="c1"># evaluate</span>
 
-    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Implementation of Pandas evaluation of operators</span>
 
@@ -198,7 +194,6 @@
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">presentation_model_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">presentation_model_name</span> <span class="o">=</span> <span class="n">presentation_model_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">user_fun_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 </pre></div>
 
         </details>
@@ -220,7 +215,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build a new emtpy data frame.</span>
 
-<span class="sd">        :param arg&quot; optional argument passed to constructor.</span>
+<span class="sd">        :param arg: optional argument passed to constructor.</span>
 <span class="sd">        :return: data frame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
@@ -230,7 +225,7 @@
 
             <div class="docstring"><p>Build a new emtpy data frame.</p>
 
-<p>:param arg" optional argument passed to constructor.
+<p>:param arg: optional argument passed to constructor.
 :return: data frame</p>
 </div>
 
@@ -241,12 +236,12 @@
 
         
             <span class="def">def</span>
-            <span class="name">is_appropriate_data_instance</span><span class="signature">(self, df)</span>:
+            <span class="name">is_appropriate_data_instance</span><span class="signature">(self, df) -&gt; bool</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">is_appropriate_data_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">is_appropriate_data_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if df is our type of data frame.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -265,12 +260,12 @@
 
         
             <span class="def">def</span>
-            <span class="name">eval</span><span class="signature">(self, *, op, data_map: dict, narrow: bool)</span>:
+            <span class="name">eval</span><span class="signature">(self, op, *, data_map: Optional[Dict] = None, narrow: bool = False)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Implementation of Pandas evaluation of operators</span>
 

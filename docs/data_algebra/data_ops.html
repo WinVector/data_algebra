@@ -609,6 +609,7 @@
 <span class="sd">        :return: table result</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
+        <span class="n">data_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">tv</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tv</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span>
             <span class="k">assert</span> <span class="n">tv</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -616,7 +617,8 @@
                 <span class="k">assert</span> <span class="n">tv</span><span class="o">.</span><span class="n">table_name_was_set_by_user</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_limited_tables</span><span class="p">:</span>
                 <span class="k">assert</span> <span class="n">tv</span><span class="o">.</span><span class="n">nrows</span> <span class="o">==</span> <span class="n">tv</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
+            <span class="n">data_map</span><span class="p">[</span><span class="n">tv</span><span class="o">.</span><span class="n">table_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">tv</span><span class="o">.</span><span class="n">head</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 
     <span class="c1"># characterization</span>
 
@@ -3223,6 +3225,7 @@
 <span class="sd">        :return: table result</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
+        <span class="n">data_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">tv</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tv</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span>
             <span class="k">assert</span> <span class="n">tv</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -3230,7 +3233,8 @@
                 <span class="k">assert</span> <span class="n">tv</span><span class="o">.</span><span class="n">table_name_was_set_by_user</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_limited_tables</span><span class="p">:</span>
                 <span class="k">assert</span> <span class="n">tv</span><span class="o">.</span><span class="n">nrows</span> <span class="o">==</span> <span class="n">tv</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
+            <span class="n">data_map</span><span class="p">[</span><span class="n">tv</span><span class="o">.</span><span class="n">table_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">tv</span><span class="o">.</span><span class="n">head</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 
     <span class="c1"># characterization</span>
 
@@ -3981,6 +3985,7 @@ Abstract base class.</p>
 <span class="sd">        :return: table result</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span>
+        <span class="n">data_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">tv</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tv</span><span class="p">,</span> <span class="n">TableDescription</span><span class="p">)</span>
             <span class="k">assert</span> <span class="n">tv</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -3988,7 +3993,8 @@ Abstract base class.</p>
                 <span class="k">assert</span> <span class="n">tv</span><span class="o">.</span><span class="n">table_name_was_set_by_user</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_limited_tables</span><span class="p">:</span>
                 <span class="k">assert</span> <span class="n">tv</span><span class="o">.</span><span class="n">nrows</span> <span class="o">==</span> <span class="n">tv</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
+            <span class="n">data_map</span><span class="p">[</span><span class="n">tv</span><span class="o">.</span><span class="n">table_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">tv</span><span class="o">.</span><span class="n">head</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 </pre></div>
 
         </details>
