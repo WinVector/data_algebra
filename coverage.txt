@@ -115,7 +115,7 @@ data_algebra/__init__.py                   5      0   100%
 data_algebra/arrow.py                    141     32    77%
 data_algebra/cdata.py                    342     66    81%
 data_algebra/connected_components.py      22      0   100%
-data_algebra/data_model.py                45     18    60%
+data_algebra/data_model.py                15      3    80%
 data_algebra/data_ops.py                1179    192    84%
 data_algebra/data_ops_types.py            84     35    58%
 data_algebra/data_ops_utils.py            49      5    90%
@@ -132,7 +132,7 @@ data_algebra/python3_lark.py               1      0   100%
 data_algebra/test_util.py                273     50    82%
 data_algebra/util.py                     140     29    79%
 ----------------------------------------------------------
-TOTAL                                   5229    898    83%
+TOTAL                                   5199    883    83%
 
 
-============================= 250 passed in 28.57s =============================
+============================= 250 passed in 27.88s =============================

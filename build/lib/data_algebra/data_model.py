@@ -37,30 +37,6 @@ class DataModel(ABC):
         """
         raise NotImplementedError("base method called")
 
-    def can_convert_col_to_numeric(self, x):
-        """
-        Return True if column or value can be converted to numeric type.
-        """
-        raise NotImplementedError("base method called")
-
-    def to_numeric(self, x, *, errors="coerce"):
-        """
-        Convert column to numeric.
-        """
-        raise NotImplementedError("base method called")
-
-    def isnull(self, x):
-        """
-        Return vector indicating which entries are null (vectorized).
-        """
-        raise NotImplementedError("base method called")
-
-    def bad_column_positions(self, x):
-        """
-        Return vector indicating which entries are bad (null or nan) (vectorized).
-        """
-        raise NotImplementedError("base method called")
-
     # evaluate
 
     def eval(self, *, op, data_map: dict, narrow: bool):
@@ -73,76 +49,3 @@ class DataModel(ABC):
         :return: data frame result
         """
         raise NotImplementedError("base method called")
-
-    # operation implementations
-
-    def table_step(self, op, *, data_map, narrow):
-        """
-        Return data frame from table description and data_map.
-
-        :param op: operation
-        :param data_map: map from tables to values
-        :param narrow: optional columns to narrow to.
-        :return: transformed table
-        """
-        raise NotImplementedError("base method called")
-
-    def extend_step(self, op, *, data_map, narrow):
-        """
-        Execute an extend step, returning a data frame.
-        """
-        raise NotImplementedError("base method called")
-
-    def project_step(self, op, *, data_map, narrow):
-        """
-        Execute a project step, returning a data frame.
-        """
-        raise NotImplementedError("base method called")
-
-    def select_rows_step(self, op, *, data_map, narrow):
-        """
-        Execute a select rows step, returning a data frame.
-        """
-        raise NotImplementedError("base method called")
-
-    def select_columns_step(self, op, *, data_map, narrow):
-        """
-        Execute a select columns step, returning a data frame.
-        """
-        raise NotImplementedError("base method called")
-
-    def drop_columns_step(self, op, *, data_map, narrow):
-        """
-        Execute a drop columns step, returning a data frame.
-        """
-        raise NotImplementedError("base method called")
-
-    def order_rows_step(self, op, *, data_map, narrow):
-        """
-        Execute an order rows step, returning a data frame.
-        """
-        raise NotImplementedError("base method called")
-
-    def rename_columns_step(self, op, *, data_map, narrow):
-        """
-        Execute a rename columns step, returning a data frame.
-        """
-        raise NotImplementedError("base method called")
-
-    def natural_join_step(self, op, *, data_map, narrow):
-        """
-        Execute a natural join step, returning a data frame.
-        """
-        raise NotImplementedError("base method called")
-
-    def concat_rows_step(self, op, *, data_map, narrow):
-        """
-        Execute a concat rows step, returning a data frame.
-        """
-        raise NotImplementedError("base method called")
-
-    def convert_records_step(self, op, *, data_map, narrow):
-        """
-        Execute record conversion step, returning a data frame.
-        """
-        raise NotImplementedError("base class called")
