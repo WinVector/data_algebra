@@ -366,17 +366,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
 
     # Pandas realization
 
-    def eval_implementation_(self, *, data_map, data_model, narrow):
-        """
-        Implementation of Pandas evaluation of operators. Internal method.
-
-        :param data_map: dictionary of data sources
-        :param data_model: Pandas data model adaptor
-        :param narrow: if True narrow results to only columns anticipated
-        :return: Pandas data frame
-        """
-        raise NotImplementedError("base method called")
-
     def check_constraints(self, data_model, *, strict=True):
         """
         Check tables supplied meet data consistency constraints.
@@ -434,9 +423,7 @@ class ViewRepresentation(OperatorPlatform, ABC):
                 else:
                     if not data_model.is_appropriate_data_instance(data_map[k]):
                         raise ValueError("data_map[" + k + "] was not a usable type")
-        return self.eval_implementation_(
-            data_map=data_map, data_model=data_model, narrow=narrow
-        )
+        return data_model.eval(op=self, data_map=data_map, narrow=narrow)
 
     # noinspection PyPep8Naming
     def transform(self, X, *, data_model=None, narrow: bool = True, check_incoming_data_constraints: bool = False):
@@ -468,7 +455,6 @@ class ViewRepresentation(OperatorPlatform, ABC):
             data_model=data_model,
             narrow=narrow,
             check_incoming_data_constraints=check_incoming_data_constraints)
-
 
     # composition (used to eliminate intermediate order nodes)
 
@@ -975,19 +961,6 @@ class TableDescription(ViewRepresentation):
         raise an exception if the values are not consistent"""
         return {self.key: self}
 
-    def eval_implementation_(self, *, data_map, data_model, narrow):
-        """
-        Implementation of Pandas evaluation of operators. Internal method.
-
-        :param data_map: dictionary of data sources
-        :param data_model: Pandas data model adaptor
-        :param narrow: if True narrow results to only columns anticipated
-        :return: Pandas data frame
-        """
-        if data_model is None:
-            raise ValueError("Expected data_model to not be None")
-        return data_model.table_step(op=self, data_map=data_map, narrow=narrow)
-
     def columns_used_from_sources(self, using: Optional[set] = None) -> List:
         """
         Get columns used from sources. Internal method.
@@ -1259,7 +1232,7 @@ class ExtendNode(ViewRepresentation):
 
     def apply_to(self, a, *, target_table_key=None):
         """
-        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.
+        Apply self to operator DAG a. Basic OperatorPlatform, composable API.
 
         :param a: operators to apply to
         :param target_table_key: table key to replace with self, None counts as "match all"
@@ -1397,19 +1370,6 @@ class ExtendNode(ViewRepresentation):
             temp_id_source=temp_id_source,
             sql_format_options=sql_format_options,
         )
-
-    def eval_implementation_(self, *, data_map, data_model, narrow):
-        """
-        Implementation of Pandas evaluation of operators. Internal method.
-
-        :param data_map: dictionary of data sources
-        :param data_model: Pandas data model adaptor
-        :param narrow: if True narrow results to only columns anticipated
-        :return: Pandas data frame
-        """
-        if data_model is None:
-            raise ValueError("Expected data_model to not be None")
-        return data_model.extend_step(op=self, data_map=data_map, narrow=narrow)
 
 
 class ProjectNode(ViewRepresentation):
@@ -1589,19 +1549,6 @@ class ProjectNode(ViewRepresentation):
             sql_format_options=sql_format_options,
         )
 
-    def eval_implementation_(self, *, data_map, data_model, narrow):
-        """
-        Implementation of Pandas evaluation of operators. Internal method.
-
-        :param data_map: dictionary of data sources
-        :param data_model: Pandas data model adaptor
-        :param narrow: if True narrow results to only columns anticipated
-        :return: Pandas data frame
-        """
-        if data_model is None:
-            raise ValueError("Expected data_model to not be None")
-        return data_model.project_step(op=self, data_map=data_map, narrow=narrow)
-
 
 class SelectRowsNode(ViewRepresentation):
     """
@@ -1698,19 +1645,6 @@ class SelectRowsNode(ViewRepresentation):
             temp_id_source=temp_id_source,
             sql_format_options=sql_format_options,
         )
-
-    def eval_implementation_(self, *, data_map, data_model, narrow):
-        """
-        Implementation of Pandas evaluation of operators. Internal method.
-
-        :param data_map: dictionary of data sources
-        :param data_model: Pandas data model adaptor
-        :param narrow: if True narrow results to only columns anticipated
-        :return: Pandas data frame
-        """
-        if data_model is None:
-            raise ValueError("Expected data_model to not be None")
-        return data_model.select_rows_step(op=self, data_map=data_map, narrow=narrow)
 
 
 class SelectColumnsNode(ViewRepresentation):
@@ -1820,19 +1754,6 @@ class SelectColumnsNode(ViewRepresentation):
             sql_format_options=sql_format_options,
         )
 
-    def eval_implementation_(self, *, data_map, data_model, narrow):
-        """
-        Implementation of Pandas evaluation of operators. Internal method.
-
-        :param data_map: dictionary of data sources
-        :param data_model: Pandas data model adaptor
-        :param narrow: if True narrow results to only columns anticipated
-        :return: Pandas data frame
-        """
-        if data_model is None:
-            raise ValueError("Expected data_model to not be None")
-        return data_model.select_columns_step(op=self, data_map=data_map, narrow=narrow)
-
 
 class DropColumnsNode(ViewRepresentation):
     """
@@ -1940,19 +1861,6 @@ class DropColumnsNode(ViewRepresentation):
             temp_id_source=temp_id_source,
             sql_format_options=sql_format_options,
         )
-
-    def eval_implementation_(self, *, data_map, data_model, narrow):
-        """
-        Implementation of Pandas evaluation of operators. Internal method.
-
-        :param data_map: dictionary of data sources
-        :param data_model: Pandas data model adaptor
-        :param narrow: if True narrow results to only columns anticipated
-        :return: Pandas data frame
-        """
-        if data_model is None:
-            raise ValueError("Expected data_model to not be None")
-        return data_model.drop_columns_step(op=self, data_map=data_map, narrow=narrow)
 
 
 class OrderRowsNode(ViewRepresentation):
@@ -2066,19 +1974,6 @@ class OrderRowsNode(ViewRepresentation):
             temp_id_source=temp_id_source,
             sql_format_options=sql_format_options,
         )
-
-    def eval_implementation_(self, *, data_map, data_model, narrow):
-        """
-        Implementation of Pandas evaluation of operators. Internal method.
-
-        :param data_map: dictionary of data sources
-        :param data_model: Pandas data model adaptor
-        :param narrow: if True narrow results to only columns anticipated
-        :return: Pandas data frame
-        """
-        if data_model is None:
-            raise ValueError("Expected data_model to not be None")
-        return data_model.order_rows_step(op=self, data_map=data_map, narrow=narrow)
 
     # short-cut main interface
 
@@ -2218,19 +2113,6 @@ class RenameColumnsNode(ViewRepresentation):
             temp_id_source=temp_id_source,
             sql_format_options=sql_format_options,
         )
-
-    def eval_implementation_(self, *, data_map, data_model, narrow):
-        """
-        Implementation of Pandas evaluation of operators. Internal method.
-
-        :param data_map: dictionary of data sources
-        :param data_model: Pandas data model adaptor
-        :param narrow: if True narrow results to only columns anticipated
-        :return: Pandas data frame
-        """
-        if data_model is None:
-            raise ValueError("Expected data_model to not be None")
-        return data_model.rename_columns_step(op=self, data_map=data_map, narrow=narrow)
 
 
 class NaturalJoinNode(ViewRepresentation):
@@ -2391,19 +2273,6 @@ class NaturalJoinNode(ViewRepresentation):
             sql_format_options=sql_format_options,
         )
 
-    def eval_implementation_(self, *, data_map, data_model, narrow):
-        """
-        Implementation of Pandas evaluation of operators. Internal method.
-
-        :param data_map: dictionary of data sources
-        :param data_model: Pandas data model adaptor
-        :param narrow: if True narrow results to only columns anticipated
-        :return: Pandas data frame
-        """
-        if data_model is None:
-            raise ValueError("Expected data_model to not be None")
-        return data_model.natural_join_step(op=self, data_map=data_map, narrow=narrow)
-
 
 class ConcatRowsNode(ViewRepresentation):
     """
@@ -2539,19 +2408,6 @@ class ConcatRowsNode(ViewRepresentation):
             sql_format_options=sql_format_options,
         )
 
-    def eval_implementation_(self, *, data_map, data_model, narrow):
-        """
-        Implementation of Pandas evaluation of operators. Internal method.
-
-        :param data_map: dictionary of data sources
-        :param data_model: Pandas data model adaptor
-        :param narrow: if True narrow results to only columns anticipated
-        :return: Pandas data frame
-        """
-        if data_model is None:
-            raise ValueError("Expected data_model to not be None")
-        return data_model.concat_rows_step(op=self, data_map=data_map, narrow=narrow)
-
 
 class ConvertRecordsNode(ViewRepresentation):
     """
@@ -2676,21 +2532,6 @@ class ConvertRecordsNode(ViewRepresentation):
             assert isinstance(near_sql, data_algebra.near_sql.NearSQL)
         return near_sql
 
-    def eval_implementation_(self, *, data_map, data_model, narrow):
-        """
-        Implementation of Pandas evaluation of operators. Internal method.
-
-        :param data_map: dictionary of data sources
-        :param data_model: Pandas data model adaptor
-        :param narrow: if True narrow results to only columns anticipated
-        :return: Pandas data frame
-        """
-        if data_model is None:
-            raise ValueError("Expected data_model to not be None")
-        return data_model.convert_records_step(
-            op=self, data_map=data_map, narrow=narrow
-        )
-
 
 class SQLNode(ViewRepresentation):
     """
@@ -2789,17 +2630,6 @@ class SQLNode(ViewRepresentation):
             add_select=False,
         )
         return near_sql
-
-    def eval_implementation_(self, *, data_map, data_model, narrow):
-        """
-        Implementation of Pandas evaluation of operators. Internal method.
-
-        :param data_map: dictionary of data sources
-        :param data_model: Pandas data model adaptor
-        :param narrow: if True narrow results to only columns anticipated
-        :return: Pandas data frame
-        """
-        return data_map[self.view_name]
 
 
 def ex(d, *, data_model=None, narrow=True, allow_limited_tables=False):

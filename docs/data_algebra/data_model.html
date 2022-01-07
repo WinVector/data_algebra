@@ -55,6 +55,9 @@
                                 <a class="function" href="#DataModel.bad_column_positions">bad_column_positions</a>
                         </li>
                         <li>
+                                <a class="function" href="#DataModel.eval">eval</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#DataModel.table_step">table_step</a>
                         </li>
                         <li>
@@ -171,6 +174,19 @@
     <span class="k">def</span> <span class="nf">bad_column_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return vector indicating which entries are bad (null or nan) (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
+
+    <span class="c1"># evaluate</span>
+
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implementation of Pandas evaluation of operators</span>
+
+<span class="sd">        :param op: ViewRepresentation to evaluate</span>
+<span class="sd">        :param data_map: dictionary mapping table and view names to data frames</span>
+<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
+<span class="sd">        :return: data frame result</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
@@ -313,6 +329,19 @@
     <span class="k">def</span> <span class="nf">bad_column_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return vector indicating which entries are bad (null or nan) (vectorized).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
+
+    <span class="c1"># evaluate</span>
+
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implementation of Pandas evaluation of operators</span>
+
+<span class="sd">        :param op: ViewRepresentation to evaluate</span>
+<span class="sd">        :param data_map: dictionary mapping table and view names to data frames</span>
+<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
+<span class="sd">        :return: data frame result</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
 
@@ -562,6 +591,40 @@
         </details>
 
             <div class="docstring"><p>Return vector indicating which entries are bad (null or nan) (vectorized).</p>
+</div>
+
+
+                            </div>
+                            <div id="DataModel.eval" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#DataModel.eval">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">eval</span><span class="signature">(self, *, op, data_map: dict, narrow: bool)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implementation of Pandas evaluation of operators</span>
+
+<span class="sd">        :param op: ViewRepresentation to evaluate</span>
+<span class="sd">        :param data_map: dictionary mapping table and view names to data frames</span>
+<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
+<span class="sd">        :return: data frame result</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Implementation of Pandas evaluation of operators</p>
+
+<p>:param op: ViewRepresentation to evaluate
+:param data_map: dictionary mapping table and view names to data frames
+:param narrow: if True narrow results to only columns anticipated
+:return: data frame result</p>
 </div>
 
 

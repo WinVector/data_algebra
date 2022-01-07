@@ -79,9 +79,6 @@
                                 <a class="function" href="#ViewRepresentation.to_sql">to_sql</a>
                         </li>
                         <li>
-                                <a class="function" href="#ViewRepresentation.eval_implementation_">eval_implementation_</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#ViewRepresentation.check_constraints">check_constraints</a>
                         </li>
                         <li>
@@ -163,9 +160,6 @@
                                 <a class="function" href="#TableDescription.get_tables">get_tables</a>
                         </li>
                         <li>
-                                <a class="function" href="#TableDescription.eval_implementation_">eval_implementation_</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#TableDescription.columns_used_from_sources">columns_used_from_sources</a>
                         </li>
                         <li>
@@ -207,9 +201,6 @@
                         <li>
                                 <a class="function" href="#ExtendNode.to_near_sql_implementation_">to_near_sql_implementation_</a>
                         </li>
-                        <li>
-                                <a class="function" href="#ExtendNode.eval_implementation_">eval_implementation_</a>
-                        </li>
                 </ul>
 
             </li>
@@ -234,9 +225,6 @@
                         <li>
                                 <a class="function" href="#ProjectNode.to_near_sql_implementation_">to_near_sql_implementation_</a>
                         </li>
-                        <li>
-                                <a class="function" href="#ProjectNode.eval_implementation_">eval_implementation_</a>
-                        </li>
                 </ul>
 
             </li>
@@ -257,9 +245,6 @@
                         </li>
                         <li>
                                 <a class="function" href="#SelectRowsNode.to_near_sql_implementation_">to_near_sql_implementation_</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#SelectRowsNode.eval_implementation_">eval_implementation_</a>
                         </li>
                 </ul>
 
@@ -285,9 +270,6 @@
                         <li>
                                 <a class="function" href="#SelectColumnsNode.to_near_sql_implementation_">to_near_sql_implementation_</a>
                         </li>
-                        <li>
-                                <a class="function" href="#SelectColumnsNode.eval_implementation_">eval_implementation_</a>
-                        </li>
                 </ul>
 
             </li>
@@ -312,9 +294,6 @@
                         <li>
                                 <a class="function" href="#DropColumnsNode.to_near_sql_implementation_">to_near_sql_implementation_</a>
                         </li>
-                        <li>
-                                <a class="function" href="#DropColumnsNode.eval_implementation_">eval_implementation_</a>
-                        </li>
                 </ul>
 
             </li>
@@ -335,9 +314,6 @@
                         </li>
                         <li>
                                 <a class="function" href="#OrderRowsNode.to_near_sql_implementation_">to_near_sql_implementation_</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#OrderRowsNode.eval_implementation_">eval_implementation_</a>
                         </li>
                         <li>
                                 <a class="function" href="#OrderRowsNode.is_trivial_when_intermediate_">is_trivial_when_intermediate_</a>
@@ -366,9 +342,6 @@
                         <li>
                                 <a class="function" href="#RenameColumnsNode.to_near_sql_implementation_">to_near_sql_implementation_</a>
                         </li>
-                        <li>
-                                <a class="function" href="#RenameColumnsNode.eval_implementation_">eval_implementation_</a>
-                        </li>
                 </ul>
 
             </li>
@@ -389,9 +362,6 @@
                         </li>
                         <li>
                                 <a class="function" href="#NaturalJoinNode.to_near_sql_implementation_">to_near_sql_implementation_</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#NaturalJoinNode.eval_implementation_">eval_implementation_</a>
                         </li>
                 </ul>
 
@@ -414,9 +384,6 @@
                         <li>
                                 <a class="function" href="#ConcatRowsNode.to_near_sql_implementation_">to_near_sql_implementation_</a>
                         </li>
-                        <li>
-                                <a class="function" href="#ConcatRowsNode.eval_implementation_">eval_implementation_</a>
-                        </li>
                 </ul>
 
             </li>
@@ -437,9 +404,6 @@
                         </li>
                         <li>
                                 <a class="function" href="#ConvertRecordsNode.to_near_sql_implementation_">to_near_sql_implementation_</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ConvertRecordsNode.eval_implementation_">eval_implementation_</a>
                         </li>
                 </ul>
 
@@ -464,9 +428,6 @@
                         </li>
                         <li>
                                 <a class="function" href="#SQLNode.to_near_sql_implementation_">to_near_sql_implementation_</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#SQLNode.eval_implementation_">eval_implementation_</a>
                         </li>
                 </ul>
 
@@ -863,17 +824,6 @@
 
     <span class="c1"># Pandas realization</span>
 
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">check_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check tables supplied meet data consistency constraints.</span>
@@ -931,9 +881,7 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">data_map</span><span class="p">[</span><span class="n">k</span><span class="p">]):</span>
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data_map[&quot;</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;] was not a usable type&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
@@ -965,7 +913,6 @@
             <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span>
             <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,</span>
             <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="n">check_incoming_data_constraints</span><span class="p">)</span>
-
 
     <span class="c1"># composition (used to eliminate intermediate order nodes)</span>
 
@@ -1472,19 +1419,6 @@
 <span class="sd">        raise an exception if the values are not consistent&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">:</span> <span class="bp">self</span><span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">table_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">set</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get columns used from sources. Internal method.</span>
@@ -1756,7 +1690,7 @@
 
     <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.</span>
+<span class="sd">        Apply self to operator DAG a. Basic OperatorPlatform, composable API.</span>
 
 <span class="sd">        :param a: operators to apply to</span>
 <span class="sd">        :param target_table_key: table key to replace with self, None counts as &quot;match all&quot;</span>
@@ -1894,19 +1828,6 @@
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">extend_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">ProjectNode</span><span class="p">(</span><span class="n">ViewRepresentation</span><span class="p">):</span>
@@ -2086,19 +2007,6 @@
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">project_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
-
 
 <span class="k">class</span> <span class="nc">SelectRowsNode</span><span class="p">(</span><span class="n">ViewRepresentation</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -2195,19 +2103,6 @@
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">select_rows_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">SelectColumnsNode</span><span class="p">(</span><span class="n">ViewRepresentation</span><span class="p">):</span>
@@ -2317,19 +2212,6 @@
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">select_columns_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
-
 
 <span class="k">class</span> <span class="nc">DropColumnsNode</span><span class="p">(</span><span class="n">ViewRepresentation</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -2437,19 +2319,6 @@
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">drop_columns_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">OrderRowsNode</span><span class="p">(</span><span class="n">ViewRepresentation</span><span class="p">):</span>
@@ -2563,19 +2432,6 @@
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">order_rows_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 
     <span class="c1"># short-cut main interface</span>
 
@@ -2715,19 +2571,6 @@
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">rename_columns_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">NaturalJoinNode</span><span class="p">(</span><span class="n">ViewRepresentation</span><span class="p">):</span>
@@ -2888,19 +2731,6 @@
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">natural_join_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
-
 
 <span class="k">class</span> <span class="nc">ConcatRowsNode</span><span class="p">(</span><span class="n">ViewRepresentation</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -3036,19 +2866,6 @@
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">concat_rows_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
-
 
 <span class="k">class</span> <span class="nc">ConvertRecordsNode</span><span class="p">(</span><span class="n">ViewRepresentation</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -3173,21 +2990,6 @@
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
 
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">convert_records_step</span><span class="p">(</span>
-            <span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
-
 
 <span class="k">class</span> <span class="nc">SQLNode</span><span class="p">(</span><span class="n">ViewRepresentation</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -3286,17 +3088,6 @@
             <span class="n">add_select</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
-
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">data_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">view_name</span><span class="p">]</span>
 
 
 <span class="k">def</span> <span class="nf">ex</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">allow_limited_tables</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -3647,17 +3438,6 @@
 
     <span class="c1"># Pandas realization</span>
 
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">check_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check tables supplied meet data consistency constraints.</span>
@@ -3715,9 +3495,7 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">data_map</span><span class="p">[</span><span class="n">k</span><span class="p">]):</span>
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data_map[&quot;</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;] was not a usable type&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">check_incoming_data_constraints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
@@ -3749,7 +3527,6 @@
             <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span>
             <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">,</span>
             <span class="n">check_incoming_data_constraints</span><span class="o">=</span><span class="n">check_incoming_data_constraints</span><span class="p">)</span>
-
 
     <span class="c1"># composition (used to eliminate intermediate order nodes)</span>
 
@@ -4603,40 +4380,6 @@ raise an exception if the values are not consistent.</p>
 
 
                             </div>
-                            <div id="ViewRepresentation.eval_implementation_" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ViewRepresentation.eval_implementation_">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">eval_implementation_</span><span class="signature">(self, *, data_map, data_model, narrow)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;base method called&quot;</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Implementation of Pandas evaluation of operators. Internal method.</p>
-
-<p>:param data_map: dictionary of data sources
-:param data_model: Pandas data model adaptor
-:param narrow: if True narrow results to only columns anticipated
-:return: Pandas data frame</p>
-</div>
-
-
-                            </div>
                             <div id="ViewRepresentation.check_constraints" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#ViewRepresentation.check_constraints">#&nbsp;&nbsp</a>
 
@@ -4731,9 +4474,7 @@ raise an exception if the values are not consistent.</p>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">data_map</span><span class="p">[</span><span class="n">k</span><span class="p">]):</span>
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data_map[&quot;</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;] was not a usable type&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -5666,19 +5407,6 @@ raise an exception if the values are not consistent.</p>
 <span class="sd">        raise an exception if the values are not consistent&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">:</span> <span class="bp">self</span><span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">table_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">columns_used_from_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">set</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get columns used from sources. Internal method.</span>
@@ -6019,42 +5747,6 @@ raise an exception if the values are not consistent.</p>
 
             <div class="docstring"><p>get a dictionary of all tables used in an operator DAG,
 raise an exception if the values are not consistent</p>
-</div>
-
-
-                            </div>
-                            <div id="TableDescription.eval_implementation_" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#TableDescription.eval_implementation_">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">eval_implementation_</span><span class="signature">(self, *, data_map, data_model, narrow)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">table_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Implementation of Pandas evaluation of operators. Internal method.</p>
-
-<p>:param data_map: dictionary of data sources
-:param data_model: Pandas data model adaptor
-:param narrow: if True narrow results to only columns anticipated
-:return: Pandas data frame</p>
 </div>
 
 
@@ -6519,7 +6211,7 @@ raise an exception if the values are not consistent</p>
 
     <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.</span>
+<span class="sd">        Apply self to operator DAG a. Basic OperatorPlatform, composable API.</span>
 
 <span class="sd">        :param a: operators to apply to</span>
 <span class="sd">        :param target_table_key: table key to replace with self, None counts as &quot;match all&quot;</span>
@@ -6657,19 +6349,6 @@ raise an exception if the values are not consistent</p>
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">extend_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -6830,7 +6509,7 @@ raise an exception if the values are not consistent</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">apply_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_table_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Apply self to operator DAG a. Basic OperatorPlatform, composabile API.</span>
+<span class="sd">        Apply self to operator DAG a. Basic OperatorPlatform, composable API.</span>
 
 <span class="sd">        :param a: operators to apply to</span>
 <span class="sd">        :param target_table_key: table key to replace with self, None counts as &quot;match all&quot;</span>
@@ -6849,7 +6528,7 @@ raise an exception if the values are not consistent</p>
 
         </details>
 
-            <div class="docstring"><p>Apply self to operator DAG a. Basic OperatorPlatform, composabile API.</p>
+            <div class="docstring"><p>Apply self to operator DAG a. Basic OperatorPlatform, composable API.</p>
 
 <p>:param a: operators to apply to
 :param target_table_key: table key to replace with self, None counts as "match all"
@@ -7051,42 +6730,6 @@ raise an exception if the values are not consistent</p>
 :param temp_id_source: source of temporary ids
 :param sql_format_options: options for sql formatting
 :return: <a href="near_sql.html#NearSQL">data_algebra.near_sql.NearSQL</a></p>
-</div>
-
-
-                            </div>
-                            <div id="ExtendNode.eval_implementation_" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ExtendNode.eval_implementation_">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">eval_implementation_</span><span class="signature">(self, *, data_map, data_model, narrow)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">extend_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Implementation of Pandas evaluation of operators. Internal method.</p>
-
-<p>:param data_map: dictionary of data sources
-:param data_model: Pandas data model adaptor
-:param narrow: if True narrow results to only columns anticipated
-:return: Pandas data frame</p>
 </div>
 
 
@@ -7328,19 +6971,6 @@ raise an exception if the values are not consistent</p>
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">project_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -7642,42 +7272,6 @@ raise an exception if the values are not consistent</p>
 
 
                             </div>
-                            <div id="ProjectNode.eval_implementation_" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ProjectNode.eval_implementation_">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">eval_implementation_</span><span class="signature">(self, *, data_map, data_model, narrow)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">project_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Implementation of Pandas evaluation of operators. Internal method.</p>
-
-<p>:param data_map: dictionary of data sources
-:param data_model: Pandas data model adaptor
-:param narrow: if True narrow results to only columns anticipated
-:return: Pandas data frame</p>
-</div>
-
-
-                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
@@ -7833,19 +7427,6 @@ raise an exception if the values are not consistent</p>
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">select_rows_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -8045,42 +7626,6 @@ raise an exception if the values are not consistent</p>
 
 
                             </div>
-                            <div id="SelectRowsNode.eval_implementation_" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#SelectRowsNode.eval_implementation_">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">eval_implementation_</span><span class="signature">(self, *, data_map, data_model, narrow)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">select_rows_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Implementation of Pandas evaluation of operators. Internal method.</p>
-
-<p>:param data_map: dictionary of data sources
-:param data_model: Pandas data model adaptor
-:param narrow: if True narrow results to only columns anticipated
-:return: Pandas data frame</p>
-</div>
-
-
-                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
@@ -8248,19 +7793,6 @@ raise an exception if the values are not consistent</p>
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">select_columns_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -8496,42 +8028,6 @@ raise an exception if the values are not consistent</p>
 
 
                             </div>
-                            <div id="SelectColumnsNode.eval_implementation_" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#SelectColumnsNode.eval_implementation_">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">eval_implementation_</span><span class="signature">(self, *, data_map, data_model, narrow)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">select_columns_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Implementation of Pandas evaluation of operators. Internal method.</p>
-
-<p>:param data_map: dictionary of data sources
-:param data_model: Pandas data model adaptor
-:param narrow: if True narrow results to only columns anticipated
-:return: Pandas data frame</p>
-</div>
-
-
-                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
@@ -8698,19 +8194,6 @@ raise an exception if the values are not consistent</p>
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">drop_columns_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -8946,42 +8429,6 @@ raise an exception if the values are not consistent</p>
 
 
                             </div>
-                            <div id="DropColumnsNode.eval_implementation_" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#DropColumnsNode.eval_implementation_">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">eval_implementation_</span><span class="signature">(self, *, data_map, data_model, narrow)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">drop_columns_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Implementation of Pandas evaluation of operators. Internal method.</p>
-
-<p>:param data_map: dictionary of data sources
-:param data_model: Pandas data model adaptor
-:param narrow: if True narrow results to only columns anticipated
-:return: Pandas data frame</p>
-</div>
-
-
-                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
@@ -9153,19 +8600,6 @@ raise an exception if the values are not consistent</p>
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">order_rows_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 
     <span class="c1"># short-cut main interface</span>
 
@@ -9387,42 +8821,6 @@ raise an exception if the values are not consistent</p>
 
 
                             </div>
-                            <div id="OrderRowsNode.eval_implementation_" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#OrderRowsNode.eval_implementation_">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">eval_implementation_</span><span class="signature">(self, *, data_map, data_model, narrow)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">order_rows_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Implementation of Pandas evaluation of operators. Internal method.</p>
-
-<p>:param data_map: dictionary of data sources
-:param data_model: Pandas data model adaptor
-:param narrow: if True narrow results to only columns anticipated
-:return: Pandas data frame</p>
-</div>
-
-
-                            </div>
                             <div id="OrderRowsNode.is_trivial_when_intermediate_" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#OrderRowsNode.is_trivial_when_intermediate_">#&nbsp;&nbsp</a>
 
@@ -9636,19 +9034,6 @@ raise an exception if the values are not consistent</p>
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">rename_columns_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -9905,42 +9290,6 @@ raise an exception if the values are not consistent</p>
 
 
                             </div>
-                            <div id="RenameColumnsNode.eval_implementation_" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#RenameColumnsNode.eval_implementation_">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">eval_implementation_</span><span class="signature">(self, *, data_map, data_model, narrow)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">rename_columns_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Implementation of Pandas evaluation of operators. Internal method.</p>
-
-<p>:param data_map: dictionary of data sources
-:param data_model: Pandas data model adaptor
-:param narrow: if True narrow results to only columns anticipated
-:return: Pandas data frame</p>
-</div>
-
-
-                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
@@ -10158,19 +9507,6 @@ raise an exception if the values are not consistent</p>
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">natural_join_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -10432,42 +9768,6 @@ raise an exception if the values are not consistent</p>
 
 
                             </div>
-                            <div id="NaturalJoinNode.eval_implementation_" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#NaturalJoinNode.eval_implementation_">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">eval_implementation_</span><span class="signature">(self, *, data_map, data_model, narrow)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">natural_join_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Implementation of Pandas evaluation of operators. Internal method.</p>
-
-<p>:param data_map: dictionary of data sources
-:param data_model: Pandas data model adaptor
-:param narrow: if True narrow results to only columns anticipated
-:return: Pandas data frame</p>
-</div>
-
-
-                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
@@ -10662,19 +9962,6 @@ raise an exception if the values are not consistent</p>
             <span class="n">temp_id_source</span><span class="o">=</span><span class="n">temp_id_source</span><span class="p">,</span>
             <span class="n">sql_format_options</span><span class="o">=</span><span class="n">sql_format_options</span><span class="p">,</span>
         <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">concat_rows_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -10911,42 +10198,6 @@ raise an exception if the values are not consistent</p>
 
 
                             </div>
-                            <div id="ConcatRowsNode.eval_implementation_" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ConcatRowsNode.eval_implementation_">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">eval_implementation_</span><span class="signature">(self, *, data_map, data_model, narrow)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">concat_rows_step</span><span class="p">(</span><span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Implementation of Pandas evaluation of operators. Internal method.</p>
-
-<p>:param data_map: dictionary of data sources
-:param data_model: Pandas data model adaptor
-:param narrow: if True narrow results to only columns anticipated
-:return: Pandas data frame</p>
-</div>
-
-
-                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
@@ -11130,21 +10381,6 @@ raise an exception if the values are not consistent</p>
             <span class="p">)</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">near_sql</span><span class="p">,</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">near_sql</span><span class="o">.</span><span class="n">NearSQL</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
-
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">convert_records_step</span><span class="p">(</span>
-            <span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
 </pre></div>
 
         </details>
@@ -11376,44 +10612,6 @@ raise an exception if the values are not consistent</p>
 
 
                             </div>
-                            <div id="ConvertRecordsNode.eval_implementation_" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ConvertRecordsNode.eval_implementation_">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">eval_implementation_</span><span class="signature">(self, *, data_map, data_model, narrow)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected data_model to not be None&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data_model</span><span class="o">.</span><span class="n">convert_records_step</span><span class="p">(</span>
-            <span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Implementation of Pandas evaluation of operators. Internal method.</p>
-
-<p>:param data_map: dictionary of data sources
-:param data_model: Pandas data model adaptor
-:param narrow: if True narrow results to only columns anticipated
-:return: Pandas data frame</p>
-</div>
-
-
-                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
@@ -11572,17 +10770,6 @@ raise an exception if the values are not consistent</p>
             <span class="n">add_select</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">near_sql</span>
-
-    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">data_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">view_name</span><span class="p">]</span>
 </pre></div>
 
         </details>
@@ -11805,40 +10992,6 @@ raise an exception if the values are not consistent.</p>
 :param temp_id_source: source of temporary ids
 :param sql_format_options: options for sql formatting
 :return: <a href="near_sql.html#NearSQL">data_algebra.near_sql.NearSQL</a></p>
-</div>
-
-
-                            </div>
-                            <div id="SQLNode.eval_implementation_" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#SQLNode.eval_implementation_">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">eval_implementation_</span><span class="signature">(self, *, data_map, data_model, narrow)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval_implementation_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implementation of Pandas evaluation of operators. Internal method.</span>
-
-<span class="sd">        :param data_map: dictionary of data sources</span>
-<span class="sd">        :param data_model: Pandas data model adaptor</span>
-<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
-<span class="sd">        :return: Pandas data frame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">data_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">view_name</span><span class="p">]</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Implementation of Pandas evaluation of operators. Internal method.</p>
-
-<p>:param data_map: dictionary of data sources
-:param data_model: Pandas data model adaptor
-:param narrow: if True narrow results to only columns anticipated
-:return: Pandas data frame</p>
 </div>
 
 

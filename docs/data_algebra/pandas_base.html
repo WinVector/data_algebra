@@ -67,6 +67,9 @@
                                 <a class="function" href="#PandasModelBase.add_data_frame_columns_to_data_frame_">add_data_frame_columns_to_data_frame_</a>
                         </li>
                         <li>
+                                <a class="function" href="#PandasModelBase.eval">eval</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#PandasModelBase.extend_step">extend_step</a>
                         </li>
                         <li>
@@ -128,6 +131,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">types</span>
 <span class="kn">import</span> <span class="nn">numbers</span>
@@ -286,7 +290,7 @@
     <span class="k">return</span> <span class="n">res</span>
 
 
-<span class="k">def</span> <span class="nf">populate_impl_map</span><span class="p">(</span><span class="n">data_model</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">populate_impl_map</span><span class="p">(</span><span class="n">data_model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Map symbols to implementations.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -390,6 +394,10 @@
 <span class="sd">    Base class for implementing the data algebra on pandas-like APIs</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">pd</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span>
+    <span class="n">impl_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span>
+    <span class="n">_method_dispatch_table</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">pd</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pd</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">)</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -397,6 +405,20 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pd</span> <span class="o">=</span> <span class="n">pd</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">impl_map</span> <span class="o">=</span> <span class="n">populate_impl_map</span><span class="p">(</span><span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_method_dispatch_table</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ConcatRowsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat_rows_step</span><span class="p">,</span>
+            <span class="s2">&quot;ConvertRecordsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_records_step</span><span class="p">,</span>
+            <span class="s2">&quot;DropColumnsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_columns_step</span><span class="p">,</span>
+            <span class="s2">&quot;ExtendNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">extend_step</span><span class="p">,</span>
+            <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">natural_join_step</span><span class="p">,</span>
+            <span class="s2">&quot;OrderRowsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_rows_step</span><span class="p">,</span>
+            <span class="s2">&quot;ProjectNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_step</span><span class="p">,</span>
+            <span class="s2">&quot;RenameColumnsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">rename_columns_step</span><span class="p">,</span>
+            <span class="s2">&quot;SelectColumnsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_columns_step</span><span class="p">,</span>
+            <span class="s2">&quot;SelectRowsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_rows_step</span><span class="p">,</span>
+            <span class="s2">&quot;SQLNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sql_proxy_step</span><span class="p">,</span>
+            <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_step</span><span class="p">,</span>
+        <span class="p">}</span>
 
     <span class="c1"># utils</span>
 
@@ -489,6 +511,13 @@
         <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span>
 
+    <span class="k">def</span> <span class="nf">_sql_proxy_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        replace user sql with view from data map</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;SQLNode&quot;</span>
+        <span class="k">return</span> <span class="n">data_map</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">view_name</span><span class="p">]</span>
+
     <span class="k">def</span> <span class="nf">columns_to_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_rows</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert a dictionary of column names to series-like objects and scalars into a Pandas data frame.</span>
@@ -560,6 +589,23 @@
             <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">res</span>
 
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implementation of Pandas evaluation of operators</span>
+
+<span class="sd">        :param op: ViewRepresentation to evaluate</span>
+<span class="sd">        :param data_map: dictionary mapping table and view names to data frames</span>
+<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
+<span class="sd">        :return: data frame result</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="n">op</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_eval_value_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate an incoming (or value source) node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method_dispatch_table</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">node_name</span><span class="p">](</span><span class="n">op</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Execute an extend step, returning a data frame.</span>
@@ -573,9 +619,7 @@
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">window_situation</span><span class="p">:</span>
             <span class="n">op</span><span class="o">.</span><span class="n">check_extend_window_fns_</span><span class="p">()</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">window_situation</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>  <span class="c1"># out of range things like arccosh were warning</span>
@@ -693,9 +737,7 @@
         <span class="c1"># try the following tutorial:</span>
         <span class="c1"># https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/</span>
         <span class="n">data_algebra_temp_cols</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">opk</span><span class="p">)</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -763,9 +805,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.SelectRowsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">res</span>
         <span class="n">selection</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">expr</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
@@ -780,9 +820,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.SelectColumnsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">column_selection</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">drop_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
@@ -793,9 +831,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.DropColumnsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="n">column_selection</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">column_deletions</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="n">column_selection</span><span class="p">]</span>
 
@@ -807,9 +843,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.OrderRowsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">ascending</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="kc">False</span> <span class="k">if</span> <span class="n">ci</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">reverse</span><span class="p">)</span> <span class="k">else</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">order_columns</span>
@@ -829,9 +863,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.RenameColumnsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">op</span><span class="o">.</span><span class="n">reverse_mapping</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyMethodMayBeStatic</span>
@@ -859,12 +891,8 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.NaturalJoinNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">left</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
-        <span class="n">right</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="n">common_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">left</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
             <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">right</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
         <span class="p">)</span>
@@ -910,12 +938,8 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ConcatRowsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">left</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
-        <span class="n">right</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">id_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">left</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">left</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">id_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">a_name</span>
@@ -945,9 +969,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ConvertRecordsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">op</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
 </pre></div>
 
@@ -959,12 +981,12 @@
 
         
             <span class="def">def</span>
-            <span class="name">populate_impl_map</span><span class="signature">(data_model)</span>:
+            <span class="name">populate_impl_map</span><span class="signature">(data_model) -&gt; Dict[str, Callable]</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">populate_impl_map</span><span class="p">(</span><span class="n">data_model</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">populate_impl_map</span><span class="p">(</span><span class="n">data_model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Map symbols to implementations.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1085,6 +1107,10 @@
 <span class="sd">    Base class for implementing the data algebra on pandas-like APIs</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">pd</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span>
+    <span class="n">impl_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span>
+    <span class="n">_method_dispatch_table</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">pd</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">,</span> <span class="n">presentation_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pd</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">)</span>
         <span class="n">data_algebra</span><span class="o">.</span><span class="n">data_model</span><span class="o">.</span><span class="n">DataModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -1092,6 +1118,20 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pd</span> <span class="o">=</span> <span class="n">pd</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">impl_map</span> <span class="o">=</span> <span class="n">populate_impl_map</span><span class="p">(</span><span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_method_dispatch_table</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ConcatRowsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat_rows_step</span><span class="p">,</span>
+            <span class="s2">&quot;ConvertRecordsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_records_step</span><span class="p">,</span>
+            <span class="s2">&quot;DropColumnsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_columns_step</span><span class="p">,</span>
+            <span class="s2">&quot;ExtendNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">extend_step</span><span class="p">,</span>
+            <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">natural_join_step</span><span class="p">,</span>
+            <span class="s2">&quot;OrderRowsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_rows_step</span><span class="p">,</span>
+            <span class="s2">&quot;ProjectNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_step</span><span class="p">,</span>
+            <span class="s2">&quot;RenameColumnsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">rename_columns_step</span><span class="p">,</span>
+            <span class="s2">&quot;SelectColumnsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_columns_step</span><span class="p">,</span>
+            <span class="s2">&quot;SelectRowsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_rows_step</span><span class="p">,</span>
+            <span class="s2">&quot;SQLNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sql_proxy_step</span><span class="p">,</span>
+            <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_step</span><span class="p">,</span>
+        <span class="p">}</span>
 
     <span class="c1"># utils</span>
 
@@ -1184,6 +1224,13 @@
         <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span>
 
+    <span class="k">def</span> <span class="nf">_sql_proxy_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        replace user sql with view from data map</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;SQLNode&quot;</span>
+        <span class="k">return</span> <span class="n">data_map</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">view_name</span><span class="p">]</span>
+
     <span class="k">def</span> <span class="nf">columns_to_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_rows</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert a dictionary of column names to series-like objects and scalars into a Pandas data frame.</span>
@@ -1255,6 +1302,23 @@
             <span class="n">res</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">transient_new_frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">res</span>
 
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implementation of Pandas evaluation of operators</span>
+
+<span class="sd">        :param op: ViewRepresentation to evaluate</span>
+<span class="sd">        :param data_map: dictionary mapping table and view names to data frames</span>
+<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
+<span class="sd">        :return: data frame result</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="n">op</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_eval_value_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate an incoming (or value source) node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method_dispatch_table</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">node_name</span><span class="p">](</span><span class="n">op</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">extend_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Execute an extend step, returning a data frame.</span>
@@ -1268,9 +1332,7 @@
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">window_situation</span><span class="p">:</span>
             <span class="n">op</span><span class="o">.</span><span class="n">check_extend_window_fns_</span><span class="p">()</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">window_situation</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>  <span class="c1"># out of range things like arccosh were warning</span>
@@ -1388,9 +1450,7 @@
         <span class="c1"># try the following tutorial:</span>
         <span class="c1"># https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/</span>
         <span class="n">data_algebra_temp_cols</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">opk</span><span class="p">)</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1458,9 +1518,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.SelectRowsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">res</span>
         <span class="n">selection</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">expr</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
@@ -1475,9 +1533,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.SelectColumnsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">column_selection</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">drop_columns_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="p">):</span>
@@ -1488,9 +1544,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.DropColumnsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="n">column_selection</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">column_deletions</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="n">column_selection</span><span class="p">]</span>
 
@@ -1502,9 +1556,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.OrderRowsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">ascending</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="kc">False</span> <span class="k">if</span> <span class="n">ci</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">reverse</span><span class="p">)</span> <span class="k">else</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">order_columns</span>
@@ -1524,9 +1576,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.RenameColumnsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">op</span><span class="o">.</span><span class="n">reverse_mapping</span><span class="p">)</span>
 
     <span class="c1"># noinspection PyMethodMayBeStatic</span>
@@ -1554,12 +1604,8 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.NaturalJoinNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">left</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
-        <span class="n">right</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="n">common_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">left</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
             <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">right</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
         <span class="p">)</span>
@@ -1605,12 +1651,8 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ConcatRowsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">left</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
-        <span class="n">right</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">id_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">left</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">left</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">id_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">a_name</span>
@@ -1640,9 +1682,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ConvertRecordsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">op</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
 </pre></div>
 
@@ -1668,6 +1708,20 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pd</span> <span class="o">=</span> <span class="n">pd</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">impl_map</span> <span class="o">=</span> <span class="n">populate_impl_map</span><span class="p">(</span><span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_method_dispatch_table</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ConcatRowsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat_rows_step</span><span class="p">,</span>
+            <span class="s2">&quot;ConvertRecordsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_records_step</span><span class="p">,</span>
+            <span class="s2">&quot;DropColumnsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_columns_step</span><span class="p">,</span>
+            <span class="s2">&quot;ExtendNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">extend_step</span><span class="p">,</span>
+            <span class="s2">&quot;NaturalJoinNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">natural_join_step</span><span class="p">,</span>
+            <span class="s2">&quot;OrderRowsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_rows_step</span><span class="p">,</span>
+            <span class="s2">&quot;ProjectNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_step</span><span class="p">,</span>
+            <span class="s2">&quot;RenameColumnsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">rename_columns_step</span><span class="p">,</span>
+            <span class="s2">&quot;SelectColumnsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_columns_step</span><span class="p">,</span>
+            <span class="s2">&quot;SelectRowsNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_rows_step</span><span class="p">,</span>
+            <span class="s2">&quot;SQLNode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sql_proxy_step</span><span class="p">,</span>
+            <span class="s2">&quot;TableDescription&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_step</span><span class="p">,</span>
+        <span class="p">}</span>
 </pre></div>
 
         </details>
@@ -2002,6 +2056,40 @@ transient_new_frame may be returned.</p>
 
 
                             </div>
+                            <div id="PandasModelBase.eval" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#PandasModelBase.eval">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">eval</span><span class="signature">(self, *, op, data_map: dict, narrow: bool)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implementation of Pandas evaluation of operators</span>
+
+<span class="sd">        :param op: ViewRepresentation to evaluate</span>
+<span class="sd">        :param data_map: dictionary mapping table and view names to data frames</span>
+<span class="sd">        :param narrow: if True narrow results to only columns anticipated</span>
+<span class="sd">        :return: data frame result</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="n">op</span><span class="p">,</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Implementation of Pandas evaluation of operators</p>
+
+<p>:param op: ViewRepresentation to evaluate
+:param data_map: dictionary mapping table and view names to data frames
+:param narrow: if True narrow results to only columns anticipated
+:return: data frame result</p>
+</div>
+
+
+                            </div>
                             <div id="PandasModelBase.extend_step" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#PandasModelBase.extend_step">#&nbsp;&nbsp</a>
 
@@ -2025,9 +2113,7 @@ transient_new_frame may be returned.</p>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">window_situation</span><span class="p">:</span>
             <span class="n">op</span><span class="o">.</span><span class="n">check_extend_window_fns_</span><span class="p">()</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">window_situation</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>  <span class="c1"># out of range things like arccosh were warning</span>
@@ -2163,9 +2249,7 @@ transient_new_frame may be returned.</p>
         <span class="c1"># try the following tutorial:</span>
         <span class="c1"># https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/</span>
         <span class="n">data_algebra_temp_cols</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">opk</span><span class="p">)</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opk</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -2251,9 +2335,7 @@ transient_new_frame may be returned.</p>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.SelectRowsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">res</span>
         <span class="n">selection</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">expr</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
@@ -2286,9 +2368,7 @@ transient_new_frame may be returned.</p>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.SelectColumnsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">column_selection</span><span class="p">]</span>
 </pre></div>
 
@@ -2317,9 +2397,7 @@ transient_new_frame may be returned.</p>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.DropColumnsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="n">column_selection</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">column_deletions</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="n">column_selection</span><span class="p">]</span>
 </pre></div>
@@ -2349,9 +2427,7 @@ transient_new_frame may be returned.</p>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.OrderRowsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">ascending</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="kc">False</span> <span class="k">if</span> <span class="n">ci</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">reverse</span><span class="p">)</span> <span class="k">else</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">order_columns</span>
@@ -2389,9 +2465,7 @@ transient_new_frame may be returned.</p>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.RenameColumnsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">op</span><span class="o">.</span><span class="n">reverse_mapping</span><span class="p">)</span>
 </pre></div>
 
@@ -2454,12 +2528,8 @@ transient_new_frame may be returned.</p>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.NaturalJoinNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">left</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
-        <span class="n">right</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="n">common_cols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">left</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
             <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">right</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
         <span class="p">)</span>
@@ -2523,12 +2593,8 @@ transient_new_frame may be returned.</p>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ConcatRowsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">left</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
-        <span class="n">right</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">id_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">left</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">left</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">id_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">a_name</span>
@@ -2576,9 +2642,7 @@ transient_new_frame may be returned.</p>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;op was supposed to be a data_algebra.data_ops.ConvertRecordsNode&quot;</span>
             <span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval_implementation_</span><span class="p">(</span>
-            <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span>
-        <span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_value_source</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_map</span><span class="o">=</span><span class="n">data_map</span><span class="p">,</span> <span class="n">narrow</span><span class="o">=</span><span class="n">narrow</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">op</span><span class="o">.</span><span class="n">record_map</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">local_data_model</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
 </pre></div>
 

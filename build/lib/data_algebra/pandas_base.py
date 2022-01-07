@@ -3,6 +3,7 @@ Base class for adapters for Pandas-like APIs
 """
 
 from abc import ABC
+from typing import Callable, Dict
 import datetime
 import types
 import numbers
@@ -161,7 +162,7 @@ def _k_mul(*args):
     return res
 
 
-def populate_impl_map(data_model):
+def populate_impl_map(data_model) -> Dict[str, Callable]:
     """
     Map symbols to implementations.
     """
@@ -265,6 +266,10 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
     Base class for implementing the data algebra on pandas-like APIs
     """
 
+    pd: types.ModuleType
+    impl_map: Dict[str, Callable]
+    _method_dispatch_table: Dict[str, Callable]
+
     def __init__(self, *, pd: types.ModuleType, presentation_model_name: str):
         assert isinstance(pd, types.ModuleType)
         data_algebra.data_model.DataModel.__init__(
@@ -272,6 +277,20 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         )
         self.pd = pd
         self.impl_map = populate_impl_map(data_model=self)
+        self._method_dispatch_table = {
+            "ConcatRowsNode": self.concat_rows_step,
+            "ConvertRecordsNode": self.convert_records_step,
+            "DropColumnsNode": self.drop_columns_step,
+            "ExtendNode": self.extend_step,
+            "NaturalJoinNode": self.natural_join_step,
+            "OrderRowsNode": self.order_rows_step,
+            "ProjectNode": self.project_step,
+            "RenameColumnsNode": self.rename_columns_step,
+            "SelectColumnsNode": self.select_columns_step,
+            "SelectRowsNode": self.select_rows_step,
+            "SQLNode": self._sql_proxy_step,
+            "TableDescription": self.table_step,
+        }
 
     # utils
 
@@ -364,6 +383,13 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         res = res.reset_index(drop=True)
         return res
 
+    def _sql_proxy_step(self, op, *, data_map: dict, narrow: bool):
+        """
+        replace user sql with view from data map
+        """
+        assert op.node_name == "SQLNode"
+        return data_map[op.view_name]
+
     def columns_to_frame_(self, cols, *, target_rows=0):
         """
         Convert a dictionary of column names to series-like objects and scalars into a Pandas data frame.
@@ -435,6 +461,23 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             res[c] = transient_new_frame[c]
         return res
 
+    def eval(self, *, op, data_map: dict, narrow: bool):
+        """
+        Implementation of Pandas evaluation of operators
+
+        :param op: ViewRepresentation to evaluate
+        :param data_map: dictionary mapping table and view names to data frames
+        :param narrow: if True narrow results to only columns anticipated
+        :return: data frame result
+        """
+        return self._eval_value_source(s=op, data_map=data_map, narrow=narrow)
+
+    def _eval_value_source(self, s, *, data_map: dict, narrow: bool):
+        """
+        Evaluate an incoming (or value source) node.
+        """
+        return self._method_dispatch_table[s.node_name](op=s, data_map=data_map, narrow=narrow)
+
     def extend_step(self, op, *, data_map, narrow):
         """
         Execute an extend step, returning a data frame.
@@ -448,9 +491,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         )
         if window_situation:
             op.check_extend_window_fns_()
-        res = op.sources[0].eval_implementation_(
-            data_map=data_map, data_model=self, narrow=narrow
-        )
+        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
         if not window_situation:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")  # out of range things like arccosh were warning
@@ -568,9 +609,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         # try the following tutorial:
         # https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
         data_algebra_temp_cols = {}
-        res = op.sources[0].eval_implementation_(
-            data_map=data_map, data_model=self, narrow=narrow
-        )
+        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
         for (k, opk) in op.ops.items():
             if len(opk.args) > 1:
                 raise ValueError(
@@ -638,9 +677,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.SelectRowsNode"
             )
-        res = op.sources[0].eval_implementation_(
-            data_map=data_map, data_model=self, narrow=narrow
-        )
+        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
         if res.shape[0] < 1:
             return res
         selection = op.expr.evaluate(res)
@@ -655,9 +692,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.SelectColumnsNode"
             )
-        res = op.sources[0].eval_implementation_(
-            data_map=data_map, data_model=self, narrow=narrow
-        )
+        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
         return res[op.column_selection]
 
     def drop_columns_step(self, op, *, data_map, narrow):
@@ -668,9 +703,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.DropColumnsNode"
             )
-        res = op.sources[0].eval_implementation_(
-            data_map=data_map, data_model=self, narrow=narrow
-        )
+        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
         column_selection = [c for c in res.columns if c not in op.column_deletions]
         return res[column_selection]
 
@@ -682,9 +715,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.OrderRowsNode"
             )
-        res = op.sources[0].eval_implementation_(
-            data_map=data_map, data_model=self, narrow=narrow
-        )
+        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
         if res.shape[0] > 1:
             ascending = [
                 False if ci in set(op.reverse) else True for ci in op.order_columns
@@ -704,9 +735,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.RenameColumnsNode"
             )
-        res = op.sources[0].eval_implementation_(
-            data_map=data_map, data_model=self, narrow=narrow
-        )
+        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
         return res.rename(columns=op.reverse_mapping)
 
     # noinspection PyMethodMayBeStatic
@@ -734,12 +763,8 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.NaturalJoinNode"
             )
-        left = op.sources[0].eval_implementation_(
-            data_map=data_map, data_model=self, narrow=narrow
-        )
-        right = op.sources[1].eval_implementation_(
-            data_map=data_map, data_model=self, narrow=narrow
-        )
+        left = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
+        right = self._eval_value_source(op.sources[1], data_map=data_map, narrow=narrow)
         common_cols = set([c for c in left.columns]).intersection(
             [c for c in right.columns]
         )
@@ -785,12 +810,8 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.ConcatRowsNode"
             )
-        left = op.sources[0].eval_implementation_(
-            data_map=data_map, data_model=self, narrow=narrow
-        )
-        right = op.sources[1].eval_implementation_(
-            data_map=data_map, data_model=self, narrow=narrow
-        )
+        left = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
+        right = self._eval_value_source(op.sources[1], data_map=data_map, narrow=narrow)
         if op.id_column is not None:
             if left.shape[0] > 0:
                 left[op.id_column] = op.a_name
@@ -820,7 +841,5 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise TypeError(
                 "op was supposed to be a data_algebra.data_ops.ConvertRecordsNode"
             )
-        res = op.sources[0].eval_implementation_(
-            data_map=data_map, data_model=self, narrow=narrow
-        )
+        res = self._eval_value_source(op.sources[0], data_map=data_map, narrow=narrow)
         return op.record_map.transform(res, local_data_model=self)

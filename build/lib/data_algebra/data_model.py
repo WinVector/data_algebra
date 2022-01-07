@@ -61,6 +61,19 @@ class DataModel(ABC):
         """
         raise NotImplementedError("base method called")
 
+    # evaluate
+
+    def eval(self, *, op, data_map: dict, narrow: bool):
+        """
+        Implementation of Pandas evaluation of operators
+
+        :param op: ViewRepresentation to evaluate
+        :param data_map: dictionary mapping table and view names to data frames
+        :param narrow: if True narrow results to only columns anticipated
+        :return: data frame result
+        """
+        raise NotImplementedError("base method called")
+
     # operation implementations
 
     def table_step(self, op, *, data_map, narrow):
