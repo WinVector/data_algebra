@@ -148,9 +148,19 @@ def equivalent_frames(
                 if ca_can_be_numeric and cb_can_be_numeric:
                     if len(ca_n) != len(cb_n):
                         return False
-                    dif = numpy.abs(ca_n - cb_n) / numpy.maximum(numpy.maximum(numpy.abs(ca_n), numpy.abs(cb_n)), 1.0)
-                    if numpy.max(dif) > float_tol:
+                    ca_inf = numpy.isinf(ca_n)
+                    cb_inf = numpy.isinf(cb_n)
+                    if numpy.any(ca_inf != cb_inf):
                         return False
+                    if numpy.any(ca_inf):
+                        if numpy.any(numpy.sign(ca_n[ca_inf]) != numpy.sign(cb_n[cb_inf])):
+                            return False
+                    if numpy.any(numpy.logical_not(ca_inf)):
+                        ca_f = ca_n[numpy.logical_not(ca_inf)]
+                        cb_f = cb_n[numpy.logical_not(cb_inf)]
+                        dif = numpy.abs(ca_f - cb_f) / numpy.maximum(numpy.maximum(numpy.abs(ca_f), numpy.abs(cb_f)), 1.0)
+                        if numpy.max(dif) > float_tol:
+                            return False
                 else:
                     if not numpy.all(ca == cb):
                         return False
@@ -273,7 +283,7 @@ def _run_handle_experiments(
 def check_transform_on_handles(
     *,
     ops,
-    data,
+    data: dict,
     expect,
     db_handles,
     float_tol: float = 1e-8,
@@ -302,12 +312,8 @@ def check_transform_on_handles(
     :return: None, assert if there is an issue
     """
 
-    # convert single table to dictionary
-    if not isinstance(data, dict):
-        cols_used = ops.columns_used()
-        table_name = [k for k in cols_used.keys()][0]
-        data = {table_name: data}
     assert isinstance(data, dict)
+    orig_data = {k: v.copy() for k, v in data.items()}
     n_tables = len(data)
     assert n_tables > 0
     if local_data_model is None:
@@ -337,6 +343,10 @@ def check_transform_on_handles(
         check_row_order=check_row_order,
     ):
         raise ValueError("Pandas eval result did not match expect")
+    # show inputs didn't change
+    for k, v in orig_data.items():
+        v2 = data[k]
+        assert equivalent_frames(v, v2)
     if check_parse:
         if not formats_to_self(ops):
             raise ValueError("ops did not round-trip format")
@@ -366,6 +376,10 @@ def check_transform_on_handles(
             check_row_order=check_row_order,
         ):
             raise ValueError("Pandas transform result did not match expect")
+        # show inputs didn't change
+        for k, v in orig_data.items():
+            v2 = data[k]
+            assert equivalent_frames(v, v2)
     # try on empty inputs
     empty_map = {
         k: v.iloc[range(0), :].reset_index(drop=True, inplace=False)

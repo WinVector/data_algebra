@@ -382,7 +382,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
             raise ValueError("missing required columns: " + str(missing))
         # make an index-free copy of the data to isolate side-effects and not deal with indices
         res = df.loc[:, columns_using]
-        res = res.reset_index(drop=True)
+        res = res.reset_index(drop=True, inplace=False)  # copy
         return res
 
     def _sql_proxy_step(self, op, *, data_map: dict, narrow: bool):
@@ -390,7 +390,7 @@ class PandasModelBase(data_algebra.data_model.DataModel, ABC):
         replace user sql with view from data map
         """
         assert op.node_name == "SQLNode"
-        return data_map[op.view_name]
+        return data_map[op.view_name].reset_index(drop=True, inplace=False)  # copy
 
     def columns_to_frame_(self, cols, *, target_rows=0):
         """

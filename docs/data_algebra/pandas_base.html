@@ -510,7 +510,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;missing required columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="c1"># make an index-free copy of the data to isolate side-effects and not deal with indices</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">columns_using</span><span class="p">]</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># copy</span>
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">_sql_proxy_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
@@ -518,7 +518,7 @@
 <span class="sd">        replace user sql with view from data map</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;SQLNode&quot;</span>
-        <span class="k">return</span> <span class="n">data_map</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">view_name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">data_map</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">view_name</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># copy</span>
 
     <span class="k">def</span> <span class="nf">columns_to_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_rows</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1226,7 +1226,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;missing required columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="c1"># make an index-free copy of the data to isolate side-effects and not deal with indices</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">columns_using</span><span class="p">]</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># copy</span>
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">_sql_proxy_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">narrow</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
@@ -1234,7 +1234,7 @@
 <span class="sd">        replace user sql with view from data map</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">op</span><span class="o">.</span><span class="n">node_name</span> <span class="o">==</span> <span class="s2">&quot;SQLNode&quot;</span>
-        <span class="k">return</span> <span class="n">data_map</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">view_name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">data_map</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">view_name</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># copy</span>
 
     <span class="k">def</span> <span class="nf">columns_to_frame_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_rows</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1940,7 +1940,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;missing required columns: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
         <span class="c1"># make an index-free copy of the data to isolate side-effects and not deal with indices</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">columns_using</span><span class="p">]</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># copy</span>
         <span class="k">return</span> <span class="n">res</span>
 </pre></div>
 
