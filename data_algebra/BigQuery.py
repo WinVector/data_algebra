@@ -24,6 +24,13 @@ def _bigquery_median_expr(dbmodel, expression):
     )
 
 
+def _bigquery_std_expr(dbmodel, expression):
+    return (
+        "STDDEV_POP("
+        + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
+        + ")"
+    )
+
 def _bigquery_is_bad_expr(dbmodel, expression):
     subexpr = dbmodel.expr_to_sql(expression.args[0], want_inline_parens=True)
     return (
@@ -46,6 +53,7 @@ def _bigquery_is_bad_expr(dbmodel, expression):
 BigQuery_formatters = {
     "median": _bigquery_median_expr,
     "is_bad": _bigquery_is_bad_expr,
+    "std": _bigquery_std_expr,
 }
 
 
