@@ -4,7 +4,7 @@ from data_algebra.data_ops import *
 import data_algebra.test_util
 
 
-def xicor_query(*, x_name: str = 'x', y_name: str = 'y'):
+def xicor_query(*, x_name: str = 'x', y_name: str = 'y', table_name='df'):
     """
     Build a query computing the xicor of y_name as a function of x_name.
     Ref: https://arxiv.org/abs/1909.10140
@@ -15,6 +15,7 @@ def xicor_query(*, x_name: str = 'x', y_name: str = 'y'):
 
     :param x_name: name for explanatory variable column.
     :param y_name: name for dependent variable column.
+    :param table_name: name of data source
     :return: data algebra query computing xicor.
     """
     assert isinstance(x_name, str)
@@ -29,7 +30,7 @@ def xicor_query(*, x_name: str = 'x', y_name: str = 'y'):
         ]
     assert(len(names) == len(set(names)))
     ops = (
-        TableDescription(table_name="data_frame", column_names=[x_name, y_name])
+        TableDescription(table_name=table_name, column_names=[x_name, y_name])
             .extend({y_group: f"{y_name}.as_str()"})  # Google BigQuery won't group by float
             .extend({    # convert types, and add in tie breaking column
                 x_name: f"1.0 * {x_name}",
