@@ -4,7 +4,7 @@ Class for representing record structure transformations.
 
 
 import re
-from typing import List, Optional
+from typing import Iterable, List, Optional
 
 import numpy
 
@@ -702,3 +702,39 @@ def pivot_rowrecs_to_blocks(
         local_data_model=local_data_model,
     )
     return ct.map_from_rows()
+
+
+def melt_specification(
+        *,
+        row_keys: Iterable[str],
+        col_name_key: str = 'column_name',
+        col_value_key: str = 'column_value',
+        value_cols: Iterable[str]
+) -> RecordSpecification:
+    """
+    Specify the cdata transformation that melts records into a single column of values plus keys.
+
+    :param row_keys: columns that identify rows in the incoming data set
+    :param col_name_key: column name to land the names of columns as a column
+    :param col_value_key: column name to land the values in columns as a column
+    :param value_cols: columns to take values from
+    :return: RecordSpecification
+    """
+    assert not isinstance(value_cols, str)
+    cols = list(value_cols)
+    assert not isinstance(row_keys, str)
+    row_keys = list(row_keys)
+    assert isinstance(col_name_key, str)
+    assert isinstance(col_value_key, str)
+    known_cols = row_keys + [col_name_key, col_value_key] + value_cols
+    assert len(known_cols) == len(set(known_cols))
+    record_map = RecordMap(
+        blocks_out=RecordSpecification(
+            control_table=data_algebra.pandas_model.pd.DataFrame({
+                col_name_key: cols,
+                col_value_key: cols,
+            }),
+            record_keys=row_keys,
+            control_table_keys=[col_name_key])
+        )
+    return record_map

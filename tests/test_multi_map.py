@@ -4,7 +4,8 @@ from data_algebra.data_ops import descr
 from data_algebra.solutions import def_multi_column_map
 import data_algebra.test_util
 
-
+# From:
+# https://github.com/WinVector/data_algebra/blob/main/Examples/MultiJoin/MultiJoin.ipynb
 def test_multi_map():
     pd = data_algebra.default_data_model.pd  # Pandas
 

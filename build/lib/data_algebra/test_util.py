@@ -292,6 +292,7 @@ def check_transform_on_handles(
     check_row_order: bool = False,
     check_parse: bool = True,
     local_data_model=None,
+    valid_for_empty: bool = True,
     empty_produces_empty: bool = True,
 ) -> None:
     """
@@ -308,7 +309,8 @@ def check_transform_on_handles(
     :param check_row_order: passed to equivalent_frames()
     :param check_parse: if True check expression parses/formats to self
     :param local_data_model: optional alternate evaluation model
-    :param empty_produces_empty: logical, if true assume emtpy inputs should produce empty output
+    :param valid_for_empty: logical, if True test on empty inputs
+    :param empty_produces_empty: logical, if True assume emtpy inputs should produce empty output
     :return: None, assert if there is an issue
     """
 
@@ -380,34 +382,35 @@ def check_transform_on_handles(
         for k, v in orig_data.items():
             v2 = data[k]
             assert equivalent_frames(v, v2)
-    # try on empty inputs
-    empty_map = {
-        k: v.iloc[range(0), :].reset_index(drop=True, inplace=False)
-        for k, v in data.items()
-    }
-    empty_res = ops.eval(empty_map)
-    assert local_data_model.is_appropriate_data_instance(empty_res)
-    assert set(empty_res.columns) == set(res.columns)
-    if empty_produces_empty:
-        assert empty_res.shape[0] == 0
-    else:
-        assert empty_res.shape[0] > 0
-    # try on combinations of empty and original
-    if n_tables == 2:
-        keys = [k for k in data.keys()]
-        partial_maps = [
-            {
-                keys[0]: data[keys[0]].reset_index(drop=True, inplace=False),
-                keys[1]: data[keys[1]],
-            },
-            {
-                keys[0]: data[keys[0]],
-                keys[1]: data[keys[1]].reset_index(drop=True, inplace=False),
-            },
-        ]
-        for pm in partial_maps:
-            empty_res_i = ops.eval(pm)
-            assert set(empty_res_i.columns) == set(res.columns)
+    if valid_for_empty:
+        # try on empty inputs
+        empty_map = {
+            k: v.iloc[range(0), :].reset_index(drop=True, inplace=False)
+            for k, v in data.items()
+        }
+        empty_res = ops.eval(empty_map)
+        assert local_data_model.is_appropriate_data_instance(empty_res)
+        assert set(empty_res.columns) == set(res.columns)
+        if empty_produces_empty:
+            assert empty_res.shape[0] == 0
+        else:
+            assert empty_res.shape[0] > 0
+        # try on combinations of empty and original
+        if n_tables == 2:
+            keys = [k for k in data.keys()]
+            partial_maps = [
+                {
+                    keys[0]: data[keys[0]].reset_index(drop=True, inplace=False),
+                    keys[1]: data[keys[1]],
+                },
+                {
+                    keys[0]: data[keys[0]],
+                    keys[1]: data[keys[1]].reset_index(drop=True, inplace=False),
+                },
+            ]
+            for pm in partial_maps:
+                empty_res_i = ops.eval(pm)
+                assert set(empty_res_i.columns) == set(res.columns)
     # try any db paths
     global global_test_result_cache
     global run_direct_ops_path_tests
@@ -489,6 +492,7 @@ def check_transform(
     check_row_order: bool = False,
     check_parse: bool = True,
     models_to_skip: Optional[Iterable[str]] = None,
+    valid_for_empty: bool = True,
     empty_produces_empty: bool = True,
 ) -> None:
     """
@@ -504,7 +508,8 @@ def check_transform(
     :param check_row_order: passed to equivalent_frames()
     :param check_parse: if True check expression parses/formats to self
     :param models_to_skip: None or set of model names to skip testing
-    :param empty_produces_empty: logical, if true assume emtpy inputs should produce empty output
+    :param valid_for_empty: logical, if True perform tests on empty inputs
+    :param empty_produces_empty: logical, if True assume emtpy inputs should produce empty output
     :return: nothing
     """
 
@@ -542,6 +547,7 @@ def check_transform(
             check_row_order=check_row_order,
             check_parse=check_parse,
             db_handles=db_handles,
+            valid_for_empty=valid_for_empty,
             empty_produces_empty=empty_produces_empty,
         )
     except AssertionError:

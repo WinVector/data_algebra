@@ -366,6 +366,7 @@
     <span class="n">check_row_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">check_parse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">valid_for_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">empty_produces_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -382,7 +383,8 @@
 <span class="sd">    :param check_row_order: passed to equivalent_frames()</span>
 <span class="sd">    :param check_parse: if True check expression parses/formats to self</span>
 <span class="sd">    :param local_data_model: optional alternate evaluation model</span>
-<span class="sd">    :param empty_produces_empty: logical, if true assume emtpy inputs should produce empty output</span>
+<span class="sd">    :param valid_for_empty: logical, if True test on empty inputs</span>
+<span class="sd">    :param empty_produces_empty: logical, if True assume emtpy inputs should produce empty output</span>
 <span class="sd">    :return: None, assert if there is an issue</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -454,34 +456,35 @@
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">orig_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">v2</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
             <span class="k">assert</span> <span class="n">equivalent_frames</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span>
-    <span class="c1"># try on empty inputs</span>
-    <span class="n">empty_map</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-    <span class="p">}</span>
-    <span class="n">empty_res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">empty_map</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">empty_res</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">empty_res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">empty_produces_empty</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="n">empty_res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="n">empty_res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
-    <span class="c1"># try on combinations of empty and original</span>
-    <span class="k">if</span> <span class="n">n_tables</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
-        <span class="n">partial_maps</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="p">{</span>
-                <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-                <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
-            <span class="p">},</span>
-            <span class="p">{</span>
-                <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
-                <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-            <span class="p">},</span>
-        <span class="p">]</span>
-        <span class="k">for</span> <span class="n">pm</span> <span class="ow">in</span> <span class="n">partial_maps</span><span class="p">:</span>
-            <span class="n">empty_res_i</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">pm</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">empty_res_i</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">valid_for_empty</span><span class="p">:</span>
+        <span class="c1"># try on empty inputs</span>
+        <span class="n">empty_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="n">empty_res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">empty_map</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">empty_res</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">empty_res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">empty_produces_empty</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">empty_res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">empty_res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="c1"># try on combinations of empty and original</span>
+        <span class="k">if</span> <span class="n">n_tables</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+            <span class="n">partial_maps</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                    <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                    <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                <span class="p">},</span>
+            <span class="p">]</span>
+            <span class="k">for</span> <span class="n">pm</span> <span class="ow">in</span> <span class="n">partial_maps</span><span class="p">:</span>
+                <span class="n">empty_res_i</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">pm</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">empty_res_i</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
     <span class="c1"># try any db paths</span>
     <span class="k">global</span> <span class="n">global_test_result_cache</span>
     <span class="k">global</span> <span class="n">run_direct_ops_path_tests</span>
@@ -563,6 +566,7 @@
     <span class="n">check_row_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">check_parse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">models_to_skip</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">valid_for_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">empty_produces_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -578,7 +582,8 @@
 <span class="sd">    :param check_row_order: passed to equivalent_frames()</span>
 <span class="sd">    :param check_parse: if True check expression parses/formats to self</span>
 <span class="sd">    :param models_to_skip: None or set of model names to skip testing</span>
-<span class="sd">    :param empty_produces_empty: logical, if true assume emtpy inputs should produce empty output</span>
+<span class="sd">    :param valid_for_empty: logical, if True perform tests on empty inputs</span>
+<span class="sd">    :param empty_produces_empty: logical, if True assume emtpy inputs should produce empty output</span>
 <span class="sd">    :return: nothing</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -616,6 +621,7 @@
             <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
             <span class="n">check_parse</span><span class="o">=</span><span class="n">check_parse</span><span class="p">,</span>
             <span class="n">db_handles</span><span class="o">=</span><span class="n">db_handles</span><span class="p">,</span>
+            <span class="n">valid_for_empty</span><span class="o">=</span><span class="n">valid_for_empty</span><span class="p">,</span>
             <span class="n">empty_produces_empty</span><span class="o">=</span><span class="n">empty_produces_empty</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
@@ -886,6 +892,7 @@ Ignores indexing. None and nan are considered equivalent in numeric contexts.</p
     check_row_order: bool = False,
     check_parse: bool = True,
     local_data_model=None,
+    valid_for_empty: bool = True,
     empty_produces_empty: bool = True
 ) -&gt; None</span>:
     </div>
@@ -904,6 +911,7 @@ Ignores indexing. None and nan are considered equivalent in numeric contexts.</p
     <span class="n">check_row_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">check_parse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">local_data_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">valid_for_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">empty_produces_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -920,7 +928,8 @@ Ignores indexing. None and nan are considered equivalent in numeric contexts.</p
 <span class="sd">    :param check_row_order: passed to equivalent_frames()</span>
 <span class="sd">    :param check_parse: if True check expression parses/formats to self</span>
 <span class="sd">    :param local_data_model: optional alternate evaluation model</span>
-<span class="sd">    :param empty_produces_empty: logical, if true assume emtpy inputs should produce empty output</span>
+<span class="sd">    :param valid_for_empty: logical, if True test on empty inputs</span>
+<span class="sd">    :param empty_produces_empty: logical, if True assume emtpy inputs should produce empty output</span>
 <span class="sd">    :return: None, assert if there is an issue</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -992,34 +1001,35 @@ Ignores indexing. None and nan are considered equivalent in numeric contexts.</p
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">orig_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">v2</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
             <span class="k">assert</span> <span class="n">equivalent_frames</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span>
-    <span class="c1"># try on empty inputs</span>
-    <span class="n">empty_map</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-    <span class="p">}</span>
-    <span class="n">empty_res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">empty_map</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">empty_res</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">empty_res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">empty_produces_empty</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="n">empty_res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="n">empty_res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
-    <span class="c1"># try on combinations of empty and original</span>
-    <span class="k">if</span> <span class="n">n_tables</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
-        <span class="n">partial_maps</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="p">{</span>
-                <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-                <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
-            <span class="p">},</span>
-            <span class="p">{</span>
-                <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
-                <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-            <span class="p">},</span>
-        <span class="p">]</span>
-        <span class="k">for</span> <span class="n">pm</span> <span class="ow">in</span> <span class="n">partial_maps</span><span class="p">:</span>
-            <span class="n">empty_res_i</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">pm</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">empty_res_i</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">valid_for_empty</span><span class="p">:</span>
+        <span class="c1"># try on empty inputs</span>
+        <span class="n">empty_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="n">empty_res</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">empty_map</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">local_data_model</span><span class="o">.</span><span class="n">is_appropriate_data_instance</span><span class="p">(</span><span class="n">empty_res</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">empty_res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">empty_produces_empty</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">empty_res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">empty_res</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="c1"># try on combinations of empty and original</span>
+        <span class="k">if</span> <span class="n">n_tables</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+            <span class="n">partial_maps</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                    <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                    <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">data</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                <span class="p">},</span>
+            <span class="p">]</span>
+            <span class="k">for</span> <span class="n">pm</span> <span class="ow">in</span> <span class="n">partial_maps</span><span class="p">:</span>
+                <span class="n">empty_res_i</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">pm</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">empty_res_i</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
     <span class="c1"># try any db paths</span>
     <span class="k">global</span> <span class="n">global_test_result_cache</span>
     <span class="k">global</span> <span class="n">run_direct_ops_path_tests</span>
@@ -1071,7 +1081,8 @@ Asserts if there are issues</p>
 :param check_row_order: passed to equivalent_frames()
 :param check_parse: if True check expression parses/formats to self
 :param local_data_model: optional alternate evaluation model
-:param empty_produces_empty: logical, if true assume emtpy inputs should produce empty output
+:param valid_for_empty: logical, if True test on empty inputs
+:param empty_produces_empty: logical, if True assume emtpy inputs should produce empty output
 :return: None, assert if there is an issue</p>
 </div>
 
@@ -1143,6 +1154,7 @@ Asserts if there are issues</p>
     check_row_order: bool = False,
     check_parse: bool = True,
     models_to_skip: Optional[Iterable[str]] = None,
+    valid_for_empty: bool = True,
     empty_produces_empty: bool = True
 ) -&gt; None</span>:
     </div>
@@ -1160,6 +1172,7 @@ Asserts if there are issues</p>
     <span class="n">check_row_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">check_parse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">models_to_skip</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">valid_for_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">empty_produces_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -1175,7 +1188,8 @@ Asserts if there are issues</p>
 <span class="sd">    :param check_row_order: passed to equivalent_frames()</span>
 <span class="sd">    :param check_parse: if True check expression parses/formats to self</span>
 <span class="sd">    :param models_to_skip: None or set of model names to skip testing</span>
-<span class="sd">    :param empty_produces_empty: logical, if true assume emtpy inputs should produce empty output</span>
+<span class="sd">    :param valid_for_empty: logical, if True perform tests on empty inputs</span>
+<span class="sd">    :param empty_produces_empty: logical, if True assume emtpy inputs should produce empty output</span>
 <span class="sd">    :return: nothing</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1213,6 +1227,7 @@ Asserts if there are issues</p>
             <span class="n">check_row_order</span><span class="o">=</span><span class="n">check_row_order</span><span class="p">,</span>
             <span class="n">check_parse</span><span class="o">=</span><span class="n">check_parse</span><span class="p">,</span>
             <span class="n">db_handles</span><span class="o">=</span><span class="n">db_handles</span><span class="p">,</span>
+            <span class="n">valid_for_empty</span><span class="o">=</span><span class="n">valid_for_empty</span><span class="p">,</span>
             <span class="n">empty_produces_empty</span><span class="o">=</span><span class="n">empty_produces_empty</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
@@ -1245,7 +1260,8 @@ Assert if there are issues.</p>
 :param check_row_order: passed to equivalent_frames()
 :param check_parse: if True check expression parses/formats to self
 :param models_to_skip: None or set of model names to skip testing
-:param empty_produces_empty: logical, if true assume emtpy inputs should produce empty output
+:param valid_for_empty: logical, if True perform tests on empty inputs
+:param empty_produces_empty: logical, if True assume emtpy inputs should produce empty output
 :return: nothing</p>
 </div>
 
