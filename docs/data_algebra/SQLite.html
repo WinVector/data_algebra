@@ -55,9 +55,6 @@
                                 <a class="function" href="#SQLiteModel.prepare_connection">prepare_connection</a>
                         </li>
                         <li>
-                                <a class="function" href="#SQLiteModel.insert_table">insert_table</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#SQLiteModel.natural_join_to_near_sql">natural_join_to_near_sql</a>
                         </li>
                 </ul>
@@ -346,38 +343,6 @@
 
         <span class="c1"># https://docs.python.org/3/library/sqlite3.html</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MedianAgg</span><span class="p">)</span>
-
-    <span class="c1"># noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection</span>
-    <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span>
-    <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param conn: a database connection</span>
-<span class="sd">        :param d: a Pandas table</span>
-<span class="sd">        :param table_name: name to give write to</span>
-<span class="sd">        :param qualifiers: schema and such</span>
-<span class="sd">        :param allow_overwrite logical, if True drop previous table</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">if</span> <span class="n">qualifiers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;non-empty qualifiers not yet supported on insert&quot;</span><span class="p">)</span>
-        <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-        <span class="c1"># check for table</span>
-        <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="c1"># noinspection PyBroadException</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_overwrite</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;DROP TABLE &quot;</span> <span class="o">+</span> <span class="n">table_name</span><span class="p">)</span>
-        <span class="c1"># Note: the Pandas to_sql() method appears to have SQLite hard-wired into it</span>
-        <span class="c1"># it refers to sqlite_master</span>
-        <span class="n">d</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span> <span class="n">con</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_emit_right_join_as_left_join</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
@@ -732,38 +697,6 @@
         <span class="c1"># https://docs.python.org/3/library/sqlite3.html</span>
         <span class="n">conn</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MedianAgg</span><span class="p">)</span>
 
-    <span class="c1"># noinspection PyMethodMayBeStatic,SqlNoDataSourceInspection</span>
-    <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span>
-    <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param conn: a database connection</span>
-<span class="sd">        :param d: a Pandas table</span>
-<span class="sd">        :param table_name: name to give write to</span>
-<span class="sd">        :param qualifiers: schema and such</span>
-<span class="sd">        :param allow_overwrite logical, if True drop previous table</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">if</span> <span class="n">qualifiers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;non-empty qualifiers not yet supported on insert&quot;</span><span class="p">)</span>
-        <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-        <span class="c1"># check for table</span>
-        <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="c1"># noinspection PyBroadException</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_overwrite</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;DROP TABLE &quot;</span> <span class="o">+</span> <span class="n">table_name</span><span class="p">)</span>
-        <span class="c1"># Note: the Pandas to_sql() method appears to have SQLite hard-wired into it</span>
-        <span class="c1"># it refers to sqlite_master</span>
-        <span class="n">d</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span> <span class="n">con</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">_emit_right_join_as_left_join</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">join_node</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp_id_source</span><span class="p">,</span> <span class="n">sql_format_options</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
@@ -1010,59 +943,6 @@
 
 
                             </div>
-                            <div id="SQLiteModel.insert_table" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#SQLiteModel.insert_table">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">insert_table</span><span class="signature">(self, conn, d, table_name, *, qualifiers=None, allow_overwrite=False)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">insert_table</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">qualifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_overwrite</span><span class="o">=</span><span class="kc">False</span>
-    <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param conn: a database connection</span>
-<span class="sd">        :param d: a Pandas table</span>
-<span class="sd">        :param table_name: name to give write to</span>
-<span class="sd">        :param qualifiers: schema and such</span>
-<span class="sd">        :param allow_overwrite logical, if True drop previous table</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">if</span> <span class="n">qualifiers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;non-empty qualifiers not yet supported on insert&quot;</span><span class="p">)</span>
-        <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-        <span class="c1"># check for table</span>
-        <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="c1"># noinspection PyBroadException</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">read_query</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; LIMIT 1&quot;</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="n">table_exists</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="n">table_exists</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_overwrite</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;table &quot;</span> <span class="o">+</span> <span class="n">table_name</span> <span class="o">+</span> <span class="s2">&quot; already exists&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;DROP TABLE &quot;</span> <span class="o">+</span> <span class="n">table_name</span><span class="p">)</span>
-        <span class="c1"># Note: the Pandas to_sql() method appears to have SQLite hard-wired into it</span>
-        <span class="c1"># it refers to sqlite_master</span>
-        <span class="n">d</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span> <span class="n">con</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>:param conn: a database connection
-:param d: a Pandas table
-:param table_name: name to give write to
-:param qualifiers: schema and such
-:param allow_overwrite logical, if True drop previous table</p>
-</div>
-
-
-                            </div>
                             <div id="SQLiteModel.natural_join_to_near_sql" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#SQLiteModel.natural_join_to_near_sql">#&nbsp;&nbsp</a>
 
@@ -1141,6 +1021,7 @@
                 <dd id="SQLiteModel.read_query" class="function"><a href="db_model.html#DBModel.read_query">read_query</a></dd>
                 <dd id="SQLiteModel.table_exists" class="function"><a href="db_model.html#DBModel.table_exists">table_exists</a></dd>
                 <dd id="SQLiteModel.drop_table" class="function"><a href="db_model.html#DBModel.drop_table">drop_table</a></dd>
+                <dd id="SQLiteModel.insert_table" class="function"><a href="db_model.html#DBModel.insert_table">insert_table</a></dd>
                 <dd id="SQLiteModel.read_table" class="function"><a href="db_model.html#DBModel.read_table">read_table</a></dd>
                 <dd id="SQLiteModel.read" class="function"><a href="db_model.html#DBModel.read">read</a></dd>
                 <dd id="SQLiteModel.quote_identifier" class="function"><a href="db_model.html#DBModel.quote_identifier">quote_identifier</a></dd>

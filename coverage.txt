@@ -110,7 +110,7 @@ data_algebra/BigQuery.py                 108     67    38%
 data_algebra/MySQL.py                     28     10    64%
 data_algebra/OrderedSet.py                73      9    88%
 data_algebra/PostgreSQL.py                21      7    67%
-data_algebra/SQLite.py                   151     21    86%
+data_algebra/SQLite.py                   137     17    88%
 data_algebra/SparkSQL.py                  81     45    44%
 data_algebra/__init__.py                   5      0   100%
 data_algebra/arrow.py                    141     32    77%
@@ -120,7 +120,7 @@ data_algebra/data_model.py                13      3    77%
 data_algebra/data_ops.py                1181    192    84%
 data_algebra/data_ops_types.py            84     35    58%
 data_algebra/data_ops_utils.py            49      5    90%
-data_algebra/db_model.py                 898    101    89%
+data_algebra/db_model.py                 898     96    89%
 data_algebra/expr_parse.py                35      0   100%
 data_algebra/expr_rep.py                 624     96    85%
 data_algebra/flow_text.py                 17      0   100%
@@ -133,7 +133,7 @@ data_algebra/python3_lark.py               1      0   100%
 data_algebra/test_util.py                286     49    83%
 data_algebra/util.py                     140     29    79%
 ----------------------------------------------------------
-TOTAL                                   5215    885    83%
+TOTAL                                   5201    876    83%
 
 
-============================= 251 passed in 27.51s =============================
+============================= 251 passed in 27.93s =============================
