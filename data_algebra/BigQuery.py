@@ -26,7 +26,7 @@ def _bigquery_median_expr(dbmodel, expression):
 
 def _bigquery_std_expr(dbmodel, expression):
     return (
-        "STDDEV_POP("
+        "STDDEV_SAMP("
         + dbmodel.expr_to_sql(expression.args[0], want_inline_parens=False)
         + ")"
     )
