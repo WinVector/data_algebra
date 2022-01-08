@@ -45,6 +45,8 @@ class SQLFormatOptions(SimpleNamespace):
         assert isinstance(use_with, bool)
         assert isinstance(annotate, bool)
         assert isinstance(sql_indent, str)
+        assert len(sql_indent) > 0
+        assert len(sql_indent.strip()) == 0
         assert isinstance(initial_commas, bool)
         SimpleNamespace.__init__(
             self,
@@ -825,7 +827,7 @@ class DBModel:
         Quote a string value.
         """
         assert isinstance(string, str)
-        # replace all string with doubled string quotes
+        # replace all string quotes with doubled string quotes
         return (
             self.string_quote
             + re.sub(self.string_quote, self.string_quote + self.string_quote, string)
@@ -1571,7 +1573,7 @@ class DBModel:
         )
         return near_sql
 
-    def to_sql(self, ops, *, sql_format_options=None,) -> str:
+    def to_sql(self, ops, *, sql_format_options=None) -> str:
         """
         Convert ViewRepresentation into SQL string.
         """
@@ -2125,11 +2127,11 @@ class DBHandle:
         )
         return self.describe_table(table_name)
 
-    def to_sql(self, ops, *, sql_format_options=None,) -> str:
+    def to_sql(self, ops, *, sql_format_options=None) -> str:
         """
         Convert operations into SQL
         """
-        return self.db_model.to_sql(ops=ops, sql_format_options=sql_format_options,)
+        return self.db_model.to_sql(ops=ops, sql_format_options=sql_format_options)
 
     def query_to_csv(self, q, *, res_name: str) -> None:
         """
