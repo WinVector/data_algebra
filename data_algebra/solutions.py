@@ -3,7 +3,7 @@
 data algebra solutions to common data processing problems
 """
 
-from typing import Iterable
+from typing import Iterable, Optional
 from data_algebra.data_ops import ViewRepresentation
 from data_algebra.cdata import melt_specification
 
@@ -17,6 +17,8 @@ def def_multi_column_map(
         col_value_key: str = 'column_value',
         mapped_value_key: str = 'mapped_value',
         cols_to_map: Iterable[str],
+        coalesce_value=None,
+        cols_to_map_back: Optional[Iterable[str]] = None,
 ) -> ViewRepresentation:
     """
     Map all columns in list cols_to_map through the mapping in mapping table (key by column name and value).
@@ -29,6 +31,8 @@ def def_multi_column_map(
     :param col_value_key: column name specifying pre-map values in mapping table
     :param mapped_value_key: column name specifying post-map values in mapping table
     :param cols_to_map: columns to re-map.
+    :param coalesce_value: if not None, coalesce to this value
+    :param cols_to_map_back: if not None new names for resulting columns
     :return: operations specifying how to re-map DataFrame
     """
     assert not isinstance(row_keys, str)
@@ -40,8 +44,19 @@ def def_multi_column_map(
     assert isinstance(col_name_key, str)
     assert isinstance(col_value_key, str)
     assert isinstance(mapped_value_key, str)
-    col_names = row_keys + [col_name_key, col_value_key, mapped_value_key] + cols_to_map
-    assert len(col_names) == len(set(col_names))
+    if cols_to_map_back is not None:
+        assert not isinstance(cols_to_map_back, str)
+        cols_to_map_back = list(cols_to_map_back)
+        assert len(cols_to_map_back) == len(cols_to_map)
+    pre_col_names = row_keys + cols_to_map
+    assert len(pre_col_names) == len(set(pre_col_names))
+    mid_col_names = row_keys + [col_name_key, col_value_key, mapped_value_key]
+    assert len(mid_col_names) == len(set(mid_col_names))
+    if cols_to_map_back is None:
+        post_col_names = row_keys + cols_to_map
+    else:
+        post_col_names = row_keys + cols_to_map_back
+    assert len(post_col_names) == len(set(post_col_names))
     record_map_to = melt_specification(
         row_keys=row_keys,
         col_name_key=col_name_key,
@@ -62,6 +77,11 @@ def def_multi_column_map(
                 jointype='left',
                 by=[col_name_key, col_value_key],
                 )
-            .convert_records(record_map_back)
         )
+    if coalesce_value is not None:
+        ops = ops.extend({mapped_value_key: f'{mapped_value_key}.coalesce({coalesce_value})'})
+    ops = ops.convert_records(record_map_back)
+    if cols_to_map_back is not None:
+        # could do this in the record mapping, but this seems easier to read
+        ops = ops.rename_columns({new_name: old_name for new_name, old_name in zip(cols_to_map_back, cols_to_map)})
     return ops

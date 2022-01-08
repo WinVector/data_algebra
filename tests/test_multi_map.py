@@ -1,5 +1,4 @@
 
-import numpy as np
 from data_algebra.data_ops import descr
 from data_algebra.solutions import def_multi_column_map
 import data_algebra.test_util
@@ -28,13 +27,15 @@ def test_multi_map():
         mapping_table=descr(m=m),
         row_keys=row_keys,
         cols_to_map=cols_to_map,
+        coalesce_value=0.0,
+        cols_to_map_back=[f'{c}_mapped' for c in cols_to_map],
     )
     res = ops.eval({'d': d, 'm': m})
 
     expect = pd.DataFrame({
         'id': [1, 2, 3, 4],
-        'va': [1.0, 2.0, 1.0, np.nan],
-        'vb': [3.0, 3.0, np.nan, 4.0],
+        'va_mapped': [1.0, 2.0, 1.0, 0.0],
+        'vb_mapped': [3.0, 3.0, 0.0, 4.0],
     })
 
     assert data_algebra.test_util.equivalent_frames(res, expect)
