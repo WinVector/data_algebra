@@ -104,6 +104,7 @@ def xicor_query(
     where r(i) is the rank of the i-th Y item when ordered by x, and l(i) is the reverse rank of
     the l-th Y item.
 
+    :param data: description of data to transform
     :param x_name: name for explanatory variable column.
     :param y_name: name for dependent variable column.
     :param var_keys: list of names for variable id columns.
