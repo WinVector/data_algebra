@@ -109,7 +109,10 @@
                     <a class="function" href="#pivot_rowrecs_to_blocks">pivot_rowrecs_to_blocks</a>
             </li>
             <li>
-                    <a class="function" href="#melt_specification">melt_specification</a>
+                    <a class="function" href="#pivot_specification">pivot_specification</a>
+            </li>
+            <li>
+                    <a class="function" href="#unpivot_specification">unpivot_specification</a>
             </li>
     </ul>
 
@@ -838,7 +841,7 @@
     <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">map_from_rows</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">melt_specification</span><span class="p">(</span>
+<span class="k">def</span> <span class="nf">pivot_specification</span><span class="p">(</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;column_name&#39;</span><span class="p">,</span>
@@ -846,7 +849,45 @@
         <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecordMap</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Specify the cdata transformation that melts records into a single column of values plus keys.</span>
+<span class="sd">    Specify the cdata transformation that pivots records from a single column of values into collected rows.</span>
+<span class="sd">    https://en.wikipedia.org/wiki/Pivot_table#History</span>
+
+<span class="sd">    :param row_keys: columns that identify rows in the incoming data set</span>
+<span class="sd">    :param col_name_key: column name to take the names of columns as a column</span>
+<span class="sd">    :param col_value_key: column name to take the values in columns as a column</span>
+<span class="sd">    :param value_cols: columns to place values in</span>
+<span class="sd">    :return: RecordSpecification</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_cols</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="n">value_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">value_cols</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="n">row_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">row_keys</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_name_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_value_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="n">known_cols</span> <span class="o">=</span> <span class="n">row_keys</span> <span class="o">+</span> <span class="p">[</span><span class="n">col_name_key</span><span class="p">,</span> <span class="n">col_value_key</span><span class="p">]</span> <span class="o">+</span> <span class="n">value_cols</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">known_cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">known_cols</span><span class="p">))</span>
+    <span class="n">record_map</span> <span class="o">=</span> <span class="n">RecordMap</span><span class="p">(</span>
+        <span class="n">blocks_in</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
+            <span class="n">control_table</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">pandas_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+                <span class="n">col_name_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
+                <span class="n">col_value_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
+            <span class="p">}),</span>
+            <span class="n">record_keys</span><span class="o">=</span><span class="n">row_keys</span><span class="p">,</span>
+            <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">col_name_key</span><span class="p">])</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">record_map</span>
+
+
+<span class="k">def</span> <span class="nf">unpivot_specification</span><span class="p">(</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;column_name&#39;</span><span class="p">,</span>
+        <span class="n">col_value_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;column_value&#39;</span><span class="p">,</span>
+        <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecordMap</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Specify the cdata transformation that un-pivots records into a single column of values plus keys.</span>
+<span class="sd">    https://en.wikipedia.org/wiki/Pivot_table#History</span>
 
 <span class="sd">    :param row_keys: columns that identify rows in the incoming data set</span>
 <span class="sd">    :param col_name_key: column name to land the names of columns as a column</span>
@@ -2463,12 +2504,12 @@
 
 
                 </section>
-                <section id="melt_specification">
-                            <div class="attr function"><a class="headerlink" href="#melt_specification">#&nbsp;&nbsp</a>
+                <section id="pivot_specification">
+                            <div class="attr function"><a class="headerlink" href="#pivot_specification">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">melt_specification</span><span class="signature">(
+            <span class="name">pivot_specification</span><span class="signature">(
     *,
     row_keys: Iterable[str],
     col_name_key: str = &#39;column_name&#39;,
@@ -2479,7 +2520,7 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">melt_specification</span><span class="p">(</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">pivot_specification</span><span class="p">(</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;column_name&#39;</span><span class="p">,</span>
@@ -2487,7 +2528,75 @@
         <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecordMap</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Specify the cdata transformation that melts records into a single column of values plus keys.</span>
+<span class="sd">    Specify the cdata transformation that pivots records from a single column of values into collected rows.</span>
+<span class="sd">    https://en.wikipedia.org/wiki/Pivot_table#History</span>
+
+<span class="sd">    :param row_keys: columns that identify rows in the incoming data set</span>
+<span class="sd">    :param col_name_key: column name to take the names of columns as a column</span>
+<span class="sd">    :param col_value_key: column name to take the values in columns as a column</span>
+<span class="sd">    :param value_cols: columns to place values in</span>
+<span class="sd">    :return: RecordSpecification</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_cols</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="n">value_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">value_cols</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="n">row_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">row_keys</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_name_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_value_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="n">known_cols</span> <span class="o">=</span> <span class="n">row_keys</span> <span class="o">+</span> <span class="p">[</span><span class="n">col_name_key</span><span class="p">,</span> <span class="n">col_value_key</span><span class="p">]</span> <span class="o">+</span> <span class="n">value_cols</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">known_cols</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">known_cols</span><span class="p">))</span>
+    <span class="n">record_map</span> <span class="o">=</span> <span class="n">RecordMap</span><span class="p">(</span>
+        <span class="n">blocks_in</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
+            <span class="n">control_table</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">pandas_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+                <span class="n">col_name_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
+                <span class="n">col_value_key</span><span class="p">:</span> <span class="n">value_cols</span><span class="p">,</span>
+            <span class="p">}),</span>
+            <span class="n">record_keys</span><span class="o">=</span><span class="n">row_keys</span><span class="p">,</span>
+            <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="n">col_name_key</span><span class="p">])</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">record_map</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Specify the cdata transformation that pivots records from a single column of values into collected rows.
+https://en.wikipedia.org/wiki/Pivot_table#History</p>
+
+<p>:param row_keys: columns that identify rows in the incoming data set
+:param col_name_key: column name to take the names of columns as a column
+:param col_value_key: column name to take the values in columns as a column
+:param value_cols: columns to place values in
+:return: RecordSpecification</p>
+</div>
+
+
+                </section>
+                <section id="unpivot_specification">
+                            <div class="attr function"><a class="headerlink" href="#unpivot_specification">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">unpivot_specification</span><span class="signature">(
+    *,
+    row_keys: Iterable[str],
+    col_name_key: str = &#39;column_name&#39;,
+    col_value_key: str = &#39;column_value&#39;,
+    value_cols: Iterable[str]
+) -&gt; <a href="#RecordMap">data_algebra.cdata.RecordMap</a></span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">unpivot_specification</span><span class="p">(</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">row_keys</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">col_name_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;column_name&#39;</span><span class="p">,</span>
+        <span class="n">col_value_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;column_value&#39;</span><span class="p">,</span>
+        <span class="n">value_cols</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecordMap</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Specify the cdata transformation that un-pivots records into a single column of values plus keys.</span>
+<span class="sd">    https://en.wikipedia.org/wiki/Pivot_table#History</span>
 
 <span class="sd">    :param row_keys: columns that identify rows in the incoming data set</span>
 <span class="sd">    :param col_name_key: column name to land the names of columns as a column</span>
@@ -2517,7 +2626,8 @@
 
         </details>
 
-            <div class="docstring"><p>Specify the cdata transformation that melts records into a single column of values plus keys.</p>
+            <div class="docstring"><p>Specify the cdata transformation that un-pivots records into a single column of values plus keys.
+https://en.wikipedia.org/wiki/Pivot_table#History</p>
 
 <p>:param row_keys: columns that identify rows in the incoming data set
 :param col_name_key: column name to land the names of columns as a column

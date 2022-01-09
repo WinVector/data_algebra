@@ -8,7 +8,7 @@ from typing import Iterable, Optional
 import numpy
 import data_algebra
 from data_algebra.data_ops import descr, ViewRepresentation
-from data_algebra.cdata import melt_specification, RecordMap, RecordSpecification
+from data_algebra.cdata import pivot_specification, unpivot_specification, RecordMap, RecordSpecification
 
 
 def def_multi_column_map(
@@ -60,16 +60,16 @@ def def_multi_column_map(
     else:
         post_col_names = row_keys + cols_to_map_back
     assert len(post_col_names) == len(set(post_col_names))
-    record_map_to = melt_specification(
+    record_map_to = unpivot_specification(
         row_keys=row_keys,
         col_name_key=col_name_key,
         col_value_key=col_value_key,
         value_cols=cols_to_map)
-    record_map_back = melt_specification(
+    record_map_back = pivot_specification(
         row_keys=row_keys,
         col_name_key=col_name_key,
         col_value_key=mapped_value_key,
-        value_cols=cols_to_map).inverse()
+        value_cols=cols_to_map)
     ops = (
         d
             .select_columns(row_keys + cols_to_map)

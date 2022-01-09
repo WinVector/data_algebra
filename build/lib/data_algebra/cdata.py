@@ -704,7 +704,7 @@ def pivot_rowrecs_to_blocks(
     return ct.map_from_rows()
 
 
-def melt_specification(
+def pivot_specification(
         *,
         row_keys: Iterable[str],
         col_name_key: str = 'column_name',
@@ -712,7 +712,45 @@ def melt_specification(
         value_cols: Iterable[str]
 ) -> RecordMap:
     """
-    Specify the cdata transformation that melts records into a single column of values plus keys.
+    Specify the cdata transformation that pivots records from a single column of values into collected rows.
+    https://en.wikipedia.org/wiki/Pivot_table#History
+
+    :param row_keys: columns that identify rows in the incoming data set
+    :param col_name_key: column name to take the names of columns as a column
+    :param col_value_key: column name to take the values in columns as a column
+    :param value_cols: columns to place values in
+    :return: RecordSpecification
+    """
+    assert not isinstance(value_cols, str)
+    value_cols = list(value_cols)
+    assert not isinstance(row_keys, str)
+    row_keys = list(row_keys)
+    assert isinstance(col_name_key, str)
+    assert isinstance(col_value_key, str)
+    known_cols = row_keys + [col_name_key, col_value_key] + value_cols
+    assert len(known_cols) == len(set(known_cols))
+    record_map = RecordMap(
+        blocks_in=RecordSpecification(
+            control_table=data_algebra.pandas_model.pd.DataFrame({
+                col_name_key: value_cols,
+                col_value_key: value_cols,
+            }),
+            record_keys=row_keys,
+            control_table_keys=[col_name_key])
+        )
+    return record_map
+
+
+def unpivot_specification(
+        *,
+        row_keys: Iterable[str],
+        col_name_key: str = 'column_name',
+        col_value_key: str = 'column_value',
+        value_cols: Iterable[str]
+) -> RecordMap:
+    """
+    Specify the cdata transformation that un-pivots records into a single column of values plus keys.
+    https://en.wikipedia.org/wiki/Pivot_table#History
 
     :param row_keys: columns that identify rows in the incoming data set
     :param col_name_key: column name to land the names of columns as a column
