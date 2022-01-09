@@ -133,3 +133,19 @@ def test_xicor():
         db_handle.drop_table("rep_frame")
         db_handle.drop_table("xicor")
         db_handle.close()
+
+
+def test_xicor_frame_calc():
+    df = data_algebra.default_data_model.pd.DataFrame({'x1': [1, 2, 3], 'x2': [1, 1, 2], 'y': [1, 2, 3]})
+    ops, rep_frame_name, rep_frame = data_algebra.solutions.xicor_score_variables_plan(
+        descr(df=df),
+        x_vars=['x1', 'x2'],
+        y_name='y',
+    )
+    res = ops.eval({'df': df, rep_frame_name: rep_frame})
+    expect = data_algebra.default_data_model.pd.DataFrame({
+        'variable_name': ['x1', 'x2'],
+        'xicor_mean': [0.25, 0.1],
+        'xicor_std': [0.0, 0.18],
+    })
+    assert data_algebra.test_util.equivalent_frames(res, expect, float_tol=0.1)
