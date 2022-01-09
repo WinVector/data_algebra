@@ -1,4 +1,3 @@
-LICENSE
 README.md
 setup.py
 data_algebra/BigQuery.py

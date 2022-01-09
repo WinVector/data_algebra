@@ -710,7 +710,7 @@ def melt_specification(
         col_name_key: str = 'column_name',
         col_value_key: str = 'column_value',
         value_cols: Iterable[str]
-) -> RecordSpecification:
+) -> RecordMap:
     """
     Specify the cdata transformation that melts records into a single column of values plus keys.
 
@@ -721,7 +721,7 @@ def melt_specification(
     :return: RecordSpecification
     """
     assert not isinstance(value_cols, str)
-    cols = list(value_cols)
+    value_cols = list(value_cols)
     assert not isinstance(row_keys, str)
     row_keys = list(row_keys)
     assert isinstance(col_name_key, str)
@@ -731,8 +731,8 @@ def melt_specification(
     record_map = RecordMap(
         blocks_out=RecordSpecification(
             control_table=data_algebra.pandas_model.pd.DataFrame({
-                col_name_key: cols,
-                col_value_key: cols,
+                col_name_key: value_cols,
+                col_value_key: value_cols,
             }),
             record_keys=row_keys,
             control_table_keys=[col_name_key])
