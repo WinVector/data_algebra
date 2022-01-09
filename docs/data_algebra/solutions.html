@@ -224,6 +224,7 @@
         <span class="o">*</span><span class="p">,</span>
         <span class="n">x_vars</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">y_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">n_rep</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set up a query to batch compute xicor.</span>
@@ -231,6 +232,7 @@
 <span class="sd">    :param d: description of incoming data frame</span>
 <span class="sd">    :param x_vars: list of explanatory variable names</span>
 <span class="sd">    :param y_name: name of dependent variable</span>
+<span class="sd">    :param n_rep: number of times to repeat calculation</span>
 <span class="sd">    :return: group_calc_ops, rep_frame_name, rep_frame</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x_vars</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
@@ -243,6 +245,7 @@
     <span class="n">d_col_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">y_name</span> <span class="ow">in</span> <span class="n">d_col_set</span>
     <span class="k">assert</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="n">c</span> <span class="ow">in</span> <span class="n">d_col_set</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">x_vars</span><span class="p">])</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n_rep</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
     <span class="n">record_map</span> <span class="o">=</span> <span class="n">RecordMap</span><span class="p">(</span>
         <span class="n">blocks_out</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
             <span class="n">control_table</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">pandas_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
@@ -254,7 +257,7 @@
             <span class="n">record_keys</span><span class="o">=</span><span class="p">[],</span>
             <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;variable_name&#39;</span><span class="p">])</span>
     <span class="p">)</span>
-    <span class="n">rep_frame</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;rep&#39;</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">)})</span>
+    <span class="n">rep_frame</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;rep&#39;</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_rep</span><span class="p">)})</span>
     <span class="n">grouped_calc</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">xicor_query</span><span class="p">(</span>
             <span class="n">d</span>
@@ -507,7 +510,8 @@ the l-th Y item.</p>
     d: <a href="data_ops.html#ViewRepresentation">data_algebra.data_ops.ViewRepresentation</a>,
     *,
     x_vars: Iterable[str],
-    y_name: str
+    y_name: str,
+    n_rep: int = 25
 )</span>:
     </div>
 
@@ -518,6 +522,7 @@ the l-th Y item.</p>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">x_vars</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">y_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">n_rep</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set up a query to batch compute xicor.</span>
@@ -525,6 +530,7 @@ the l-th Y item.</p>
 <span class="sd">    :param d: description of incoming data frame</span>
 <span class="sd">    :param x_vars: list of explanatory variable names</span>
 <span class="sd">    :param y_name: name of dependent variable</span>
+<span class="sd">    :param n_rep: number of times to repeat calculation</span>
 <span class="sd">    :return: group_calc_ops, rep_frame_name, rep_frame</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x_vars</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
@@ -537,6 +543,7 @@ the l-th Y item.</p>
     <span class="n">d_col_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">y_name</span> <span class="ow">in</span> <span class="n">d_col_set</span>
     <span class="k">assert</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="n">c</span> <span class="ow">in</span> <span class="n">d_col_set</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">x_vars</span><span class="p">])</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n_rep</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
     <span class="n">record_map</span> <span class="o">=</span> <span class="n">RecordMap</span><span class="p">(</span>
         <span class="n">blocks_out</span><span class="o">=</span><span class="n">RecordSpecification</span><span class="p">(</span>
             <span class="n">control_table</span><span class="o">=</span><span class="n">data_algebra</span><span class="o">.</span><span class="n">pandas_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
@@ -548,7 +555,7 @@ the l-th Y item.</p>
             <span class="n">record_keys</span><span class="o">=</span><span class="p">[],</span>
             <span class="n">control_table_keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;variable_name&#39;</span><span class="p">])</span>
     <span class="p">)</span>
-    <span class="n">rep_frame</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;rep&#39;</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">)})</span>
+    <span class="n">rep_frame</span> <span class="o">=</span> <span class="n">data_algebra</span><span class="o">.</span><span class="n">default_data_model</span><span class="o">.</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;rep&#39;</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_rep</span><span class="p">)})</span>
     <span class="n">grouped_calc</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">xicor_query</span><span class="p">(</span>
             <span class="n">d</span>
@@ -576,6 +583,7 @@ the l-th Y item.</p>
 <p>:param d: description of incoming data frame
 :param x_vars: list of explanatory variable names
 :param y_name: name of dependent variable
+:param n_rep: number of times to repeat calculation
 :return: group_calc_ops, rep_frame_name, rep_frame</p>
 </div>
 

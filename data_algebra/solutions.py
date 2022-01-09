@@ -163,6 +163,7 @@ def xicor_score_variables_plan(
         *,
         x_vars: Iterable[str],
         y_name: str,
+        n_rep: int = 25,
 ):
     """
     Set up a query to batch compute xicor.
@@ -170,6 +171,7 @@ def xicor_score_variables_plan(
     :param d: description of incoming data frame
     :param x_vars: list of explanatory variable names
     :param y_name: name of dependent variable
+    :param n_rep: number of times to repeat calculation
     :return: group_calc_ops, rep_frame_name, rep_frame
     """
     assert not isinstance(x_vars, str)
@@ -182,6 +184,7 @@ def xicor_score_variables_plan(
     d_col_set = set(d.column_names)
     assert y_name in d_col_set
     assert numpy.all([c in d_col_set for c in x_vars])
+    assert isinstance(n_rep, int)
     record_map = RecordMap(
         blocks_out=RecordSpecification(
             control_table=data_algebra.pandas_model.pd.DataFrame({
@@ -193,7 +196,7 @@ def xicor_score_variables_plan(
             record_keys=[],
             control_table_keys=['variable_name'])
     )
-    rep_frame = data_algebra.default_data_model.pd.DataFrame({'rep': range(20)})
+    rep_frame = data_algebra.default_data_model.pd.DataFrame({'rep': range(n_rep)})
     grouped_calc = (
         xicor_query(
             d
