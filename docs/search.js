@@ -4,7 +4,7 @@ window.pdocSearch = (function(){
 
     // mirrored in build-search-index.js (part 1)
     // Also split on html tags. this is a cheap heuristic, but good enough.
-    elasticlunr.tokenizer.setSeperator(/[\s\-.;&_]+|<[^>]*>/);
+    elasticlunr.tokenizer.setSeperator(/[\s\-.;&]+|<[^>]*>/);
 
     let searchIndex;
     if (docs._isPrebuiltIndex) {
@@ -14,7 +14,6 @@ window.pdocSearch = (function(){
         console.time("building search index");
         // mirrored in build-search-index.js (part 2)
         searchIndex = elasticlunr(function () {
-            this.pipeline.remove(elasticlunr.stemmer);
             this.addField("qualname");
             this.addField("fullname");
             this.addField("doc");
