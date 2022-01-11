@@ -33,25 +33,14 @@ def test_xicor():
         res_frame = x_y_ops.transform(pd.DataFrame({'x': x, 'y': y}))
         return res_frame['xicor'].values[0]
 
-    # %%
-
     x1 = xicor([1, 2, 3], [1, 2, 3])  # expect 0.25
-    assert x1 == 0.25
-    x1
-
-    # %%
+    assert numpy.abs(x1 - 0.25) < 1e-5
 
     x2 = xicor([1, 2, 3], [3, 2, 1])  # expect 0.25
-    assert x2 == 0.25
-    x2
-
-    # %%
+    assert numpy.abs(x2 - 0.25) < 1e-5
 
     x3 = xicor([1, 2, 3], [1, 3, 2])  # expect -0.125
-    assert x3 == -0.125
-    x3
-
-    # %%
+    assert numpy.abs(x3 - -.125) < 1e-5
 
     def example_to_frame(ei):
         "encode an example into a data frame"
@@ -62,10 +51,6 @@ def test_xicor():
 
     example_frames = [example_to_frame(ei) for ei in range(len(examples))]
     example_frames = pd.concat(example_frames).reset_index(drop=True, inplace=False)
-
-    example_frames
-
-    # %%
 
     rep_frame = pd.DataFrame({
         'rep': range(100)
@@ -90,10 +75,6 @@ def test_xicor():
             .order_rows(['vname'])
     )
     xicor_results = grouped_calc.eval({'d': example_frames, 'rep_frame': rep_frame})
-
-    xicor_results
-
-    # %%
 
     # compare results
     def compare_res(xicor_results_to_check):
